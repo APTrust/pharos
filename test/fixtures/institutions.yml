@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: 
+  brief_name: 
+  identifier: 
+  dpn_uuid: MyString
+
+two:
+  name: 
+  brief_name: 
+  identifier: 
+  dpn_uuid: MyString
