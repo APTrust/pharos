@@ -1,1 +1,1 @@
-# pharos
+# Pharos
