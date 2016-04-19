@@ -1,15 +1,25 @@
-require 'rails_helper'
+require 'spec_helper'
 
-# Specs in this file have access to a helper object that includes
-# the WorkItemsHelper. For example:
-#
-# describe WorkItemsHelper do
-#   describe "string concat" do
-#     it "concats two strings with spaces" do
-#       expect(helper.concat_strings("this","that")).to eq("this that")
-#     end
-#   end
-# end
-RSpec.describe WorkItemsHelper, :type => :helper do
-  pending "add some examples to (or delete) #{__FILE__}"
+describe WorkItemsHelper do
+
+  describe '#current_path' do
+    it 'should return an updated path with new parameters' do
+      helper.request.path = 'localhost:3000/itemresults'
+      name = 'status'
+      value = 'Success'
+      expected_result = 'localhost:3000/itemresults?status=Success'
+      helper.current_path(name, value).should == expected_result
+    end
+
+    it 'should add in search parameters to the search path' do
+      helper.request.path = 'localhost:3000/search'
+      helper.params[:qq] = '34'
+      helper.params[:search_field] = 'Name'
+      name = 'status'
+      value = 'Success'
+      expected_result = 'localhost:3000/?status=Success&search_field=Name&qq=34'
+    end
+  end
+
 end
+
