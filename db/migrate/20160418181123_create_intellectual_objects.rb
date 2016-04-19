@@ -7,6 +7,7 @@ class CreateIntellectualObjects < ActiveRecord::Migration
       t.string :alt_identifier
       t.string :access
       t.string :bag_name
+      t.string :institution
       t.belongs_to :institution, index: true
       t.timestamps null: false
     end

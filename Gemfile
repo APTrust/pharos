@@ -23,7 +23,6 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
-# as an authorization replacement for CanCan
 gem 'pundit'
 gem 'figaro'
 gem 'devise', '3.3.0'

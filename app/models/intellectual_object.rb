@@ -1,9 +1,9 @@
 class IntellectualObject < ActiveRecord::Base
   #include Auditable   # premis events
 
-  belongs_to :institution, property: :is_part_of
-  has_many :generic_files, property: :is_part_of
-  has_many :events, property: :is_part_of
+  belongs_to :institution
+  has_many :generic_files
+  has_many :events
   accepts_nested_attributes_for :generic_files
 
   # has_attributes :title, :access, :description, :identifier, :bag_name, datastream: 'descMetadata', multiple: false

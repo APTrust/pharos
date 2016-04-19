@@ -14,6 +14,8 @@ class User < ActiveRecord::Base
   validates :email, uniqueness: true
   validates :institution_pid, presence: true
   validate :institution_pid_points_at_institution
+  belongs_to :institution
+  has_many :roles
 
   # Custom format validations.  See app/validators
   validates :name, person_name_format: true, if: ->{ name.present? }
@@ -44,10 +46,6 @@ class User < ActiveRecord::Base
     institution.identifier
   end
 
-  # Blacklight uses #to_s on youruser class to get a user-displayable
-  # login/identifier for the account.
-  #
-  # Method modified from the Blacklight default.
   def to_s
     name || email
   end
@@ -59,7 +57,6 @@ class User < ActiveRecord::Base
     json_data
   end
 
-  # Roles are managed through the hydra-role-management gem.
   def is?(role)
     self.roles.pluck(:name).include?(role.to_s)
   end
@@ -96,20 +93,10 @@ class User < ActiveRecord::Base
     end
   end
 
-  # Since an Institution is an ActiveFedora Object, these two objects cannot be related as normal (i.e. belongs_to)
-  # They will be connected through the User.institution_pid.
-  # TODO: change this - they can be related directly now
-  def institution
-    @institution ||= Institution.find(self.institution_pid)
-  end
-
   def institution_group_suffix
-    clean_for_solr(institution_pid)
+    institution_pid
   end
 
-  # Guest users are disabled in this application.  The default Blacklight installation includes the gem devise-guests
-  # which is not bundled with this app.  hydra-role-management gem requires a guest boolean, so we must provide it here.
-  # This will be fixed in hydra-role-management 0.1.1
   def guest?
     false
   end

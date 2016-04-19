@@ -5,6 +5,7 @@ class CreateGenericFiles < ActiveRecord::Migration
       t.string :uri
       t.long :size
       t.string :identifier
+      t.string :intellectual_object
       t.belongs_to :intellectual_object, index: true
       t.timestamps null: false
     end

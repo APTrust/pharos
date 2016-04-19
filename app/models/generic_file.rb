@@ -1,9 +1,9 @@
 class GenericFile < ActiveRecord::Base
   #include Auditable   # premis events
 
-  belongs_to :intellectual_object, property: :is_part_of
-  has_many :events, property: :is_part_of
-  has_many :checksums, property: :is_part_of
+  belongs_to :intellectual_object
+  has_many :events
+  has_many :checksums
 
   validates_presence_of :uri
   validates_presence_of :size
