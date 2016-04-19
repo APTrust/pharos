@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :checksum do
-    algorithm ''
-    datetime ''
-    digest 'MyString'
+    algorithm 'sha256'
+    datetime Time.now.to_s
+    digest SecureRandom.hex
   end
 end
