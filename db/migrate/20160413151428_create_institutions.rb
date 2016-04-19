@@ -5,7 +5,6 @@ class CreateInstitutions < ActiveRecord::Migration
       t.string :brief_name
       t.string :identifier
       t.string :dpn_uuid
-
       t.timestamps null: false
     end
   end

@@ -10,7 +10,8 @@ class CreateEvents < ActiveRecord::Migration
       t.string :event_outcome_information
       t.string :event_object
       t.string :event_agent
-
+      t.belongs_to :intellectual_object, index: true
+      t.belongs_to :generic_file, index: true
       t.timestamps null: false
     end
   end

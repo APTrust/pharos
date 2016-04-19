@@ -1,8 +1,8 @@
 class Institution < ActiveRecord::Base
 
   has_many :intellectual_objects, property: :is_part_of
-
-  has_attributes :name, :brief_name, :identifier, :dpn_uuid, multiple: false
+  has_many :users, property: :is_part_of
+  #has_attributes :name, :brief_name, :identifier, :dpn_uuid, multiple: false
 
   validates :name, :identifier, presence: true
   validate :name_is_unique

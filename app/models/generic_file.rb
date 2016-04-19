@@ -2,9 +2,8 @@ class GenericFile < ActiveRecord::Base
   #include Auditable   # premis events
 
   belongs_to :intellectual_object, property: :is_part_of
-
-  has_attributes :uri, :size, :file_format, :created, :modified, :identifier, datastream: 'techMetadata', multiple: false
-  delegate :checksum_attributes=, :checksum, to: :techMetadata
+  has_many :events, property: :is_part_of
+  has_many :checksums, property: :is_part_of
 
   validates_presence_of :uri
   validates_presence_of :size

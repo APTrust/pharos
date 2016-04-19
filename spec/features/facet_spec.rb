@@ -6,8 +6,6 @@ describe 'Faceting' do
     Institution.destroy_all
     GenericFile.destroy_all
     IntellectualObject.destroy_all
-    solr = ActiveFedora::SolrService.instance.conn
-    solr.delete_by_query('*:*', params: { commit: true })
   end
 
   describe 'Logged in as institutional_admin' do

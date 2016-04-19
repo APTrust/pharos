@@ -4,7 +4,7 @@ class CreateChecksums < ActiveRecord::Migration
       t.string :algorithm
       t.string :datetime
       t.string :digest
-
+      t.belongs_to :generic_file, index: true
       t.timestamps null: false
     end
   end
