@@ -25,7 +25,7 @@ class GenericFile < ActiveRecord::Base
 
   def find_latest_fixity_check
     fixity = ''
-    PremisEvents.events.each do |event|
+    Event.events.each do |event|
       if event.type.first == 'fixity_check'
         if fixity == '' || fixity == nil? || DateTime.parse(fixity.to_s) < DateTime.parse(event.date_time.to_s)
           fixity = DateTime.parse(event.date_time.to_s)
@@ -35,6 +35,7 @@ class GenericFile < ActiveRecord::Base
     fixity
   end
 
+  # TODO: check on find_with_conditions
   def self.find_files_in_need_of_fixity(date, options={})
     rows = options[:rows] || 10
     start = options[:start] || 0
@@ -111,7 +112,7 @@ class GenericFile < ActiveRecord::Base
     }
     if options.has_key?(:include)
       data.merge!(checksum: serialize_checksums) if options[:include].include?(:checksum)
-      data.merge!(premisEvents: serialize_events) if options[:include].include?(:premisEvents)
+      data.merge!(premisEvents: serialize_events) if options[:include].include?(:Event)
     end
     data
   end
@@ -127,7 +128,7 @@ class GenericFile < ActiveRecord::Base
   end
 
   def serialize_events
-    premisEvents.events.map do |event|
+    events.map do |event|
       event.serializable_hash
     end
   end
