@@ -1,0 +1,2 @@
+class PremisEventsController < ApplicationController
+end

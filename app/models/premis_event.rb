@@ -1,3 +1,3 @@
-class Event < ActiveRecord::Base
+class PremisEvent < ActiveRecord::Base
   # TODO: turn this into an actual class
 end

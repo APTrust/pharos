@@ -2,7 +2,7 @@ class GenericFile < ActiveRecord::Base
   #include Auditable   # premis events
 
   belongs_to :intellectual_object
-  has_many :events
+  has_many :premis_events
   has_many :checksums
 
   validates_presence_of :uri
@@ -25,7 +25,7 @@ class GenericFile < ActiveRecord::Base
 
   def find_latest_fixity_check
     fixity = ''
-    Event.events.each do |event|
+    PremisEvent.events.each do |event|
       if event.type.first == 'fixity_check'
         if fixity == '' || fixity == nil? || DateTime.parse(fixity.to_s) < DateTime.parse(event.date_time.to_s)
           fixity = DateTime.parse(event.date_time.to_s)
@@ -112,7 +112,7 @@ class GenericFile < ActiveRecord::Base
     }
     if options.has_key?(:include)
       data.merge!(checksum: serialize_checksums) if options[:include].include?(:checksum)
-      data.merge!(premisEvents: serialize_events) if options[:include].include?(:Event)
+      data.merge!(premisEvents: serialize_events) if options[:include].include?(:PremisEvent)
     end
     data
   end

@@ -6,7 +6,7 @@ describe 'Routes for Events' do
     expect(
         post: 'events/apt.org/123/data/file.pdf'
     ).to(
-        route_to(controller: 'events',
+        route_to(controller: 'premis_events',
                  action: 'create',
                  generic_file_identifier: 'apt.org/123/data/file.pdf'
         )
@@ -17,7 +17,7 @@ describe 'Routes for Events' do
     expect(
         get: 'events/apt.org/123/data/file.pdf'
     ).to(
-        route_to(controller: 'events',
+        route_to(controller: 'premis_events',
                  action: 'index',
                  generic_file_identifier: 'apt.org/123/data/file.pdf'
         )
@@ -28,7 +28,7 @@ describe 'Routes for Events' do
     expect(
         post: 'events/apt.org/123'
     ).to(
-        route_to(controller: 'events',
+        route_to(controller: 'premis_events',
                  action: 'create',
                  intellectual_object_identifier: 'apt.org/123'
         )
@@ -39,7 +39,7 @@ describe 'Routes for Events' do
     expect(
         get: 'events/apt.org/123'
     ).to(
-        route_to(controller: 'events',
+        route_to(controller: 'premis_events',
                  action: 'index',
                  intellectual_object_identifier: 'apt.org/123'
         )
@@ -50,7 +50,7 @@ describe 'Routes for Events' do
     expect(
         get: 'events/testinst.com'
     ).to(
-        route_to(controller: 'events',
+        route_to(controller: 'premis_events',
                  action: 'index',
                  institution_identifier: 'testinst.com'
         )

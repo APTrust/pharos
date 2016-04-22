@@ -3,7 +3,7 @@ class IntellectualObject < ActiveRecord::Base
 
   belongs_to :institution
   has_many :generic_files
-  has_many :events
+  has_many :premis_events
   accepts_nested_attributes_for :generic_files
 
   # has_attributes :title, :access, :description, :identifier, :bag_name, datastream: 'descMetadata', multiple: false

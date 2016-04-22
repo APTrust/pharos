@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EventsHelper do
+describe PremisEventsHelper do
 
   let(:id) { '123' }
   let(:uri) { 'uri for file' }

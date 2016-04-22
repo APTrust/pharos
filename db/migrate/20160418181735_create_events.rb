@@ -1,6 +1,6 @@
 class CreateEvents < ActiveRecord::Migration
   def change
-    create_table :events do |t|
+    create_table :premis_events do |t|
       t.string :event_identifier
       t.string :event_type
       t.text :event_outcome
