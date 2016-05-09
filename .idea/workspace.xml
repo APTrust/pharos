@@ -35,45 +35,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="intellectual_objects_controller.rb" pinned="false" current-in-tab="false">
+      <file leaf-file-name="intellectual_objects_controller.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/controllers/intellectual_objects_controller.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="14.346154" vertical-offset="4378" max-vertical-offset="5625">
+            <state vertical-scroll-proportion="-0.6311337" vertical-offset="4378" max-vertical-offset="5625">
               <caret line="267" column="5" selection-start-line="267" selection-start-column="5" selection-end-line="267" selection-end-column="5" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="work_items_controller.rb" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/controllers/work_items_controller.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3922204" vertical-offset="2428" max-vertical-offset="3795">
-              <caret line="213" column="5" selection-start-line="213" selection-start-column="5" selection-end-line="213" selection-end-column="5" />
-              <folding>
-                <element signature="e#5779#7533#0" expanded="false" />
-                <element signature="e#8570#8896#0" expanded="false" />
-                <element signature="e#9373#10379#0" expanded="false" />
-                <element signature="e#10383#10513#0" expanded="false" />
-                <element signature="e#10518#11175#0" expanded="false" />
-                <element signature="e#11179#11876#0" expanded="false" />
-                <element signature="e#11891#12006#0" expanded="false" />
-                <element signature="e#12010#12258#0" expanded="false" />
-                <element signature="e#12262#12624#0" expanded="false" />
-                <element signature="e#12628#13359#0" expanded="false" />
-                <element signature="e#13363#13758#0" expanded="false" />
-                <element signature="e#13762#14087#0" expanded="false" />
-                <element signature="e#14091#14255#0" expanded="false" />
-                <element signature="e#14259#15219#0" expanded="false" />
-                <element signature="e#15323#15816#0" expanded="false" />
-                <element signature="e#15926#17202#0" expanded="false" />
-                <element signature="e#17206#17513#0" expanded="false" />
-                <element signature="e#17517#17605#0" expanded="false" />
-                <element signature="e#17609#17652#0" expanded="false" />
-                <element signature="e#17656#17931#0" expanded="false" />
-                <element signature="e#17935#18193#0" expanded="false" />
-                <element signature="e#18197#19073#0" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -940,17 +907,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/intellectual_objects_controller.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="14.346154" vertical-offset="4378" max-vertical-offset="5625">
-          <caret line="267" column="5" selection-start-line="267" selection-start-column="5" selection-end-line="267" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/work_items_controller.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3922204" vertical-offset="2428" max-vertical-offset="3795">
+        <state vertical-scroll-proportion="4.3273907" vertical-offset="0" max-vertical-offset="3795">
           <caret line="213" column="5" selection-start-line="213" selection-start-column="5" selection-end-line="213" selection-end-column="5" />
           <folding>
             <element signature="e#5779#7533#0" expanded="false" />
@@ -976,6 +935,14 @@
             <element signature="e#17935#18193#0" expanded="false" />
             <element signature="e#18197#19073#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/intellectual_objects_controller.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.6311337" vertical-offset="4378" max-vertical-offset="5625">
+          <caret line="267" column="5" selection-start-line="267" selection-start-column="5" selection-end-line="267" selection-end-column="5" />
+          <folding />
         </state>
       </provider>
     </entry>
