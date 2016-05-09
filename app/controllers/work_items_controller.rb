@@ -120,6 +120,40 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  def authoritative_index
+    current_action = params[:current_action]
+    delete = Fluctus::Application::FLUCTUS_ACTIONS['delete']
+    restore = Fluctus::Application::FLUCTUS_ACTIONS['restore']
+    dpn = Fluctus::Application::FLUCTUS_ACTIONS['dpn']
+    requested = Fluctus::Application::FLUCTUS_STAGES['requested']
+    pending = Fluctus::Application::FLUCTUS_STATUSES['pend']
+    failed = Fluctus::Application::FLUCTUS_STATUSES['fail']
+    case current_action
+    when 'delete'
+      @items = WorkItem.where(action: delete)
+    when 'restore'
+      @items = WorkItem.where(action: restore)
+    when 'dpn'
+      @items = WorkItem.where(action: dpn)
+    end
+
+    if current_action == delete
+      !request[:generic_file_identifier].blank? ?
+          @items = @items.where(generic_file_identifier: request[:generic_file_identifier]) :
+          @items = @items.where(stage: requested, status: [pending, failed], retry: true)
+    else
+      !request[:object_identifier].blank? ?
+          @items = @items.where(object_identifier: request[:object_identifier]) :
+          @items = @items.where(stage: requested, status: pending, retry: true)
+    end
+    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
+    authorize @items
+
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
   def api_index
     if current_user.admin?
       params[:institution].present? ? @items = WorkItem.where(institution: params[:institution]) : @items = WorkItem.all
@@ -178,93 +212,6 @@ class WorkItemsController < ApplicationController
       end
     end
   end
-
-  # get '/api/v1/itemresults/items_for_restore'
-  # Returns a list of items the users have requested
-  # to be queued for restoration. These will always be
-  # IntellectualObjects. If param object_identifier is supplied,
-  # it returns all restoration requests for the object. Otherwise,
-  # it returns pending requests for all objects where retry is true.
-  # (This is because retry gets set to false when the restorer encounters
-  # some fatal error. There is no sense in reprocessing those requests.)
-  def items_for_restore
-    restore = Fluctus::Application::FLUCTUS_ACTIONS['restore']
-    requested = Fluctus::Application::FLUCTUS_STAGES['requested']
-    pending = Fluctus::Application::FLUCTUS_STATUSES['pend']
-    @items = WorkItem.where(action: restore)
-    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items
-    # Get items for a single object, which may consist of multiple bags.
-    # Return anything for that object identifier with action=Restore and retry=true
-    if !request[:object_identifier].blank?
-      @items = @items.where(object_identifier: request[:object_identifier])
-    else
-      # If user is not looking for a single bag, return all requested/pending items.
-      @items = @items.where(stage: requested, status: pending, retry: true)
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
-
-  # get '/api/v1/itemresults/items_for_dpn'
-  # Returns a list of items the users have requested
-  # to be queued for DPN. These will always be
-  # IntellectualObjects. If param object_identifier is supplied,
-  # it returns all DPN requests for the object. Otherwise,
-  # it returns pending requests for all objects where retry is true.
-  # (This is because retry gets set to false when the requestor encounters
-  # some fatal error. There is no sense in reprocessing those requests.)
-  def items_for_dpn
-    dpn = Fluctus::Application::FLUCTUS_ACTIONS['dpn']
-    requested = Fluctus::Application::FLUCTUS_STAGES['requested']
-    pending = Fluctus::Application::FLUCTUS_STATUSES['pend']
-    @items = WorkItem.where(action: dpn)
-    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items
-    # Get items for a single object, which may consist of multiple bags.
-    # Return anything for that object identifier with action=DPN and retry=true
-    if !request[:object_identifier].blank?
-      @items = @items.where(object_identifier: request[:object_identifier])
-    else
-      # If user is not looking for a single bag, return all requested/pending items.
-      @items = @items.where(stage: requested, status: pending, retry: true)
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
-
-
-  # get '/api/v1/itemresults/items_for_delete'
-  # Returns a list of items the users have requested
-  # to be queued for deletion. These items will always represent
-  # GenericFiles. If param generic_file_identifier is supplied,
-  # it returns all deletion requests for the generic file. Otherwise,
-  # it returns pending requests for all items where retry is true.
-  # (This is because retry gets set to false when the restorer encounters
-  # some fatal error. There is no sense in reprocessing those requests.)
-  def items_for_delete
-    delete = Fluctus::Application::FLUCTUS_ACTIONS['delete']
-    requested = Fluctus::Application::FLUCTUS_STAGES['requested']
-    pending = Fluctus::Application::FLUCTUS_STATUSES['pend']
-    failed = Fluctus::Application::FLUCTUS_STATUSES['fail']
-    @items = WorkItem.where(action: delete)
-    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items
-    # Return a record for a single file?
-    if !request[:generic_file_identifier].blank?
-      @items = @items.where(generic_file_identifier: request[:generic_file_identifier])
-    else
-      # If user is not looking for a single bag, return all requested items
-      # where retry is true and status is pending or failed.
-      @items = @items.where(stage: requested, status: [pending, failed], retry: true)
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
-
 
   # post '/api/v1/itemresults/delete_test_items'
   #
