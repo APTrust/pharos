@@ -19,28 +19,30 @@ class User < ActiveRecord::Base
   has_many :roles
 
   # Custom format validations.  See app/validators
-  validates :name, presence: true, if: ->{ name.present? }
+  validates :name, presence: true, if: ->{ name.present? } #TODO: find name validator that actually works
   validates :email, email: true
 
   # Handle and normalize phone numbers
   phony_normalize :phone_number, :default_country_code => 'US'
 
   validates :phone_number, :phony_plausible => true
+  has_many :roles
 
   # This method assigns permission groups
-  def groups
-    super + institution_groups
-  end
-
-  def institution_groups
-    if institutional_admin?
-      ["Admin_At_#{institution_group_suffix}"]
-    elsif institutional_user?
-      ["User_At_#{institution_group_suffix}"]
-    else
-      []
-    end
-  end
+  # Don't think these are necessary anymore, we use Pundit/Roles
+  # def groups
+  #   super + institution_groups
+  # end
+  #
+  # def institution_groups
+  #   if institutional_admin?
+  #     ["Admin_At_#{institution_group_suffix}"]
+  #   elsif institutional_user?
+  #     ["User_At_#{institution_group_suffix}"]
+  #   else
+  #     []
+  #   end
+  # end
 
   def institution_identifier
     institution = Institution.find(self.institution_pid)
