@@ -28,6 +28,7 @@ gem 'figaro'
 gem 'devise', '3.3.0'
 gem 'rake'
 gem 'rename'
+gem 'valid_email'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.0.2'

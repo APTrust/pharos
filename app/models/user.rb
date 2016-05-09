@@ -1,4 +1,5 @@
 require 'bcrypt'
+require 'valid_email'
 
 class User < ActiveRecord::Base
 
@@ -18,7 +19,7 @@ class User < ActiveRecord::Base
   has_many :roles
 
   # Custom format validations.  See app/validators
-  validates :name, person_name_format: true, if: ->{ name.present? }
+  validates :name, presence: true, if: ->{ name.present? }
   validates :email, email: true
 
   # Handle and normalize phone numbers

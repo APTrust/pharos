@@ -4,13 +4,6 @@ class IntellectualObjectsController < ApplicationController
   before_filter :load_object, only: [:show, :edit, :update, :destroy, :restore, :dpn]
   after_action :verify_authorized, :except => [:index, :create, :create_from_json]
 
-  include Aptrust::GatedSearch
-  include RecordsControllerBehavior
-  self.solr_search_params_logic += [:for_selected_institution]
-  self.solr_search_params_logic += [:only_intellectual_objects]
-  self.solr_search_params_logic += [:add_access_controls_to_solr_params]
-  self.solr_search_params_logic += [:only_active_objects]
-
   def index
     authorize @institution
     @intellectual_objects = @institution.intellectual_objects
@@ -272,13 +265,6 @@ class IntellectualObjectsController < ApplicationController
       else
         new_object[attr_name.to_s] = attr_value.to_s
     end
-  end
-
-  # Set the search params for the page return based on the insitution.
-  def for_selected_institution(solr_parameters, user_parameters)
-    return unless params[:institution_identifier]
-    solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << ActiveFedora::SolrService.construct_query_for_rel(is_part_of: "info:fedora/#{@institution.id}")
   end
 
   # Override Blacklight so that it has the "institution_identifier" set even when we're on a show page (e.g. /objects/foo:123)

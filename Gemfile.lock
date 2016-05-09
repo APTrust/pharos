@@ -269,6 +269,9 @@ GEM
     uglifier (3.0.0)
       execjs (>= 0.3.0, < 3)
     uuidtools (2.1.5)
+    valid_email (0.0.13)
+      activemodel
+      mail (~> 2.6.1)
     warden (1.2.3)
       rack (>= 1.0)
     web-console (2.3.0)
@@ -321,6 +324,7 @@ DEPENDENCIES
   turbolinks
   uglifier (>= 1.3.0)
   uuidtools
+  valid_email
   web-console (~> 2.0)
 
 BUNDLED WITH

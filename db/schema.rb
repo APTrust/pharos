@@ -24,25 +24,6 @@ ActiveRecord::Schema.define(version: 20160419173712) do
 
   add_index "checksums", ["generic_file_id"], name: "index_checksums_on_generic_file_id"
 
-  create_table "events", force: :cascade do |t|
-    t.string   "event_identifier"
-    t.string   "event_type"
-    t.text     "event_outcome"
-    t.string   "event_date_time"
-    t.string   "event_outcome_detail"
-    t.string   "event_detail"
-    t.string   "event_outcome_information"
-    t.string   "event_object"
-    t.string   "event_agent"
-    t.integer  "intellectual_object_id"
-    t.integer  "generic_file_id"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  add_index "events", ["generic_file_id"], name: "index_events_on_generic_file_id"
-  add_index "events", ["intellectual_object_id"], name: "index_events_on_intellectual_object_id"
-
   create_table "generic_files", force: :cascade do |t|
     t.string   "file_format"
     t.string   "uri"
@@ -79,6 +60,25 @@ ActiveRecord::Schema.define(version: 20160419173712) do
   end
 
   add_index "intellectual_objects", ["institution_id"], name: "index_intellectual_objects_on_institution_id"
+
+  create_table "premis_events", force: :cascade do |t|
+    t.string   "event_identifier"
+    t.string   "event_type"
+    t.text     "event_outcome"
+    t.string   "event_date_time"
+    t.string   "event_outcome_detail"
+    t.string   "event_detail"
+    t.string   "event_outcome_information"
+    t.string   "event_object"
+    t.string   "event_agent"
+    t.integer  "intellectual_object_id"
+    t.integer  "generic_file_id"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
+  add_index "premis_events", ["intellectual_object_id"], name: "index_premis_events_on_intellectual_object_id"
 
   create_table "roles", force: :cascade do |t|
     t.string   "name"
