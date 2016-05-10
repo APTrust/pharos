@@ -2,47 +2,41 @@ require 'bcrypt'
 require 'valid_email'
 
 class User < ActiveRecord::Base
+  belongs_to :institution
+  has_many :roles
 
   # Include default devise modules. Others available are:
   # :database_authenticatable,
   # :recoverable, :rememberable, :trackable, :validatable,
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :recoverable, :rememberable, :trackable,
-         :timeoutable, :validatable
+  #devise :database_authenticatable, :recoverable, :rememberable, :trackable,
+        # :timeoutable, :validatable
 
   validates :email, :phone_number, :role_ids, presence: true
   validates :email, uniqueness: true
   validates :institution_pid, presence: true
   validate :institution_pid_points_at_institution
-  belongs_to :institution
-  has_many :roles
-
-  # Custom format validations.  See app/validators
   validates :name, presence: true, if: ->{ name.present? } #TODO: find name validator that actually works
   validates :email, email: true
-
-  # Handle and normalize phone numbers
   phony_normalize :phone_number, :default_country_code => 'US'
-
   validates :phone_number, :phony_plausible => true
-  has_many :roles
 
   # This method assigns permission groups
   # Don't think these are necessary anymore, we use Pundit/Roles
-  # def groups
-  #   super + institution_groups
-  # end
-  #
-  # def institution_groups
-  #   if institutional_admin?
-  #     ["Admin_At_#{institution_group_suffix}"]
-  #   elsif institutional_user?
-  #     ["User_At_#{institution_group_suffix}"]
-  #   else
-  #     []
-  #   end
-  # end
+  def groups
+    super + institution_groups
+  end
+
+  def institution_groups
+    if institutional_admin?
+      ["Admin_At_#{institution_group_suffix}"]
+    elsif institutional_user?
+      ["User_At_#{institution_group_suffix}"]
+    else
+      []
+    end
+  end
 
   def institution_identifier
     institution = Institution.find(self.institution_pid)

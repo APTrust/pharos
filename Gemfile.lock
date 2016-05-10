@@ -46,7 +46,7 @@ GEM
     arel (6.0.3)
     aws-sdk-core (2.2.34)
       jmespath (~> 1.0)
-    bcrypt (3.1.10)
+    bcrypt (3.1.11)
     better_errors (2.1.1)
       coderay (>= 1.0.0)
       erubis (>= 2.6.6)
@@ -83,10 +83,11 @@ GEM
       tins (~> 1.6.0)
     currencies (0.4.2)
     debug_inspector (0.0.2)
-    devise (3.3.0)
+    devise (3.4.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
+      responders
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
@@ -272,7 +273,7 @@ GEM
     valid_email (0.0.13)
       activemodel
       mail (~> 2.6.1)
-    warden (1.2.3)
+    warden (1.2.6)
       rack (>= 1.0)
     web-console (2.3.0)
       activemodel (>= 4.0)
@@ -293,7 +294,7 @@ DEPENDENCIES
   capybara (= 2.3.0)
   coffee-rails (~> 4.1.0)
   coveralls
-  devise (= 3.3.0)
+  devise (= 3.4.1)
   factory_girl_rails
   faker!
   figaro

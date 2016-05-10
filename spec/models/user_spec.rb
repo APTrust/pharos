@@ -6,7 +6,7 @@ describe User do
   let(:inst_pid) { subject.institution_pid }
 
   it 'should return a valid institution' do
-    user.institution.pid.should == user.institution_pid
+    user.institution.id.should == user.institution_pid
   end
 
   describe 'as an admin' do
@@ -102,14 +102,14 @@ describe User do
     end
   end
 
-  describe 'session timeout' do
-    it 'defaults to Devise.timeout_in' do
-      user.timeout_in.should eq Devise.timeout_in
-    end
-    it 'can be reset to an integer value' do
-      user.set_session_timeout(1234)
-      user.timeout_in.should eq 1234
-    end
-  end
+  # describe 'session timeout' do
+  #   it 'defaults to Devise.timeout_in' do
+  #     user.timeout_in.should eq Devise.timeout_in
+  #   end
+  #   it 'can be reset to an integer value' do
+  #     user.set_session_timeout(1234)
+  #     user.timeout_in.should eq 1234
+  #   end
+  # end
 
 end

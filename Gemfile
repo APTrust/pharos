@@ -25,7 +25,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '3.3.0'
+gem 'devise', '3.4.1'
 gem 'rake'
 gem 'rename'
 gem 'valid_email'

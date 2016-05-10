@@ -2,20 +2,21 @@ FactoryGirl.define do
   factory :user, class: 'User' do
     name { Faker::Name.name }
     email { Faker::Internet.email }
-    phone_number { Faker::PhoneNumber.phone_number }
-    password { 'password' }
-    institution_pid { FactoryGirl.create(:institution).pid }
+    phone_number { 4344666249 }
+    #phone_number { Faker::PhoneNumber.phone_number } TODO: figure out why this returns invalid phone number
+    #password { 'password' }
+    institution_pid { FactoryGirl.create(:institution).id }
     roles { [Role.where(name: 'public').first_or_create] }
 
     factory :aptrust_user, class: 'User' do
       institution_pid {
-        aptrust_institution = Institution.where(desc_metadata__name_tesim: 'APTrust')
+        aptrust_institution = Institution.where(name: 'APTrust')
         if aptrust_institution.count == 1
           aptrust_institution.first.pid
         elsif aptrust_institution.count > 1
           raise 'There should never be more than one institution with the name APTrust'
         else
-          FactoryGirl.create(:aptrust).pid
+          FactoryGirl.create(:aptrust).id
         end
       }
     end
