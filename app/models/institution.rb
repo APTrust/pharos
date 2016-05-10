@@ -16,11 +16,11 @@ class Institution < ActiveRecord::Base
 
   # Return the users that belong to this institution.  Sorted by name for display purposes primarily.
   def users
-    User.where(institution_pid: self.pid).to_a.sort_by(&:name)
+    User.where(institution_pid: self.id).to_a.sort_by(&:name)
   end
 
   def serializable_hash(options={})
-    { pid: pid, name: name, brief_name: brief_name, identifier: identifier, dpn_uuid: dpn_uuid }
+    { id: id, name: name, brief_name: brief_name, identifier: identifier, dpn_uuid: dpn_uuid }
   end
 
   def bytes_by_format
@@ -47,7 +47,7 @@ class Institution < ActiveRecord::Base
   end
 
   def statistics
-    UsageSample.where(institution_id: pid).map {|sample| sample.to_flot }
+    UsageSample.where(institution_id: id).map {|sample| sample.to_flot }
   end
   private
 
@@ -78,12 +78,12 @@ class Institution < ActiveRecord::Base
   end
 
   def check_for_associations
-    if User.where(institution_pid: self.pid).count != 0
-      errors[:base] << "Cannot delete #{self.name} because some Users are associated with this Insitution"
+    if User.where(institution_pid: self.id).count != 0
+      errors[:base] << "Cannot delete #{self.name} because some Users are associated with this Institution"
     end
 
     if self.intellectual_objects.count != 0
-      errors[:base] << "Cannot delete #{self.name} because Intellectual Objects are associated with it"
+      errors[:base] << "Cannot delete #{self.name} because Intellectual Objects are associated with this Institution"
     end
 
     errors[:base].empty?

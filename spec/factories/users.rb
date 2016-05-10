@@ -12,7 +12,7 @@ FactoryGirl.define do
       institution_pid {
         aptrust_institution = Institution.where(name: 'APTrust')
         if aptrust_institution.count == 1
-          aptrust_institution.first.pid
+          aptrust_institution.first.id
         elsif aptrust_institution.count > 1
           raise 'There should never be more than one institution with the name APTrust'
         else
