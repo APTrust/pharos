@@ -4,7 +4,7 @@ FactoryGirl.define do
     etag { SecureRandom.hex }
     bag_date { Time.now.utc }
     user { Faker::Name.name }
-    institution { FactoryGirl.create(:institution).pid }
+    institution { FactoryGirl.create(:institution).id }
     bucket { "aptrust.receiving.#{institution}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
@@ -20,7 +20,7 @@ FactoryGirl.define do
     etag { SecureRandom.hex }
     bag_date { Time.now.utc }
     user { Faker::Name.name }
-    institution { FactoryGirl.create(:institution).pid }
+    institution { FactoryGirl.create(:institution).id }
     bucket { "aptrust.receiving.#{institution}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
@@ -36,7 +36,7 @@ FactoryGirl.define do
     etag { SecureRandom.hex }
     bag_date { Time.now.utc }
     user { Faker::Name.name }
-    institution { FactoryGirl.create(:institution).pid }
+    institution { FactoryGirl.create(:institution).id }
     bucket { "aptrust.receiving.#{institution}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }

@@ -178,7 +178,7 @@ class GenericFilesController < ApplicationController
                      outcome_detail: current_user.email,
                      object: 'Goamz S3 Client',
                      agent: 'https://github.com/crowdmob/goamz',
-                     outcome_information: "Action requested by user from #{current_user.institution_pid}"
+                     outcome_information: "Action requested by user from #{current_user.institution_id}"
       }
       @generic_file.soft_delete(attributes)
       respond_to do |format|

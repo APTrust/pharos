@@ -3,10 +3,10 @@ require 'spec_helper'
 describe User do
   let(:user) { FactoryGirl.create(:aptrust_user) }
   let(:inst_admin) { FactoryGirl.create(:user, :institutional_admin) }
-  let(:inst_pid) { subject.institution_pid }
+  let(:inst_id) { subject.institution_id }
 
   it 'should return a valid institution' do
-    user.institution.id.should == user.institution_pid
+    user.institution.id.should == user.institution_id
   end
 
   describe 'as an admin' do
@@ -16,12 +16,12 @@ describe User do
 
   describe 'as an institutional admin' do
     subject { FactoryGirl.create(:user, :institutional_admin) }
-    its(:groups) { should match_array ['registered', 'institutional_admin', "Admin_At_#{inst_pid}"]}
+    its(:groups) { should match_array ['registered', 'institutional_admin', "Admin_At_#{inst_id}"]}
   end
 
   describe 'as an institutional user' do
     subject { FactoryGirl.create(:user, :institutional_user) }
-    its(:groups) { should match_array ['registered', 'institutional_user', "User_At_#{inst_pid}"]}
+    its(:groups) { should match_array ['registered', 'institutional_user', "User_At_#{inst_id}"]}
   end
 
   describe '#api_secret_key=' do

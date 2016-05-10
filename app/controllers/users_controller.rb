@@ -92,21 +92,21 @@ class UsersController < ApplicationController
   end
 
   def build_resource_params
-    [params.fetch(:user, {}).permit(:name, :email, :phone_number, :password, :password_confirmation, :institution_pid).tap do |p|
-       p[:institution_pid] = build_institution_pid if params[:user][:institution_pid] unless params[:user].nil?
+    [params.fetch(:user, {}).permit(:name, :email, :phone_number, :password, :password_confirmation, :institution_id).tap do |p|
+       p[:institution_id] = build_institution_id if params[:user][:institution_id] unless params[:user].nil?
        p[:role_ids] = build_role_ids if params[:user][:role_ids] unless params[:user].nil?
      end]
   end
 
-  def build_institution_pid
-    if params[:user][:institution_pid].empty?
+  def build_institution_id
+    if params[:user][:institution_id].empty?
       if @user.nil?
         instituion = ''
       else
-        institution = Institution.find(@user.institution_pid)
+        institution = Institution.find(@user.institution_id)
       end
     else
-      institution = Institution.find(params[:user][:institution_pid])
+      institution = Institution.find(params[:user][:institution_id])
     end
     unless institution.nil?
       authorize institution, :add_user?

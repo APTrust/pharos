@@ -5,11 +5,11 @@ FactoryGirl.define do
     phone_number { 4344666249 }
     #phone_number { Faker::PhoneNumber.phone_number } TODO: figure out why this returns invalid phone number
     #password { 'password' }
-    institution_pid { FactoryGirl.create(:institution).id }
+    institution_id { FactoryGirl.create(:institution).id }
     roles { [Role.where(name: 'public').first_or_create] }
 
     factory :aptrust_user, class: 'User' do
-      institution_pid {
+      institution_id {
         aptrust_institution = Institution.where(name: 'APTrust')
         if aptrust_institution.count == 1
           aptrust_institution.first.id

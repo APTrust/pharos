@@ -5,7 +5,7 @@ describe WorkItemPolicy do
   let(:institution) { FactoryGirl.create(:institution) }
 
   context 'for an admin user' do
-    let(:user) { FactoryGirl.create(:user, :admin, institution_pid: institution.pid) }
+    let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }
     let(:work_item) { FactoryGirl.create(:work_item)}
 
     it do
@@ -21,7 +21,7 @@ describe WorkItemPolicy do
 
   context 'for an institutional admin user' do
     let(:user) { FactoryGirl.create(:user, :institutional_admin,
-                                    institution_pid: institution.pid) }
+                                    institution_id: institution.id) }
     describe 'when the item is' do
       describe 'in my institution' do
         let(:work_item) { FactoryGirl.create(:work_item, institution: institution.identifier) }
@@ -53,7 +53,7 @@ describe WorkItemPolicy do
 
   context 'for an institutional user' do
     let(:user) { FactoryGirl.create(:user, :institutional_user,
-                                    institution_pid: institution.pid) }
+                                    institution_id: institution.id) }
     describe 'when the item is' do
       describe 'in my institution' do
         let(:work_item) { FactoryGirl.create(:work_item, institution: institution.identifier) }

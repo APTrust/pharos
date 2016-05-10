@@ -6,7 +6,7 @@ describe IntellectualObjectPolicy do
   let(:institution) { FactoryGirl.create(:institution) }
 
   context 'for an admin user' do
-    let(:user) { FactoryGirl.create(:user, :admin, institution_pid: institution.pid) }
+    let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }
     let(:intellectual_object) { FactoryGirl.create(:intellectual_object) }
     it do
       should permit(:create_through_intellectual_object)
@@ -21,7 +21,7 @@ describe IntellectualObjectPolicy do
 
   context 'for an institutional admin user' do
     let(:user) { FactoryGirl.create(:user, :institutional_admin,
-                                    institution_pid: institution.pid) }
+                                    institution_id: institution.id) }
     describe 'when the object is' do
       describe 'in my institution' do
         let(:intellectual_object) { FactoryGirl.create(:intellectual_object, institution: institution) }
@@ -68,7 +68,7 @@ describe IntellectualObjectPolicy do
 
   context 'for an institutional user' do
     let(:user) { FactoryGirl.create(:user, :institutional_user,
-                                    institution_pid: institution.pid) }
+                                    institution_id: institution.id) }
     describe 'when the object is' do
       describe 'in my institution' do
         describe 'and is consortial accessible' do

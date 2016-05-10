@@ -7,7 +7,7 @@ class IntellectualObjectPolicy < ApplicationPolicy
       user.institutional_admin? || user.institutional_user?
       # if restricted or institutional access
     else
-      user.institution_pid == record.institution.id
+      user.institution_id == record.institution.id
     end
   end
 
@@ -18,20 +18,20 @@ class IntellectualObjectPolicy < ApplicationPolicy
       user.institutional_admin? || user.institutional_user?
       # if restricted or institutional access
     else
-      user.institution_pid == record.intellectual_object.institution.id
+      user.institution_id == record.intellectual_object.institution.id
     end
   end
 
   # for generic_file object
   def create_through_intellectual_object?
     user.admin?  ||
-        (user.institutional_admin? && user.institution_pid == record.institution.id)
+        (user.institutional_admin? && user.institution_id == record.institution.id)
   end
 
   # for adding premis events
   def add_event?
     user.admin? ||
-        (user.institutional_admin? && user.institution_pid == record.institution.id)
+        (user.institutional_admin? && user.institution_id == record.institution.id)
   end
 
   def show?
@@ -40,10 +40,10 @@ class IntellectualObjectPolicy < ApplicationPolicy
     elsif record.access == 'consortia'
       user.institutional_admin? || user.institutional_user?
     elsif record.access == 'institution'
-      user.institution_pid == record.institution.id
+      user.institution_id == record.institution.id
       # if restricted access
     else
-      user.institutional_admin? && user.institution_pid == record.institution.id
+      user.institutional_admin? && user.institution_id == record.institution.id
     end
   end
 
@@ -61,15 +61,15 @@ class IntellectualObjectPolicy < ApplicationPolicy
 
   def soft_delete?
     user.admin? ||
-        (user.institutional_admin? && user.institution_pid == record.institution.id)
+        (user.institutional_admin? && user.institution_id == record.institution.id)
   end
 
   def restore?
-    user.admin? || (user.institutional_admin? && user.institution_pid == record.institution.id)
+    user.admin? || (user.institutional_admin? && user.institution_id == record.institution.id)
   end
 
   def dpn?
-    user.admin? || (user.institutional_admin? && user.institution_pid == record.institution.id)
+    user.admin? || (user.institutional_admin? && user.institution_id == record.institution.id)
   end
 
   class Scope
@@ -84,7 +84,7 @@ class IntellectualObjectPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       else
-        scope.where(institution_id: user.institution_pid)
+        scope.where(institution_id: user.institution_id)
       end
     end
   end

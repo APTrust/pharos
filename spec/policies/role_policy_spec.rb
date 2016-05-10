@@ -6,7 +6,7 @@ describe RolePolicy do
   subject (:role_policy) { RolePolicy.new(user, role) }
 
   context 'for an admin user' do
-    let(:user) { FactoryGirl.create(:user, :admin, institution_pid: institution.pid )}
+    let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id )}
 
     describe 'with admin role' do
       let(:role) { Role.where(name: 'admin').first }
@@ -25,7 +25,7 @@ describe RolePolicy do
   end
 
   context 'for an institutional admin user' do
-    let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: institution.pid )}
+    let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: institution.id )}
 
     describe 'with admin role' do
       let(:role) { Role.where(name: 'admin').first }
@@ -44,7 +44,7 @@ describe RolePolicy do
   end
 
   context 'for an institutional user' do
-    let(:user) { FactoryGirl.create(:user, :institutional_user, institution_pid: institution.pid )}
+    let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: institution.id )}
     describe 'with admin role' do
       let(:role) { Role.where(name: 'admin').first }
       it { should_not permit(:add_user) }

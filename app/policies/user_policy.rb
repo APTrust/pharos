@@ -10,12 +10,12 @@ class UserPolicy < ApplicationPolicy
 
   def index?
     user.admin? ||
-        (user.institutional_admin? && (user.institution_pid == record.institution_pid))
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
   def show?
     user == record ||  user.admin? ||
-        (user.institutional_admin? && (user.institution_pid == record.institution_pid))
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
   def edit?
@@ -24,7 +24,7 @@ class UserPolicy < ApplicationPolicy
 
   def update?
     user == record || user.admin? ||
-        (user.institutional_admin? && (user.institution_pid == record.institution_pid))
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
   # institutional_admin cannot generate key for institutional user
@@ -48,7 +48,7 @@ class UserPolicy < ApplicationPolicy
   def destroy?
     return false if user == record
     user.admin? ||
-        (user.institutional_admin? && (user.institution_pid == record.institution_pid))
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
   class Scope
@@ -63,7 +63,7 @@ class UserPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       else
-        scope.where(institution_pid: user.institution_pid)
+        scope.where(institution_id: user.institution_id)
       end
     end
   end

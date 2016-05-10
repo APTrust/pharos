@@ -14,7 +14,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
 
   let(:valid_key) { '123' }
   let(:invalid_key) { '456' }
-  let(:user) { FactoryGirl.create :user, :institutional_admin, institution_pid: inst.pid, api_secret_key: valid_key }
+  let(:user) { FactoryGirl.create :user, :institutional_admin, institution_id: inst.id, api_secret_key: valid_key }
 
   after do
     Institution.destroy_all
@@ -58,7 +58,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
   end
 
   describe 'A user without an API key' do
-    let(:user_without_key) { FactoryGirl.create :user, :institutional_admin, institution_pid: inst.pid }
+    let(:user_without_key) { FactoryGirl.create :user, :institutional_admin, institution_id: inst.id }
     let(:login_headers) {{ 'X-Fluctus-API-User' => user_without_key.email, 'X-Fluctus-API-Key' => nil }}
 
     it 'cannot log in via API request' do

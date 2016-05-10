@@ -170,9 +170,9 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def set_permissions
-    inst_pid = clean_for_solr(self.institution.pid)
-    inst_admin_group = "Admin_At_#{inst_pid}"
-    inst_user_group = "User_At_#{inst_pid}"
+    inst_id = clean_for_solr(self.institution.id)
+    inst_admin_group = "Admin_At_#{inst_id}"
+    inst_user_group = "User_At_#{inst_id}"
     case access
       when 'consortia'
         self.read_groups = %w(institutional_admin institutional_user)
@@ -202,7 +202,7 @@ class IntellectualObject < ActiveRecord::Base
   def check_for_associations
     # Check for related GenericFiles
     unless generic_file_ids.empty?
-      errors[:base] << "Cannot delete #{self.pid} because Generic Files are associated with it"
+      errors[:base] << "Cannot delete #{self.id} because Generic Files are associated with it"
     end
     errors[:base].empty?
   end

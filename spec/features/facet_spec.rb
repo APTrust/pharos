@@ -11,7 +11,7 @@ describe 'Faceting' do
   describe 'Logged in as institutional_admin' do
     let(:file) { FactoryGirl.create(:generic_file) }
     let(:inst) { file.institution }
-    let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: inst.pid) }
+    let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: inst.id) }
 
     before do
       login_as user

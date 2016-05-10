@@ -7,14 +7,14 @@ class GenericFilePolicy < ApplicationPolicy
       user.institutional_admin? || user.institutional_user?
       # if restricted or institutional access
     else
-      user.institution_pid == record.intellectual_object.institution.id
+      user.institution_id == record.intellectual_object.institution.id
     end
   end
 
   # for adding premis events
   def add_event?
     user.admin? ||
-        (user.institutional_admin? && user.institution_pid == record.intellectual_object.institution.id)
+        (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)
   end
 
   def show?
@@ -23,10 +23,10 @@ class GenericFilePolicy < ApplicationPolicy
     elsif record.intellectual_object.access == 'consortia'
       user.institutional_admin? || user.institutional_user?
     elsif record.intellectual_object.access == 'institution'
-      user.institution_pid == record.intellectual_object.institution.id
+      user.institution_id == record.intellectual_object.institution.id
       # if restricted access
     else
-      user.institutional_admin? && user.institution_pid == record.intellectual_object.institution.id
+      user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id
     end
   end
 
@@ -44,7 +44,7 @@ class GenericFilePolicy < ApplicationPolicy
 
   def soft_delete?
     user.admin? ||
-        (user.institutional_admin? && user.institution_pid == record.intellectual_object.institution.id)
+        (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)
   end
 
   class Scope
@@ -59,7 +59,7 @@ class GenericFilePolicy < ApplicationPolicy
       if user.admin?
         scope.all
       else
-        scope.where(:intellectual_object => { :institution_id => user.institution_pid })
+        scope.where(:intellectual_object => { :institution_id => user.institution_id })
       end
     end
   end

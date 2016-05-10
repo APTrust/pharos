@@ -15,8 +15,8 @@ class User < ActiveRecord::Base
 
   validates :email, :phone_number, :role_ids, presence: true
   validates :email, uniqueness: true
-  validates :institution_pid, presence: true
-  validate :institution_pid_points_at_institution
+  validates :institution_id, presence: true
+  validate :institution_id_points_at_institution
   validates :name, presence: true, if: ->{ name.present? } #TODO: find name validator that actually works
   validates :email, email: true
   phony_normalize :phone_number, :default_country_code => 'US'
@@ -39,7 +39,7 @@ class User < ActiveRecord::Base
   end
 
   def institution_identifier
-    institution = Institution.find(self.institution_pid)
+    institution = Institution.find(self.institution_id)
     institution.identifier
   end
 
@@ -91,7 +91,7 @@ class User < ActiveRecord::Base
   end
 
   def institution_group_suffix
-    institution_pid
+    institution_id
   end
 
   def guest?
@@ -169,8 +169,8 @@ class User < ActiveRecord::Base
 
   private
 
-  def institution_pid_points_at_institution
-    errors.add(:institution_pid, 'is not a valid institution') unless Institution.exists?(institution_pid)
+  def institution_id_points_at_institution
+    errors.add(:institution_id, 'is not a valid institution') unless Institution.exists?(institution_id)
   end
 
 end

@@ -5,7 +5,7 @@ describe GenericFilePolicy do
   let(:institution) { FactoryGirl.create(:institution) }
 
   context 'for an admin user' do
-    let(:user) { FactoryGirl.create(:user, :admin, institution_pid: institution.pid) }
+    let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }
     let(:generic_file) { FactoryGirl.build(:generic_file)}
 
     it 'access any generic file' do
@@ -21,7 +21,7 @@ describe GenericFilePolicy do
 
   context 'for an institutional admin user' do
     let(:user) { FactoryGirl.create(:user, :institutional_admin,
-                                    institution_pid: institution.pid) }
+                                    institution_id: institution.id) }
     context 'access file in my institution' do
       let(:intellectual_object) { FactoryGirl.create(:intellectual_object, institution: institution) }
       let(:generic_file) { FactoryGirl.create(:generic_file, intellectual_object: intellectual_object) }
@@ -67,7 +67,7 @@ describe GenericFilePolicy do
 
   context 'for an institutional user' do
     let(:user) { FactoryGirl.create(:user, :institutional_user,
-                                    institution_pid: institution.pid) }
+                                    institution_id: institution.id) }
     describe 'when the file is' do
       describe 'in my institution' do
         describe 'and it belongs to a consortial accessible object' do

@@ -16,7 +16,7 @@ class Institution < ActiveRecord::Base
 
   # Return the users that belong to this institution.  Sorted by name for display purposes primarily.
   def users
-    User.where(institution_pid: self.id).to_a.sort_by(&:name)
+    User.where(institution_id: self.id).to_a.sort_by(&:name)
   end
 
   def serializable_hash(options={})
@@ -78,7 +78,7 @@ class Institution < ActiveRecord::Base
   end
 
   def check_for_associations
-    if User.where(institution_pid: self.id).count != 0
+    if User.where(institution_id: self.id).count != 0
       errors[:base] << "Cannot delete #{self.name} because some Users are associated with this Institution"
     end
 
