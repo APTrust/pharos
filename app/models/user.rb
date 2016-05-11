@@ -10,8 +10,8 @@ class User < ActiveRecord::Base
   # :recoverable, :rememberable, :trackable, :validatable,
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  #devise :database_authenticatable, :recoverable, :rememberable, :trackable,
-        # :timeoutable, :validatable
+  devise :database_authenticatable, :recoverable, :rememberable, :trackable,
+         :timeoutable, :validatable
 
   validates :email, :phone_number, :role_ids, presence: true
   validates :email, uniqueness: true

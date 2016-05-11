@@ -1,6 +1,6 @@
 class Institution < ActiveRecord::Base
 
-  has_many :users
+  #has_many :users
   has_many :intellectual_objects
   #has_attributes :name, :brief_name, :identifier, :dpn_uuid, multiple: false
 

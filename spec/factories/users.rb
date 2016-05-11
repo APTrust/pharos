@@ -4,7 +4,7 @@ FactoryGirl.define do
     email { Faker::Internet.email }
     phone_number { 4344666249 }
     #phone_number { Faker::PhoneNumber.phone_number } TODO: figure out why this returns invalid phone number
-    #password { 'password' }
+    password { 'password' }
     institution_id { FactoryGirl.create(:institution).id }
     roles { [Role.where(name: 'public').first_or_create] }
 
