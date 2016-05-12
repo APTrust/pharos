@@ -9,7 +9,7 @@
       "/Users/kec6en/FluctusApps/pharos/app/models/institution.rb": [
         1,
         null,
-        null,
+        1,
         1,
         null,
         null,
@@ -2995,6 +2995,6 @@
         0
       ]
     },
-    "timestamp": 1462998238
+    "timestamp": 1463079016
   }
 }
