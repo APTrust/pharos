@@ -170,7 +170,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def set_permissions
-    inst_id = clean_for_solr(self.institution.id)
+    inst_id = self.institution.id
     inst_admin_group = "Admin_At_#{inst_id}"
     inst_user_group = "User_At_#{inst_id}"
     case access

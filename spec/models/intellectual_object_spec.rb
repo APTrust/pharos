@@ -62,25 +62,6 @@ RSpec.describe IntellectualObject, :type => :model do
       expect(subject.terms_for_editing).to eq [:title, :description, :access]
     end
 
-    # describe '#to_solr' do
-    #   subject { FactoryGirl.create(:institutional_intellectual_object) }
-    #   before do
-    #     subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, size: 53)
-    #     subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, size: 47)
-    #   end
-    #   let(:solr_doc) { subject.to_solr }
-    #   it 'should have fields' do
-    #     solr_doc['institution_name_ssi'].should == subject.institution.name
-    #     solr_doc['is_part_of_ssim'].should == subject.institution.internal_uri
-    #     # Searchable
-    #     solr_doc['desc_metadata__title_tesim'].should == [subject.title]
-    #     # sortable
-    #     solr_doc['desc_metadata__title_si'].should == subject.title
-    #     solr_doc['desc_metadata__identifier_tesim'].should == [subject.identifier]
-    #     solr_doc['desc_metadata__description_tesim'].should == [subject.description]
-    #     solr_doc['desc_metadata__access_sim'].should == ['institution']
-    #   end
-    # end
   end
 
   describe 'bytes_by_format' do
@@ -101,28 +82,6 @@ RSpec.describe IntellectualObject, :type => :model do
                                                'application/xml' => 166311750,
                                                'audio/wav' => 143732461})
       end
-    end
-  end
-
-  describe '#get_from_solr' do
-    subject { FactoryGirl.create(:intellectual_object) }
-    it 'should grab the object from solr and create an intellectual object for the data' do
-      object = IntellectualObject.get_from_solr(subject.id)
-      object.identifier.should == subject.identifier
-      object.bag_name.should == subject.bag_name
-      object.description.should == subject.description
-      object.title.should == subject.title
-      object.access.should == subject.access
-    end
-  end
-
-  describe '#files_from_solr' do
-    subject { FactoryGirl.create(:intellectual_object) }
-    it 'should grab the objects files from solr and create generic file objects for them' do
-      gf = FactoryGirl.build(:generic_file, intellectual_object: subject, size: 53)
-      subject.generic_files << gf
-      files = IntellectualObject.files_from_solr(subject.id)
-      files[0].identifier.should == gf.identifier
     end
   end
 
@@ -174,7 +133,7 @@ RSpec.describe IntellectualObject, :type => :model do
           }.to change { subject.premisEvents.events.count}.by(1)
           subject.background_deletion({type: 'delete', outcome_detail: 'joe@example.com'})
           expect(subject.state).to eq 'D'
-          expect(subject.to_solr['object_state_ssi']).to eq 'D'
+          #expect(subject.to_solr['object_state_ssi']).to eq 'D'
           subject.generic_files.all?{ |file| expect(file.state).to eq 'D' }
         end
 
@@ -196,7 +155,7 @@ RSpec.describe IntellectualObject, :type => :model do
     end
 
     describe 'indexes groups' do
-      let(:inst_id) { clean_for_solr(subject.institution.id) }
+      let(:inst_id) { subject.institution.id }
       describe 'with consortial access' do
         subject { FactoryGirl.create(:consortial_intellectual_object) }
         it 'should properly set groups' do
