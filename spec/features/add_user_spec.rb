@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'Adding a new user' do
   before do
     Institution.destroy_all
-    FactoryGirl.create(:aptrust) if Institution.where(desc_metadata__name_ssim: 'APTrust').empty?
+    FactoryGirl.create(:aptrust) if Institution.where(name: 'APTrust').empty?
     Role.where(name: 'institutional_admin').first_or_create
   end
 

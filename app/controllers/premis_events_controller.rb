@@ -16,13 +16,13 @@ class PremisEventsController < ApplicationController
 
   def index
     if params['institution_identifier']
-      @institution = Institution.where(desc_metadata__identifier_ssim: params['institution_identifier']).first
+      @institution = Institution.where(identifier: params['institution_identifier']).first
       obj = @institution
     elsif params['intellectual_object_identifier']
-      @intellectual_object = IntellectualObject.where(desc_metadata__identifier_ssim: params['intellectual_object_identifier']).first
+      @intellectual_object = IntellectualObject.where(identifier: params['intellectual_object_identifier']).first
       obj = @intellectual_object
     elsif params['generic_file_identifier']
-      @generic_file = GenericFile.where(tech_metadata__identifier_ssim: params['generic_file_identifier']).first
+      @generic_file = GenericFile.where(identifier: params['generic_file_identifier']).first
       obj = @generic_file
     end
     authorize obj
@@ -67,7 +67,7 @@ class PremisEventsController < ApplicationController
 
   def load_intellectual_object
     objId = params[:intellectual_object_identifier].gsub(/%2F/i, '/')
-    @parent_object = IntellectualObject.where(desc_metadata__identifier_ssim: objId).first
+    @parent_object = IntellectualObject.where(identifier: objId).first
     params[:intellectual_object_id] = @parent_object.id
   end
 

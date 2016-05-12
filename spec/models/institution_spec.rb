@@ -6,9 +6,9 @@ RSpec.describe Institution, :type => :model do
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:identifier) }
 
-  it 'should retun a proper solr_doc' do
-    subject.to_solr['desc_metadata__name_tesim'].should == [subject.name]
-  end
+  # it 'should retun a proper solr_doc' do
+  #   subject.to_solr['desc_metadata__name_tesim'].should == [subject.name]
+  # end
 
   describe '#name_is_unique' do
     it 'should validate uniqueness of the name' do

@@ -62,25 +62,25 @@ RSpec.describe IntellectualObject, :type => :model do
       expect(subject.terms_for_editing).to eq [:title, :description, :access]
     end
 
-    describe '#to_solr' do
-      subject { FactoryGirl.create(:institutional_intellectual_object) }
-      before do
-        subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, size: 53)
-        subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, size: 47)
-      end
-      let(:solr_doc) { subject.to_solr }
-      it 'should have fields' do
-        solr_doc['institution_name_ssi'].should == subject.institution.name
-        solr_doc['is_part_of_ssim'].should == subject.institution.internal_uri
-        # Searchable
-        solr_doc['desc_metadata__title_tesim'].should == [subject.title]
-        # sortable
-        solr_doc['desc_metadata__title_si'].should == subject.title
-        solr_doc['desc_metadata__identifier_tesim'].should == [subject.identifier]
-        solr_doc['desc_metadata__description_tesim'].should == [subject.description]
-        solr_doc['desc_metadata__access_sim'].should == ['institution']
-      end
-    end
+    # describe '#to_solr' do
+    #   subject { FactoryGirl.create(:institutional_intellectual_object) }
+    #   before do
+    #     subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, size: 53)
+    #     subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, size: 47)
+    #   end
+    #   let(:solr_doc) { subject.to_solr }
+    #   it 'should have fields' do
+    #     solr_doc['institution_name_ssi'].should == subject.institution.name
+    #     solr_doc['is_part_of_ssim'].should == subject.institution.internal_uri
+    #     # Searchable
+    #     solr_doc['desc_metadata__title_tesim'].should == [subject.title]
+    #     # sortable
+    #     solr_doc['desc_metadata__title_si'].should == subject.title
+    #     solr_doc['desc_metadata__identifier_tesim'].should == [subject.identifier]
+    #     solr_doc['desc_metadata__description_tesim'].should == [subject.description]
+    #     solr_doc['desc_metadata__access_sim'].should == ['institution']
+    #   end
+    # end
   end
 
   describe 'bytes_by_format' do

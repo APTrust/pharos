@@ -14,13 +14,14 @@ class IntellectualObjectsController < ApplicationController
     @institution = current_user.institution
     authorize @institution, :index?
     if current_user.admin?
-      params[:institution].present? ? @items = IntellectualObject.where(desc_metadata__identifier_tesim: params[:institution]) : @items = IntellectualObject.all
+      params[:institution].present? ? @items = Institution.where(identifier: params[:institution]).intellectual_objects : @items = IntellectualObject.all
 
     else
-      @items = IntellectualObject.where(desc_metadata__identifier_tesim: current_user.institution.identifier)
+      @items = Institution.where(identifier: current_user.institution.identifier).intellectual_objects
     end
-    @items = @items.where(desc_metadata__identifier_ssim: params[:name_exact]) if params[:name_exact].present?
-    @items = @items.where(desc_metadata__identifier_tesim: params[:name_contains]) if params[:name_contains].present?
+    #TODO: This needs reworking for searches
+    @items = @items.where(identifier_ssim: params[:name_exact]) if params[:name_exact].present?
+    @items = @items.where(identifier_tesim: params[:name_contains]) if params[:name_contains].present?
     @items = @items.where(object_state_ssi: params[:state]) if params[:state].present?
 
     # Do not instantiate objects. Make Solr do the filtering.
@@ -164,7 +165,7 @@ class IntellectualObjectsController < ApplicationController
         # We might be re-ingesting a previously-deleted intellectual object,
         # or more likely, creating a new intel obj. Load or create the object.
         identifier = object['identifier'].gsub(/%2F/i, '/')
-        new_object = IntellectualObject.where(desc_metadata__identifier_ssim: identifier).first ||
+        new_object = IntellectualObject.where(identifier: identifier).first ||
             IntellectualObject.new()
         new_object.state = 'A' # in case we just loaded a deleted object
         # Set the object's attributes from the JSON data.,
@@ -255,7 +256,7 @@ class IntellectualObjectsController < ApplicationController
   def set_obj_attr(new_object, state, attr_name, attr_value)
     case attr_name
       when 'institution_id'
-        attr_value.to_s.include?(':') ? new_object.institution = Institution.find(attr_value.to_s) : new_object.institution = Institution.where(desc_metadata__identifier_ssim: attr_value.to_s).first
+        attr_value.to_s.include?(':') ? new_object.institution = Institution.find(attr_value.to_s) : new_object.institution = Institution.where(identifier: attr_value.to_s).first
       when 'premisEvents'
         state[:object_events] = attr_value
       when 'generic_files'
@@ -294,12 +295,12 @@ class IntellectualObjectsController < ApplicationController
 
   def load_object
     if params[:intellectual_object_identifier]
-      @intellectual_object = IntellectualObject.where(desc_metadata__identifier_ssim: params[:intellectual_object_identifier]).first
+      @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
       @institution = @intellectual_object.institution
       params[:id] = @intellectual_object.id
     elsif params[:identifier] && params[:id].blank?
       identifier = params[:identifier].gsub(/%2F/i, '/')
-      @intellectual_object ||= IntellectualObject.where(desc_metadata__identifier_ssim: identifier).first
+      @intellectual_object ||= IntellectualObject.where(identifier: identifier).first
 
       # Solr permissions handler expects params[:id] to be the object ID,
       # and will blow up if it's not. So humor it.
@@ -321,7 +322,7 @@ class IntellectualObjectsController < ApplicationController
       #@institution ||= Institution.find(params[:institution_id])
       @institution ||= Institution.get_from_solr(params[:institution_id])
     else
-      @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(desc_metadata__identifier_ssim: params[:institution_identifier]).first
+      @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(identifier: params[:institution_identifier]).first
     end
     params[:id] = @institution.id
   end

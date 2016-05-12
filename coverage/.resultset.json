@@ -1,16 +1,12 @@
 {
   "RSpec": {
     "coverage": {
-      "/Users/kec6en/FluctusApps/pharos/app/models/role.rb": [
-        1,
-        1,
-        null
-      ],
       "/Users/kec6en/FluctusApps/pharos/app/models/institution.rb": [
         1,
         null,
         1,
         1,
+        1,
         null,
         null,
         1,
@@ -64,41 +60,46 @@
         null,
         null,
         1,
-        15,
-        15,
+        10,
+        11,
         null,
         null,
         1,
-        15,
-        15,
-        15,
-        15,
-        15,
-        15,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        1,
+        null,
+        10,
         0,
         null,
-        15,
-        0,
-        null,
-        15,
+        10,
         0,
         null,
         null,
         null,
         null,
         1,
-        0,
-        0,
-        null,
-        null,
-        0,
+        4,
         0,
         null,
         null,
+        4,
         0,
         null,
         null,
+        4,
         null,
+        null,
+        null,
+        null
+      ],
+      "/Users/kec6en/FluctusApps/pharos/app/models/role.rb": [
+        1,
+        1,
         null
       ],
       "/Users/kec6en/FluctusApps/pharos/app/models/generic_file.rb": [
@@ -2995,6 +2996,6 @@
         0
       ]
     },
-    "timestamp": 1463079016
+    "timestamp": 1463082796
   }
 }
