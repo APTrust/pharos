@@ -47,10 +47,25 @@ group :development do
   gem 'meta_request'
   gem 'better_errors'
   gem 'binding_of_caller'
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+end
+
+group :test do
+  gem 'capybara', '2.3.0'
+  gem 'shoulda-matchers', '~> 2.5.0'
+  gem 'coveralls', require: false
+end
+
+group :production do
+  gem 'pg' #Necessary for heroku
+  gem "rails_12factor" # Necessary for heroku
 end
 
 group :development, :test, :demo do
-  gem "jettywrapper"
+  gem 'jettywrapper'
 end
 
 group :development, :test, :demo, :production do
@@ -62,24 +77,5 @@ group :development, :test, :demo, :production do
   gem 'rspec-rails', '~> 3.0.0'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
-end
-
-group :test do
-  gem 'capybara', '2.3.0'
-  gem 'shoulda-matchers'
-  gem 'coveralls', require: false
-end
-
-group :production do
-  gem 'pg' #Necessary for heroku
-  gem "rails_12factor" # Necessary for heroku
-end
-
-group :development do
-  # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
-
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
 end
 
