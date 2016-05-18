@@ -56,8 +56,6 @@ class InstitutionsController < ApplicationController
     update!
   end
 
-  include Blacklight::SolrHelper
-
   private
   def load_institution
     @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(identifier: params[:institution_identifier]).first

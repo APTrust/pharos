@@ -26,26 +26,14 @@ class Institution < ActiveRecord::Base
   end
 
   def bytes_by_format
-    #TODO: rewrite this
-    # resp = ActiveFedora::SolrService.instance.conn.get 'select', :params => {
-    #                                                                'q' => 'tech_metadata__size_lsi:[* TO *]',
-    #                                                                'fq' =>[ActiveFedora::SolrService.construct_query_for_rel(:has_model => GenericFile.to_class_uri),
-    #                                                                        "_query_:\"{!raw f=institution_uri_ssim}#{internal_uri}\""],
-    #                                                                'stats' => true,
-    #                                                                'fl' => '',
-    #                                                                'stats.field' =>'tech_metadata__size_lsi',
-    #                                                                'stats.facet' => 'tech_metadata__file_format_ssi'
-    #                                                            }
-    # stats = resp['stats']['stats_fields']['tech_metadata__size_lsi']
-    # if stats
-    #   cross_tab = stats['facets']['tech_metadata__file_format_ssi'].each_with_object({}) { |(k,v), obj|
-    #     obj[k] = v['sum']
-    #   }
-    #   cross_tab['all'] = stats['sum']
-    #   cross_tab
-    # else
-    #   {'all' => 0}
-    # end
+    stats = self.intellectual_objects.sum(:size)
+    if stats
+      cross_tab = self.intellectual_objects.group(:file_format).sum(:size)
+      cross_tab['all'] = stats
+      cross_tab
+    else
+      {'all' => 0}
+    end
   end
 
   def statistics
