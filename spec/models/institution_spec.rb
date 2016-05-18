@@ -6,10 +6,6 @@ RSpec.describe Institution, :type => :model do
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:identifier) }
 
-  # it 'should retun a proper solr_doc' do
-  #   subject.to_solr['desc_metadata__name_tesim'].should == [subject.name]
-  # end
-
   describe '#name_is_unique' do
     it 'should validate uniqueness of the name' do
       one = FactoryGirl.create(:institution, name: 'test')
@@ -44,17 +40,6 @@ RSpec.describe Institution, :type => :model do
                                                'application/xml' => 166311750,
                                                'audio/wav' => 143732461})
       end
-    end
-  end
-
-  describe '#get_from_solr' do
-    subject { FactoryGirl.create(:institution) }
-    it 'should grab the institution from solr and create an institution object for the data' do
-      inst = Institution.get_from_solr(subject.id)
-      inst.identifier.should == subject.identifier
-      inst.name.should == subject.name
-      inst.brief_name.should == subject.brief_name
-      inst.dpn_uuid.should == subject.dpn_uuid
     end
   end
 
