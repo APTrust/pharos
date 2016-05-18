@@ -16,7 +16,7 @@ class IntellectualObject < ActiveRecord::Base
   validates_inclusion_of :access, in: %w(consortia institution restricted), message: "#{:access} is not a valid access", if: :access
   validate :identifier_is_unique
 
-  before_save :set_permissions
+  #before_save :set_permissions
   before_save :set_bag_name
   before_save :active_files
   before_destroy :check_for_associations
@@ -169,22 +169,22 @@ class IntellectualObject < ActiveRecord::Base
     end
   end
 
-  def set_permissions
-    inst_id = self.institution.id
-    inst_admin_group = "Admin_At_#{inst_id}"
-    inst_user_group = "User_At_#{inst_id}"
-    case access
-      when 'consortia'
-        self.read_groups = %w(institutional_admin institutional_user)
-        self.edit_groups = [inst_admin_group]
-      when 'institution'
-        self.read_groups = [inst_user_group]
-        self.edit_groups = [inst_admin_group]
-      when 'restricted'
-        self.discover_groups = [inst_user_group]
-        self.edit_groups = [inst_admin_group]
-    end
-  end
+  # def set_permissions
+  #   inst_id = self.institution.id
+  #   inst_admin_group = "Admin_At_#{inst_id}"
+  #   inst_user_group = "User_At_#{inst_id}"
+  #   case access
+  #     when 'consortia'
+  #       self.read_groups = %w(institutional_admin institutional_user)
+  #       self.edit_groups = [inst_admin_group]
+  #     when 'institution'
+  #       self.read_groups = [inst_user_group]
+  #       self.edit_groups = [inst_admin_group]
+  #     when 'restricted'
+  #       self.discover_groups = [inst_user_group]
+  #       self.edit_groups = [inst_admin_group]
+  #   end
+  # end
 
   def set_bag_name
     return if self.identifier.nil?
