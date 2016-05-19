@@ -4,10 +4,8 @@ class IntellectualObject < ActiveRecord::Base
   belongs_to :institution
   has_many :generic_files
   has_many :premis_events
+  has_many :checksums, through: :generic_files
   accepts_nested_attributes_for :generic_files
-
-  # has_attributes :title, :access, :description, :identifier, :bag_name, datastream: 'descMetadata', multiple: false
-  # has_attributes :alt_identifier, datastream: 'descMetadata', multiple: true
 
   validates_presence_of :title
   validates_presence_of :institution
@@ -35,28 +33,16 @@ class IntellectualObject < ActiveRecord::Base
     [:title, :description, :access]
   end
 
-  #TODO: Fix this
-  # def bytes_by_format
-  #   resp = ActiveFedora::SolrService.instance.conn.get 'select', :params => {
-  #                                                                  'q' => 'tech_metadata__size_lsi:[* TO *]',
-  #                                                                  'fq' =>[ActiveFedora::SolrService.construct_query_for_rel(:has_model => GenericFile.to_class_uri),
-  #                                                                          "_query_:\"{!raw f=is_part_of_ssim}info:fedora/#{self.id}\""],
-  #                                                                  'stats' => true,
-  #                                                                  'fl' => '',
-  #                                                                  'stats.field' =>'tech_metadata__size_lsi',
-  #                                                                  'stats.facet' => 'tech_metadata__file_format_ssi'
-  #                                                              }
-  #   stats = resp['stats']['stats_fields']['tech_metadata__size_lsi']
-  #   if stats
-  #     cross_tab = stats['facets']['tech_metadata__file_format_ssi'].each_with_object({}) { |(k,v), obj|
-  #       obj[k] = v['sum']
-  #     }
-  #     cross_tab['all'] = stats['sum']
-  #     cross_tab
-  #   else
-  #     {'all' => 0}
-  #   end
-  # end
+  def bytes_by_format
+    stats = self.sum(:size)
+    if stats
+      cross_tab = self.group(:file_format).sum(:size)
+      cross_tab['all'] = stats
+      cross_tab
+    else
+      {'all' => 0}
+    end
+  end
 
   def soft_delete(attributes)
     self.state = 'D'

@@ -4,6 +4,7 @@ class GenericFile < ActiveRecord::Base
   belongs_to :intellectual_object
   has_many :premis_events
   has_many :checksums
+  accepts_nested_attributes_for :checksums
 
   validates_presence_of :uri
   validates_presence_of :size
@@ -44,8 +45,7 @@ class GenericFile < ActiveRecord::Base
     ActiveFedora::SolrService.reify_solr_results(files)
   end
 
-  # TODO: fix this
-  # def self.bytes_by_format
+  def self.bytes_by_format
   #   resp = ActiveFedora::SolrService.instance.conn.get 'select', :params => {
   #                                                                  'q' => 'tech_metadata__size_lsi:[* TO *]',
   #                                                                  'stats' => true,
@@ -63,7 +63,7 @@ class GenericFile < ActiveRecord::Base
   #   else
   #     {'all' => 0}
   #   end
-  # end
+  end
 
   def display
     identifier
