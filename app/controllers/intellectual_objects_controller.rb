@@ -301,9 +301,6 @@ class IntellectualObjectsController < ApplicationController
     elsif params[:identifier] && params[:id].blank?
       identifier = params[:identifier].gsub(/%2F/i, '/')
       @intellectual_object ||= IntellectualObject.where(identifier: identifier).first
-
-      # Solr permissions handler expects params[:id] to be the object ID,
-      # and will blow up if it's not. So humor it.
       if @intellectual_object.nil?
         msg = "IntellectualObject '#{params[:identifier]}' not found"
         raise ActionController::RoutingError.new(msg)
@@ -311,16 +308,13 @@ class IntellectualObjectsController < ApplicationController
         params[:id] = @intellectual_object.id if @intellectual_object
       end
     else
-      #@intellectual_object ||= IntellectualObject.find(params[:id])
-      @intellectual_object ||= IntellectualObject.get_from_solr(params[:id])
-      #@files = IntellectualObject.files_from_solr(params[:id], {rows: 1000, start: 0})
+      @intellectual_object ||= IntellectualObject.find(params[:id])
     end
   end
 
   def load_institution
     if params[:institution_id]
-      #@institution ||= Institution.find(params[:institution_id])
-      @institution ||= Institution.get_from_solr(params[:institution_id])
+      @institution ||= Institution.find(params[:institution_id])
     else
       @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(identifier: params[:institution_identifier]).first
     end
@@ -331,7 +325,6 @@ class IntellectualObjectsController < ApplicationController
     @institution = params[:institution_id].nil? ? object.institution : Institution.find(params[:institution_id])
   end
 
-  # Put the date in a format Solr understands
   def format_date
     time = Time.parse(params[:updated_since])
     time.utc.iso8601

@@ -133,7 +133,6 @@ RSpec.describe IntellectualObject, :type => :model do
           }.to change { subject.premisEvents.events.count}.by(1)
           subject.background_deletion({type: 'delete', outcome_detail: 'joe@example.com'})
           expect(subject.state).to eq 'D'
-          #expect(subject.to_solr['object_state_ssi']).to eq 'D'
           subject.generic_files.all?{ |file| expect(file.state).to eq 'D' }
         end
 
