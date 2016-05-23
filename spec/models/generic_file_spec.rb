@@ -6,13 +6,9 @@ RSpec.describe GenericFile, :type => :model do
     subject.respond_to?(:add_event).should be true
   end
 
-  it 'should have a techMetadata datastream' do
-    subject.techMetadata.should be_kind_of GenericFileMetadata
-  end
-
-  it 'should have a premisEvents datastream' do
-    subject.premisEvents.should be_kind_of PremisEventsMetadata
-  end
+  # it 'should have a premisEvents datastream' do
+  #   subject.premisEvents.should be_kind_of PremisEventsMetadata
+  # end
 
   it 'delegates institution to the intellectual object' do
     file = FactoryGirl.create(:generic_file)

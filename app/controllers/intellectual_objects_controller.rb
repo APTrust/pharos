@@ -228,7 +228,7 @@ class IntellectualObjectsController < ApplicationController
     # We may have an existing generic file if this intellectual
     # object was previously deleted and is now being re-ingested.
     gfid = file['identifier'].gsub(/%2F/i, '/')
-    new_file = GenericFile.where(tech_metadata__identifier_ssim: gfid).first || GenericFile.new()
+    new_file = GenericFile.where(identifier: gfid).first || GenericFile.new()
     file_events, file_checksums = []
     file.each { |file_attr_name, file_attr_value|
       case file_attr_name
@@ -239,7 +239,7 @@ class IntellectualObjectsController < ApplicationController
         else
           new_file[file_attr_name.to_s] = file_attr_value.to_s
       end }
-    file_checksums.each { |checksum| new_file.techMetadata.checksum.build(checksum) }
+    file_checksums.each { |checksum| new_file.checksums.build(checksum) }
     state[:current_object] = "GenericFile #{new_file.identifier}"
     new_file.intellectual_object = intel_obj
     new_file.state = 'A' # in case we loaded a deleted file

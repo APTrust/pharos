@@ -1,6 +1,6 @@
-require 'rails_helper'
+require 'spec_helper'
 
-RSpec.describe InstitutionsController, :type => :controller do
+RSpec.describe InstitutionsController, type: :controller do
   before :all do
     Institution.destroy_all
   end

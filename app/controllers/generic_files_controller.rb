@@ -119,7 +119,7 @@ class GenericFilesController < ApplicationController
         # Change param name to make inherited resources happy.
         gf_without_events[:checksum_attributes] = gf[:checksum]
         # Load the existing generic file, or create a new one.
-        generic_file = (GenericFile.where(tech_metadata__identifier_ssim: gf[:identifier]).first ||
+        generic_file = (GenericFile.where(identifier: gf[:identifier]).first ||
             @intellectual_object.generic_files.new(gf_without_events))
         generic_file.state = 'A'
         generic_file.intellectual_object = @intellectual_object if generic_file.intellectual_object.nil?
@@ -270,7 +270,7 @@ class GenericFilesController < ApplicationController
   def load_generic_file
     if params[:generic_file_identifier]
       gfid = params[:generic_file_identifier].gsub(/%2F/i, '/')
-      @generic_file ||= GenericFile.where(tech_metadata__identifier_ssim: gfid).first
+      @generic_file ||= GenericFile.where(identifier: gfid).first
       params[:id] = @generic_file.id unless @generic_file.nil?
     elsif params[:id]
       #@generic_file ||= GenericFile.find(params[:id])

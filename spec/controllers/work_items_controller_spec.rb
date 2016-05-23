@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe WorkItemsController, :type => :controller do
+RSpec.describe WorkItemsController, type: :controller do
   let(:institution) { FactoryGirl.create(:institution) }
   let(:admin_user) { FactoryGirl.create(:user, :admin) }
   let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution_pid: institution.id) }

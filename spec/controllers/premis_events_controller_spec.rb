@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe PremisEventsController, :type => :controller do
+RSpec.describe PremisEventsController, type: :controller do
   after do
     Institution.destroy_all
   end

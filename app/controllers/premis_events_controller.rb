@@ -77,7 +77,7 @@ class PremisEventsController < ApplicationController
   # because they leave the '%2F' unescaped.
   def load_generic_file
     gfid = params[:generic_file_identifier].gsub(/%2F/i, '/')
-    @parent_object = GenericFile.where(tech_metadata__identifier_ssim: gfid).first
+    @parent_object = GenericFile.where(identifier: gfid).first
     params[:generic_file_id] = @parent_object.id
   end
 

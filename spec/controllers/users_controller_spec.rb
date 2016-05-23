@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe UsersController, :type => :controller do
+RSpec.describe UsersController, type: :controller do
   after do
     Institution.destroy_all
   end

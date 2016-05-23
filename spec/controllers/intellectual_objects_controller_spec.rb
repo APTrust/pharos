@@ -1,6 +1,6 @@
-require 'rails_helper'
+require 'spec_helper'
 
-RSpec.describe IntellectualObjectsController, :type => :controller do
+RSpec.describe IntellectualObjectsController, type: :controller do
   after do
     Institution.destroy_all
   end

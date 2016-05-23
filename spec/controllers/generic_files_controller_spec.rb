@@ -1,294 +1,388 @@
-class GenericFilesController < ApplicationController
-  before_filter :authenticate_user!
-  before_filter :filter_parameters, only: [:create, :update]
-  before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:update, :create, :save_batch, :index, :file_summary]
-  after_action :verify_authorized, :except => [:create, :index, :not_checked_since]
+require 'spec_helper'
 
+RSpec.describe GenericFilesController, type: :controller do
+  let(:user) { FactoryGirl.create(:user, :admin, institution_pid: @institution.pid) }
+  let(:file) { FactoryGirl.create(:generic_file) }
+  let(:inst_user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @institution.pid)}
 
-  def index
-    authorize @intellectual_object
-    @generic_files = @intellectual_object.generic_files
-    respond_to do |format|
-      # Return active files only, not deleted files!
-      format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
-      format.html { super }
+  before(:all) do
+    @institution = FactoryGirl.create(:institution)
+    @another_institution = FactoryGirl.create(:institution)
+    @intellectual_object = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id)
+    GenericFile.delete_all
+  end
+
+  after(:all) do
+    GenericFile.delete_all
+  end
+
+  describe 'GET #index' do
+    before do
+      sign_in user
+      file.premisEvents.events_attributes = [
+          FactoryGirl.attributes_for(:premis_event_ingest),
+          FactoryGirl.attributes_for(:premis_event_fixity_generation)
+      ]
+      file.save!
+      get :show, generic_file_identifier: file
+    end
+
+    it 'can index files by intellectual object identifier' do
+      get :index, intellectual_object_identifier: URI.encode(@intellectual_object.identifier), format: :json
+      expect(response).to be_successful
+      expect(assigns(:intellectual_object)).to eq @intellectual_object
+    end
+
+    it 'returns only active files' do
+      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'one', state: 'A')
+      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'two', state: 'D')
+      get :index, intellectual_object_identifier: URI.encode(@intellectual_object.identifier), format: :json
+      expect(response).to be_successful
+      response_data = JSON.parse(response.body)
+      expect(response_data.select{|f| f['state'] == 'A'}.count).to eq 2
+      expect(response_data.select{|f| f['state'] != 'A'}.count).to eq 0
     end
   end
 
-  def show
-    authorize @generic_file
-    respond_to do |format|
-      format.json { render json: object_as_json }
-      format.html {
-        @events = Kaminari.paginate_array(@generic_file.premisEvents.events).page(params[:page]).per(10)
-        super
-      }
+  describe 'GET #file_summary' do
+    before do
+      sign_in user
+      file.premisEvents.events_attributes = [
+          FactoryGirl.attributes_for(:premis_event_ingest),
+          FactoryGirl.attributes_for(:premis_event_fixity_generation)
+      ]
+      file.save!
+      get :show, generic_file_identifier: file
     end
-  end
 
-  def create
-    authorize @intellectual_object, :create_through_intellectual_object?
-    @generic_file = @intellectual_object.generic_files.new(params[:generic_file])
-    @generic_file.state = 'A'
-    respond_to do |format|
-      if @generic_file.save
-        format.json { render json: object_as_json, status: :created }
-      else
-        log_model_error(@generic_file)
-        format.json { render json: @generic_file.errors, status: :unprocessable_entity }
+    it 'can index files by intellectual object identifier' do
+      get :file_summary, intellectual_object_identifier: CGI.escape(@intellectual_object.identifier), format: :json, use_route: 'file_summary'
+      expect(response).to be_successful
+      expect(assigns(:intellectual_object)).to eq @intellectual_object
+    end
+
+    it 'returns only active files with uri, size and identifier attributes' do
+      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://one', identifier: 'file_one', state: 'A')
+      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://two', identifier: 'file_two', state: 'D')
+      get :file_summary, intellectual_object_identifier: CGI.escape(@intellectual_object.identifier), format: :json, use_route: 'file_summary'
+      expect(response).to be_successful
+
+      # Reload, or the files don't appear
+      @intellectual_object.reload
+
+      active_files = {}
+      @intellectual_object.active_files.each do |f|
+        key = "#{f.uri}-#{f.size}"
+        active_files[key] = f
+      end
+      response_data = JSON.parse(response.body)
+      response_data.each do |file_summary|
+        key = "#{file_summary['uri']}-#{file_summary['size']}"
+        generic_file = active_files[key]
+        expect(generic_file).not_to be_nil
+        expect(file_summary['uri']).to eq generic_file.uri
+        expect(file_summary['size']).to eq generic_file.size
+        expect(file_summary['identifier']).to eq generic_file.identifier
       end
     end
   end
 
-  #TODO: rewrite if necessary
-  def file_summary
-    authorize @intellectual_object
-    data = []
-    GenericFile.find_in_batches(object_state_ssi: 'A', gf_parent_ssim: @intellectual_object.identifier) do |batch|
-      batch.each do |solr_hash|
-        file = {}
-        file['size'] = solr_hash['tech_metadata__size_lsi']
-        file['identifier'] = solr_hash['tech_metadata__identifier_ssim'].first
-        file['uri'] = solr_hash['tech_metadata__uri_ssim'].first
-        data << file
+  describe 'GET #show' do
+    before do
+      sign_in user
+      file.premisEvents.events_attributes = [
+          FactoryGirl.attributes_for(:premis_event_ingest),
+          FactoryGirl.attributes_for(:premis_event_fixity_generation)
+      ]
+      file.save!
+      get :show, generic_file_identifier: file
+    end
+
+    it 'responds successfully' do
+      expect(response).to render_template('show')
+      response.should be_successful
+    end
+
+    it 'assigns the generic file' do
+      assigns(:generic_file).should == file
+    end
+
+    it 'assigns events' do
+      assigns(:events).count.should == file.premisEvents.events.count
+    end
+
+    it 'should show the file by identifier for API users' do
+      get :show, identifier: URI.encode(file.identifier), use_route: 'file_by_identifier_path'
+      #expect(response).to be_successful
+      expect(assigns(:generic_file)).to eq file
+    end
+
+  end
+
+  describe 'POST #create' do
+    describe 'when not signed in' do
+      let(:obj1) { @intellectual_object }
+      it 'should redirect to login' do
+        post :create, intellectual_object_identifier: obj1.identifier, intellectual_object: {title: 'Foo' }
+        expect(response).to redirect_to root_url + 'users/sign_in'
+        expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
     end
-    respond_to do |format|
-      format.json { render json: data }
-      format.html { super }
-    end
-  end
 
-  # /api/v1/files/not_checked_since?date=2015-01-01T00:00:00Z&start=100&rows=20
-  # Returns a list of GenericFiles that have not had a fixity
-  # check since the specified date.
-  def not_checked_since
-    datetime = Time.parse(params[:date]) rescue nil
-    if datetime.nil?
-      raise ActionController::BadRequest.new(type: 'date', e: "Param date is missing or invalid. Hint: Use format '2015-01-31T14:31:36Z'")
-    end
-    if current_user.admin? == false
-      logger.warn("User #{current_user.email} tried to access generic_files_controller#not_checked_since")
-      raise ActionController::Forbidden
-    end
-    @generic_files = GenericFile.find_files_in_need_of_fixity(params[:date], {rows: params[:rows], start: params[:start]})
-    respond_to do |format|
-      # Return active files only, not deleted files!
-      format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum]) } }
-      format.html { super }
-    end
-  end
+    describe 'when signed in' do
+      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @institution.pid) }
+      let(:obj1) { @intellectual_object }
+      before { sign_in user }
 
-  # /api/v1/objects/:intellectual_object_identifier/files/save_batch
-  #
-  # save_batch creates or updates a batch of GenericFile objects, along
-  # with their related PremisEvents. Although there's no built-in limit
-  # on the number of files you can save in a batch, you should limit
-  # batches to 200 or so files to avoid a response timeout.
-  #
-  # This methods determines whether to update an existing GenericFile
-  # or create a new one. It then adds any related events to the new/updated
-  # GenericFile.
-  #
-  # Before save_batch, saving a GenericFile required 7 HTTP calls:
-  #
-  # - 1 x check if file exists
-  # - 1 x save or update file
-  # - 5 x save generic file event
-  #
-  # Saving 200 generic files required 1400 HTTP calls. Now it requires 1.
-  #
-  # NOTE: The API client submits checksums in a param called :checksum.
-  # The remove_existing_checksums method below renames that param to
-  # :checksum_attributes. See the doc below on remove_existing_checksums.
-  #
-  # We have to rewrite the params here so that checksum becomes
-  # checksum_attributes. When serializing generic files back to the
-  # API client, this app always uses generic_file.checksum. Other
-  # contollers, such as the intellectual_object controller, also
-  # use generic_file.checksum for both input and output. However, Rails
-  # nested resources expects generic_file.checksum_attributes. That
-  # means the API has to serialize generic files differently, depending
-  # on which endpoint it's talking to, and Rails will reject the same
-  # JSON it just sent to the API client.
-  #
-  # Instead of making the API client guess which JSON format Rails wants,
-  # let's make consistent and use generic_file.checksum. We'll change it
-  # to checksum_attributes here to satisfy nested resources.
-  def save_batch
-    generic_files = []
-    current_object = nil
-    authorize @intellectual_object, :create_through_intellectual_object?
-    begin
-      params[:generic_files].each do |gf|
-        current_object = "GenericFile #{gf[:identifier]}"
-        if gf[:checksum].blank?
-          raise "GenericFile #{gf[:identifier]} is missing checksums."
-        end
-        if gf[:premisEvents].blank?
-          raise "GenericFile #{gf[:identifier]} is missing Premis Events."
-        end
-        gf_without_events = gf.except(:premisEvents, :checksum)
-        # Change param name to make inherited resources happy.
-        gf_without_events[:checksum_attributes] = gf[:checksum]
-        # Load the existing generic file, or create a new one.
-        generic_file = (GenericFile.where(tech_metadata__identifier_ssim: gf[:identifier]).first ||
-            @intellectual_object.generic_files.new(gf_without_events))
-        generic_file.state = 'A'
-        generic_file.intellectual_object = @intellectual_object if generic_file.intellectual_object.nil?
-        if generic_file.id.present?
-          # This is an update
-          gf_clean_data = remove_existing_checksums(generic_file, gf_without_events)
-          generic_file.update(gf_clean_data)
-        else
-          # New GenericFile
-          generic_file.save!
-        end
-        generic_files.push(generic_file)
-        gf[:premisEvents].each do |event|
-          current_object = "Event #{event[':type']} id #{event[:identifier]} for #{gf[:identifier]}"
-          generic_file.add_event(event)
+      describe "and assigning to an object you don't have access to" do
+        let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
+        it 'should be forbidden' do
+          post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
         end
       end
-      respond_to { |format| format.json { render json: array_as_json(generic_files), status: :created } }
-    rescue Exception => ex
-      logger.error("save_batch failed on #{current_object}")
-      log_exception(ex)
-      generic_files.each do |gf|
-        gf.destroy
+
+      it 'should show errors' do
+        post :create, intellectual_object_identifier: obj1.identifier, generic_file: {foo: 'bar'}, format: 'json'
+        expect(response.code).to eq '422' #Unprocessable Entity
+        expect(JSON.parse(response.body)).to eq( {
+                                                     'checksum' => ["can't be blank"],
+                                                     'created' => ["can't be blank"],
+                                                     'file_format' => ["can't be blank"],
+                                                     'identifier' => ["can't be blank"],
+                                                     'modified' => ["can't be blank"],
+                                                     'size' => ["can't be blank"],
+                                                     'uri' => ["can't be blank"]})
       end
-      respond_to { |format| format.json {
-        render json: { error: "#{ex.message} : #{current_object}" }, status: :unprocessable_entity }
-      }
-    end
-  end
 
-
-  def update
-    authorize @generic_file
-    @generic_file.state = 'A'
-    if resource.update(params_for_update)
-      head :no_content
-    else
-      log_model_error(resource)
-      render json: resource.errors, status: :unprocessable_entity
-    end
-  end
-
-  def destroy
-    authorize @generic_file, :soft_delete?
-    # Don't allow a delete request if an ingest or restore is in process
-    # for this object. OK to delete if another delete request is in process.
-    result = ProcessedItem.can_delete_file?(@generic_file.intellectual_object.identifier, @generic_file.identifier)
-    if @generic_file.state == 'D'
-      redirect_to @generic_file
-      flash[:alert] = 'This file has already been deleted.'
-    elsif result == 'true'
-      attributes = { type: 'delete',
-                     date_time: "#{Time.now}",
-                     detail: 'Object deleted from S3 storage',
-                     outcome: 'Success',
-                     outcome_detail: current_user.email,
-                     object: 'Goamz S3 Client',
-                     agent: 'https://github.com/crowdmob/goamz',
-                     outcome_information: "Action requested by user from #{current_user.institution_id}"
-      }
-      @generic_file.soft_delete(attributes)
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}"
-          redirect_to @generic_file.intellectual_object
-        }
+      it 'should update fields' do
+        #IntellectualObject.any_instance.should_receive(:update_index)
+        post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+        expect(response.code).to eq '201'
+        assigns(:generic_file).tap do |file|
+          expect(file.uri).to eq 'path/within/bag'
+          expect(file.content.dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg'
+          expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/puppy.jpg'
+        end
       end
-    else
-      redirect_to @generic_file
-      flash[:alert] = "Your file cannot be deleted at this time due to a pending #{result} request."
+
+      it 'should add generic file using API identifier' do
+        identifier = URI.escape(obj1.identifier)
+        post :create, intellectual_object_identifier: identifier, generic_file: {uri: 'path/within/bag', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/cat.jpg', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+        expect(response.code).to eq '201'
+        assigns(:generic_file).tap do |file|
+          expect(file.uri).to eq 'path/within/bag'
+          expect(file.content.dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg'
+          expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/cat.jpg'
+        end
+      end
+
+      it 'should create generic files larger than 2GB' do
+        identifier = URI.escape(obj1.identifier)
+        post :create, intellectual_object_identifier: identifier, generic_file: {uri: 'path/within/dog', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg', size: 300000000000, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/dog.jpg', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+        expect(response.code).to eq '201'
+        assigns(:generic_file).tap do |file|
+          expect(file.uri).to eq 'path/within/dog'
+          expect(file.content.dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg'
+          expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/dog.jpg'
+        end
+      end
+
     end
   end
 
-  protected
-
-  def filter_parameters
-    params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
-                                                                   :modified, :file_format,
-                                                                   checksum_attributes: [:digest, :algorithm, :datetime])
-  end
-
-  # When updating a generic file, the client will likely send back
-  # copy of the GenericFile object that includes checksum attributes.
-  # If we don't filter those out, Hydra will simply append those
-  # checksums to the original checksums, and every time the GenericFile
-  # is updated, the number of checksums doubles. We really only want
-  # to save the checksums when the GenericFile is created. After that,
-  # we'll do fixity checks to make sure they haven't changed, and those
-  # checks will be recorded as PremisEvents.
-  # Fixes bug https://www.pivotaltracker.com/story/show/73796812
-  def params_for_update
-    params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
-                                                                   :modified, :file_format)
-  end
-
-
-  def resource
-    @generic_file
-  end
-
-  def load_intellectual_object
-    if params[:intellectual_object_identifier]
-      @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
-    elsif params[:intellectual_object_id]
-      @intellectual_object = IntellectualObject.find(params[:intellectual_object_id])
-    else
-      @intellectual_object = GenericFile.find(params[:id]).intellectual_object
-    end
-  end
-
-  # Override Fedora's default JSON serialization for our API
-  def object_as_json
-    if params[:include_relations]
-      @generic_file.serializable_hash(include: [:checksum, :premisEvents])
-    else
-      @generic_file.serializable_hash()
-    end
-  end
-
-  # Given a list of GenericObjects, returns a list of serializable
-  # hashes that include checksum and PremisEvent data. That hash is
-  # suitable for JSON serialization back to the API client.
-  def array_as_json(list_of_generic_files)
-    list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksum, :premisEvents]) }
-  end
-
-  # Remove existing checksums from submitted generic file data.
-  # We don't want two copies of the same md5 and two of the same sha256.
-  # Returns a copy of gf_params with existing checksums removed.
-  # This prevents duplicate checksums from accumulating in the metadata.
-  def remove_existing_checksums(generic_file, gf_params)
-    copy_of_params = gf_params.deep_dup
-    generic_file.checksum.each do |existing_checksum|
-      copy_of_params[:checksum_attributes].delete_if do |submitted_checksum|
-        generic_file.has_checksum?(submitted_checksum[:digest])
+  describe 'POST #save_batch' do
+    describe 'when not signed in' do
+      let(:obj1) { @intellectual_object }
+      it 'should show unauthorized' do
+        post(:save_batch, intellectual_object_identifier: obj1.identifier, generic_files: [],
+             format: 'json', use_route: 'generic_file_create_batch')
+        expect(response.code).to eq '401' # unauthorized
       end
     end
-    copy_of_params
+
+    describe 'when signed in' do
+      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @institution.pid) }
+      let(:obj2) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id) }
+      let(:batch_obj) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id) }
+      let(:current_dir) { File.dirname(__FILE__) }
+      let(:json_file) { File.join(current_dir, '..', 'fixtures', 'generic_file_batch.json') }
+      let(:raw_json) { File.read(json_file) }
+      let(:gf_data) { JSON.parse(raw_json) }
+
+      before { sign_in user }
+
+      describe "and assigning to an object you don't have access to" do
+        it 'should be forbidden' do
+          post(:save_batch, intellectual_object_identifier: obj2.identifier, generic_files: [],
+               format: 'json', use_route: 'generic_file_create_batch')
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error', 'message'=>'You are not authorized to access this page.'})
+        end
+      end
+
+      # Loading test data from a fixture, because there there doesn't seem
+      # to be any direct method of creating a PremisEvent without saving it
+      # as well (see GenericFile.add_event). We need to save some files with
+      # new, unsaved PremisEvents.
+      describe 'and assigning to an object you do have access to' do
+        it 'it should create or update multiple files and their events' do
+          # First post is a create
+          post(:save_batch, intellectual_object_id: batch_obj.id, generic_files: gf_data,
+               format: 'json', use_route: 'generic_file_create_batch')
+          expect(response.code).to eq '201'
+          return_data = JSON.parse(response.body)
+          expect(return_data.count).to eq 2
+          expect(return_data[0]['id']).not_to be_empty
+          expect(return_data[1]['id']).not_to be_empty
+          expect(return_data[0]['state']).to eq 'A'
+          expect(return_data[1]['state']).to eq 'A'
+          expect(return_data[0]['premisEvents'].count).to eq 2
+          expect(return_data[1]['premisEvents'].count).to eq 2
+          expect(return_data[0]['checksum'].count).to eq 2
+          expect(return_data[1]['checksum'].count).to eq 2
+
+          # Now alter data and post again. Should be an update.
+          id1 = return_data[0]['id']
+          id2 = return_data[1]['id']
+          gf_data[0]['file_format'] = 'text/apple'
+          gf_data[1]['file_format'] = 'text/orange'
+
+          post(:save_batch, intellectual_object_identifier: batch_obj.identifier, generic_files: gf_data,
+               format: 'json', use_route: 'generic_file_create_batch')
+          expect(response.code).to eq '201'
+          return_data = JSON.parse(response.body)
+          expect(return_data.count).to eq 2
+          expect(return_data[0]['id']).to eq id1
+          expect(return_data[1]['id']).to eq id2
+          expect(return_data[0]['file_format']).to eq 'text/apple'
+          expect(return_data[1]['file_format']).to eq 'text/orange'
+          expect(return_data[0]['premisEvents'].count).to eq 2
+          expect(return_data[1]['premisEvents'].count).to eq 2
+          expect(return_data[0]['checksum'].count).to eq 2
+          expect(return_data[1]['checksum'].count).to eq 2
+        end
+      end
+
+    end
   end
 
-  # Load generic file by identifier, if we got that, or by id if we got an id.
-  # Identifiers always start with data/, so we can look for a slash. Ids include
-  # a urn, a colon, and an integer. They will not include a slash.
-  def load_generic_file
-    if params[:generic_file_identifier]
-      @generic_file = GenericFile.where(identifier: params[:generic_file_identifier]).first
-      params[:id] = @generic_file.id unless @generic_file.nil?
-    elsif params[:id]
-      @generic_file = GenericFile.find(params[:id])
+  describe 'PATCH #update' do
+    before(:all) { @file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id) }
+    let(:file) { @file }
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        patch :update, intellectual_object_identifier: file.intellectual_object, generic_file_identifier: file, trailing_slash: true
+        expect(response).to redirect_to root_url + 'users/sign_in'
+        expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
+      end
     end
-    unless @generic_file.nil?
-      @intellectual_object = @generic_file.intellectual_object
-      @institution = @intellectual_object.institution
+
+    describe 'when signed in' do
+      before { sign_in user }
+
+      describe "and updating a file you don't have access to" do
+        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @another_institution.id) }
+        it 'should be forbidden' do
+          patch :update, intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file.identifier, generic_file: {size: 99}, format: 'json', trailing_slash: true
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
+        end
+      end
+
+      describe 'and you have access to the file' do
+        it 'should update the file' do
+          patch :update, intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file, generic_file: {size: 99}, format: 'json', trailing_slash: true
+          expect(assigns[:generic_file].size).to eq 99
+          expect(response.code).to eq '204'
+        end
+
+        it 'should update the file by identifier (API)' do
+          patch :update, generic_file_identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true
+          expect(assigns[:generic_file].size).to eq 99
+          expect(response.code).to eq '204'
+        end
+      end
     end
   end
 
+  describe 'DELETE #destroy' do
+    before(:all) {
+      @file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+      @parent_work_item = FactoryGirl.create(:work_item,
+                                                  object_identifier: @intellectual_object.identifier,
+                                                  action: Fluctus::Application::FLUCTUS_ACTIONS['ingest'],
+                                                  stage: Fluctus::Application::FLUCTUS_STAGES['record'],
+                                                  status: Fluctus::Application::FLUCTUS_STATUSES['success'])
+    }
+    let(:file) { @file }
+
+    after(:all) {
+      @parent_work_item.delete
+    }
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        delete :destroy, generic_file_identifier: file
+        expect(response).to redirect_to root_url + 'users/sign_in'
+        expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
+      end
+    end
+
+    describe 'when signed in' do
+      before { sign_in user }
+
+      describe "and deleting a file you don't have access to" do
+        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @another_institution.id) }
+        it 'should be forbidden' do
+          delete :destroy, generic_file_identifier: file, format: 'json'
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
+        end
+      end
+
+      describe 'and you have access to the file' do
+        it 'should delete the file' do
+          delete :destroy, generic_file_identifier: file, format: 'json'
+          expect(assigns[:generic_file].state).to eq 'D'
+          expect(response.code).to eq '204'
+        end
+
+        it 'delete the file with html response' do
+          file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+          delete :destroy, generic_file_identifier: file
+          expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
+          expect(assigns[:generic_file].state).to eq 'D'
+          expect(flash[:notice]).to eq "Delete job has been queued for file: #{file.uri}"
+        end
+
+        it 'should create a WorkItem with the delete request' do
+          file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+          delete :destroy, generic_file_identifier: file, format: 'json'
+          wi = WorkItem.where(generic_file_identifier: file.identifier).first
+          expect(wi).not_to be_nil
+          expect(wi.object_identifier).to eq @intellectual_object.identifier
+          expect(wi.action).to eq Fluctus::Application::FLUCTUS_ACTIONS['delete']
+          expect(wi.stage).to eq Fluctus::Application::FLUCTUS_STAGES['requested']
+          expect(wi.status).to eq Fluctus::Application::FLUCTUS_STATUSES['pend']
+        end
+
+      end
+    end
+  end
+
+  describe 'GET #not_checked_since' do
+    describe 'when signed in as an admin user' do
+      before do
+        sign_in user
+      end
+
+      it 'allows access to the API endpoint' do
+        get :not_checked_since, date: '2015-01-31T14:31:36Z', format: :json, use_route: :files_not_checked_since
+        expect(response.status).to eq 200
+      end
+    end
+  end
 end
