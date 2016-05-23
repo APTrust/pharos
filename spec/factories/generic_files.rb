@@ -10,7 +10,7 @@ FactoryGirl.define do
     modified { "#{Time.now}" }
 
     after(:build) do  |generic_file|
-      generic_file.checksum.build({
+      generic_file.checksums.build({
                                       algorithm: 'md5',
                                       datetime: Time.now.to_s,
                                       digest: SecureRandom.hex

@@ -111,14 +111,14 @@ class GenericFile < ActiveRecord::Base
         state: state,
     }
     if options.has_key?(:include)
-      data.merge!(checksum: serialize_checksums) if options[:include].include?(:checksum)
+      data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksum)
       data.merge!(premisEvents: serialize_events) if options[:include].include?(:PremisEvent)
     end
     data
   end
 
   def serialize_checksums
-    checksum.map do |cs|
+    checksums.map do |cs|
       {
           algorithm: cs.algorithm.first,
           digest: cs.digest.first,
@@ -137,7 +137,7 @@ class GenericFile < ActiveRecord::Base
   # No need to specify algorithm, since we're using md5 and sha256,
   # and their digests have different lengths.
   def find_checksum_by_digest(digest)
-    checksum.select { |cs| digest.strip == cs.digest.first.to_s.strip }.first
+    checksums.select { |cs| digest.strip == cs.digest.first.to_s.strip }.first
   end
 
   # Returns true if the GenericFile has a checksum with the specified digest.
@@ -152,13 +152,13 @@ class GenericFile < ActiveRecord::Base
   end
 
   def has_right_number_of_checksums
-    if(checksum.count == 0)
-      errors.add(:checksum, "can't be blank")
+    if(checksums.count == 0)
+      errors.add(:checksums, "can't be blank")
     else
       algorithms = Array.new
-      checksum.each do |cs|
+      checksums.each do |cs|
         if (algorithms.include? cs)
-          errors.add(:checksum, "can't have multiple checksums with same algorithm")
+          errors.add(:checksums, "can't have multiple checksums with same algorithm")
         else
           algorithms.push(cs)
         end
@@ -169,7 +169,7 @@ class GenericFile < ActiveRecord::Base
   def identifier_is_unique
     return if self.identifier.nil?
     count = 0;
-    files = GenericFile.where(tech_metadata__identifier_ssim: self.identifier)
+    files = GenericFile.where(identifier: self.identifier)
     count +=1 if files.count == 1 && files.first.id != self.id
     count = files.count if files.count > 1
     if(count > 0)

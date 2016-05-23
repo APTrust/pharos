@@ -11,13 +11,10 @@ RSpec.describe IntellectualObject, :type => :model do
   it { should validate_presence_of(:access)}
 
   describe 'An instance' do
-    it 'should have a descMetadata datastream' do
-      subject.descMetadata.should be_kind_of IntellectualObjectMetadata
-    end
 
-    it 'should have a premisEvents datastream' do
-      subject.premisEvents.should be_kind_of PremisEventsMetadata
-    end
+    # it 'should have a premisEvents datastream' do
+    #   subject.premisEvents.should be_kind_of PremisEventsMetadata
+    # end
 
     it 'should properly set a title' do
       subject.title = 'War and Peace'
@@ -49,7 +46,7 @@ RSpec.describe IntellectualObject, :type => :model do
     it 'should properly set an alternative identifier' do
       exp = 'test.edu/123456'
       subject.alt_identifier = exp
-      subject.alt_identifier.should == [exp]
+      subject.alt_identifier.should == exp
     end
 
     it 'should properly set a bag name' do
@@ -140,13 +137,13 @@ RSpec.describe IntellectualObject, :type => :model do
           subject.soft_delete({type: 'delete', outcome_detail: 'user@example.com'})
           subject.background_deletion({type: 'delete', outcome_detail: 'user@example.com'})
           subject.generic_files.all?{ |file|
-            pi = WorkItem.where(generic_file_identifier: file.identifier).first
-            expect(pi).not_to be_nil
-            expect(pi.object_identifier).to eq subject.identifier
-            expect(pi.action).to eq Fluctus::Application::FLUCTUS_ACTIONS['delete']
-            expect(pi.stage).to eq Fluctus::Application::FLUCTUS_STAGES['requested']
-            expect(pi.status).to eq Fluctus::Application::FLUCTUS_STATUSES['pend']
-            expect(pi.user).to eq 'user@example.com'
+            wi = WorkItem.where(generic_file_identifier: file.identifier).first
+            expect(wi).not_to be_nil
+            expect(wi.object_identifier).to eq subject.identifier
+            expect(wi.action).to eq Fluctus::Application::FLUCTUS_ACTIONS['delete']
+            expect(wi.stage).to eq Fluctus::Application::FLUCTUS_STAGES['requested']
+            expect(wi.status).to eq Fluctus::Application::FLUCTUS_STATUSES['pend']
+            expect(wi.user).to eq 'user@example.com'
           }
         end
 
