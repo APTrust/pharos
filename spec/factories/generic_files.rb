@@ -8,14 +8,7 @@ FactoryGirl.define do
     size { rand(20000..500000000) }
     created { "#{Time.now}" }
     modified { "#{Time.now}" }
-
-    after(:build) do  |generic_file|
-      generic_file.checksums.build({
-                                      algorithm: 'md5',
-                                      datetime: Time.now.to_s,
-                                      digest: SecureRandom.hex
-                                  })
-    end
+    checksums {[ FactoryGirl.build(:checksum, algorithm: 'md5', datetime: Time.now.to_s, digest: SecureRandom.hex) ]}
 
   end
 
