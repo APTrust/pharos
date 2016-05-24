@@ -176,7 +176,7 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'find_checksum_by_digest' do
-        let(:digest) { subject.checksum.last.digest.first.to_s }
+        let(:digest) { subject.checksums.last.digest.first.to_s }
         it 'should find the checksum' do
           expect(subject.find_checksum_by_digest(digest)).not_to be_empty
         end
@@ -186,13 +186,13 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'has_checksum?' do
-        let(:digest) { subject.checksum.last.digest.first.to_s }
+        let(:digest) { subject.checksums.last.digest.first.to_s }
         it 'should return true if checksum is present' do
           expect(subject.has_checksum?(digest)).to be true
         end
         it 'should return false if checksum is not present' do
           expect(subject.has_checksum?(' :( ')).to be false
-        end
+        end                                              git
       end
 
     end

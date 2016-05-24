@@ -152,11 +152,12 @@ class GenericFile < ActiveRecord::Base
   end
 
   def has_right_number_of_checksums
-    if(checksums.count == 0)
+    if(self.checksums.count == 0)
+      puts "You are inside the loop #{self.checksums.first}"
       errors.add(:checksums, "can't be blank")
     else
       algorithms = Array.new
-      checksums.each do |cs|
+      self.checksums.each do |cs|
         if (algorithms.include? cs)
           errors.add(:checksums, "can't have multiple checksums with same algorithm")
         else
