@@ -6,12 +6,12 @@ class GenericFile < ActiveRecord::Base
   has_many :checksums
   accepts_nested_attributes_for :checksums
 
-  validates_presence_of :uri
-  validates_presence_of :size
-  validates_presence_of :created
-  validates_presence_of :modified
-  validates_presence_of :file_format
-  validates_presence_of :identifier
+  validates :uri, presence: true
+  validates :size, presence: true
+  validates :created, presence: true
+  validates :modified, presence: true
+  validates :file_format, presence: true
+  validates :identifier, presence: true
   validate :has_right_number_of_checksums
   validate :identifier_is_unique
 

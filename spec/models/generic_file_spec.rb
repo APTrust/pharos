@@ -26,7 +26,6 @@ RSpec.describe GenericFile, :type => :model do
     expect(subject.valid?).to be false
     expect(subject.errors[:checksums]).to eq ["can't be blank"]
     subject.checksum_attributes = [{digest: '1234'}]
-    # other fields cause the object to not be valid. This forces recalculating errors
     expect(subject.valid?).to be false
     expect(subject.errors[:checksums]).to be_empty
   end
@@ -192,7 +191,7 @@ RSpec.describe GenericFile, :type => :model do
         end
         it 'should return false if checksum is not present' do
           expect(subject.has_checksum?(' :( ')).to be false
-        end                                              git
+        end
       end
 
     end

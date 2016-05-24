@@ -7,10 +7,10 @@ class IntellectualObject < ActiveRecord::Base
   has_many :checksums, through: :generic_files
   accepts_nested_attributes_for :generic_files
 
-  validates_presence_of :title
-  validates_presence_of :institution
-  validates_presence_of :identifier
-  validates_presence_of :access
+  validates :title, presence: true
+  validates :institution, presence: true
+  validates :identifier, presence: true
+  validates :access, presence: true
   validates_inclusion_of :access, in: %w(consortia institution restricted), message: "#{:access} is not a valid access", if: :access
   validate :identifier_is_unique
 
