@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160525195618) do
+ActiveRecord::Schema.define(version: 20160525200329) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20160525195618) do
     t.string   "read_groups"
     t.string   "edit_groups"
     t.string   "discover_groups"
+    t.string   "permissions"
   end
 
   add_index "generic_files", ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
@@ -66,6 +67,7 @@ ActiveRecord::Schema.define(version: 20160525195618) do
     t.string   "read_groups"
     t.string   "edit_groups"
     t.string   "discover_groups"
+    t.string   "permissions"
   end
 
   add_index "intellectual_objects", ["institution_id"], name: "index_intellectual_objects_on_institution_id"
