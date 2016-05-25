@@ -25,16 +25,16 @@ class User < ActiveRecord::Base
   # This method assigns permission groups
   # Don't think these are necessary anymore, we use Pundit/Roles
   def groups
-    super + institution_groups
+    institution_groups + ['registered']
   end
 
   def institution_groups
     if institutional_admin?
-      ["Admin_At_#{institution_group_suffix}"]
+      ["Admin_At_#{institution_group_suffix}", 'institutional_admin']
     elsif institutional_user?
-      ["User_At_#{institution_group_suffix}"]
+      ["User_At_#{institution_group_suffix}", 'institutional_user']
     else
-      []
+      ['admin']
     end
   end
 
