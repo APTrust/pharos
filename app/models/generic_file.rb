@@ -15,7 +15,6 @@ class GenericFile < ActiveRecord::Base
   validate :has_right_number_of_checksums
   validate :identifier_is_unique
 
-  before_save :copy_permissions_from_intellectual_object
   after_save :update_parent_index
 
   delegate :institution, to: :intellectual_object
@@ -145,11 +144,12 @@ class GenericFile < ActiveRecord::Base
     find_checksum_by_digest(digest).nil? == false
   end
 
-  private
-
-  def copy_permissions_from_intellectual_object
-    self.permissions = intellectual_object.permissions if intellectual_object
+  def check_permissions
+    permissions = intellectual_object.check_permissions if intellectual_object
+    permissions
   end
+
+  private
 
   def has_right_number_of_checksums
     if(self.checksums.count == 0)

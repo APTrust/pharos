@@ -14,7 +14,6 @@ class IntellectualObject < ActiveRecord::Base
   validates_inclusion_of :access, in: %w(consortia institution restricted), message: "#{:access} is not a valid access", if: :access
   validate :identifier_is_unique
 
-  before_save :set_permissions
   before_save :set_bag_name
   before_save :active_files
   before_destroy :check_for_associations
@@ -141,6 +140,28 @@ class IntellectualObject < ActiveRecord::Base
     data
   end
 
+  def check_permissions
+    inst_id = self.institution.id
+    inst_admin_group = "Admin_At_#{inst_id}"
+    inst_user_group = "User_At_#{inst_id}"
+    permissions = {}
+    case access
+      when 'consortia'
+        permissions[:discover_groups] = %w(admin institutional_admin institutional_user)
+        permissions[:read_groups] = %w(admin institutional_admin institutional_user)
+        permissions[:edit_groups] = ['admin', inst_admin_group]
+      when 'institution'
+        permissions[:discover_groups] = ['admin', inst_user_group, inst_admin_group]
+        permissions[:read_groups] = ['admin', inst_user_group, inst_admin_group]
+        permissions[:edit_groups] = ['admin', inst_admin_group]
+      when 'restricted'
+        permissions[:discover_groups] = ['admin', inst_user_group, inst_admin_group]
+        permissions[:read_groups] = ['admin', inst_admin_group]
+        permissions[:edit_groups] = ['admin', inst_admin_group]
+    end
+    permissions
+  end
+
   private
   def identifier_is_unique
     return if self.identifier.nil?
@@ -152,23 +173,6 @@ class IntellectualObject < ActiveRecord::Base
     end
     if(count > 0)
       errors.add(:identifier, 'has already been taken')
-    end
-  end
-
-  def set_permissions
-    inst_id = self.institution.id
-    inst_admin_group = "Admin_At_#{inst_id}"
-    inst_user_group = "User_At_#{inst_id}"
-    case access
-      when 'consortia'
-        self.read_groups = %w(institutional_admin institutional_user)
-        self.edit_groups = [inst_admin_group]
-      when 'institution'
-        self.read_groups = [inst_user_group]
-        self.edit_groups = [inst_admin_group]
-      when 'restricted'
-        self.discover_groups = [inst_user_group]
-        self.edit_groups = [inst_admin_group]
     end
   end
 
