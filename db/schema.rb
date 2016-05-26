@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160525200713) do
+ActiveRecord::Schema.define(version: 20160526192033) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -33,9 +33,6 @@ ActiveRecord::Schema.define(version: 20160525200713) do
     t.integer  "intellectual_object_id"
     t.datetime "created",                null: false
     t.datetime "modified",               null: false
-    t.string   "read_groups"
-    t.string   "edit_groups"
-    t.string   "discover_groups"
     t.string   "permissions"
   end
 
@@ -62,11 +59,8 @@ ActiveRecord::Schema.define(version: 20160525200713) do
     t.string   "bag_name"
     t.string   "institution"
     t.integer  "institution_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-    t.string   "read_groups"
-    t.string   "edit_groups"
-    t.string   "discover_groups"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
     t.string   "permissions"
   end
 
