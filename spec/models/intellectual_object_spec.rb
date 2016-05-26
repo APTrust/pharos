@@ -155,27 +155,30 @@ RSpec.describe IntellectualObject, :type => :model do
       describe 'with consortial access' do
         subject { FactoryGirl.create(:consortial_intellectual_object) }
         it 'should properly set groups' do
-          expect(subject.edit_groups).to eq ["Admin_At_#{inst_id}"]
-          expect(subject.read_groups).to match_array %w(institutional_user institutional_admin)
-          expect(subject.discover_groups).to eq []
+          permissions = subject.check_permissions
+          expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
+          expect(permissions[:read_groups]).to eq %w(admin institutional_admin institutional_user)
+          expect(permissions[:discover_groups]).to eq %w(admin institutional_admin institutional_user)
         end
       end
 
       describe 'with institutional access' do
         subject { FactoryGirl.create(:institutional_intellectual_object) }
         it 'should properly set groups' do
-          expect(subject.edit_groups).to eq ["Admin_At_#{inst_id}"]
-          expect(subject.read_groups).to eq ["User_At_#{inst_id}"]
-          expect(subject.discover_groups).to eq []
+          permissions = subject.check_permissions
+          expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
+          expect(permissions[:read_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
+          expect(permissions[:discover_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
         end
       end
 
       describe 'with restricted access' do
         subject { FactoryGirl.create(:restricted_intellectual_object) }
         it 'should properly set groups' do
-          expect(subject.edit_groups).to eq ["Admin_At_#{inst_id}"]
-          expect(subject.read_groups).to eq []
-          expect(subject.discover_groups).to eq ["User_At_#{inst_id}"]
+          permissions = subject.check_permissions
+          expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
+          expect(permissions[:read_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
+          expect(permissions[:discover_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
         end
       end
 

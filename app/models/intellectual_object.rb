@@ -151,11 +151,11 @@ class IntellectualObject < ActiveRecord::Base
         permissions[:read_groups] = %w(admin institutional_admin institutional_user)
         permissions[:edit_groups] = ['admin', inst_admin_group]
       when 'institution'
-        permissions[:discover_groups] = ['admin', inst_user_group, inst_admin_group]
-        permissions[:read_groups] = ['admin', inst_user_group, inst_admin_group]
+        permissions[:discover_groups] = ['admin', inst_admin_group, inst_user_group]
+        permissions[:read_groups] = ['admin', inst_admin_group, inst_user_group]
         permissions[:edit_groups] = ['admin', inst_admin_group]
       when 'restricted'
-        permissions[:discover_groups] = ['admin', inst_user_group, inst_admin_group]
+        permissions[:discover_groups] = ['admin', inst_admin_group, inst_user_group]
         permissions[:read_groups] = ['admin', inst_admin_group]
         permissions[:edit_groups] = ['admin', inst_admin_group]
     end
