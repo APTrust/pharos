@@ -8,9 +8,9 @@ FactoryGirl.define do
     bucket { "aptrust.receiving.#{institution}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
-    action { Fluctus::Application::FLUCTUS_ACTIONS.values.sample }
-    stage { Fluctus::Application::FLUCTUS_STAGES.values.sample }
-    status { Fluctus::Application::FLUCTUS_STATUSES.values.sample }
+    action { Pharos::Application::PHAROS_ACTIONS.values.sample }
+    stage { Pharos::Application::PHAROS_STAGES.values.sample }
+    status { Pharos::Application::PHAROS_STATUSES.values.sample }
     outcome { Faker::Lorem.sentence }
     reviewed { false }
   end
@@ -24,9 +24,9 @@ FactoryGirl.define do
     bucket { "aptrust.receiving.#{institution}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
-    action { Fluctus::Application::FLUCTUS_ACTIONS['ingest'] }
-    stage { Fluctus::Application::FLUCTUS_STAGES['record'] }
-    status { Fluctus::Application::FLUCTUS_STATUSES['success'] }
+    action { Pharos::Application::PHAROS_ACTIONS['ingest'] }
+    stage { Pharos::Application::PHAROS_STAGES['record'] }
+    status { Pharos::Application::PHAROS_STATUSES['success'] }
     outcome { Faker::Lorem.sentence }
     reviewed { false }
   end
@@ -40,9 +40,9 @@ FactoryGirl.define do
     bucket { "aptrust.receiving.#{institution}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
-    action { Fluctus::Application::FLUCTUS_ACTIONS.values.sample }
-    stage { Fluctus::Application::FLUCTUS_STAGES.values.sample }
-    status { Fluctus::Application::FLUCTUS_STATUSES.values.sample }
+    action { Pharos::Application::PHAROS_ACTIONS.values.sample }
+    stage { Pharos::Application::PHAROS_STAGES.values.sample }
+    status { Pharos::Application::PHAROS_STATUSES.values.sample }
     outcome { Faker::Lorem.sentence }
     reviewed { false }
     state { Faker::Lorem.sentence }

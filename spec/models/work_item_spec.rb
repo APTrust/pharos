@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-ingest = Fluctus::Application::FLUCTUS_ACTIONS['ingest']
-restore = Fluctus::Application::FLUCTUS_ACTIONS['restore']
-dpn = Fluctus::Application::FLUCTUS_ACTIONS['dpn']
-requested = Fluctus::Application::FLUCTUS_STAGES['requested']
-receive = Fluctus::Application::FLUCTUS_STAGES['receive']
-record = Fluctus::Application::FLUCTUS_STAGES['record']
-clean = Fluctus::Application::FLUCTUS_STAGES['clean']
-success = Fluctus::Application::FLUCTUS_STATUSES['success']
-failed = Fluctus::Application::FLUCTUS_STATUSES['fail']
-pending = Fluctus::Application::FLUCTUS_STATUSES['pend']
+ingest = Pharos::Application::PHAROS_ACTIONS['ingest']
+restore = Pharos::Application::PHAROS_ACTIONS['restore']
+dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
+requested = Pharos::Application::PHAROS_STAGES['requested']
+receive = Pharos::Application::PHAROS_STAGES['receive']
+record = Pharos::Application::PHAROS_STAGES['record']
+clean = Pharos::Application::PHAROS_STAGES['clean']
+success = Pharos::Application::PHAROS_STATUSES['success']
+failed = Pharos::Application::PHAROS_STATUSES['fail']
+pending = Pharos::Application::PHAROS_STATUSES['pend']
 
 # Creates an item we can save. We'll set action, stage and status
 # for various tests below
@@ -221,9 +221,9 @@ RSpec.describe WorkItem, :type => :model do
       3.times do
         ingest_date = ingest_date + 1.days
         FactoryGirl.create(:work_item, object_identifier: 'abc/123',
-                           action: Fluctus::Application::FLUCTUS_ACTIONS['ingest'],
-                           stage: Fluctus::Application::FLUCTUS_STAGES['record'],
-                           status: Fluctus::Application::FLUCTUS_STATUSES['success'],
+                           action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                           stage: Pharos::Application::PHAROS_STAGES['record'],
+                           status: Pharos::Application::PHAROS_STATUSES['success'],
                            date: ingest_date)
       end
     end
@@ -236,9 +236,9 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a restoration request when asked' do
       wi = WorkItem.create_restore_request('abc/123', 'mikey@example.com')
-      wi.action.should == Fluctus::Application::FLUCTUS_ACTIONS['restore']
-      wi.stage.should == Fluctus::Application::FLUCTUS_STAGES['requested']
-      wi.status.should == Fluctus::Application::FLUCTUS_STATUSES['pend']
+      wi.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
+      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
+      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
       wi.note.should == 'Restore requested'
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
@@ -253,9 +253,9 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a dpn request when asked' do
       wi = WorkItem.create_dpn_request('abc/123', 'mikey@example.com')
-      wi.action.should == Fluctus::Application::FLUCTUS_ACTIONS['dpn']
-      wi.stage.should == Fluctus::Application::FLUCTUS_STAGES['requested']
-      wi.status.should == Fluctus::Application::FLUCTUS_STATUSES['pend']
+      wi.action.should == Pharos::Application::PHAROS_ACTIONS['dpn']
+      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
+      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
       wi.note.should == 'Requested item be sent to DPN'
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
@@ -270,9 +270,9 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a delete request when asked' do
       wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com')
-      wi.action.should == Fluctus::Application::FLUCTUS_ACTIONS['delete']
-      wi.stage.should == Fluctus::Application::FLUCTUS_STAGES['requested']
-      wi.status.should == Fluctus::Application::FLUCTUS_STATUSES['pend']
+      wi.action.should == Pharos::Application::PHAROS_ACTIONS['delete']
+      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
+      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
       wi.note.should == 'Delete requested'
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'

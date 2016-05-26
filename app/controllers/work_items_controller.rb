@@ -122,12 +122,12 @@ class WorkItemsController < ApplicationController
 
   def authoritative_index
     current_action = params[:current_action]
-    delete = Fluctus::Application::FLUCTUS_ACTIONS['delete']
-    restore = Fluctus::Application::FLUCTUS_ACTIONS['restore']
-    dpn = Fluctus::Application::FLUCTUS_ACTIONS['dpn']
-    requested = Fluctus::Application::FLUCTUS_STAGES['requested']
-    pending = Fluctus::Application::FLUCTUS_STATUSES['pend']
-    failed = Fluctus::Application::FLUCTUS_STATUSES['fail']
+    delete = Pharos::Application::PHAROS_ACTIONS['delete']
+    restore = Pharos::Application::PHAROS_ACTIONS['restore']
+    dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
+    requested = Pharos::Application::PHAROS_STAGES['requested']
+    pending = Pharos::Application::PHAROS_STATUSES['pend']
+    failed = Pharos::Application::PHAROS_STATUSES['fail']
     case current_action
     when 'delete'
       @items = WorkItem.where(action: delete)
@@ -175,9 +175,9 @@ class WorkItemsController < ApplicationController
       @items = @items.where('updated_at >= ?', date)
     end
 
-    @items = @items.where(action: Fluctus::Application::FLUCTUS_ACTIONS[params[:item_action]]) if params[:item_action].present?
-    @items = @items.where(stage: Fluctus::Application::FLUCTUS_STAGES[params[:stage]]) if params[:stage].present?
-    @items = @items.where(status: Fluctus::Application::FLUCTUS_STATUSES[params[:status]]) if params[:status].present?
+    @items = @items.where(action: Pharos::Application::PHAROS_ACTIONS[params[:item_action]]) if params[:item_action].present?
+    @items = @items.where(stage: Pharos::Application::PHAROS_STAGES[params[:stage]]) if params[:stage].present?
+    @items = @items.where(status: Pharos::Application::PHAROS_STATUSES[params[:status]]) if params[:status].present?
     @items = @items.where(reviewed: to_boolean(params[:reviewed])) if params[:reviewed].present?
     @count = @items.count
     params[:page] = 1 unless params[:page].present?
@@ -244,7 +244,7 @@ class WorkItemsController < ApplicationController
   def set_restoration_status
     # Fix Apache/Passenger passthrough of %2f-encoded slashes in identifier
     params[:object_identifier] = params[:object_identifier].gsub(/%2F/i, "/")
-    restore = Fluctus::Application::FLUCTUS_ACTIONS['restore']
+    restore = Pharos::Application::PHAROS_ACTIONS['restore']
     @item = WorkItem.where(object_identifier: params[:object_identifier],
                                 action: restore).order(created_at: :desc).first
     authorize @item || WorkItem.new  # avoids Pundit NilClass exception
@@ -280,7 +280,7 @@ class WorkItemsController < ApplicationController
         id = item.split("_")[1]
         proc_item = WorkItem.find(id)
         authorize proc_item, :mark_as_reviewed?
-        if (proc_item.status == Fluctus::Application::FLUCTUS_STATUSES['success'] || proc_item.status == Fluctus::Application::FLUCTUS_STATUSES['fail'])
+        if (proc_item.status == Pharos::Application::PHAROS_STATUSES['success'] || proc_item.status == Pharos::Application::PHAROS_STATUSES['fail'])
           proc_item.reviewed = true
           proc_item.save!
         end
@@ -297,7 +297,7 @@ class WorkItemsController < ApplicationController
     current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution: current_user.institution.identifier)
     authorize items
     items.each do |item|
-      if item.date < session[:purge_datetime] && (item.status == Fluctus::Application::FLUCTUS_STATUSES['success'] || item.status == Fluctus::Application::FLUCTUS_STATUSES['fail'])
+      if item.date < session[:purge_datetime] && (item.status == Pharos::Application::PHAROS_STATUSES['success'] || item.status == Pharos::Application::PHAROS_STATUSES['fail'])
         item.reviewed = true
         item.save!
       end
@@ -327,9 +327,9 @@ class WorkItemsController < ApplicationController
   end
 
   def set_filter_values
-    @statuses = Fluctus::Application::FLUCTUS_STATUSES.values
-    @stages = Fluctus::Application::FLUCTUS_STAGES.values
-    @actions = Fluctus::Application::FLUCTUS_ACTIONS.values
+    @statuses = Pharos::Application::PHAROS_STATUSES.values
+    @stages = Pharos::Application::PHAROS_STAGES.values
+    @actions = Pharos::Application::PHAROS_ACTIONS.values
     @institutions = Array.new
     Institution.all.each do |inst|
       @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'

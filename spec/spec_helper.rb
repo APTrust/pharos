@@ -31,7 +31,7 @@ Warden.test_mode!
 
 RSpec.configure do |config|
 
-  # Add all fluctus roles before testing.
+  # Add all pharos roles before testing.
   config.before(:all) do
     %w(admin institutional_admin institutional_user).each do |role|
       Role.where(name: role).first_or_create

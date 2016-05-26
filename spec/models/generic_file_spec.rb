@@ -110,9 +110,9 @@ RSpec.describe GenericFile, :type => :model do
           subject.save!
           @parent_work_item = FactoryGirl.create(:work_item,
                                                       object_identifier: subject.intellectual_object.identifier,
-                                                      action: Fluctus::Application::FLUCTUS_ACTIONS['ingest'],
-                                                      stage: Fluctus::Application::FLUCTUS_STAGES['record'],
-                                                      status: Fluctus::Application::FLUCTUS_STATUSES['success'])
+                                                      action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                                      stage: Pharos::Application::PHAROS_STAGES['record'],
+                                                      status: Pharos::Application::PHAROS_STATUSES['success'])
         end
         after do
           subject.destroy
@@ -135,9 +135,9 @@ RSpec.describe GenericFile, :type => :model do
           pi = WorkItem.where(generic_file_identifier: subject.identifier).first
           expect(pi).not_to be_nil
           expect(pi.object_identifier).to eq subject.intellectual_object.identifier
-          expect(pi.action).to eq Fluctus::Application::FLUCTUS_ACTIONS['delete']
-          expect(pi.stage).to eq Fluctus::Application::FLUCTUS_STAGES['requested']
-          expect(pi.status).to eq Fluctus::Application::FLUCTUS_STATUSES['pend']
+          expect(pi.action).to eq Pharos::Application::PHAROS_ACTIONS['delete']
+          expect(pi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
+          expect(pi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
           expect(pi.user).to eq 'user@example.com'
         end
 

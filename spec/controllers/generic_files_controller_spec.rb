@@ -313,9 +313,9 @@ RSpec.describe GenericFilesController, type: :controller do
       @file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
       @parent_work_item = FactoryGirl.create(:work_item,
                                                   object_identifier: @intellectual_object.identifier,
-                                                  action: Fluctus::Application::FLUCTUS_ACTIONS['ingest'],
-                                                  stage: Fluctus::Application::FLUCTUS_STAGES['record'],
-                                                  status: Fluctus::Application::FLUCTUS_STATUSES['success'])
+                                                  action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                                  stage: Pharos::Application::PHAROS_STAGES['record'],
+                                                  status: Pharos::Application::PHAROS_STATUSES['success'])
     }
     let(:file) { @file }
 
@@ -364,9 +364,9 @@ RSpec.describe GenericFilesController, type: :controller do
           wi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(wi).not_to be_nil
           expect(wi.object_identifier).to eq @intellectual_object.identifier
-          expect(wi.action).to eq Fluctus::Application::FLUCTUS_ACTIONS['delete']
-          expect(wi.stage).to eq Fluctus::Application::FLUCTUS_STAGES['requested']
-          expect(wi.status).to eq Fluctus::Application::FLUCTUS_STATUSES['pend']
+          expect(wi.action).to eq Pharos::Application::PHAROS_ACTIONS['delete']
+          expect(wi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
+          expect(wi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
         end
 
       end

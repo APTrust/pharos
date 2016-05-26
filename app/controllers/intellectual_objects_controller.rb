@@ -132,7 +132,7 @@ class IntellectualObjectsController < ApplicationController
   def dpn
     authorize @intellectual_object
     pending = WorkItem.pending?(@intellectual_object.identifier)
-    if Fluctus::Application.config.show_send_to_dpn_button == false
+    if Pharos::Application.config.show_send_to_dpn_button == false
       redirect_to @intellectual_object
       flash[:alert] = 'We are not currently sending objects to DPN.'
     elsif @intellectual_object.state == 'D'

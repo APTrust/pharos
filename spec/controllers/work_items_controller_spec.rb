@@ -5,8 +5,8 @@ RSpec.describe WorkItemsController, type: :controller do
   let(:admin_user) { FactoryGirl.create(:user, :admin) }
   let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution_pid: institution.id) }
 
-  let!(:item) { FactoryGirl.create(:work_item, action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'], status: Fluctus::Application::FLUCTUS_STATUSES['success']) }
-  let!(:user_item) { FactoryGirl.create(:work_item, action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'], institution: institution.identifier, status: Fluctus::Application::FLUCTUS_STATUSES['fail']) }
+  let!(:item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
+  let!(:user_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution.identifier, status: Pharos::Application::PHAROS_STATUSES['fail']) }
 
   after do
     WorkItem.destroy_all
@@ -37,7 +37,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'assigns @counts' do
         get :index
-        assigns(:counts).should include(Fluctus::Application::FLUCTUS_ACTIONS['ingest'])
+        assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['ingest'])
       end
 
     end
@@ -54,7 +54,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'assigns @counts' do
         get :index
-        assigns(:counts).should include(Fluctus::Application::FLUCTUS_ACTIONS['ingest'])
+        assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['ingest'])
       end
 
     end
@@ -196,9 +196,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: true)
       end
 
@@ -224,9 +224,9 @@ RSpec.describe WorkItemsController, type: :controller do
       before do
         sign_in institutional_admin
         2.times { FactoryGirl.create(:work_item) }
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  institution: institutional_admin.institution.identifier,
                                  retry: true)
 
@@ -241,9 +241,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'with object_identifier param' do
       before do
         3.times do
-          FactoryGirl.create(:work_item, action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'])
+          FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
         end
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                  institution: institution.identifier,
                                  retry: true)
         WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
@@ -261,9 +261,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['dpn'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: true)
       end
 
@@ -289,9 +289,9 @@ RSpec.describe WorkItemsController, type: :controller do
       before do
         sign_in institutional_admin
         2.times { FactoryGirl.create(:work_item) }
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['dpn'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  institution: institutional_admin.institution.identifier,
                                  retry: true)
 
@@ -306,9 +306,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'with object_identifier param' do
       before do
         3.times do
-          FactoryGirl.create(:work_item, action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'])
+          FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
         end
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['dpn'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                  institution: institution.identifier,
                                  retry: true)
         WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
@@ -326,9 +326,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['delete'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: true)
       end
 
@@ -354,9 +354,9 @@ RSpec.describe WorkItemsController, type: :controller do
       before do
         sign_in institutional_admin
         2.times { FactoryGirl.create(:work_item) }
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['delete'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  institution: institutional_admin.institution.identifier,
                                  retry: true)
       end
@@ -371,9 +371,9 @@ RSpec.describe WorkItemsController, type: :controller do
       before do
         3.times do
           FactoryGirl.create(:work_item,
-                             action: Fluctus::Application::FLUCTUS_ACTIONS['delete'],
-                             stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                             status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+                             action: Pharos::Application::PHAROS_ACTIONS['delete'],
+                             stage: Pharos::Application::PHAROS_STAGES['requested'],
+                             status: Pharos::Application::PHAROS_STATUSES['pend'],
                              institution: institutional_admin.institution.identifier,
                              object_identifier: 'mickey/mouse',
                              generic_file_identifier: 'mickey/mouse/club',
@@ -413,9 +413,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: false,
                                  object_identifier: 'ned/flanders')
       end
@@ -467,7 +467,7 @@ RSpec.describe WorkItemsController, type: :controller do
              use_route: 'item_set_restoration_status')
         expect(response).to be_success
         wi = WorkItem.where(object_identifier: 'ned/flanders',
-                                 action: Fluctus::Application::FLUCTUS_ACTIONS['restore']).order(created_at: :desc).first
+                                 action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq('10.11.12.13')
         expect(wi.state).to eq('{JSON data}')
         expect(wi.pid).to eq(4321)
@@ -481,7 +481,7 @@ RSpec.describe WorkItemsController, type: :controller do
              use_route: 'item_set_restoration_status')
         expect(response).to be_success
         wi = WorkItem.where(object_identifier: 'ned/flanders',
-                                 action: Fluctus::Application::FLUCTUS_ACTIONS['restore']).order(created_at: :desc).first
+                                 action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq(nil)
         expect(wi.state).to eq('{new JSON data}')
         expect(wi.pid).to eq(0)
@@ -493,9 +493,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user - with duplicate entries' do
       before do
         sign_in admin_user
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: false,
                                  object_identifier: 'ned/flanders',
                                  etag: '12345678')
@@ -516,14 +516,14 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(update_count).to eq(1)
         # ... and it should be the most recent
         restore_items = WorkItem.where(object_identifier: 'ned/flanders',
-                                            action: Fluctus::Application::FLUCTUS_ACTIONS['restore']).order(created_at: :desc)
+                                            action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc)
         restore_items.each_with_index do |item, index|
           if index == 0
             # first item should be updated
             expect(item.status).to eq('Success')
           else
             # all other items should not be updated
-            expect(item.status).to eq(Fluctus::Application::FLUCTUS_STATUSES['pend'])
+            expect(item.status).to eq(Pharos::Application::PHAROS_STATUSES['pend'])
           end
         end
       end
@@ -532,9 +532,9 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin user' do
       before do
         sign_in institutional_admin
-        WorkItem.update_all(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
-                                 stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                 status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: false,
                                  object_identifier: 'ned/flanders')
       end
@@ -578,8 +578,8 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'should accept good parameters via json' do
         expect {
           post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
-                                         bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'],
-                                         stage: Fluctus::Application::FLUCTUS_STAGES['fetch'], status: Fluctus::Application::FLUCTUS_STATUSES['fail'], outcome: 'Outcome', reviewed: false}, format: 'json'
+                                         bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
+                                         stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: false}, format: 'json'
         }.to change(WorkItem, :count).by(1)
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
@@ -588,8 +588,8 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'should fix an item with a null reviewed flag' do
         post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
-                                       bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'],
-                                       stage: Fluctus::Application::FLUCTUS_STAGES['fetch'], status: Fluctus::Application::FLUCTUS_STATUSES['fail'], outcome: 'Outcome', reviewed: nil}, format: 'json'
+                                       bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
+                                       stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: nil}, format: 'json'
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
         expect(assigns(:work_item).reviewed).to eq(false)
@@ -607,8 +607,8 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'restricts institutional admins from API usage' do
         post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
-                                       bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'],
-                                       stage: Fluctus::Application::FLUCTUS_STAGES['fetch'], status: Fluctus::Application::FLUCTUS_STATUSES['fail'], outcome: 'Outcome', reviewed: false},
+                                       bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
+                                       stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: false},
              format: 'json', use_route: :work_item_api_create
         expect(response.status).to eq 403
       end
@@ -617,7 +617,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
   describe 'Post #handle_selected' do
     describe 'as admin user' do
-      let!(:working_item) { FactoryGirl.create(:work_item, action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'], status: Fluctus::Application::FLUCTUS_STATUSES['start']) }
+      let!(:working_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['start']) }
       let(:item_id) { "r_#{item.id}" }
       let(:work_id) { "r_#{working_item.id}" }
       before do
@@ -660,8 +660,8 @@ RSpec.describe WorkItemsController, type: :controller do
   end
 
   describe 'Post #review_all' do
-    let!(:failed_item) { FactoryGirl.create(:work_item, action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'], status: Fluctus::Application::FLUCTUS_STATUSES['fail']) }
-    let!(:second_item) { FactoryGirl.create(:work_item, action: Fluctus::Application::FLUCTUS_ACTIONS['fixity'], status: Fluctus::Application::FLUCTUS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution.identifier) }
+    let!(:failed_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail']) }
+    let!(:second_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROSPHAROS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution.identifier) }
     describe 'as admin user' do
       before do
         sign_in admin_user

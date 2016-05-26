@@ -23,4 +23,39 @@ module Pharos
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
   end
+
+
+  #GLOBALS
+  PHAROS_STATUSES = {
+      'pend' => 'Pending',
+      'start' => 'Started',
+      'success' => 'Success',
+      'fail' => 'Failed',
+      'cancel' => 'Cancelled'
+  }
+
+  PHAROS_STAGES = {
+      'requested' => 'Requested',
+      'receive' => 'Receive',
+      'fetch' => 'Fetch',
+      'unpack' => 'Unpack',
+      'validate' => 'Validate',
+      'store' => 'Store',
+      'record' => 'Record',
+      'clean' => 'Cleanup',
+      'resolve' => 'Resolve'
+  }
+
+  PHAROS_ACTIONS = {
+      'ingest' => 'Ingest',
+      'fixity' => 'Fixity Check',
+      'restore' => 'Restore',
+      'delete' => 'Delete',
+      'dpn' => 'DPN'
+  }
+
+  DPN_STATUS = false
+
+  APTRUST_NAME = 'APTrust'
+  APTRUST_ID = 'aptrust.org'
 end

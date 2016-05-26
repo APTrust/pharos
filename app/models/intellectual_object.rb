@@ -55,9 +55,9 @@ class IntellectualObject < ActiveRecord::Base
 
   def in_dpn?
     object_in_dpn = false
-    dpn = Fluctus::Application::FLUCTUS_ACTIONS['dpn']
-    record = Fluctus::Application::FLUCTUS_STAGES['record']
-    success = Fluctus::Application::FLUCTUS_STATUSES['success']
+    dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
+    record = Pharos::Application::PHAROS_STAGES['record']
+    success = Pharos::Application::PHAROS_STATUSES['success']
     dpn_items = WorkItem.where(object_identifier: self.identifier, action: dpn)
     dpn_items.each do |item|
       if item.stage == record && item.status == success

@@ -553,9 +553,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should mark only the latest work item for restore' do
         get :restore, intellectual_object_identifier: obj1
         expect(response).to redirect_to obj1
-        count = WorkItem.where(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
-                                    stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                    status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                    stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                    status: Pharos::Application::PHAROS_STATUSES['pend'],
                                     retry: true).count
         expect(count).to eq(1)
       end
@@ -580,9 +580,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should mark the work item for restore' do
         get :restore, intellectual_object_identifier: obj1
         expect(response).to redirect_to obj1
-        count = WorkItem.where(action: Fluctus::Application::FLUCTUS_ACTIONS['restore'],
-                                    stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                    status: Fluctus::Application::FLUCTUS_STATUSES['pend']).count
+        count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                    stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                    status: Pharos::Application::PHAROS_STATUSES['pend']).count
         expect(count).to eq(1)
 
       end
@@ -619,9 +619,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should mark the work item as sent to dpn' do
         get :dpn, intellectual_object_identifier: obj1
         expect(response).to redirect_to obj1
-        count = WorkItem.where(action: Fluctus::Application::FLUCTUS_ACTIONS['dpn'],
-                                    stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                    status: Fluctus::Application::FLUCTUS_STATUSES['pend'],
+        count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                    stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                    status: Pharos::Application::PHAROS_STATUSES['pend'],
                                     retry: true).count
         expect(count).to eq(1)
       end
@@ -646,9 +646,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should mark the work item as sent to dpn' do
         get :dpn, intellectual_object_identifier: obj1
         expect(response).to redirect_to obj1
-        count = WorkItem.where(action: Fluctus::Application::FLUCTUS_ACTIONS['dpn'],
-                                    stage: Fluctus::Application::FLUCTUS_STAGES['requested'],
-                                    status: Fluctus::Application::FLUCTUS_STATUSES['pend']).count
+        count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                    stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                    status: Pharos::Application::PHAROS_STATUSES['pend']).count
         expect(count).to eq(1)
 
       end

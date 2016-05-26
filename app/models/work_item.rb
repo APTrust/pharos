@@ -17,21 +17,21 @@ class WorkItem < ActiveRecord::Base
     items = items.order('date DESC')
     pending = 'false'
     items.each do |item|
-      if item.status == Fluctus::Application::FLUCTUS_STATUSES['success'] ||
-          item.status == Fluctus::Application::FLUCTUS_STATUSES['fail'] ||
-          item.status == Fluctus::Application::FLUCTUS_STATUSES['cancel']
+      if item.status == Pharos::Application::PHAROS_STATUSES['success'] ||
+          item.status == Pharos::Application::PHAROS_STATUSES['fail'] ||
+          item.status == Pharos::Application::PHAROS_STATUSES['cancel']
         pending = 'false'
       else
-        if item.action == Fluctus::Application::FLUCTUS_ACTIONS['ingest']
+        if item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
           pending = 'ingest'
           break
-        elsif item.action == Fluctus::Application::FLUCTUS_ACTIONS['restore']
+        elsif item.action == Pharos::Application::PHAROS_ACTIONS['restore']
           pending = 'restore'
           break
-        elsif item.action == Fluctus::Application::FLUCTUS_ACTIONS['delete']
+        elsif item.action == Pharos::Application::PHAROS_ACTIONS['delete']
           pending = 'delete'
           break
-        elsif item.action == Fluctus::Application::FLUCTUS_ACTIONS['dpn']
+        elsif item.action == Pharos::Application::PHAROS_ACTIONS['dpn']
           pending = 'DPN'
           break
         end
@@ -45,18 +45,18 @@ class WorkItem < ActiveRecord::Base
     items = items.order('date DESC')
     result = 'true'
     items.each do |item|
-      if item.status == Fluctus::Application::FLUCTUS_STATUSES['success'] ||
-          item.status == Fluctus::Application::FLUCTUS_STATUSES['fail'] ||
-          item.status == Fluctus::Application::FLUCTUS_STATUSES['cancel']
+      if item.status == Pharos::Application::PHAROS_STATUSES['success'] ||
+          item.status == Pharos::Application::PHAROS_STATUSES['fail'] ||
+          item.status == Pharos::Application::PHAROS_STATUSES['cancel']
         result = 'true'
       else
-        if item.action == Fluctus::Application::FLUCTUS_ACTIONS['ingest']
+        if item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
           result = 'ingest'
           break
-        elsif item.action == Fluctus::Application::FLUCTUS_ACTIONS['restore']
+        elsif item.action == Pharos::Application::PHAROS_ACTIONS['restore']
           result = 'restore'
           break
-        elsif item.action == Fluctus::Application::FLUCTUS_ACTIONS['delete'] && item.generic_file_identifier == generic_file_identifier
+        elsif item.action == Pharos::Application::PHAROS_ACTIONS['delete'] && item.generic_file_identifier == generic_file_identifier
           result = 'delete'
           break
         end
@@ -73,11 +73,11 @@ class WorkItem < ActiveRecord::Base
   # * Stage is Clean or (Stage is Record and Status is Success)
   # * Has the latest date of any record with the above characteristics
   def self.last_ingested_version(intellectual_object_identifier)
-    items = WorkItem.where(object_identifier: intellectual_object_identifier, action: Fluctus::Application::FLUCTUS_ACTIONS['ingest'],
-                                stage: Fluctus::Application::FLUCTUS_STAGES['clean']).order('date DESC').limit(1).first
+    items = WorkItem.where(object_identifier: intellectual_object_identifier, action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                stage: Pharos::Application::PHAROS_STAGES['clean']).order('date DESC').limit(1).first
     if items.nil?
-      items = WorkItem.where(object_identifier: intellectual_object_identifier, action: Fluctus::Application::FLUCTUS_ACTIONS['ingest'],
-                                  stage: Fluctus::Application::FLUCTUS_STAGES['record'], status: Fluctus::Application::FLUCTUS_STATUSES['success']).order('date DESC').limit(1).first
+      items = WorkItem.where(object_identifier: intellectual_object_identifier, action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                  stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success']).order('date DESC').limit(1).first
     end
     items
   end
@@ -91,9 +91,9 @@ class WorkItem < ActiveRecord::Base
       raise ActiveRecord::RecordNotFound
     end
     restore_item = item.dup
-    restore_item.action = Fluctus::Application::FLUCTUS_ACTIONS['restore']
-    restore_item.stage = Fluctus::Application::FLUCTUS_STAGES['requested']
-    restore_item.status = Fluctus::Application::FLUCTUS_STATUSES['pend']
+    restore_item.action = Pharos::Application::PHAROS_ACTIONS['restore']
+    restore_item.stage = Pharos::Application::PHAROS_STAGES['requested']
+    restore_item.status = Pharos::Application::PHAROS_STATUSES['pend']
     restore_item.note = 'Restore requested'
     restore_item.outcome = 'Not started'
     restore_item.user = requested_by
@@ -114,9 +114,9 @@ class WorkItem < ActiveRecord::Base
       raise ActiveRecord::RecordNotFound
     end
     dpn_item = item.dup
-    dpn_item.action = Fluctus::Application::FLUCTUS_ACTIONS['dpn']
-    dpn_item.stage = Fluctus::Application::FLUCTUS_STAGES['requested']
-    dpn_item.status = Fluctus::Application::FLUCTUS_STATUSES['pend']
+    dpn_item.action = Pharos::Application::PHAROS_ACTIONS['dpn']
+    dpn_item.stage = Pharos::Application::PHAROS_STAGES['requested']
+    dpn_item.status = Pharos::Application::PHAROS_STATUSES['pend']
     dpn_item.note = 'Requested item be sent to DPN'
     dpn_item.outcome = 'Not started'
     dpn_item.user = requested_by
@@ -140,9 +140,9 @@ class WorkItem < ActiveRecord::Base
       raise ActiveRecord::RecordNotFound
     end
     delete_item = item.dup
-    delete_item.action = Fluctus::Application::FLUCTUS_ACTIONS['delete']
-    delete_item.stage = Fluctus::Application::FLUCTUS_STAGES['requested']
-    delete_item.status = Fluctus::Application::FLUCTUS_STATUSES['pend']
+    delete_item.action = Pharos::Application::PHAROS_ACTIONS['delete']
+    delete_item.stage = Pharos::Application::PHAROS_STAGES['requested']
+    delete_item.status = Pharos::Application::PHAROS_STATUSES['pend']
     delete_item.note = 'Delete requested'
     delete_item.outcome = 'Not started'
     delete_item.user = requested_by
@@ -160,19 +160,19 @@ class WorkItem < ActiveRecord::Base
 
 
   def status_is_allowed
-    if !Fluctus::Application::FLUCTUS_STATUSES.values.include?(self.status)
+    if !Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
       errors.add(:status, 'Status is not one of the allowed options')
     end
   end
 
   def stage_is_allowed
-    if !Fluctus::Application::FLUCTUS_STAGES.values.include?(self.stage)
+    if !Pharos::Application::PHAROS_STAGES.values.include?(self.stage)
       errors.add(:stage, 'Stage is not one of the allowed options')
     end
   end
 
   def action_is_allowed
-    if !Fluctus::Application::FLUCTUS_ACTIONS.values.include?(self.action)
+    if !Pharos::Application::PHAROS_ACTIONS.values.include?(self.action)
       errors.add(:action, 'Action is not one of the allowed options')
     end
   end
@@ -190,10 +190,10 @@ class WorkItem < ActiveRecord::Base
   end
 
   def ingested?
-    ingest = Fluctus::Application::FLUCTUS_ACTIONS['ingest']
-    record = Fluctus::Application::FLUCTUS_STAGES['record']
-    clean = Fluctus::Application::FLUCTUS_STAGES['clean']
-    success = Fluctus::Application::FLUCTUS_STATUSES['success']
+    ingest = Pharos::Application::PHAROS_ACTIONS['ingest']
+    record = Pharos::Application::PHAROS_STAGES['record']
+    clean = Pharos::Application::PHAROS_STAGES['clean']
+    success = Pharos::Application::PHAROS_STATUSES['success']
 
     if self.action.blank? == false && self.action != ingest
       # we're past ingest
