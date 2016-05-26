@@ -8,6 +8,14 @@ Bundler.require(*Rails.groups)
 
 module Pharos
   class Application < Rails::Application
+    config.generators do |g|
+      g.test_framework :rspec, :spec => true
+    end
+
+    config.autoload_paths += Dir["#{config.root}/lib/**/"]
+
+    Faker::Config.locale = 'en-us'
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -20,42 +28,43 @@ module Pharos
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
+    VERSION = "0.5.dev"
+
+    config.i18n.enforce_available_locales = true
+
+    #GLOBALS
+    PHAROS_STATUSES = {
+        'pend' => 'Pending',
+        'start' => 'Started',
+        'success' => 'Success',
+        'fail' => 'Failed',
+        'cancel' => 'Cancelled'
+    }
+
+    PHAROS_STAGES = {
+        'requested' => 'Requested',
+        'receive' => 'Receive',
+        'fetch' => 'Fetch',
+        'unpack' => 'Unpack',
+        'validate' => 'Validate',
+        'store' => 'Store',
+        'record' => 'Record',
+        'clean' => 'Cleanup',
+        'resolve' => 'Resolve'
+    }
+
+    PHAROS_ACTIONS = {
+        'ingest' => 'Ingest',
+        'fixity' => 'Fixity Check',
+        'restore' => 'Restore',
+        'delete' => 'Delete',
+        'dpn' => 'DPN'
+    }
+
+    DPN_STATUS = false
+
+    APTRUST_NAME = 'APTrust'
+    APTRUST_ID = 'aptrust.org'
+
   end
-
-
-  #GLOBALS
-  PHAROS_STATUSES = {
-      'pend' => 'Pending',
-      'start' => 'Started',
-      'success' => 'Success',
-      'fail' => 'Failed',
-      'cancel' => 'Cancelled'
-  }
-
-  PHAROS_STAGES = {
-      'requested' => 'Requested',
-      'receive' => 'Receive',
-      'fetch' => 'Fetch',
-      'unpack' => 'Unpack',
-      'validate' => 'Validate',
-      'store' => 'Store',
-      'record' => 'Record',
-      'clean' => 'Cleanup',
-      'resolve' => 'Resolve'
-  }
-
-  PHAROS_ACTIONS = {
-      'ingest' => 'Ingest',
-      'fixity' => 'Fixity Check',
-      'restore' => 'Restore',
-      'delete' => 'Delete',
-      'dpn' => 'DPN'
-  }
-
-  DPN_STATUS = false
-
-  APTRUST_NAME = 'APTrust'
-  APTRUST_ID = 'aptrust.org'
 end
