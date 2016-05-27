@@ -75,7 +75,7 @@ RSpec.describe IntellectualObject, :type => :model do
       end
 
       it 'should return a hash' do
-        expect(subject.bytes_by_format).to eq({"all"=>310044211,
+        expect(subject.bytes_by_format).to eq({'all'=>310044211,
                                                'application/xml' => 166311750,
                                                'audio/wav' => 143732461})
       end

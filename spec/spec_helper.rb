@@ -1,15 +1,12 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path("../../config/environment", __FILE__)
+require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 require 'shoulda-matchers'
-#require 'rspec/autorun'
 require 'capybara/rails'
 require 'capybara/rspec'
 require 'coveralls'
 require 'simplecov'
-#require 'email_spec'
-#require 'pundit/rspec'
 
 # push test code to remote and produce locally.
 Coveralls.wear!
@@ -46,6 +43,8 @@ RSpec.configure do |config|
     IntellectualObject.destroy_all
     Institution.destroy_all
   end
+
+  config.color = true
 
   #config.include(EmailSpec::Helpers)
   #config.include(EmailSpec::Matchers)
