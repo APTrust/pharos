@@ -25,7 +25,7 @@ RSpec.describe GenericFile, :type => :model do
   it 'should validate presence of a checksum' do
     expect(subject.valid?).to be false
     expect(subject.errors[:checksums]).to eq ["can't be blank"]
-    subject.checksum_attributes = [{digest: '1234'}]
+    subject.checksums.push( FactoryGirl.create(:checksum, digest: '1234') )
     expect(subject.valid?).to be false
     expect(subject.errors[:checksums]).to be_empty
   end
@@ -46,19 +46,6 @@ RSpec.describe GenericFile, :type => :model do
 
     let(:institution) { mock_model Institution, internal_uri: 'info:fedora/testing:123', name: 'Mock Name' }
     let(:intellectual_object) { mock_model IntellectualObject, institution: institution, identifier: 'info:fedora/testing:123/1234567' }
-
-    describe '#file_from_solr' do
-      subject { FactoryGirl.create(:generic_file) }
-      it 'should grab the file from solr and create a generic file object for the data' do
-        file = GenericFile.file_from_solr(subject.id)
-        file.identifier.should == subject.identifier
-        file.uri.should == subject.uri
-        file.file_format.should == subject.file_format
-        file.created.should == subject.created
-        file.modified.should == subject.modified
-        file.size.should == subject.size
-      end
-    end
 
     describe '#find_latest_fixity_check' do
       subject { FactoryGirl.create(:generic_file) }
@@ -175,7 +162,7 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'find_checksum_by_digest' do
-        let(:digest) { subject.checksums.last.digest.first.to_s }
+        let(:digest) { subject.checksums.first.digest.to_s }
         it 'should find the checksum' do
           expect(subject.find_checksum_by_digest(digest)).not_to be_empty
         end
@@ -185,7 +172,7 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'has_checksum?' do
-        let(:digest) { subject.checksums.last.digest.first.to_s }
+        let(:digest) { subject.checksums.first.digest.to_s }
         it 'should return true if checksum is present' do
           expect(subject.has_checksum?(digest)).to be true
         end

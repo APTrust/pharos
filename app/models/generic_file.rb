@@ -15,8 +15,6 @@ class GenericFile < ActiveRecord::Base
   validate :has_right_number_of_checksums
   validate :identifier_is_unique
 
-  after_save :update_parent_index
-
   delegate :institution, to: :intellectual_object
 
   def to_param
@@ -152,8 +150,7 @@ class GenericFile < ActiveRecord::Base
   private
 
   def has_right_number_of_checksums
-    if(self.checksums.count == 0)
-      puts "You are inside the loop #{self.checksums.first}"
+    if(self.checksums.length == 0)
       errors.add(:checksums, "can't be blank")
     else
       algorithms = Array.new
