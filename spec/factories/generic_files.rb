@@ -8,6 +8,7 @@ FactoryGirl.define do
     size { rand(20000..500000000) }
     created { "#{Time.now}" }
     modified { "#{Time.now}" }
+    state { 'A' }
     checksums {[ FactoryGirl.build(:checksum, algorithm: 'md5', datetime: Time.now.to_s, digest: SecureRandom.hex) ]}
 
   end

@@ -8,6 +8,7 @@ FactoryGirl.define do
     access { ['consortia', 'institution', 'restricted'].sample }
     alt_identifier { [] }
     bag_name { identifier.split('/')[1] }
+    state { 'A' }
 
     factory :consortial_intellectual_object, class: IntellectualObject do
       access { 'consortia' }
