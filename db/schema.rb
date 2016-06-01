@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160531201827) do
+ActiveRecord::Schema.define(version: 20160601180247) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -69,19 +69,19 @@ ActiveRecord::Schema.define(version: 20160531201827) do
   add_index "intellectual_objects", ["institution_id"], name: "index_intellectual_objects_on_institution_id"
 
   create_table "premis_events", force: :cascade do |t|
-    t.string   "event_identifier"
+    t.string   "identifier"
     t.string   "event_type"
-    t.text     "event_outcome"
-    t.string   "event_date_time"
-    t.string   "event_outcome_detail"
-    t.string   "event_detail"
-    t.string   "event_outcome_information"
-    t.string   "event_object"
-    t.string   "event_agent"
+    t.string   "date_time"
+    t.string   "outcome_detail"
+    t.string   "detail"
+    t.string   "outcome_information"
+    t.string   "object"
+    t.string   "agent"
     t.integer  "intellectual_object_id"
     t.integer  "generic_file_id"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "outcome"
   end
 
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
