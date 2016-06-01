@@ -232,7 +232,7 @@ class IntellectualObjectsController < ApplicationController
     file_events, file_checksums = []
     file.each { |file_attr_name, file_attr_value|
       case file_attr_name
-        when 'premisEvents'
+        when 'premis_events'
           file_events = file_attr_value
         when 'checksum'
           file_checksums = file_attr_value
@@ -257,7 +257,7 @@ class IntellectualObjectsController < ApplicationController
     case attr_name
       when 'institution_id'
         attr_value.to_s.include?(':') ? new_object.institution = Institution.find(attr_value.to_s) : new_object.institution = Institution.where(identifier: attr_value.to_s).first
-      when 'premisEvents'
+      when 'premis_events'
         state[:object_events] = attr_value
       when 'generic_files'
         state[:object_files] = attr_value
@@ -278,7 +278,7 @@ class IntellectualObjectsController < ApplicationController
   def object_as_json
     if params[:include_relations]
       # Return only active files, but call them generic_files
-      data = @intellectual_object.serializable_hash(include: [:premisEvents, active_files: { include: [:checksum, :premisEvents]}])
+      data = @intellectual_object.serializable_hash(include: [:premis_events, active_files: { include: [:checksum, :premis_events]}])
       data[:generic_files] = data.delete(:active_files)
       data[:state] = @intellectual_object.state
       data

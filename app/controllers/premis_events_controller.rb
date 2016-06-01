@@ -27,7 +27,7 @@ class PremisEventsController < ApplicationController
     end
     authorize obj
     respond_to do |format|
-      format.json { render json: obj.premisEvents.events.map { |event| event.serializable_hash } }
+      format.json { render json: obj.premis_events.events.map { |event| event.serializable_hash } }
       # TODO: Code review. Can't get the HTML rendering to work without super,
       # but do I really want to call super within this block???
       format.html {super}

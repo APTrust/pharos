@@ -58,11 +58,11 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'POST create' do
       it 'creates an event for the generic file' do
-        file.premisEvents.events.count.should == 0
+        file.premis_events.events.count.should == 0
         post :create, generic_file_identifier: file, event: event_attrs
         file.reload
 
-        file.premisEvents.events.count.should == 1
+        file.premis_events.events.count.should == 1
         response.should redirect_to generic_file_path(file)
         assigns(:parent_object).should == file
         assigns(:event).should_not be_nil
@@ -70,21 +70,21 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it 'creates an event for the generic file using generic file identifier (API)' do
-        file.premisEvents.events.count.should == 0
+        file.premis_events.events.count.should == 0
         post :create, generic_file_identifier: URI.escape(file.identifier), event: event_attrs, format: :json, use_route: 'events_by_file_identifier_path'
         file.reload
-        file.premisEvents.events.count.should == 1
+        file.premis_events.events.count.should == 1
         assigns(:parent_object).should == file
         # API response should be 201/created instead of redirect that the HTML client gets
         expect(response.status).to eq(201)
       end
 
       it 'creates an event for an intellectual object' do
-        object.premisEvents.events.count.should == 0
+        object.premis_events.events.count.should == 0
         post :create, intellectual_object_identifier: object, event: event_attrs
         object.reload
 
-        object.premisEvents.events.count.should == 1
+        object.premis_events.events.count.should == 1
         response.should redirect_to intellectual_object_path(object)
         assigns(:parent_object).should == object
         assigns(:event).should_not be_nil
@@ -93,11 +93,11 @@ RSpec.describe PremisEventsController, type: :controller do
 
 
       it 'creates an event for an intellectual object by object identifier' do
-        object.premisEvents.events.count.should == 0
+        object.premis_events.events.count.should == 0
         post :create, intellectual_object_identifier: URI.escape(object.identifier), event: event_attrs, use_route: 'events_by_object_identifier_path'
         object.reload
 
-        object.premisEvents.events.count.should == 1
+        object.premis_events.events.count.should == 1
         response.should redirect_to intellectual_object_path(object)
         assigns(:parent_object).should == object
         assigns(:event).should_not be_nil
@@ -106,22 +106,22 @@ RSpec.describe PremisEventsController, type: :controller do
 
 
       it 'if it fails, it prints a fail message' do
-        file.premisEvents.events.count.should == 0
+        file.premis_events.events.count.should == 0
         GenericFile.any_instance.should_receive(:save).and_return(false) # Make it fail
         post :create, generic_file_identifier: file, event: event_attrs
         file.reload
-        file.premisEvents.events.count.should == 0
+        file.premis_events.events.count.should == 0
         flash[:alert].should =~ /Unable to create event/
       end
     end
 
     describe "POST create a file where you don't have permission" do
       it 'denies access' do
-        someone_elses_file.premisEvents.events.count.should == 0
+        someone_elses_file.premis_events.events.count.should == 0
         post :create, generic_file_identifier: someone_elses_file, event: event_attrs
         someone_elses_file.reload
 
-        someone_elses_file.premisEvents.events.count.should == 0
+        someone_elses_file.premis_events.events.count.should == 0
         expect(response).to redirect_to root_url
         flash[:alert].should =~ /You are not authorized/
       end
@@ -136,11 +136,11 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'POST create' do
       it 'denies access' do
-        file.premisEvents.events.count.should == 0
+        file.premis_events.events.count.should == 0
         post :create, generic_file_identifier: file, event: event_attrs
         file.reload
 
-        file.premisEvents.events.count.should == 0
+        file.premis_events.events.count.should == 0
         expect(response).to redirect_to root_url
         flash[:alert].should =~ /You are not authorized/
       end

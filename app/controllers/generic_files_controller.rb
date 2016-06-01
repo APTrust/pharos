@@ -26,7 +26,7 @@ class GenericFilesController < ApplicationController
     respond_to do |format|
       format.json { render json: object_as_json }
       format.html {
-        @events = Kaminari.paginate_array(@generic_file.premisEvents.events).page(params[:page]).per(10)
+        @events = Kaminari.paginate_array(@generic_file.premis_events.events).page(params[:page]).per(10)
         super
       }
     end
@@ -112,10 +112,10 @@ class GenericFilesController < ApplicationController
         if gf[:checksum].blank?
           raise "GenericFile #{gf[:identifier]} is missing checksums."
         end
-        if gf[:premisEvents].blank?
+        if gf[:premis_events].blank?
           raise "GenericFile #{gf[:identifier]} is missing Premis Events."
         end
-        gf_without_events = gf.except(:premisEvents, :checksum)
+        gf_without_events = gf.except(:premis_events, :checksum)
         # Change param name to make inherited resources happy.
         gf_without_events[:checksum_attributes] = gf[:checksum]
         # Load the existing generic file, or create a new one.
@@ -132,7 +132,7 @@ class GenericFilesController < ApplicationController
           generic_file.save!
         end
         generic_files.push(generic_file)
-        gf[:premisEvents].each do |event|
+        gf[:premis_events].each do |event|
           current_object = "Event #{event[':type']} id #{event[:identifier]} for #{gf[:identifier]}"
           generic_file.add_event(event)
         end
@@ -237,7 +237,7 @@ class GenericFilesController < ApplicationController
   # Override Fedora's default JSON serialization for our API
   def object_as_json
     if params[:include_relations]
-      @generic_file.serializable_hash(include: [:checksum, :premisEvents])
+      @generic_file.serializable_hash(include: [:checksum, :premis_events])
     else
       @generic_file.serializable_hash()
     end
@@ -247,7 +247,7 @@ class GenericFilesController < ApplicationController
   # hashes that include checksum and PremisEvent data. That hash is
   # suitable for JSON serialization back to the API client.
   def array_as_json(list_of_generic_files)
-    list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksum, :premisEvents]) }
+    list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksum, :premis_events]) }
   end
 
   # Remove existing checksums from submitted generic file data.

@@ -111,7 +111,7 @@ class IntellectualObject < ActiveRecord::Base
           data.merge!(active_files: serialize_active_files(opt[:active_files]))
         end
       end
-      data.merge!(premisEvents: serialize_events) if options[:include].include?(:premisEvents)
+      data.merge!(premis_events: serialize_events) if options[:include].include?(:premis_events)
       if options[:include].include?(:etag)
         item = WorkItem.last_ingested_version(self.identifier)
         data.merge!(etag: item.etag) unless item.nil?
@@ -127,7 +127,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def serialize_events
-    self.premisEvents.events.map do |event|
+    self.premis_events.events.map do |event|
       event.serializable_hash
     end
   end

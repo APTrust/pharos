@@ -6,10 +6,6 @@ RSpec.describe GenericFile, :type => :model do
   #   subject.respond_to?(:add_event).should be true
   # end
 
-  # it 'should have a premisEvents datastream' do
-  #   subject.premisEvents.should be_kind_of PremisEventsMetadata
-  # end
-
   it 'delegates institution to the intellectual object' do
     file = FactoryGirl.create(:generic_file)
     institution = file.intellectual_object.institution
@@ -112,7 +108,7 @@ RSpec.describe GenericFile, :type => :model do
         it 'should set the state to deleted and index the object state' do
           expect {
             subject.soft_delete({type: 'delete', outcome_detail: 'joe@example.com'})
-          }.to change { subject.premisEvents.events.count}.by(1)
+          }.to change { subject.premis_events.events.count}.by(1)
           expect(subject.state).to eq 'D'
           expect(subject.to_solr['object_state_ssi']).to eq 'D'
         end
@@ -147,7 +143,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h1.has_key?(:identifier)).to be true
           expect(h1.has_key?(:state)).to be true
 
-          h2 = subject.serializable_hash(include: [:checksum, :premisEvents])
+          h2 = subject.serializable_hash(include: [:checksum, :premis_events])
           expect(h2.has_key?(:id)).to be true
           expect(h2.has_key?(:uri)).to be true
           expect(h2.has_key?(:size)).to be true
@@ -157,7 +153,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h2.has_key?(:identifier)).to be true
           expect(h2.has_key?(:state)).to be true
           expect(h2.has_key?(:checksum)).to be true
-          expect(h2.has_key?(:premisEvents)).to be true
+          expect(h2.has_key?(:premis_events)).to be true
         end
       end
 

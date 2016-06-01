@@ -18,7 +18,7 @@
         "datetime": "2014-10-20T13:56:35Z"
       }
     ],
-    "premisEvents": [
+    "premis_events": [
       {
         "identifier": "00000000-1111-1111-1111-00000000",
         "type": "fixity_generation",
@@ -62,7 +62,7 @@
         "datetime": "2014-10-20T13:56:35Z"
       }
     ],
-    "premisEvents": [
+    "premis_events": [
       {
         "identifier": "00000000-3333-3333-3333-00000000",
         "type": "fixity_generation",

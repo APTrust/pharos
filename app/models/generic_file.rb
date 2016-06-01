@@ -109,7 +109,7 @@ class GenericFile < ActiveRecord::Base
     }
     if options.has_key?(:include)
       data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksum)
-      data.merge!(premisEvents: serialize_events) if options[:include].include?(:PremisEvent)
+      data.merge!(premis_events: serialize_events) if options[:include].include?(:PremisEvent)
     end
     data
   end

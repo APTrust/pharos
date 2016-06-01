@@ -247,7 +247,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           identifier: 'ncsu.edu/ncsu.1840.16-388',
           alt_identifier: [],
           bag_name: '',
-          premisEvents: [
+          premis_events: [
               { identifier: '6b0f1c45-99e3-4636-4e46-d9498573d029',
                 type: 'ingest',
                 date_time: '2014-07-14T15:11:01-04:00',
@@ -286,7 +286,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       datetime: '2014-07-14T19:10:58Z'
                     }
                 ],
-                premisEvents: [
+                premis_events: [
                     { identifier: '155fb018-5ba0-440c-62a0-fc5dfe30dfd3',
                       type: 'fixity_check',
                       date_time: '2014-07-14T15:10:58-04:00',
@@ -355,7 +355,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       datetime: '2014-07-14T19:10:58Z'
                     }
                 ],
-                premisEvents: [
+                premis_events: [
                     { identifier: '74eb8c26-88ab-444f-4aab-d7f9c2cef550',
                       type: 'fixity_check',
                       date_time: '2014-07-14T15:10:58-04:00',
@@ -470,10 +470,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should roll back when nested items are invalid' do
         obj = sample_object()
         obj[:identifier] = 'ncsu.edu/ncsu.ahchoo'
-        obj[:premisEvents].each { |pe| pe[:identifier] += '_1' }
+        obj[:premis_events].each { |pe| pe[:identifier] += '_1' }
         obj[:generic_files].each { |gf|
           gf[:identifier] += '_1'
-          gf[:premisEvents].each { |pe| pe[:identifier] += '_1' }
+          gf[:premis_events].each { |pe| pe[:identifier] += '_1' }
         }
         # Missing format is invalid. This will cause create_from_json
         # to fail after it's already built up some generic files and

@@ -19,7 +19,7 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #index' do
     before do
       sign_in user
-      file.premisEvents.events_attributes = [
+      file.premis_events.events_attributes = [
           FactoryGirl.attributes_for(:premis_event_ingest),
           FactoryGirl.attributes_for(:premis_event_fixity_generation)
       ]
@@ -47,7 +47,7 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #file_summary' do
     before do
       sign_in user
-      file.premisEvents.events_attributes = [
+      file.premis_events.events_attributes = [
           FactoryGirl.attributes_for(:premis_event_ingest),
           FactoryGirl.attributes_for(:premis_event_fixity_generation)
       ]
@@ -90,7 +90,7 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #show' do
     before do
       sign_in user
-      file.premisEvents.events_attributes = [
+      file.premis_events.events_attributes = [
           FactoryGirl.attributes_for(:premis_event_ingest),
           FactoryGirl.attributes_for(:premis_event_fixity_generation)
       ]
@@ -108,7 +108,7 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     it 'assigns events' do
-      assigns(:events).count.should == file.premisEvents.events.count
+      assigns(:events).count.should == file.premis_events.events.count
     end
 
     it 'should show the file by identifier for API users' do
@@ -238,8 +238,8 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(return_data[1]['id']).not_to be_empty
           expect(return_data[0]['state']).to eq 'A'
           expect(return_data[1]['state']).to eq 'A'
-          expect(return_data[0]['premisEvents'].count).to eq 2
-          expect(return_data[1]['premisEvents'].count).to eq 2
+          expect(return_data[0]['premis_events'].count).to eq 2
+          expect(return_data[1]['premis_events'].count).to eq 2
           expect(return_data[0]['checksum'].count).to eq 2
           expect(return_data[1]['checksum'].count).to eq 2
 
@@ -258,8 +258,8 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(return_data[1]['id']).to eq id2
           expect(return_data[0]['file_format']).to eq 'text/apple'
           expect(return_data[1]['file_format']).to eq 'text/orange'
-          expect(return_data[0]['premisEvents'].count).to eq 2
-          expect(return_data[1]['premisEvents'].count).to eq 2
+          expect(return_data[0]['premis_events'].count).to eq 2
+          expect(return_data[1]['premis_events'].count).to eq 2
           expect(return_data[0]['checksum'].count).to eq 2
           expect(return_data[1]['checksum'].count).to eq 2
         end

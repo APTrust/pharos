@@ -1,3 +1,8 @@
 class PremisEvent < ActiveRecord::Base
-  # TODO: turn this into an actual class
+  belongs_to :intellectual_object
+  belongs_to :generic_file
+
+  validates :event_identifier, presence: true
+
+
 end
