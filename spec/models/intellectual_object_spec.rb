@@ -123,7 +123,7 @@ RSpec.describe IntellectualObject, :type => :model do
         it 'should set the state to deleted and index the object state' do
           expect {
             subject.soft_delete({type: 'delete', outcome_detail: 'joe@example.com'})
-          }.to change { subject.premis_events.events.count}.by(1)
+          }.to change { subject.premis_events.count}.by(1)
           subject.background_deletion({type: 'delete', outcome_detail: 'joe@example.com'})
           expect(subject.state).to eq 'D'
           subject.generic_files.all?{ |file| expect(file.state).to eq 'D' }

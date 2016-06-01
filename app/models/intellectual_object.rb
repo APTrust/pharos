@@ -126,6 +126,11 @@ class IntellectualObject < ActiveRecord::Base
     end
   end
 
+  def add_event(attributes)
+    event = self.premis_events.build(attributes)
+    event
+  end
+
   def serialize_events
     self.premis_events.events.map do |event|
       event.serializable_hash
