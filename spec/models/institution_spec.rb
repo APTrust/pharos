@@ -26,7 +26,7 @@ RSpec.describe Institution, :type => :model do
 
   describe 'bytes_by_format' do
     it 'should return a hash' do
-      expect(subject.bytes_by_format).to eq({"all"=>0})
+      expect(subject.bytes_by_format).to eq({'all'=>0})
     end
     describe 'with attached files' do
       before do

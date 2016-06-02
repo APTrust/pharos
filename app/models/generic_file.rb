@@ -44,23 +44,15 @@ class GenericFile < ActiveRecord::Base
   end
 
   def self.bytes_by_format
-  #   resp = ActiveFedora::SolrService.instance.conn.get 'select', :params => {
-  #                                                                  'q' => 'tech_metadata__size_lsi:[* TO *]',
-  #                                                                  'stats' => true,
-  #                                                                  'fl' => '',
-  #                                                                  'stats.field' =>'tech_metadata__size_lsi',
-  #                                                                  'stats.facet' => 'tech_metadata__file_format_ssi'
-  #                                                              }
-  #   stats = resp['stats']['stats_fields']['tech_metadata__size_lsi']
-  #   if stats
-  #     cross_tab = stats['facets']['tech_metadata__file_format_ssi'].each_with_object({}) { |(k,v), obj|
-  #       obj[k] = v['sum']
-  #     }
-  #     cross_tab['all'] = stats['sum']
-  #     cross_tab
-  #   else
-  #     {'all' => 0}
-  #   end
+    stats = GenericFile.sum(:size)
+    if stats
+      cross_tab = GenericFile.group(:file_format).sum(:size)
+      cross_tab['all'] = stats
+      cross_tab
+    else
+      {'all' => 0}
+    end
+
   end
 
   def display

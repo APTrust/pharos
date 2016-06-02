@@ -24,9 +24,9 @@ class Institution < ActiveRecord::Base
   end
 
   def bytes_by_format
-    stats = self.intellectual_objects.sum(:size)
+    stats = self.generic_files.sum(:size)
     if stats
-      cross_tab = self.intellectual_objects.group(:file_format).sum(:size)
+      cross_tab = self.generic_files.group(:file_format).sum(:size)
       cross_tab['all'] = stats
       cross_tab
     else
