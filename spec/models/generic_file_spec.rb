@@ -18,6 +18,13 @@ RSpec.describe GenericFile, :type => :model do
   it { should validate_presence_of(:modified) }
   it { should validate_presence_of(:file_format) }
   it { should validate_presence_of(:identifier)}
+
+  it 'should validate presence of intellectual object' do
+    file = FactoryGirl.create(:generic_file)
+    expect(file.intellectual_object).to be_valid
+    expect(file.intellectual_object.identifier).to include('/')
+  end
+
   it 'should validate presence of a checksum' do
     expect(subject.valid?).to be false
     expect(subject.errors[:checksums]).to eq ["can't be blank"]
@@ -127,6 +134,7 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'serializable_hash' do
+        let(:subject) { FactoryGirl.create(:generic_file) }
         before do
         end
         after do
@@ -143,7 +151,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h1.has_key?(:identifier)).to be true
           expect(h1.has_key?(:state)).to be true
 
-          h2 = subject.serializable_hash(include: [:checksum, :premis_events])
+          h2 = subject.serializable_hash(include: [:checksums, :premis_events])
           expect(h2.has_key?(:id)).to be true
           expect(h2.has_key?(:uri)).to be true
           expect(h2.has_key?(:size)).to be true
@@ -152,15 +160,16 @@ RSpec.describe GenericFile, :type => :model do
           expect(h2.has_key?(:file_format)).to be true
           expect(h2.has_key?(:identifier)).to be true
           expect(h2.has_key?(:state)).to be true
-          expect(h2.has_key?(:checksum)).to be true
+          expect(h2.has_key?(:checksums)).to be true
           expect(h2.has_key?(:premis_events)).to be true
         end
       end
 
       describe 'find_checksum_by_digest' do
-        let(:digest) { subject.checksums.first.digest.to_s }
         it 'should find the checksum' do
-          expect(subject.find_checksum_by_digest(digest)).not_to be_empty
+          subject.checksums.push(FactoryGirl.create(:checksum))
+          digest = subject.checksums.first.digest
+          expect(subject.find_checksum_by_digest(digest)).not_to be_nil
         end
         it 'should return nil for non-existent checksum' do
           expect(subject.find_checksum_by_digest(' :-{ ')).to be_nil
@@ -168,8 +177,9 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'has_checksum?' do
-        let(:digest) { subject.checksums.first.digest.to_s }
         it 'should return true if checksum is present' do
+          subject.checksums.push(FactoryGirl.create(:checksum))
+          digest = subject.checksums.first.digest
           expect(subject.has_checksum?(digest)).to be true
         end
         it 'should return false if checksum is not present' do

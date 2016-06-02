@@ -94,15 +94,15 @@ class GenericFile < ActiveRecord::Base
         id: id,
         uri: uri,
         size: size.to_i,
-        created: Time.parse(created).iso8601,
-        modified: Time.parse(modified).iso8601,
+        created: Time.parse(created.to_s).iso8601,
+        modified: Time.parse(modified.to_s).iso8601,
         file_format: file_format,
         identifier: identifier,
         state: state,
     }
     if options.has_key?(:include)
-      data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksum)
-      data.merge!(premis_events: serialize_events) if options[:include].include?(:PremisEvent)
+      data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksums)
+      data.merge!(premis_events: serialize_events) if options[:include].include?(:premis_events)
     end
     data
   end
@@ -112,7 +112,7 @@ class GenericFile < ActiveRecord::Base
       {
           algorithm: cs.algorithm.first,
           digest: cs.digest.first,
-          datetime: Time.parse(cs.datetime.first).iso8601,
+          datetime: Time.parse(cs.datetime.to_s).iso8601,
       }
     end
   end
@@ -123,7 +123,7 @@ class GenericFile < ActiveRecord::Base
   end
 
   def serialize_events
-    events.map do |event|
+    premis_events.map do |event|
       event.serializable_hash
     end
   end
@@ -132,7 +132,15 @@ class GenericFile < ActiveRecord::Base
   # No need to specify algorithm, since we're using md5 and sha256,
   # and their digests have different lengths.
   def find_checksum_by_digest(digest)
-    checksums.select { |cs| digest.strip == cs.digest.first.to_s.strip }.first
+    checksum = nil
+    checksums.each do |cs|
+      if cs.digest == digest
+        checksum = cs
+        break
+      end
+    end
+    checksum
+    #checksums.select { |cs| digest.strip == cs.digest.first.to_s.strip }.first
   end
 
   # Returns true if the GenericFile has a checksum with the specified digest.

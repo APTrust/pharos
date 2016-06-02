@@ -1,7 +1,7 @@
 FactoryGirl.define do
 
   factory :generic_file do
-    intellectual_object { FactoryGirl.build(:intellectual_object) }
+    intellectual_object { FactoryGirl.create(:intellectual_object) }
     identifier { "#{intellectual_object.identifier}/data/filename.xml" }
     file_format { 'application/xml' }
     uri { 'file://test/data/filename.xml' }
@@ -9,8 +9,7 @@ FactoryGirl.define do
     created { "#{Time.now}" }
     modified { "#{Time.now}" }
     state { 'A' }
-    checksums {[ FactoryGirl.build(:checksum, algorithm: 'md5', datetime: Time.now.to_s, digest: SecureRandom.hex) ]}
-
+    checksums {[ FactoryGirl.create(:checksum, algorithm: 'md5', datetime: Time.now.to_s, digest: SecureRandom.hex) ]}
   end
 
 end
