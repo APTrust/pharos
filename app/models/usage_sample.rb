@@ -12,7 +12,7 @@ class UsageSample < ActiveRecord::Base
   end
 
   def institution= inst
-    self.institution_id = inst.pid
+    self.institution_id = inst.id
     @institution = inst
   end
 

@@ -7,7 +7,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums
 
   validates :uri, presence: true
-  validates :intellectual_object_id, presence: true
+  validates :intellectual_object, presence: true
   validates :size, presence: true
   validates :created, presence: true
   validates :modified, presence: true
