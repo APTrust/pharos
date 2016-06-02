@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe UsageSample do
+RSpec.describe UsageSample, :type => :model do
   it 'should have a hash' do
     subject.data['all'] = '123123'
     expect(subject.data).to eq({'all' => '123123'})
