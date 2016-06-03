@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe GenericFile, :type => :model do
-  # it 'uses the Auditable module to create premis events' do
-  #   GenericFile.included_modules.include?(Auditable).should be true
-  #   subject.respond_to?(:add_event).should be true
-  # end
 
   it 'delegates institution to the intellectual object' do
     file = FactoryGirl.create(:generic_file)
@@ -59,9 +55,7 @@ RSpec.describe GenericFile, :type => :model do
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_three))
-        subject.update_index
-        solr_doc = subject.to_solr
-        solr_doc['latest_fixity_dti'].should == date_two
+        subject.find_latest_fixity_check.should == date_two
       end
     end
 
@@ -96,16 +90,18 @@ RSpec.describe GenericFile, :type => :model do
       # end
 
       describe 'soft_delete' do
+        let(:object) { FactoryGirl.create(:intellectual_object) }
+        let(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
         before do
-          subject.save!
+          file.save!
           @parent_work_item = FactoryGirl.create(:work_item,
-                                                      object_identifier: subject.intellectual_object.identifier,
+                                                      object_identifier: file.intellectual_object.identifier,
                                                       action: Pharos::Application::PHAROS_ACTIONS['ingest'],
                                                       stage: Pharos::Application::PHAROS_STAGES['record'],
                                                       status: Pharos::Application::PHAROS_STATUSES['success'])
         end
         after do
-          subject.destroy
+          file.destroy
           intellectual_object.destroy
           @parent_work_item.delete
         end
@@ -113,18 +109,18 @@ RSpec.describe GenericFile, :type => :model do
         let(:async_job) { double('one') }
 
         it 'should set the state to deleted and index the object state' do
+
           expect {
-            subject.soft_delete({type: 'delete', outcome_detail: 'joe@example.com'})
-          }.to change { subject.premis_events.events.count}.by(1)
-          expect(subject.state).to eq 'D'
-          expect(subject.to_solr['object_state_ssi']).to eq 'D'
+            file.soft_delete(FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
+          }.to change { file.premis_events.count}.by(1)
+          expect(file.state).to eq 'D'
         end
 
         it 'should create a WorkItem showing delete was requested' do
-          subject.soft_delete({type: 'delete', outcome_detail: 'user@example.com'})
-          pi = WorkItem.where(generic_file_identifier: subject.identifier).first
+          file.soft_delete(FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com'))
+          pi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(pi).not_to be_nil
-          expect(pi.object_identifier).to eq subject.intellectual_object.identifier
+          expect(pi.object_identifier).to eq file.intellectual_object.identifier
           expect(pi.action).to eq Pharos::Application::PHAROS_ACTIONS['delete']
           expect(pi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
           expect(pi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
@@ -201,9 +197,7 @@ RSpec.describe GenericFile, :type => :model do
       date_two = '2014-12-12T16:33:39Z'
       param = '2014-09-02T16:33:39Z'
       subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
-      subject.update_index
       subject_two.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
-      subject_two.update_index
       files = GenericFile.find_files_in_need_of_fixity(param)
       count = 0
       files.each { count = count+1 }
