@@ -65,7 +65,8 @@ class GenericFile < ActiveRecord::Base
 
   def soft_delete(attributes)
     user_email = attributes[:outcome_detail]
-    WorkItem.create_delete_request(self.intellectual_object.identifier,
+    io = IntellectualObject.find(self.intellectual_object_id)
+    WorkItem.create_delete_request(io.identifier,
                                         self.identifier,
                                         user_email)
     self.state = 'D'

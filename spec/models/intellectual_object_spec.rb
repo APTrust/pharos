@@ -86,10 +86,10 @@ RSpec.describe IntellectualObject, :type => :model do
         subject.generic_files.destroy_all
       end
 
-      subject { FactoryGirl.create(:intellectual_object, bag_name: '') }
+      subject { FactoryGirl.create(:intellectual_object) }
 
       before do
-        @file = FactoryGirl.create(:generic_file, intellectual_object_id: subject.id)
+        @file = FactoryGirl.create(:generic_file, intellectual_object: subject)
         subject.reload
       end
 
@@ -121,17 +121,19 @@ RSpec.describe IntellectualObject, :type => :model do
         let(:generic_file_delete_job) { double('file') }
 
         it 'should set the state to deleted and index the object state' do
+          attributes = FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
           expect {
-            subject.soft_delete({event_type: 'delete', outcome_detail: 'joe@example.com'})
+            subject.soft_delete(attributes)
           }.to change { subject.premis_events.count}.by(1)
-          subject.background_deletion({event_type: 'delete', outcome_detail: 'joe@example.com'})
+          subject.background_deletion(attributes)
           expect(subject.state).to eq 'D'
           subject.generic_files.all?{ |file| expect(file.state).to eq 'D' }
         end
 
         it 'should set the state to deleted and index the object state' do
-          subject.soft_delete({event_type: 'delete', outcome_detail: 'user@example.com'})
-          subject.background_deletion({event_type: 'delete', outcome_detail: 'user@example.com'})
+          attributes = FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com')
+          subject.soft_delete(attributes)
+          subject.background_deletion(attributes)
           subject.generic_files.all?{ |file|
             wi = WorkItem.where(generic_file_identifier: file.identifier).first
             expect(wi).not_to be_nil
