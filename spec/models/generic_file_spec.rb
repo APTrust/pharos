@@ -48,13 +48,14 @@ RSpec.describe GenericFile, :type => :model do
 
     describe '#find_latest_fixity_check' do
       subject { FactoryGirl.create(:generic_file) }
-      it 'should have a latest fixity index in solr' do
+      it 'should return the most recent fixity check' do
         date = '2014-08-01T16:33:39Z'
         date_two = '2014-11-01T16:33:39Z'
         date_three = '2014-10-01T16:33:39Z'
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_three))
+        puts "Event check: #{subject.premis_events.count}"
         subject.find_latest_fixity_check.should == date_two
       end
     end

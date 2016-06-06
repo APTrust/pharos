@@ -25,7 +25,7 @@ class GenericFile < ActiveRecord::Base
   def find_latest_fixity_check
     fixity = ''
     PremisEvent.all.each do |event|
-      if event.type.first == 'fixity_check'
+      if event.event_type == 'fixity_check'
         if fixity == '' || fixity == nil? || DateTime.parse(fixity.to_s) < DateTime.parse(event.date_time.to_s)
           fixity = DateTime.parse(event.date_time.to_s)
         end
@@ -38,7 +38,7 @@ class GenericFile < ActiveRecord::Base
   def self.find_files_in_need_of_fixity(date, options={})
     rows = options[:rows] || 10
     start = options[:start] || 0
-    files = GenericFile.where("object_state_ssi:A AND latest_fixity_dti:[* TO #{date}]",
+    files = GenericFile.where("object_state:A AND latest_fixity_dti:[* TO #{date}]",
                                              sort: 'latest_fixity_dti asc', start: start, rows: rows)
     ActiveFedora::SolrService.reify_solr_results(files)
   end
@@ -120,6 +120,8 @@ class GenericFile < ActiveRecord::Base
 
   def add_event(attributes)
     event = self.premis_events.build(attributes)
+    event.generic_file = self
+    event.save!
     event
   end
 
