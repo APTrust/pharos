@@ -29,6 +29,7 @@ gem 'devise', '3.4.1'
 gem 'rake'
 gem 'rename'
 gem 'valid_email'
+gem 'rdf'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.0.2'
