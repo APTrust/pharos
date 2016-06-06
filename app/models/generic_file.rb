@@ -34,13 +34,12 @@ class GenericFile < ActiveRecord::Base
     fixity
   end
 
-  # TODO: check on find_with_conditions
   def self.find_files_in_need_of_fixity(date, options={})
-    rows = options[:rows] || 10
-    start = options[:start] || 0
-    files = GenericFile.where("object_state:A AND latest_fixity_dti:[* TO #{date}]",
-                                             sort: 'latest_fixity_dti asc', start: start, rows: rows)
-    ActiveFedora::SolrService.reify_solr_results(files)
+    #TODO: rewrite logic to find files where latest checksum created_at datetime is more than 90 days old
+    # rows = options[:rows] || 10
+    # start = options[:start] || 0
+    # files = GenericFile.where("object_state:A AND latest_fixity_dti:[* TO #{date}]",
+                                           #  sort: 'latest_fixity_dti asc', start: start, rows: rows)
   end
 
   def self.bytes_by_format
