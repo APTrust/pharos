@@ -52,7 +52,7 @@ describe 'Routes for Events' do
     ).to(
         route_to(controller: 'premis_events',
                  action: 'index',
-                 institution_identifier: 'testinst.com'
+                 identifier: 'testinst.com'
         )
     )
   end

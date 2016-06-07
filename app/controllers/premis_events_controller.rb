@@ -15,8 +15,8 @@ class PremisEventsController < ApplicationController
   self.solr_search_params_logic += [:sort_chronologically]
 
   def index
-    if params['institution_identifier']
-      @institution = Institution.where(identifier: params['institution_identifier']).first
+    if params['identifier']
+      @institution = Institution.where(identifier: params['identifier']).first
       obj = @institution
     elsif params['intellectual_object_identifier']
       @intellectual_object = IntellectualObject.where(identifier: params['intellectual_object_identifier']).first

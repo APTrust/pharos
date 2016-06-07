@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
 
   institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)/
-  resources :institutions do
+  resources :institutions, param: :identifier, identifier: institution_ptrn do
     resources :intellectual_objects, only: [:index, :create], path: 'objects'
     resources :premis_events, only: [:index]
   end

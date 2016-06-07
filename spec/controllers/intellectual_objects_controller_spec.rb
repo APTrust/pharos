@@ -14,7 +14,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        get :index, institution_identifier: 'apt.edu'
+        get :index, identifier: 'apt.edu'
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -32,7 +32,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :institutional_user) }
         describe 'and viewing my institution' do
           it 'should show the results that I have access to that belong to the institution' do
-            get :index, institution_identifier: user.institution_identifier
+            get :index, identifier: user.institution_identifier
             expect(response).to be_successful
             expect(assigns(:document_list).size).to eq 3
             #assigns(:document_list).each {|doc| expect(doc).to be_kind_of SolrDocument}
@@ -40,27 +40,27 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           end
 
           it 'should match a partial search on title' do
-            get :index, institution_identifier: user.institution_identifier, q: 'Rugby'
+            get :index, identifier: user.institution_identifier, q: 'Rugby'
             expect(response).to be_successful
             expect(assigns(:document_list).map &:id).to match_array [obj2.id]
           end
           it 'should match a partial search on description' do
-            get :index, institution_identifier: user.institution_identifier, q: 'Guangzhou'
+            get :index, identifier: user.institution_identifier, q: 'Guangzhou'
             expect(response).to be_successful
             expect(assigns(:document_list).map &:id).to match_array [obj4.id]
           end
           it 'should match an exact search on identifier' do
-            get :index, institution_identifier: user.institution_identifier, q: obj4.identifier
+            get :index, identifier: user.institution_identifier, q: obj4.identifier
             expect(response).to be_successful
             expect(assigns(:document_list).map &:id).to match_array [obj4.id]
           end
           it 'should match an exact search on bag name' do
-            get :index, institution_identifier: user.institution_identifier, q: '12345-abcde'
+            get :index, identifier: user.institution_identifier, q: '12345-abcde'
             expect(response).to be_successful
             expect(assigns(:document_list).map &:id).to match_array [obj6.id]
           end
           it 'should match an exact search on alternate identifiers' do
-            get :index, institution_identifier: user.institution_identifier, q: 'test.edu/some-bag'
+            get :index, identifier: user.institution_identifier, q: 'test.edu/some-bag'
             expect(response).to be_successful
             expect(assigns(:document_list).map &:id).to match_array [obj6.id]
           end
@@ -68,7 +68,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
         describe 'and viewing another institution' do
           it 'should redirect' do
-            get :index, institution_identifier: another_institution.identifier
+            get :index, identifier: another_institution.identifier
             expect(response).to redirect_to root_url
             expect(flash[:alert]).to eq 'You are not authorized to access this page.'
           end
@@ -79,7 +79,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :admin) }
         describe 'and viewing another institution' do
           it 'should show the results that I have access to that belong to the institution' do
-            get :index, institution_identifier: another_institution.identifier
+            get :index, identifier: another_institution.identifier
             expect(response).to be_successful
             expect(assigns(:document_list).size).to eq 3
             #assigns(:document_list).each {|doc| expect(doc).to be_kind_of SolrDocument}
@@ -414,7 +414,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        post :create, institution_identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo' }
+        post :create, identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo' }
         expect(response).to redirect_to root_url + 'users/sign_in'
         expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
@@ -424,19 +424,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in user }
 
       it 'should only allow assigning institutions you have access to' do
-        post :create, institution_identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo'}, format: 'json'
+        post :create, identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo'}, format: 'json'
         expect(response.code).to eq '403' # forbidden
         expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
       end
 
       it 'should show errors' do
-        post :create, institution_identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: 'json'
+        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: 'json'
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq({'identifier' => ["can't be blank"],'access' => ["can't be blank"]})
       end
 
       it 'should update fields' do
-        post :create, institution_identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/124', access: 'restricted', bag_name: '124'}, format: 'json'
+        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/124', access: 'restricted', bag_name: '124'}, format: 'json'
         expect(response.code).to eq '201'
         expect(assigns(:intellectual_object).title).to eq 'Foo'
         expect(assigns(:intellectual_object).identifier).to eq 'test.edu/124'
@@ -445,7 +445,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should use the institution parameter in the URL, not from the json' do
         expect {
-          post :create, institution_identifier: user.institution_identifier, intellectual_object: {title: 'Foo', institution_id: user.institution_id, identifier: 'test.edu/123', access: 'restricted'}, format: 'json'
+          post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', institution_id: user.institution_id, identifier: 'test.edu/123', access: 'restricted'}, format: 'json'
           expect(response.code).to eq '201'
           expect(assigns(:intellectual_object).title).to eq 'Foo'
           expect(assigns(:intellectual_object).institution_id).to eq user.institution_id
@@ -460,7 +460,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should create all nested items when include relations flag is true' do
         expect {
-          post :create_from_json, institution_identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: 'json'
+          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: 'json'
           expect(response.code).to eq '201'
           expect(assigns(:intellectual_object).title).to eq 'Test Title'
           expect(assigns(:intellectual_object).bag_name).to eq 'ncsu.1840.16-388'
@@ -480,7 +480,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         # events.
         obj[:generic_files][1][:file_format] = ''
         expect {
-          post :create_from_json, institution_identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [obj], format: 'json'
+          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [obj], format: 'json'
           expect(response.code).to eq '422'
         }.to change(IntellectualObject, :count).by(0)
       end
