@@ -18,6 +18,10 @@ class PremisEvent < ActiveRecord::Base
     init_time
   end
 
+  def to_param
+    identifier
+  end
+
   def serializable_hash
     data = {
         identifier: identifier,
