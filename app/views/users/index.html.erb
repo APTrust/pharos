@@ -1,0 +1,28 @@
+<div class="page-header">
+  <h1>Users</h1>
+</div>
+
+<table class="table table-condensed">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Institution</th>
+    <th>Group</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @users.each do |user| %>
+      <tr id="<%= user.id %>">
+        <td><%= user.name %></td>
+        <td><%= user.email %></td>
+        <td><%= user.institution.name %></td>
+        <td><%= user.main_group %> </td>
+        <td><%= show_link user %> <%= edit_link user %> <%= destroy_link user %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= create_link(User) %>

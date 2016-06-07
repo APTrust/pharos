@@ -1,0 +1,22 @@
+<h4>User Information</h4>
+<%= gravatar_for @user %>
+<address>
+
+  <strong><%= @user.name %></strong> (<em><%= @user.institution.name %></em>)<br />
+  <a href="mailto:#"><%= @user.email %></a><br>
+  <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br><br>
+</address>
+
+<h4>Roles</h4>
+<ul class="unstyled">
+  <% @user.roles.each do |role| %>
+      <li><%= role.name.titleize %></li>
+  <% end %>
+</ul>
+
+<%= render 'api_key' %>
+
+<hr />
+
+<%= edit_link(@user) %>
+<%= destroy_link(@user) %>

@@ -1,0 +1,27 @@
+<% if policy(@user).generate_api_key? %>
+    <h4> API Secret Key </h4>
+
+    <% unless @user.encrypted_api_secret_key %>
+        <div> You do not have an API secret key yet. </div>
+        <br />
+    <% end %>
+
+    <div>
+      <%= link_to 'Generate API Secret Key',
+                  generate_api_key_user_path(@user),
+                  class: 'btn doc-action-btn btn-normal',
+                  method: :patch,
+                  data: { confirm: generate_key_confirmation_msg(@user) } %>
+    </div>
+    <br />
+
+    <div>
+      You should treat your API secret key the same way you would treat a password:
+      <ul>
+        <li> Don't share it with other people </li>
+        <li> Don't send it over email or other insecure communications </li>
+        <li> Use proper file protections (e.g. chmod) so that other people cannot read it from your configuration files or scripts </li>
+      </ul>
+    </div>
+
+<% end %>
