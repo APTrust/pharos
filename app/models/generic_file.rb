@@ -24,13 +24,8 @@ class GenericFile < ActiveRecord::Base
 
   def find_latest_fixity_check
     fixity = ''
-    PremisEvent.all.each do |event|
-      if event.event_type == 'fixity_check'
-        if fixity == '' || fixity == nil? || DateTime.parse(fixity.to_s) < DateTime.parse(event.date_time.to_s)
-          fixity = DateTime.parse(event.date_time.to_s)
-        end
-      end
-    end
+    latest = self.premis_events.where(event_type: 'fixity_check').order('date_time DESC').first.date_time
+    fixity = latest unless latest.nil?
     fixity
   end
 
