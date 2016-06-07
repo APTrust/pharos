@@ -74,7 +74,7 @@ group :development, :test, :demo, :production do
   gem 'factory_girl_rails'
   gem 'faker', github: 'stympy/faker'
   gem 'quiet_assets'
-  gem 'rspec-rails', '~> 3.0.0'
+  gem 'rspec-rails', '~> 3.1'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
