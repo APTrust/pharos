@@ -69,13 +69,13 @@ RSpec.describe UsersController, type: :controller do
       let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
 
       it 'when the parameters are valid' do
-        patch :update, id: institutional_admin, user: {name: 'Frankie'}
+        put :update, id: institutional_admin, user: {name: 'Frankie'}
         response.should redirect_to user_url(institutional_admin)
         expect(flash[:notice]).to eq 'User was successfully updated.'
         expect(assigns[:user].name).to eq 'Frankie'
       end
       it 'when the parameters are invalid' do
-        patch :update, id: institutional_admin, user: {phone_number: 'f121'}
+        put :update, id: institutional_admin, user: {phone_number: 'f121'}
         response.should be_successful
         expect(assigns[:user].errors.include?(:phone_number)).to be true
       end

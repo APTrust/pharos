@@ -13,14 +13,17 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :recoverable, :rememberable, :trackable,
          :timeoutable, :validatable
 
-  validates :email, :phone_number, :role_ids, presence: true
+  validates :email, presence: true
+  validates :phone_number, presence: true
+  validates :role_ids, presence: true
   validates :email, uniqueness: true
   validates :institution_id, presence: true
   validate :institution_id_points_at_institution
   validates :name, presence: true, if: ->{ name.present? } #TODO: find name validator that actually works
   validates :email, email: true
   phony_normalize :phone_number, :default_country_code => 'US'
-  validates :phone_number, :phony_plausible => true
+  validates_plausible_phone :phone_number
+  #validate :phone_number_length
 
   # This method assigns permission groups
   # Don't think these are necessary anymore, we use Pundit/Roles
@@ -171,6 +174,10 @@ class User < ActiveRecord::Base
 
   def institution_id_points_at_institution
     errors.add(:institution_id, 'is not a valid institution') unless Institution.exists?(institution_id)
+  end
+
+  def phone_number_length
+    errors.add(:phone_number, 'is not the proper length') if phone_number.length < 10
   end
 
 end
