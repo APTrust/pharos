@@ -1,0 +1,82 @@
+<div class="page-header">
+  <h1><%= @institution.name %></h1>
+</div>
+
+<ul class="nav nav-tabs">
+  <li><a href="#summary" data-toggle="tab">Summary</a></li>
+  <li><a href="#stats" data-toggle="tab">Statistics</a></li>
+  <li><%= link_to 'Objects', institution_intellectual_objects_path(@institution, sort: 'system_modified_dtsi desc') %></li>
+  <li><a href="#users" data-toggle="tab">Users</a></li>
+  <li><%= link_to 'Events', institution_events_path(@institution) %></li>
+  <li><%= link_to 'Processed Items', processed_items_path %></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane" id="summary">
+
+    <dl class="dl-horizontal">
+      <dt>Users</dt>
+      <dd><%= @institution.users.count %></dd>
+      <dt>DPN UUID</dt>
+      <dd><%= @institution.dpn_uuid %></dd>
+      <dt>Intellectual Objects</dt>
+      <dd><%= @object_count %></dd>
+      <dt>Processed Items</dt>
+      <dd><%= @item_count %></dd>
+      <dt>Total Storage Used</dt>
+      <dd><%= number_to_human_size(@size) %></dd>
+    </dl>
+
+    <%= render "shared/processed_items" %>
+
+    <%= link_to 'View All Jobs', processed_items_path %>
+  </div>
+
+  <div class="tab-pane" id="stats">
+    <table class="upload_stats table">
+      <% @institution.bytes_by_format.each do |format, bytes| %>
+          <tr>
+            <td class="<%=format_class(format) %>"><%= format_display(format) %></td>
+            <td class="bytes"><%=number_to_human_size bytes %></td>
+          </tr>
+      <% end %>
+    </table>
+
+    <div id="chart-frame">
+      <div id="chart" style="padding: 0px; position: relative;"></div>
+    </div>
+    <script>
+        var d = <%=@institution.statistics.inspect %>
+
+                $.plot("#chart", [d], {
+                    xaxis: { mode: "time" }
+                });
+    </script>
+
+  </div>
+
+  <div class="tab-pane" id="users">
+    <table class="table table-condensed">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @institution.users.each do |user| %>
+          <tr>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td>
+              <%= show_link(user) %>
+              <%= edit_link(user) %>
+            </td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+</div>

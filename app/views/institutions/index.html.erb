@@ -1,0 +1,24 @@
+<div class="page-header">
+  <h1>Institutions</h1>
+</div>
+
+<table class="table table-condensed table-hover">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Total Storage Used</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @institutions.each do |institution| %>
+      <tr id="<%= institution.id %>">
+        <td><%= link_to_if policy(institution).show?, institution.name, institution_path(institution), class: "block-link" %></td>
+        <td><%= number_to_human_size(@sizes[institution.name]) %></td>
+        <td><%= edit_link institution %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= create_link(Institution) %>

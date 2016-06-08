@@ -1,0 +1,21 @@
+<%= simple_form_for(@institution, html: {class: 'form-horizontal'}) do |f| %>
+    <%= f.error_notification %>
+
+    <div class="form-inputs">
+      <%= f.input :name %>
+      <%= f.input :brief_name %>
+      <%= f.input :identifier %>
+      <%= f.input :dpn_uuid %>
+    </div>
+    <br>
+    <div class="form-actions">
+
+      <%= button_tag(type: 'submit', class: "btn doc-action-btn btn-success") do %>
+          <i class="glyphicon glyphicon-check"></i> Submit
+      <% end %>
+      <%= link_to @institution, {class: "btn doc-action-btn btn-warning"} do %>
+          <i class="glyphicon glyphicon-remove"></i> Cancel
+      <% end %>
+
+    </div>
+<% end %>
