@@ -68,14 +68,14 @@ class InstitutionsController < ApplicationController
 
   def set_recent_objects
     if current_user.admin? && current_user.institution.identifier == @institution.identifier
-      @items = ProcessedItem.order('date').limit(10).reverse_order
+      @items = WorkItem.order('date').limit(10).reverse_order
       @size = GenericFile.bytes_by_format['all']
-      @item_count = ProcessedItem.all.count
+      @item_count = WorkItem.all.count
       @object_count = IntellectualObject.all.count
     else
-      @items = ProcessedItem.where(institution: @institution.identifier).order('date').limit(10).reverse_order
+      @items = WorkItem.where(institution: @institution.identifier).order('date').limit(10).reverse_order
       @size = @institution.bytes_by_format()['all']
-      @item_count = ProcessedItem.where(institution: @institution.identifier).count
+      @item_count = WorkItem.where(institution: @institution.identifier).count
       @object_count = @institution.intellectual_objects.count
     end
     @failed = @items.where(status: Pharos::Application::PHAROS_STATUSES['fail'])
