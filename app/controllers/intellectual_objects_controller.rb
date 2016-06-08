@@ -7,7 +7,7 @@ class IntellectualObjectsController < ApplicationController
   def index
     authorize @institution
     @intellectual_objects = @institution.intellectual_objects
-    super
+    #super
   end
 
   def api_index
@@ -47,7 +47,6 @@ class IntellectualObjectsController < ApplicationController
     @intellectual_object = @institution.intellectual_objects.new(params[:intellectual_object])
     super
   end
-
 
   def show
     authorize @intellectual_object
@@ -210,12 +209,9 @@ class IntellectualObjectsController < ApplicationController
 
   protected
 
-  # Override Hydra-editor to redirect to an alternate location after create
   def redirect_after_update
     intellectual_object_path(resource)
   end
-
-  private
 
   def get_create_params
     params[:intellectual_object].is_a?(Array) ? json_param = params[:intellectual_object] : json_param = params[:intellectual_object][:_json]

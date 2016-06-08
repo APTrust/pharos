@@ -1,0 +1,92 @@
+<div id="content" class="col-md-9 show-document">
+
+  <ol class="breadcrumb">
+    <li><%= link_to @intellectual_object.institution.name, @intellectual_object.institution %></li>
+    <li class="active"><%= @intellectual_object.title %></li>
+  </ol>
+
+  <div class="page-header">
+    <h1><%= @intellectual_object.title %></h1>
+  </div>
+
+  <div class="object_info">
+    <dl class="dl-horizontal dl-invert">
+      <dt>Institution</dt>
+      <dd><%= link_to @intellectual_object.institution.name, @intellectual_object.institution %> [<%= @intellectual_object.institution.brief_name %>]</dd>
+      <dt>Access</dt>
+      <dd><%= @intellectual_object.access.capitalize %></dd>
+      <dt>Identifier</dt>
+      <dd><%= @intellectual_object.identifier %></dd>
+      <dt>Bag Name</dt>
+      <dd><%= @intellectual_object.bag_name %></dd>
+      <dt> Last Modified </dt>
+      <dd> <%= @intellectual_object.modified_date %> </dd>
+      <dt>Description</dt>
+      <dd><%= @intellectual_object.description %></dd>
+      <% if @intellectual_object.alt_identifier.count >= 1  %>
+          <dt>Alternate Identifiers</dt>
+      <% end %>
+      <% @intellectual_object.alt_identifier.each do |alt_ident| %>
+          <dd><%= alt_ident %></dd>
+      <% end %>
+      <dt>DPN Status</dt>
+      <% if @intellectual_object.in_dpn? %>
+          <dd>Item has been uploaded to DPN.</dd>
+      <% else %>
+          <dd>Item does not reside in DPN.</dd>
+      <% end %>
+      <% if @intellectual_object.state == 'D' %>
+          <dt><i><b>State</b></i></dt>
+          <dd><i>This object has been deleted.</i></dd>
+      <% end %>
+
+
+    </dl>
+  </div>
+
+  <div class="panel">
+    <%= link_to intellectual_object_files_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
+        <i class="glyphicon glyphicon-list-alt"></i> View Preserved Files
+    <% end %>
+    <%= link_to intellectual_object_events_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
+        <i class="glyphicon glyphicon-eye-open"></i> View Events
+    <% end %>
+    <% unless @intellectual_object.state == 'D' %>
+        <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_pid == @intellectual_object.institution_id) %>
+            <%= link_to intellectual_object_restore_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
+                <i class="glyphicon glyphicon-download"></i> Restore Object
+            <% end %>
+            <% if (Fluctus::Application.config.show_send_to_dpn_button == true && @intellectual_object.institution.dpn_uuid.blank? == false && @intellectual_object.in_dpn? == false )%>
+                <%= link_to intellectual_object_dpn_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
+                    <i class="glyphicon glyphicon-send dpn"></i> Send Object To DPN
+                <% end %>
+            <% end %>
+        <% end %>
+        <%= render_document_sidebar_partial %>
+    <% end %>
+
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        Aggregate Data About Preserved Files
+      </h3>
+    </div>
+
+    <div class="panel-body">
+      <dl class="dl-horizontal dl-invert">
+        <dt>Files Preserved </dt>
+        <dd><%= @intellectual_object.generic_files.count %></dd>
+        <dt>Total Content Upload</dt>
+        <dd><%= number_to_human_size(@intellectual_object.bytes_by_format()['all']) %></dd>
+        <% @intellectual_object.bytes_by_format.each do |format, bytes| %>
+            <% unless format == 'all' %>
+                <dt class="<%=format_class(format) %>"><%= format_display(format) %></dt>
+                <dd class="bytes"><%=number_to_human_size bytes %></dd>
+            <% end %>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+</div>
