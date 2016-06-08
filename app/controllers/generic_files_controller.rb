@@ -66,7 +66,7 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  # /api/v1/objects/:intellectual_object_identifier/files/save_batch
+  # /api/v1/objects/:identifier/files/save_batch
   #
   # save_batch creates or updates a batch of GenericFile objects, along
   # with their related PremisEvents. Although there's no built-in limit
@@ -222,9 +222,9 @@ class GenericFilesController < ApplicationController
   end
 
   def load_intellectual_object
-    if params[:intellectual_object_identifier]
-      #objId = params[:intellectual_object_identifier].gsub(/%2F/i, '/')
-      @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
+    if params[:identifier]
+      #objId = params[:identifier].gsub(/%2F/i, '/')
+      @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
       params[:intellectual_object_id] = @intellectual_object.id
     elsif params[:intellectual_object_id]
       #@intellectual_object ||= IntellectualObject.find(params[:intellectual_object_id])

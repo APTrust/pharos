@@ -33,7 +33,7 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it "can view events, even if it's not my intellectual object" do
-        get :index, intellectual_object_identifier: someone_elses_object
+        get :index, identifier: someone_elses_object
         expect(response).to be_success
         assigns(:intellectual_object).should == someone_elses_object
         assigns(:document_list).length.should == 1
@@ -41,7 +41,7 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it 'can view objects events by object identifier (API)' do
-        get :index, intellectual_object_identifier: someone_elses_object.identifier, use_route: 'events_by_object_identifier_path'
+        get :index, identifier: someone_elses_object.identifier, use_route: 'events_by_object_identifier_path'
         expect(response).to be_success
         assigns(:intellectual_object).should == someone_elses_object
         assigns(:document_list).length.should == 1
@@ -81,7 +81,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it 'creates an event for an intellectual object' do
         object.premis_events.events.count.should == 0
-        post :create, intellectual_object_identifier: object, event: event_attrs
+        post :create, identifier: object, event: event_attrs
         object.reload
 
         object.premis_events.events.count.should == 1
@@ -94,7 +94,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it 'creates an event for an intellectual object by object identifier' do
         object.premis_events.events.count.should == 0
-        post :create, intellectual_object_identifier: URI.escape(object.identifier), event: event_attrs, use_route: 'events_by_object_identifier_path'
+        post :create, identifier: URI.escape(object.identifier), event: event_attrs, use_route: 'events_by_object_identifier_path'
         object.reload
 
         object.premis_events.events.count.should == 1
@@ -172,7 +172,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe 'events for an intellectual object' do
         it 'shows the events for that object, sorted by time' do
-          get :index, intellectual_object_identifier: object
+          get :index, identifier: object
           expect(response).to be_success
           assigns(:intellectual_object).should == object
           assigns(:document_list).length.should == 3
@@ -200,7 +200,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe "for an intellectual object where you don't have permission" do
         it 'denies access' do
-          get :index, intellectual_object_identifier: someone_elses_object
+          get :index, identifier: someone_elses_object
           expect(response).to redirect_to root_url
           flash[:alert].should =~ /You are not authorized/
         end

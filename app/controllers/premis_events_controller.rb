@@ -15,6 +15,7 @@ class PremisEventsController < ApplicationController
   self.solr_search_params_logic += [:sort_chronologically]
 
   def index
+    #TODO: figure out how to figure which identifier is which
     if params['identifier']
       @institution = Institution.where(identifier: params['identifier']).first
       obj = @institution
@@ -58,15 +59,15 @@ class PremisEventsController < ApplicationController
   protected
 
   def intellectual_object_identifier_exists?
-    params['intellectual_object_identifier']
+    params['identifier']
   end
 
   def generic_file_identifier_exists?
-    params['generic_file_identifier']
+    params['identifier'].contains?('data')
   end
 
   def load_intellectual_object
-    objId = params[:intellectual_object_identifier].gsub(/%2F/i, '/')
+    objId = params[:identifier].gsub(/%2F/i, '/')
     @parent_object = IntellectualObject.where(identifier: objId).first
     params[:intellectual_object_id] = @parent_object.id
   end
@@ -83,7 +84,7 @@ class PremisEventsController < ApplicationController
 
   def load_and_authorize_parent_object
     if @parent_object.nil?
-      params[:intellectual_object_identifier] ? load_intellectual_object : load_generic_file
+      params[:identifier].contains?('data') ? load_intellectual_object : load_generic_file
     end
     authorize @parent_object, :add_event?
   end

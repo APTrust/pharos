@@ -30,7 +30,7 @@ describe 'Routes for Events' do
     ).to(
         route_to(controller: 'premis_events',
                  action: 'create',
-                 intellectual_object_identifier: 'apt.org/123'
+                 identifier: 'apt.org/123'
         )
     )
   end
@@ -41,7 +41,7 @@ describe 'Routes for Events' do
     ).to(
         route_to(controller: 'premis_events',
                  action: 'index',
-                 intellectual_object_identifier: 'apt.org/123'
+                 identifier: 'apt.org/123'
         )
     )
   end

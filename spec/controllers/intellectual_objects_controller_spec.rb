@@ -96,7 +96,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        get :show, intellectual_object_identifier: obj1
+        get :show, identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in user }
 
       it 'should show the object' do
-        get :show, intellectual_object_identifier: obj1
+        get :show, identifier: obj1
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
       end
@@ -139,7 +139,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when not signed in' do
       let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
       it 'should redirect to login' do
-        get :edit, intellectual_object_identifier: obj1
+        get :edit, identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -150,7 +150,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :institutional_user) }
         before { sign_in user }
         it 'should be unauthorized' do
-          get :edit, intellectual_object_identifier: obj1
+          get :edit, identifier: obj1
           expect(response).to redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -160,7 +160,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :institutional_admin) }
         before { sign_in user }
         it 'should be unauthorized' do
-          get :edit, intellectual_object_identifier: obj1
+          get :edit, identifier: obj1
           expect(response).to redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -170,7 +170,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :admin) }
         before { sign_in user }
         it 'should not show the object' do
-          get :edit, intellectual_object_identifier: obj1
+          get :edit, identifier: obj1
           expect(response).to redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -185,7 +185,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when not signed in' do
       let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
       it 'should redirect to login' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo' }
+        patch :update, identifier: obj1, intellectual_object: {title: 'Foo' }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -199,19 +199,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       }
 
       it 'should update the search counter' do
-        patch :update, intellectual_object_identifier: obj1, counter: '5'
+        patch :update, identifier: obj1, counter: '5'
         expect(response).to redirect_to intellectual_object_path(obj1)
         expect(session[:search][:counter]).to eq '5'
       end
 
       it 'should update fields' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}
         expect(response).to redirect_to intellectual_object_path(obj1)
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
 
       it 'should update via json' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}, format: 'json'
+        patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}, format: 'json'
         expect(response).to be_successful
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
@@ -492,7 +492,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
       after { obj1.destroy }
       it 'should redirect to login' do
-        delete :destroy, intellectual_object_identifier: obj1
+        delete :destroy, identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -505,14 +505,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should update via json' do
         pi = FactoryGirl.create(:ingested_item, object_identifier: obj1.identifier)
-        delete :destroy, intellectual_object_identifier: obj1, format: 'json'
+        delete :destroy, identifier: obj1, format: 'json'
         expect(response.code).to eq '204'
         expect(assigns(:intellectual_object).state).to eq 'D'
       end
 
       it 'should update via html' do
         pi = FactoryGirl.create(:ingested_item, object_identifier: obj1.identifier)
-        delete :destroy, intellectual_object_identifier: obj1
+        delete :destroy, identifier: obj1
         expect(response).to redirect_to root_path
         expect(flash[:notice]).to eq "Delete job has been queued for object: #{obj1.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
         expect(assigns(:intellectual_object).state).to eq 'D'
@@ -526,7 +526,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       after { obj1.destroy }
 
       it 'should redirect to login' do
-        get :restore, intellectual_object_identifier: obj1
+        get :restore, identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
 
@@ -551,7 +551,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark only the latest work item for restore' do
-        get :restore, intellectual_object_identifier: obj1
+        get :restore, identifier: obj1
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -578,7 +578,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item for restore' do
-        get :restore, intellectual_object_identifier: obj1
+        get :restore, identifier: obj1
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -595,7 +595,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       after { obj1.destroy }
 
       it 'should redirect to login' do
-        get :dpn, intellectual_object_identifier: obj1
+        get :dpn, identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
 
@@ -617,7 +617,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item as sent to dpn' do
-        get :dpn, intellectual_object_identifier: obj1
+        get :dpn, identifier: obj1
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -644,7 +644,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item as sent to dpn' do
-        get :dpn, intellectual_object_identifier: obj1
+        get :dpn, identifier: obj1
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],

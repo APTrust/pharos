@@ -7,18 +7,18 @@ Rails.application.routes.draw do
   end
 
   object_identifier_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
-  resources :intellectual_objects, path: 'objects' do
+  resources :intellectual_objects, param: :identifier, identifier: object_identifier_ptrn, path: 'objects' do
     resources :generic_files, only: [:index, :create], path: 'files'
     resources :premis_events, only: [:index, :create]
   end
 
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
-  resources :generic_files, path: 'files' do
+  resources :generic_files, param: :identifier, identifier: file_ptrn, path: 'files' do
     resources :premis_events, only: [:index, :create]
   end
 
-  get 'objects/*intellectual_object_identifier/restore', to: 'intellectual_objects#restore', as: :intellectual_object_restore, intellectual_object_identifier: object_identifier_ptrn
-  get 'objects/*intellectual_object_identifier/dpn', to: 'intellectual_objects#dpn', as: :intellectual_object_dpn, intellectual_object_identifier: object_identifier_ptrn
+  get 'objects/*identifier/restore', to: 'intellectual_objects#restore', as: :intellectual_object_restore, identifier: object_identifier_ptrn
+  get 'objects/*identifier/dpn', to: 'intellectual_objects#dpn', as: :intellectual_object_dpn, identifier: object_identifier_ptrn
 
   devise_for :users
 
@@ -69,16 +69,16 @@ Rails.application.routes.draw do
   get '/api/v1/institutions/:institution_identifier', to: 'institutions#show', format: 'json', as: :institution_api_show, institution_identifier: institution_ptrn
 
   post '/api/v1/objects/include_nested', to: 'intellectual_objects#create_from_json', format: 'json'
-  post '/api/v1/objects/:intellectual_object_identifier/files/save_batch', to: 'generic_files#save_batch', format: 'json', intellectual_object_identifier: /[^\/]*/, as: :generic_files_save_batch
-  post '/api/v1/objects/:intellectual_object_identifier/files(.:format)', to: 'generic_files#create', format: 'json', intellectual_object_identifier: /[^\/]*/
-  get  '/api/v1/objects/:intellectual_object_identifier/files(.:format)', to: 'generic_files#index', format: 'json', intellectual_object_identifier: /[^\/]*/
+  post '/api/v1/objects/:identifier/files/save_batch', to: 'generic_files#save_batch', format: 'json', identifier: /[^\/]*/, as: :generic_files_save_batch
+  post '/api/v1/objects/:identifier/files(.:format)', to: 'generic_files#create', format: 'json', identifier: /[^\/]*/
+  get  '/api/v1/objects/:identifier/files(.:format)', to: 'generic_files#index', format: 'json', identifier: /[^\/]*/
 
   get  '/api/v1/objects/:identifier', to: 'intellectual_objects#show', format: 'json', identifier: /[^\/]*/, as: :object_by_identifier
   put  '/api/v1/objects/:identifier', to: 'intellectual_objects#update', format: 'json', identifier: /[^\/]*/, as: :object_update_by_identifier
-  post '/api/v1/objects/:intellectual_object_identifier/events(.:format)', to: 'events#create', format: 'json', intellectual_object_identifier: /[^\/]*/, as: 'events_by_object_identifier'
+  post '/api/v1/objects/:identifier/events(.:format)', to: 'events#create', format: 'json', identifier: /[^\/]*/, as: 'events_by_object_identifier'
 
 
-  get  '/api/v1/file_summary/:intellectual_object_identifier', to: 'generic_files#file_summary', format: 'json', intellectual_object_identifier: /[^\/]*/, as: 'file_summary'
+  get  '/api/v1/file_summary/:identifier', to: 'generic_files#file_summary', format: 'json', identifier: /[^\/]*/, as: 'file_summary'
   get  '/api/v1/files/not_checked_since', to: 'generic_files#not_checked_since', format: 'json', generic_file_identifier: /[^\/]*/, as: 'files_not_checked_since'
   get  '/api/v1/files/:generic_file_identifier', to: 'generic_files#show', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_by_identifier'
   put  '/api/v1/files/:generic_file_identifier', to: 'generic_files#update', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_update_by_identifier'

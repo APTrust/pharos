@@ -19,15 +19,15 @@ class IntellectualObjectsController < ApplicationController
     else
       @items = Institution.where(identifier: current_user.institution.identifier).intellectual_objects
     end
-    #TODO: This needs reworking for searches
-    @items = @items.where(identifier_ssim: params[:name_exact]) if params[:name_exact].present?
-    @items = @items.where(identifier_tesim: params[:name_contains]) if params[:name_contains].present?
-    @items = @items.where(object_state_ssi: params[:state]) if params[:state].present?
+
+    @items = @items.where(identifier: params[:name_exact]) if params[:name_exact].present?
+    @items = @items.where('identifier LIKE ?', params[:name_contains]) if params[:name_contains].present?
+    @items = @items.where(state: params[:state]) if params[:state].present?
 
     # Do not instantiate objects. Make Solr do the filtering.
     if params[:updated_since].present?
       date = format_date
-      @items = @items.where("system_modified_dtsi:[#{date} TO *]")
+      @items = @items.where(updated_at: date..Time.now)
     end
 
     @count = @items.count
@@ -293,8 +293,8 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def load_object
-    if params[:intellectual_object_identifier]
-      @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
+    if params[:identifier]
+      @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
       @institution = @intellectual_object.institution
       params[:id] = @intellectual_object.id
     elsif params[:identifier] && params[:id].blank?
