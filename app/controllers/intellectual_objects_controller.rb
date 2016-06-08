@@ -1,4 +1,5 @@
 class IntellectualObjectsController < ApplicationController
+  inherit_resources
   before_filter :authenticate_user!
   before_filter :load_institution, only: [:index, :create]
   before_filter :load_object, only: [:show, :edit, :update, :destroy, :restore, :dpn]
@@ -7,7 +8,7 @@ class IntellectualObjectsController < ApplicationController
   def index
     authorize @institution
     @intellectual_objects = @institution.intellectual_objects
-    #super
+    index!
   end
 
   def api_index
@@ -45,7 +46,7 @@ class IntellectualObjectsController < ApplicationController
   def create
     authorize @institution, :create_through_institution?
     @intellectual_object = @institution.intellectual_objects.new(params[:intellectual_object])
-    super
+    create!
   end
 
   def show
@@ -65,18 +66,19 @@ class IntellectualObjectsController < ApplicationController
 
   def edit
     authorize @intellectual_object
-    super
+    edit!
   end
 
   def update
     authorize @intellectual_object
     if params[:counter]
       # They are just updating the search counter
-      search_session[:counter] = params[:counter]
+      #TODO: figure out where/how to initialize this counter
+      #search_session[:counter] = params[:counter]
       redirect_to :action => 'show', :status => 303
     else
       # They are updating a record. Use the method defined in RecordsControllerBehavior
-      super
+      update!
     end
   end
 
@@ -87,7 +89,7 @@ class IntellectualObjectsController < ApplicationController
       redirect_to @intellectual_object
       flash[:alert] = 'This item has already been deleted.'
     elsif pending == 'false'
-      attributes = { type: 'delete',
+      attributes = { event_type: 'delete',
                      date_time: "#{Time.now}",
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',
@@ -178,7 +180,7 @@ class IntellectualObjectsController < ApplicationController
         new_object.save!
         # Save the ingest and other object-level events.
         state[:object_events].each { |event|
-          state[:current_object] = "IntellectualObject Event #{event['type']} / #{event['identifier']}"
+          state[:current_object] = "IntellectualObject Event #{event['event_type']} / #{event['identifier']}"
           new_object.add_event(event)
         }
         # Save all the files and their events.
@@ -242,7 +244,7 @@ class IntellectualObjectsController < ApplicationController
     # We have to save this now to get events into Solr
     new_file.save!
     file_events.each { |event|
-      state[:current_object] = "GenericFile Event #{event['type']} / #{event['identifier']}"
+      state[:current_object] = "GenericFile Event #{event['event_type']} / #{event['identifier']}"
       new_file.add_event(event)
     }
     # We have to save again to get events back from Fedora!

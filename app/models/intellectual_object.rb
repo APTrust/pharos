@@ -141,8 +141,11 @@ class IntellectualObject < ActiveRecord::Base
 
   def serialize_alt_identifiers
     data = []
-    alt_identifier.each do |ident|
-      data.push(ident)
+    alts = alt_identifier.split(',')
+    unless alts.empty?
+      alts.each do |ident|
+        data.push(ident)
+      end
     end
     data
   end
