@@ -34,35 +34,34 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           it 'should show the results that I have access to that belong to the institution' do
             get :index, identifier: user.institution_identifier
             expect(response).to be_successful
-            expect(assigns(:document_list).size).to eq 3
-            #assigns(:document_list).each {|doc| expect(doc).to be_kind_of SolrDocument}
-            expect(assigns(:document_list).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
+            expect(assigns(:intellectual_objects).size).to eq 3
+            expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
           end
 
           it 'should match a partial search on title' do
-            get :index, identifier: user.institution_identifier, q: 'Rugby'
+            get :index, identifier: user.institution_identifier, q: 'Rugby', search_field: 'title'
             expect(response).to be_successful
-            expect(assigns(:document_list).map &:id).to match_array [obj2.id]
+            expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id]
           end
           it 'should match a partial search on description' do
-            get :index, identifier: user.institution_identifier, q: 'Guangzhou'
+            get :index, identifier: user.institution_identifier, q: 'Guangzhou', search_field: 'description'
             expect(response).to be_successful
-            expect(assigns(:document_list).map &:id).to match_array [obj4.id]
+            expect(assigns(:intellectual_objects).map &:id).to match_array [obj4.id]
           end
           it 'should match an exact search on identifier' do
-            get :index, identifier: user.institution_identifier, q: obj4.identifier
+            get :index, identifier: user.institution_identifier, q: obj4.identifier, search_field: 'identifier'
             expect(response).to be_successful
-            expect(assigns(:document_list).map &:id).to match_array [obj4.id]
+            expect(assigns(:intellectual_objects).map &:id).to match_array [obj4.id]
           end
           it 'should match an exact search on bag name' do
-            get :index, identifier: user.institution_identifier, q: '12345-abcde'
+            get :index, identifier: user.institution_identifier, q: '12345-abcde', search_field: 'bag_name'
             expect(response).to be_successful
-            expect(assigns(:document_list).map &:id).to match_array [obj6.id]
+            expect(assigns(:intellectual_objects).map &:id).to match_array [obj6.id]
           end
           it 'should match an exact search on alternate identifiers' do
-            get :index, identifier: user.institution_identifier, q: 'test.edu/some-bag'
+            get :index, identifier: user.institution_identifier, q: 'test.edu/some-bag', search_field: 'alt_identifier'
             expect(response).to be_successful
-            expect(assigns(:document_list).map &:id).to match_array [obj6.id]
+            expect(assigns(:intellectual_objects).map &:id).to match_array [obj6.id]
           end
         end
 
@@ -81,9 +80,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           it 'should show the results that I have access to that belong to the institution' do
             get :index, identifier: another_institution.identifier
             expect(response).to be_successful
-            expect(assigns(:document_list).size).to eq 3
-            #assigns(:document_list).each {|doc| expect(doc).to be_kind_of SolrDocument}
-            expect(assigns(:document_list).map &:id).to match_array [obj1.id, obj3.id, obj5.id]
+            expect(assigns(:intellectual_objects).size).to eq 3
+            expect(assigns(:intellectual_objects).map &:id).to match_array [obj1.id, obj3.id, obj5.id]
           end
         end
       end

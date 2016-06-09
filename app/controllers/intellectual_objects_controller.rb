@@ -1,13 +1,27 @@
 class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_filter :authenticate_user!
-  before_filter :load_institution, only: [:index, :create]
-  before_filter :load_object, only: [:show, :edit, :update, :destroy, :restore, :dpn]
+  before_action :load_institution, only: [:index, :create]
+  before_action :load_object, only: [:show, :edit, :update, :destroy, :restore, :dpn]
   after_action :verify_authorized, :except => [:index, :create, :create_from_json]
 
   def index
     authorize @institution
     @intellectual_objects = @institution.intellectual_objects
+    if params[:search_field].present?
+      case params[:search_field]
+        when 'title'
+          @intellectual_objects = @intellectual_objects.where('title LIKE ?', "%#{params[:q]}%")
+        when 'description'
+          @intellectual_objects = @intellectual_objects.where('description LIKE ?', "%#{params[:q]}%")
+        when 'bag_name'
+          @intellectual_objects = @intellectual_objects.where('bag_name=? OR bag_name LIKE ?', params[:q], "%#{params[:q]}%")
+        when 'alt_identifier'
+          @intellectual_objects = @intellectual_objects.where('alt_identifier=? OR alt_identifier LIKE ?', params[:q], "%#{params[:q]}%")
+        when 'identifier'
+          @intellectual_objects = @intellectual_objects.where('identifier=? OR identifier LIKE ?', params[:q], "%#{params[:q]}%")
+      end
+    end
     index!
   end
 
@@ -16,7 +30,6 @@ class IntellectualObjectsController < ApplicationController
     authorize @institution, :index?
     if current_user.admin?
       params[:institution].present? ? @items = Institution.where(identifier: params[:institution]).intellectual_objects : @items = IntellectualObject.all
-
     else
       @items = Institution.where(identifier: current_user.institution.identifier).intellectual_objects
     end
