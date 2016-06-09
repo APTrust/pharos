@@ -110,7 +110,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should show the object by identifier for API users' do
-        get :show, identifier: CGI.escape(obj1.identifier), use_route: 'object_by_identifier'
+        get :show, esc_identifier: CGI.escape(obj1.identifier)
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
       end
@@ -118,12 +118,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should include only active generic files for API users' do
         FactoryGirl.create(:generic_file, intellectual_object: obj1, identifier: 'one', state: 'A')
         FactoryGirl.create(:generic_file, intellectual_object: obj1, identifier: 'two', state: 'D')
-        get(:show, identifier: CGI.escape(obj1.identifier), use_route: 'object_by_identifier',
+        get(:show, esc_identifier: CGI.escape(obj1.identifier),
             include_relations: true, format: :json)
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
         response_data = JSON.parse(response.body)
-        expect(response_data['generic_files'].select{|f| f['state'] == 'A'}.count).to eq 2
+        expect(response_data['generic_files'].select{|f| f['state'] == 'A'}.count).to eq 1
         expect(response_data['generic_files'].select{|f| f['state'] != 'A'}.count).to eq 0
       end
 

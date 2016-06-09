@@ -134,7 +134,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def serialize_events
-    self.premis_events.events.map do |event|
+    self.premis_events.map do |event|
       event.serializable_hash
     end
   end

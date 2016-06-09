@@ -306,20 +306,17 @@ class IntellectualObjectsController < ApplicationController
   def load_object
     if params[:identifier]
       @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
-      @institution = @intellectual_object.institution
-      params[:id] = @intellectual_object.id
-    elsif params[:identifier] && params[:id].blank?
-      identifier = params[:identifier].gsub(/%2F/i, '/')
+    elsif params[:esc_identifier]
+      identifier = params[:esc_identifier].gsub(/%2F/i, '/')
       @intellectual_object ||= IntellectualObject.where(identifier: identifier).first
       if @intellectual_object.nil?
-        msg = "IntellectualObject '#{params[:identifier]}' not found"
+        msg = "IntellectualObject '#{params[:esc_identifier]}' not found"
         raise ActionController::RoutingError.new(msg)
-      else
-        params[:id] = @intellectual_object.id if @intellectual_object
       end
     else
       @intellectual_object ||= IntellectualObject.find(params[:id])
     end
+    @institution = @intellectual_object.institution unless @intellectual_object.nil?
   end
 
   def load_institution
