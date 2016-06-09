@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   get 'objects/*identifier/restore', to: 'intellectual_objects#restore', as: :intellectual_object_restore, identifier: object_identifier_ptrn
   get 'objects/*identifier/dpn', to: 'intellectual_objects#dpn', as: :intellectual_object_dpn, identifier: object_identifier_ptrn
   get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: 'json', esc_identifier: /[^\/]*/, as: :object_by_identifier
+  put  '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#update', identifier: /[^\/]*/, as: :object_update_by_identifier, defaults: {format: 'json'}
 
   devise_for :users
 
@@ -74,7 +75,6 @@ Rails.application.routes.draw do
   post '/api/v1/objects/:identifier/files(.:format)', to: 'generic_files#create', format: 'json', identifier: /[^\/]*/
   get  '/api/v1/objects/:identifier/files(.:format)', to: 'generic_files#index', format: 'json', identifier: /[^\/]*/
 
-  put  '/api/v1/objects/:identifier', to: 'intellectual_objects#update', format: 'json', identifier: /[^\/]*/, as: :object_update_by_identifier
   post '/api/v1/objects/:identifier/events(.:format)', to: 'events#create', format: 'json', identifier: /[^\/]*/, as: 'events_by_object_identifier'
 
 

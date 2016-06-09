@@ -84,15 +84,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update
     authorize @intellectual_object
-    if params[:counter]
-      # They are just updating the search counter
-      #TODO: figure out where/how to initialize this counter
-      #search_session[:counter] = params[:counter]
-      redirect_to :action => 'show', :status => 303
-    else
-      # They are updating a record. Use the method defined in RecordsControllerBehavior
-      update!
-    end
+    update!
   end
 
   def destroy
@@ -298,9 +290,8 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def intellectual_object_params
-    params.require(:intellectual_object).permit(:id, :institution_id, :title,
-                                                :description, :access, :identifier,
-                                                :bag_name, :alt_identifier)
+    params.require(:intellectual_object).permit(:id, :institution_id, :title, :description, :access, :identifier,
+                                                :bag_name, :alt_identifier, :state)
   end
 
   def load_object

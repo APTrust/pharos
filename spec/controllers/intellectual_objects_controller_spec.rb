@@ -196,11 +196,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         sign_in user
       }
 
-      it 'should update the search counter' do
-        patch :update, identifier: obj1, counter: '5'
-        expect(response).to redirect_to intellectual_object_path(obj1)
-        expect(session[:search][:counter]).to eq '5'
-      end
+      #Not going to use this. Check in later
+      # it 'should update the search counter' do
+      #   patch :update, identifier: obj1, counter: '5'
+      #   expect(response).to redirect_to intellectual_object_path(obj1)
+      #   expect(session[:search][:counter]).to eq '5'
+      # end
 
       it 'should update fields' do
         patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}
@@ -215,7 +216,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should update fields when called with identifier (API)' do
-        patch :update, identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}, use_route: 'object_update_by_identifier'
+        patch :update, esc_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
     end
@@ -227,7 +228,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should restrict API usage' do
-        patch :update, identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}, use_route: :object_update_by_identifier
+        patch :update, esc_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
         expect(response.status).to eq 302
       end
     end
