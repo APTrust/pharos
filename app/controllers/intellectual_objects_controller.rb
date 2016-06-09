@@ -29,13 +29,19 @@ class IntellectualObjectsController < ApplicationController
     @institution = current_user.institution
     authorize @institution, :index?
     if current_user.admin?
-      params[:institution].present? ? @items = Institution.where(identifier: params[:institution]).intellectual_objects : @items = IntellectualObject.all
+      if params[:institution].present? then
+        @institution = Institution.where(identifier: params[:institution])
+        @items = @institution.intellectual_objects
+      else
+        @items = IntellectualObject.all
+      end
     else
-      @items = Institution.where(identifier: current_user.institution.identifier).intellectual_objects
+      @institution = Institution.find(current_user.institution_id)
+      @items = @institution.intellectual_objects
     end
 
     @items = @items.where(identifier: params[:name_exact]) if params[:name_exact].present?
-    @items = @items.where('identifier LIKE ?', params[:name_contains]) if params[:name_contains].present?
+    @items = @items.where('identifier LIKE ?', "%#{params[:name_contains]}%") if params[:name_contains].present?
     @items = @items.where(state: params[:state]) if params[:state].present?
 
     # Do not instantiate objects. Make Solr do the filtering.
