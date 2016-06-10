@@ -525,7 +525,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       after { obj1.destroy }
 
       it 'should redirect to login' do
-        get :restore, identifier: obj1
+        get :index, q: obj1, alt_action: 'restore', identifier: obj1.institution.identifier
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
 
@@ -550,7 +550,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark only the latest work item for restore' do
-        get :restore, identifier: obj1
+        get :index, q: obj1, alt_action: 'restore', identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -577,7 +577,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item for restore' do
-        get :restore, identifier: obj1
+        get :index, q: obj1, alt_action: 'restore', identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -594,7 +594,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       after { obj1.destroy }
 
       it 'should redirect to login' do
-        get :dpn, identifier: obj1
+        get :index, q: obj1, alt_action: 'dpn', identifier: obj1.institution.identifier
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
 
@@ -616,7 +616,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item as sent to dpn' do
-        get :dpn, identifier: obj1
+        get :index, q: obj1, alt_action: 'dpn', identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -643,7 +643,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item as sent to dpn' do
-        get :dpn, identifier: obj1
+        get :index, q: obj1, alt_action: 'dpn', identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],

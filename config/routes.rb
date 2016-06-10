@@ -21,9 +21,6 @@ Rails.application.routes.draw do
     resources :premis_events, only: [:index, :create]
   end
 
-  #get 'objects/*identifier/restore', to: 'intellectual_objects#restore', as: :intellectual_object_restore, identifier: object_identifier_ptrn
-  #get 'objects/*identifier/dpn', to: 'intellectual_objects#dpn', as: :intellectual_object_dpn, identifier: object_identifier_ptrn
-
   devise_for :users
 
   resources :users do

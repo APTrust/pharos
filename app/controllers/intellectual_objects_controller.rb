@@ -2,11 +2,12 @@ class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_filter :authenticate_user!
   before_action :load_institution, only: [:index, :create]
-  before_action :load_object, only: [:show, :edit, :update, :destroy, :restore, :dpn]
+  before_action :load_object, only: [:show, :edit, :update, :destroy]
   after_action :verify_authorized, :except => [:index, :create, :create_from_json]
 
   def index
     authorize @institution
+
     if current_user.admin?
       if params[:institution].present? then
         @institution = Institution.where(identifier: params[:institution])
@@ -18,6 +19,7 @@ class IntellectualObjectsController < ApplicationController
       @institution = Institution.find(current_user.institution_id)
       @intellectual_objects = @institution.intellectual_objects
     end
+
     if params[:search_field].present?
       case params[:search_field]
         when 'title'
@@ -51,9 +53,49 @@ class IntellectualObjectsController < ApplicationController
     @intellectual_objects = @intellectual_objects.offset(start).limit(per_page)
     @next = format_next(page, per_page)
     @previous = format_previous(page, per_page)
+
     respond_to do |format|
       format.json { render json: {count: @count, next: @next, previous: @previous, results: @intellectual_objects.map{ |item| item.serializable_hash(include: [:etag])}} }
-      format.html { index! }
+      format.html {
+        if params[:alt_action].present?
+          @intellectual_object = IntellectualObject.where(identifier: params[:q]).first
+          case params[:alt_action]
+            when 'dpn'
+              authorize @intellectual_object, :dpn?
+              pending = WorkItem.pending?(@intellectual_object.identifier)
+              if Pharos::Application.config.show_send_to_dpn_button == false
+                redirect_to @intellectual_object
+                flash[:alert] = 'We are not currently sending objects to DPN.'
+              elsif @intellectual_object.state == 'D'
+                redirect_to @intellectual_object
+                flash[:alert] = 'This item has been deleted and cannot be sent to DPN.'
+              elsif pending == 'false'
+                WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
+                redirect_to @intellectual_object
+                flash[:notice] = 'Your item has been queued for DPN.'
+              else
+                redirect_to @intellectual_object
+                flash[:alert] = "Your object cannot be sent to DPN at this time due to a pending #{pending} request."
+              end
+            when 'restore'
+              authorize @intellectual_object, :restore?
+              pending = WorkItem.pending?(@intellectual_object.identifier)
+              if @intellectual_object.state == 'D'
+                redirect_to @intellectual_object
+                flash[:alert] = 'This item has been deleted and cannot be queued for restoration.'
+              elsif pending == 'false'
+                WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
+                redirect_to @intellectual_object
+                flash[:notice] = 'Your item has been queued for restoration.'
+              else
+                redirect_to @intellectual_object
+                flash[:alert] = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
+              end
+          end
+        else
+          index!
+        end
+      }
     end
   end
 
@@ -120,43 +162,6 @@ class IntellectualObjectsController < ApplicationController
     else
       redirect_to @intellectual_object
       flash[:alert] = "Your object cannot be deleted at this time due to a pending #{pending} request."
-    end
-  end
-
-  # get 'objects/:id/restore'
-  def restore
-    authorize @intellectual_object
-    pending = WorkItem.pending?(@intellectual_object.identifier)
-    if @intellectual_object.state == 'D'
-      redirect_to @intellectual_object
-      flash[:alert] = 'This item has been deleted and cannot be queued for restoration.'
-    elsif pending == 'false'
-      WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
-      redirect_to @intellectual_object
-      flash[:notice] = 'Your item has been queued for restoration.'
-    else
-      redirect_to @intellectual_object
-      flash[:alert] = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
-    end
-  end
-
-  # get 'objects/:id/dpn'
-  def dpn
-    authorize @intellectual_object
-    pending = WorkItem.pending?(@intellectual_object.identifier)
-    if Pharos::Application.config.show_send_to_dpn_button == false
-      redirect_to @intellectual_object
-      flash[:alert] = 'We are not currently sending objects to DPN.'
-    elsif @intellectual_object.state == 'D'
-      redirect_to @intellectual_object
-      flash[:alert] = 'This item has been deleted and cannot be sent to DPN.'
-    elsif pending == 'false'
-      WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
-      redirect_to @intellectual_object
-      flash[:notice] = 'Your item has been queued for DPN.'
-    else
-      redirect_to @intellectual_object
-      flash[:alert] = "Your object cannot be sent to DPN at this time due to a pending #{pending} request."
     end
   end
 
