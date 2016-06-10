@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   end
 
   object_identifier_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
-  resources :intellectual_objects, param: :identifier, identifier: object_identifier_ptrn, path: 'objects' do
+  resources :intellectual_objects, format: [:json, :html], param: :identifier, identifier: object_identifier_ptrn, path: 'objects' do
     resources :generic_files, only: [:index, :create], path: 'files'
     resources :premis_events, only: [:index, :create]
   end

@@ -210,7 +210,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should update via json' do
-        patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}, format: 'json'
+        patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}, format: :json
         expect(response).to be_successful
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
@@ -423,19 +423,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in user }
 
       it 'should only allow assigning institutions you have access to' do
-        post :create, identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo'}, format: 'json'
+        post :create, identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo'}, format: :json
         expect(response.code).to eq '403' # forbidden
         expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
       end
 
       it 'should show errors' do
-        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: 'json'
+        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: :json
         expect(response.code).to eq '422' #Unprocessable Entity
-        expect(JSON.parse(response.body)).to eq({'identifier' => ["can't be blank"],'access' => ["can't be blank"]})
+        expect(JSON.parse(response.body)).to eq({'identifier' => ["can't be blank"],'access' => ["can't be blank"],'bag_name' => ["can't be blank"]})
       end
 
       it 'should update fields' do
-        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/124', access: 'restricted', bag_name: '124'}, format: 'json'
+        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/124', access: 'restricted', bag_name: '124'}, format: :json
         expect(response.code).to eq '201'
         expect(assigns(:intellectual_object).title).to eq 'Foo'
         expect(assigns(:intellectual_object).identifier).to eq 'test.edu/124'
@@ -444,7 +444,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should use the institution parameter in the URL, not from the json' do
         expect {
-          post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', institution_id: user.institution_id, identifier: 'test.edu/123', access: 'restricted'}, format: 'json'
+          post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', institution_id: user.institution_id, identifier: 'test.edu/123', access: 'restricted'}, format: :json
           expect(response.code).to eq '201'
           expect(assigns(:intellectual_object).title).to eq 'Foo'
           expect(assigns(:intellectual_object).institution_id).to eq user.institution_id
@@ -459,7 +459,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should create all nested items when include relations flag is true' do
         expect {
-          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: 'json'
+          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: :json
           expect(response.code).to eq '201'
           expect(assigns(:intellectual_object).title).to eq 'Test Title'
           expect(assigns(:intellectual_object).bag_name).to eq 'ncsu.1840.16-388'
@@ -479,7 +479,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         # events.
         obj[:generic_files][1][:file_format] = ''
         expect {
-          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [obj], format: 'json'
+          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: obj, format: :json
           expect(response.code).to eq '422'
         }.to change(IntellectualObject, :count).by(0)
       end
@@ -504,7 +504,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should update via json' do
         pi = FactoryGirl.create(:ingested_item, object_identifier: obj1.identifier)
-        delete :destroy, identifier: obj1, format: 'json'
+        delete :destroy, identifier: obj1, format: :json
         expect(response.code).to eq '204'
         expect(assigns(:intellectual_object).state).to eq 'D'
       end

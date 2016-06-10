@@ -64,8 +64,12 @@ class IntellectualObjectsController < ApplicationController
 
   def create
     authorize @institution, :create_through_institution?
-    @intellectual_object = @institution.intellectual_objects.new(params[:intellectual_object])
+    @intellectual_object = @institution.intellectual_objects.new(intellectual_object_params)
     create!
+    respond_to do |format|
+      format.json { render object_as_json }
+      format.html
+    end
   end
 
   def show
@@ -90,6 +94,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update
     authorize @intellectual_object
+    respond_to(:html, :json)
     update!
   end
 
@@ -281,8 +286,6 @@ class IntellectualObjectsController < ApplicationController
     institution_intellectual_objects_path(params[:identifier] || @intellectual_object.institution.identifier)
   end
 
-  # Override Fedora's default JSON serialization for our API
-  # Note that we return only active files, not deleted files
   def object_as_json
     if params[:include_relations]
       # Return only active files, but call them generic_files
@@ -296,6 +299,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def intellectual_object_params
+    params[:intellectual_object] = params[:intellectual_object].first if params[:intellectual_object].kind_of?(Array)
     params.require(:intellectual_object).permit(:id, :institution_id, :title, :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :state)
   end
