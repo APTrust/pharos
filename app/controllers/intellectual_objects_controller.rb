@@ -8,89 +8,26 @@ class IntellectualObjectsController < ApplicationController
   def index
     authorize @institution
 
-    if current_user.admin?
-      if params[:institution].present? then
-        @institution = Institution.where(identifier: params[:institution])
-        @intellectual_objects = @institution.intellectual_objects
-      else
-        @intellectual_objects = IntellectualObject.all
-      end
-    else
-      @institution = Institution.find(current_user.institution_id)
-      @intellectual_objects = @institution.intellectual_objects
-    end
-
     if params[:search_field].present?
-      case params[:search_field]
-        when 'title'
-          @intellectual_objects = @intellectual_objects.where('title LIKE ?', "%#{params[:q]}%")
-        when 'description'
-          @intellectual_objects = @intellectual_objects.where('description LIKE ?', "%#{params[:q]}%")
-        when 'bag_name'
-          @intellectual_objects = @intellectual_objects.where('bag_name=? OR bag_name LIKE ?', params[:q], "%#{params[:q]}%")
-        when 'alt_identifier'
-          @intellectual_objects = @intellectual_objects.where('alt_identifier=? OR alt_identifier LIKE ?', params[:q], "%#{params[:q]}%")
-        when 'identifier'
-          @intellectual_objects = @intellectual_objects.where('identifier=? OR identifier LIKE ?', params[:q], "%#{params[:q]}%")
-      end
+      filter_results_by_standard_params
+      prep_search_incidentals
+    elsif params[:alt_action].present?
+      @intellectual_object = IntellectualObject.where(identifier: params[:q]).first
+    else
+      narrow_results_to_specific_institution
+      filter_results_by_other_params
+      prep_search_incidentals
     end
-
-    @intellectual_objects = @intellectual_objects.where(identifier: params[:name_exact]) if params[:name_exact].present?
-    @intellectual_objects = @intellectual_objects.where('identifier LIKE ?', "%#{params[:name_contains]}%") if params[:name_contains].present?
-    @intellectual_objects = @intellectual_objects.where(state: params[:state]) if params[:state].present?
-
-    if params[:updated_since].present?
-      date = format_date
-      @intellectual_objects = @intellectual_objects.where(updated_at: date..Time.now)
-    end
-
-    @count = @intellectual_objects.count
-    params[:page] = 1 unless params[:page].present?
-    params[:per_page] = 10 unless params[:per_page].present?
-    page = params[:page].to_i
-    per_page = params[:per_page].to_i
-    start = ((page - 1) * per_page)
-    @intellectual_objects = @intellectual_objects.offset(start).limit(per_page)
-    @next = format_next(page, per_page)
-    @previous = format_previous(page, per_page)
 
     respond_to do |format|
       format.json { render json: {count: @count, next: @next, previous: @previous, results: @intellectual_objects.map{ |item| item.serializable_hash(include: [:etag])}} }
       format.html {
         if params[:alt_action].present?
-          @intellectual_object = IntellectualObject.where(identifier: params[:q]).first
           case params[:alt_action]
             when 'dpn'
-              authorize @intellectual_object, :dpn?
-              pending = WorkItem.pending?(@intellectual_object.identifier)
-              if Pharos::Application.config.show_send_to_dpn_button == false
-                redirect_to @intellectual_object
-                flash[:alert] = 'We are not currently sending objects to DPN.'
-              elsif @intellectual_object.state == 'D'
-                redirect_to @intellectual_object
-                flash[:alert] = 'This item has been deleted and cannot be sent to DPN.'
-              elsif pending == 'false'
-                WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
-                redirect_to @intellectual_object
-                flash[:notice] = 'Your item has been queued for DPN.'
-              else
-                redirect_to @intellectual_object
-                flash[:alert] = "Your object cannot be sent to DPN at this time due to a pending #{pending} request."
-              end
+              send_to_dpn
             when 'restore'
-              authorize @intellectual_object, :restore?
-              pending = WorkItem.pending?(@intellectual_object.identifier)
-              if @intellectual_object.state == 'D'
-                redirect_to @intellectual_object
-                flash[:alert] = 'This item has been deleted and cannot be queued for restoration.'
-              elsif pending == 'false'
-                WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
-                redirect_to @intellectual_object
-                flash[:notice] = 'Your item has been queued for restoration.'
-              else
-                redirect_to @intellectual_object
-                flash[:alert] = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
-              end
+              restore_item
           end
         else
           index!
@@ -235,6 +172,98 @@ class IntellectualObjectsController < ApplicationController
     params[:intellectual_object].is_a?(Array) ? json_param = params[:intellectual_object] : json_param = params[:intellectual_object][:_json]
   end
 
+  def send_to_dpn
+    authorize @intellectual_object, :dpn?
+    pending = WorkItem.pending?(@intellectual_object.identifier)
+    if Pharos::Application.config.show_send_to_dpn_button == false
+      redirect_to @intellectual_object
+      flash[:alert] = 'We are not currently sending objects to DPN.'
+    elsif @intellectual_object.state == 'D'
+      redirect_to @intellectual_object
+      flash[:alert] = 'This item has been deleted and cannot be sent to DPN.'
+    elsif pending == 'false'
+      WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
+      redirect_to @intellectual_object
+      flash[:notice] = 'Your item has been queued for DPN.'
+    else
+      redirect_to @intellectual_object
+      flash[:alert] = "Your object cannot be sent to DPN at this time due to a pending #{pending} request."
+    end
+  end
+
+  def restore_item
+    authorize @intellectual_object, :restore?
+    pending = WorkItem.pending?(@intellectual_object.identifier)
+    if @intellectual_object.state == 'D'
+      redirect_to @intellectual_object
+      flash[:alert] = 'This item has been deleted and cannot be queued for restoration.'
+    elsif pending == 'false'
+      WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
+      redirect_to @intellectual_object
+      flash[:notice] = 'Your item has been queued for restoration.'
+    else
+      redirect_to @intellectual_object
+      flash[:alert] = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
+    end
+  end
+
+  def filter_results_by_standard_params
+    params[:identifier].present? ?
+        @intellectual_objects = @institution.intellectual_objects :
+        @intellectual_objects = IntellectualObject.all
+    case params[:search_field]
+      when 'title'
+        @intellectual_objects = @intellectual_objects.where('title LIKE ?', "%#{params[:q]}%")
+      when 'description'
+        @intellectual_objects = @intellectual_objects.where('description LIKE ?', "%#{params[:q]}%")
+      when 'bag_name'
+        @intellectual_objects = @intellectual_objects.where('bag_name=? OR bag_name LIKE ?', params[:q], "%#{params[:q]}%")
+      when 'alt_identifier'
+        @intellectual_objects = @intellectual_objects.where('alt_identifier=? OR alt_identifier LIKE ?', params[:q], "%#{params[:q]}%")
+      when 'identifier'
+        @intellectual_objects = @intellectual_objects.where('identifier=? OR identifier LIKE ?', params[:q], "%#{params[:q]}%")
+    end
+  end
+
+  def narrow_results_to_specific_institution
+    if current_user.admin?
+      if params[:institution].present? then
+        @search_institution = Institution.where(identifier: params[:institution])
+        @intellectual_objects = @search_institution.intellectual_objects
+      elsif params[:identifier].present?
+        @search_institution = @institution
+        @intellectual_objects = @search_institution.intellectual_objects
+      else
+        @intellectual_objects = IntellectualObject.all
+      end
+    else
+      @search_institution = Institution.find(current_user.institution_id)
+      @intellectual_objects = @search_institution.intellectual_objects
+    end
+  end
+
+  def filter_results_by_other_params
+    @intellectual_objects = @intellectual_objects.where(identifier: params[:name_exact]) if params[:name_exact].present?
+    @intellectual_objects = @intellectual_objects.where('identifier LIKE ?', "%#{params[:name_contains]}%") if params[:name_contains].present?
+    @intellectual_objects = @intellectual_objects.where(state: params[:state]) if params[:state].present?
+    if params[:updated_since].present?
+      date = format_date
+      @intellectual_objects = @intellectual_objects.where(updated_at: date..Time.now)
+    end
+  end
+
+  def prep_search_incidentals
+    @count = @intellectual_objects.count
+    params[:page] = 1 unless params[:page].present?
+    params[:per_page] = 10 unless params[:per_page].present?
+    page = params[:page].to_i
+    per_page = params[:per_page].to_i
+    start = ((page - 1) * per_page)
+    @intellectual_objects = @intellectual_objects.offset(start).limit(per_page)
+    @next = format_next(page, per_page)
+    @previous = format_previous(page, per_page)
+  end
+
   private
 
   def create_generic_file(file, intel_obj, state)
@@ -326,7 +355,6 @@ class IntellectualObjectsController < ApplicationController
     else
       @institution = params[:identifier].nil? ? current_user.institution : Institution.where(identifier: params[:identifier]).first
     end
-    params[:id] = @institution.id
   end
 
   def load_institution_for_create_from_json(object)
@@ -365,6 +393,7 @@ class IntellectualObjectsController < ApplicationController
     str = str << "&name_exact=#{params[:name_exact]}" if params[:name_exact].present?
     str = str << "&name_contains=#{params[:name_contains]}" if params[:name_contains].present?
     str = str << "&institution=#{params[:institution]}" if params[:institution].present?
+    str = str << "&institution=#{params[:identifier]}" if params[:identifier].present?
     str = str << "&state=#{params[:state]}" if params[:state].present?
     str = str << "&search_field=#{params[:search_field]}" if params[:search_field].present?
     str = str << "&q=#{params[:q]}" if params[:q].present?
