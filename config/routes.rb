@@ -12,15 +12,17 @@ Rails.application.routes.draw do
     resources :premis_events, only: [:index, :create]
   end
 
+  get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: 'json', esc_identifier: /[^\/]*/, as: :object_by_identifier
+  put  '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#update', identifier: /[^\/]*/, as: :object_update_by_identifier, defaults: {format: 'json'}
+  get '/member-api/v1/objects/', to: 'intellectual_objects#index', format: 'json'
+
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
   resources :generic_files, param: :identifier, identifier: file_ptrn, path: 'files' do
     resources :premis_events, only: [:index, :create]
   end
 
-  get 'objects/*identifier/restore', to: 'intellectual_objects#restore', as: :intellectual_object_restore, identifier: object_identifier_ptrn
-  get 'objects/*identifier/dpn', to: 'intellectual_objects#dpn', as: :intellectual_object_dpn, identifier: object_identifier_ptrn
-  get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: 'json', esc_identifier: /[^\/]*/, as: :object_by_identifier
-  put  '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#update', identifier: /[^\/]*/, as: :object_update_by_identifier, defaults: {format: 'json'}
+  #get 'objects/*identifier/restore', to: 'intellectual_objects#restore', as: :intellectual_object_restore, identifier: object_identifier_ptrn
+  #get 'objects/*identifier/dpn', to: 'intellectual_objects#dpn', as: :intellectual_object_dpn, identifier: object_identifier_ptrn
 
   devise_for :users
 
@@ -83,7 +85,6 @@ Rails.application.routes.draw do
   get  '/api/v1/files/:generic_file_identifier', to: 'generic_files#show', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_by_identifier'
   put  '/api/v1/files/:generic_file_identifier', to: 'generic_files#update', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_update_by_identifier'
 
-  get '/member-api/v1/objects/', to: 'intellectual_objects#api_index', format: 'json'
   get '/member-api/v1/items/', to: 'processed_item#api_index', format: 'json'
 
   # The pattern for generic_file_identifier is tricky, because we do not want it to

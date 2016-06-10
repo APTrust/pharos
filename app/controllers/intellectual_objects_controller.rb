@@ -7,7 +7,17 @@ class IntellectualObjectsController < ApplicationController
 
   def index
     authorize @institution
-    @intellectual_objects = @institution.intellectual_objects
+    if current_user.admin?
+      if params[:institution].present? then
+        @institution = Institution.where(identifier: params[:institution])
+        @intellectual_objects = @institution.intellectual_objects
+      else
+        @intellectual_objects = IntellectualObject.all
+      end
+    else
+      @institution = Institution.find(current_user.institution_id)
+      @intellectual_objects = @institution.intellectual_objects
+    end
     if params[:search_field].present?
       case params[:search_field]
         when 'title'
@@ -22,44 +32,29 @@ class IntellectualObjectsController < ApplicationController
           @intellectual_objects = @intellectual_objects.where('identifier=? OR identifier LIKE ?', params[:q], "%#{params[:q]}%")
       end
     end
-    index!
-  end
 
-  def api_index
-    @institution = current_user.institution
-    authorize @institution, :index?
-    if current_user.admin?
-      if params[:institution].present? then
-        @institution = Institution.where(identifier: params[:institution])
-        @items = @institution.intellectual_objects
-      else
-        @items = IntellectualObject.all
-      end
-    else
-      @institution = Institution.find(current_user.institution_id)
-      @items = @institution.intellectual_objects
-    end
+    @intellectual_objects = @intellectual_objects.where(identifier: params[:name_exact]) if params[:name_exact].present?
+    @intellectual_objects = @intellectual_objects.where('identifier LIKE ?', "%#{params[:name_contains]}%") if params[:name_contains].present?
+    @intellectual_objects = @intellectual_objects.where(state: params[:state]) if params[:state].present?
 
-    @items = @items.where(identifier: params[:name_exact]) if params[:name_exact].present?
-    @items = @items.where('identifier LIKE ?', "%#{params[:name_contains]}%") if params[:name_contains].present?
-    @items = @items.where(state: params[:state]) if params[:state].present?
-
-    # Do not instantiate objects. Make Solr do the filtering.
     if params[:updated_since].present?
       date = format_date
-      @items = @items.where(updated_at: date..Time.now)
+      @intellectual_objects = @intellectual_objects.where(updated_at: date..Time.now)
     end
 
-    @count = @items.count
+    @count = @intellectual_objects.count
     params[:page] = 1 unless params[:page].present?
     params[:per_page] = 10 unless params[:per_page].present?
     page = params[:page].to_i
     per_page = params[:per_page].to_i
     start = ((page - 1) * per_page)
-    @items = @items.offset(start).limit(per_page)
+    @intellectual_objects = @intellectual_objects.offset(start).limit(per_page)
     @next = format_next(page, per_page)
     @previous = format_previous(page, per_page)
-    render json: {count: @count, next: @next, previous: @previous, results: @items.map{ |item| item.serializable_hash(include: [:etag])}}
+    respond_to do |format|
+      format.json { render json: {count: @count, next: @next, previous: @previous, results: @intellectual_objects.map{ |item| item.serializable_hash(include: [:etag])}} }
+      format.html { index! }
+    end
   end
 
   def create
@@ -366,6 +361,8 @@ class IntellectualObjectsController < ApplicationController
     str = str << "&name_contains=#{params[:name_contains]}" if params[:name_contains].present?
     str = str << "&institution=#{params[:institution]}" if params[:institution].present?
     str = str << "&state=#{params[:state]}" if params[:state].present?
+    str = str << "&search_field=#{params[:search_field]}" if params[:search_field].present?
+    str = str << "&q=#{params[:q]}" if params[:q].present?
     str
   end
 end

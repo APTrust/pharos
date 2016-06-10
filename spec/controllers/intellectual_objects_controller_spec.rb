@@ -669,23 +669,23 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'returns all items when no other parameters are specified' do
-        get :api_index, format: :json, per_page: 1000
-        assigns(:items).should include(object1)
-        assigns(:items).should include(object2)
-        assigns(:items).should include(object3)
+        get :index, format: :json, per_page: 1000
+        assigns(:intellectual_objects).should include(object1)
+        assigns(:intellectual_objects).should include(object2)
+        assigns(:intellectual_objects).should include(object3)
       end
 
       it 'filters down to the right records and has the right count' do
         ident_parts = object1.identifier.split('/')
-        get :api_index, format: :json, name_contains: ident_parts[1]
-        assigns(:items).should_not include(object2)
-        assigns(:items).should_not include(object3)
-        assigns(:items).should include(object1)
+        get :index, format: :json, name_contains: ident_parts[1]
+        assigns(:intellectual_objects).should_not include(object2)
+        assigns(:intellectual_objects).should_not include(object3)
+        assigns(:intellectual_objects).should include(object1)
         assigns(:count).should == 1
       end
 
       it 'returns the correct next and previous links' do
-        get :api_index, format: :json, per_page: 2, page: 2, updated_since: '2014-06-03T15:28:39+00:00'
+        get :index, format: :json, per_page: 2, page: 2, updated_since: '2014-06-03T15:28:39+00:00'
         assigns(:next).should == 'http://test.host/member-api/v1/objects/?page=3&per_page=2&updated_since=2014-06-03T15:28:39+00:00'
         assigns(:previous).should == 'http://test.host/member-api/v1/objects/?page=1&per_page=2&updated_since=2014-06-03T15:28:39+00:00'
       end
@@ -702,10 +702,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it "returns only the items within the user's institution" do
-        get :api_index, format: :json, per_page: 100
-        assigns(:items).should include(object1)
-        assigns(:items).should include(object2)
-        assigns(:items).should_not include(object3)
+        get :index, format: :json, per_page: 100
+        assigns(:intellectual_objects).should include(object1)
+        assigns(:intellectual_objects).should include(object2)
+        assigns(:intellectual_objects).should_not include(object3)
       end
     end
   end
