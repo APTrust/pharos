@@ -39,10 +39,9 @@ class IntellectualObjectsController < ApplicationController
   def create
     authorize @institution, :create_through_institution?
     @intellectual_object = @institution.intellectual_objects.new(intellectual_object_params)
-    create!
     respond_to do |format|
       format.json { render object_as_json }
-      format.html
+      format.html { create! }
     end
   end
 
@@ -102,65 +101,65 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def create_from_json
-    # new_object is the IntellectualObject we're creating.
-    # current_object is the item we're about to save at any
-    # given step of this operation. We use this in the rescue
-    # clause to let the caller know where the operation failed.
-    state = {
-        current_object: nil,
-        object_events: [],
-        object_files: [],
-    }
-    if params[:include_nested] == 'true'
-      begin
-        json_param = get_create_params
-        object = JSON.parse(json_param.to_json).first
-        # We might be re-ingesting a previously-deleted intellectual object,
-        # or more likely, creating a new intel obj. Load or create the object.
-        identifier = object['identifier'].gsub(/%2F/i, '/')
-        new_object = IntellectualObject.where(identifier: identifier).first ||
-            IntellectualObject.new()
-        new_object.state = 'A' # in case we just loaded a deleted object
-        # Set the object's attributes from the JSON data.,
-        # then authorize and save it.
-        object.each { |attr_name, attr_value|
-          set_obj_attr(new_object, state, attr_name, attr_value)
-        }
-        state[:current_object] = "IntellectualObject #{new_object.identifier}"
-        load_institution_for_create_from_json(new_object)
-        authorize @institution, :create_through_institution?
-        new_object.save!
-        # Save the ingest and other object-level events.
-        state[:object_events].each { |event|
-          state[:current_object] = "IntellectualObject Event #{event['event_type']} / #{event['identifier']}"
-          new_object.add_event(event)
-        }
-        # Save all the files and their events.
-        state[:object_files].each do |file|
-          create_generic_file(file, new_object, state)
-        end
-        # Save again, or we won't get our events back from Fedora!
-        new_object.save!
-        @intellectual_object = new_object
-        @institution = @intellectual_object.institution
-        respond_to { |format| format.json { render json: object_as_json, status: :created } }
-      rescue Exception => ex
-        log_exception(ex)
-        if !new_object.nil?
-          new_object.generic_files.each do |gf|
-            gf.destroy
-          end
-          new_object.destroy
-        end
-        respond_to { |format| format.json {
-          render json: { error: "#{ex.message} : #{state[:current_object]}" },
-                 status: :unprocessable_entity
-        }
-        }
-      end
-    end
-  end
+  # def create_from_json
+  #   # new_object is the IntellectualObject we're creating.
+  #   # current_object is the item we're about to save at any
+  #   # given step of this operation. We use this in the rescue
+  #   # clause to let the caller know where the operation failed.
+  #   state = {
+  #       current_object: nil,
+  #       object_events: [],
+  #       object_files: [],
+  #   }
+  #   if params[:include_nested] == 'true'
+  #     begin
+  #       json_param = get_create_params
+  #       object = JSON.parse(json_param.to_json).first
+  #       # We might be re-ingesting a previously-deleted intellectual object,
+  #       # or more likely, creating a new intel obj. Load or create the object.
+  #       identifier = object['identifier'].gsub(/%2F/i, '/')
+  #       new_object = IntellectualObject.where(identifier: identifier).first ||
+  #           IntellectualObject.new()
+  #       new_object.state = 'A' # in case we just loaded a deleted object
+  #       # Set the object's attributes from the JSON data.,
+  #       # then authorize and save it.
+  #       object.each { |attr_name, attr_value|
+  #         set_obj_attr(new_object, state, attr_name, attr_value)
+  #       }
+  #       state[:current_object] = "IntellectualObject #{new_object.identifier}"
+  #       load_institution_for_create_from_json(new_object)
+  #       authorize @institution, :create_through_institution?
+  #       new_object.save!
+  #       # Save the ingest and other object-level events.
+  #       state[:object_events].each { |event|
+  #         state[:current_object] = "IntellectualObject Event #{event['event_type']} / #{event['identifier']}"
+  #         new_object.add_event(event)
+  #       }
+  #       # Save all the files and their events.
+  #       state[:object_files].each do |file|
+  #         create_generic_file(file, new_object, state)
+  #       end
+  #       # Save again, or we won't get our events back from Fedora!
+  #       new_object.save!
+  #       @intellectual_object = new_object
+  #       @institution = @intellectual_object.institution
+  #       respond_to { |format| format.json { render json: object_as_json, status: :created } }
+  #     rescue Exception => ex
+  #       log_exception(ex)
+  #       if !new_object.nil?
+  #         new_object.generic_files.each do |gf|
+  #           gf.destroy
+  #         end
+  #         new_object.destroy
+  #       end
+  #       respond_to { |format| format.json {
+  #         render json: { error: "#{ex.message} : #{state[:current_object]}" },
+  #                status: :unprocessable_entity
+  #       }
+  #       }
+  #     end
+  #   end
+  # end
 
   protected
 

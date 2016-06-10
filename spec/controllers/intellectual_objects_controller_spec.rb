@@ -459,7 +459,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should create all nested items when include relations flag is true' do
         expect {
-          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: :json
+          post :create, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: :json
           expect(response.code).to eq '201'
           expect(assigns(:intellectual_object).title).to eq 'Test Title'
           expect(assigns(:intellectual_object).bag_name).to eq 'ncsu.1840.16-388'
@@ -479,7 +479,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         # events.
         obj[:generic_files][1][:file_format] = ''
         expect {
-          post :create_from_json, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: obj, format: :json
+          post :create, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: obj, format: :json
           expect(response.code).to eq '422'
         }.to change(IntellectualObject, :count).by(0)
       end
