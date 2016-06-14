@@ -11,7 +11,7 @@
       <%= f.input :phone_number %>
 
       <% if current_user.admin?  %>
-          <%= f.input :institution_pid, collection: institutions_for_select, as: :select, label: "Institution" %>
+          <%= f.input :institution_id, collection: institutions_for_select, as: :select, label: "Institution" %>
       <% end %>
 
       <% if current_user.admin? || current_user.institutional_admin? %>

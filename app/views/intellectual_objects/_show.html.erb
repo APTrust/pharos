@@ -52,7 +52,7 @@
         <i class="glyphicon glyphicon-eye-open"></i> View Events
     <% end %>
     <% unless @intellectual_object.state == 'D' %>
-        <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_pid == @intellectual_object.institution_id) %>
+        <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_id == @intellectual_object.institution_id) %>
             <%= link_to intellectual_object_restore_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
                 <i class="glyphicon glyphicon-download"></i> Restore Object
             <% end %>

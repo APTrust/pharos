@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe WorkItemsController, type: :controller do
   let(:institution) { FactoryGirl.create(:institution) }
   let(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution_pid: institution.id) }
+  let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution_id: institution.id) }
 
   let!(:item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
   let!(:user_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution.identifier, status: Pharos::Application::PHAROS_STATUSES['fail']) }
@@ -88,9 +88,9 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'exposes :state, :node, or :pid for the admin user' do
         get :show, id: item.id, format: :json
         data = JSON.parse(response.body)
-        expect(data).to have_key("state")
-        expect(data).to have_key("node")
-        expect(data).to have_key("pid")
+        expect(data).to have_key('state')
+        expect(data).to have_key('node')
+        expect(data).to have_key('pid')
       end
 
       it 'returns 404, not 500, for item not found' do
@@ -108,16 +108,16 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       # it 'restricts API usage' do
-      #   get :show, etag: item.etag, name: item.name, bag_date: item.bag_date, format: 'json', use_route: :work_item_by_etag
+      #   get :show, etag: item.etag, name: item.name, bag_date: item.bag_date, format: 'json'
       #   expect(response.status).to eq 403
       # end
 
       it 'does not expose :state, :node, or :pid to non-admins' do
         get :show, id: item.id, format: :json
         data = JSON.parse(response.body)
-        expect(data).to_not have_key("state")
-        expect(data).to_not have_key("node")
-        expect(data).to_not have_key("pid")
+        expect(data).to_not have_key('state')
+        expect(data).to_not have_key('node')
+        expect(data).to_not have_key('pid')
       end
 
     end
@@ -132,12 +132,12 @@ RSpec.describe WorkItemsController, type: :controller do
         sign_in admin_user
       end
 
-      it 'does expose :state, :node, or :pid through admin #api_show' do
+      it 'does expose :state, :node, or :id through admin #api_show' do
         get :api_show, id: item.id, format: :json
         data = JSON.parse(response.body)
-        expect(data).to have_key("state")
-        expect(data).to have_key("node")
-        expect(data).to have_key("pid")
+        expect(data).to have_key('state')
+        expect(data).to have_key('node')
+        expect(data).to have_key('pid')
       end
     end
     describe 'for institutional admin' do
@@ -161,14 +161,14 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'accepts extended queue data - state, node, pid' do
         pi_hash = FactoryGirl.create(:work_item_with_state).attributes
-        put :update, id: item.id, format: 'json', work_item: pi_hash, use_route: :work_item_api_update_by_id
+        put :update, id: item.id, format: 'json', work_item: pi_hash
         expect(response.status).to eq 200
       end
 
       it 'sets node to "" when params[:node] == ""' do
         pi_hash = FactoryGirl.create(:work_item_with_state).attributes
         pi_hash[:node] = ""
-        put :update, id: item.id, format: 'json', work_item: pi_hash, use_route: :work_item_api_update_by_id
+        put :update, id: item.id, format: 'json', work_item: pi_hash
         expect(assigns(:work_item).node).to eq('')
       end
 
@@ -180,12 +180,12 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage when updating by id' do
-        put :update, id: item.id, format: 'json', use_route: :work_item_api_update_by_id
+        put :update, id: item.id, format: 'json'
         expect(response.status).to eq 403
       end
 
       # it 'restricts institutional admins from API usage when updating by etag' do
-      #   put :update, etag: item.etag, name: item.name, bag_date: item.bag_date, format: 'json', use_route: :work_item_api_update_by_etag
+      #   put :update, etag: item.etag, name: item.name, bag_date: item.bag_date, format: 'json'
       #   expect(response.status).to eq 403
       # end
     end
@@ -422,15 +422,13 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
-             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             use_route: 'item_set_restoration_status')
+             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
         expect(response).to be_success
       end
 
       it 'assigns the correct @item' do
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
-             stage: 'Resolve', status: 'Success', note: 'Buzz', retry: true,
-             use_route: 'item_set_restoration_status')
+             stage: 'Resolve', status: 'Success', note: 'Buzz', retry: true)
         expected_item = WorkItem.where(object_identifier: 'ned/flanders').order(created_at: :desc).first
         expect(assigns(:item).id).to eq(expected_item.id)
       end
@@ -438,8 +436,7 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'updates the correct @item' do
         WorkItem.first.update(object_identifier: 'homer/simpson')
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
-             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true,
-             use_route: 'item_set_restoration_status')
+             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
         update_count = WorkItem.where(object_identifier: 'ned/flanders',
                                            stage: 'Resolve', status: 'Success', retry: true).count
         expect(update_count).to eq(1)
@@ -448,23 +445,20 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'returns 404 for no matching records' do
         WorkItem.update_all(object_identifier: 'homer/simpson')
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
-             stage: 'Resolve', status: 'Success', note: 'Neil', retry: true,
-             use_route: 'item_set_restoration_status')
+             stage: 'Resolve', status: 'Success', note: 'Neil', retry: true)
         expect(response.status).to eq(404)
       end
 
       it 'returns 400 for bad request' do
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
-             stage: 'Invalid_Stage', status: 'Invalid_Status', note: 'Armstrong', retry: true,
-             use_route: 'item_set_restoration_status')
+             stage: 'Invalid_Stage', status: 'Invalid_Status', note: 'Armstrong', retry: true)
         expect(response.status).to eq(400)
       end
 
       it 'updates node, state, pid and needs_admin_review' do
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             node: '10.11.12.13', state: '{JSON data}', pid: 4321, needs_admin_review: true,
-             use_route: 'item_set_restoration_status')
+             node: '10.11.12.13', state: '{JSON data}', pid: 4321, needs_admin_review: true)
         expect(response).to be_success
         wi = WorkItem.where(object_identifier: 'ned/flanders',
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
@@ -477,8 +471,7 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'clears node, pid and needs_admin_review, updates state' do
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             node: nil, pid: 0, state: '{new JSON data}', needs_admin_review: false,
-             use_route: 'item_set_restoration_status')
+             node: nil, pid: 0, state: '{new JSON data}', needs_admin_review: false)
         expect(response).to be_success
         wi = WorkItem.where(object_identifier: 'ned/flanders',
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
@@ -508,8 +501,7 @@ RSpec.describe WorkItemsController, type: :controller do
       # be touched.
       it 'updates the correct @items' do
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
-             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true,
-             use_route: 'item_set_restoration_status')
+             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
         update_count = WorkItem.where(object_identifier: 'ned/flanders',
                                            stage: 'Resolve', status: 'Success', retry: true).count
         # Should be only one item updated...
@@ -541,8 +533,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'restricts access to the admin API' do
         post(:set_restoration_status, format: :json, object_identifier: 'ned/flanders',
-             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             use_route: 'item_set_restoration_status')
+             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
         expect(response.status).to eq 403
       end
     end
@@ -609,7 +600,7 @@ RSpec.describe WorkItemsController, type: :controller do
         post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
                                        bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
                                        stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: false},
-             format: 'json', use_route: :work_item_api_create
+             format: 'json'
         expect(response.status).to eq 403
       end
     end
@@ -729,7 +720,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
     it 'non admin users can not use API ingested since route' do
       sign_in other_user
-      get :ingested_since, since: '2009-01-01', format: :json, use_route: :work_items_ingested_since
+      get :ingested_since, since: '2009-01-01', format: :json
       expect(response.status).to eq 403
     end
 
@@ -850,7 +841,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage' do
-        get :api_search, format: 'json', use_route: :work_item_api_search
+        get :api_search, format: 'json'
         expect(response.status).to eq 403
       end
     end

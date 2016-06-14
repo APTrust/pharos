@@ -31,15 +31,15 @@ Rails.application.routes.draw do
 
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
 
-  get '/itemresults/search', to: 'processed_item#search', as: :processed_item_search
-  post '/itemresults/search', to: 'processed_item#search'
-  get 'itemresults/', to: 'processed_item#index', as: :processed_items
-  get 'itemresults/:id', to: 'processed_item#show', as: :processed_item
-  post '/itemresults/review_all', to: 'processed_item#review_all'
-  post '/itemresults/handle_selected', to: 'processed_item#handle_selected', as: :handle_selected
-  post '/itemresults/show_reviewed', to: 'processed_item#show_reviewed'
+  get '/itemresults/search', to: 'work_items#search', as: :work_item_search
+  post '/itemresults/search', to: 'work_items#search'
+  get 'itemresults/', to: 'work_items#index', as: :work_items
+  get 'itemresults/:id', to: 'work_items#show', as: :work_item
+  post '/itemresults/review_all', to: 'work_items#review_all'
+  post '/itemresults/handle_selected', to: 'work_items#handle_selected', as: :handle_selected
+  post '/itemresults/show_reviewed', to: 'work_items#show_reviewed'
 
-  #delete 'itemresults/:etag/:name', to: 'processed_item#destroy'
+  #delete 'itemresults/:etag/:name', to: 'work_item#destroy'
 
 
   # ----------------------------------------------------------------------
@@ -51,21 +51,21 @@ Rails.application.routes.draw do
   # Some of these routes are named because rspec cannot find them unless we explicitly name them.
   #
 
-  post '/api/v1/itemresults/', to: 'processed_item#create', format: 'json', as: :processed_item_api_create
-  get '/api/v1/itemresults/search', to: 'processed_item#api_search', format: 'json', as: :processed_item_api_search
-  get '/api/v1/itemresults/ingested_since/:since', to: 'processed_item#ingested_since', as: :processed_items_ingested_since
-  get '/api/v1/itemresults/:etag/:name/:bag_date', to: 'processed_item#show', as: :processed_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
-  put '/api/v1/itemresults/:id', to: 'processed_item#update', format: 'json', as: :processed_item_api_update_by_id
-  put '/api/v1/itemresults/:etag/:name/:bag_date', to: 'processed_item#update', format: 'json', as: :processed_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
-  get '/api/v1/itemresults/items_for_restore', to: 'processed_item#items_for_restore', format: 'json', as: :processed_item_api_restore
-  get '/api/v1/itemresults/items_for_dpn', to: 'processed_item#items_for_dpn', format: 'json', as: :processed_item_api_dpn
-  get '/api/v1/itemresults/items_for_delete', to: 'processed_item#items_for_delete', format: 'json', as: :processed_item_api_delete
+  post '/api/v1/itemresults/', to: 'work_items#create', format: 'json', as: :work_item_api_create
+  get '/api/v1/itemresults/search', to: 'work_items#api_search', format: 'json', as: :work_item_api_search
+  get '/api/v1/itemresults/ingested_since/:since', to: 'work_items#ingested_since', as: :work_items_ingested_since
+  get '/api/v1/itemresults/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
+  put '/api/v1/itemresults/:id', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_id
+  put '/api/v1/itemresults/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
+  get '/api/v1/itemresults/items_for_restore', to: 'work_items#items_for_restore', format: 'json', as: :work_item_api_restore
+  get '/api/v1/itemresults/items_for_dpn', to: 'work_items#items_for_dpn', format: 'json', as: :work_item_api_dpn
+  get '/api/v1/itemresults/items_for_delete', to: 'work_items#items_for_delete', format: 'json', as: :work_item_api_delete
   # This route must come after all other /api/v1/itemresults routes
   # because it's so general, it will catch everything.
-  get '/api/v1/itemresults/:id', to: 'processed_item#api_show', format: 'json', id: /\d+/, as: :processed_item_api_show
+  get '/api/v1/itemresults/:id', to: 'work_items#api_show', format: 'json', id: /\d+/, as: :work_item_api_show
 
-  post '/api/v1/itemresults/restoration_status/:object_identifier', to: 'processed_item#set_restoration_status', as: :item_set_restoration_status, object_identifier: /.*/
-  post '/api/v1/itemresults/delete_test_items', to: 'processed_item#delete_test_items', format: 'json', as: :processed_item_test_delete
+  post '/api/v1/itemresults/restoration_status/:object_identifier', to: 'work_items#set_restoration_status', as: :item_set_restoration_status, object_identifier: /.*/
+  post '/api/v1/itemresults/delete_test_items', to: 'work_items#delete_test_items', format: 'json', as: :work_item_test_delete
 
   get '/api/v1/institutions/:institution_identifier', to: 'institutions#show', format: 'json', as: :institution_api_show, institution_identifier: institution_ptrn
 
@@ -82,7 +82,7 @@ Rails.application.routes.draw do
   get  '/api/v1/files/:generic_file_identifier', to: 'generic_files#show', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_by_identifier'
   put  '/api/v1/files/:generic_file_identifier', to: 'generic_files#update', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_update_by_identifier'
 
-  get '/member-api/v1/items/', to: 'processed_item#api_index', format: 'json'
+  get '/member-api/v1/items/', to: 'work_items#api_index', format: 'json'
 
   # The pattern for generic_file_identifier is tricky, because we do not want it to
   # conflict with /files/:generic_file_id/events. The pattern is: non-slash characters,

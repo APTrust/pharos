@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe GenericFilesController, type: :controller do
-  let(:user) { FactoryGirl.create(:user, :admin, institution_pid: @institution.pid) }
+  let(:user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
   let(:file) { FactoryGirl.create(:generic_file) }
-  let(:inst_user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @institution.pid)}
+  let(:inst_user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id)}
 
   before(:all) do
     @institution = FactoryGirl.create(:institution)
@@ -130,7 +130,7 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in' do
-      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @institution.pid) }
+      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
       before { sign_in user }
 
@@ -203,7 +203,7 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in' do
-      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @institution.pid) }
+      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id) }
       let(:obj2) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id) }
       let(:batch_obj) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id) }
       let(:current_dir) { File.dirname(__FILE__) }
@@ -284,7 +284,7 @@ RSpec.describe GenericFilesController, type: :controller do
       before { sign_in user }
 
       describe "and updating a file you don't have access to" do
-        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @another_institution.id) }
+        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
           patch :update, identifier: file.intellectual_object.identifier, generic_file_identifier: file.identifier, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(response.code).to eq '403' # forbidden
@@ -335,7 +335,7 @@ RSpec.describe GenericFilesController, type: :controller do
       before { sign_in user }
 
       describe "and deleting a file you don't have access to" do
-        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_pid: @another_institution.id) }
+        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
           delete :destroy, generic_file_identifier: file, format: 'json'
           expect(response.code).to eq '403' # forbidden
