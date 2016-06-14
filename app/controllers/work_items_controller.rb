@@ -8,6 +8,10 @@ class WorkItemsController < ApplicationController
 
   after_action :verify_authorized, :except => [:delete_test_items, :show_reviewed, :ingested_since]
 
+  def index
+    authorize @items
+  end
+
   def create
     authorize @work_item
     respond_to do |format|
@@ -191,6 +195,92 @@ class WorkItemsController < ApplicationController
     render json: {count: @count, next: @next, previous: @previous, results: json_list}
   end
 
+  # get '/api/v1/itemresults/items_for_restore'
+  # Returns a list of items the users have requested
+  # to be queued for restoration. These will always be
+  # IntellectualObjects. If param object_identifier is supplied,
+  # it returns all restoration requests for the object. Otherwise,
+  # it returns pending requests for all objects where retry is true.
+  # (This is because retry gets set to false when the restorer encounters
+  # some fatal error. There is no sense in reprocessing those requests.)
+  def items_for_restore
+    restore = Pharos::Application::PHAROS_ACTIONS['restore']
+    requested = Pharos::Application::PHAROS_STAGES['requested']
+    pending = Pharos::Application::PHAROS_STATUSES['pend']
+    @items = WorkItem.where(action: restore)
+    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
+    authorize @items
+    # Get items for a single object, which may consist of multiple bags.
+    # Return anything for that object identifier with action=Restore and retry=true
+    if !request[:object_identifier].blank?
+      @items = @items.where(object_identifier: request[:object_identifier])
+    else
+      # If user is not looking for a single bag, return all requested/pending items.
+      @items = @items.where(stage: requested, status: pending, retry: true)
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
+  # get '/api/v1/itemresults/items_for_dpn'
+  # Returns a list of items the users have requested
+  # to be queued for DPN. These will always be
+  # IntellectualObjects. If param object_identifier is supplied,
+  # it returns all DPN requests for the object. Otherwise,
+  # it returns pending requests for all objects where retry is true.
+  # (This is because retry gets set to false when the requestor encounters
+  # some fatal error. There is no sense in reprocessing those requests.)
+  def items_for_dpn
+    dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
+    requested = Pharos::Application::PHAROS_STAGES['requested']
+    pending = Pharos::Application::PHAROS_STATUSES['pend']
+    @items = WorkItem.where(action: dpn)
+    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
+    authorize @items
+    # Get items for a single object, which may consist of multiple bags.
+    # Return anything for that object identifier with action=DPN and retry=true
+    if !request[:object_identifier].blank?
+      @items = @items.where(object_identifier: request[:object_identifier])
+    else
+      # If user is not looking for a single bag, return all requested/pending items.
+      @items = @items.where(stage: requested, status: pending, retry: true)
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
+
+  # get '/api/v1/itemresults/items_for_delete'
+  # Returns a list of items the users have requested
+  # to be queued for deletion. These items will always represent
+  # GenericFiles. If param generic_file_identifier is supplied,
+  # it returns all deletion requests for the generic file. Otherwise,
+  # it returns pending requests for all items where retry is true.
+  # (This is because retry gets set to false when the restorer encounters
+  # some fatal error. There is no sense in reprocessing those requests.)
+  def items_for_delete
+    delete = Pharos::Application::PHAROS_ACTIONS['delete']
+    requested = Pharos::Application::PHAROS_STAGES['requested']
+    pending = Pharos::Application::PHAROS_STATUSES['pend']
+    failed = Pharos::Application::PHAROS_STATUSES['fail']
+    @items = WorkItem.where(action: delete)
+    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
+    authorize @items
+    # Return a record for a single file?
+    if !request[:generic_file_identifier].blank?
+      @items = @items.where(generic_file_identifier: request[:generic_file_identifier])
+    else
+      # If user is not looking for a single bag, return all requested items
+      # where retry is true and status is pending or failed.
+      @items = @items.where(stage: requested, status: [pending, failed], retry: true)
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
   # This is an API call for the bucket reader that queues up work for
   # the bag processor. It returns all of the items that have started
   # the ingest process since the specified timestamp.
@@ -271,7 +361,6 @@ class WorkItemsController < ApplicationController
       format.js {}
     end
   end
-
 
   def handle_selected
     review_list = params[:review]

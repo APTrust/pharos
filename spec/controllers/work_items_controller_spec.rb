@@ -123,7 +123,6 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
-
   # Special show method for the admin API that exposes some attributes
   # of WorkItem that we don't want to show to normal users.
   describe 'GET #api_show' do
@@ -190,7 +189,6 @@ RSpec.describe WorkItemsController, type: :controller do
       # end
     end
   end
-
 
   describe 'GET #items_for_restore' do
     describe 'for admin user' do
@@ -652,7 +650,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
   describe 'Post #review_all' do
     let!(:failed_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail']) }
-    let!(:second_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROSPHAROS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution.identifier) }
+    let!(:second_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution.identifier) }
     describe 'as admin user' do
       before do
         sign_in admin_user

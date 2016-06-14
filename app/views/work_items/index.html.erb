@@ -1,0 +1,15 @@
+<div id="sidebar" class="col-md-3">
+  <%= render 'facets' %>
+</div>
+
+<div id="content" class="col-md-9">
+  <section>
+    <%= render 'search_breadcrumb' %>
+  </section>
+  <section>
+    <%= render 'sort_and_per_page' %>
+  </section>
+  <section id="itemTable" class="queue">
+    <%= render 'item_table' %>
+  </section>
+</div>
