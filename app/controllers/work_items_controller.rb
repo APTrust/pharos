@@ -251,7 +251,6 @@ class WorkItemsController < ApplicationController
     end
   end
 
-
   # get '/api/v1/itemresults/items_for_delete'
   # Returns a list of items the users have requested
   # to be queued for deletion. These items will always represent
@@ -379,6 +378,7 @@ class WorkItemsController < ApplicationController
     session[:select_notice] = 'Selected items have been marked for review or purge from S3 as indicated.'
     respond_to do |format|
       format.js {}
+      format.html {}
     end
   end
 
