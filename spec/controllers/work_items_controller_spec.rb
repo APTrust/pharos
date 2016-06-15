@@ -604,7 +604,7 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
-  describe 'Post #handle_selected' do
+  describe 'Post #review_selected' do
     describe 'as admin user' do
       let!(:working_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['start']) }
       let(:item_id) { "r_#{item.id}" }
@@ -618,13 +618,13 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update an item's review field to true" do
-        post :handle_selected, review: [item_id], format: 'js'
+        post :index, alt_action: 'review_selected', review: [item_id], format: 'js'
         expect(response.status).to eq(200)
         WorkItem.find(item.id).reviewed.should eq(true)
       end
 
       it 'should not review a working item' do
-        post :handle_selected, review: [work_id], format: 'js'
+        post :index, alt_action: 'review_selected', review: [work_id], format: 'js'
         expect(response.status).to eq(200)
         WorkItem.find(working_item.id).reviewed.should eq(false)
       end
@@ -641,7 +641,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update an item's review field to true" do
-        post :handle_selected, review: [user_id], format: 'js'
+        post :index, alt_action: 'review_selected', review: [user_id], format: 'js'
         expect(response.status).to eq(200)
         WorkItem.find(user_item.id).reviewed.should eq(true)
       end
@@ -663,12 +663,12 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'should reset the purge datetime in the session variable' do
         time_before = session[:purge_datetime]
-        post :review_all
+        post :index, alt_action: 'review_all'
         session[:purge_datetime].should_not eq(time_before)
       end
 
       it "should update all item's review fields to true" do
-        post :review_all
+        post :index, alt_action: 'review_all'
         expect(response.status).to eq(302)
         WorkItem.find(failed_item.id).reviewed.should eq(true)
       end
@@ -681,7 +681,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update all items associated with user's institution's review fields to true" do
-        post :review_all
+        post :index, alt_action: 'review_all'
         expect(response.status).to eq(302)
         WorkItem.find(second_item.id).reviewed.should eq(true)
       end

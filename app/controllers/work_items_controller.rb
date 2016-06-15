@@ -10,6 +10,16 @@ class WorkItemsController < ApplicationController
 
   def index
     authorize @items
+    if params[:alt_action].present?
+      case params[:alt_action]
+        when 'show_reviewed'
+          show_reviewed
+        when 'review_all'
+          review_all
+        when 'review_selected'
+          review_selected
+      end
+    end
   end
 
   def create
@@ -354,31 +364,12 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  private
+
   def show_reviewed
     session[:show_reviewed] = params[:show_reviewed]
     respond_to do |format|
       format.js {}
-    end
-  end
-
-  def handle_selected
-    review_list = params[:review]
-    unless review_list.nil?
-      review_list.each do |item|
-        id = item.split("_")[1]
-        proc_item = WorkItem.find(id)
-        authorize proc_item, :mark_as_reviewed?
-        if (proc_item.status == Pharos::Application::PHAROS_STATUSES['success'] || proc_item.status == Pharos::Application::PHAROS_STATUSES['fail'])
-          proc_item.reviewed = true
-          proc_item.save!
-        end
-      end
-    end
-    set_items
-    session[:select_notice] = 'Selected items have been marked for review or purge from S3 as indicated.'
-    respond_to do |format|
-      format.js {}
-      format.html {}
     end
   end
 
@@ -399,7 +390,26 @@ class WorkItemsController < ApplicationController
     flash[:notice] = 'All items have been marked as reviewed.'
   end
 
-  private
+  def review_selected
+    review_list = params[:review]
+    unless review_list.nil?
+      review_list.each do |item|
+        id = item.split("_")[1]
+        proc_item = WorkItem.find(id)
+        authorize proc_item, :mark_as_reviewed?
+        if (proc_item.status == Pharos::Application::PHAROS_STATUSES['success'] || proc_item.status == Pharos::Application::PHAROS_STATUSES['fail'])
+          proc_item.reviewed = true
+          proc_item.save!
+        end
+      end
+    end
+    set_items
+    session[:select_notice] = 'Selected items have been marked for review or purge from S3 as indicated.'
+    respond_to do |format|
+      format.js {}
+      format.html {}
+    end
+  end
 
   def init_from_params
     @work_item = WorkItem.new(work_item_params)

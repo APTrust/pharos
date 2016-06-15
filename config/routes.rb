@@ -21,6 +21,10 @@ Rails.application.routes.draw do
     resources :premis_events, only: [:index, :create]
   end
 
+  resources :work_items, path: 'items'
+
+  get '/itemresults/search', to: 'work_items#search', as: :work_item_search
+
   devise_for :users
 
   resources :users do
@@ -31,13 +35,7 @@ Rails.application.routes.draw do
 
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
 
-  get '/itemresults/search', to: 'work_items#search', as: :work_item_search
-  post '/itemresults/search', to: 'work_items#search'
-  get 'itemresults/', to: 'work_items#index', as: :work_items
-  get 'itemresults/:id', to: 'work_items#show', as: :work_item
-  post '/itemresults/review_all', to: 'work_items#review_all'
-  post '/itemresults/handle_selected', to: 'work_items#handle_selected', as: :handle_selected
-  post '/itemresults/show_reviewed', to: 'work_items#show_reviewed'
+
 
   #delete 'itemresults/:etag/:name', to: 'work_item#destroy'
 
