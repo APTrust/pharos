@@ -9,7 +9,6 @@ class WorkItemsController < ApplicationController
   after_action :verify_authorized, :except => [:delete_test_items, :show_reviewed, :ingested_since]
 
   def index
-    authorize @items
     if params[:alt_action].present?
       case params[:alt_action]
         when 'show_reviewed'
@@ -18,8 +17,21 @@ class WorkItemsController < ApplicationController
           review_all
         when 'review_selected'
           review_selected
+        when 'set_restoration_status'
+          set_restoration_status
+        when 'ingested_since'
+          ingested_since
+        when 'restore'
+          items_for_restore
+        when 'delete'
+          items_for_delete
+        when 'dpn'
+          items_for_dpn
       end
+    else
+
     end
+
   end
 
   def create
@@ -45,16 +57,6 @@ class WorkItemsController < ApplicationController
         item = @work_item.serializable_hash(except: [:state, :node, :pid])
       end
       format.json { render json: item }
-      format.html
-    end
-  end
-
-  # Show for admin API users. Includes :state, :node, :pid
-  def api_show
-    @work_item = WorkItem.find(params[:id])
-    authorize @work_item, :admin_show?
-    respond_to do |format|
-      format.json { render json: @work_item }
       format.html
     end
   end
@@ -205,6 +207,130 @@ class WorkItemsController < ApplicationController
     render json: {count: @count, next: @next, previous: @previous, results: json_list}
   end
 
+  # post '/api/v1/itemresults/delete_test_items'
+  #
+  # Integration tests from the Go code add some WorkItem records
+  # that we'll want to delete. All have the institution test.edu.
+  # The Go integration tests will call this method to clean up after
+  # themselves. This method is forbidden in production.
+  def delete_test_items
+    respond_to do |format|
+      if Rails.env.production?
+        format.json { render json: {"error" => "This call is forbidden in production!"}, status: :forbidden }
+      end
+      WorkItem.where(institution: 'test.edu').delete_all
+      format.json { render nothing: true, status: :ok }
+    end
+  end
+
+  private
+
+  def show_reviewed
+    authorize @items
+    session[:show_reviewed] = params[:show_reviewed]
+    respond_to do |format|
+      format.js {}
+    end
+  end
+
+  def review_all
+    authorize @items
+    current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution: current_user.institution.identifier)
+    authorize items
+    items.each do |item|
+      if item.date < session[:purge_datetime] && (item.status == Pharos::Application::PHAROS_STATUSES['success'] || item.status == Pharos::Application::PHAROS_STATUSES['fail'])
+        item.reviewed = true
+        item.save!
+      end
+    end
+    session[:purge_datetime] = Time.now.utc
+    redirect_to :back
+    flash[:notice] = 'All items have been marked as reviewed.'
+  rescue ActionController::RedirectBackError
+    redirect_to root_path
+    flash[:notice] = 'All items have been marked as reviewed.'
+  end
+
+  def review_selected
+    authorize @items
+    review_list = params[:review]
+    unless review_list.nil?
+      review_list.each do |item|
+        id = item.split("_")[1]
+        proc_item = WorkItem.find(id)
+        authorize proc_item, :mark_as_reviewed?
+        if (proc_item.status == Pharos::Application::PHAROS_STATUSES['success'] || proc_item.status == Pharos::Application::PHAROS_STATUSES['fail'])
+          proc_item.reviewed = true
+          proc_item.save!
+        end
+      end
+    end
+    set_items
+    session[:select_notice] = 'Selected items have been marked for review or purge from S3 as indicated.'
+    respond_to do |format|
+      format.js {}
+      format.html {}
+    end
+  end
+
+  # post '/api/v1/itemresults/restoration_status/:object_identifier'
+  #
+  # This is an API call for the bag restoration service.
+  #
+  # Sets the status of items that the user has requested be restored.
+  # Since an item can be restored multiple times, we want to update
+  # only the most recent restoration request for the item.
+  #
+  # Expects param :object_identifier in URL and :stage, :status, :retry
+  # in post body.
+  #
+  # Should be available to admin user only.
+  def set_restoration_status
+    # Fix Apache/Passenger passthrough of %2f-encoded slashes in identifier
+    params[:object_identifier] = params[:object_identifier].gsub(/%2F/i, "/")
+    restore = Pharos::Application::PHAROS_ACTIONS['restore']
+    @item = WorkItem.where(object_identifier: params[:object_identifier],
+                           action: restore).order(created_at: :desc).first
+    authorize (@item || WorkItem.new), :set_restoration_status?
+    if @item
+      succeeded = @item.update_attributes(params_for_status_update)
+    end
+    respond_to do |format|
+      if @item.nil?
+        error = { error: "No items for object identifier #{params[:object_identifier]}" }
+        format.json { render json: error, status: :not_found }
+      end
+      if succeeded == false
+        errors = @item.errors.full_messages
+        format.json { render json: errors, status: :bad_request }
+      else
+        format.json { render json: {result: 'OK'}, status: :ok }
+      end
+    end
+  end
+
+  # This is an API call for the bucket reader that queues up work for
+  # the bag processor. It returns all of the items that have started
+  # the ingest process since the specified timestamp.
+  def ingested_since
+    since = params[:since]
+    begin
+      dtSince = DateTime.parse(since)
+    rescue
+      # We'll get this below
+    end
+    respond_to do |format|
+      if dtSince == nil
+        err = { 'error' => 'Param since must be a valid datetime' }
+        format.json { render json: err, status: :bad_request }
+      else
+        @items = WorkItem.where("action='Ingest' and date >= ?", dtSince)
+        authorize @items, :admin_api?
+        format.json { render json: @items, status: :ok }
+      end
+    end
+  end
+
   # get '/api/v1/itemresults/items_for_restore'
   # Returns a list of items the users have requested
   # to be queued for restoration. These will always be
@@ -219,7 +345,7 @@ class WorkItemsController < ApplicationController
     pending = Pharos::Application::PHAROS_STATUSES['pend']
     @items = WorkItem.where(action: restore)
     @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items
+    authorize @items, :admin_api?
     # Get items for a single object, which may consist of multiple bags.
     # Return anything for that object identifier with action=Restore and retry=true
     if !request[:object_identifier].blank?
@@ -247,7 +373,7 @@ class WorkItemsController < ApplicationController
     pending = Pharos::Application::PHAROS_STATUSES['pend']
     @items = WorkItem.where(action: dpn)
     @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items
+    authorize @items, :admin_api?
     # Get items for a single object, which may consist of multiple bags.
     # Return anything for that object identifier with action=DPN and retry=true
     if !request[:object_identifier].blank?
@@ -276,7 +402,7 @@ class WorkItemsController < ApplicationController
     failed = Pharos::Application::PHAROS_STATUSES['fail']
     @items = WorkItem.where(action: delete)
     @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items
+    authorize @items, :admin_api?
     # Return a record for a single file?
     if !request[:generic_file_identifier].blank?
       @items = @items.where(generic_file_identifier: request[:generic_file_identifier])
@@ -287,127 +413,6 @@ class WorkItemsController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: @items, status: :ok }
-    end
-  end
-
-  # This is an API call for the bucket reader that queues up work for
-  # the bag processor. It returns all of the items that have started
-  # the ingest process since the specified timestamp.
-  def ingested_since
-    since = params[:since]
-    begin
-      dtSince = DateTime.parse(since)
-    rescue
-      # We'll get this below
-    end
-    respond_to do |format|
-      if dtSince == nil
-        err = { 'error' => 'Param since must be a valid datetime' }
-        format.json { render json: err, status: :bad_request }
-      else
-        @items = WorkItem.where("action='Ingest' and date >= ?", dtSince)
-        authorize @items, :admin_api?
-        format.json { render json: @items, status: :ok }
-      end
-    end
-  end
-
-  # post '/api/v1/itemresults/delete_test_items'
-  #
-  # Integration tests from the Go code add some WorkItem records
-  # that we'll want to delete. All have the institution test.edu.
-  # The Go integration tests will call this method to clean up after
-  # themselves. This method is forbidden in production.
-  def delete_test_items
-    respond_to do |format|
-      if Rails.env.production?
-        format.json { render json: {"error" => "This call is forbidden in production!"}, status: :forbidden }
-      end
-      WorkItem.where(institution: 'test.edu').delete_all
-      format.json { render nothing: true, status: :ok }
-    end
-  end
-
-  # post '/api/v1/itemresults/restoration_status/:object_identifier'
-  #
-  # This is an API call for the bag restoration service.
-  #
-  # Sets the status of items that the user has requested be restored.
-  # Since an item can be restored multiple times, we want to update
-  # only the most recent restoration request for the item.
-  #
-  # Expects param :object_identifier in URL and :stage, :status, :retry
-  # in post body.
-  #
-  # Should be available to admin user only.
-  def set_restoration_status
-    # Fix Apache/Passenger passthrough of %2f-encoded slashes in identifier
-    params[:object_identifier] = params[:object_identifier].gsub(/%2F/i, "/")
-    restore = Pharos::Application::PHAROS_ACTIONS['restore']
-    @item = WorkItem.where(object_identifier: params[:object_identifier],
-                                action: restore).order(created_at: :desc).first
-    authorize @item || WorkItem.new  # avoids Pundit NilClass exception
-    if @item
-      succeeded = @item.update_attributes(params_for_status_update)
-    end
-    respond_to do |format|
-      if @item.nil?
-        error = { error: "No items for object identifier #{params[:object_identifier]}" }
-        format.json { render json: error, status: :not_found }
-      end
-      if succeeded == false
-        errors = @item.errors.full_messages
-        format.json { render json: errors, status: :bad_request }
-      else
-        format.json { render json: {result: 'OK'}, status: :ok }
-      end
-    end
-  end
-
-  private
-
-  def show_reviewed
-    session[:show_reviewed] = params[:show_reviewed]
-    respond_to do |format|
-      format.js {}
-    end
-  end
-
-  def review_all
-    current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution: current_user.institution.identifier)
-    authorize items
-    items.each do |item|
-      if item.date < session[:purge_datetime] && (item.status == Pharos::Application::PHAROS_STATUSES['success'] || item.status == Pharos::Application::PHAROS_STATUSES['fail'])
-        item.reviewed = true
-        item.save!
-      end
-    end
-    session[:purge_datetime] = Time.now.utc
-    redirect_to :back
-    flash[:notice] = 'All items have been marked as reviewed.'
-  rescue ActionController::RedirectBackError
-    redirect_to root_path
-    flash[:notice] = 'All items have been marked as reviewed.'
-  end
-
-  def review_selected
-    review_list = params[:review]
-    unless review_list.nil?
-      review_list.each do |item|
-        id = item.split("_")[1]
-        proc_item = WorkItem.find(id)
-        authorize proc_item, :mark_as_reviewed?
-        if (proc_item.status == Pharos::Application::PHAROS_STATUSES['success'] || proc_item.status == Pharos::Application::PHAROS_STATUSES['fail'])
-          proc_item.reviewed = true
-          proc_item.save!
-        end
-      end
-    end
-    set_items
-    session[:select_notice] = 'Selected items have been marked for review or purge from S3 as indicated.'
-    respond_to do |format|
-      format.js {}
-      format.html {}
     end
   end
 
