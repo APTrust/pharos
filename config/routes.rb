@@ -21,7 +21,7 @@ Rails.application.routes.draw do
     resources :premis_events, only: [:index, :create]
   end
 
-  resources :work_items, path: 'items'
+  resources :work_items, path: 'items', only: [:index, :create, :show, :update]
 
   resources :work_items, path: '/api/v1/items'
 

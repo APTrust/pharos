@@ -6,7 +6,7 @@ class WorkItemsController < ApplicationController
   before_filter :init_from_params, only: :create
   before_filter :find_and_update, only: :update
 
-  after_action :verify_authorized, :except => [:delete_test_items, :show_reviewed, :ingested_since]
+  after_action :verify_authorized, :except => [:delete_test_items]
 
   def index
     if params[:alt_action].present?
@@ -131,40 +131,6 @@ class WorkItemsController < ApplicationController
     if params[:item_action].present?
       @items = @items.where(action: params[:item_action])
     end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
-
-  def authoritative_index
-    current_action = params[:current_action]
-    delete = Pharos::Application::PHAROS_ACTIONS['delete']
-    restore = Pharos::Application::PHAROS_ACTIONS['restore']
-    dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
-    requested = Pharos::Application::PHAROS_STAGES['requested']
-    pending = Pharos::Application::PHAROS_STATUSES['pend']
-    failed = Pharos::Application::PHAROS_STATUSES['fail']
-    case current_action
-    when 'delete'
-      @items = WorkItem.where(action: delete)
-    when 'restore'
-      @items = WorkItem.where(action: restore)
-    when 'dpn'
-      @items = WorkItem.where(action: dpn)
-    end
-
-    if current_action == delete
-      !request[:generic_file_identifier].blank? ?
-          @items = @items.where(generic_file_identifier: request[:generic_file_identifier]) :
-          @items = @items.where(stage: requested, status: [pending, failed], retry: true)
-    else
-      !request[:object_identifier].blank? ?
-          @items = @items.where(object_identifier: request[:object_identifier]) :
-          @items = @items.where(stage: requested, status: pending, retry: true)
-    end
-    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items
-
     respond_to do |format|
       format.json { render json: @items, status: :ok }
     end
