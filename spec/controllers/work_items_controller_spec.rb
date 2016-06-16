@@ -858,14 +858,14 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns all items when no other parameters are specified' do
-        get :api_index, format: :json
+        get :index, format: :json
         assigns(:items).should include(user_item)
         assigns(:items).should include(item)
         assigns(:items).should include(item1)
       end
 
       it 'filters down to the right records and has the right count' do
-        get :api_index, format: :json, name_contains: 'item1'
+        get :index, format: :json, name_contains: 'item1'
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)
@@ -873,7 +873,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns the correct next and previous links' do
-        get :api_index, format: :json, per_page: 2, page: 2, stage: 'unpack'
+        get :index, format: :json, per_page: 2, page: 2, stage: 'unpack'
         assigns(:next).should == 'http://test.host/member-api/v1/items/?page=3&per_page=2&stage=unpack'
         assigns(:previous).should == 'http://test.host/member-api/v1/items/?page=1&per_page=2&stage=unpack'
       end
@@ -885,7 +885,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "returns only the items within the user's institution" do
-        get :api_index, format: :json
+        get :index, format: :json
         assigns(:items).should include(item1)
         assigns(:items).should include(item2)
         assigns(:items).should_not include(item3)

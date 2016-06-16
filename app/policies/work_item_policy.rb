@@ -17,7 +17,7 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def admin_api?
-    record.first.nil? || user.admin?
+    user.admin? || record.first.nil?
   end
 
   def admin_show?

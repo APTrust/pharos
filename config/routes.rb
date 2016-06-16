@@ -30,7 +30,7 @@ Rails.application.routes.draw do
 
   post '/api/v1/items/delete_test_items', to: 'work_items#delete_test_items', format: 'json', as: :work_item_test_delete
 
-  get '/member-api/v1/items/', to: 'work_items#api_index', format: 'json'
+  get '/member-api/v1/items/', to: 'work_items#index', format: 'json'
 
   devise_for :users
 
