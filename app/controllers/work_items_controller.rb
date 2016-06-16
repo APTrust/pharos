@@ -30,6 +30,8 @@ class WorkItemsController < ApplicationController
           items_for_something(params[:alt_action])
         when 'dpn'
           items_for_something(params[:alt_action])
+        when 'api_search'
+          api_search
       end
     elsif params[:qq].present?
       set_items
@@ -84,37 +86,6 @@ class WorkItemsController < ApplicationController
       else
         format.json { render json: @work_item.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  def api_search
-    current_user.admin? ? @items = WorkItem.all : @items = WorkItem.where(institution: current_user.institution.identifier)
-    authorize @items, :admin_api?
-    if Rails.env.test? || Rails.env.development?
-      rewrite_params_for_sqlite
-    end
-    search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
-                     :retry, :reviewed, :object_identifier, :generic_file_identifier,
-                     :node, :needs_admin_review, :process_after]
-    search_fields.each do |field|
-      if params[field].present?
-        if field == :bag_date && (Rails.env.test? || Rails.env.development?)
-          @items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
-        elsif field == :node and params[field] == 'null'
-          @items = @items.where('node is null')
-        elsif field == :assignment_pending_since and params[field] == 'null'
-          @items = @items.where('assignment_pending_since is null')
-        else
-          @items = @items.where(field => params[field])
-        end
-      end
-    end
-
-    if params[:item_action].present?
-      @items = @items.where(action: params[:item_action])
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
     end
   end
 
@@ -259,6 +230,37 @@ class WorkItemsController < ApplicationController
       @items = @items
     else
       @items = @items.where('name LIKE ? OR etag LIKE ?', search_param, search_param)
+    end
+  end
+
+  def api_search
+    current_user.admin? ? @items = WorkItem.all : @items = WorkItem.where(institution: current_user.institution.identifier)
+    authorize @items, :admin_api?
+    if Rails.env.test? || Rails.env.development?
+      rewrite_params_for_sqlite
+    end
+    search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
+                     :retry, :reviewed, :object_identifier, :generic_file_identifier,
+                     :node, :needs_admin_review, :process_after]
+    search_fields.each do |field|
+      if params[field].present?
+        if field == :bag_date && (Rails.env.test? || Rails.env.development?)
+          @items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+        elsif field == :node and params[field] == 'null'
+          @items = @items.where('node is null')
+        elsif field == :assignment_pending_since and params[field] == 'null'
+          @items = @items.where('assignment_pending_since is null')
+        else
+          @items = @items.where(field => params[field])
+        end
+      end
+    end
+
+    if params[:item_action].present?
+      @items = @items.where(action: params[:item_action])
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
     end
   end
 

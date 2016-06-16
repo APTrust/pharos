@@ -796,7 +796,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns all records when no criteria specified' do
-        get :api_search, format: :json
+        get :index, alt_action: 'api_search', format: :json
         assigns(:items).should include(user_item)
         assigns(:items).should include(item)
         assigns(:items).should include(item1)
@@ -806,7 +806,7 @@ RSpec.describe WorkItemsController, type: :controller do
       # request, or SQLite search fails. Also be sure to include
       # the Z at the end of the bag_date string.
       it 'filters down to the right records' do
-        get(:api_search, format: :json, name: 'item1.tar',
+        get(:index, alt_action: 'api_search', format: :json, name: 'item1.tar',
             etag: 'etag1', institution: 'inst1',
             retry: 'true', reviewed: 'false',
             bag_date: '2014-10-17 14:56:56Z',
@@ -819,14 +819,14 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'filters on new fields' do
-        get(:api_search, format: :json, node: '10.11.12.13', needs_admin_review: false)
+        get(:index, alt_action: 'api_search', format: :json, node: '10.11.12.13', needs_admin_review: false)
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)
       end
 
       it 'filters down to null nodes' do
-        get(:api_search, format: :json, node: 'null')
+        get(:index, alt_action: 'api_search', format: :json, node: 'null')
         assigns(:items).should include(user_item)
         assigns(:items).should include(item)
         assigns(:items).should_not include(item1)
@@ -839,7 +839,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage' do
-        get :api_search, format: 'json'
+        get :index, alt_action: 'api_search', format: 'json'
         expect(response.status).to eq 403
       end
     end
