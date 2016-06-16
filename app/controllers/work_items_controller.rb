@@ -31,8 +31,17 @@ class WorkItemsController < ApplicationController
         when 'dpn'
           items_for_something(params[:alt_action])
       end
+    elsif params[:qq].present?
+      set_items
+      search
+      filter_items
+      set_filter_values
+      set_various_counts
     else
       set_items
+      filter_items
+      set_filter_values
+      set_various_counts
       if params[:format] == 'json'
         json_list = @items.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
         render json: {count: @count, next: @next, previous: @previous, results: json_list}
@@ -78,31 +87,6 @@ class WorkItemsController < ApplicationController
     end
   end
 
-  def search
-    search_param = "%#{params[:qq]}%"
-    field = params[:pi_search_field]
-    @institution = current_user.institution
-    params[:pi_sort] = 'date' if params[:pi_sort].nil?
-    current_user.admin? ? initial_items = WorkItem.all : initial_items = WorkItem.where(institution: @institution.identifier)
-    authorize initial_items
-    if field == 'Name'
-      @items = initial_items.where('name LIKE ?', search_param)
-    elsif field == 'Etag'
-      @items = initial_items.where('etag LIKE ?', search_param)
-    elsif params[:qq] == '*'
-      @items = initial_items
-    else
-      @items = initial_items.where('name LIKE ? OR etag LIKE ?', search_param, search_param)
-    end
-    @items = @items.order(params[:pi_sort])
-    @items = @items.reverse_order if params[:pi_sort] == 'date'
-    filter_items
-    set_filter_values
-    params[:id] = @institution.id
-    @items = @items.page(params[:page]).per(10)
-    set_various_counts
-  end
-
   def api_search
     current_user.admin? ? @items = WorkItem.all : @items = WorkItem.where(institution: current_user.institution.identifier)
     authorize @items, :admin_api?
@@ -115,19 +99,17 @@ class WorkItemsController < ApplicationController
     search_fields.each do |field|
       if params[field].present?
         if field == :bag_date && (Rails.env.test? || Rails.env.development?)
-          @items = @items.where("datetime(bag_date) = datetime(?)", params[:bag_date])
-        elsif field == :node and params[field] == "null"
-          @items = @items.where("node is null")
-        elsif field == :assignment_pending_since and params[field] == "null"
-          @items = @items.where("assignment_pending_since is null")
+          @items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+        elsif field == :node and params[field] == 'null'
+          @items = @items.where('node is null')
+        elsif field == :assignment_pending_since and params[field] == 'null'
+          @items = @items.where('assignment_pending_since is null')
         else
           @items = @items.where(field => params[field])
         end
       end
     end
 
-    # Fix for Rails overwriting params[:action] with name of controller
-    # action: Use param :item_action instead of :action
     if params[:item_action].present?
       @items = @items.where(action: params[:item_action])
     end
@@ -266,6 +248,20 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  def search
+    search_param = "%#{params[:qq]}%"
+    field = params[:pi_search_field]
+    if field == 'Name'
+      @items = @items.where('name LIKE ?', search_param)
+    elsif field == 'Etag'
+      @items = @items.where('etag LIKE ?', search_param)
+    elsif params[:qq] == '*'
+      @items = @items
+    else
+      @items = @items.where('name LIKE ? OR etag LIKE ?', search_param, search_param)
+    end
+  end
+
   def init_from_params
     @work_item = WorkItem.new(work_item_params)
     @work_item.user = current_user.email
@@ -369,9 +365,6 @@ class WorkItemsController < ApplicationController
     @items = @items.order(params[:pi_sort])
     @items = @items.reverse_order if params[:pi_sort] == 'date'
     authorize @items
-    filter_items
-    set_filter_values
-    set_various_counts
     session[:purge_datetime] = Time.now.utc if params[:page] == 1 || params[:page].nil?
   end
 
