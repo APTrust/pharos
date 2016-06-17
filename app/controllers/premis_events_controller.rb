@@ -6,16 +6,7 @@ class PremisEventsController < ApplicationController
 
   after_action :verify_authorized, only: [:index, :create]
 
-  include Aptrust::GatedSearch
-
-  self.solr_search_params_logic += [:only_events]
-  self.solr_search_params_logic += [:for_selected_institution]
-  self.solr_search_params_logic += [:for_selected_object]
-  self.solr_search_params_logic += [:for_selected_file]
-  self.solr_search_params_logic += [:sort_chronologically]
-
   def index
-    #TODO: figure out how to figure which identifier is which
     if params['identifier']
       @institution = Institution.where(identifier: params['identifier']).first
       obj = @institution
@@ -29,8 +20,6 @@ class PremisEventsController < ApplicationController
     authorize obj
     respond_to do |format|
       format.json { render json: obj.premis_events.events.map { |event| event.serializable_hash } }
-      # TODO: Code review. Can't get the HTML rendering to work without super,
-      # but do I really want to call super within this block???
       format.html {super}
     end
   end
@@ -72,10 +61,6 @@ class PremisEventsController < ApplicationController
     params[:intellectual_object_id] = @parent_object.id
   end
 
-  # Loads the generic file to which the event being created is related.
-  # In dev environment, using WebBrick, converting '%2F' to '/' is not
-  # necessary, but it is required when running under Apache + Passenger,
-  # because they leave the '%2F' unescaped.
   def load_generic_file
     gfid = params[:generic_file_identifier].gsub(/%2F/i, '/')
     @parent_object = GenericFile.where(identifier: gfid).first
@@ -89,37 +74,23 @@ class PremisEventsController < ApplicationController
     authorize @parent_object, :add_event?
   end
 
-  def for_selected_institution(solr_parameters, user_parameters)
+  def for_selected_institution
     return unless @institution
-    solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << "institution_id_ssim:\"#{@institution.id}\""
+    @premis_events = @premis_events.where(institution_id: @institution.id)
   end
 
-  def for_selected_object(solr_parameters, user_parameters)
+  def for_selected_object
     return unless @intellectual_object
-    solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << "intellectual_object_id_ssim:\"#{@intellectual_object.id}\""
+    @premis_events = @premis_events.where(intellectual_object_id: @intellectual_object.id)
   end
 
-  def for_selected_file(solr_parameters, user_parameters)
+  def for_selected_file
     return unless @generic_file
-    solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << "generic_file_id_ssim:\"#{@generic_file.id}\""
+    @premis_events = @premis_events.where(generic_file_id: generic_file.id)
   end
 
-  def only_events(solr_parameters, user_parameters)
-    solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << 'event_type_ssim:*'
-  end
-
-  def sort_chronologically(solr_parameters, user_parameters)
-    chron_sort = "#{Solrizer.solr_name('event_date_time', :sortable)} desc"
-
-    unless solr_parameters[:sort].blank?
-      chron_sort = chron_sort + ', ' + solr_parameters[:sort]
-    end
-
-    solr_parameters[:sort] = chron_sort
+  def sort_chronologically
+    @premis_events = @premis_events.order('datetime')
   end
 
   def event_params
@@ -136,5 +107,4 @@ class PremisEventsController < ApplicationController
   end
 
 end
-Status API Training Shop Blog About
 
