@@ -29,7 +29,7 @@ RSpec.describe PremisEventsController, type: :controller do
         expect(response).to be_success
         assigns(:institution).should == someone_elses_file.institution
         assigns(:document_list).length.should == 1
-        assigns(:document_list).map(&:id).should == @someone_elses_event.identifier
+        assigns(:document_list).map(&:identifier).should == [@someone_elses_event.identifier]
       end
 
       it "can view events, even if it's not my intellectual object" do
@@ -37,20 +37,19 @@ RSpec.describe PremisEventsController, type: :controller do
         expect(response).to be_success
         assigns(:intellectual_object).should == someone_elses_object
         assigns(:document_list).length.should == 1
-        assigns(:document_list).map(&:id).should == @someone_elses_event.identifier
+        assigns(:document_list).map(&:identifier).should == [@someone_elses_event.identifier]
       end
 
       it 'can view objects events by object identifier (API)' do
-        get :index, identifier: someone_elses_object.identifier, use_route: 'events_by_object_identifier_path'
+        get :index, identifier: someone_elses_object.identifier
         expect(response).to be_success
         assigns(:intellectual_object).should == someone_elses_object
         assigns(:document_list).length.should == 1
-        assigns(:document_list).map(&:id).should == @someone_elses_event.identifier
+        assigns(:document_list).map(&:identifier).should == [@someone_elses_event.identifier]
       end
 
     end
   end
-
 
   describe 'signed in as institutional admin' do
     let(:user) { FactoryGirl.create(:user, :institutional_admin) }
@@ -58,11 +57,11 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'POST create' do
       it 'creates an event for the generic file' do
-        file.premis_events.events.count.should == 0
-        post :create, generic_file_identifier: file, event: event_attrs
+        file.premis_events.count.should == 0
+        post :create, identifier: file, event: event_attrs
         file.reload
 
-        file.premis_events.events.count.should == 1
+        file.premis_events.count.should == 1
         response.should redirect_to generic_file_path(file)
         assigns(:parent_object).should == file
         assigns(:event).should_not be_nil
@@ -70,21 +69,21 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it 'creates an event for the generic file using generic file identifier (API)' do
-        file.premis_events.events.count.should == 0
-        post :create, generic_file_identifier: URI.escape(file.identifier), event: event_attrs, format: :json, use_route: 'events_by_file_identifier_path'
+        file.premis_events.count.should == 0
+        post :create, identifier: URI.escape(file.identifier), event: event_attrs, format: :json
         file.reload
-        file.premis_events.events.count.should == 1
+        file.premis_events.count.should == 1
         assigns(:parent_object).should == file
         # API response should be 201/created instead of redirect that the HTML client gets
         expect(response.status).to eq(201)
       end
 
       it 'creates an event for an intellectual object' do
-        object.premis_events.events.count.should == 0
+        object.premis_events.count.should == 0
         post :create, identifier: object, event: event_attrs
         object.reload
 
-        object.premis_events.events.count.should == 1
+        object.premis_events.count.should == 1
         response.should redirect_to intellectual_object_path(object)
         assigns(:parent_object).should == object
         assigns(:event).should_not be_nil
@@ -93,11 +92,11 @@ RSpec.describe PremisEventsController, type: :controller do
 
 
       it 'creates an event for an intellectual object by object identifier' do
-        object.premis_events.events.count.should == 0
-        post :create, identifier: URI.escape(object.identifier), event: event_attrs, use_route: 'events_by_object_identifier_path'
+        object.premis_events.count.should == 0
+        post :create, identifier: URI.escape(object.identifier), event: event_attrs
         object.reload
 
-        object.premis_events.events.count.should == 1
+        object.premis_events.count.should == 1
         response.should redirect_to intellectual_object_path(object)
         assigns(:parent_object).should == object
         assigns(:event).should_not be_nil
@@ -106,22 +105,22 @@ RSpec.describe PremisEventsController, type: :controller do
 
 
       it 'if it fails, it prints a fail message' do
-        file.premis_events.events.count.should == 0
-        GenericFile.any_instance.should_receive(:save).and_return(false) # Make it fail
-        post :create, generic_file_identifier: file, event: event_attrs
+        file.premis_events.count.should == 0
+        GenericFile.any_instance.should_receive(:save).and_return(false) # Make it infail
+        post :create, identifier: file, event: event_attrs
         file.reload
-        file.premis_events.events.count.should == 0
+        file.premis_events.count.should == 0
         flash[:alert].should =~ /Unable to create event/
       end
     end
 
     describe "POST create a file where you don't have permission" do
       it 'denies access' do
-        someone_elses_file.premis_events.events.count.should == 0
-        post :create, generic_file_identifier: someone_elses_file, event: event_attrs
+        someone_elses_file.premis_events.count.should == 0
+        post :create, identifier: someone_elses_file, event: event_attrs
         someone_elses_file.reload
 
-        someone_elses_file.premis_events.events.count.should == 0
+        someone_elses_file.premis_events.count.should == 0
         expect(response).to redirect_to root_url
         flash[:alert].should =~ /You are not authorized/
       end
@@ -129,18 +128,17 @@ RSpec.describe PremisEventsController, type: :controller do
 
   end
 
-
   describe 'signed in as institutional user' do
     let(:user) { FactoryGirl.create(:user, :institutional_user) }
     before { sign_in user }
 
     describe 'POST create' do
       it 'denies access' do
-        file.premis_events.events.count.should == 0
-        post :create, generic_file_identifier: file, event: event_attrs
+        file.premis_events.count.should == 0
+        post :create, identifier: file, event: event_attrs
         file.reload
 
-        file.premis_events.events.count.should == 0
+        file.premis_events.count.should == 0
         expect(response).to redirect_to root_url
         flash[:alert].should =~ /You are not authorized/
       end
@@ -166,7 +164,7 @@ RSpec.describe PremisEventsController, type: :controller do
           get :index, identifier: file.institution.identifier
           assigns(:institution).should == file.institution
           assigns(:document_list).length.should == 3
-          assigns(:document_list).map(&:id).should == [@event2.identifier.first, @event3.identifier.first, @event.identifier.first]
+          assigns(:document_list).map(&:identifier).should == [@event2.identifier, @event3.identifier, @event.identifier]
         end
       end
 
@@ -176,17 +174,17 @@ RSpec.describe PremisEventsController, type: :controller do
           expect(response).to be_success
           assigns(:intellectual_object).should == object
           assigns(:document_list).length.should == 3
-          assigns(:document_list).map(&:id).should == [@event2.identifier.first, @event3.identifier.first, @event.identifier.first]
+          assigns(:document_list).map(&:identifier).should == [@event2.identifier, @event3.identifier, @event.identifier]
         end
       end
 
       describe 'events for a generic file' do
         it 'shows the events for that file, sorted by time' do
-          get :index, generic_file_identifier: file
+          get :index, identifier: file
           expect(response).to be_success
           assigns(:generic_file).should == file
           assigns(:document_list).length.should == 3
-          assigns(:document_list).map(&:id).should == [@event2.identifier.first, @event3.identifier.first, @event.identifier.first]
+          assigns(:document_list).map(&:identifier).should == [@event2.identifier, @event3.identifier, @event.identifier]
         end
       end
 
@@ -208,7 +206,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe "for a generic file where you don't have permission" do
         it 'denies access' do
-          get :index, generic_file_identifier: someone_elses_file
+          get :index, identifier: someone_elses_file
           expect(response).to redirect_to root_url
           flash[:alert].should =~ /You are not authorized/
         end
@@ -216,13 +214,12 @@ RSpec.describe PremisEventsController, type: :controller do
     end
   end
 
-
   describe 'not signed in' do
     let(:file) { FactoryGirl.create(:generic_file) }
 
     describe 'POST create' do
       before do
-        post :create, generic_file_identifier: file, event: event_attrs
+        post :create, identifier: file, event: event_attrs
       end
 
       it 'redirects to login' do

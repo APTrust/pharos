@@ -5,12 +5,6 @@ class GenericFilesController < ApplicationController
   before_filter :load_intellectual_object, only: [:update, :create, :save_batch, :index, :file_summary]
   after_action :verify_authorized, :except => [:create, :index, :not_checked_since]
 
-  include Aptrust::GatedSearch
-  # self.solr_search_params_logic += [:for_selected_object]
-  # self.solr_search_params_logic += [:only_generic_files]
-  # self.solr_search_params_logic += [:add_access_controls_to_solr_params]
-  # self.solr_search_params_logic += [:only_active_objects]
-
   def index
     authorize @intellectual_object
     @generic_files = @intellectual_object.generic_files

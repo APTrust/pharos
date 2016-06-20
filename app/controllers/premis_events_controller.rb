@@ -1,26 +1,27 @@
 class PremisEventsController < ApplicationController
   before_filter :authenticate_user!
-  before_filter :load_intellectual_object, if: :intellectual_object_identifier_exists?
-  before_filter :load_generic_file, if: :generic_file_identifier_exists?
+  #before_filter :load_intellectual_object, if: :intellectual_object_identifier_exists?
+  #before_filter :load_generic_file, if: :generic_file_identifier_exists?
   before_filter :load_and_authorize_parent_object, only: [:create]
 
   after_action :verify_authorized, only: [:index, :create]
 
   def index
-    if params['identifier']
-      @institution = Institution.where(identifier: params['identifier']).first
-      obj = @institution
-    elsif params['intellectual_object_identifier']
-      @intellectual_object = IntellectualObject.where(identifier: params['intellectual_object_identifier']).first
+    if (params[:identifier]=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/)
+      @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
       obj = @intellectual_object
-    elsif params['generic_file_identifier']
-      @generic_file = GenericFile.where(identifier: params['generic_file_identifier']).first
+    elsif (params[:identifier]=~/(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/)
+      @generic_file = GenericFile.where(identifier: params[:identifier]).first
       obj = @generic_file
+    elsif (params[:identifier]=~/(\w+\.)*\w+(\.edu|\.com|\.org)/)
+      @institution = Institution.where(identifier: params[:identifier]).first
+      obj = @institution
     end
     authorize obj
+    @document_list = obj.premis_events
     respond_to do |format|
-      format.json { render json: obj.premis_events.events.map { |event| event.serializable_hash } }
-      format.html {super}
+      format.json { render json: obj.premis_events.map { |event| event.serializable_hash } }
+      format.html { }
     end
   end
 
@@ -47,29 +48,27 @@ class PremisEventsController < ApplicationController
 
   protected
 
-  def intellectual_object_identifier_exists?
-    params['identifier']
-  end
-
-  def generic_file_identifier_exists?
-    params['identifier'].contains?('data')
-  end
+  # def intellectual_object_identifier_exists?
+  #   params[:identifier] && params[:identifier] =~ /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
+  # end
+  #
+  # def generic_file_identifier_exists?
+  #   params[:identifier] && params[:identifier] =~ /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
+  # end
 
   def load_intellectual_object
-    objId = params[:identifier].gsub(/%2F/i, '/')
-    @parent_object = IntellectualObject.where(identifier: objId).first
+    @parent_object = IntellectualObject.where(identifier: params[:identifier]).first
     params[:intellectual_object_id] = @parent_object.id
   end
 
   def load_generic_file
-    gfid = params[:generic_file_identifier].gsub(/%2F/i, '/')
-    @parent_object = GenericFile.where(identifier: gfid).first
+    @parent_object = GenericFile.where(identifier: params[:identifier]).first
     params[:generic_file_id] = @parent_object.id
   end
 
   def load_and_authorize_parent_object
     if @parent_object.nil?
-      params[:identifier].contains?('data') ? load_intellectual_object : load_generic_file
+      (params[:identifier]=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/) ? load_intellectual_object : load_generic_file
     end
     authorize @parent_object, :add_event?
   end
@@ -94,16 +93,9 @@ class PremisEventsController < ApplicationController
   end
 
   def event_params
-    params.require(:intellectual_object).permit(
-        :identifier,
-        :type,
-        :outcome,
-        :outcome_detail,
-        :outcome_information,
-        :date_time,
-        :detail,
-        :object,
-        :agent)
+    params.require(:intellectual_object).permit(:identifier, :event_type, :date_time, :outcome, :outcome_detail,
+        :outcome_information, :date_time, :detail, :object, :agent, :intellectual_object_id, :generic_file_id,
+        :institution_id, :created_at, :updated_at)
   end
 
 end

@@ -1,0 +1,20 @@
+<%= render 'breadcrumb' %>
+
+<div id="sidebar" class="col-md-3">
+  <%= render 'sidebar' %>
+</div>
+
+<div id="content" class="col-md-9">
+  <h2 class="top-content-title"> <%= event_catalog_title %> </h2>
+
+  <%= render 'shared/constraints' %>
+  <%= render 'sort_and_per_page' %>
+
+  <%- if @response.empty?  %>
+      <%= render 'shared/zero_results' %>
+  <%- else %>
+      <%= render_document_index %>
+  <%- end %>
+
+  <%= render 'shared/results_pagination' %>
+</div>

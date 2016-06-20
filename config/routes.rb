@@ -3,13 +3,13 @@ Rails.application.routes.draw do
   institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)/
   resources :institutions, param: :identifier, identifier: institution_ptrn do
     resources :intellectual_objects, only: [:index, :create], path: 'objects'
-    resources :premis_events, only: [:index]
+    #resources :premis_events, only: [:index], format: [:json, :html], param: :identifier, identifier: institution_ptrn
   end
 
   object_identifier_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
   resources :intellectual_objects, format: [:json, :html], param: :identifier, identifier: object_identifier_ptrn, path: 'objects' do
     resources :generic_files, only: [:index, :create], path: 'files'
-    resources :premis_events, only: [:index, :create]
+    #resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: object_identifier_ptrn
   end
 
   get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: 'json', esc_identifier: /[^\/]*/, as: :object_by_identifier
@@ -17,9 +17,9 @@ Rails.application.routes.draw do
   get '/member-api/v1/objects/', to: 'intellectual_objects#index', format: 'json'
 
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
-  resources :generic_files, param: :identifier, identifier: file_ptrn, path: 'files' do
-    resources :premis_events, only: [:index, :create]
-  end
+  resources :generic_files, param: :identifier, identifier: file_ptrn, path: 'files'
+
+  resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, path: 'events'
 
   resources :work_items, path: 'items', only: [:index, :create, :show, :update]
 

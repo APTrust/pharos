@@ -12,11 +12,14 @@ class PremisEvent < ActiveRecord::Base
   validates :object,  presence: true
   validates :agent,  presence: true
 
-  def initialize(graph={}, subject=nil)
-    super
-    init_identifier
-    init_time
-  end
+  before_save :init_identifier
+  before_save :init_time
+
+  # def initialize(graph={}, subject=nil)
+  #   super
+  #   init_identifier
+  #   init_time
+  # end
 
   def to_param
     identifier

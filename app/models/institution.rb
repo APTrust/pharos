@@ -3,6 +3,8 @@ class Institution < ActiveRecord::Base
   has_many :users
   has_many :intellectual_objects
   has_many :generic_files, through: :intellectual_objects
+  has_many :premis_events, through: :intellectual_objects
+  has_many :premis_events, through: :generic_files
 
   validates :name, :identifier, presence: true
   validate :name_is_unique
