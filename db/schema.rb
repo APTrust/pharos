@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160617202826) do
+ActiveRecord::Schema.define(version: 20160621140704) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 20160617202826) do
     t.datetime "modified",               null: false
     t.string   "permissions"
     t.string   "state"
+    t.string   "content_dsLocation"
   end
 
   add_index "generic_files", ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"

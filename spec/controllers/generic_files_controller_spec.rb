@@ -130,7 +130,7 @@ RSpec.describe GenericFilesController, type: :controller do
       describe "and assigning to an object you don't have access to" do
         let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
         it 'should be forbidden' do
-          post :create, identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+          post :create, identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
           expect(response.code).to eq '403' # forbidden
           expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
         end
@@ -140,7 +140,7 @@ RSpec.describe GenericFilesController, type: :controller do
         post :create, identifier: obj1.identifier, generic_file: {foo: 'bar'}, format: 'json'
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( {
-                                                     'checksum' => ["can't be blank"],
+                                                     'checksums' => ["can't be blank"],
                                                      'created' => ["can't be blank"],
                                                      'file_format' => ["can't be blank"],
                                                      'identifier' => ["can't be blank"],
@@ -151,33 +151,33 @@ RSpec.describe GenericFilesController, type: :controller do
 
       it 'should update fields' do
         #IntellectualObject.any_instance.should_receive(:update_index)
-        post :create, identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+        post :create, identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
           expect(file.uri).to eq 'path/within/bag'
-          expect(file.content.dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg'
+          expect(file.content_dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg'
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/puppy.jpg'
         end
       end
 
       it 'should add generic file using API identifier' do
         identifier = URI.escape(obj1.identifier)
-        post :create, identifier: identifier, generic_file: {uri: 'path/within/bag', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/cat.jpg', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+        post :create, identifier: identifier, generic_file: {uri: 'path/within/bag', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg', size: 12314121, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/cat.jpg', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
           expect(file.uri).to eq 'path/within/bag'
-          expect(file.content.dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg'
+          expect(file.content_dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg'
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/cat.jpg'
         end
       end
 
       it 'should create generic files larger than 2GB' do
         identifier = URI.escape(obj1.identifier)
-        post :create, identifier: identifier, generic_file: {uri: 'path/within/dog', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg', size: 300000000000, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/dog.jpg', checksum_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+        post :create, identifier: identifier, generic_file: {uri: 'path/within/dog', content_uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg', size: 300000000000, created: '2001-12-31', modified: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/dog.jpg', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
           expect(file.uri).to eq 'path/within/dog'
-          expect(file.content.dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg'
+          expect(file.content_dsLocation).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg'
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/dog.jpg'
         end
       end

@@ -54,7 +54,7 @@ class GenericFile < ActiveRecord::Base
   end
 
   def content_uri= uri
-    content.dsLocation = uri
+    self.content_dsLocation = uri
   end
 
   def soft_delete(attributes)
