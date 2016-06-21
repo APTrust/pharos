@@ -26,8 +26,7 @@ class GenericFilesController < ApplicationController
     respond_to do |format|
       format.json { render json: object_as_json }
       format.html {
-        @events = Kaminari.paginate_array(@generic_file.premis_events.events).page(params[:page]).per(10)
-        super
+        @events = Kaminari.paginate_array(@generic_file.premis_events).page(params[:page]).per(10)
       }
     end
   end
@@ -223,12 +222,13 @@ class GenericFilesController < ApplicationController
   end
 
   def load_generic_file
-    if params[:generic_file_identifier]
-      gfid = params[:generic_file_identifier].gsub(/%2F/i, '/')
-      @generic_file ||= GenericFile.where(identifier: gfid).first
-      params[:id] = @generic_file.id unless @generic_file.nil?
+    if params[:identifier]
+      @generic_file ||= GenericFile.where(identifier: params[:identifier]).first
+      if @generic_file.nil?
+        gfid = params[:identifier].gsub(/%2F/i, '/')
+        @generic_file ||= GenericFile.where(identifier: gfid).first
+      end
     elsif params[:id]
-      #@generic_file ||= GenericFile.find(params[:id])
       @generic_file ||=GenericFile.find(params[:id])
     end
     unless @generic_file.nil?

@@ -84,30 +84,29 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #show' do
     before do
       sign_in user
-      file.premis_events.events_attributes = [
-          FactoryGirl.attributes_for(:premis_event_ingest),
-          FactoryGirl.attributes_for(:premis_event_fixity_generation)
-      ]
+      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
       file.save!
-      get :show, identifier: file
     end
 
     it 'responds successfully' do
+      get :show, identifier: file.identifier
       expect(response).to render_template('show')
       response.should be_successful
     end
 
     it 'assigns the generic file' do
+      get :show, identifier: file.identifier
       assigns(:generic_file).should == file
     end
 
     it 'assigns events' do
-      assigns(:events).count.should == file.premis_events.events.count
+      get :show, identifier: file.identifier
+      assigns(:events).count.should == file.premis_events.count
     end
 
     it 'should show the file by identifier for API users' do
       get :show, identifier: URI.encode(file.identifier)
-      #expect(response).to be_successful
       expect(assigns(:generic_file)).to eq file
     end
 
