@@ -85,7 +85,8 @@ class IntellectualObjectsController < ApplicationController
                      outcome_detail: current_user.email,
                      object: 'Goamz S3 Client',
                      agent: 'https://github.com/crowdmob/goamz',
-                     outcome_information: "Action requested by user from #{current_user.institution_id}"
+                     outcome_information: "Action requested by user from #{current_user.institution_id}",
+                     identifier: SecureRandom.uuid
       }
       resource.soft_delete(attributes)
       respond_to do |format|
