@@ -2,14 +2,13 @@ class GenericFilesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :filter_parameters, only: [:create, :update]
   before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:update, :create, :save_batch, :index, :file_summary]
-  after_action :verify_authorized, :except => [:create, :index, :not_checked_since]
+  before_filter :load_intellectual_object, only: [:index, :update, :create, :save_batch, :file_summary]
+  after_action :verify_authorized, :except => [:create, :not_checked_since]
 
   def index
     authorize @intellectual_object
     @generic_files = @intellectual_object.generic_files
     respond_to do |format|
-      # Return active files only, not deleted files!
       format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
       format.html { super }
     end
@@ -144,7 +143,6 @@ class GenericFilesController < ApplicationController
     end
   end
 
-
   def update
     authorize @generic_file
     @generic_file.state = 'A'
@@ -210,18 +208,14 @@ class GenericFilesController < ApplicationController
                                                                    :modified, :file_format)
   end
 
-
   def resource
     @generic_file
   end
 
   def load_intellectual_object
     if params[:identifier]
-      #objId = params[:identifier].gsub(/%2F/i, '/')
       @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
-      params[:intellectual_object_id] = @intellectual_object.id
     elsif params[:intellectual_object_id]
-      #@intellectual_object ||= IntellectualObject.find(params[:intellectual_object_id])
       @intellectual_object = IntellectualObject.find(params[:intellectual_object_id])
     else
       @intellectual_object = GenericFile.find(params[:id]).intellectual_object

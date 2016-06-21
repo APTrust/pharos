@@ -3,13 +3,11 @@ Rails.application.routes.draw do
   institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)/
   resources :institutions, param: :identifier, identifier: institution_ptrn do
     resources :intellectual_objects, only: [:index, :create], path: 'objects'
-    #resources :premis_events, only: [:index], format: [:json, :html], param: :identifier, identifier: institution_ptrn
   end
 
   object_identifier_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
   resources :intellectual_objects, format: [:json, :html], param: :identifier, identifier: object_identifier_ptrn, path: 'objects' do
     resources :generic_files, only: [:index, :create], path: 'files'
-    #resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: object_identifier_ptrn
   end
 
   get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: 'json', esc_identifier: /[^\/]*/, as: :object_by_identifier
@@ -18,6 +16,10 @@ Rails.application.routes.draw do
 
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
   resources :generic_files, param: :identifier, identifier: file_ptrn, path: 'files'
+  resources :generic_files, param: :identifier, identifier: /[^\/]*/, path: 'api/v1/files'
+
+  get  '/api/v1/file_summary/:identifier', to: 'generic_files#file_summary', format: 'json', identifier: /[^\/]*/, as: 'file_summary'
+  get  '/api/v1/files/not_checked_since', to: 'generic_files#not_checked_since', format: 'json', generic_file_identifier: /[^\/]*/, as: 'files_not_checked_since'
 
   resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, path: 'events'
 
@@ -49,12 +51,6 @@ Rails.application.routes.draw do
   post '/api/v1/objects/:identifier/files(.:format)', to: 'generic_files#create', format: 'json', identifier: /[^\/]*/
   get  '/api/v1/objects/:identifier/files(.:format)', to: 'generic_files#index', format: 'json', identifier: /[^\/]*/
   post '/api/v1/objects/:identifier/events(.:format)', to: 'events#create', format: 'json', identifier: /[^\/]*/, as: 'events_by_object_identifier'
-
-  get  '/api/v1/file_summary/:identifier', to: 'generic_files#file_summary', format: 'json', identifier: /[^\/]*/, as: 'file_summary'
-  get  '/api/v1/files/not_checked_since', to: 'generic_files#not_checked_since', format: 'json', generic_file_identifier: /[^\/]*/, as: 'files_not_checked_since'
-  get  '/api/v1/files/:generic_file_identifier', to: 'generic_files#show', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_by_identifier'
-  put  '/api/v1/files/:generic_file_identifier', to: 'generic_files#update', format: 'json', generic_file_identifier: /[^\/]*/, as: 'file_update_by_identifier'
-  post '/api/v1/files/:generic_file_identifier/events(.:format)', to: 'events#create', format: 'json', generic_file_identifier: /[^\/]*\.[^\/]*/, as: 'events_by_file_identifier'
 
   authenticated :user do
     root to: 'institutions#show', as: 'authenticated_root'

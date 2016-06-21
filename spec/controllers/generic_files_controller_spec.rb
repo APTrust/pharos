@@ -19,16 +19,13 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #index' do
     before do
       sign_in user
-      file.premis_events.events_attributes = [
-          FactoryGirl.attributes_for(:premis_event_ingest),
-          FactoryGirl.attributes_for(:premis_event_fixity_generation)
-      ]
+      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
       file.save!
-      get :show, generic_file_identifier: file
     end
 
     it 'can index files by intellectual object identifier' do
-      get :index, identifier: URI.encode(@intellectual_object.identifier), format: :json
+      get :index, identifier: @intellectual_object.identifier, format: :json
       expect(response).to be_successful
       expect(assigns(:intellectual_object)).to eq @intellectual_object
     end
@@ -36,10 +33,10 @@ RSpec.describe GenericFilesController, type: :controller do
     it 'returns only active files' do
       FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'one', state: 'A')
       FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'two', state: 'D')
-      get :index, identifier: URI.encode(@intellectual_object.identifier), format: :json
+      get :index, identifier: @intellectual_object.identifier, format: :json
       expect(response).to be_successful
       response_data = JSON.parse(response.body)
-      expect(response_data.select{|f| f['state'] == 'A'}.count).to eq 2
+      expect(response_data.select{|f| f['state'] == 'A'}.count).to eq 1
       expect(response_data.select{|f| f['state'] != 'A'}.count).to eq 0
     end
   end
@@ -52,11 +49,11 @@ RSpec.describe GenericFilesController, type: :controller do
           FactoryGirl.attributes_for(:premis_event_fixity_generation)
       ]
       file.save!
-      get :show, generic_file_identifier: file
+      get :show, identifier: file
     end
 
     it 'can index files by intellectual object identifier' do
-      get :file_summary, identifier: CGI.escape(@intellectual_object.identifier), format: :json, use_route: 'file_summary'
+      get :file_summary, identifier: CGI.escape(@intellectual_object.identifier), format: :json
       expect(response).to be_successful
       expect(assigns(:intellectual_object)).to eq @intellectual_object
     end
@@ -64,7 +61,7 @@ RSpec.describe GenericFilesController, type: :controller do
     it 'returns only active files with uri, size and identifier attributes' do
       FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://one', identifier: 'file_one', state: 'A')
       FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://two', identifier: 'file_two', state: 'D')
-      get :file_summary, identifier: CGI.escape(@intellectual_object.identifier), format: :json, use_route: 'file_summary'
+      get :file_summary, identifier: CGI.escape(@intellectual_object.identifier), format: :json
       expect(response).to be_successful
 
       # Reload, or the files don't appear
@@ -95,7 +92,7 @@ RSpec.describe GenericFilesController, type: :controller do
           FactoryGirl.attributes_for(:premis_event_fixity_generation)
       ]
       file.save!
-      get :show, generic_file_identifier: file
+      get :show, identifier: file
     end
 
     it 'responds successfully' do
@@ -112,7 +109,7 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     it 'should show the file by identifier for API users' do
-      get :show, identifier: URI.encode(file.identifier), use_route: 'file_by_identifier_path'
+      get :show, identifier: URI.encode(file.identifier)
       #expect(response).to be_successful
       expect(assigns(:generic_file)).to eq file
     end
@@ -197,7 +194,7 @@ RSpec.describe GenericFilesController, type: :controller do
       let(:obj1) { @intellectual_object }
       it 'should show unauthorized' do
         post(:save_batch, identifier: obj1.identifier, generic_files: [],
-             format: 'json', use_route: 'generic_file_create_batch')
+             format: 'json')
         expect(response.code).to eq '401' # unauthorized
       end
     end
@@ -216,7 +213,7 @@ RSpec.describe GenericFilesController, type: :controller do
       describe "and assigning to an object you don't have access to" do
         it 'should be forbidden' do
           post(:save_batch, identifier: obj2.identifier, generic_files: [],
-               format: 'json', use_route: 'generic_file_create_batch')
+               format: 'json')
           expect(response.code).to eq '403' # forbidden
           expect(JSON.parse(response.body)).to eq({'status'=>'error', 'message'=>'You are not authorized to access this page.'})
         end
@@ -230,7 +227,7 @@ RSpec.describe GenericFilesController, type: :controller do
         it 'it should create or update multiple files and their events' do
           # First post is a create
           post(:save_batch, intellectual_object_id: batch_obj.id, generic_files: gf_data,
-               format: 'json', use_route: 'generic_file_create_batch')
+               format: 'json')
           expect(response.code).to eq '201'
           return_data = JSON.parse(response.body)
           expect(return_data.count).to eq 2
@@ -250,7 +247,7 @@ RSpec.describe GenericFilesController, type: :controller do
           gf_data[1]['file_format'] = 'text/orange'
 
           post(:save_batch, identifier: batch_obj.identifier, generic_files: gf_data,
-               format: 'json', use_route: 'generic_file_create_batch')
+               format: 'json')
           expect(response.code).to eq '201'
           return_data = JSON.parse(response.body)
           expect(return_data.count).to eq 2
@@ -274,7 +271,7 @@ RSpec.describe GenericFilesController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        patch :update, identifier: file.intellectual_object, generic_file_identifier: file, trailing_slash: true
+        patch :update, identifier: file.intellectual_object, identifier: file, trailing_slash: true
         expect(response).to redirect_to root_url + 'users/sign_in'
         expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
@@ -286,7 +283,7 @@ RSpec.describe GenericFilesController, type: :controller do
       describe "and updating a file you don't have access to" do
         let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
-          patch :update, identifier: file.intellectual_object.identifier, generic_file_identifier: file.identifier, generic_file: {size: 99}, format: 'json', trailing_slash: true
+          patch :update, identifier: file.intellectual_object.identifier, identifier: file.identifier, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(response.code).to eq '403' # forbidden
           expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
         end
@@ -294,13 +291,13 @@ RSpec.describe GenericFilesController, type: :controller do
 
       describe 'and you have access to the file' do
         it 'should update the file' do
-          patch :update, identifier: file.intellectual_object.identifier, generic_file_identifier: file, generic_file: {size: 99}, format: 'json', trailing_slash: true
+          patch :update, identifier: file.intellectual_object.identifier, identifier: file, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(assigns[:generic_file].size).to eq 99
           expect(response.code).to eq '204'
         end
 
         it 'should update the file by identifier (API)' do
-          patch :update, generic_file_identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true
+          patch :update, identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(assigns[:generic_file].size).to eq 99
           expect(response.code).to eq '204'
         end
@@ -325,7 +322,7 @@ RSpec.describe GenericFilesController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        delete :destroy, generic_file_identifier: file
+        delete :destroy, identifier: file
         expect(response).to redirect_to root_url + 'users/sign_in'
         expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
@@ -337,7 +334,7 @@ RSpec.describe GenericFilesController, type: :controller do
       describe "and deleting a file you don't have access to" do
         let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
-          delete :destroy, generic_file_identifier: file, format: 'json'
+          delete :destroy, identifier: file, format: 'json'
           expect(response.code).to eq '403' # forbidden
           expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
         end
@@ -345,14 +342,14 @@ RSpec.describe GenericFilesController, type: :controller do
 
       describe 'and you have access to the file' do
         it 'should delete the file' do
-          delete :destroy, generic_file_identifier: file, format: 'json'
+          delete :destroy, identifier: file, format: 'json'
           expect(assigns[:generic_file].state).to eq 'D'
           expect(response.code).to eq '204'
         end
 
         it 'delete the file with html response' do
           file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
-          delete :destroy, generic_file_identifier: file
+          delete :destroy, identifier: file
           expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
           expect(assigns[:generic_file].state).to eq 'D'
           expect(flash[:notice]).to eq "Delete job has been queued for file: #{file.uri}"
@@ -360,7 +357,7 @@ RSpec.describe GenericFilesController, type: :controller do
 
         it 'should create a WorkItem with the delete request' do
           file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
-          delete :destroy, generic_file_identifier: file, format: 'json'
+          delete :destroy, identifier: file, format: 'json'
           wi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(wi).not_to be_nil
           expect(wi.object_identifier).to eq @intellectual_object.identifier
@@ -380,7 +377,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'allows access to the API endpoint' do
-        get :not_checked_since, date: '2015-01-31T14:31:36Z', format: :json, use_route: :files_not_checked_since
+        get :not_checked_since, date: '2015-01-31T14:31:36Z', format: :json
         expect(response.status).to eq 200
       end
     end
