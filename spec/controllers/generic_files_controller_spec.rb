@@ -44,16 +44,13 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #file_summary' do
     before do
       sign_in user
-      file.premis_events.events_attributes = [
-          FactoryGirl.attributes_for(:premis_event_ingest),
-          FactoryGirl.attributes_for(:premis_event_fixity_generation)
-      ]
+      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
       file.save!
-      get :show, identifier: file
     end
 
     it 'can index files by intellectual object identifier' do
-      get :file_summary, identifier: CGI.escape(@intellectual_object.identifier), format: :json
+      get :index, alt_action: 'file_summary', esc_identifier: CGI.escape(@intellectual_object.identifier), format: :json
       expect(response).to be_successful
       expect(assigns(:intellectual_object)).to eq @intellectual_object
     end
@@ -61,7 +58,7 @@ RSpec.describe GenericFilesController, type: :controller do
     it 'returns only active files with uri, size and identifier attributes' do
       FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://one', identifier: 'file_one', state: 'A')
       FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://two', identifier: 'file_two', state: 'D')
-      get :file_summary, identifier: CGI.escape(@intellectual_object.identifier), format: :json
+      get :index, alt_action: 'file_summary', esc_identifier: CGI.escape(@intellectual_object.identifier), format: :json
       expect(response).to be_successful
 
       # Reload, or the files don't appear

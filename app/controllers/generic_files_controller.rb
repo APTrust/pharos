@@ -2,15 +2,22 @@ class GenericFilesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :filter_parameters, only: [:create, :update]
   before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:index, :update, :create, :save_batch, :file_summary]
+  before_filter :load_intellectual_object, only: [:index, :update, :create, :save_batch]
   after_action :verify_authorized, :except => [:create, :not_checked_since]
 
   def index
     authorize @intellectual_object
-    @generic_files = @intellectual_object.generic_files
-    respond_to do |format|
-      format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
-      format.html { super }
+    if params[:alt_action]
+      case params[:alt_action]
+        when 'file_summary'
+          file_summary
+      end
+    else
+      @generic_files = @intellectual_object.generic_files
+      respond_to do |format|
+        format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
+        format.html { super }
+      end
     end
   end
 
@@ -39,9 +46,6 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  # /api/v1/files/not_checked_since?date=2015-01-01T00:00:00Z&start=100&rows=20
-  # Returns a list of GenericFiles that have not had a fixity
-  # check since the specified date.
   def not_checked_since
     datetime = Time.parse(params[:date]) rescue nil
     if datetime.nil?
@@ -59,42 +63,6 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  # /api/v1/objects/:identifier/files/save_batch
-  #
-  # save_batch creates or updates a batch of GenericFile objects, along
-  # with their related PremisEvents. Although there's no built-in limit
-  # on the number of files you can save in a batch, you should limit
-  # batches to 200 or so files to avoid a response timeout.
-  #
-  # This methods determines whether to update an existing GenericFile
-  # or create a new one. It then adds any related events to the new/updated
-  # GenericFile.
-  #
-  # Before save_batch, saving a GenericFile required 7 HTTP calls:
-  #
-  # - 1 x check if file exists
-  # - 1 x save or update file
-  # - 5 x save generic file event
-  #
-  # Saving 200 generic files required 1400 HTTP calls. Now it requires 1.
-  #
-  # NOTE: The API client submits checksums in a param called :checksum.
-  # The remove_existing_checksums method below renames that param to
-  # :checksum_attributes. See the doc below on remove_existing_checksums.
-  #
-  # We have to rewrite the params here so that checksum becomes
-  # checksum_attributes. When serializing generic files back to the
-  # API client, this app always uses generic_file.checksum. Other
-  # contollers, such as the intellectual_object controller, also
-  # use generic_file.checksum for both input and output. However, Rails
-  # nested resources expects generic_file.checksum_attributes. That
-  # means the API has to serialize generic files differently, depending
-  # on which endpoint it's talking to, and Rails will reject the same
-  # JSON it just sent to the API client.
-  #
-  # Instead of making the API client guess which JSON format Rails wants,
-  # let's make consistent and use generic_file.checksum. We'll change it
-  # to checksum_attributes here to satisfy nested resources.
   def save_batch
     generic_files = []
     current_object = nil
@@ -188,21 +156,28 @@ class GenericFilesController < ApplicationController
 
   protected
 
+  def file_summary
+    data = []
+    files = GenericFile.where(state: 'A', intellectual_object_id: @intellectual_object.id)
+    files.each do |file|
+      summary = {}
+      summary['size'] = file.size
+      summary['identifier'] = file.identifier
+      summary['uri'] = file.uri
+      data << summary
+    end
+    respond_to do |format|
+      format.json { render json: data }
+      format.html { super }
+    end
+  end
+
   def filter_parameters
     params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
                                                                    :modified, :file_format,
                                                                    checksum_attributes: [:digest, :algorithm, :datetime])
   end
 
-  # When updating a generic file, the client will likely send back
-  # copy of the GenericFile object that includes checksum attributes.
-  # If we don't filter those out, Hydra will simply append those
-  # checksums to the original checksums, and every time the GenericFile
-  # is updated, the number of checksums doubles. We really only want
-  # to save the checksums when the GenericFile is created. After that,
-  # we'll do fixity checks to make sure they haven't changed, and those
-  # checks will be recorded as PremisEvents.
-  # Fixes bug https://www.pivotaltracker.com/story/show/73796812
   def params_for_update
     params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
                                                                    :modified, :file_format)
@@ -215,6 +190,9 @@ class GenericFilesController < ApplicationController
   def load_intellectual_object
     if params[:identifier]
       @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
+    elsif params[:esc_identifier]
+      objId = params[:esc_identifier].gsub(/%2F/i, '/')
+      @intellectual_object = IntellectualObject.where(identifier: objId).first
     elsif params[:intellectual_object_id]
       @intellectual_object = IntellectualObject.find(params[:intellectual_object_id])
     else
@@ -222,7 +200,6 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  # Override Fedora's default JSON serialization for our API
   def object_as_json
     if params[:include_relations]
       @generic_file.serializable_hash(include: [:checksum, :premis_events])
@@ -231,17 +208,10 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  # Given a list of GenericObjects, returns a list of serializable
-  # hashes that include checksum and PremisEvent data. That hash is
-  # suitable for JSON serialization back to the API client.
   def array_as_json(list_of_generic_files)
     list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksum, :premis_events]) }
   end
 
-  # Remove existing checksums from submitted generic file data.
-  # We don't want two copies of the same md5 and two of the same sha256.
-  # Returns a copy of gf_params with existing checksums removed.
-  # This prevents duplicate checksums from accumulating in the metadata.
   def remove_existing_checksums(generic_file, gf_params)
     copy_of_params = gf_params.deep_dup
     generic_file.checksum.each do |existing_checksum|
@@ -252,9 +222,6 @@ class GenericFilesController < ApplicationController
     copy_of_params
   end
 
-  # Load generic file by identifier, if we got that, or by id if we got an id.
-  # Identifiers always start with data/, so we can look for a slash. Ids include
-  # a urn, a colon, and an integer. They will not include a slash.
   def load_generic_file
     if params[:generic_file_identifier]
       gfid = params[:generic_file_identifier].gsub(/%2F/i, '/')

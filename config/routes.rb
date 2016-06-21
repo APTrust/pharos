@@ -18,8 +18,8 @@ Rails.application.routes.draw do
   resources :generic_files, param: :identifier, identifier: file_ptrn, path: 'files'
   resources :generic_files, param: :identifier, identifier: /[^\/]*/, path: 'api/v1/files'
 
-  get  '/api/v1/file_summary/:identifier', to: 'generic_files#file_summary', format: 'json', identifier: /[^\/]*/, as: 'file_summary'
-  get  '/api/v1/files/not_checked_since', to: 'generic_files#not_checked_since', format: 'json', generic_file_identifier: /[^\/]*/, as: 'files_not_checked_since'
+  get '/api/v1/files/not_checked_since', to: 'generic_files#not_checked_since', format: 'json', generic_file_identifier: /[^\/]*/, as: 'files_not_checked_since'
+  get '/api/v1/files/esc_identifier', to: 'generic_files#index', format: 'json'
 
   resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, path: 'events'
 
