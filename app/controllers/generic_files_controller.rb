@@ -130,14 +130,15 @@ class GenericFilesController < ApplicationController
       redirect_to @generic_file
       flash[:alert] = 'This file has already been deleted.'
     elsif result == 'true'
-      attributes = { type: 'delete',
+      attributes = { event_type: 'delete',
                      date_time: "#{Time.now}",
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',
                      outcome_detail: current_user.email,
                      object: 'Goamz S3 Client',
                      agent: 'https://github.com/crowdmob/goamz',
-                     outcome_information: "Action requested by user from #{current_user.institution_id}"
+                     outcome_information: "Action requested by user from #{current_user.institution_id}",
+                     identifier: SecureRandom.uuid
       }
       @generic_file.soft_delete(attributes)
       respond_to do |format|
