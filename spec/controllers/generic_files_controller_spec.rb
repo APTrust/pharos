@@ -373,7 +373,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'allows access to the API endpoint' do
-        get :not_checked_since, date: '2015-01-31T14:31:36Z', format: :json
+        get :index, alt_action: 'not_checked_since', date: '2015-01-31T14:31:36Z', format: :json
         expect(response.status).to eq 200
       end
     end

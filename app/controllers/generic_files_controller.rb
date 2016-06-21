@@ -2,17 +2,22 @@ class GenericFilesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :filter_parameters, only: [:create, :update]
   before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:index, :update, :create, :save_batch]
-  after_action :verify_authorized, :except => [:create, :not_checked_since]
+  before_filter :load_intellectual_object, only: [:update, :create, :save_batch]
+  after_action :verify_authorized, :except => [:create, :index]
 
   def index
-    authorize @intellectual_object
     if params[:alt_action]
       case params[:alt_action]
         when 'file_summary'
+          load_intellectual_object
+          authorize @intellectual_object
           file_summary
+        when 'not_checked_since'
+          not_checked_since
       end
     else
+      load_intellectual_object
+      authorize @intellectual_object
       @generic_files = @intellectual_object.generic_files
       respond_to do |format|
         format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
@@ -42,23 +47,6 @@ class GenericFilesController < ApplicationController
         log_model_error(@generic_file)
         format.json { render json: @generic_file.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  def not_checked_since
-    datetime = Time.parse(params[:date]) rescue nil
-    if datetime.nil?
-      raise ActionController::BadRequest.new(type: 'date', e: "Param date is missing or invalid. Hint: Use format '2015-01-31T14:31:36Z'")
-    end
-    if current_user.admin? == false
-      logger.warn("User #{current_user.email} tried to access generic_files_controller#not_checked_since")
-      raise ActionController::Forbidden
-    end
-    @generic_files = GenericFile.find_files_in_need_of_fixity(params[:date], {rows: params[:rows], start: params[:start]})
-    respond_to do |format|
-      # Return active files only, not deleted files!
-      format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum]) } }
-      format.html { super }
     end
   end
 
@@ -169,6 +157,23 @@ class GenericFilesController < ApplicationController
     respond_to do |format|
       format.json { render json: data }
       format.html { super }
+    end
+  end
+
+  def not_checked_since
+    datetime = Time.parse(params[:date]) rescue nil
+    if datetime.nil?
+      raise ActionController::BadRequest.new(type: 'date', e: "Param date is missing or invalid. Hint: Use format '2015-01-31T14:31:36Z'")
+    end
+    if current_user.admin? == false
+      logger.warn("User #{current_user.email} tried to access generic_files_controller#not_checked_since")
+      raise ActionController::Forbidden
+    end
+    @generic_files = GenericFile.find_files_in_need_of_fixity(params[:date], {rows: params[:rows], start: params[:start]})
+    respond_to do |format|
+      # Return active files only, not deleted files!
+      format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum]) } }
+      format.html { }
     end
   end
 
