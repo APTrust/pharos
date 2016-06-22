@@ -65,8 +65,11 @@ class IntellectualObjectsController < ApplicationController
 
   def update
     authorize @intellectual_object
-    respond_to(:html, :json)
     update!
+    respond_to do |format|
+      format.json { render object_as_json}
+      format.html { }
+    end
   end
 
   def destroy
