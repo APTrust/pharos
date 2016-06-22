@@ -58,7 +58,7 @@ RSpec.describe PremisEventsController, type: :controller do
     describe 'POST create' do
       it 'creates an event for the generic file' do
         file.premis_events.count.should == 0
-        post :create, identifier: file, event: event_attrs
+        post :create, identifier: file, premis_event: event_attrs
         file.reload
 
         file.premis_events.count.should == 1
@@ -70,7 +70,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it 'creates an event for the generic file using generic file identifier (API)' do
         file.premis_events.count.should == 0
-        post :create, identifier: URI.escape(file.identifier), event: event_attrs, format: :json
+        post :create, identifier: URI.escape(file.identifier), premis_event: event_attrs, format: :json
         file.reload
         file.premis_events.count.should == 1
         assigns(:parent_object).should == file
@@ -80,9 +80,8 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it 'creates an event for an intellectual object' do
         object.premis_events.count.should == 0
-        post :create, identifier: object, event: event_attrs
+        post :create, identifier: object, premis_event: event_attrs
         object.reload
-
         object.premis_events.count.should == 1
         response.should redirect_to intellectual_object_path(object)
         assigns(:parent_object).should == object
@@ -90,10 +89,9 @@ RSpec.describe PremisEventsController, type: :controller do
         flash[:notice].should =~ /Successfully created new event/
       end
 
-
       it 'creates an event for an intellectual object by object identifier' do
         object.premis_events.count.should == 0
-        post :create, identifier: URI.escape(object.identifier), event: event_attrs
+        post :create, identifier: URI.escape(object.identifier), premis_event: event_attrs
         object.reload
 
         object.premis_events.count.should == 1
@@ -106,10 +104,9 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it 'if it fails, it prints a fail message' do
         file.premis_events.count.should == 0
-        GenericFile.any_instance.should_receive(:save).and_return(false) # Make it infail
-        post :create, identifier: file, event: event_attrs
+        expect_any_instance_of(GenericFile).to receive(:save).and_return(false) # Make it fail
+        post :create, identifier: file, premis_event: event_attrs
         file.reload
-        file.premis_events.count.should == 0
         flash[:alert].should =~ /Unable to create event/
       end
     end

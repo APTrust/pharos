@@ -1,9 +1,6 @@
 class PremisEventsController < ApplicationController
   before_filter :authenticate_user!
-  #before_filter :load_intellectual_object, if: :intellectual_object_identifier_exists?
-  #before_filter :load_generic_file, if: :generic_file_identifier_exists?
   before_filter :load_and_authorize_parent_object, only: [:create]
-
   after_action :verify_authorized, only: [:index, :create]
 
   def index
@@ -26,7 +23,7 @@ class PremisEventsController < ApplicationController
   end
 
   def create
-    @event = @parent_object.add_event(params['event'])
+    @event = @parent_object.add_event(params[:premis_event])
     respond_to do |format|
       format.json {
         if @parent_object.save
@@ -47,14 +44,6 @@ class PremisEventsController < ApplicationController
   end
 
   protected
-
-  # def intellectual_object_identifier_exists?
-  #   params[:identifier] && params[:identifier] =~ /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
-  # end
-  #
-  # def generic_file_identifier_exists?
-  #   params[:identifier] && params[:identifier] =~ /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
-  # end
 
   def load_intellectual_object
     @parent_object = IntellectualObject.where(identifier: params[:identifier]).first
@@ -92,9 +81,9 @@ class PremisEventsController < ApplicationController
     @premis_events = @premis_events.order('datetime')
   end
 
-  def event_params
-    params.require(:intellectual_object).permit(:identifier, :event_type, :date_time, :outcome, :outcome_detail,
-        :outcome_information, :date_time, :detail, :object, :agent, :intellectual_object_id, :generic_file_id,
+  def premis_event_params
+    params.require(:premis_event).permit(:identifier, :event_type, :date_time, :outcome, :outcome_detail,
+        :outcome_information, :detail, :object, :agent, :intellectual_object_id, :generic_file_id,
         :institution_id, :created_at, :updated_at)
   end
 
