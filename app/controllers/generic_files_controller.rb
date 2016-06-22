@@ -3,7 +3,7 @@ class GenericFilesController < ApplicationController
   before_filter :filter_parameters, only: [:create, :update]
   before_filter :load_generic_file, only: [:show, :update, :destroy]
   before_filter :load_intellectual_object, only: [:update, :create, :save_batch]
-  after_action :verify_authorized, :except => [:create, :index]
+  after_action :verify_authorized, :except => [:index]
 
   def index
     if params[:alt_action]
@@ -180,7 +180,7 @@ class GenericFilesController < ApplicationController
   def filter_parameters
     params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
                                                                    :modified, :file_format,
-                                                                   checksum_attributes: [:digest, :algorithm, :datetime])
+                                                                   checksums_attributes: [:digest, :algorithm, :datetime])
   end
 
   def params_for_update

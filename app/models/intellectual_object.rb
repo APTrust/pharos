@@ -189,7 +189,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def set_bag_name
-    puts "Identifier? #{self.identifier.nil?}"
+    #puts "Identifier: #{self.identifier}"
     return if self.identifier.nil?
     if self.bag_name.nil? || self.bag_name == ''
       puts 'inside bag_name set'
