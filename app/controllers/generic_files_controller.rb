@@ -38,14 +38,37 @@ class GenericFilesController < ApplicationController
 
   def create
     authorize @intellectual_object, :create_through_intellectual_object?
-    @generic_file = @intellectual_object.generic_files.new(params[:generic_file])
-    @generic_file.state = 'A'
-    respond_to do |format|
-      if @generic_file.save
-        format.json { render json: object_as_json, status: :created }
-      else
-        log_model_error(@generic_file)
-        format.json { render json: @generic_file.errors, status: :unprocessable_entity }
+    if params[:save_batch]
+      new_gf = nil
+      @generic_files = []
+      @generic_files = @intellectual_object.generic_files.create([params[:generic_files]])
+      @generic_files.update_all(state: 'A')
+      # begin
+      #   params[:generic_files].each do |file|
+      #     new_gf = @intellectual_object.generic_files.new(file)
+      #     @generic_files.push(new_gf)
+      #   end
+      #   respond_to { |format| format.json { render json: array_as_json(@generic_files), status: :created } }
+      # rescue Exception => ex
+      #   logger.error("save_batch failed on #{new_gf}")
+      #   log_exception(ex)
+      #   @generic_files.each do |gf|
+      #     gf.destroy
+      #   end
+      #   respond_to { |format| format.json {
+      #     render json: { error: "#{ex.message} : #{new_gf}" }, status: :unprocessable_entity }
+      #   }
+      # end
+    else
+      @generic_file = @intellectual_object.generic_files.new(params[:generic_file])
+      @generic_file.state = 'A'
+      respond_to do |format|
+        if @generic_file.save
+          format.json { render json: object_as_json, status: :created }
+        else
+          log_model_error(@generic_file)
+          format.json { render json: @generic_file.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -89,7 +112,7 @@ class GenericFilesController < ApplicationController
     rescue Exception => ex
       logger.error("save_batch failed on #{current_object}")
       log_exception(ex)
-      generic_files.each do |gf|
+      @generic_files.each do |gf|
         gf.destroy
       end
       respond_to { |format| format.json {
@@ -181,6 +204,12 @@ class GenericFilesController < ApplicationController
     params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
                                                                    :modified, :file_format,
                                                                    checksums_attributes: [:digest, :algorithm, :datetime])
+    unless params[:generic_files].nil? || params[:generic_files] == []
+      params[:generic_files] &&= params.require(:generic_files).each do |file|
+        file.permit(:uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
+                    checksums_attributes: [:digest, :algorithm, :datetime])
+      end
+    end
   end
 
   def params_for_update

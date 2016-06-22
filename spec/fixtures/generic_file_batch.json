@@ -6,7 +6,7 @@
     "modified": "2014-04-14T11:55:25-04:00",
     "file_format": "text/plain",
     "identifier": "virginia.edu/virginia.edu.uva-lib_2278801/data/datastream-DC",
-    "checksum": [
+    "checksums_attributes": [
       {
         "algorithm": "md5",
         "digest": "44d85cf4810d6c6fe87750117633e461",
@@ -50,7 +50,7 @@
     "modified": "2014-04-14T11:55:26-04:00",
     "file_format": "application/xml",
     "identifier": "virginia.edu/virginia.edu.uva-lib_2278801/data/datastream-RELS-EXT",
-    "checksum": [
+    "checksums_attributes": [
       {
         "algorithm": "md5",
         "digest": "ff731b9a1758618f6cc22538dede6174",
