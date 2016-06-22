@@ -3,11 +3,9 @@ class IntellectualObjectsController < ApplicationController
   before_filter :authenticate_user!
   before_action :load_institution, only: [:index, :create]
   before_action :load_object, only: [:show, :edit, :update, :destroy]
-  after_action :verify_authorized, :except => [:index, :create, :create_from_json]
 
   def index
     authorize @institution
-
     if params[:search_field].present?
       filter_results_by_standard_params
       prep_search_incidentals
@@ -18,7 +16,6 @@ class IntellectualObjectsController < ApplicationController
       filter_results_by_other_params
       prep_search_incidentals
     end
-
     respond_to do |format|
       format.json { render json: {count: @count, next: @next, previous: @previous, results: @intellectual_objects.map{ |item| item.serializable_hash(include: [:etag])}} }
       format.html {
@@ -39,9 +36,10 @@ class IntellectualObjectsController < ApplicationController
   def create
     authorize @institution, :create_through_institution?
     @intellectual_object = @institution.intellectual_objects.new(intellectual_object_params)
+    create!
     respond_to do |format|
       format.json { render object_as_json }
-      format.html { create! }
+      format.html { }
     end
   end
 
