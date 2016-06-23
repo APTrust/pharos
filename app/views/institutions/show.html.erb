@@ -8,7 +8,7 @@
   <li><%= link_to 'Objects', institution_intellectual_objects_path(@institution, sort: 'system_modified_dtsi desc') %></li>
   <li><a href="#users" data-toggle="tab">Users</a></li>
   <li><%= link_to 'Events', institution_events_path(@institution) %></li>
-  <li><%= link_to 'Processed Items', processed_items_path %></li>
+  <li><%= link_to 'Work Items', work_items_path %></li>
 </ul>
 
 <div class="tab-content">
@@ -21,15 +21,15 @@
       <dd><%= @institution.dpn_uuid %></dd>
       <dt>Intellectual Objects</dt>
       <dd><%= @object_count %></dd>
-      <dt>Processed Items</dt>
+      <dt>Work Items</dt>
       <dd><%= @item_count %></dd>
       <dt>Total Storage Used</dt>
       <dd><%= number_to_human_size(@size) %></dd>
     </dl>
 
-    <%= render "shared/processed_items" %>
+    <%= render "shared/work_items" %>
 
-    <%= link_to 'View All Jobs', processed_items_path %>
+    <%= link_to 'View All Jobs', work_items_path %>
   </div>
 
   <div class="tab-pane" id="stats">

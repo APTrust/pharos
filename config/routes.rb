@@ -2,35 +2,37 @@ Rails.application.routes.draw do
 
   # INSTITUTION ROUTES
   institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)/
-  resources :institutions, param: :identifier, identifier: institution_ptrn do
-    resources :intellectual_objects, only: [:index, :create], path: 'objects'
+  resources :institutions, format: [:json, :html], param: :identifier, identifier: institution_ptrn do
+    resources :intellectual_objects, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: institution_ptrn, path: 'objects'
   end
-  resources :institutions, param: :identifier, format: :json, only: [:index], identifier: institution_ptrn, path: 'api/vi/institutions'
+  resources :institutions, only: [:index], format: :json, param: :identifier, identifier: institution_ptrn, path: 'api/v1/institutions' do
+    resources :intellectual_objects, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: institution_ptrn, path: 'api/v1/objects'
+  end
 
   # INTELLECTUAL OBJECT ROUTES
-  object_identifier_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
-  resources :intellectual_objects, format: [:json, :html], param: :identifier, identifier: object_identifier_ptrn, path: 'objects' do
-    resources :generic_files, only: [:index, :create], path: 'files'
-  end
-  resources :intellectual_objects, format: :json, param: :identifier, identifier:  /[^\/]*/, path: 'api/v1/objects' do
-    resources :generic_files, only: [:index, :create], path: 'api/v1/files', param: :identifier, identifier: /[^\/]*/
-  end
-  resources :intellectual_objects, format: :json, param: :identifier, identifier:  object_identifier_ptrn, path: 'member-api/v1/objects', only: [:index]
+  object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+/
+  resources :intellectual_objects, only: [:show, :update, :edit, :destroy], format: [:json, :html], param: :identifier, identifier: object_ptrn, path: 'objects'
+  resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :identifier, identifier:  /[^\/]*/, path: 'api/v1/objects'
+  resources :intellectual_objects, only: [:index], format: :json, param: :identifier, identifier:  institution_ptrn, path: 'member-api/v1/objects'
   get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: :json, esc_identifier: /[^\/]*/
   put '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#update', format: :json, esc_identifier: /[^\/]*/
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
-  resources :generic_files, param: :identifier, identifier: file_ptrn, path: 'files'
-  resources :generic_files, param: :identifier, identifier: /[^\/]*/, path: 'api/v1/files'
+  resources :generic_files, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: object_ptrn, path: 'files'
+  resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :identifier, identifier: file_ptrn, path: 'files'
+  resources :generic_files, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: /[^\/]*/, path: 'api/v1/files'
+  resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :identifier, identifier: /[^\/]*/, path: 'api/v1/files'
   get '/api/v1/files/esc_identifier', to: 'generic_files#index', format: 'json'
 
   # PREMIS EVENT ROUTES
-  resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, path: 'events'
+  resources :premis_events, only: [:index], format: [:json, :html], param: :identifier, identifier: institution_ptrn, path: 'events'
+  resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: object_ptrn, path: 'events'
+  resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, identifier: file_ptrn, path: 'events', as: :institution_events
   resources :premis_events, only: [:create], format: :json, param: :identifier, identifier: /[^\/]*/, path: 'api/v1/events'
 
   # WORK ITEM ROUTES
-  resources :work_items, path: 'items', only: [:index, :create, :show, :update]
+  resources :work_items, only: [:index, :create, :show, :update], path: 'items'
   resources :work_items, path: '/api/v1/items'
   resources :work_items, format: :json, only: [:index], path: 'member-api/v1/items'
   get '/api/v1/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/

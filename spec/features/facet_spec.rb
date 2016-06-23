@@ -19,9 +19,9 @@ describe 'Faceting' do
 
     describe 'Events list' do
       before do
-        @event1 = file.add_event(type: 'Type 1', outcome: 'Outcome 1')
-        @event2 = file.add_event(type: 'Type 2', outcome: 'Outcome 2')
-        @event3 = file.add_event(type: 'Type 3', outcome: 'Outcome 3')
+        @event1 = file.add_event(event_type: 'Type 1', outcome: 'Outcome 1')
+        @event2 = file.add_event(event_type: 'Type 2', outcome: 'Outcome 2')
+        @event3 = file.add_event(event_type: 'Type 3', outcome: 'Outcome 3')
         file.save!
       end
 

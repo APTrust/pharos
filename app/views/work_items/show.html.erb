@@ -4,7 +4,7 @@
   </ol>
 
   <section class="page-header">
-    <h2><%= @processed_item.name %></h2>
+    <h2><%= @work_item.name %></h2>
   </section>
 
   <section class="queue">
@@ -13,77 +13,77 @@
       <tr>
       <tr>
         <th>Name</th>
-        <td><%= @processed_item.name %></td>
+        <td><%= @work_item.name %></td>
       </tr>
       <tr>
         <th>Institution</th>
-        <td><%= @processed_item.institution %></td>
+        <td><%= @work_item.institution %></td>
       </tr>
       <tr>
         <th>Bucket</th>
-        <td><%= @processed_item.bucket %></td>
+        <td><%= @work_item.bucket %></td>
       </tr>
       <tr>
         <th>Etag</th>
-        <td><%= @processed_item.etag %></td>
+        <td><%= @work_item.etag %></td>
       </tr>
       <tr>
         <th>Object Identifier</th>
-        <td class="identifier"><%= @processed_item.object_identifier %></td>
+        <td class="identifier"><%= @work_item.object_identifier %></td>
       </tr>
-      <% unless @processed_item.generic_file_identifier.nil? %>
+      <% unless @work_item.generic_file_identifier.nil? %>
           <tr>
             <th>Generic File Identifier</th>
-            <td class="identifier"><%= @processed_item.generic_file_identifier %></td>
+            <td class="identifier"><%= @work_item.generic_file_identifier %></td>
           </tr>
       <% end %>
       <tr>
         <th>Bag Date</th>
-        <td><%= @processed_item.bag_date %></td>
+        <td><%= @work_item.bag_date %></td>
       </tr>
       <tr>
         <th>Date Processed</th>
-        <td><%= @processed_item.date %></td>
+        <td><%= @work_item.date %></td>
       </tr>
       <tr>
         <th>Action</th>
-        <td><%= @processed_item.action %></td>
+        <td><%= @work_item.action %></td>
       </tr>
       <tr>
         <th>Stage</th>
-        <td><%= @processed_item.stage %></td>
+        <td><%= @work_item.stage %></td>
       </tr>
-      <tr class="<%= @processed_item.status %>">
+      <tr class="<%= @work_item.status %>">
         <th>Status</th>
-        <td class="status"><%= @processed_item.status %></td>
+        <td class="status"><%= @work_item.status %></td>
       </tr>
       <tr>
         <th>Retry</th>
-        <td><%= @processed_item.retry %></td>
+        <td><%= @work_item.retry %></td>
       </tr>
       <tr>
         <th>Needs Admin Review?</th>
-        <td><%= @processed_item.needs_admin_review %></td>
+        <td><%= @work_item.needs_admin_review %></td>
       </tr>
       <tr>
         <th>Note / Error</th>
-        <td><%= @processed_item.note %></td>
+        <td><%= @work_item.note %></td>
       </tr>
       <% if current_user.admin? %>
           <tr>
             <th>Node</th>
-            <td><%= @processed_item.node %></td>
+            <td><%= @work_item.node %></td>
           </tr>
           <tr>
             <th>PID</th>
-            <td><%= @processed_item.pid %></td>
+            <td><%= @work_item.pid %></td>
           </tr>
           <tr>
             <th>State</th>
             <td>
               <div style="overflow:auto;max-width:800px;max-height:600px;">
                 <pre>
-<%= @processed_item.pretty_state %>
+<%= @work_item.pretty_state %>
                </pre>
               </div>
             </td>
