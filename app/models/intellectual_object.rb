@@ -3,8 +3,7 @@ class IntellectualObject < ActiveRecord::Base
 
   belongs_to :institution
   has_many :generic_files
-  has_many :premis_events, through: :intellectual_objects
-  has_many :premis_events, through: :generic_files
+  has_many :premis_events
   has_many :checksums, through: :generic_files
   accepts_nested_attributes_for :generic_files
 
