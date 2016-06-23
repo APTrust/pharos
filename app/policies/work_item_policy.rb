@@ -65,6 +65,10 @@ class WorkItemPolicy < ApplicationPolicy
     record.first.nil? || user.admin?
   end
 
+  def delete_test_items?
+    user.admin?
+  end
+
   class Scope
     attr_reader :user, :scope
 

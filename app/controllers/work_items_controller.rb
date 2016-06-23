@@ -24,6 +24,8 @@ class WorkItemsController < ApplicationController
           set_restoration_status
         when 'ingested_since'
           ingested_since
+        when 'delete_test'
+          delete_test_items
         when 'restore'
           items_for_something(params[:alt_action])
         when 'delete'
@@ -89,7 +91,10 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  private
+
   def delete_test_items
+    authorize WorkItem.new, :delete_test_items?
     respond_to do |format|
       if Rails.env.production?
         format.json { render json: {"error" => "This call is forbidden in production!"}, status: :forbidden }
@@ -98,8 +103,6 @@ class WorkItemsController < ApplicationController
       format.json { render nothing: true, status: :ok }
     end
   end
-
-  private
 
   def show_reviewed
     authorize @items

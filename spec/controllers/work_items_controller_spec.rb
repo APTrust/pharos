@@ -402,7 +402,7 @@ RSpec.describe WorkItemsController, type: :controller do
     end
 
     it 'should return only items with the specified object_identifier' do
-      post :delete_test_items, format: :json
+      post :index, alt_action: 'delete_test', format: :json
       expect(WorkItem.where(institution: 'test.edu').count).to eq 0
     end
   end

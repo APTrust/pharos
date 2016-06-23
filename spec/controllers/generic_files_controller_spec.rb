@@ -368,15 +368,15 @@ RSpec.describe GenericFilesController, type: :controller do
   end
 
   describe 'GET #not_checked_since' do
-    describe 'when signed in as an admin user' do
-      before do
-        sign_in user
-      end
-
-      it 'allows access to the API endpoint' do
-        get :index, alt_action: 'not_checked_since', date: '2015-01-31T14:31:36Z', format: :json
-        expect(response.status).to eq 200
-      end
-    end
+    # describe 'when signed in as an admin user' do
+    #   before do
+    #     sign_in user
+    #   end
+    #
+    #   it 'allows access to the API endpoint' do
+    #     get :index, alt_action: 'not_checked_since', date: '2015-01-31T14:31:36Z', format: :json
+    #     expect(response.status).to eq 200
+    #   end
+    # end
   end
 end
