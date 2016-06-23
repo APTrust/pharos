@@ -202,8 +202,12 @@ class GenericFilesController < ApplicationController
 
   def filter_parameters
     params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
-                                                                   :modified, :file_format,
-                                                                   checksums_attributes: [:digest, :algorithm, :datetime])
+                                                                    :modified, :file_format, checksums_attributes:
+                                                                   [:digest, :algorithm, :datetime], premis_events_attributes:
+                                                                   [:identifier, :event_type, :date_time, :outcome,
+                                                                    :outcome_detail, :outcome_information, :detail, :object,
+                                                                    :agent, :intellectual_object_id, :generic_file_id,
+                                                                    :institution_id, :created_at, :updated_at])
     unless params[:generic_files].nil? || params[:generic_files] == []
       params[:generic_files] &&= params.require(:generic_files).each do |file|
         file.permit(:uri, :content_uri, :identifier, :size, :created, :modified, :file_format,

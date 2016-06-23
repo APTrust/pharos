@@ -196,13 +196,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         sign_in user
       }
 
-      #Not going to use this. Check in later
-      # it 'should update the search counter' do
-      #   patch :update, identifier: obj1, counter: '5'
-      #   expect(response).to redirect_to intellectual_object_path(obj1)
-      #   expect(session[:search][:counter]).to eq '5'
-      # end
-
       it 'should update fields' do
         patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}
         expect(response).to redirect_to intellectual_object_path(obj1)
@@ -216,7 +209,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should update fields when called with identifier (API)' do
-        patch :update, esc_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
+        put :update, esc_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
     end
@@ -431,12 +424,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should show errors' do
         post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: :json
         expect(response.code).to eq '422' #Unprocessable Entity
-        expect(JSON.parse(response.body)).to eq({'identifier' => ["can't be blank"],'access' => ["can't be blank"],'bag_name' => ["can't be blank"]})
+        expect(JSON.parse(response.body)).to eq({'identifier' => ["can't be blank"],'access' => ["can't be blank"]})
       end
 
       it 'should update fields' do
         post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/124', access: 'restricted', bag_name: '124'}, format: :json
-        expect(response.code).to eq '201'
+        expect(response.code).to eq '200'
+        expect(assigns(:institution).intellectual_objects.map &:id).to match_array [assigns(:intellectual_object).id]
         expect(assigns(:intellectual_object).title).to eq 'Foo'
         expect(assigns(:intellectual_object).identifier).to eq 'test.edu/124'
         expect(assigns(:intellectual_object).bag_name).to eq '124'
@@ -444,8 +438,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should use the institution parameter in the URL, not from the json' do
         expect {
-          post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', institution_id: user.institution_id, identifier: 'test.edu/123', access: 'restricted'}, format: :json
-          expect(response.code).to eq '201'
+          post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/123', access: 'restricted'}, format: :json
+          expect(response.code).to eq '200'
+          expect(assigns(:institution).intellectual_objects.map &:id).to match_array [assigns(:intellectual_object).id]
           expect(assigns(:intellectual_object).title).to eq 'Foo'
           expect(assigns(:intellectual_object).institution_id).to eq user.institution_id
         }.to change(IntellectualObject, :count).by(1)
@@ -460,7 +455,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should create all nested items when include relations flag is true' do
         expect {
           post :create, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: :json
-          expect(response.code).to eq '201'
+          expect(response.code).to eq '200'
+          expect(assigns(:institution).intellectual_objects.map &:id).to match_array [assigns(:intellectual_object).id]
           expect(assigns(:intellectual_object).title).to eq 'Test Title'
           expect(assigns(:intellectual_object).bag_name).to eq 'ncsu.1840.16-388'
         }.to change(IntellectualObject, :count).by(1)

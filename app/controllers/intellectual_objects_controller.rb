@@ -36,11 +36,24 @@ class IntellectualObjectsController < ApplicationController
   def create
     authorize @institution, :create_through_institution?
     @intellectual_object = @institution.intellectual_objects.new(intellectual_object_params)
-    create!
-    respond_to do |format|
-      format.json { render object_as_json }
-      format.html { }
+    if @intellectual_object.save
+      respond_to do |format|
+        format.json { render object_as_json, status: :created }
+        format.html {
+          render status: :created
+          super
+        }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: @intellectual_object.errors, status: :unprocessable_entity }
+        format.html {
+          render status: :unprocessable_entity
+          super
+        }
+      end
     end
+
   end
 
   def show
@@ -65,10 +78,10 @@ class IntellectualObjectsController < ApplicationController
 
   def update
     authorize @intellectual_object
-    update!
+    @intellectual_object.update!(intellectual_object_params)
     respond_to do |format|
       format.json { render object_as_json}
-      format.html { }
+      format.html { render intellectual_object_path(@intellectual_object) }
     end
   end
 
@@ -331,7 +344,13 @@ class IntellectualObjectsController < ApplicationController
   def intellectual_object_params
     params[:intellectual_object] = params[:intellectual_object].first if params[:intellectual_object].kind_of?(Array)
     params.require(:intellectual_object).permit(:id, :institution_id, :title, :description, :access, :identifier,
-                                                :bag_name, :alt_identifier, :state)
+                                                :bag_name, :alt_identifier, :state, generic_files_attributes:
+                                                [:uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
+                                                 checksums_attributes: [:digest, :algorithm, :datetime]],
+                                                 premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
+                                                 :outcome_detail, :outcome_information, :detail, :object, :agent,
+                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at,
+                                                 :updated_at])
   end
 
   def load_object

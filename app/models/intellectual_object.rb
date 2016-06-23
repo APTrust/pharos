@@ -8,7 +8,6 @@ class IntellectualObject < ActiveRecord::Base
   accepts_nested_attributes_for :generic_files
 
   validates :title, presence: true
-  validates :bag_name, presence: true
   validates :institution, presence: true
   validates :identifier, presence: true
   validates :access, presence: true
@@ -188,10 +187,8 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def set_bag_name
-    #puts "Identifier: #{self.identifier}"
     return if self.identifier.nil?
     if self.bag_name.nil? || self.bag_name == ''
-      puts 'inside bag_name set'
       pieces = self.identifier.split('/')
       i = 1
       while i < pieces.count do

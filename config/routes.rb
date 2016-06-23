@@ -16,8 +16,8 @@ Rails.application.routes.draw do
     resources :generic_files, only: [:index, :create], path: 'api/v1/files', param: :identifier, identifier: /[^\/]*/
   end
   resources :intellectual_objects, format: :json, param: :identifier, identifier:  object_identifier_ptrn, path: 'member-api/v1/objects', only: [:index]
-  get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: 'json', esc_identifier: /[^\/]*/, as: :object_by_identifier
-  put  '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#update', identifier: /[^\/]*/, as: :object_update_by_identifier, defaults: {format: 'json'}
+  get '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#show', format: :json, esc_identifier: /[^\/]*/
+  put '/api/v1/objects/:esc_identifier', to: 'intellectual_objects#update', format: :json, esc_identifier: /[^\/]*/
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/
