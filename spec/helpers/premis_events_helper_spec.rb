@@ -12,7 +12,8 @@ describe PremisEventsHelper do
   describe '#generic_file_link' do
     it 'returns a link for the GenericFile' do
       event.generic_file = file
-      expected_result =  "<a href=\"/files/#{file.identifier}\">#{file.identifier}</a>"
+      esc = file.identifier.gsub('/', '%2F')
+      expected_result =  "<a href=\"/files/#{esc}\">#{file.identifier}</a>"
       helper.generic_file_link(event).should == expected_result
     end
   end
@@ -20,7 +21,8 @@ describe PremisEventsHelper do
   describe '#intellectual_object_link' do
     it 'returns a link for the IntellectualObject' do
       event.intellectual_object = object
-      expected_result =  "<a href=\"/objects/#{object.identifier}\">#{object.identifier}</a>"
+      esc = object.identifier.gsub('/', '%2F')
+      expected_result =  "<a href=\"/objects/#{esc}\">#{object.identifier}</a>"
       helper.intellectual_object_link(event).should == expected_result
     end
   end

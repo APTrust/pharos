@@ -11,8 +11,7 @@ module PremisEventsHelper
     id  = event.intellectual_object_id
     identifier = IntellectualObject.find(event.intellectual_object_id).identifier
     link_name = identifier ? identifier : id
-    puts "path check: #{intellectual_objects_path(identifier)}"
-    link_to.html_safe link_name, intellectual_object_path(identifier)
+    link_to link_name, intellectual_object_path(identifier)
   end
 
   def parent_object_link(event)

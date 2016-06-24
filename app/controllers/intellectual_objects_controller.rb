@@ -222,7 +222,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def filter_results_by_standard_params
-    params[:identifier].present? ?
+    params[:institution_identifier].present? ?
         @intellectual_objects = @institution.intellectual_objects :
         @intellectual_objects = IntellectualObject.all
     case params[:search_field]
@@ -242,9 +242,9 @@ class IntellectualObjectsController < ApplicationController
   def narrow_results_to_specific_institution
     if current_user.admin?
       if params[:institution].present? then
-        @search_institution = Institution.where(identifier: params[:institution])
+        @search_institution = Institution.where(identifier: params[:institution_institution]).first
         @intellectual_objects = @search_institution.intellectual_objects
-      elsif params[:identifier].present?
+      elsif params[:institution_identifier].present?
         @search_institution = @institution
         @intellectual_objects = @search_institution.intellectual_objects
       else
@@ -354,13 +354,11 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def load_object
-    if params[:identifier]
-      @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
-    elsif params[:esc_identifier]
-      identifier = params[:esc_identifier].gsub(/%2F/i, '/')
-      @intellectual_object ||= IntellectualObject.where(identifier: identifier).first
+    if params[:intellectual_object_identifier]
+      identifier = params[:intellectual_object_identifier].gsub(/%2F/i, '/')
+      @intellectual_object = IntellectualObject.where(identifier: identifier).first
       if @intellectual_object.nil?
-        msg = "IntellectualObject '#{params[:esc_identifier]}' not found"
+        msg = "IntellectualObject '#{params[:intellectual_object_identifier]}' not found"
         raise ActionController::RoutingError.new(msg)
       end
     else
@@ -373,7 +371,7 @@ class IntellectualObjectsController < ApplicationController
     if params[:institution_id]
       @institution ||= Institution.find(params[:institution_id])
     else
-      @institution = params[:identifier].nil? ? current_user.institution : Institution.where(identifier: params[:identifier]).first
+      @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(identifier: params[:institution_identifier]).first
     end
   end
 
@@ -413,7 +411,7 @@ class IntellectualObjectsController < ApplicationController
     str = str << "&name_exact=#{params[:name_exact]}" if params[:name_exact].present?
     str = str << "&name_contains=#{params[:name_contains]}" if params[:name_contains].present?
     str = str << "&institution=#{params[:institution]}" if params[:institution].present?
-    str = str << "&institution=#{params[:identifier]}" if params[:identifier].present?
+    str = str << "&institution=#{params[:institution_identifier]}" if params[:institution_identifier].present?
     str = str << "&state=#{params[:state]}" if params[:state].present?
     str = str << "&search_field=#{params[:search_field]}" if params[:search_field].present?
     str = str << "&q=#{params[:q]}" if params[:q].present?

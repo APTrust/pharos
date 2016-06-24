@@ -14,7 +14,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        get :index, identifier: 'apt.edu'
+        get :index, institution_identifier: 'apt.edu'
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -32,34 +32,34 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :institutional_user) }
         describe 'and viewing my institution' do
           it 'should show the results that I have access to that belong to the institution' do
-            get :index, identifier: user.institution_identifier
+            get :index, institution_identifier: user.institution_identifier
             expect(response).to be_successful
             expect(assigns(:intellectual_objects).size).to eq 3
             expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
           end
 
           it 'should match a partial search on title' do
-            get :index, identifier: user.institution_identifier, q: 'Rugby', search_field: 'title'
+            get :index, institution_identifier: user.institution_identifier, q: 'Rugby', search_field: 'title'
             expect(response).to be_successful
             expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id]
           end
           it 'should match a partial search on description' do
-            get :index, identifier: user.institution_identifier, q: 'Guangzhou', search_field: 'description'
+            get :index, institution_identifier: user.institution_identifier, q: 'Guangzhou', search_field: 'description'
             expect(response).to be_successful
             expect(assigns(:intellectual_objects).map &:id).to match_array [obj4.id]
           end
           it 'should match an exact search on identifier' do
-            get :index, identifier: user.institution_identifier, q: obj4.identifier, search_field: 'identifier'
+            get :index, institution_identifier: user.institution_identifier, q: obj4.identifier, search_field: 'identifier'
             expect(response).to be_successful
             expect(assigns(:intellectual_objects).map &:id).to match_array [obj4.id]
           end
           it 'should match an exact search on bag name' do
-            get :index, identifier: user.institution_identifier, q: '12345-abcde', search_field: 'bag_name'
+            get :index, institution_identifier: user.institution_identifier, q: '12345-abcde', search_field: 'bag_name'
             expect(response).to be_successful
             expect(assigns(:intellectual_objects).map &:id).to match_array [obj6.id]
           end
           it 'should match an exact search on alternate identifiers' do
-            get :index, identifier: user.institution_identifier, q: 'test.edu/some-bag', search_field: 'alt_identifier'
+            get :index, institution_identifier: user.institution_identifier, q: 'test.edu/some-bag', search_field: 'alt_identifier'
             expect(response).to be_successful
             expect(assigns(:intellectual_objects).map &:id).to match_array [obj6.id]
           end
@@ -67,7 +67,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
         describe 'and viewing another institution' do
           it 'should redirect' do
-            get :index, identifier: another_institution.identifier
+            get :index, institution_identifier: another_institution.identifier
             expect(response).to redirect_to root_url
             expect(flash[:alert]).to eq 'You are not authorized to access this page.'
           end
@@ -78,7 +78,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :admin) }
         describe 'and viewing another institution' do
           it 'should show the results that I have access to that belong to the institution' do
-            get :index, identifier: another_institution.identifier
+            get :index, institution_identifier: another_institution.identifier
             expect(response).to be_successful
             expect(assigns(:intellectual_objects).size).to eq 3
             expect(assigns(:intellectual_objects).map &:id).to match_array [obj1.id, obj3.id, obj5.id]
@@ -94,7 +94,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        get :show, identifier: obj1
+        get :show, intellectual_object_identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -104,13 +104,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in user }
 
       it 'should show the object' do
-        get :show, identifier: obj1
+        get :show, intellectual_object_identifier: obj1
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
       end
 
       it 'should show the object by identifier for API users' do
-        get :show, esc_identifier: CGI.escape(obj1.identifier)
+        get :show, intellectual_object_identifier: CGI.escape(obj1.identifier)
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
       end
@@ -118,7 +118,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should include only active generic files for API users' do
         FactoryGirl.create(:generic_file, intellectual_object: obj1, identifier: 'one', state: 'A')
         FactoryGirl.create(:generic_file, intellectual_object: obj1, identifier: 'two', state: 'D')
-        get(:show, esc_identifier: CGI.escape(obj1.identifier),
+        get(:show, intellectual_object_identifier: CGI.escape(obj1.identifier),
             include_relations: true, format: :json)
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
@@ -137,7 +137,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when not signed in' do
       let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
       it 'should redirect to login' do
-        get :edit, identifier: obj1
+        get :edit, intellectual_object_identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -148,7 +148,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :institutional_user) }
         before { sign_in user }
         it 'should be unauthorized' do
-          get :edit, identifier: obj1
+          get :edit, intellectual_object_identifier: obj1
           expect(response).to redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -158,7 +158,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :institutional_admin) }
         before { sign_in user }
         it 'should be unauthorized' do
-          get :edit, identifier: obj1
+          get :edit, intellectual_object_identifier: obj1
           expect(response).to redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -168,7 +168,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryGirl.create(:user, :admin) }
         before { sign_in user }
         it 'should not show the object' do
-          get :edit, identifier: obj1
+          get :edit, intellectual_object_identifier: obj1
           expect(response).to redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -183,7 +183,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when not signed in' do
       let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
       it 'should redirect to login' do
-        patch :update, identifier: obj1, intellectual_object: {title: 'Foo' }
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo' }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -197,19 +197,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       }
 
       it 'should update fields' do
-        patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
         expect(response).to redirect_to intellectual_object_path(obj1)
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
 
       it 'should update via json' do
-        patch :update, identifier: obj1, intellectual_object: {title: 'Foo'}, format: :json
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}, format: :json
         expect(response).to be_successful
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
 
       it 'should update fields when called with identifier (API)' do
-        put :update, esc_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
+        put :update, intellectual_object_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
         expect(assigns(:intellectual_object).title).to eq 'Foo'
       end
     end
@@ -221,7 +221,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should restrict API usage' do
-        patch :update, esc_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
+        patch :update, intellectual_object_identifier: CGI.escape(obj1.identifier), intellectual_object: {title: 'Foo'}
         expect(response.status).to eq 302
       end
     end
@@ -406,7 +406,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        post :create, identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo' }
+        post :create, institution_identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo' }
         expect(response).to redirect_to root_url + 'users/sign_in'
         expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
@@ -416,19 +416,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in user }
 
       it 'should only allow assigning institutions you have access to' do
-        post :create, identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo'}, format: :json
+        post :create, institution_identifier: FactoryGirl.create(:institution).identifier, intellectual_object: {title: 'Foo'}, format: :json
         expect(response.code).to eq '403' # forbidden
         expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
       end
 
       it 'should show errors' do
-        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: :json
+        post :create, intellectual_object_identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: :json
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq({'identifier' => ["can't be blank"],'access' => ["can't be blank"]})
       end
 
       it 'should update fields' do
-        post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/124', access: 'restricted', bag_name: '124'}, format: :json
+        post :create, institution_identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/124', access: 'restricted', bag_name: '124'}, format: :json
         expect(response.code).to eq '200'
         expect(assigns(:institution).intellectual_objects.map &:id).to match_array [assigns(:intellectual_object).id]
         expect(assigns(:intellectual_object).title).to eq 'Foo'
@@ -438,7 +438,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should use the institution parameter in the URL, not from the json' do
         expect {
-          post :create, identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/123', access: 'restricted'}, format: :json
+          post :create, institution_identifier: user.institution_identifier, intellectual_object: {title: 'Foo', identifier: 'test.edu/123', access: 'restricted'}, format: :json
           expect(response.code).to eq '200'
           expect(assigns(:institution).intellectual_objects.map &:id).to match_array [assigns(:intellectual_object).id]
           expect(assigns(:intellectual_object).title).to eq 'Foo'
@@ -454,7 +454,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should create all nested items when include relations flag is true' do
         expect {
-          post :create, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: :json
+          post :create, institution_identifier: any_institution.identifier, include_nested: 'true', intellectual_object: [sample_object], format: :json
           expect(response.code).to eq '200'
           expect(assigns(:institution).intellectual_objects.map &:id).to match_array [assigns(:intellectual_object).id]
           expect(assigns(:intellectual_object).title).to eq 'Test Title'
@@ -475,7 +475,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         # events.
         obj[:generic_files][1][:file_format] = ''
         expect {
-          post :create, identifier: any_institution.identifier, include_nested: 'true', intellectual_object: obj, format: :json
+          post :create, institution_identifier: any_institution.identifier, include_nested: 'true', intellectual_object: obj, format: :json
           expect(response.code).to eq '422'
         }.to change(IntellectualObject, :count).by(0)
       end
@@ -487,7 +487,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
       after { obj1.destroy }
       it 'should redirect to login' do
-        delete :destroy, identifier: obj1
+        delete :destroy, intellectual_object_identifier: obj1
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -500,14 +500,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'should update via json' do
         pi = FactoryGirl.create(:ingested_item, object_identifier: obj1.identifier)
-        delete :destroy, identifier: obj1, format: :json
+        delete :destroy, intellectual_object_identifier: obj1, format: :json
         expect(response.code).to eq '204'
         expect(assigns(:intellectual_object).state).to eq 'D'
       end
 
       it 'should update via html' do
         pi = FactoryGirl.create(:ingested_item, object_identifier: obj1.identifier)
-        delete :destroy, identifier: obj1
+        delete :destroy, intellectual_object_identifier: obj1
         expect(response).to redirect_to root_path
         expect(flash[:notice]).to eq "Delete job has been queued for object: #{obj1.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
         expect(assigns(:intellectual_object).state).to eq 'D'
@@ -521,7 +521,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       after { obj1.destroy }
 
       it 'should redirect to login' do
-        get :index, q: obj1, alt_action: 'restore', identifier: obj1.institution.identifier
+        get :index, q: obj1, alt_action: 'restore', institution_identifier: obj1.institution.identifier
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
 
@@ -546,7 +546,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark only the latest work item for restore' do
-        get :index, q: obj1, alt_action: 'restore', identifier: obj1.institution.identifier
+        get :index, q: obj1, alt_action: 'restore', institution_identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -573,7 +573,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item for restore' do
-        get :index, q: obj1, alt_action: 'restore', identifier: obj1.institution.identifier
+        get :index, q: obj1, alt_action: 'restore', institution_identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -590,7 +590,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       after { obj1.destroy }
 
       it 'should redirect to login' do
-        get :index, q: obj1, alt_action: 'dpn', identifier: obj1.institution.identifier
+        get :index, q: obj1, alt_action: 'dpn', institution_identifier: obj1.institution.identifier
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
 
@@ -612,7 +612,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item as sent to dpn' do
-        get :index, q: obj1, alt_action: 'dpn', identifier: obj1.institution.identifier
+        get :index, q: obj1, alt_action: 'dpn', institution_identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -639,7 +639,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should mark the work item as sent to dpn' do
-        get :index, q: obj1, alt_action: 'dpn', identifier: obj1.institution.identifier
+        get :index, q: obj1, alt_action: 'dpn', institution_identifier: obj1.institution.identifier
         expect(response).to redirect_to obj1
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],

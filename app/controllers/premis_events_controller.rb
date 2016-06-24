@@ -4,13 +4,14 @@ class PremisEventsController < ApplicationController
   after_action :verify_authorized, only: [:index, :create]
 
   def index
-    if (params[:identifier]=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/)
+    identifier = params[:identifier].gsub(/%2F/i, '/')
+    if (identifier=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/)
       @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
       obj = @intellectual_object
-    elsif (params[:identifier]=~/(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/)
+    elsif (identifier=~/(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/)
       @generic_file = GenericFile.where(identifier: params[:identifier]).first
       obj = @generic_file
-    elsif (params[:identifier]=~/(\w+\.)*\w+(\.edu|\.com|\.org)/)
+    elsif (identifier=~/(\w+\.)*\w+(\.edu|\.com|\.org)/)
       @institution = Institution.where(identifier: params[:identifier]).first
       obj = @institution
     end
@@ -46,18 +47,21 @@ class PremisEventsController < ApplicationController
   protected
 
   def load_intellectual_object
-    @parent_object = IntellectualObject.where(identifier: params[:identifier]).first
+    identifier = params[:identifier].gsub(/%2F/i, '/')
+    @parent_object = IntellectualObject.where(identifier: identifier).first
     params[:intellectual_object_id] = @parent_object.id
   end
 
   def load_generic_file
-    @parent_object = GenericFile.where(identifier: params[:identifier]).first
+    identifier = params[:identifier].gsub(/%2F/i, '/')
+    @parent_object = GenericFile.where(identifier: identifier).first
     params[:generic_file_id] = @parent_object.id
   end
 
   def load_and_authorize_parent_object
     if @parent_object.nil?
-      (params[:identifier]=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/) ? load_intellectual_object : load_generic_file
+      identifier = params[:identifier].gsub(/%2F/i, '/')
+      (identifier=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/) ? load_intellectual_object : load_generic_file
     end
     authorize @parent_object, :add_event?
   end
