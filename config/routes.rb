@@ -6,21 +6,25 @@ Rails.application.routes.draw do
   resources :institutions, only: [:index], format: :json, param: :institution_identifier, path: 'api/v1/institutions'
 
   # INTELLECTUAL OBJECT ROUTES
-  object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\/\w\-\.]+/
+  object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+/
   resources :intellectual_objects, only: [:show, :edit, :update, :destroy], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'objects'
-  resources :intellectual_objects, only: [:index, :create], param: :institution_identifier, institution_identifier: institution_ptrn, format: [:json, :html], path: 'objects'
-  #resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v1/objects'
-  #resources :intellectual_objects, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'member-api/v1/objects'
+  get 'objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
+  post 'objects/:institution_identifier', to: 'intellectual_objects#create', format: [:json, :html], institution_identifier: institution_ptrn
+  resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v1/objects'
+  resources :intellectual_objects, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'member-api/v1/objects'
 
   # GENERIC FILE ROUTES
-  file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)[\/\%\w\-\.]+/
-  resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'files'
+  file_ptrn = /[\w+\-\.]*\w+%2[fF][\w\-\.]+%2[fF].*/
+  file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
-  resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v1/files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, path: 'api/v1/files'
+  get 'files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn
+  post 'files/:intellectual_object_identifier', to: 'generic_files#create', format: [:json, :html], intellectual_object_identifier: object_ptrn
+  resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v1/files'
 
   # PREMIS EVENT ROUTES
-  resources :premis_events, only: [:index, :create], format: [:json, :html], param: :identifier, path: 'events'
+  get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[^\/]*/
+  post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[^\/]*/
   resources :premis_events, only: [:create], format: :json, param: :identifier, path: 'api/v1/events'
 
   # WORK ITEM ROUTES
