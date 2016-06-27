@@ -422,7 +422,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should show errors' do
-        post :create, intellectual_object_identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: :json
+        post :create, institution_identifier: user.institution_identifier, intellectual_object: {title: 'Foo'}, format: :json
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq({'identifier' => ["can't be blank"],'access' => ["can't be blank"]})
       end

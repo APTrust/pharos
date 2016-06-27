@@ -23,8 +23,8 @@ Rails.application.routes.draw do
   resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v1/files'
 
   # PREMIS EVENT ROUTES
-  get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[^\/]*/
-  post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[^\/]*/
+  get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
+  post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
   resources :premis_events, only: [:create], format: :json, param: :identifier, path: 'api/v1/events'
 
   # WORK ITEM ROUTES
