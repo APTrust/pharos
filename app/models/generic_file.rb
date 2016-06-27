@@ -5,9 +5,10 @@ class GenericFile < ActiveRecord::Base
   has_many :premis_events
   has_many :checksums
   accepts_nested_attributes_for :checksums
+  accepts_nested_attributes_for :premis_events
 
   validates :uri, presence: true
-  validates :intellectual_object, presence: true
+  #validates :intellectual_object, presence: true
   validates :size, presence: true
   validates :created, presence: true
   validates :modified, presence: true

@@ -239,9 +239,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           identifier: 'ncsu.edu/ncsu.1840.16-388',
           alt_identifier: [],
           bag_name: '',
-          premis_events: [
+          premis_events_attributes: [
               { identifier: '6b0f1c45-99e3-4636-4e46-d9498573d029',
-                type: 'ingest',
+                event_type: 'ingest',
                 date_time: '2014-07-14T15:11:01-04:00',
                 detail: 'Copied all files to perservation bucket',
                 outcome: 'Success',
@@ -251,7 +251,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                 outcome_information: 'Multipart put using md5 checksum'
               },
               { identifier: '6b0f1c45-99e3-4636-4e46-d9498573d029',
-                type: 'identifier_assignment',
+                event_type: 'identifier_assignment',
                 date_time: '2014-07-14T15:11:02-04:00',
                 detail: 'Assigned bag identifier',
                 outcome: 'Success',
@@ -261,14 +261,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                 outcome_information: 'Institution domain + tar file name'
               }
           ],
-          generic_files: [
+          generic_files_attributes: [
               { uri: 'https://s3.amazonaws.com/aptrust.test.preservation/47e00844-a53a-46de-5d93-d8ecff0e0e4b',
                 size: 4853,
                 created: '2014-04-25T14:06:39-04:00',
                 modified: '2014-04-25T14:06:39-04:00',
                 file_format: 'application/xml',
                 identifier: 'ncsu.edu/ncsu.1840.16-388/data/metadata.xml',
-                checksum: [
+                checksums_attributes: [
                     { algorithm: 'md5',
                       digest: '1202ef3562a201060bbdb5a7c6d37d91',
                       datetime: '2014-04-25T14:06:39-04:00'
@@ -278,9 +278,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       datetime: '2014-07-14T19:10:58Z'
                     }
                 ],
-                premis_events: [
+                premis_events_attributes: [
                     { identifier: '155fb018-5ba0-440c-62a0-fc5dfe30dfd3',
-                      type: 'fixity_check',
+                      event_type: 'fixity_check',
                       date_time: '2014-07-14T15:10:58-04:00',
                       detail: 'Fixity check against registered hash',
                       outcome: 'Success',
@@ -290,17 +290,17 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       outcome_information: 'Fixity matches'
                     },
                     { identifier: 'd656fd3b-5876-4e21-6449-44a3f6df3b81',
-                      type: 'ingest',
+                      event_type: 'ingest',
                       date_time: '2014-07-14T15:10:58-04:00',
                       detail: 'Completed copy to S3',
                       outcome: 'Success',
-                      outcome_detail: '',
+                      outcome_detail: 'something',
                       object: 'bagman + goamz s3 client',
                       agent: 'https://github.com/APTrust/bagman',
                       outcome_information: 'Put using md5 checksum'
                     },
                     { identifier: '1f5671c6-ca2e-4b98-4847-54407338e7f6',
-                      type: 'fixity_generation',
+                      event_type: 'fixity_generation',
                       date_time: '2014-07-14T19:10:58Z',
                       detail: 'Calculated new fixity value',
                       outcome: 'Success',
@@ -310,7 +310,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       outcome_information: ''
                     },
                     { identifier: '9f6f4e83-e796-4a19-49af-c8feaf9fd167',
-                      type: 'identifier_assignment',
+                      event_type: 'identifier_assignment',
                       date_time: '2014-07-14T19:10:58Z',
                       detail: 'Assigned new institution.bag/path identifier',
                       outcome: 'Success',
@@ -320,7 +320,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       outcome_information: ''
                     },
                     { identifier: '318a6e86-8b0a-4e73-5f54-9e3ccd98a5b3',
-                      type: 'identifier_assignment',
+                      event_type: 'identifier_assignment',
                       date_time: '2014-07-14T19:10:58Z',
                       detail: 'Assigned new storage URL identifier',
                       outcome: 'Success',
@@ -337,7 +337,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                 modified: '2014-04-25T14:06:39-04:00',
                 file_format: 'text/plain',
                 identifier: 'ncsu.edu/ncsu.1840.16-388/data/object.properties',
-                checksum: [
+                checksums_attributes: [
                     { algorithm: 'md5',
                       digest: '3ab392455183820d9f6a5c641ec1dea7',
                       datetime: '2014-04-25T14:06:39-04:00'
@@ -347,9 +347,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       datetime: '2014-07-14T19:10:58Z'
                     }
                 ],
-                premis_events: [
+                premis_events_attributes: [
                     { identifier: '74eb8c26-88ab-444f-4aab-d7f9c2cef550',
-                      type: 'fixity_check',
+                      event_type: 'fixity_check',
                       date_time: '2014-07-14T15:10:58-04:00',
                       detail: 'Fixity check against registered hash',
                       outcome: 'Success',
@@ -359,17 +359,17 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       outcome_information: 'Fixity matches'
                     },
                     { identifier: '8e04d3a0-097b-4600-60fb-56e16ebba46f',
-                      type: 'ingest',
+                      event_type: 'ingest',
                       date_time: '2014-07-14T15:10:58-04:00',
                       detail: 'Completed copy to S3',
                       outcome: 'Success',
-                      outcome_detail: '',
+                      outcome_detail: 'something',
                       object: 'bagman + goamz s3 client',
                       agent: 'https://github.com/APTrust/bagman',
                       outcome_information: 'Put using md5 checksum'
                     },
                     { identifier: 'ce53b4f9-9ada-4d72-695c-21cb118f5918',
-                      type: 'fixity_generation',
+                      event_type: 'fixity_generation',
                       date_time: '2014-07-14T19:10:58Z',
                       detail: 'Calculated new fixity value',
                       outcome: 'Success',
@@ -379,7 +379,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       outcome_information: ''
                     },
                     { identifier: '42f07e80-c025-40fe-6784-0c397be03556',
-                      type: 'identifier_assignment',
+                      event_type: 'identifier_assignment',
                       date_time: '2014-07-14T19:10:58Z',
                       detail: 'Assigned new institution.bag/path identifier',
                       outcome: 'Success',
@@ -389,7 +389,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                       outcome_information: ''
                     },
                     { identifier: 'a517c55a-f5b8-4313-7db2-13c65ed9baa0',
-                      type: 'identifier_assignment',
+                      event_type: 'identifier_assignment',
                       date_time: '2014-07-14T19:10:58Z',
                       detail: 'Assigned new storage URL identifier',
                       outcome: 'Success',
@@ -459,21 +459,23 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           expect(assigns(:institution).intellectual_objects.map &:id).to match_array [assigns(:intellectual_object).id]
           expect(assigns(:intellectual_object).title).to eq 'Test Title'
           expect(assigns(:intellectual_object).bag_name).to eq 'ncsu.1840.16-388'
+          expect(assigns(:intellectual_object).generic_files.count).to eq 2
+          expect(GenericFile.where(intellectual_object_id: assigns(:intellectual_object).id).count).to eq 2
         }.to change(IntellectualObject, :count).by(1)
       end
 
       it 'should roll back when nested items are invalid' do
         obj = sample_object()
         obj[:identifier] = 'ncsu.edu/ncsu.ahchoo'
-        obj[:premis_events].each { |pe| pe[:identifier] += '_1' }
-        obj[:generic_files].each { |gf|
+        obj[:premis_events_attributes].each { |pe| pe[:identifier] += '_1' }
+        obj[:generic_files_attributes].each { |gf|
           gf[:identifier] += '_1'
-          gf[:premis_events].each { |pe| pe[:identifier] += '_1' }
+          gf[:premis_events_attributes].each { |pe| pe[:identifier] += '_1' }
         }
         # Missing format is invalid. This will cause create_from_json
         # to fail after it's already built up some generic files and
         # events.
-        obj[:generic_files][1][:file_format] = ''
+        obj[:generic_files_attributes][1][:file_format] = ''
         expect {
           post :create, institution_identifier: any_institution.identifier, include_nested: 'true', intellectual_object: obj, format: :json
           expect(response.code).to eq '422'

@@ -5,7 +5,9 @@ class IntellectualObject < ActiveRecord::Base
   has_many :generic_files
   has_many :premis_events
   has_many :checksums, through: :generic_files
-  accepts_nested_attributes_for :generic_files
+  accepts_nested_attributes_for :generic_files, allow_destroy: true, reject_if: :invalid_file
+  accepts_nested_attributes_for :premis_events
+  accepts_nested_attributes_for :checksums
 
   validates :title, presence: true
   validates :institution, presence: true
@@ -20,6 +22,20 @@ class IntellectualObject < ActiveRecord::Base
 
   def to_param
     identifier
+  end
+
+  def invalid_file(attributes)
+    file_valid = true
+    file_valid = false if (attributes['uri'].nil? || attributes['uri'] == '')
+    file_valid = false if (attributes['size'].nil? || attributes['size'] == '')
+    file_valid = false if (attributes['created'].nil? || attributes['created'] == '')
+    file_valid = false if (attributes['modified'].nil? || attributes['modified'] == '')
+    file_valid = false if (attributes['file_format'].nil? || attributes['file_format'] == '')
+    file_valid = false if (attributes['identifier'].nil? || attributes['identifier'] == '')
+    checksums = has_right_number_of_checksums(attributes['checksums_attributes'])
+    file_valid = false if !checksums
+    file_valid = false if !unique_file_identifier(attributes)
+    !file_valid
   end
 
   def institution_identifier
@@ -186,17 +202,34 @@ class IntellectualObject < ActiveRecord::Base
     end
   end
 
-  def set_bag_name
-    return if self.identifier.nil?
-    if self.bag_name.nil? || self.bag_name == ''
-      pieces = self.identifier.split('/')
-      i = 1
-      while i < pieces.count do
-        (i == 1) ? name = pieces[1] : name = "#{name}/#{pieces[i]}"
-        i = i+1
+  def has_right_number_of_checksums(checksum_list)
+    checksums_okay = true
+    if(checksum_list.nil? || checksum_list.length == 0)
+      checksums_okay = false
+    else
+      algorithms = Array.new
+      checksum_list.each do |cs|
+        if (algorithms.include? cs)
+          checksums_okay = false
+        else
+          algorithms.push(cs)
+        end
       end
-      self.bag_name = name
     end
+    checksums_okay
+  end
+
+  def unique_file_identifier(identifier)
+    ident_check = true
+    ident_check = false if identifier.nil?
+    count = 0;
+    files = GenericFile.where(identifier: self.identifier)
+    count +=1 if files.count == 1 && files.first.id != self.id
+    count = files.count if files.count > 1
+    if(count > 0)
+      ident_check = false
+    end
+    ident_check
   end
 
   def check_for_associations
@@ -205,6 +238,19 @@ class IntellectualObject < ActiveRecord::Base
       errors[:base] << "Cannot delete #{self.id} because Generic Files are associated with it"
     end
     errors[:base].empty?
+  end
+
+  def set_bag_name
+    return if self.identifier.nil?
+    if (self.bag_name.nil? || self.bag_name == '')
+      pieces = self.identifier.split('/')
+      i = 1
+      while i < pieces.count do
+        (i == 1) ? name = pieces[1] : name = "#{name}/#{pieces[i]}"
+        i = i+1
+      end
+      self.bag_name = name
+    end
   end
 
 end

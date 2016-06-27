@@ -36,7 +36,7 @@ class IntellectualObjectsController < ApplicationController
   def create
     authorize @institution, :create_through_institution?
     @intellectual_object = @institution.intellectual_objects.new(intellectual_object_params)
-    if @intellectual_object.save
+    if check_whole_object
       respond_to do |format|
         format.json { render object_as_json, status: :created }
         format.html {
@@ -45,6 +45,7 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     else
+      rollback
       respond_to do |format|
         format.json { render json: @intellectual_object.errors, status: :unprocessable_entity }
         format.html {
@@ -115,66 +116,6 @@ class IntellectualObjectsController < ApplicationController
       flash[:alert] = "Your object cannot be deleted at this time due to a pending #{pending} request."
     end
   end
-
-  # def create_from_json
-  #   # new_object is the IntellectualObject we're creating.
-  #   # current_object is the item we're about to save at any
-  #   # given step of this operation. We use this in the rescue
-  #   # clause to let the caller know where the operation failed.
-  #   state = {
-  #       current_object: nil,
-  #       object_events: [],
-  #       object_files: [],
-  #   }
-  #   if params[:include_nested] == 'true'
-  #     begin
-  #       json_param = get_create_params
-  #       object = JSON.parse(json_param.to_json).first
-  #       # We might be re-ingesting a previously-deleted intellectual object,
-  #       # or more likely, creating a new intel obj. Load or create the object.
-  #       identifier = object['identifier'].gsub(/%2F/i, '/')
-  #       new_object = IntellectualObject.where(identifier: identifier).first ||
-  #           IntellectualObject.new()
-  #       new_object.state = 'A' # in case we just loaded a deleted object
-  #       # Set the object's attributes from the JSON data.,
-  #       # then authorize and save it.
-  #       object.each { |attr_name, attr_value|
-  #         set_obj_attr(new_object, state, attr_name, attr_value)
-  #       }
-  #       state[:current_object] = "IntellectualObject #{new_object.identifier}"
-  #       load_institution_for_create_from_json(new_object)
-  #       authorize @institution, :create_through_institution?
-  #       new_object.save!
-  #       # Save the ingest and other object-level events.
-  #       state[:object_events].each { |event|
-  #         state[:current_object] = "IntellectualObject Event #{event['event_type']} / #{event['identifier']}"
-  #         new_object.add_event(event)
-  #       }
-  #       # Save all the files and their events.
-  #       state[:object_files].each do |file|
-  #         create_generic_file(file, new_object, state)
-  #       end
-  #       # Save again, or we won't get our events back from Fedora!
-  #       new_object.save!
-  #       @intellectual_object = new_object
-  #       @institution = @intellectual_object.institution
-  #       respond_to { |format| format.json { render json: object_as_json, status: :created } }
-  #     rescue Exception => ex
-  #       log_exception(ex)
-  #       if !new_object.nil?
-  #         new_object.generic_files.each do |gf|
-  #           gf.destroy
-  #         end
-  #         new_object.destroy
-  #       end
-  #       respond_to { |format| format.json {
-  #         render json: { error: "#{ex.message} : #{state[:current_object]}" },
-  #                status: :unprocessable_entity
-  #       }
-  #       }
-  #     end
-  #   end
-  # end
 
   protected
 
@@ -278,37 +219,36 @@ class IntellectualObjectsController < ApplicationController
     @previous = format_previous(page, per_page)
   end
 
-  private
-
-  def create_generic_file(file, intel_obj, state)
-    # Create a new generic file object, or load the existing one.
-    # We may have an existing generic file if this intellectual
-    # object was previously deleted and is now being re-ingested.
-    gfid = file['identifier'].gsub(/%2F/i, '/')
-    new_file = GenericFile.where(identifier: gfid).first || GenericFile.new()
-    file_events, file_checksums = []
-    file.each { |file_attr_name, file_attr_value|
-      case file_attr_name
-        when 'premis_events'
-          file_events = file_attr_value
-        when 'checksum'
-          file_checksums = file_attr_value
-        else
-          new_file[file_attr_name.to_s] = file_attr_value.to_s
-      end }
-    file_checksums.each { |checksum| new_file.checksums.build(checksum) }
-    state[:current_object] = "GenericFile #{new_file.identifier}"
-    new_file.intellectual_object = intel_obj
-    new_file.state = 'A' # in case we loaded a deleted file
-    # We have to save this now to get events into Solr
-    new_file.save!
-    file_events.each { |event|
-      state[:current_object] = "GenericFile Event #{event['event_type']} / #{event['identifier']}"
-      new_file.add_event(event)
+  def nested_create
+    state = {
+        current_object: nil,
+        object_events: [],
+        object_files: [],
     }
-    # We have to save again to get events back from Fedora!
-    new_file.save!
+    begin
+      object_files = params[:intellectual_object][:generic_files_attributes]
+      new_object = IntellectualObject.create(params[:intellectual_object])
+      object_files.each do |gf|
+        new_object.generic_files.new(gf)
+      end
+      @intellectual_object = new_object
+      @institution = @intellectual_object.institution
+      respond_to { |format| format.json { render json: object_as_json, status: :created } }
+    rescue Exception => ex
+      log_exception(ex)
+      if !new_object.nil?
+        new_object.generic_files.each do |gf|
+          gf.destroy
+        end
+        new_object.destroy
+      end
+      respond_to { |format| format.json {
+        render json: { error: "#{ex.message} : #{state[:current_object]}" }, status: :unprocessable_entity }
+      }
+    end
   end
+
+  private
 
   def set_obj_attr(new_object, state, attr_name, attr_value)
     case attr_name
@@ -341,16 +281,38 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
+  def check_whole_object
+    return false if !@intellectual_object.save
+    unless @intellectual_object.generic_files.nil?
+      @intellectual_object.generic_files.each do |gf|
+        return false if !gf.save
+      end
+    end
+    unless params[:intellectual_object][:generic_files_attributes].nil?
+      params[:intellectual_object][:generic_files_attributes].each do |gf|
+        return false if @intellectual_object.generic_files.where(identifier: gf[:identifier]).count == 0
+      end
+    end
+    true
+  end
+
+  def rollback
+    @intellectual_object.generic_files.each { |gf| gf.delete }
+    @intellectual_object.delete
+  end
+
   def intellectual_object_params
     params[:intellectual_object] = params[:intellectual_object].first if params[:intellectual_object].kind_of?(Array)
     params.require(:intellectual_object).permit(:id, :institution_id, :title, :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :state, generic_files_attributes:
                                                 [:uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
-                                                 checksums_attributes: [:digest, :algorithm, :datetime]],
+                                                 checksums_attributes: [:digest, :algorithm, :datetime],
                                                  premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
                                                  :outcome_detail, :outcome_information, :detail, :object, :agent,
-                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at,
-                                                 :updated_at])
+                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at]],
+                                                 premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
+                                                 :outcome_detail, :outcome_information, :detail, :object, :agent,
+                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at])
   end
 
   def load_object
