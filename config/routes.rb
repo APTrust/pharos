@@ -14,7 +14,6 @@ Rails.application.routes.draw do
   resources :intellectual_objects, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'member-api/v1/objects'
 
   # GENERIC FILE ROUTES
-  file_ptrn = /[\w+\-\.]*\w+%2[fF][\w\-\.]+%2[fF].*/
   file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, path: 'api/v1/files'

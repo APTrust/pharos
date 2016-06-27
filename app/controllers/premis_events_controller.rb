@@ -5,10 +5,10 @@ class PremisEventsController < ApplicationController
 
   def index
     identifier = params[:identifier].gsub(/%2F/i, '/')
-    if (identifier=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/)
+    if (identifier=~/^(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+$/)
       @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
       obj = @intellectual_object
-    elsif (identifier=~/(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.\/]+/)
+    elsif (identifier=~/(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/)
       @generic_file = GenericFile.where(identifier: params[:identifier]).first
       obj = @generic_file
     elsif (identifier=~/(\w+\.)*\w+(\.edu|\.com|\.org)/)
@@ -61,7 +61,7 @@ class PremisEventsController < ApplicationController
   def load_and_authorize_parent_object
     if @parent_object.nil?
       identifier = params[:identifier].gsub(/%2F/i, '/')
-      (identifier=~/^(\w+\.)*\w+(\.edu|\.com|\.org)\/[\w\-\.]+$/) ? load_intellectual_object : load_generic_file
+      (identifier=~/^(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+$/) ? load_intellectual_object : load_generic_file
     end
     authorize @parent_object, :add_event?
   end
