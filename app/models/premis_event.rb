@@ -37,7 +37,8 @@ class PremisEvent < ActiveRecord::Base
         agent: agent,
         outcome_information: outcome_information,
         created_at: created_at,
-        updated_at: updated_at
+        updated_at: updated_at,
+        id: self.id
     }
     data.merge!(intellectual_object: intellectual_object_id) if self.intellectual_object !nil?
     data.merge!(generic_file: generic_file_id) if self.generic_file !nil?

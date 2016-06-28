@@ -1,8 +1,7 @@
 class GenericFilesController < ApplicationController
   before_filter :authenticate_user!
-  before_filter :filter_parameters, only: [:create, :update]
   before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:update, :create, :save_batch]
+  before_filter :load_intellectual_object, only: [:update, :create]
   after_action :verify_authorized, :except => [:index]
 
   def index
@@ -39,28 +38,25 @@ class GenericFilesController < ApplicationController
   def create
     authorize @intellectual_object, :create_through_intellectual_object?
     if params[:save_batch]
-      new_gf = nil
-      @generic_files = []
-      @generic_files = @intellectual_object.generic_files.create([params[:generic_files]])
-      @generic_files.update_all(state: 'A')
-      # begin
-      #   params[:generic_files].each do |file|
-      #     new_gf = @intellectual_object.generic_files.new(file)
-      #     @generic_files.push(new_gf)
-      #   end
-      #   respond_to { |format| format.json { render json: array_as_json(@generic_files), status: :created } }
-      # rescue Exception => ex
-      #   logger.error("save_batch failed on #{new_gf}")
-      #   log_exception(ex)
-      #   @generic_files.each do |gf|
-      #     gf.destroy
-      #   end
-      #   respond_to { |format| format.json {
-      #     render json: { error: "#{ex.message} : #{new_gf}" }, status: :unprocessable_entity }
-      #   }
-      # end
+      GenericFile.transaction do
+        batch_generic_file_params
+        @generic_files = []
+        params[:generic_files][:files].each do |gf|
+          file = @intellectual_object.generic_files.new(gf)
+          file.state = 'A'
+          @generic_files.push(file)
+        end
+        raise ActiveRecord::Rollback
+      end
+      respond_to do |format|
+        if @intellectual_object.save
+          format.json { render json: array_as_json(@generic_files), status: :created }
+        else
+          format.json { render status: :unprocessable_entity }
+        end
+      end
     else
-      @generic_file = @intellectual_object.generic_files.new(params[:generic_file])
+      @generic_file = @intellectual_object.generic_files.new(generic_file_params)
       @generic_file.state = 'A'
       respond_to do |format|
         if @generic_file.save
@@ -73,62 +69,37 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  def save_batch
-    generic_files = []
-    current_object = nil
-    authorize @intellectual_object, :create_through_intellectual_object?
-    begin
-      params[:generic_files].each do |gf|
-        current_object = "GenericFile #{gf[:identifier]}"
-        if gf[:checksum].blank?
-          raise "GenericFile #{gf[:identifier]} is missing checksums."
-        end
-        if gf[:premis_events].blank?
-          raise "GenericFile #{gf[:identifier]} is missing Premis Events."
-        end
-        gf_without_events = gf.except(:premis_events, :checksum)
-        # Change param name to make inherited resources happy.
-        gf_without_events[:checksum_attributes] = gf[:checksum]
-        # Load the existing generic file, or create a new one.
-        generic_file = (GenericFile.where(identifier: gf[:identifier]).first ||
-            @intellectual_object.generic_files.new(gf_without_events))
-        generic_file.state = 'A'
-        generic_file.intellectual_object = @intellectual_object if generic_file.intellectual_object.nil?
-        if generic_file.id.present?
-          # This is an update
-          gf_clean_data = remove_existing_checksums(generic_file, gf_without_events)
-          generic_file.update(gf_clean_data)
-        else
-          # New GenericFile
-          generic_file.save!
-        end
-        generic_files.push(generic_file)
-        gf[:premis_events].each do |event|
-          current_object = "Event #{event[':type']} id #{event[:identifier]} for #{gf[:identifier]}"
-          generic_file.add_event(event)
-        end
-      end
-      respond_to { |format| format.json { render json: array_as_json(generic_files), status: :created } }
-    rescue Exception => ex
-      logger.error("save_batch failed on #{current_object}")
-      log_exception(ex)
-      @generic_files.each do |gf|
-        gf.destroy
-      end
-      respond_to { |format| format.json {
-        render json: { error: "#{ex.message} : #{current_object}" }, status: :unprocessable_entity }
-      }
-    end
-  end
-
   def update
-    authorize @generic_file
-    @generic_file.state = 'A'
-    if resource.update(params_for_update)
-      head :no_content
+    if params[:save_batch]
+      authorize @intellectual_object, :create_through_intellectual_object?
+      batch_generic_file_params
+      GenericFile.transaction do
+        @generic_files = []
+        params[:generic_files][:files].each do |gf|
+          file = GenericFile.where(identifier: gf[:identifier]).first
+          file.update(gf)
+          @generic_files.push(file)
+        end
+        # files = params[:generic_files][:files]
+        # GenericFile.update(files.keys, files.values)
+        raise ActiveRecord::Rollback
+      end
+      respond_to do |format|
+        if @generic_files
+          format.json { render json: array_as_json(@generic_files), status: :created }
+        else
+          format.json { render status: :unprocessable_entity }
+        end
+      end
     else
-      log_model_error(resource)
-      render json: resource.errors, status: :unprocessable_entity
+      authorize @generic_file
+      @generic_file.state = 'A'
+      if resource.update(params_for_update)
+        head :no_content
+      else
+        log_model_error(resource)
+        render json: resource.errors, status: :unprocessable_entity
+      end
     end
   end
 
@@ -200,20 +171,24 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  def filter_parameters
-    params[:generic_file] &&= params.require(:generic_file).permit(:uri, :content_uri, :identifier, :size, :created,
-                                                                    :modified, :file_format, checksums_attributes:
-                                                                   [:digest, :algorithm, :datetime], premis_events_attributes:
-                                                                   [:identifier, :event_type, :date_time, :outcome,
-                                                                    :outcome_detail, :outcome_information, :detail, :object,
-                                                                    :agent, :intellectual_object_id, :generic_file_id,
-                                                                    :institution_id, :created_at, :updated_at])
-    unless params[:generic_files].nil? || params[:generic_files] == []
-      params[:generic_files] &&= params.require(:generic_files).each do |file|
-        file.permit(:uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
-                    checksums_attributes: [:digest, :algorithm, :datetime])
-      end
-    end
+  def generic_file_params
+    params[:generic_file] &&= params.require(:generic_file).permit(:id, :uri, :content_uri, :identifier, :size, :created,
+                                                                   :modified, :file_format, checksums_attributes:
+                                                                  [:digest, :algorithm, :datetime, :id], premis_events_attributes:
+                                                                  [:identifier, :event_type, :date_time, :outcome, :id,
+                                                                   :outcome_detail, :outcome_information, :detail, :object,
+                                                                   :agent, :intellectual_object_id, :generic_file_id,
+                                                                   :institution_id, :created_at, :updated_at])
+  end
+
+  def batch_generic_file_params
+    params[:generic_files] &&= params.require(:generic_files).permit(files: [:id, :uri, :content_uri, :identifier, :size, :created,
+                                                                   :modified, :file_format, checksums_attributes:
+                                                                  [:digest, :algorithm, :datetime, :id], premis_events_attributes:
+                                                                  [:identifier, :event_type, :date_time, :outcome, :id,
+                                                                   :outcome_detail, :outcome_information, :detail, :object,
+                                                                   :agent, :intellectual_object_id, :generic_file_id,
+                                                                   :institution_id, :created_at, :updated_at]])
   end
 
   def params_for_update
@@ -245,7 +220,7 @@ class GenericFilesController < ApplicationController
   end
 
   def array_as_json(list_of_generic_files)
-    list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksum, :premis_events]) }
+    list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
   end
 
   def remove_existing_checksums(generic_file, gf_params)

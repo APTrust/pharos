@@ -18,10 +18,10 @@
         "datetime": "2014-10-20T13:56:35Z"
       }
     ],
-    "premis_events": [
+    "premis_events_attributes": [
       {
         "identifier": "00000000-1111-1111-1111-00000000",
-        "type": "fixity_generation",
+        "event_type": "fixity_generation",
         "date_time": "2012-01-01",
         "detail": "generated checksum",
         "outcome": "Success",
@@ -32,7 +32,7 @@
       },
       {
         "identifier": "00000000-2222-2222-2222-00000000",
-        "type": "fixity_generation",
+        "event_type": "fixity_generation",
         "date_time": "2012-01-01",
         "detail": "generated checksum",
         "outcome": "Success",
@@ -62,10 +62,10 @@
         "datetime": "2014-10-20T13:56:35Z"
       }
     ],
-    "premis_events": [
+    "premis_events_attributes": [
       {
         "identifier": "00000000-3333-3333-3333-00000000",
-        "type": "fixity_generation",
+        "event_type": "fixity_generation",
         "date_time": "2012-01-01",
         "detail": "generated checksum",
         "outcome": "Success",
@@ -76,7 +76,7 @@
       },
       {
         "identifier": "00000000-4444-4444-4444-00000000",
-        "type": "fixity_generation",
+        "event_type": "fixity_generation",
         "date_time": "2012-01-01",
         "detail": "generated checksum",
         "outcome": "Success",

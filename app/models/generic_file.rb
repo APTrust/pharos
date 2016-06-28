@@ -4,8 +4,8 @@ class GenericFile < ActiveRecord::Base
   belongs_to :intellectual_object
   has_many :premis_events
   has_many :checksums
-  accepts_nested_attributes_for :checksums
-  accepts_nested_attributes_for :premis_events
+  accepts_nested_attributes_for :checksums, allow_destroy: true
+  accepts_nested_attributes_for :premis_events, allow_destroy: true
 
   validates :uri, presence: true
   #validates :intellectual_object, presence: true
@@ -109,6 +109,7 @@ class GenericFile < ActiveRecord::Base
           algorithm: cs.algorithm.first,
           digest: cs.digest.first,
           datetime: Time.parse(cs.datetime.to_s).iso8601,
+          id: cs.id
       }
     end
   end

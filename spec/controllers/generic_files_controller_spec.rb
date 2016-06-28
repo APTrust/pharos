@@ -116,7 +116,7 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when not signed in' do
       let(:obj1) { @intellectual_object }
       it 'should redirect to login' do
-        post :create, intellectual_object_identifier: obj1.identifier, intellectual_object: {title: 'Foo' }
+        post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'Foo' }
         expect(response).to redirect_to root_url + 'users/sign_in'
         expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
@@ -137,7 +137,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'should show errors' do
-        post :create, intellectual_object_identifier: obj1.identifier, generic_file: {foo: 'bar'}, format: 'json'
+        post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'bar'}, format: 'json'
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( {
                                                      'checksums' => ["can't be blank"],
@@ -145,8 +145,7 @@ RSpec.describe GenericFilesController, type: :controller do
                                                      'file_format' => ["can't be blank"],
                                                      'identifier' => ["can't be blank"],
                                                      'modified' => ["can't be blank"],
-                                                     'size' => ["can't be blank"],
-                                                     'uri' => ["can't be blank"]})
+                                                     'size' => ["can't be blank"]})
       end
 
       it 'should update fields' do
@@ -191,7 +190,7 @@ RSpec.describe GenericFilesController, type: :controller do
       it 'should show unauthorized' do
         post(:create, save_batch: true, intellectual_object_identifier: obj1.identifier, generic_files: [],
              format: 'json')
-        expect(response.code).to eq '401' # unauthorized
+        expect(response.code).to eq '401'
       end
     end
 
@@ -208,42 +207,47 @@ RSpec.describe GenericFilesController, type: :controller do
 
       describe "and assigning to an object you don't have access to" do
         it 'should be forbidden' do
-          post(:create, save_batch: true, intellectual_object_identifier: obj2.identifier, generic_files: [],
+          post(:create, save_batch: true, intellectual_object_identifier: obj2.identifier, generic_files: {},
                format: 'json')
-          expect(response.code).to eq '403' # forbidden
+          expect(response.code).to eq '403'
           expect(JSON.parse(response.body)).to eq({'status'=>'error', 'message'=>'You are not authorized to access this page.'})
         end
       end
 
-      # Loading test data from a fixture, because there there doesn't seem
-      # to be any direct method of creating a PremisEvent without saving it
-      # as well (see GenericFile.add_event). We need to save some files with
-      # new, unsaved PremisEvents.
       describe 'and assigning to an object you do have access to' do
         it 'it should create or update multiple files and their events' do
           # First post is a create
-          post(:create, save_batch: true, intellectual_object_id: batch_obj.id, generic_files: gf_data,
+          post(:create, save_batch: true, intellectual_object_id: batch_obj.id, generic_files: {files: gf_data},
                format: 'json')
-          #expect(response.code).to eq '201'
+          expect(response.code).to eq '201'
           return_data = JSON.parse(response.body)
-          puts "return data: #{return_data}"
           expect(return_data.count).to eq 2
-          expect(return_data[0]['id']).not_to be_empty
-          expect(return_data[1]['id']).not_to be_empty
+          expect(return_data[0]['id']).not_to be_nil
+          expect(return_data[1]['id']).not_to be_nil
           expect(return_data[0]['state']).to eq 'A'
           expect(return_data[1]['state']).to eq 'A'
           expect(return_data[0]['premis_events'].count).to eq 2
           expect(return_data[1]['premis_events'].count).to eq 2
-          expect(return_data[0]['checksum'].count).to eq 2
-          expect(return_data[1]['checksum'].count).to eq 2
+          expect(return_data[0]['checksums'].count).to eq 2
+          expect(return_data[1]['checksums'].count).to eq 2
 
           # Now alter data and post again. Should be an update.
           id1 = return_data[0]['id']
           id2 = return_data[1]['id']
+
+          # IT IS IMPERATIVE THAT UPDATES CONTAIN THE IDS OF ALL NESTED OBJECTS
           gf_data[0]['file_format'] = 'text/apple'
+          gf_data[0]['checksums_attributes'][0]['id'] = return_data[0]['checksums'][0]['id']
+          gf_data[0]['checksums_attributes'][1]['id'] = return_data[0]['checksums'][1]['id']
+          gf_data[1]['checksums_attributes'][0]['id'] = return_data[1]['checksums'][0]['id']
+          gf_data[1]['checksums_attributes'][1]['id'] = return_data[1]['checksums'][1]['id']
+          gf_data[0]['premis_events_attributes'][0]['id'] = return_data[0]['premis_events'][0]['id']
+          gf_data[0]['premis_events_attributes'][1]['id'] = return_data[0]['premis_events'][1]['id']
+          gf_data[1]['premis_events_attributes'][0]['id'] = return_data[1]['premis_events'][0]['id']
+          gf_data[1]['premis_events_attributes'][1]['id'] = return_data[1]['premis_events'][1]['id']
           gf_data[1]['file_format'] = 'text/orange'
 
-          post(:save_batch, identifier: batch_obj.identifier, generic_files: gf_data,
+          post(:update, save_batch: true, intellectual_object_identifier: batch_obj.identifier, generic_files: {files: gf_data},
                format: 'json')
           expect(response.code).to eq '201'
           return_data = JSON.parse(response.body)
@@ -254,11 +258,10 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(return_data[1]['file_format']).to eq 'text/orange'
           expect(return_data[0]['premis_events'].count).to eq 2
           expect(return_data[1]['premis_events'].count).to eq 2
-          expect(return_data[0]['checksum'].count).to eq 2
-          expect(return_data[1]['checksum'].count).to eq 2
+          expect(return_data[0]['checksums'].count).to eq 2
+          expect(return_data[1]['checksums'].count).to eq 2
         end
       end
-
     end
   end
 

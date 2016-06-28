@@ -6,8 +6,8 @@ class IntellectualObject < ActiveRecord::Base
   has_many :premis_events
   has_many :checksums, through: :generic_files
   accepts_nested_attributes_for :generic_files, allow_destroy: true, reject_if: :invalid_file
-  accepts_nested_attributes_for :premis_events
-  accepts_nested_attributes_for :checksums
+  accepts_nested_attributes_for :premis_events, allow_destroy: true
+  accepts_nested_attributes_for :checksums, allow_destroy: true
 
   validates :title, presence: true
   validates :institution, presence: true

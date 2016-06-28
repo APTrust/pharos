@@ -128,10 +128,6 @@ class IntellectualObjectsController < ApplicationController
     intellectual_object_path(resource)
   end
 
-  def get_create_params
-    params[:intellectual_object].is_a?(Array) ? json_param = params[:intellectual_object] : json_param = params[:intellectual_object][:_json]
-  end
-
   def send_to_dpn
     authorize @intellectual_object, :dpn?
     pending = WorkItem.pending?(@intellectual_object.identifier)
@@ -255,21 +251,6 @@ class IntellectualObjectsController < ApplicationController
 
   private
 
-  def set_obj_attr(new_object, state, attr_name, attr_value)
-    case attr_name
-      when 'institution_id'
-        attr_value.to_s.include?(':') ? new_object.institution = Institution.find(attr_value.to_s) : new_object.institution = Institution.where(identifier: attr_value.to_s).first
-      when 'premis_events'
-        state[:object_events] = attr_value
-      when 'generic_files'
-        state[:object_files] = attr_value
-      when "alt_identifier"
-        new_object.alt_identifier = attr_value
-      else
-        new_object[attr_name.to_s] = attr_value.to_s
-    end
-  end
-
   def search_action_url options = {}
     institution_intellectual_objects_path(params[:identifier] || @intellectual_object.institution.identifier)
   end
@@ -290,12 +271,12 @@ class IntellectualObjectsController < ApplicationController
     params[:intellectual_object] = params[:intellectual_object].first if params[:intellectual_object].kind_of?(Array)
     params.require(:intellectual_object).permit(:id, :institution_id, :title, :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :state, generic_files_attributes:
-                                                [:uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
-                                                checksums_attributes: [:digest, :algorithm, :datetime],
-                                                premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
+                                                [:id, :uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
+                                                checksums_attributes: [:digest, :algorithm, :datetime, :id],
+                                                premis_events_attributes: [:id, :identifier, :event_type, :date_time, :outcome,
                                                 :outcome_detail, :outcome_information, :detail, :object, :agent,
                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at]],
-                                                premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
+                                                premis_events_attributes: [:id, :identifier, :event_type, :date_time, :outcome,
                                                 :outcome_detail, :outcome_information, :detail, :object, :agent,
                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at])
   end
