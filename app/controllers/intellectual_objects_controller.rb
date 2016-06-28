@@ -35,8 +35,14 @@ class IntellectualObjectsController < ApplicationController
 
   def create
     authorize @institution, :create_through_institution?
-    @intellectual_object = @institution.intellectual_objects.new(intellectual_object_params)
-    if check_whole_object
+    intellectual_object_params
+    separate_params
+    IntellectualObject.transaction do
+      @intellectual_object = @institution.intellectual_objects.new(@object_params)
+      @file_params.each { |gf| @intellectual_object.generic_files.new(gf) } unless @file_params.nil?
+      raise ActiveRecord::Rollback
+    end
+    if @intellectual_object.save
       respond_to do |format|
         format.json { render object_as_json, status: :created }
         format.html {
@@ -45,7 +51,6 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     else
-      rollback
       respond_to do |format|
         format.json { render json: @intellectual_object.errors, status: :unprocessable_entity }
         format.html {
@@ -281,38 +286,33 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def check_whole_object
-    return false if !@intellectual_object.save
-    unless @intellectual_object.generic_files.nil?
-      @intellectual_object.generic_files.each do |gf|
-        return false if !gf.save
-      end
-    end
-    unless params[:intellectual_object][:generic_files_attributes].nil?
-      params[:intellectual_object][:generic_files_attributes].each do |gf|
-        return false if @intellectual_object.generic_files.where(identifier: gf[:identifier]).count == 0
-      end
-    end
-    true
-  end
-
-  def rollback
-    @intellectual_object.generic_files.each { |gf| gf.delete }
-    @intellectual_object.delete
-  end
-
   def intellectual_object_params
     params[:intellectual_object] = params[:intellectual_object].first if params[:intellectual_object].kind_of?(Array)
     params.require(:intellectual_object).permit(:id, :institution_id, :title, :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :state, generic_files_attributes:
                                                 [:uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
-                                                 checksums_attributes: [:digest, :algorithm, :datetime],
-                                                 premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
-                                                 :outcome_detail, :outcome_information, :detail, :object, :agent,
-                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at]],
-                                                 premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
-                                                 :outcome_detail, :outcome_information, :detail, :object, :agent,
-                                                 :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at])
+                                                checksums_attributes: [:digest, :algorithm, :datetime],
+                                                premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
+                                                :outcome_detail, :outcome_information, :detail, :object, :agent,
+                                                :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at]],
+                                                premis_events_attributes: [:identifier, :event_type, :date_time, :outcome,
+                                                :outcome_detail, :outcome_information, :detail, :object, :agent,
+                                                :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at])
+  end
+
+  def separate_params
+    @object_params = {}
+    @object_params[:id] = params[:intellectual_object][:id] if params[:intellectual_object][:id].present?
+    @object_params[:institution_id] = params[:intellectual_object][:institution_id] if params[:intellectual_object][:institution_id].present?
+    @object_params[:title] = params[:intellectual_object][:title] if params[:intellectual_object][:title].present?
+    @object_params[:description] = params[:intellectual_object][:description] if params[:intellectual_object][:description].present?
+    @object_params[:access] = params[:intellectual_object][:access] if params[:intellectual_object][:access].present?
+    @object_params[:identifier] = params[:intellectual_object][:identifier] if params[:intellectual_object][:identifier].present?
+    @object_params[:bag_name] = params[:intellectual_object][:bag_name] if params[:intellectual_object][:bag_name].present?
+    @object_params[:alt_identifier] = params[:intellectual_object][:alt_identifier] if params[:intellectual_object][:alt_identifier].present?
+    @object_params[:state] = params[:intellectual_object][:state] if params[:intellectual_object][:state].present?
+    @object_params[:premis_events_attributes] = params[:intellectual_object][:premis_events_attributes] if params[:intellectual_object][:premis_events_attributes].present?
+    @file_params = params[:intellectual_object][:generic_files_attributes] if params[:intellectual_object][:generic_files_attributes].present?
   end
 
   def load_object
