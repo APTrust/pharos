@@ -44,7 +44,7 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
-  # institutional_admin cannot delelte institutional user
+  # institutional_admin cannot delete institutional user
   def destroy?
     return false if user == record
     user.admin? ||

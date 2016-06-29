@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v1/files'
 
   # PREMIS EVENT ROUTES
-  get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
+  get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[\/\-\%\w\.]*/, as: :events
   post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
   resources :premis_events, only: [:create], format: :json, param: :identifier, path: 'api/v1/events'
 
@@ -45,7 +45,7 @@ Rails.application.routes.draw do
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
 
   authenticated :user do
-    root to: 'institutions#show', as: 'authenticated_root'
+    root to: 'users#index', as: 'authenticated_root'
   end
 
   root :to => 'institutions#show'

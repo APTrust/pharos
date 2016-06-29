@@ -1,28 +1,35 @@
+<%- model_class = User -%>
 <div class="page-header">
-  <h1>Users</h1>
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 </div>
-
-<table class="table table-condensed">
+<table class="table table-striped">
   <thead>
-  <tr>
-    <th>Name</th>
-    <th>Email</th>
-    <th>Institution</th>
-    <th>Group</th>
-  </tr>
+    <tr>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:email) %></th>
+      <th><%= model_class.human_attribute_name(:institution) %></th>
+      <th><%= model_class.human_attribute_name(:groups) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
   </thead>
-
   <tbody>
-  <% @users.each do |user| %>
-      <tr id="<%= user.id %>">
+    <% @users.each do |user| %>
+      <tr>
         <td><%= user.name %></td>
         <td><%= user.email %></td>
         <td><%= user.institution.name %></td>
-        <td><%= user.main_group %> </td>
-        <td><%= show_link user %> <%= edit_link user %> <%= destroy_link user %></td>
+
+        <td><% user.roles.each do |role| %>
+          <%= role.name.capitalize %>
+        <% end %></td>
+        <td>
+          <%= show_link user %> <%= edit_link user %> <%= destroy_link user %>
+        </td>
       </tr>
-  <% end %>
+    <% end %>
   </tbody>
 </table>
 
-<%= create_link(User) %>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_user_path,
+            :class => 'btn btn-success btn-sm' %>

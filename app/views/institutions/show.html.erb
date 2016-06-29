@@ -5,9 +5,9 @@
 <ul class="nav nav-tabs">
   <li><a href="#summary" data-toggle="tab">Summary</a></li>
   <li><a href="#stats" data-toggle="tab">Statistics</a></li>
-  <li><%= link_to 'Objects', institution_intellectual_objects_path(@institution, sort: 'system_modified_dtsi desc') %></li>
+  <li><%= link_to 'Objects', intellectual_objects_path(@institution, sort: 'system_modified_dtsi desc') %></li>
   <li><a href="#users" data-toggle="tab">Users</a></li>
-  <li><%= link_to 'Events', institution_events_path(@institution) %></li>
+  <li><%= link_to 'Events', events_path(@institution) %></li>
   <li><%= link_to 'Work Items', work_items_path %></li>
 </ul>
 
