@@ -1,0 +1,44 @@
+<div id="header-navbar" class="navbar navbar-default navbar-static-top" role="navigation">
+  <div class="container">
+
+    <div class="navbar-header col-md-3">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#user-util-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <%= link_to image_tag("aptrust/APTrustLogo.gif", height: 75, width: 300, border: 0, alt: "APTrust Logo"), root_path, class: "navbar-brand logo-text" %>
+    </div>
+
+    <div id="search-navbar" class="navbar-static-top col-md-6" role="navigation">
+      <div class="navbar-header">
+        <% if user_signed_in? %>
+            <div id="tabs">
+              <ul class="search_tabs">
+                <li><a href="#tabs-1">Objects & Files</a></li>
+                <li><a href="#tabs-2" id="tabs-2-link">Work Items</a></li>
+              </ul>
+              <div id="tabs-1"><%= render partial: '/shared/search_form' %></div>
+              <div id="tabs-2"><%= render partial: '/shared/wi_search_form' %></div>
+            </div>
+        <% end %>
+      </div>
+    </div>
+    <script>$("#tabs").tabs();</script>
+
+    <% if controller_name == 'work_item' %>
+        <script>select_wi_tab();</script>
+    <% end %>
+
+    <div class="collapse navbar-collapse col-md-3" id="user-util-collapse">
+      <% if user_signed_in? %>
+          <%= render partial: '/user_util_links' %>
+      <% else %>
+          <%= render partial: '/user_sign_in_links' %>
+      <% end %>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="navbar-right">
+  <% if current_user.admin? or current_user.institutional_admin? %>
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin</strong> <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><%= link_to 'Manage Users', users_path %></li>
+            <li><%= link_to 'New User', new_user_path %></li>
+            <% if policy(current_user.institution).index? %>
+                <li class="divider"></li>
+                <li><%= link_to 'Manage Institutions', institutions_path %></li>
+            <% end %>
+            <% if policy(Institution).create? %>
+                <li><%= link_to 'New Institution', new_institution_path %></li>
+            <% end %>
+          </ul>
+        </li>
+      </ul>
+  <% end %>
+
+  <ul class="nav navbar-nav">
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= current_user.to_s %></strong> <b class="caret"></b></a>
+      <ul class="dropdown-menu">
+        <li><%= link_to 'Booksmarks', root_path %></li>
+        <li><%= link_to 'Saved Searches', root_path %></li>
+        <li><%= link_to 'Search History', root_path %></li>
+        <li class="divider"></li>
+        <li><%= link_to "View Profile", user_path(current_user) %></li>
+        <li><%= link_to "Edit Profile", edit_user_path(current_user) %></li>
+        <li><%= link_to "Change Password", edit_password_user_path(current_user), method: :get %></li>
+        <li class="divider"></li>
+        <li><%= link_to 'Logout', destroy_user_session_path, method: :delete %></li>
+      </ul>
+    </li>
+  </ul>
+</div>
