@@ -56,7 +56,7 @@
             <%= link_to intellectual_object_restore_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
                 <i class="glyphicon glyphicon-download"></i> Restore Object
             <% end %>
-            <% if (Fluctus::Application.config.show_send_to_dpn_button == true && @intellectual_object.institution.dpn_uuid.blank? == false && @intellectual_object.in_dpn? == false )%>
+            <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.institution.dpn_uuid.blank? == false && @intellectual_object.in_dpn? == false )%>
                 <%= link_to intellectual_object_dpn_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
                     <i class="glyphicon glyphicon-send dpn"></i> Send Object To DPN
                 <% end %>
