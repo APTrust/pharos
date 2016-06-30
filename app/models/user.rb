@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
   validates :email, uniqueness: true
   validates :institution_id, presence: true
   validate :institution_id_points_at_institution
-  validates :name, presence: true, if: ->{ name.present? } #TODO: find name validator that actually works
+  validates :name, presence: true
   validates :email, email: true
   phony_normalize :phone_number, :default_country_code => 'US'
   validates_plausible_phone :phone_number

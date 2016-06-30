@@ -1,13 +1,13 @@
 module ApplicationHelper
   def show_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-eye-open"></i> View'
-    options[:class] = 'btn doc-action-btn btn-primary btn-sm' if options[:class].nil?
+    options[:class] = 'btn doc-action-btn btn-normal btn-sm' if options[:class].nil?
     link_to(content.html_safe, object, options) if policy(object).show?
   end
 
   def edit_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-edit"></i> Edit'
-    options[:class] = 'btn doc-action-btn btn-primary btn-sm' if options[:class].nil?
+    options[:class] = 'btn doc-action-btn btn-normal btn-sm' if options[:class].nil?
     link_to(content.html_safe, [:edit, object], options) if policy(object).edit?
   end
 
@@ -21,7 +21,7 @@ module ApplicationHelper
 
   def admin_password_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-warning-sign"></i> Reset User Password'
-    options[:class] = 'btn doc-action-btn btn-danger' if options[:class].nil?
+    options[:class] = 'btn doc-action-btn btn-danger btn-sm' if options[:class].nil?
     options[:method] = :get if options[:method].nil?
     options[:data] = { confirm: 'Are you sure?' }if options[:confirm].nil?
     link_to(content.html_safe, [:admin_password_reset, object], options) if policy(object).admin_password_reset?
@@ -29,7 +29,7 @@ module ApplicationHelper
 
   def create_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-plus"></i> Create'
-    options[:class] = 'btn doc-action-btn btn-success' if options[:class].nil?
+    options[:class] = 'btn doc-action-btn btn-success btn-sm' if options[:class].nil?
     if policy(object).create?
       object_class = (object.kind_of?(Class) ? object : object.class)
       link_to(content.html_safe, [:new, object_class.name.underscore.to_sym], options)
