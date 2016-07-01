@@ -1,11 +1,11 @@
 <div id="sidebar" class="col-md-3">
-  <%= render 'search_sidebar' %>
+  <%= render 'facets' %>
 </div>
 
 <div id="content" class="col-md-9">
 
   <h2 class="top-content-title">Objects for <%= @institution.name %></h2>
-  <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
+  <% @page_title = t('Search', :application_name => application_name) %>
 
   <%= render 'did_you_mean' %>
 
