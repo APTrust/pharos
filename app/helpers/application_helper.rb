@@ -62,6 +62,6 @@ module ApplicationHelper
   def display_version
     return '' if Rails.env.production?
     app_version = Pharos::Application::VERSION
-    return "Running Fluctus ver #{app_version} on Rails #{Rails.version} under Ruby #{RUBY_VERSION}"
+    return "Running Pharos ver #{app_version} on Rails #{Rails.version} under Ruby #{RUBY_VERSION}"
   end
 end

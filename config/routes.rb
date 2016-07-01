@@ -45,7 +45,7 @@ Rails.application.routes.draw do
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
 
   authenticated :user do
-    root to: 'users#index', as: 'authenticated_root'
+    root to: 'institutions#show', as: 'authenticated_root'
   end
 
   root :to => 'institutions#show'
