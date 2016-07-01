@@ -5,15 +5,9 @@
 <div id="content" class="col-md-9">
 
   <h2 class="top-content-title">Objects for <%= @institution.name %></h2>
-  <% @page_title = t('Search', :application_name => application_name) %>
+  <% @page_title = t('Search', :application_name => 'something') %>
 
-  <%= render 'did_you_mean' %>
-
-  <%= render 'shared/constraints' %>
-
-  <%= render 'sort_and_per_page' %>
-
-  <%- if @response.empty? %>
+  <%- if @intellectual_objects.empty? %>
       <%= render "shared/zero_results" %>
   <%- elsif render_grouped_response? %>
       <%= render_grouped_document_index %>
@@ -21,6 +15,5 @@
       <%= render_document_index %>
   <%- end %>
 
-  <%= render 'shared/results_pagination' %>
 
 </div>
