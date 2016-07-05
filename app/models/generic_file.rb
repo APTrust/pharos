@@ -149,7 +149,7 @@ class GenericFile < ActiveRecord::Base
   end
 
   def check_permissions
-    permissions = intellectual_object.check_permissions if intellectual_object
+    permissions = intellectual_object.set_permissions if intellectual_object
     permissions
   end
 
