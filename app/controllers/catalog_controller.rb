@@ -14,6 +14,7 @@ class CatalogController < ApplicationController
       when '*'
         generic_search
     end
+    filter_results
   end
 
   protected
@@ -120,6 +121,61 @@ class CatalogController < ApplicationController
         @results << WorkItem.where(intellectual_object_identifier: params[:q])
         @results << WorkItem.where(generic_file_identifier: params[:q])
     end
+  end
+
+  def filter_results
+    filter_by_status if params[:status].present?
+    filter_by_stage if params[:stage].present?
+    filter_by_action if params[:object_action].present?
+    filter_by_institution if params[:institution].present?
+    filter_by_access if params[:access].present?
+    filter_by_format if params[:format].present?
+    filter_by_association if params[:association].present?
+    filter_by_type if params[:object_type].present?
+  end
+
+  def filter_by_status
+    @results = @results.where(status: params[:status])
+    @selected[:status] = params[:status]
+  end
+
+  def filter_by_stage
+    @results = @results.where(stage: params[:stage])
+    @selected[:stage] = params[:stage]
+  end
+
+  def filter_by_action
+    @results = @results.where(action: params[:object_action])
+    @selected[:object_action] = params[:object_action]
+  end
+
+  def filter_by_institution
+    @results = @results.where(institution: params[:institution])
+    @selected[:institution] = params[:institution]
+  end
+
+  def filter_by_access
+    @results = @results.where(access: params[:access])
+    @selected[:access] = params[:access]
+  end
+
+  def filter_by_format
+    #TODO: make sure this is applicable to objects as well as files
+    @results = @results.where(format: params[:format])
+    @selected[:format] = params[:format]
+  end
+
+  def filter_by_association
+    filtered_results = []
+    filtered_results << @results.where(intellectual_object_id: params[:association])
+    filtered_results << @results.where(generic_file_id: params[:association])
+    @results = filtered_results
+    @selected[:association] = params[:association]
+  end
+
+  def filter_by_type
+    @results = @results.where(type: params[:type])
+    @selected[:type] = params[:type]
   end
 
 end

@@ -6,7 +6,7 @@ describe 'Catalog' do
     Institution.destroy_all
   end
 
-  describe 'GET #index', :type => :feature do
+  describe 'GET #search', :type => :feature do
     before(:each) do
       visit('/')
     end
