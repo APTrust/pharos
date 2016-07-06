@@ -21,12 +21,6 @@ RSpec.describe CatalogController, type: :controller do
     @file_four = FactoryGirl.create(:generic_file, intellectual_object_id: @object_four.id)
     @file_five = FactoryGirl.create(:generic_file, intellectual_object_id: @object_five.id)
     @file_six = FactoryGirl.create(:generic_file, intellectual_object_id: @object_six.id)
-    @event_one = FactoryGirl.create(:premis_event_ingest, intellectual_object_id: @object_one.id)
-    @event_two = FactoryGirl.create(:premis_event_ingest, intellectual_object_id: @object_two.id)
-    @event_three = FactoryGirl.create(:premis_event_ingest, intellectual_object_id: @object_three.id)
-    @event_four = FactoryGirl.create(:premis_event_ingest, intellectual_object_id: @object_four.id)
-    @event_five = FactoryGirl.create(:premis_event_ingest, intellectual_object_id: @object_five.id)
-    @event_six = FactoryGirl.create(:premis_event_ingest, intellectual_object_id: @object_six.id)
     @item_one = FactoryGirl.create(:work_item, intellectual_object_id: @object_one.id)
     @item_two = FactoryGirl.create(:work_item, intellectual_object_id: @object_two.id)
     @item_three = FactoryGirl.create(:work_item, intellectual_object_id: @object_three.id)
@@ -43,21 +37,35 @@ RSpec.describe CatalogController, type: :controller do
   end
 
   describe 'GET #search' do
-    describe 'for an admin user' do
-      before do
-        sign_in admin_user
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        get :search, institution_identifier: 'apt.edu'
+        expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
 
-    describe 'for an institutional admin user' do
-      before do
-        sign_in inst_admin
-      end
-    end
+    describe 'when signed in' do
+      describe 'as an admin user' do
+        before do
+          sign_in admin_user
+        end
 
-    describe 'for an institutional user' do
-      before do
-        sign_in inst_user
+        it 'should return all results' do
+          get :search, q: '*', search_field: '*', object_type: '*'
+          expect(assigns(:results).size).to eq 18
+        end
+      end
+
+      describe 'as an institutional admin user' do
+        before do
+          sign_in inst_admin
+        end
+      end
+
+      describe 'as an institutional user' do
+        before do
+          sign_in inst_user
+        end
       end
     end
   end
