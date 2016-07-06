@@ -29,23 +29,20 @@ class CatalogController < ApplicationController
     params[:per_page] = 10 unless params[:per_page].present?
     page = params[:page].to_i
     per_page = params[:per_page].to_i
-    @paged_results = @results.page(page).per(per_page)
+    permission_check
+    @paged_results = @authorized_results.page(page).per(per_page)
     @next = format_next(page, per_page)
     @previous = format_previous(page, per_page)
-    @authorized_results = []
 
   end
 
-  def permission(current_object)
-    permissions = current_object.check_permissions
-    admin_group = "Admin_At_#{current_user.institution_id}"
-    user_group = "User_At_#{current_user.institution_id}"
+  def permission_check
     if current_user.admin?
-      true
-    elsif current_user.institutional_admin?
-      (permissions[:discover_group].include?('institutional_admin') || permissions[:discover_group].include?(admin_group)) ? true : false
-    elsif current_user.institutional_user?
-      (permissions[:discover_group].include?('institutional_user') || permissions[:discover_group].include?(user_group)) ? true : false
+      @authorized_results = @results
+    else
+      @authorized_results << @results.where(access: 'consortial')
+      @authorized_results << @results.where(access: 'institution', institution_id: current_user.institution_id)
+      @authorized_results << @results.where(access: 'restricted', institution_id: current_user.institution_id)
     end
   end
 
