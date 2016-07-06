@@ -15,9 +15,26 @@ class CatalogController < ApplicationController
         generic_search
     end
     filter_results
+    set_various_counts
+    respond_to do |format|
+      format.json { render json: {results: @results, next: @next, previous: @previous} }
+      format.html { }
+    end
   end
 
   protected
+
+  def page_and_authorize
+    params[:page] = 1 unless params[:page].present?
+    params[:per_page] = 10 unless params[:per_page].present?
+    page = params[:page].to_i
+    per_page = params[:per_page].to_i
+    @paged_results = @results.page(page).per(per_page)
+    @next = format_next(page, per_page)
+    @previous = format_previous(page, per_page)
+    @authorized_results = []
+
+  end
 
   def permission(current_object)
     permissions = current_object.check_permissions
@@ -176,6 +193,103 @@ class CatalogController < ApplicationController
   def filter_by_type
     @results = @results.where(type: params[:type])
     @selected[:type] = params[:type]
+  end
+
+  def set_filter_values
+    @statuses = Pharos::Application::PHAROS_STATUSES.values
+    @stages = Pharos::Application::PHAROS_STAGES.values
+    @actions = Pharos::Application::PHAROS_ACTIONS.values
+    @institutions = Array.new
+    @accesses = %w(Consortial Institution Restricted)
+    @formats = set_formats
+    @associations = set_associations
+    @types = ['Intellectual Objects', 'Generic Files', 'Work Items']
+    Institution.all.each do |inst|
+      @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'
+    end
+  end
+
+  def set_various_counts
+    set_filter_values
+    @counts = {}
+    @statuses.each { |status| @counts[status] = @results.where(status: status).count() }
+    @stages.each { |stage| @counts[stage] = @results.where(stage: stage).count() }
+    @actions.each { |action| @counts[action] = @results.where(action: action).count() }
+    @institutions.each { |institution| @counts[institution] = @results.where(institution: institution).count() }
+    @accesses.each { |acc| @counts[acc] = @results.where(access: acc).count }
+    @formats.each { |format| @counts[format] = @results.where(format: format).count }
+    @associations.each { |assc| @counts[assc] = @results.where(intellectual_object: assc).count }
+    @associations.each { |assc| @counts[assc] = @results.where(generic_file: assc).count }
+    @types.each { |type| @counts[type] = @results.where(type: type).count }
+
+    @count = @results.count
+    if @count == 0
+      @second_number = 0
+      @first_number = 0
+    elsif params[:page].nil?
+      @second_number = 10
+      @first_number = 1
+    else
+      @second_number = params[:page].to_i * 10
+      @first_number = @second_number.to_i - 9
+    end
+    @second_number = @count if @second_number > @count
+  end
+
+  def set_formats
+    #TODO: figure out how to set these without looping through all objects
+    Array.new
+  end
+
+  def set_associations
+    #TODO: figure out how to set these without looping through all objects
+    Array.new
+  end
+
+  def format_date
+    time = Time.parse(params[:updated_since])
+    time.utc.iso8601
+  end
+
+  def to_boolean(str)
+    str == 'true'
+  end
+
+  def format_next(page, per_page)
+    if @count.to_f / per_page <= page
+      nil
+    else
+      new_page = page + 1
+      new_url = "#{request.base_url}/search/?page=#{new_page}&per_page=#{per_page}"
+      new_url = add_params(new_url)
+      new_url
+    end
+  end
+
+  def format_previous(page, per_page)
+    if page == 1
+      nil
+    else
+      new_page = page - 1
+      new_url = "#{request.base_url}/search/?page=#{new_page}&per_page=#{per_page}"
+      new_url = add_params(new_url)
+      new_url
+    end
+  end
+
+  def add_params(str)
+    str = str << "&q=#{params[:q]}" if params[:q].present?
+    str = str << "&search_field=#{params[:search_field]}" if params[:search_field].present?
+    str = str << "&object_type=#{params[:object_type]}" if params[:object_type].present?
+    str = str << "&institution=#{params[:institution]}" if params[:institution].present?
+    str = str << "&object_action=#{params[:object_action]}" if params[:object_action].present?
+    str = str << "&stage=#{params[:stage]}" if params[:stage].present?
+    str = str << "&status=#{params[:status]}" if params[:status].present?
+    str = str << "&access=#{params[:access]}" if params[:access].present?
+    str = str << "&format=#{params[:format]}" if params[:format].present?
+    str = str << "&association=#{params[:association]}" if params[:association].present?
+    str = str << "&type=#{params[:type]}" if params[:type].present?
+    str
   end
 
 end
