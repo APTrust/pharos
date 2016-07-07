@@ -14,8 +14,8 @@ class CatalogController < ApplicationController
       when '*'
         generic_search
     end
-    filter_results
-    set_various_counts
+    filter
+    page_and_authorize
     respond_to do |format|
       format.json { render json: {results: @results, next: @next, previous: @previous} }
       format.html { }
@@ -137,59 +137,10 @@ class CatalogController < ApplicationController
     end
   end
 
-  def filter_results
-    filter_by_status if params[:status].present?
-    filter_by_stage if params[:stage].present?
-    filter_by_action if params[:object_action].present?
-    filter_by_institution if params[:institution].present?
-    filter_by_access if params[:access].present?
-    filter_by_format if params[:format].present?
-    filter_by_association if params[:association].present?
-    filter_by_type if params[:type].present?
-  end
-
-  def filter_by_status
-    @results = @results.where(status: params[:status])
-    @selected[:status] = params[:status]
-  end
-
-  def filter_by_stage
-    @results = @results.where(stage: params[:stage])
-    @selected[:stage] = params[:stage]
-  end
-
-  def filter_by_action
-    @results = @results.where(action: params[:object_action])
-    @selected[:object_action] = params[:object_action]
-  end
-
-  def filter_by_institution
-    @results = @results.where(institution: params[:institution])
-    @selected[:institution] = params[:institution]
-  end
-
-  def filter_by_access
-    @results = @results.where(access: params[:access])
-    @selected[:access] = params[:access]
-  end
-
-  def filter_by_format
-    #TODO: make sure this is applicable to objects as well as files
-    @results = @results.where(format: params[:format])
-    @selected[:format] = params[:format]
-  end
-
-  def filter_by_association
-    filtered_results = []
-    filtered_results << @results.where(intellectual_object_id: params[:association])
-    filtered_results << @results.where(generic_file_id: params[:association])
-    @results = filtered_results
-    @selected[:association] = params[:association]
-  end
-
-  def filter_by_type
-    @results = @results.where(type: params[:type])
-    @selected[:type] = params[:type]
+  def filter
+    set_filter_values
+    filter_results
+    set_page_counts
   end
 
   def set_filter_values
@@ -204,21 +155,77 @@ class CatalogController < ApplicationController
     Institution.all.each do |inst|
       @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'
     end
+    @counts = {}
+    @selected = {}
   end
 
-  def set_various_counts
-    set_filter_values
-    @counts = {}
+  def filter_results
+    filter_by_status if params[:status].present?
+    filter_by_stage if params[:stage].present?
+    filter_by_action if params[:object_action].present?
+    filter_by_institution if params[:institution].present?
+    filter_by_access if params[:access].present?
+    filter_by_format if params[:format].present?
+    filter_by_association if params[:association].present?
+    filter_by_type if params[:type].present?
+  end
+
+  def filter_by_status
+    @results = @results.where(status: params[:status])
+    @selected[:status] = params[:status]
     @statuses.each { |status| @counts[status] = @results.where(status: status).count() }
+  end
+
+  def filter_by_stage
+    @results = @results.where(stage: params[:stage])
+    @selected[:stage] = params[:stage]
     @stages.each { |stage| @counts[stage] = @results.where(stage: stage).count() }
+  end
+
+  def filter_by_action
+    @results = @results.where(action: params[:object_action])
+    @selected[:object_action] = params[:object_action]
     @actions.each { |action| @counts[action] = @results.where(action: action).count() }
+  end
+
+  def filter_by_institution
+    @results = @results.where(institution: params[:institution])
+    @selected[:institution] = params[:institution]
     @institutions.each { |institution| @counts[institution] = @results.where(institution: institution).count() }
+  end
+
+  def filter_by_access
+    @results = @results.where(access: params[:access])
+    @selected[:access] = params[:access]
+
     @accesses.each { |acc| @counts[acc] = @results.where(access: acc).count }
+  end
+
+  def filter_by_format
+    #TODO: make sure this is applicable to objects as well as files
+    @results = @results.where(format: params[:format])
+    @selected[:format] = params[:format]
     @formats.each { |format| @counts[format] = @results.where(format: format).count }
+  end
+
+  def filter_by_association
+    filtered_results = []
+    filtered_results << @results.where(intellectual_object_id: params[:association])
+    filtered_results << @results.where(generic_file_id: params[:association])
+    @results = filtered_results
+    @selected[:association] = params[:association]
+
     @associations.each { |assc| @counts[assc] = @results.where(intellectual_object: assc).count }
     @associations.each { |assc| @counts[assc] = @results.where(generic_file: assc).count }
-    @types.each { |type| @counts[type] = @results.where(type: type).count }
+  end
 
+  def filter_by_type
+    @results = @results.where(type: params[:type])
+    @selected[:type] = params[:type]
+    @types.each { |type| @counts[type] = @results.where(type: type).count }
+  end
+
+  def set_page_counts
     @count = @results.count
     if @count == 0
       @second_number = 0

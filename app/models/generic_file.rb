@@ -17,6 +17,8 @@ class GenericFile < ActiveRecord::Base
   validate :has_right_number_of_checksums
   validate :identifier_is_unique
 
+  before_save :set_access
+
   delegate :institution, to: :intellectual_object
 
   def to_param
@@ -178,6 +180,18 @@ class GenericFile < ActiveRecord::Base
     count = files.count if files.count > 1
     if(count > 0)
       errors.add(:identifier, 'has already been taken')
+    end
+  end
+
+  def set_access
+    if self.intellectual_object.blank?
+      if self.intellectual_object_id.blank?
+        self.access = 'restricted'
+      else
+        self.access = IntellectualObject.find(self.intellectual_object_id).access
+      end
+    else
+      self.access = self.intellectual_object.access
     end
   end
 end

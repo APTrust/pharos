@@ -7,6 +7,7 @@ class WorkItem < ActiveRecord::Base
   validate :action_is_allowed
   validate :reviewed_not_nil
   before_save :set_object_identifier_if_ingested
+  before_save :set_access
 
   def to_param
     "#{etag}/#{name}"
@@ -226,6 +227,14 @@ class WorkItem < ActiveRecord::Base
       re_multi = /\.b\d+\.of\d+$/
       bag_basename = self.name.sub(re_single, '').sub(re_multi, '')
       self.object_identifier = "#{self.institution}/#{bag_basename}"
+    end
+  end
+
+  def set_access
+    if self.intellectual_object_id.blank?
+      self.access = 'restricted'
+    else
+      self.access = IntellectualObject.find(self.intellectual_object_id).access
     end
   end
 end
