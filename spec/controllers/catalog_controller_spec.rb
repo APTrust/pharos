@@ -51,7 +51,7 @@ RSpec.describe CatalogController, type: :controller do
         end
 
         it 'should return all results' do
-          get :search, q: '*', search_field: '*', object_type: '*', per_page: 20
+          get :search, q: '%', search_field: '*', object_type: '*', per_page: 20
           expect(assigns(:results).size).to eq 18
         end
       end

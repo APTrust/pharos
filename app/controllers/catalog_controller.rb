@@ -4,6 +4,7 @@ class CatalogController < ApplicationController
 
   def search
     authorize current_user
+    params[:q] = '%' if params[:q] == '*'
     case params[:object_type]
       when 'object'
         object_search
@@ -30,6 +31,7 @@ class CatalogController < ApplicationController
     page = params[:page].to_i
     per_page = params[:per_page].to_i
     permission_check
+    puts "results check: #{@results.count}, sample: #{@results.first}"
     @paged_results = @authorized_results.page(page).per(per_page)
     @next = format_next(page, per_page)
     @previous = format_previous(page, per_page)
