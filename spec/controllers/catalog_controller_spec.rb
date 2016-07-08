@@ -7,6 +7,10 @@ RSpec.describe CatalogController, type: :controller do
   let(:inst_user) { FactoryGirl.create(:user, :institutional_user, institution_id: @another_institution.id)}
 
   before(:all) do
+    Institution.delete_all
+    IntellectualObject.delete_all
+    GenericFile.delete_all
+    WorkItem.delete_all
     @institution = FactoryGirl.create(:institution)
     @another_institution = FactoryGirl.create(:institution)
     @object_one = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id)
@@ -15,12 +19,12 @@ RSpec.describe CatalogController, type: :controller do
     @object_four = FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id)
     @object_five = FactoryGirl.create(:institutional_intellectual_object, institution_id: @another_institution.id)
     @object_six = FactoryGirl.create(:restricted_intellectual_object, institution_id: @another_institution.id)
-    @file_one = FactoryGirl.create(:generic_file, intellectual_object_id: @object_one.id)
-    @file_two = FactoryGirl.create(:generic_file, intellectual_object_id: @object_two.id)
-    @file_three = FactoryGirl.create(:generic_file, intellectual_object_id: @object_three.id)
-    @file_four = FactoryGirl.create(:generic_file, intellectual_object_id: @object_four.id)
-    @file_five = FactoryGirl.create(:generic_file, intellectual_object_id: @object_five.id)
-    @file_six = FactoryGirl.create(:generic_file, intellectual_object_id: @object_six.id)
+    @file_one = FactoryGirl.create(:generic_file, intellectual_object: @object_one)
+    @file_two = FactoryGirl.create(:generic_file, intellectual_object: @object_two)
+    @file_three = FactoryGirl.create(:generic_file, intellectual_object: @object_three)
+    @file_four = FactoryGirl.create(:generic_file, intellectual_object: @object_four)
+    @file_five = FactoryGirl.create(:generic_file, intellectual_object: @object_five)
+    @file_six = FactoryGirl.create(:generic_file, intellectual_object: @object_six)
     @item_one = FactoryGirl.create(:work_item, intellectual_object_id: @object_one.id)
     @item_two = FactoryGirl.create(:work_item, intellectual_object_id: @object_two.id)
     @item_three = FactoryGirl.create(:work_item, intellectual_object_id: @object_three.id)

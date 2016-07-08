@@ -21,6 +21,5 @@ FactoryGirl.define do
     factory :restricted_intellectual_object, class: IntellectualObject do
       access { 'restricted' }
     end
-
   end
 end

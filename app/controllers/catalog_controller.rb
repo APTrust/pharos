@@ -30,8 +30,7 @@ class CatalogController < ApplicationController
     page = params[:page].to_i
     per_page = params[:per_page].to_i
     permission_check
-    #puts "results check: #{@results.first.id}"
-    @paged_results = @authorized_results.page(page).per(per_page)
+    @paged_results = Kaminari.paginate_array(@authorized_results).page(page).per(per_page)
     @next = format_next(page, per_page)
     @previous = format_previous(page, per_page)
 
@@ -125,10 +124,6 @@ class CatalogController < ApplicationController
       when '*'
         io_results = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                               "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        #puts "results check: #{io_results.count}"
-        io_results.each do |io|
-          puts "test for id: #{io.identifier}"
-        end
         gf_results = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
         item_results = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                       "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
