@@ -4,7 +4,6 @@ class CatalogController < ApplicationController
 
   def search
     authorize current_user
-    params[:q] = '%' if params[:q] == '*'
     case params[:object_type]
       when 'object'
         object_search
@@ -31,7 +30,7 @@ class CatalogController < ApplicationController
     page = params[:page].to_i
     per_page = params[:per_page].to_i
     permission_check
-    puts "results check: #{@results.count}, sample: #{@results.first}"
+    #puts "results check: #{@results.first.id}"
     @paged_results = @authorized_results.page(page).per(per_page)
     @next = format_next(page, per_page)
     @previous = format_previous(page, per_page)
@@ -54,16 +53,14 @@ class CatalogController < ApplicationController
       when 'identifier'
         @results = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
       when 'alt_identifier'
-        @results = IntellectualObject.where('alternate_identifier LIKE ?', "%#{params[:q]}%")
+        @results = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
       when 'bag_name'
         @results = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
       when 'title'
         @results = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
       when '*'
-        @results << IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
-        @results << IntellectualObject.where('alternate_identifier LIKE ?', "%#{params[:q]}%")
-        @results << IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        @results << IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
+        @results = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+                                             "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
@@ -75,8 +72,7 @@ class CatalogController < ApplicationController
       when 'uri'
         @results = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
       when '*'
-        @results << GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
-        @results << GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
+        @results = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
@@ -88,54 +84,55 @@ class CatalogController < ApplicationController
       when 'etag'
         @results = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
       when 'object_identifier'
-        @results = WorkItem.where('intellectual_object_identifier LIKE ?', "%#{params[:q]}%")
+        @results = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
       when 'file_identifier'
         @results = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
       when '*'
-        @results << WorkItem.where('name LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('intellectual_object_identifier LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
+        @results = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+                                  "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
   def generic_search
-    @results = []
     case params[:search_field]
       when 'identifier'
-        @results << IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
-        @results << GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
+        io_results = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
+        gf_results = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
+        @results = io_results + gf_results
       when 'alt_identifier'
-        @results << IntellectualObject.where('alternate_identifier LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('intellectual_object_identifier LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
+        io_results = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
+        item_results = WorkItem.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+                                      "%#{params[:q]}%", "%#{params[:q]}%")
+        @results = io_results + item_results
       when 'bag_name'
-        @results << IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('name LIKE ?', "%#{params[:q]}%")
+        io_results = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
+        item_results = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
+        @results = io_results + item_results
       when 'title'
         @results = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
       when 'uri'
         @results = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
       when 'name'
-        @results << IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('name LIKE ?', "%#{params[:q]}%")
+        io_results = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
+        item_results = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
+        @results = io_results + item_results
       when 'etag'
         @results = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
       when 'object_identifier'
-        @results = WorkItem.where('intellectual_object_identifier LIKE ?', "%#{params[:q]}%")
+        @results = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
       when 'file_identifier'
         @results = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
       when '*'
-        @results << IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
-        @results << IntellectualObject.where('alternate_identifier LIKE ?', "%#{params[:q]}%")
-        @results << IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        @results << IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
-        @results << GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
-        @results << GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('name LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('intellectual_object_identifier LIKE ?', "%#{params[:q]}%")
-        @results << WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
+        io_results = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+                                              "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+        #puts "results check: #{io_results.count}"
+        io_results.each do |io|
+          puts "test for id: #{io.identifier}"
+        end
+        gf_results = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        item_results = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+                                      "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+        @results = io_results + gf_results + item_results
     end
   end
 
