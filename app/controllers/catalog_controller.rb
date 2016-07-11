@@ -3,6 +3,7 @@ class CatalogController < ApplicationController
   after_action :verify_authorized
 
   def search
+    params[:q] = '%' if params[:q] == '*'
     authorize current_user
     case params[:object_type]
       when 'object'

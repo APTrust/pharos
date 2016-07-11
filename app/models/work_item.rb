@@ -8,6 +8,7 @@ class WorkItem < ActiveRecord::Base
   validate :reviewed_not_nil
   before_save :set_object_identifier_if_ingested
   before_save :set_access
+  before_save :set_identifiers
 
   def to_param
     "#{etag}/#{name}"
@@ -235,6 +236,35 @@ class WorkItem < ActiveRecord::Base
       self.access = 'restricted'
     else
       self.access = IntellectualObject.find(self.intellectual_object_id).access
+    end
+  end
+
+  def set_identifiers
+    set_obj_identifier
+    set_file_identifier
+  end
+
+  def set_obj_identifier
+    if self.intellectual_object_id.blank? && self.object_identifier.blank?
+      false
+    elsif self.intellectual_object_id.blank?
+      obj = IntellectualObject.where(identifier: self.object_identifier).first
+      self.intellectual_object_id = obj.id
+    elsif self.object_identifier.blank?
+      obj = IntellectualObject.find(self.intellectual_object_id)
+      self.object_identifier = obj.identifier
+    end
+  end
+
+  def set_file_identifier
+    if self.generic_file_id.blank? && self.generic_file_identifier.blank?
+      false
+    elsif self.generic_file_id.blank?
+      file = GenericFile.where(identifier: self.generic_file_identifier).first
+      self.generic_file_id = file.id
+    elsif self.generic_file_identifier.blank?
+      file = GenericFile.find(self.generic_file_id)
+      self.generic_file_identifier = file.identifier
     end
   end
 end
