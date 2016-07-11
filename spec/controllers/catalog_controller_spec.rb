@@ -13,18 +13,21 @@ RSpec.describe CatalogController, type: :controller do
     WorkItem.delete_all
     @institution = FactoryGirl.create(:institution)
     @another_institution = FactoryGirl.create(:institution)
+
     @object_one = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id)
     @object_two = FactoryGirl.create(:institutional_intellectual_object, institution_id: @institution.id, alt_identifier: ['something/1234-5678'])
     @object_three = FactoryGirl.create(:restricted_intellectual_object, institution_id: @institution.id, bag_name: 'fancy_bag/1234-5678')
     @object_four = FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id, title: 'This is an important bag')
-    @object_five = FactoryGirl.create(:institutional_intellectual_object, institution_id: @another_institution.id)
+    @object_five = FactoryGirl.create(:institutional_intellectual_object, institution_id: @another_institution.id, identifier: 'test.edu/1234-5678')
     @object_six = FactoryGirl.create(:restricted_intellectual_object, institution_id: @another_institution.id)
+
     @file_one = FactoryGirl.create(:generic_file, intellectual_object: @object_one, uri: 'file://something/data/old_file.xml')
     @file_two = FactoryGirl.create(:generic_file, intellectual_object: @object_two, uri: 'file://fancy/data/new_file.xml')
     @file_three = FactoryGirl.create(:generic_file, intellectual_object: @object_three, identifier: 'something/1234-5678/data/new_file.xml')
     @file_four = FactoryGirl.create(:generic_file, intellectual_object: @object_four)
     @file_five = FactoryGirl.create(:generic_file, intellectual_object: @object_five)
     @file_six = FactoryGirl.create(:generic_file, intellectual_object: @object_six)
+
     @item_one = FactoryGirl.create(:work_item, object_identifier: @object_one.identifier, generic_file_identifier: @file_one.identifier)
     @item_two = FactoryGirl.create(:work_item, object_identifier: @object_two.identifier, generic_file_identifier: @file_two.identifier, etag: '1234-5678')
     @item_three = FactoryGirl.create(:work_item, object_identifier: @object_three.identifier, generic_file_identifier: @file_three.identifier)
@@ -81,8 +84,8 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should return results from multiple categories when search_field is generic' do
             get :search, q: '1234-5678', search_field: '*', object_type: 'object'
-            expect(assigns(:results).size).to eq 2
-            expect(assigns(:results).map &:id).to match_array [@object_two.id, @object_three.id]
+            expect(assigns(:results).size).to eq 3
+            expect(assigns(:results).map &:id).to match_array [@object_two.id, @object_three.id, @object_five.id]
           end
         end
 
@@ -139,6 +142,60 @@ RSpec.describe CatalogController, type: :controller do
         end
 
         describe 'for generic searches' do
+          it 'should match a search on identifier' do
+            get :search, q: '1234', search_field: 'identifier', object_type: '*'
+            expect(assigns(:results).size).to eq 3
+            expect(assigns(:results).map &:id).to match_array [@object_five.id, @file_three.id, @file_five.id]
+          end
+
+          it 'should match a search on alt_identifier' do
+            get :search, q: '1234', search_field: 'alt_identifier', object_type: '*'
+            expect(assigns(:results).size).to eq 3
+            expect(assigns(:results).map &:id).to match_array [@object_two.id, @item_three.id, @item_five.id]
+          end
+
+          it 'should match a search on bag_name' do
+            get :search, q: '1234', search_field: 'bag_name', object_type: '*'
+            expect(assigns(:results).size).to eq 3
+            expect(assigns(:results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
+          end
+
+          it 'should match a search on title' do
+            get :search, q: 'important', search_field: 'title', object_type: '*'
+            expect(assigns(:results).size).to eq 1
+            expect(assigns(:results).map &:id).to match_array [@object_four.id]
+          end
+
+          it 'should match a search on uri' do
+            get :search, q: 'new_file', search_field: 'uri', object_type: '*'
+            expect(assigns(:results).size).to eq 1
+            expect(assigns(:results).map &:id).to match_array [@file_two.id]
+          end
+
+          it 'should match a search on name' do
+            get :search, q: '1234', search_field: 'name', object_type: '*'
+            expect(assigns(:results).size).to eq 3
+            expect(assigns(:results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
+          end
+
+          it 'should match a search on etag' do
+            get :search, q: '1234', search_field: 'etag', object_type: '*'
+            expect(assigns(:results).size).to eq 1
+            expect(assigns(:results).map &:id).to match_array [@item_two.id]
+          end
+
+          it 'should match a search on object_identifier' do
+            get :search, q: '1234', search_field: 'object_identifier', object_type: '*'
+            expect(assigns(:results).size).to eq 1
+            expect(assigns(:results).map &:id).to match_array [@item_five.id]
+          end
+
+          it 'should match a search on generic_file_identifier' do
+            get :search, q: '1234', search_field: 'file_identifier', object_type: '*'
+            expect(assigns(:results).size).to eq 2
+            expect(assigns(:results).map &:id).to match_array [@item_three.id, @item_five.id]
+          end
+
           it 'should return all results when nonspecific search terms are used' do
             get :search, q: '*', search_field: '*', object_type: '*', per_page: 20
             expect(assigns(:results).size).to eq 18
