@@ -188,10 +188,13 @@ class GenericFile < ActiveRecord::Base
       if self.intellectual_object_id.blank?
         self.access = 'restricted'
       else
-        self.access = IntellectualObject.find(self.intellectual_object_id).access
+        io = IntellectualObject.find(self.intellectual_object_id)
+        self.access = io.access
+        self.institution_id = io.institution.id
       end
     else
       self.access = self.intellectual_object.access
+      self.institution_id = self.intellectual_object.institution.id
     end
   end
 end

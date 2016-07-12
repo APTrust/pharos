@@ -60,145 +60,145 @@ RSpec.describe CatalogController, type: :controller do
         describe 'for intellectual object searches' do
           it 'should match an exact search on identifier' do
             get :search, q: @object_one.identifier, search_field: 'identifier', object_type: 'object'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @object_one.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_one.id
           end
 
           it 'should match a partial search on alt_identifier' do
             get :search, q: 'something', search_field: 'alt_identifier', object_type: 'object'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @object_two.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_two.id
           end
 
           it 'should match a partial search on bag_name' do
             get :search, q: 'fancy_bag', search_field: 'bag_name', object_type: 'object'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @object_three.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_three.id
           end
 
           it 'should match a partial search on title' do
             get :search, q: 'important', search_field: 'title', object_type: 'object'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @object_four.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_four.id
           end
 
           it 'should return results from multiple categories when search_field is generic' do
             get :search, q: '1234-5678', search_field: '*', object_type: 'object'
-            expect(assigns(:results).size).to eq 3
-            expect(assigns(:results).map &:id).to match_array [@object_two.id, @object_three.id, @object_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_two.id, @object_three.id, @object_five.id]
           end
         end
 
         describe 'for generic file searches' do
           it 'should match an exact search on identifier' do
             get :search, q: @file_one.identifier, search_field: 'identifier', object_type: 'file'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @file_one.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @file_one.id
           end
 
           it 'should match a partial search on uri' do
             get :search, q: 'fancy', search_field: 'uri', object_type: 'file'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @file_two.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @file_two.id
           end
 
           it 'should return results from multiple categories when search_field is generic' do
             get :search, q: 'new_file.xml', search_field: '*', object_type: 'file'
-            expect(assigns(:results).size).to eq 2
-            expect(assigns(:results).map &:id).to match_array [@file_two.id, @file_three.id]
+            expect(assigns(:paged_results).size).to eq 2
+            expect(assigns(:paged_results).map &:id).to match_array [@file_two.id, @file_three.id]
           end
         end
 
         describe 'for work item searches' do
           it 'should match an exact search on name' do
             get :search, q: @item_one.name, search_field: 'name', object_type: 'item'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @item_one.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @item_one.id
           end
 
           it 'should match a partial search on etag' do
             get :search, q: '1234', search_field: 'etag', object_type: 'item'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @item_two.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @item_two.id
           end
 
           it 'should match a search on object_identifier' do
             get :search, q: @object_three.identifier, search_field: 'object_identifier', object_type: 'item'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @item_three.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @item_three.id
           end
 
           it 'should match a search on file_identifier' do
             get :search, q: @file_four.identifier, search_field: 'file_identifier', object_type: 'item'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).first.id).to eq @item_four.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @item_four.id
           end
 
           it 'should return results from multiple categories when search_field is generic' do
             get :search, q: '1234', search_field: '*', object_type: 'item'
-            expect(assigns(:results).size).to eq 3
-            expect(assigns(:results).map &:id).to match_array [@item_two.id, @item_three.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@item_two.id, @item_three.id, @item_five.id]
           end
         end
 
         describe 'for generic searches' do
           it 'should match a search on identifier' do
             get :search, q: '1234', search_field: 'identifier', object_type: '*'
-            expect(assigns(:results).size).to eq 3
-            expect(assigns(:results).map &:id).to match_array [@object_five.id, @file_three.id, @file_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_five.id, @file_three.id, @file_five.id]
           end
 
           it 'should match a search on alt_identifier' do
             get :search, q: '1234', search_field: 'alt_identifier', object_type: '*'
-            expect(assigns(:results).size).to eq 3
-            expect(assigns(:results).map &:id).to match_array [@object_two.id, @item_three.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_two.id, @item_three.id, @item_five.id]
           end
 
           it 'should match a search on bag_name' do
             get :search, q: '1234', search_field: 'bag_name', object_type: '*'
-            expect(assigns(:results).size).to eq 3
-            expect(assigns(:results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
           end
 
           it 'should match a search on title' do
             get :search, q: 'important', search_field: 'title', object_type: '*'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).map &:id).to match_array [@object_four.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@object_four.id]
           end
 
           it 'should match a search on uri' do
             get :search, q: 'new_file', search_field: 'uri', object_type: '*'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).map &:id).to match_array [@file_two.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@file_two.id]
           end
 
           it 'should match a search on name' do
             get :search, q: '1234', search_field: 'name', object_type: '*'
-            expect(assigns(:results).size).to eq 3
-            expect(assigns(:results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
           end
 
           it 'should match a search on etag' do
             get :search, q: '1234', search_field: 'etag', object_type: '*'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).map &:id).to match_array [@item_two.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_two.id]
           end
 
           it 'should match a search on object_identifier' do
             get :search, q: '1234', search_field: 'object_identifier', object_type: '*'
-            expect(assigns(:results).size).to eq 1
-            expect(assigns(:results).map &:id).to match_array [@item_five.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_five.id]
           end
 
           it 'should match a search on generic_file_identifier' do
             get :search, q: '1234', search_field: 'file_identifier', object_type: '*'
-            expect(assigns(:results).size).to eq 2
-            expect(assigns(:results).map &:id).to match_array [@item_three.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 2
+            expect(assigns(:paged_results).map &:id).to match_array [@item_three.id, @item_five.id]
           end
 
           it 'should return all results when nonspecific search terms are used' do
             get :search, q: '*', search_field: '*', object_type: '*', per_page: 20
-            expect(assigns(:results).size).to eq 18
+            expect(assigns(:paged_results).size).to eq 18
           end
         end
       end
@@ -207,11 +207,104 @@ RSpec.describe CatalogController, type: :controller do
         before do
           sign_in inst_admin
         end
+
+        describe 'for intellectual object searches' do
+          it 'should return only the results to which you have access' do
+            get :search, q: '*', search_field: '*', object_type: 'object'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_four.id, @object_five.id, @object_six.id]
+          end
+
+          it 'should not return results that you do not have access to' do
+            get :search, q: @object_three.identifier, search_field: 'identifier', object_type: 'object'
+            expect(assigns(:paged_results).size).to eq 0
+          end
+        end
+
+        describe 'for generic file searches' do
+          it 'should return only the results to which you have access' do
+            get :search, q: '*', search_field: '*', object_type: 'file'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id, @file_five.id, @file_six.id]
+          end
+
+          it 'should not return results that you do not have access to' do
+            get :search, q: @file_three.identifier, search_field: 'identifier', object_type: 'file'
+            expect(assigns(:paged_results).size).to eq 0
+          end
+        end
+
+        describe 'for work item searches' do
+          it 'should return only the results to which you have access' do
+            get :search, q: '*', search_field: '*', object_type: 'item'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@item_one.id, @item_four.id, @item_five.id, @item_six.id]
+          end
+
+          it 'should not return results that you do not have access to' do
+            get :search, q: @item_three.object_identifier, search_field: 'object_identifier', object_type: 'item'
+            expect(assigns(:paged_results).size).to eq 0
+          end
+        end
+
+        describe 'for generic searches' do
+          it 'should return only the results to which you have access' do
+            get :search, q: '*', search_field: '*', object_type: '*', per_page: 20
+            expect(assigns(:paged_results).size).to eq 12
+          end
+
+          it 'should not return results that you do not have access to' do
+            get :search, q: '1234', search_field: 'alt_identifier', object_type: '*'
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_five.id]
+
+          end
+        end
       end
 
       describe 'as an institutional user' do
         before do
           sign_in inst_user
+        end
+
+        describe 'for intellectual object searches' do
+          it 'should return only the results to which you have access' do
+
+          end
+
+          it 'should not return results that you do not have access to' do
+
+          end
+        end
+
+        describe 'for generic file searches' do
+          it 'should return only the results to which you have access' do
+
+          end
+
+          it 'should not return results that you do not have access to' do
+
+          end
+        end
+
+        describe 'for work item searches' do
+          it 'should return only the results to which you have access' do
+
+          end
+
+          it 'should not return results that you do not have access to' do
+
+          end
+        end
+
+        describe 'for generic searches' do
+          it 'should return only the results to which you have access' do
+
+          end
+
+          it 'should not return results that you do not have access to' do
+
+          end
         end
       end
     end

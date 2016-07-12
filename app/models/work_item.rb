@@ -7,8 +7,8 @@ class WorkItem < ActiveRecord::Base
   validate :action_is_allowed
   validate :reviewed_not_nil
   before_save :set_object_identifier_if_ingested
-  before_save :set_access
   before_save :set_identifiers
+  before_save :set_access
 
   def to_param
     "#{etag}/#{name}"
@@ -235,7 +235,9 @@ class WorkItem < ActiveRecord::Base
     if self.intellectual_object_id.blank?
       self.access = 'restricted'
     else
-      self.access = IntellectualObject.find(self.intellectual_object_id).access
+      io = IntellectualObject.find(self.intellectual_object_id)
+      self.access = io.access
+      self.institution_id = io.institution.id
     end
   end
 
