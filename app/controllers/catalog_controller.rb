@@ -41,7 +41,6 @@ class CatalogController < ApplicationController
     if current_user.admin?
       @authorized_results = @results
     else
-      puts "test: #{@results.count}"
       consortial_results = @results.where(access: 'consortia')
       institution_results = @results.where('access LIKE ? AND institution_id LIKE ?', 'institution', current_user.institution_id)
       restricted_results = @results.where('access LIKE ? AND institution_id LIKE ?', 'restricted', current_user.institution_id)

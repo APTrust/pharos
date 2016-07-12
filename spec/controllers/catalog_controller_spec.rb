@@ -269,40 +269,53 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for intellectual object searches' do
           it 'should return only the results to which you have access' do
-
+            get :search, q: '*', search_field: '*', object_type: 'object'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_four.id, @object_five.id, @object_six.id]
           end
 
           it 'should not return results that you do not have access to' do
-
+            get :search, q: @object_three.identifier, search_field: 'identifier', object_type: 'object'
+            expect(assigns(:paged_results).size).to eq 0
           end
         end
 
         describe 'for generic file searches' do
           it 'should return only the results to which you have access' do
-
+            get :search, q: '*', search_field: '*', object_type: 'file'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id, @file_five.id, @file_six.id]
           end
 
           it 'should not return results that you do not have access to' do
-
+            get :search, q: @file_three.identifier, search_field: 'identifier', object_type: 'file'
+            expect(assigns(:paged_results).size).to eq 0
           end
         end
 
         describe 'for work item searches' do
           it 'should return only the results to which you have access' do
-
+            get :search, q: '*', search_field: '*', object_type: 'item'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@item_one.id, @item_four.id, @item_five.id, @item_six.id]
           end
 
           it 'should not return results that you do not have access to' do
-
+            get :search, q: @item_three.object_identifier, search_field: 'object_identifier', object_type: 'item'
+            expect(assigns(:paged_results).size).to eq 0
           end
         end
 
         describe 'for generic searches' do
           it 'should return only the results to which you have access' do
-
+            get :search, q: '*', search_field: '*', object_type: '*', per_page: 20
+            expect(assigns(:paged_results).size).to eq 12
           end
 
           it 'should not return results that you do not have access to' do
+            get :search, q: '1234', search_field: 'alt_identifier', object_type: '*'
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_five.id]
 
           end
         end
