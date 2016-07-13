@@ -40,16 +40,16 @@ class CatalogController < ApplicationController
 
   def permission_check
     @authorized_results = []
-    consortial_results = []
-    institution_results = []
-    restricted_results = []
+    # consortial_results = []
+    # institution_results = []
+    # restricted_results = []
     if current_user.admin?
       @results.each { |key, value| @authorized_results += value }
     else
       @results.each do |key, value|
-        consortial_results = value.where(access: 'consortia') unless value == []
-        institution_results = value.where('access LIKE ? AND institution_id LIKE ?', 'institution', current_user.institution_id) unless value == []
-        restricted_results = value.where('access LIKE ? AND institution_id LIKE ?', 'restricted', current_user.institution_id) unless value == []
+        consortial_results = value.where(access: 'consortia')
+        institution_results = value.where('access LIKE ? AND institution_id LIKE ?', 'institution', current_user.institution_id)
+        restricted_results = value.where('access LIKE ? AND institution_id LIKE ?', 'restricted', current_user.institution_id)
         @authorized_results += (consortial_results + institution_results + restricted_results)
       end
     end
@@ -212,14 +212,14 @@ class CatalogController < ApplicationController
   def filter_by_type
     case params[:type]
       when 'intellectual_object'
-        @results[:files] = []
-        @results[:items] = []
+        @results.delete(:files)
+        @results.delete(:items)
       when 'generic_file'
-        @results[:objects] = []
-        @results[:items] = []
+        @results.delete(:objects)
+        @results.delete(:items)
       when 'work_item'
-        @results[:files] = []
-        @results[:objects] = []
+        @results.delete(:objects)
+        @results.delete(:files)
     end
     @selected[:type] = params[:type]
   end
