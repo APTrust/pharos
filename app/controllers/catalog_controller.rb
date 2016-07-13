@@ -40,13 +40,16 @@ class CatalogController < ApplicationController
 
   def permission_check
     @authorized_results = []
+    consortial_results = []
+    institution_results = []
+    restricted_results = []
     if current_user.admin?
       @results.each { |key, value| @authorized_results += value }
     else
       @results.each do |key, value|
-        consortial_results = value.where(access: 'consortia')
-        institution_results = value.where('access LIKE ? AND institution_id LIKE ?', 'institution', current_user.institution_id)
-        restricted_results = value.where('access LIKE ? AND institution_id LIKE ?', 'restricted', current_user.institution_id)
+        consortial_results = value.where(access: 'consortia') unless value == []
+        institution_results = value.where('access LIKE ? AND institution_id LIKE ?', 'institution', current_user.institution_id) unless value == []
+        restricted_results = value.where('access LIKE ? AND institution_id LIKE ?', 'restricted', current_user.institution_id) unless value == []
         @authorized_results += (consortial_results + institution_results + restricted_results)
       end
     end
@@ -132,6 +135,7 @@ class CatalogController < ApplicationController
   def filter
     set_filter_values
     filter_results
+    set_filter_counts
     set_page_counts
   end
 
@@ -143,7 +147,7 @@ class CatalogController < ApplicationController
     @accesses = %w(Consortial Institution Restricted)
     @formats = set_formats
     @associations = set_associations
-    @types = ['Intellectual Objects', 'Generic Files', 'Work Items']
+    #@types = ['Intellectual Objects', 'Generic Files', 'Work Items']
     Institution.all.each do |inst|
       @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'
     end
@@ -157,63 +161,52 @@ class CatalogController < ApplicationController
     filter_by_action if params[:object_action].present?
     filter_by_institution if params[:institution].present?
     filter_by_access if params[:access].present?
-    filter_by_format if params[:format].present?
+    filter_by_format if params[:file_format].present?
     filter_by_association if params[:association].present?
     filter_by_type if params[:type].present?
   end
 
   def filter_by_status
-    @results[:items] = @results[:items].where(status: params[:status])
+    @results[:items] = @results[:items].where(status: params[:status]) unless @results[:items].nil?
     @selected[:status] = params[:status]
-    @statuses.each { |status| @counts[status] = @results.where(status: status).count() }
   end
 
   def filter_by_stage
-    @results[:items] = @results[:items].where(stage: params[:stage])
+    @results[:items] = @results[:items].where(stage: params[:stage]) unless @results[:items].nil?
     @selected[:stage] = params[:stage]
-    @stages.each { |stage| @counts[stage] = @results.where(stage: stage).count() }
   end
 
   def filter_by_action
-    @results[:items] = @results[:items].where(action: params[:object_action])
+    @results[:items] = @results[:items].where(action: params[:object_action]) unless @results[:items].nil?
     @selected[:object_action] = params[:object_action]
-    @actions.each { |action| @counts[action] = @results.where(action: action).count() }
   end
 
   def filter_by_institution
-    @results[:objects] = @results[:objects].where(institution_id: params[:institution])
-    @results[:files] = @results[:files].where(institution_id: params[:institution])
-    @results[:items] = @results[:items].where(institution_id: params[:institution])
+    @results[:objects] = @results[:objects].where(institution_id: params[:institution]) unless @results[:objects].nil?
+    @results[:files] = @results[:files].where(institution_id: params[:institution]) unless @results[:files].nil?
+    @results[:items] = @results[:items].where(institution_id: params[:institution]) unless @results[:items].nil?
     @selected[:institution] = params[:institution]
-    @institutions.each { |institution| @counts[institution] = @results.where(institution: institution).count() }
   end
 
   def filter_by_access
-    @results[:objects] = @results[:objects].where(access: params[:access])
-    @results[:files] = @results[:files].where(access: params[:access])
-    @results[:items] = @results[:items].where(access: params[:access])
+    @results[:objects] = @results[:objects].where(access: params[:access]) unless @results[:objects].nil?
+    @results[:files] = @results[:files].where(access: params[:access]) unless @results[:files].nil?
+    @results[:items] = @results[:items].where(access: params[:access]) unless @results[:items].nil?
     @selected[:access] = params[:access]
-
-    @accesses.each { |acc| @counts[acc] = @results.where(access: acc).count }
   end
 
   def filter_by_format
     #TODO: make sure this is applicable to objects as well as files
-    @results[:files] = @results[:files].where(format: params[:format])
-    @results[:objects] = @results[:objects].where(format: params[:format])
-    @selected[:format] = params[:format]
-    @formats.each { |format| @counts[format] = @results.where(format: format).count }
+    @results[:files] = @results[:files].where(file_format: params[:file_format]) unless @results[:files].nil?
+    @results[:objects] = @results[:objects].where(file_format: params[:file_format]) unless @results[:objects].nil?
+    @selected[:file_format] = params[:file_format]
   end
 
   def filter_by_association
-    filtered_results = []
-    io_assc = @results[:items].where(intellectual_object_id: params[:association])
-    gf_assc = @results[:items].where(generic_file_id: params[:association])
-    @results[:items] = io_assc + gf_assc
-    @results[:files] = @results[:files].where(intellectual_object_id: params[:association])
+    @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
+                                              params[:association], params[:association]) unless @results[:items].nil?
+    @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results[:files].nil?
     @selected[:association] = params[:association]
-    @associations.each { |assc| @counts[assc] = @results.where(intellectual_object: assc).count }
-    @associations.each { |assc| @counts[assc] = @results.where(generic_file: assc).count }
   end
 
   def filter_by_type
@@ -229,7 +222,6 @@ class CatalogController < ApplicationController
         @results[:objects] = []
     end
     @selected[:type] = params[:type]
-    @types.each { |type| @counts[type] = @results.where(type: type).count }
   end
 
   def set_page_counts
@@ -246,6 +238,32 @@ class CatalogController < ApplicationController
       @first_number = @second_number.to_i - 9
     end
     @second_number = @count if @second_number > @count
+  end
+
+  def set_filter_counts
+    @results.each do |key, value|
+      if key == 'objects'
+        @institutions.each { |institution| @counts[institution] = value.where(institution_id: institution).count }
+        @accesses.each { |acc| @counts[acc] = value.where(access: acc).count }
+        #@formats.each { |format| @counts[format] = value.where(file_format: format).count }
+      elsif key == 'files'
+        @formats.each { |format| @counts[format] = value.where(file_format: format).count }
+        @institutions.each { |institution| @counts[institution] = value.where(institution_id: institution).count }
+        @associations.each { |assc| @counts[assc] = value.where(intellectual_object: assc).count }
+        @accesses.each { |acc| @counts[acc] = value.where(access: acc).count }
+      elsif key == 'items'
+        @statuses.each { |status| @counts[status] = value.where(status: status).count }
+        @stages.each { |stage| @counts[stage] = value.where(stage: stage).count }
+        @actions.each { |action| @counts[action] = value.where(action: action).count }
+        @institutions.each { |institution| @counts[institution] = value.where(institution_id: institution).count }
+        @accesses.each { |acc| @counts[acc] = value.where(access: acc).count }
+        @associations.each { |assc| @counts[assc] = value.where(intellectual_object: assc).count }
+        @associations.each { |assc| @counts[assc] = value.where(generic_file: assc).count }
+      end
+    end
+    @counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
+    @counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
+    @counts['Work Items'] = @results[:items].count unless @results[:items].nil?
   end
 
   def set_formats
@@ -298,7 +316,7 @@ class CatalogController < ApplicationController
     str = str << "&stage=#{params[:stage]}" if params[:stage].present?
     str = str << "&status=#{params[:status]}" if params[:status].present?
     str = str << "&access=#{params[:access]}" if params[:access].present?
-    str = str << "&format=#{params[:format]}" if params[:format].present?
+    str = str << "&format=#{params[:file_format]}" if params[:file_format].present?
     str = str << "&association=#{params[:association]}" if params[:association].present?
     str = str << "&type=#{params[:type]}" if params[:type].present?
     str
