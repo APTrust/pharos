@@ -4,6 +4,7 @@ class CatalogController < ApplicationController
 
   def search
     params[:q] = '%' if params[:q] == '*'
+    @results = {}
     authorize current_user
     case params[:object_type]
       when 'object'
@@ -38,58 +39,58 @@ class CatalogController < ApplicationController
   end
 
   def permission_check
+    @authorized_results = []
     if current_user.admin?
-      @authorized_results = @results
+      @results.each { |key, value| @authorized_results += value }
     else
-      consortial_results = @results.where(access: 'consortia')
-      institution_results = @results.where('access LIKE ? AND institution_id LIKE ?', 'institution', current_user.institution_id)
-      restricted_results = @results.where('access LIKE ? AND institution_id LIKE ?', 'restricted', current_user.institution_id)
-      @authorized_results = consortial_results + institution_results + restricted_results
+      @results.each do |key, value|
+        consortial_results = value.where(access: 'consortia')
+        institution_results = value.where('access LIKE ? AND institution_id LIKE ?', 'institution', current_user.institution_id)
+        restricted_results = value.where('access LIKE ? AND institution_id LIKE ?', 'restricted', current_user.institution_id)
+        @authorized_results += (consortial_results + institution_results + restricted_results)
+      end
     end
   end
 
   def object_search
-    @results = []
     case params[:search_field]
       when 'identifier'
-        @results = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
       when 'alt_identifier'
-        @results = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
       when 'bag_name'
-        @results = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
       when 'title'
-        @results = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
       when '*'
-        @results = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+        @results[:objects] = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                              "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
   def file_search
-    @results = []
     case params[:search_field]
       when 'identifier'
-        @results = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
+        @results[:files] = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
       when 'uri'
-        @results = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
+        @results[:files] = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
       when '*'
-        @results = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:files] = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
   def item_search
-    @results = []
     case params[:search_field]
       when 'name'
-        @results = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
       when 'etag'
-        @results = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
       when 'object_identifier'
-        @results = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
       when 'file_identifier'
-        @results = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
       when '*'
-        @results = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+        @results[:items] = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                   "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
@@ -97,39 +98,34 @@ class CatalogController < ApplicationController
   def generic_search
     case params[:search_field]
       when 'identifier'
-        io_results = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
-        gf_results = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
-        @results = io_results + gf_results
+        @results[:objects] = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
+        @results[:files] = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
       when 'alt_identifier'
-        io_results = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
-        item_results = WorkItem.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+        @results[:objects] = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                       "%#{params[:q]}%", "%#{params[:q]}%")
-        @results = io_results + item_results
       when 'bag_name'
-        io_results = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        item_results = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
-        @results = io_results + item_results
+        @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
       when 'title'
-        @results = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
       when 'uri'
-        @results = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
+        @results[:files] = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
       when 'name'
-        io_results = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        item_results = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
-        @results = io_results + item_results
+        @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
       when 'etag'
-        @results = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
       when 'object_identifier'
-        @results = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
       when 'file_identifier'
-        @results = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
       when '*'
-        io_results = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+        @results[:objects] = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                               "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        gf_results = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
-        item_results = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+        @results[:files] = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:items] = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                       "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        @results = io_results + gf_results + item_results
     end
   end
 
@@ -167,31 +163,35 @@ class CatalogController < ApplicationController
   end
 
   def filter_by_status
-    @results = @results.where(status: params[:status])
+    @results[:items] = @results[:items].where(status: params[:status])
     @selected[:status] = params[:status]
     @statuses.each { |status| @counts[status] = @results.where(status: status).count() }
   end
 
   def filter_by_stage
-    @results = @results.where(stage: params[:stage])
+    @results[:items] = @results[:items].where(stage: params[:stage])
     @selected[:stage] = params[:stage]
     @stages.each { |stage| @counts[stage] = @results.where(stage: stage).count() }
   end
 
   def filter_by_action
-    @results = @results.where(action: params[:object_action])
+    @results[:items] = @results[:items].where(action: params[:object_action])
     @selected[:object_action] = params[:object_action]
     @actions.each { |action| @counts[action] = @results.where(action: action).count() }
   end
 
   def filter_by_institution
-    @results = @results.where(institution: params[:institution])
+    @results[:objects] = @results[:objects].where(institution_id: params[:institution])
+    @results[:files] = @results[:files].where(institution_id: params[:institution])
+    @results[:items] = @results[:items].where(institution_id: params[:institution])
     @selected[:institution] = params[:institution]
     @institutions.each { |institution| @counts[institution] = @results.where(institution: institution).count() }
   end
 
   def filter_by_access
-    @results = @results.where(access: params[:access])
+    @results[:objects] = @results[:objects].where(access: params[:access])
+    @results[:files] = @results[:files].where(access: params[:access])
+    @results[:items] = @results[:items].where(access: params[:access])
     @selected[:access] = params[:access]
 
     @accesses.each { |acc| @counts[acc] = @results.where(access: acc).count }
@@ -199,30 +199,42 @@ class CatalogController < ApplicationController
 
   def filter_by_format
     #TODO: make sure this is applicable to objects as well as files
-    @results = @results.where(format: params[:format])
+    @results[:files] = @results[:files].where(format: params[:format])
+    @results[:objects] = @results[:objects].where(format: params[:format])
     @selected[:format] = params[:format]
     @formats.each { |format| @counts[format] = @results.where(format: format).count }
   end
 
   def filter_by_association
     filtered_results = []
-    filtered_results << @results.where(intellectual_object_id: params[:association])
-    filtered_results << @results.where(generic_file_id: params[:association])
-    @results = filtered_results
+    io_assc = @results[:items].where(intellectual_object_id: params[:association])
+    gf_assc = @results[:items].where(generic_file_id: params[:association])
+    @results[:items] = io_assc + gf_assc
+    @results[:files] = @results[:files].where(intellectual_object_id: params[:association])
     @selected[:association] = params[:association]
-
     @associations.each { |assc| @counts[assc] = @results.where(intellectual_object: assc).count }
     @associations.each { |assc| @counts[assc] = @results.where(generic_file: assc).count }
   end
 
   def filter_by_type
-    @results = @results.where(type: params[:type])
+    case params[:type]
+      when 'intellectual_object'
+        @results[:files] = []
+        @results[:items] = []
+      when 'generic_file'
+        @results[:objects] = []
+        @results[:items] = []
+      when 'work_item'
+        @results[:files] = []
+        @results[:objects] = []
+    end
     @selected[:type] = params[:type]
     @types.each { |type| @counts[type] = @results.where(type: type).count }
   end
 
   def set_page_counts
-    @count = @results.count
+    @count = 0
+    @results.each { |key, value| @count = @count + value.count }
     if @count == 0
       @second_number = 0
       @first_number = 0
