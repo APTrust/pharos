@@ -280,11 +280,11 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_four.id]
           end
 
-          it 'should filter results by format' do
-            get :search, q: '*', search_field: '*', object_type: 'object', file_format: 'application/xml'
-            expect(assigns(:paged_results).size).to eq 6
-            expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_two.id, @object_three.id, @object_four.id, @object_five.id, @object_six.id]
-          end
+          # it 'should filter results by format' do
+          #   get :search, q: '*', search_field: '*', object_type: 'object', file_format: 'application/xml'
+          #   expect(assigns(:paged_results).size).to eq 6
+          #   expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_two.id, @object_three.id, @object_four.id, @object_five.id, @object_six.id]
+          # end
         end
 
         describe 'for generic file searches' do

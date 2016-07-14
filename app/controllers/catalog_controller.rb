@@ -198,7 +198,7 @@ class CatalogController < ApplicationController
   def filter_by_format
     #TODO: make sure this is applicable to objects as well as files
     @results[:files] = @results[:files].where(file_format: params[:file_format]) unless @results[:files].nil?
-    @results[:objects] = @results[:objects].where(file_format: params[:file_format]) unless @results[:objects].nil?
+    #@results[:objects] = @results[:objects].where(file_format: params[:file_format]) unless @results[:objects].nil?
     @selected[:file_format] = params[:file_format]
   end
 
@@ -243,36 +243,34 @@ class CatalogController < ApplicationController
   def set_filter_counts
     @results.each do |key, value|
       if key == 'objects'
-        @institutions.each { |institution| @counts[institution] = value.where(institution_id: institution).count }
-        @accesses.each { |acc| @counts[acc] = value.where(access: acc).count }
-        #@formats.each { |format| @counts[format] = value.where(file_format: format).count }
+        @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
+        @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
+        #@formats.each { |format| @counts[:formats][format] += value.where(file_format: format).count }
       elsif key == 'files'
-        @formats.each { |format| @counts[format] = value.where(file_format: format).count }
-        @institutions.each { |institution| @counts[institution] = value.where(institution_id: institution).count }
-        @associations.each { |assc| @counts[assc] = value.where(intellectual_object: assc).count }
-        @accesses.each { |acc| @counts[acc] = value.where(access: acc).count }
+        @formats.each { |format| @counts[:formats][format] += value.where(file_format: format).count }
+        @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
+        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object: assc).count }
+        @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
       elsif key == 'items'
-        @statuses.each { |status| @counts[status] = value.where(status: status).count }
-        @stages.each { |stage| @counts[stage] = value.where(stage: stage).count }
-        @actions.each { |action| @counts[action] = value.where(action: action).count }
-        @institutions.each { |institution| @counts[institution] = value.where(institution_id: institution).count }
-        @accesses.each { |acc| @counts[acc] = value.where(access: acc).count }
-        @associations.each { |assc| @counts[assc] = value.where(intellectual_object: assc).count }
-        @associations.each { |assc| @counts[assc] = value.where(generic_file: assc).count }
+        @statuses.each { |status| @counts[:status][status] += value.where(status: status).count }
+        @stages.each { |stage| @counts[:stage][stage] += value.where(stage: stage).count }
+        @actions.each { |action| @counts[:action][action] += value.where(action: action).count }
+        @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
+        @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
+        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object: assc).count }
+        @associations.each { |assc| @counts[:related][assc] += value.where(generic_file: assc).count }
       end
     end
-    @counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
-    @counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
-    @counts['Work Items'] = @results[:items].count unless @results[:items].nil?
+    @counts[:type]['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
+    @counts[:type]['Generic Files'] = @results[:files].count unless @results[:files].nil?
+    @counts[:type]['Work Items'] = @results[:items].count unless @results[:items].nil?
   end
 
   def set_formats
-    #TODO: figure out how to set these without looping through all objects
     Array.new
   end
 
   def set_associations
-    #TODO: figure out how to set these without looping through all objects
     Array.new
   end
 
