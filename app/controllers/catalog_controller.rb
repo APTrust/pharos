@@ -143,10 +143,14 @@ class CatalogController < ApplicationController
     @statuses = Pharos::Application::PHAROS_STATUSES.values
     @stages = Pharos::Application::PHAROS_STAGES.values
     @actions = Pharos::Application::PHAROS_ACTIONS.values
-    @institutions = Array.new
+    @institutions = Institution.pluck(:id)
     @accesses = %w(Consortial Institution Restricted)
-    @formats = set_formats
-    @associations = set_associations
+    @formats = GenericFile.distinct.pluck(:file_format)
+    file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
+    item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
+    item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
+    deduped_io_associations = file_associations | item_io_associations
+    @associations = deduped_io_associations + item_gf_associations
     Institution.all.each do |inst|
       @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'
     end
@@ -264,18 +268,6 @@ class CatalogController < ApplicationController
     @counts[:type]['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
     @counts[:type]['Generic Files'] = @results[:files].count unless @results[:files].nil?
     @counts[:type]['Work Items'] = @results[:items].count unless @results[:items].nil?
-  end
-
-  def set_formats
-    @formats = GenericFile.distinct.pluck(:file_format)
-  end
-
-  def set_associations
-    file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
-    item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
-    item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
-    deduped_io_associations = file_associations | item_io_associations
-    @associations = deduped_io_associations + item_gf_associations
   end
 
   def format_date
