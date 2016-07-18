@@ -19,7 +19,7 @@ class CatalogController < ApplicationController
     filter
     page_and_authorize
     respond_to do |format|
-      format.json { render json: {results: @results, next: @next, previous: @previous} }
+      format.json { render json: {results: @paged_results, next: @next, previous: @previous} }
       format.html { }
     end
   end
@@ -151,9 +151,6 @@ class CatalogController < ApplicationController
     item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
     deduped_io_associations = file_associations | item_io_associations
     @associations = deduped_io_associations + item_gf_associations
-    Institution.all.each do |inst|
-      @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'
-    end
     @counts = {}
     @selected = {}
   end
