@@ -366,9 +366,9 @@ class WorkItemsController < ApplicationController
     end
     params[:institution].present? ? @institution = Institution.where(identifier: params[:institution]) : @institution = current_user.institution
     @items = @items.where(reviewed: false) unless session[:show_reviewed] == 'true'
-    params[:wi_sort] = 'date' if params[:wi_sort].nil?
-    @items = @items.order(params[:wi_sort])
-    @items = @items.reverse_order if params[:wi_sort] == 'date'
+    params[:sort] = 'date' if params[:sort].nil?
+    @items = @items.order(params[:sort])
+    @items = @items.reverse_order if params[:sort] == 'date'
     authorize @items
     session[:purge_datetime] = Time.now.utc if params[:page] == 1 || params[:page].nil?
   end
