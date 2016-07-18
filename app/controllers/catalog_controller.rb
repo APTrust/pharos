@@ -7,12 +7,14 @@ class CatalogController < ApplicationController
     @results = {}
     authorize current_user
     case params[:object_type]
-      when 'object'
+      when 'Intellectual Objects'
         object_search
-      when 'file'
+      when 'Generic Files'
         file_search
-      when 'item'
+      when 'Work Items'
         item_search
+      when 'All Types'
+        generic_search
       when '*'
         generic_search
     end
@@ -57,15 +59,15 @@ class CatalogController < ApplicationController
 
   def object_search
     case params[:search_field]
-      when 'identifier'
+      when 'Identifier'
         @results[:objects] = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
-      when 'alt_identifier'
+      when 'Alternate Identifier'
         @results[:objects] = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
-      when 'bag_name'
+      when 'Bag Name'
         @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-      when 'title'
+      when 'Title'
         @results[:objects] = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
-      when '*'
+      when 'All Fields'
         @results[:objects] = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                              "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
@@ -73,26 +75,26 @@ class CatalogController < ApplicationController
 
   def file_search
     case params[:search_field]
-      when 'identifier'
+      when 'Identifier'
         @results[:files] = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
-      when 'uri'
+      when 'URI'
         @results[:files] = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
-      when '*'
+      when 'All Fields'
         @results[:files] = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
   def item_search
     case params[:search_field]
-      when 'name'
+      when 'Name'
         @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
-      when 'etag'
+      when 'Etag'
         @results[:items] = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
-      when 'object_identifier'
+      when 'Intellectual Object Identifier'
         @results[:items] = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
-      when 'file_identifier'
+      when 'Generic File Identifier'
         @results[:items] = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
-      when '*'
+      when 'All Fields'
         @results[:items] = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                   "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
@@ -100,30 +102,32 @@ class CatalogController < ApplicationController
 
   def generic_search
     case params[:search_field]
-      when 'identifier'
+      when 'Identifier'
         @results[:objects] = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
         @results[:files] = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
-      when 'alt_identifier'
+      when 'Alternate Identifier'
         @results[:objects] = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
         @results[:items] = WorkItem.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                       "%#{params[:q]}%", "%#{params[:q]}%")
-      when 'bag_name'
+      when 'Bag Name'
         @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
         @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
-      when 'title'
+      when 'Title'
         @results[:objects] = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
-      when 'uri'
+      when 'URI'
         @results[:files] = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
-      when 'name'
+      when 'Name'
         @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
         @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
-      when 'etag'
+      when 'Etag'
         @results[:items] = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
-      when 'object_identifier'
+      when 'Intellectual Object Identifier'
         @results[:items] = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
-      when 'file_identifier'
+        @results[:objects] = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
+      when 'Generic File Identifier'
         @results[:items] = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
-      when '*'
+        @results[:files] = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
+      when 'All Fields'
         @results[:objects] = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                               "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:files] = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
