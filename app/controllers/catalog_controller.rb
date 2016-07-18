@@ -147,7 +147,6 @@ class CatalogController < ApplicationController
     @accesses = %w(Consortial Institution Restricted)
     @formats = set_formats
     @associations = set_associations
-    #@types = ['Intellectual Objects', 'Generic Files', 'Work Items']
     Institution.all.each do |inst|
       @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'
     end
@@ -249,7 +248,7 @@ class CatalogController < ApplicationController
       elsif key == 'files'
         @formats.each { |format| @counts[:formats][format] += value.where(file_format: format).count }
         @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
-        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object: assc).count }
+        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object_id: assc).count }
         @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
       elsif key == 'items'
         @statuses.each { |status| @counts[:status][status] += value.where(status: status).count }
@@ -257,21 +256,26 @@ class CatalogController < ApplicationController
         @actions.each { |action| @counts[:action][action] += value.where(action: action).count }
         @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
         @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
-        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object: assc).count }
-        @associations.each { |assc| @counts[:related][assc] += value.where(generic_file: assc).count }
+        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object_id: assc).count }
+        @associations.each { |assc| @counts[:related][assc] += value.where(generic_file_id: assc).count }
       end
     end
+    @counts[:type] = {}
     @counts[:type]['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
     @counts[:type]['Generic Files'] = @results[:files].count unless @results[:files].nil?
     @counts[:type]['Work Items'] = @results[:items].count unless @results[:items].nil?
   end
 
   def set_formats
-    Array.new
+    @formats = GenericFile.distinct.pluck(:file_format)
   end
 
   def set_associations
-    Array.new
+    file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
+    item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
+    item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
+    deduped_io_associations = file_associations | item_io_associations
+    @associations = deduped_io_associations + item_gf_associations
   end
 
   def format_date
