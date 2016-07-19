@@ -7,7 +7,6 @@ class WorkItem < ActiveRecord::Base
   validate :action_is_allowed
   validate :reviewed_not_nil
   before_save :set_object_identifier_if_ingested
-  before_save :set_identifiers
   before_save :set_access
 
   def to_param
@@ -229,6 +228,12 @@ class WorkItem < ActiveRecord::Base
       bag_basename = self.name.sub(re_single, '').sub(re_multi, '')
       self.object_identifier = "#{self.institution}/#{bag_basename}"
     end
+    unless self.object_identifier.blank?
+      self.intellectual_object_id = IntellectualObject.where(identifier: self.object_identifier).first.id
+    end
+    unless self.generic_file_identifier.blank?
+      self.generic_file_id = GenericFile.where(identifier: self.generic_file_identifier).first.id
+    end
   end
 
   def set_access
@@ -241,32 +246,4 @@ class WorkItem < ActiveRecord::Base
     end
   end
 
-  def set_identifiers
-    set_obj_identifier
-    set_file_identifier
-  end
-
-  def set_obj_identifier
-    if self.intellectual_object_id.blank? && self.object_identifier.blank?
-      false
-    elsif self.intellectual_object_id.blank?
-      obj = IntellectualObject.where(identifier: self.object_identifier).first
-      self.intellectual_object_id = obj.id
-    elsif self.object_identifier.blank?
-      obj = IntellectualObject.find(self.intellectual_object_id)
-      self.object_identifier = obj.identifier
-    end
-  end
-
-  def set_file_identifier
-    if self.generic_file_id.blank? && self.generic_file_identifier.blank?
-      false
-    elsif self.generic_file_id.blank?
-      file = GenericFile.where(identifier: self.generic_file_identifier).first
-      self.generic_file_id = file.id
-    elsif self.generic_file_identifier.blank?
-      file = GenericFile.find(self.generic_file_id)
-      self.generic_file_identifier = file.identifier
-    end
-  end
 end

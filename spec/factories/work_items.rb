@@ -13,6 +13,7 @@ FactoryGirl.define do
     status { Pharos::Application::PHAROS_STATUSES.values.sample }
     outcome { Faker::Lorem.sentence }
     reviewed { false }
+    object_identifier { FactoryGirl.create(:intellectual_object).identifier }
   end
 
   factory :ingested_item, class: WorkItem do
@@ -29,6 +30,7 @@ FactoryGirl.define do
     status { Pharos::Application::PHAROS_STATUSES['success'] }
     outcome { Faker::Lorem.sentence }
     reviewed { false }
+    object_identifier { FactoryGirl.create(:intellectual_object).identifier }
   end
 
   factory :work_item_with_state, class: WorkItem do
@@ -48,6 +50,7 @@ FactoryGirl.define do
     state { Faker::Lorem.sentence }
     node { Faker::Internet.ip_v4_address }
     pid { Random::rand(5000) }
+    object_identifier { FactoryGirl.create(:intellectual_object).identifier }
   end
 
 end

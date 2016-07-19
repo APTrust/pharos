@@ -4,9 +4,10 @@ RSpec.describe WorkItemsController, type: :controller do
   let(:institution) { FactoryGirl.create(:institution) }
   let(:admin_user) { FactoryGirl.create(:user, :admin) }
   let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution_id: institution.id) }
-
-  let!(:item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
-  let!(:user_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution.identifier, status: Pharos::Application::PHAROS_STATUSES['fail']) }
+  let(:object) { FactoryGirl.create(:intellectual_object, institution: institution) }
+  let(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
+  let!(:item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
+  let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution.identifier, status: Pharos::Application::PHAROS_STATUSES['fail']) }
 
   after do
     WorkItem.destroy_all
@@ -373,18 +374,19 @@ RSpec.describe WorkItemsController, type: :controller do
                              stage: Pharos::Application::PHAROS_STAGES['requested'],
                              status: Pharos::Application::PHAROS_STATUSES['pend'],
                              institution: institutional_admin.institution.identifier,
-                             object_identifier: 'mickey/mouse',
-                             generic_file_identifier: 'mickey/mouse/club',
+                             object_identifier: object.identifier,
+                             generic_file_identifier: file.identifier,
                              retry: true)
         end
+        new_file = FactoryGirl.create(:generic_file)
         wi = WorkItem.last
-        wi.generic_file_identifier = 'something/else'
+        wi.generic_file_identifier = new_file.identifier
         wi.save
         sign_in admin_user
       end
 
       it 'should return only items with the specified object_identifier' do
-        get :index, alt_action: 'delete', generic_file_identifier: 'mickey/mouse/club', format: :json
+        get :index, alt_action: 'delete', generic_file_identifier: file.identifier, format: :json
         expect(assigns(:items).count).to eq(2)
       end
     end
@@ -415,50 +417,51 @@ RSpec.describe WorkItemsController, type: :controller do
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: false,
-                                 object_identifier: 'ned/flanders')
+                                 object_identifier: object.identifier)
       end
 
       it 'responds successfully with an HTTP 200 status code' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier:object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
         expect(response).to be_success
       end
 
       it 'assigns the correct @item' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Buzz', retry: true)
-        expected_item = WorkItem.where(object_identifier: 'ned/flanders').order(created_at: :desc).first
+        expected_item = WorkItem.where(object_identifier: object.identifier).order(created_at: :desc).first
         expect(assigns(:item).id).to eq(expected_item.id)
       end
 
       it 'updates the correct @item' do
-        WorkItem.first.update(object_identifier: 'homer/simpson')
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        new_object = FactoryGirl.create(:intellectual_object)
+        WorkItem.first.update(object_identifier: new_object.identifier)
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
-        update_count = WorkItem.where(object_identifier: 'ned/flanders',
+        update_count = WorkItem.where(object_identifier: object.identifier,
                                            stage: 'Resolve', status: 'Success', retry: true).count
         expect(update_count).to eq(1)
       end
 
       it 'returns 404 for no matching records' do
         WorkItem.update_all(object_identifier: 'homer/simpson')
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Neil', retry: true)
         expect(response.status).to eq(404)
       end
 
       it 'returns 400 for bad request' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Invalid_Stage', status: 'Invalid_Status', note: 'Armstrong', retry: true)
         expect(response.status).to eq(400)
       end
 
       it 'updates node, state, pid and needs_admin_review' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
              node: '10.11.12.13', state: '{JSON data}', pid: 4321, needs_admin_review: true)
         expect(response).to be_success
-        wi = WorkItem.where(object_identifier: 'ned/flanders',
+        wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq('10.11.12.13')
         expect(wi.state).to eq('{JSON data}')
@@ -467,11 +470,11 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'clears node, pid and needs_admin_review, updates state' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
              node: nil, pid: 0, state: '{new JSON data}', needs_admin_review: false)
         expect(response).to be_success
-        wi = WorkItem.where(object_identifier: 'ned/flanders',
+        wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq(nil)
         expect(wi.state).to eq('{new JSON data}')
@@ -488,7 +491,7 @@ RSpec.describe WorkItemsController, type: :controller do
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: false,
-                                 object_identifier: 'ned/flanders',
+                                 object_identifier: object.identifier,
                                  etag: '12345678')
       end
 
@@ -498,14 +501,14 @@ RSpec.describe WorkItemsController, type: :controller do
       # record (the latest). None of the older restore requests should
       # be touched.
       it 'updates the correct @items' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
-        update_count = WorkItem.where(object_identifier: 'ned/flanders',
+        update_count = WorkItem.where(object_identifier: object.identifier,
                                            stage: 'Resolve', status: 'Success', retry: true).count
         # Should be only one item updated...
         expect(update_count).to eq(1)
         # ... and it should be the most recent
-        restore_items = WorkItem.where(object_identifier: 'ned/flanders',
+        restore_items = WorkItem.where(object_identifier: object.identifier,
                                             action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc)
         restore_items.each_with_index do |item, index|
           if index == 0
@@ -526,11 +529,11 @@ RSpec.describe WorkItemsController, type: :controller do
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
                                  retry: false,
-                                 object_identifier: 'ned/flanders')
+                                 object_identifier: object.identifier)
       end
 
       it 'restricts access to the admin API' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: 'ned/flanders',
+        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
         expect(response.status).to eq 403
       end
@@ -555,7 +558,8 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should reject a status, stage or action that is not allowed' do
-        post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
+        name = object.identifier.split('/')[1]
+        post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
                                        bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: 'File',
                                        stage: "Entry", status: 'Finalized', outcome: 'Outcome', reviewed: false}, format: 'json'
         expect(response.code).to eq '422' #Unprocessable Entity
@@ -565,18 +569,20 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should accept good parameters via json' do
+        name = object.identifier.split('/')[1]
         expect {
-          post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
+          post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
                                          bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
                                          stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: false}, format: 'json'
         }.to change(WorkItem, :count).by(1)
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
-        expect(assigns(:work_item).name).to eq '123456.tar'
+        expect(assigns(:work_item).name).to eq "#{name}.tar"
       end
 
       it 'should fix an item with a null reviewed flag' do
-        post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
+        name = object.identifier.split('/')[1]
+        post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
                                        bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
                                        stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: nil}, format: 'json'
         expect(response.status).to eq(201)
@@ -787,8 +793,8 @@ RSpec.describe WorkItemsController, type: :controller do
                                       stage: 'Record',
                                       status: 'Success',
                                       node: '10.11.12.13',
-                                      object_identifier: 'test.edu/item1',
-                                      generic_file_identifier: 'test.edu/item1/file1.pdf') }
+                                      object_identifier: object.identifier,
+                                      generic_file_identifier: file.identifier) }
 
     describe 'for admin user' do
       before do
@@ -811,8 +817,8 @@ RSpec.describe WorkItemsController, type: :controller do
             retry: 'true', reviewed: 'false',
             bag_date: '2014-10-17 14:56:56Z',
             action: 'Ingest', stage: 'Record',
-            status: 'Success', object_identifier: 'test.edu/item1',
-            generic_file_identifier: 'test.edu/item1/file1.pdf')
+            status: 'Success', object_identifier: object.identifier,
+            generic_file_identifier: file.identifier)
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)

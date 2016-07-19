@@ -532,13 +532,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as an admin' do
       let(:user) { FactoryGirl.create(:user, :admin) }
       let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
+      let(:obj2) { FactoryGirl.create(:consortial_intellectual_object) }
 
       before do
         5.times do
           FactoryGirl.create(:ingested_item)
         end
         WorkItem.update_all(object_identifier: obj1.identifier)
-        WorkItem.first.update(object_identifier: 'some.edu/some.bag')
+        WorkItem.first.update(object_identifier: obj2.identifier)
         request.env['HTTP_REFERER'] = 'OzzyOsbourne'
         sign_in user
       end
@@ -553,6 +554,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         count = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
                                     status: Pharos::Application::PHAROS_STATUSES['pend'],
+                                    #object_identifier: obj1.identifier,
                                     retry: true).count
         expect(count).to eq(1)
       end

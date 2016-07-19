@@ -28,12 +28,12 @@ RSpec.describe CatalogController, type: :controller do
     @file_five = FactoryGirl.create(:generic_file, intellectual_object: @object_five)
     @file_six = FactoryGirl.create(:generic_file, intellectual_object: @object_six)
 
-    @item_one = FactoryGirl.create(:work_item, object_identifier: @object_one.identifier, generic_file_identifier: @file_one.identifier)
-    @item_two = FactoryGirl.create(:work_item, object_identifier: @object_two.identifier, generic_file_identifier: @file_two.identifier, etag: '1234-5678')
-    @item_three = FactoryGirl.create(:work_item, object_identifier: @object_three.identifier, generic_file_identifier: @file_three.identifier)
-    @item_four = FactoryGirl.create(:work_item, object_identifier: @object_four.identifier, generic_file_identifier: @file_four.identifier, stage: 'Requested')
-    @item_five = FactoryGirl.create(:work_item, object_identifier: @object_five.identifier, generic_file_identifier: @file_five.identifier, name: '1234file.tar', status: 'Success')
-    @item_six = FactoryGirl.create(:work_item, object_identifier: @object_six.identifier, generic_file_identifier: @file_six.identifier, action: 'Ingest')
+    @item_one = FactoryGirl.create(:ingested_item, object_identifier: @object_one.identifier, generic_file_identifier: @file_one.identifier)
+    @item_two = FactoryGirl.create(:ingested_item, object_identifier: @object_two.identifier, generic_file_identifier: @file_two.identifier, etag: '1234-5678')
+    @item_three = FactoryGirl.create(:ingested_item, object_identifier: @object_three.identifier, generic_file_identifier: @file_three.identifier)
+    @item_four = FactoryGirl.create(:ingested_item, object_identifier: @object_four.identifier, generic_file_identifier: @file_four.identifier, stage: 'Requested')
+    @item_five = FactoryGirl.create(:ingested_item, object_identifier: @object_five.identifier, generic_file_identifier: @file_five.identifier, name: '1234file.tar', status: 'Success')
+    @item_six = FactoryGirl.create(:ingested_item, object_identifier: @object_six.identifier, generic_file_identifier: @file_six.identifier, action: 'Ingest')
   end
 
   after(:all) do
