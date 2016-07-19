@@ -186,6 +186,7 @@ class IntellectualObject < ActiveRecord::Base
         permissions[:read_groups] = ['admin', inst_admin_group]
         permissions[:edit_groups] = ['admin', inst_admin_group]
     end
+    self.permissions = permissions
     permissions
   end
 

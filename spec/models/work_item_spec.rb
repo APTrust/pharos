@@ -28,6 +28,8 @@ end
 RSpec.describe WorkItem, :type => :model do
   before(:all) do
     WorkItem.destroy_all
+    IntellectualObject.destroy_all
+    GenericFile.destroy_all
   end
 
   it { should validate_presence_of(:name) }
@@ -148,6 +150,7 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'should set object identifier in before_save if not ingested (single part bag)' do
+    FactoryGirl.create(:intellectual_object, identifier: 'hardknocks.edu/sample_bag')
     setup_item(subject)
     subject.action = ingest
     subject.stage = record
@@ -157,6 +160,7 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'should set object identifier in before_save if not ingested (multi part bag)' do
+    FactoryGirl.create(:intellectual_object, identifier: 'hardknocks.edu/sesame.street')
     setup_item(subject)
     subject.name = 'sesame.street.b046.of249.tar'
     subject.action = ingest
@@ -218,6 +222,8 @@ RSpec.describe WorkItem, :type => :model do
   describe 'work queue methods' do
     ingest_date = Time.parse('2014-06-01')
     before do
+      FactoryGirl.create(:intellectual_object, identifier: 'abc/123')
+      FactoryGirl.create(:generic_file, identifier: 'abc/123/doc.pdf')
       3.times do
         ingest_date = ingest_date + 1.days
         FactoryGirl.create(:work_item, object_identifier: 'abc/123',

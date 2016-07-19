@@ -153,7 +153,7 @@ RSpec.describe IntellectualObject, :type => :model do
       describe 'with consortial access' do
         subject { FactoryGirl.create(:consortial_intellectual_object) }
         it 'should properly set groups' do
-          permissions = subject.check_permissions
+          permissions = subject.set_permissions
           expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
           expect(permissions[:read_groups]).to eq %w(admin institutional_admin institutional_user)
           expect(permissions[:discover_groups]).to eq %w(admin institutional_admin institutional_user)
@@ -163,7 +163,7 @@ RSpec.describe IntellectualObject, :type => :model do
       describe 'with institutional access' do
         subject { FactoryGirl.create(:institutional_intellectual_object) }
         it 'should properly set groups' do
-          permissions = subject.check_permissions
+          permissions = subject.set_permissions
           expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
           expect(permissions[:read_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
           expect(permissions[:discover_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
@@ -173,7 +173,7 @@ RSpec.describe IntellectualObject, :type => :model do
       describe 'with restricted access' do
         subject { FactoryGirl.create(:restricted_intellectual_object) }
         it 'should properly set groups' do
-          permissions = subject.check_permissions
+          permissions = subject.set_permissions
           expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
           expect(permissions[:read_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
           expect(permissions[:discover_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
