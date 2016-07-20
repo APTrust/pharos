@@ -6,7 +6,7 @@ FactoryGirl.define do
     description { Faker::Lorem.paragraph }
     identifier { "#{institution.identifier}/#{SecureRandom.uuid}" }
     access { ['consortia', 'institution', 'restricted'].sample }
-    alt_identifier { [] }
+    alt_identifier { '' }
     bag_name { identifier.split('/')[1] }
     state { 'A' }
 

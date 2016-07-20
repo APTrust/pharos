@@ -20,14 +20,14 @@
       <dt>Bag Name</dt>
       <dd><%= @intellectual_object.bag_name %></dd>
       <dt> Last Modified </dt>
-      <dd> <%= @intellectual_object.modified_date %> </dd>
+      <dd> <%= @intellectual_object.updated_at %> </dd>
       <dt>Description</dt>
       <dd><%= @intellectual_object.description %></dd>
-      <% if @intellectual_object.alt_identifier.count >= 1  %>
+      <% unless @intellectual_object.alt_identifier.size == 0 || @intellectual_object.alt_identifier == '[]'  %>
           <dt>Alternate Identifiers</dt>
-      <% end %>
-      <% @intellectual_object.alt_identifier.each do |alt_ident| %>
-          <dd><%= alt_ident %></dd>
+          <% @intellectual_object.alt_identifier.each do |alt_ident| %>
+              <dd><%= alt_ident %></dd>
+          <% end %>
       <% end %>
       <dt>DPN Status</dt>
       <% if @intellectual_object.in_dpn? %>
@@ -48,21 +48,21 @@
     <%= link_to intellectual_object_files_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
         <i class="glyphicon glyphicon-list-alt"></i> View Preserved Files
     <% end %>
-    <%= link_to intellectual_object_events_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
+    <%= link_to events_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
         <i class="glyphicon glyphicon-eye-open"></i> View Events
     <% end %>
     <% unless @intellectual_object.state == 'D' %>
         <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_id == @intellectual_object.institution_id) %>
-            <%= link_to intellectual_object_restore_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
+            <%= link_to intellectual_objects_path(alt_action: 'restore', q: @intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
                 <i class="glyphicon glyphicon-download"></i> Restore Object
             <% end %>
             <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.institution.dpn_uuid.blank? == false && @intellectual_object.in_dpn? == false )%>
-                <%= link_to intellectual_object_dpn_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
+                <%= link_to intellectual_objects_path(alt_action: 'dpn', q: @intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
                     <i class="glyphicon glyphicon-send dpn"></i> Send Object To DPN
                 <% end %>
             <% end %>
+            <%= destroy_link(@intellectual_object) %>
         <% end %>
-        <%= render_document_sidebar_partial %>
     <% end %>
 
   </div>
