@@ -113,6 +113,19 @@ p.italic {
 
 #header-navbar .navbar-brand {@include fix-title;}
 
+#search_selectors {
+  float: left;
+  display: inline;
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+
+#search_inputs {
+  float: left;
+  display: inline;
+  padding-top: 17px;
+  padding-bottom: 5px;}
+
 .container {
   width: 1250px !important;
 }
@@ -149,99 +162,8 @@ form .alert {
 
 .auditinfo h3 { font-weight: bold; }
 
-.search_tabs {
-  text-align: center;
-  list-style: none;
-  margin: 10px 0 10px;
-  padding: 0;
-  line-height: 22px;
-  height: 25px;
-  overflow: hidden;
-  font-size: 12px;
-  font-family: arial;
-  position: relative;
-  width: 510px;
-}
-
-.search_tabs li {
-  border: 1px solid #AAA;
-  background: #D1D1D1;
-  background: -o-linear-gradient(top, #ECECEC 50%, #D1D1D1 100%);
-  background: -ms-linear-gradient(top, #ECECEC 50%, #D1D1D1 100%);
-  background: -moz-linear-gradient(top, #ECECEC 50%, #D1D1D1 100%);
-  background: -webkit-linear-gradient(top, #ECECEC 50%, #D1D1D1 100%);
-  background: linear-gradient(top, #ECECEC 50%, #D1D1D1 100%);
-  display: inline-block;
-  position:relative;
-  z-index: 0;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), inset 0 1px 0 #FFF;
-  text-shadow: 0 1px #FFF;
-  margin: 0 -5px;
-  padding: 0 30px;
-}
-
-.search_tabs a {
-  color: #555;
-  text-decoration: none;
-}
-
-.search_tabs li.ui-tabs-active {
-  background: #FFF;
-  color: #333;
-  z-index: 2;
-  border-top-color: #FFF;
-}
-
-.search_tabs:before {
-  position: absolute;
-  content: " ";
-  width: 100%;
-  top: 0;
-  left: 0;
-  border-top: 1px solid #AAA;
-  z-index: 1;
-}
-
-.search_tabs li:before,
-.search_tabs li:after {
-  border: 1px solid #AAA;
-  position: absolute;
-  top: -1px;
-  width: 6px;
-  height: 6px;
-  content: " ";
-}
-
-.search_tabs li:before  {
-  left: -7px;
-  border-top-right-radius: 6px;
-  border-width: 1px 1px 0px 0px;
-  box-shadow: 2px 0px 0 #ECECEC;
-}
-
-.search_tabs li:after {
-  right: -7px;
-  border-top-left-radius: 6px;
-  border-width: 1px 0px 0px 1px;
-  box-shadow: -2px 0px 0 #ECECEC;
-}
-
-.search_tabs li.ui-tabs-active:before {
-  box-shadow: 2px 0px 0 #FFF;
-}
-
-.search_tabs li.ui-tabs-active:after {
-  box-shadow: -2px 0px 0 #FFF;
-}
-
 input#q {
   width: 260px;
-}
-
-input#qq {
-  width: 312px;
 }
 
 #chart-frame {
