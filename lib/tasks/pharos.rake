@@ -29,12 +29,10 @@ namespace :pharos do
 
   desc 'Setup Pharos'
   task setup: :environment do
-    admintest = User.where(name: 'APTrustAdmin')
-
-    #if admintest.nil?
-      puts "Creating an initial institution names 'APTrust'..."
-
-      i = Institution.create!(name: 'APTrust', identifier: 'aptrust.org', brief_name: 'apt', dpn_uuid: '44c450a6-8b2e-4c59-8793-3d9366bf43f5')
+    admintest = User.where(name: 'APTrustAdmin').first
+    if admintest.nil?
+      puts "Creating an initial institutions"
+      create_institutions(partner_list)
 
       puts "Creating required roles of 'admin', 'institutional_admin', and 'institutional_user'..."
       %w(admin institutional_admin institutional_user).each do |role|
@@ -42,16 +40,20 @@ namespace :pharos do
       end
 
       puts 'Create an initial Super-User for APTrust...'
+      aptrust = Institution.where(identifier: "aptrust.org").first
       name= "APTrustAdmin"
       email= "ops@aptrust.org"
       phone_number="4341234567"
       password="password"
 
-      User.create!(name: name, email: email, password: password, phone_number: phone_number, institution_id: i.id,
+      User.create!(name: name, email: email, password: password,
+                   phone_number: phone_number, institution_id: aptrust.id,
                    role_ids: [Role.where(name: 'admin').first.id])
-    # else
-    #   puts "Setup seems to have run already. Admin user exist. Exiting."
-    # end
+      puts "Created admin user"
+    else
+      puts "Nothing to do: Institution, groups, and admin user already exist."
+    end
+    puts "You should be able to log in as ops@aptrust.org, with password 'password'"
   end
 
   # Restricted only to non-production environments
@@ -77,7 +79,7 @@ namespace :pharos do
   # end
 
   desc 'Empty DB and add dummy information'
-  task :populate_db, [:numInstitutions, :numIntObjects, :numGenFiles] => [:environment] do |_, args|
+  task :populate_db, [:numIntObjects, :numGenFiles] => [:environment] do |_, args|
     if Rails.env.production?
       puts 'Do not run in production!'
       return
@@ -88,21 +90,7 @@ namespace :pharos do
     start = Time.now
     puts "Starting time: #{start}"
 
-    args.with_defaults(:numInstitutions => partner_list.count-1, :numIntObjects => 1, :numGenFiles => 1)
-
-    num_insts = args[:numInstitutions].to_i
-    if num_insts > partner_list.count-1
-      num_insts = partner_list.count-1
-      puts "We currently have only #{partner_list.count-1} institutions."
-    end
-
-    puts "Creating #{num_insts} Institutions"
-    num_insts.times.each do |count|
-      puts "== Creating number #{count+1} of #{num_insts}: #{partner_list[count+1].first} "
-      partner = partner_list[count+1]
-      i = FactoryGirl.create(:institution, name: partner[0], brief_name: partner[1],
-                             identifier: partner[2], dpn_uuid: partner[3])
-    end
+    args.with_defaults(:numIntObjects => 1, :numGenFiles => 1)
 
     puts 'Creating Users for each Institution'
     Institution.all.each do |institution|
@@ -325,4 +313,20 @@ namespace :pharos do
       end
     end
   end
+
+  def create_institutions(partner_list)
+    partner_list.each do |partner|
+      existing_inst = Institution.where(identifier: partner[2]).first
+      if existing_inst.nil?
+        puts "Creating #{partner[0]}"
+        Institution.create!(name: partner[0],
+                            brief_name: partner[1],
+                            identifier: partner[2],
+                            dpn_uuid: partner[3])
+      else
+        puts "#{partner[0]} already exists"
+      end
+    end
+  end
+
 end
