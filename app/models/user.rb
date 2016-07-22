@@ -3,7 +3,7 @@ require 'valid_email'
 
 class User < ActiveRecord::Base
   belongs_to :institution, foreign_key: :institution_id
-  has_many :roles
+  has_and_belongs_to_many :roles
 
   # Include default devise modules. Others available are:
   # :database_authenticatable,
