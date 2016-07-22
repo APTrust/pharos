@@ -26,30 +26,16 @@ namespace :pharos do
       ['Virginia Tech','vatech', 'vt.edu', '77b67409-2966-4ea9-95f8-fef59b12ee29']
   ]
 
+  roles = ['admin', 'institutional_admin', 'institutional_user']
+
 
   desc 'Setup Pharos'
   task setup: :environment do
     admintest = User.where(name: 'APTrustAdmin').first
     if admintest.nil?
-      puts "Creating an initial institutions"
       create_institutions(partner_list)
-
-      puts "Creating required roles of 'admin', 'institutional_admin', and 'institutional_user'..."
-      %w(admin institutional_admin institutional_user).each do |role|
-        Role.create!(name: role)
-      end
-
-      puts 'Create an initial Super-User for APTrust...'
-      aptrust = Institution.where(identifier: "aptrust.org").first
-      name= "APTrustAdmin"
-      email= "ops@aptrust.org"
-      phone_number="4341234567"
-      password="password"
-
-      User.create!(name: name, email: email, password: password,
-                   phone_number: phone_number, institution_id: aptrust.id,
-                   role_ids: [Role.where(name: 'admin').first.id])
-      puts "Created admin user"
+      create_roles(roles)
+      create_users()
     else
       puts "Nothing to do: Institution, groups, and admin user already exist."
     end
@@ -90,7 +76,7 @@ namespace :pharos do
     start = Time.now
     puts "Starting time: #{start}"
 
-    args.with_defaults(:numIntObjects => 1, :numGenFiles => 1)
+    args.with_defaults(:numIntObjects => 3, :numGenFiles => 3)
 
     puts 'Creating Users for each Institution'
     Institution.all.each do |institution|
@@ -159,33 +145,8 @@ namespace :pharos do
       puts 'Do not run in production!'
       return
     end
-
-    user_inst = {}
-    User.all.each do |user|
-      user_inst[user.id] = user.institution.identifier
-    end
-
-    puts 'Deleting work items'
-    WorkItem.delete_all
-
-    puts 'Creating Institutions'
-    partner_list.count.times.each do |count|
-      puts "== Creating number #{count+1} of #{partner_list.count}: #{partner_list[count].first} "
-      partner = partner_list[count]
-      FactoryGirl.create(:institution,
-                         name: partner[0],
-                         brief_name: partner[1],
-                         identifier: partner[2],
-                         dpn_uuid: partner[3])
-    end
-
-    user_inst.each do |user_id, inst_identifier|
-      user = User.find(user_id)
-      inst = Institution.where(desc_metadata__identifier_ssim: inst_identifier).first
-      puts "Associating user #{user.email} with institution #{inst.name}"
-      user.institution_id = inst.id
-      user.save
-    end
+    Rake::Task['pharos:empty_db'].invoke
+    Rake::Task['pharos:setup'].invoke
   end
 
 
@@ -327,6 +288,37 @@ namespace :pharos do
         puts "#{partner[0]} already exists"
       end
     end
+  end
+
+  def create_roles(roles)
+      puts "Creating roles 'admin', 'institutional_admin', and 'institutional_user'"
+      roles.each do |role|
+        Role.create!(name: role)
+      end
+  end
+
+  def create_users
+    puts 'Create an initial Super-User for APTrust...'
+    aptrust = Institution.where(identifier: "aptrust.org").first
+    admin_role = Role.where(name: 'admin').first
+    name = "APTrust Admin"
+    email = "ops@aptrust.org"
+    phone_number ="4341234567"
+    password ="password"
+    User.create!(name: name, email: email, password: password,
+                 phone_number: phone_number, institution_id: aptrust.id,
+                 roles: [admin_role])
+    puts "Created admin user"
+
+    puts 'Creating system user for API use'
+    name = "APTrust System"
+    email = "system@aptrust.org"
+    api_key = "75d35f5b6e324594a05045175661ba3785c02dde"
+    User.create!(name: name, email: email, password: password,
+                 phone_number: phone_number, institution_id: aptrust.id,
+                 roles: [admin_role], api_secret_key: api_key)
+    puts "Created system (API) user"
+
   end
 
 end
