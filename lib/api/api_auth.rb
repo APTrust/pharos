@@ -5,7 +5,7 @@ module ApiAuth
   # Determine whether or not a request should be handled as
   # an API request instead of a UI/browser request.
   def api_request?
-    request.headers["X-Fluctus-API-User"] && request.headers["X-Fluctus-API-Key"]
+    request.headers["X-Pharos-API-User"] && request.headers["X-Pharos-API-Key"]
   end
 
 end
