@@ -21,10 +21,31 @@ class IntellectualObject < ActiveRecord::Base
   before_save :active_files
   before_destroy :check_for_associations
 
+
+  ### Scopes
+  scope :created_before, ->(param) { where("created_at < ?", param) unless param.blank? }
+  scope :created_after, ->(param) { where("created_at > ?", param) unless param.blank? }
+  scope :updated_before, ->(param) { where("updated_at < ?", param) unless param.blank? }
+  scope :updated_after, ->(param) { where("updated_at > ?", param) unless param.blank? }
+  scope :with_description, ->(param) { where(description: param) unless param.blank? }
+  scope :with_description_like, ->(param) { where("description like ?", "%#{param}%") unless param.blank? }
+  scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
+  scope :with_identifier_like, ->(param) { where("identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_alt_identifier, ->(param) { where(alt_identifier: param) unless param.blank? }
+  scope :with_alt_identifier_like, ->(param) { where("alt_identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_access, ->(param) { where(access: param) unless param.blank? }
+  scope :with_institution, ->(param) { where(institution: param) unless param.blank? }
+  scope :with_state, ->(param) { where(state: param) unless param.blank? }
+  # Need to add these...
+  #scope :bag_name, ->(param) {}
+  #scope :etag, ->(param) {}
+
   def to_param
     identifier
   end
 
+  # TODO: Can we get rid of this?
+  # Doesn't Rails automatically call validate on each file object before saving?
   def invalid_file(attributes)
     file_valid = true
     file_valid = false if (attributes['uri'].nil? || attributes['uri'] == '')
@@ -93,55 +114,75 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def gf_count
-    count = 0
-    self.generic_files.each { |gf| count = count+1 unless gf.state == 'D' }
-    count
+    generic_files.where(state: 'A').count
   end
 
   def gf_size
-    size = 0
-    self.generic_files.each { |gf| size = size+gf.size unless gf.state == 'D' }
-    size
+    generic_files.where(state: 'A').sum(:size)
   end
 
   def active_files
-    files = []
-    self.generic_files.each { |gf| files.push(gf) unless gf.state == 'D'}
-    files
+    generic_files.where(state: 'A')
   end
 
-  # This is for serializing JSON in the API.
-  def serializable_hash(options={})
-    data = {
-        id: id,
-        title: title,
-        description: description,
-        access: access,
-        bag_name: bag_name,
-        identifier: identifier,
-        state: state,
+  def serializable_hash (options={})
+    # TODO: Add etag and DPN bag UUID to the IntelObj table
+    last_ingested = self.last_ingested_version
+    etag = last_ingested.nil? ? nil : last_ingested.etag
+    {
+      id: id,
+      title: title,
+      description: description,
+      access: access,
+      bag_name: bag_name,
+      identifier: identifier,
+      state: state,
+      alt_identifier: [alt_identifier],
+      etag: etag,
+      in_dpn: in_dpn?,
+      file_count: gf_count,
+      file_size: gf_size
     }
-    data.merge!(alt_identifier: serialize_alt_identifiers)
-    if options.has_key?(:include)
-      options[:include].each do |opt|
-        if opt.is_a?(Hash) && opt.has_key?(:active_files)
-          data.merge!(active_files: serialize_active_files(opt[:active_files]))
-        end
-      end
-      data.merge!(premis_events: serialize_events) if options[:include].include?(:premis_events)
-      if options[:include].include?(:etag)
-        item = WorkItem.last_ingested_version(self.identifier)
-        data.merge!(etag: item.etag) unless item.nil?
-      end
-    end
-    data
   end
 
-  def serialize_active_files(options={})
-    self.active_files.map do |file|
-      file.serializable_hash(options)
-    end
+  # Returns the WorkItem describing the last ingested
+  # version of this object.
+  def last_ingested_version
+    WorkItem.last_ingested_version(self.identifier)
   end
+
+  # # This is for serializing JSON in the API.
+  # def serializable_hash(options={})
+  #   data = {
+  #       id: id,
+  #       title: title,
+  #       description: description,
+  #       access: access,
+  #       bag_name: bag_name,
+  #       identifier: identifier,
+  #       state: state,
+  #   }
+  #   data.merge!(alt_identifier: serialize_alt_identifiers)
+  #   if options.has_key?(:include)
+  #     options[:include].each do |opt|
+  #       if opt.is_a?(Hash) && opt.has_key?(:active_files)
+  #         data.merge!(active_files: serialize_active_files(opt[:active_files]))
+  #       end
+  #     end
+  #     data.merge!(premis_events: serialize_events) if options[:include].include?(:premis_events)
+  #     if options[:include].include?(:etag)
+  #       item = WorkItem.last_ingested_version(self.identifier)
+  #       data.merge!(etag: item.etag) unless item.nil?
+  #     end
+  #   end
+  #   data
+  # end
+
+  # def serialize_active_files(options={})
+  #   self.active_files.map do |file|
+  #     file.serializable_hash(options)
+  #   end
+  # end
 
   def add_event(attributes)
     event = self.premis_events.build(attributes)
@@ -150,22 +191,22 @@ class IntellectualObject < ActiveRecord::Base
     event
   end
 
-  def serialize_events
-    self.premis_events.map do |event|
-      event.serializable_hash
-    end
-  end
+  # def serialize_events
+  #   self.premis_events.map do |event|
+  #     event.serializable_hash
+  #   end
+  # end
 
-  def serialize_alt_identifiers
-    data = []
-    alts = alt_identifier.split(',') unless alt_identifier.nil?
-    unless alts.nil?
-      alts.each do |ident|
-        data.push(ident)
-      end
-    end
-    data
-  end
+  # def serialize_alt_identifiers
+  #   data = []
+  #   alts = alt_identifier.split(',') unless alt_identifier.nil?
+  #   unless alts.nil?
+  #     alts.each do |ident|
+  #       data.push(ident)
+  #     end
+  #   end
+  #   data
+  # end
 
   def set_permissions
     inst_id = self.institution.id

@@ -6,45 +6,40 @@ class IntellectualObjectsController < ApplicationController
 
   def index
     authorize @institution
-    if params[:search_field].present?
-      filter_results_by_standard_params
-      prep_search_incidentals
-    elsif params[:alt_action].present?
-      @intellectual_object = IntellectualObject.where(identifier: params[:q]).first
-    else
-      narrow_results_to_specific_institution
-      filter_results_by_other_params
-      prep_search_incidentals
-    end
+    # TODO: Replace alt_action param with urls /restore/ and /dpn/
+    user_institution = @current_user.admin? ? nil : @current_user.institution
+    # TODO: Add bag_name and etag
+    @intellectual_objects = IntellectualObject
+      .with_institution(user_institution)
+      .with_institution(params[:institution_id])
+      .with_description(params[:description])
+      .with_description_like(params[:description_like])
+      .with_identifier(params[:identifier])
+      .with_identifier_like(params[:identifier_like])
+      .with_alt_identifier(params[:alt_identifier])
+      .with_alt_identifier_like(params[:alt_identifier_like])
+      .with_access(params[:access])
+      .with_state(params[:state])
+      .created_before(params[:created_before])
+      .created_after(params[:created_after])
+      .updated_before(params[:updated_before])
+      .updated_after(params[:updated_after])
+    prep_search_incidentals
     respond_to do |format|
       format.json { render json: {count: @count, next: @next, previous: @previous, results: @intellectual_objects.map{ |item| item.serializable_hash(include: [:etag])}} }
       format.html {
-        if params[:alt_action].present?
-          case params[:alt_action]
-            when 'dpn'
-              send_to_dpn
-            when 'restore'
-              restore_item
-          end
-        else
-          index!
-        end
+        index!
       }
     end
   end
 
   def create
     authorize @institution, :create_through_institution?
-    intellectual_object_params
-    separate_params
-    IntellectualObject.transaction do
-      @intellectual_object = @institution.intellectual_objects.new(@object_params)
-      @file_params.each { |gf| @intellectual_object.generic_files.new(gf) } unless @file_params.nil?
-      raise ActiveRecord::Rollback
-    end
+    @intellectual_object = IntellectualObject.new(create_params)
+    @intellectual_object.institution = Institution.find_by_identifier(params[:institution_identifier])
     if @intellectual_object.save
       respond_to do |format|
-        format.json { render object_as_json, status: :created }
+        format.json { render json: @intellectual_object, status: :created }
         format.html {
           render status: :created
           super
@@ -163,51 +158,6 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def filter_results_by_standard_params
-    params[:institution_identifier].present? ?
-        @intellectual_objects = @institution.intellectual_objects :
-        @intellectual_objects = IntellectualObject.all
-    case params[:search_field]
-      when 'title'
-        @intellectual_objects = @intellectual_objects.where('title LIKE ?', "%#{params[:q]}%")
-      when 'description'
-        @intellectual_objects = @intellectual_objects.where('description LIKE ?', "%#{params[:q]}%")
-      when 'bag_name'
-        @intellectual_objects = @intellectual_objects.where('bag_name=? OR bag_name LIKE ?', params[:q], "%#{params[:q]}%")
-      when 'alt_identifier'
-        @intellectual_objects = @intellectual_objects.where('alt_identifier=? OR alt_identifier LIKE ?', params[:q], "%#{params[:q]}%")
-      when 'identifier'
-        @intellectual_objects = @intellectual_objects.where('identifier=? OR identifier LIKE ?', params[:q], "%#{params[:q]}%")
-    end
-  end
-
-  def narrow_results_to_specific_institution
-    if current_user.admin?
-      if params[:institution].present? then
-        @search_institution = Institution.where(identifier: params[:institution_institution]).first
-        @intellectual_objects = @search_institution.intellectual_objects
-      elsif params[:institution_identifier].present?
-        @search_institution = @institution
-        @intellectual_objects = @search_institution.intellectual_objects
-      else
-        @intellectual_objects = IntellectualObject.all
-      end
-    else
-      @search_institution = Institution.find(current_user.institution_id)
-      @intellectual_objects = @search_institution.intellectual_objects
-    end
-  end
-
-  def filter_results_by_other_params
-    @intellectual_objects = @intellectual_objects.where(identifier: params[:name_exact]) if params[:name_exact].present?
-    @intellectual_objects = @intellectual_objects.where('identifier LIKE ?', "%#{params[:name_contains]}%") if params[:name_contains].present?
-    @intellectual_objects = @intellectual_objects.where(state: params[:state]) if params[:state].present?
-    if params[:updated_since].present?
-      date = format_date
-      @intellectual_objects = @intellectual_objects.where(updated_at: date..Time.now)
-    end
-  end
-
   def prep_search_incidentals
     @count = @intellectual_objects.count
     params[:page] = 1 unless params[:page].present?
@@ -220,34 +170,6 @@ class IntellectualObjectsController < ApplicationController
     @previous = format_previous(page, per_page)
   end
 
-  def nested_create
-    state = {
-        current_object: nil,
-        object_events: [],
-        object_files: [],
-    }
-    begin
-      object_files = params[:intellectual_object][:generic_files_attributes]
-      new_object = IntellectualObject.create(params[:intellectual_object])
-      object_files.each do |gf|
-        new_object.generic_files.new(gf)
-      end
-      @intellectual_object = new_object
-      @institution = @intellectual_object.institution
-      respond_to { |format| format.json { render json: object_as_json, status: :created } }
-    rescue Exception => ex
-      log_exception(ex)
-      if !new_object.nil?
-        new_object.generic_files.each do |gf|
-          gf.destroy
-        end
-        new_object.destroy
-      end
-      respond_to { |format| format.json {
-        render json: { error: "#{ex.message} : #{state[:current_object]}" }, status: :unprocessable_entity }
-      }
-    end
-  end
 
   private
 
@@ -267,33 +189,35 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def intellectual_object_params
-    params[:intellectual_object] = params[:intellectual_object].first if params[:intellectual_object].kind_of?(Array)
-    params.require(:intellectual_object).permit(:id, :institution_id, :title, :description, :access, :identifier,
-                                                :bag_name, :alt_identifier, :state, generic_files_attributes:
-                                                [:id, :uri, :content_uri, :identifier, :size, :created, :modified, :file_format,
-                                                checksums_attributes: [:digest, :algorithm, :datetime, :id],
-                                                premis_events_attributes: [:id, :identifier, :event_type, :date_time, :outcome,
-                                                :outcome_detail, :outcome_information, :detail, :object, :agent,
-                                                :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at]],
-                                                premis_events_attributes: [:id, :identifier, :event_type, :date_time, :outcome,
-                                                :outcome_detail, :outcome_information, :detail, :object, :agent,
-                                                :intellectual_object_id, :generic_file_id, :institution_id, :created_at, :updated_at])
+  def create_params
+    params.require(:intellectual_object).permit(:id, :institution_id, :title,
+                                                :description, :access, :identifier,
+                                                :bag_name, :alt_identifier, :state,
+                                                generic_files_attributes:
+                                                [:id, :uri, :content_uri, :identifier,
+                                                 :size, :created, :modified, :file_format,
+                                                 checksums_attributes:
+                                                 [:digest, :algorithm, :datetime, :id],
+                                                 premis_events_attributes:
+                                                 [:id, :identifier, :event_type, :date_time,
+                                                  :outcome, :outcome_detail,
+                                                  :outcome_information, :detail,
+                                                  :object, :agent, :intellectual_object_id,
+                                                  :generic_file_id, :institution_id,
+                                                  :created_at, :updated_at]],
+                                                premis_events_attributes:
+                                                [:id, :identifier, :event_type,
+                                                 :date_time, :outcome, :outcome_detail,
+                                                 :outcome_information, :detail, :object,
+                                                 :agent, :intellectual_object_id,
+                                                 :generic_file_id, :institution_id,
+                                                 :created_at, :updated_at])
+
   end
 
-  def separate_params
-    @object_params = {}
-    @object_params[:id] = params[:intellectual_object][:id] if params[:intellectual_object][:id].present?
-    @object_params[:institution_id] = params[:intellectual_object][:institution_id] if params[:intellectual_object][:institution_id].present?
-    @object_params[:title] = params[:intellectual_object][:title] if params[:intellectual_object][:title].present?
-    @object_params[:description] = params[:intellectual_object][:description] if params[:intellectual_object][:description].present?
-    @object_params[:access] = params[:intellectual_object][:access] if params[:intellectual_object][:access].present?
-    @object_params[:identifier] = params[:intellectual_object][:identifier] if params[:intellectual_object][:identifier].present?
-    @object_params[:bag_name] = params[:intellectual_object][:bag_name] if params[:intellectual_object][:bag_name].present?
-    @object_params[:alt_identifier] = params[:intellectual_object][:alt_identifier] if params[:intellectual_object][:alt_identifier].present?
-    @object_params[:state] = params[:intellectual_object][:state] if params[:intellectual_object][:state].present?
-    @object_params[:premis_events_attributes] = params[:intellectual_object][:premis_events_attributes] if params[:intellectual_object][:premis_events_attributes].present?
-    @file_params = params[:intellectual_object][:generic_files_attributes] if params[:intellectual_object][:generic_files_attributes].present?
+  def update_params
+    params.require(:intellectual_object).permit(:title, :description, :access,
+                                                :alt_identifier, :state)
   end
 
   def load_object
@@ -316,15 +240,6 @@ class IntellectualObjectsController < ApplicationController
     else
       @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(identifier: params[:institution_identifier]).first
     end
-  end
-
-  def load_institution_for_create_from_json(object)
-    @institution = params[:institution_id].nil? ? object.institution : Institution.find(params[:institution_id])
-  end
-
-  def format_date
-    time = Time.parse(params[:updated_since])
-    time.utc.iso8601
   end
 
   def format_next(page, per_page)
