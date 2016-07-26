@@ -26,7 +26,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   let!(:obj6) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst1,
                                    bag_name: '12345-abcde',
-                                   alt_identifier: ['test.edu/some-bag']) }
+                                   alt_identifier: ['test.edu/some-bag'],
+                                   created_at: "2011-10-10T10:00:00Z",
+                                   updated_at: "2011-10-10T10:00:00Z") }
+
+  # before do
+  #   IntellectualObject.destroy_all
+  #   Institution.destroy_all
+  # end
+
+  # after do
+  #   IntellectualObject.destroy_all
+  #   Institution.destroy_all
+  # end
 
 
   describe 'GET #index' do
@@ -39,18 +51,36 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
-
+      before do
+        sign_in inst_user
+      end
+      it 'should show results from my institution' do
+        get :index, {}
+        expect(response).to be_successful
+        expect(assigns(:intellectual_objects).size).to eq 3
+        expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
+      end
     end
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-
+      it 'should show results from my institution' do
+        get :index, {}
+        expect(response).to be_successful
+        expect(assigns(:intellectual_objects).size).to eq 3
+        expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
+      end
     end
 
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
-
+      it 'should show all results' do
+        get :index, {}
+        expect(response).to be_successful
+        expect(assigns(:intellectual_objects).size).to eq 6
+        expect(assigns(:intellectual_objects).map &:id).to match_array [obj1.id, obj2.id, obj3.id,
+                                                                        obj4.id, obj5.id, obj6.id]
+      end
     end
 
   end # ---------------- END OF GET #index
