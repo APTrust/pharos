@@ -686,8 +686,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
       it 'returns the correct next and previous links' do
         get :index, format: :json, per_page: 2, page: 2, updated_since: '2014-06-03T15:28:39+00:00'
-        assigns(:next).should == 'http://test.host/member-api/v1/objects/?page=3&per_page=2&updated_since=2014-06-03T15:28:39+00:00'
-        assigns(:previous).should == 'http://test.host/member-api/v1/objects/?page=1&per_page=2&updated_since=2014-06-03T15:28:39+00:00'
+        assigns(:next).should == 'http://test.host/api/v2/objects.json/?page=3&per_page=2&updated_since=2014-06-03T15:28:39+00:00'
+        assigns(:previous).should == 'http://test.host/api/v2/objects.json/?page=1&per_page=2&updated_since=2014-06-03T15:28:39+00:00'
       end
     end
 

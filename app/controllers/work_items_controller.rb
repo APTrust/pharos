@@ -428,8 +428,9 @@ class WorkItemsController < ApplicationController
     if @count.to_f / per_page <= page
       nil
     else
+      path = request.fullpath.split('?').first
       new_page = page + 1
-      new_url = "#{request.base_url}/member-api/v1/items/?page=#{new_page}&per_page=#{per_page}"
+      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{per_page}"
       new_url = add_params(new_url)
       new_url
     end
@@ -439,8 +440,9 @@ class WorkItemsController < ApplicationController
     if page == 1
       nil
     else
+      path = request.fullpath.split('?').first
       new_page = page - 1
-      new_url = "#{request.base_url}/member-api/v1/items/?page=#{new_page}&per_page=#{per_page}"
+      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{per_page}"
       new_url = add_params(new_url)
       new_url
     end

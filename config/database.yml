@@ -20,6 +20,12 @@ test:
   <<: *default
   database: db/test.sqlite3
 
+# Database for integration tests. This will be emptied between
+# tests.
+integration:
+  <<: *default
+  database: db/integration.sqlite3
+
 production:
   <<: *default
   database: db/production.sqlite3
