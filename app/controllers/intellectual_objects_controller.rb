@@ -34,7 +34,6 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def create
-    authorize @institution, :create_through_institution?
     @intellectual_object = IntellectualObject.new(create_params)
     @intellectual_object.institution = Institution.find_by_identifier(params[:institution_identifier])
     if @intellectual_object.save
@@ -79,7 +78,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update
     authorize @intellectual_object
-    @intellectual_object.update!(intellectual_object_params)
+    @intellectual_object.update!(update_params)
     respond_to do |format|
       format.json { render object_as_json}
       format.html { redirect_to intellectual_object_path(@intellectual_object) }

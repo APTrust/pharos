@@ -10,7 +10,6 @@ describe InstitutionPolicy do
     describe 'access any institution' do
       it do
         should permit(:create)
-        should permit(:create_through_institution)
         should permit(:new)
         should permit(:show)
         should permit(:update)
@@ -34,7 +33,6 @@ describe InstitutionPolicy do
         it do
           should permit(:show)
           should_not permit(:create)
-          should permit(:create_through_institution)
           should_not permit(:new)
           should permit(:update)
           should permit(:edit)
@@ -47,7 +45,6 @@ describe InstitutionPolicy do
         let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: other_institution.id) }
         it do
           should_not permit(:create)
-          should_not permit(:create_through_institution)
           should_not permit(:new)
           should_not permit(:show)
           should_not permit(:update)
@@ -67,7 +64,6 @@ describe InstitutionPolicy do
         it do
           should permit(:show)
           should_not permit(:create)
-          should_not permit(:create_through_institution)
           should_not permit(:new)
           should_not permit(:update)
           should_not permit(:edit)
@@ -81,7 +77,6 @@ describe InstitutionPolicy do
                                         institution_id: other_institution.id) }
         it do
           should_not permit(:create)
-          should_not permit(:create_through_institution)
           should_not permit(:new)
           should_not permit(:show)
           should_not permit(:update)
