@@ -18,7 +18,6 @@ class IntellectualObjectsController < ApplicationController
       .with_identifier_like(params[:identifier_like])
       .with_alt_identifier(params[:alt_identifier])
       .with_alt_identifier_like(params[:alt_identifier_like])
-      .with_access(params[:access])
       .with_state(params[:state])
       .created_before(params[:created_before])
       .created_after(params[:created_after])

@@ -33,9 +33,40 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_identifier_like, ->(param) { where("identifier like ?", "%#{param}%") unless param.blank? }
   scope :with_alt_identifier, ->(param) { where(alt_identifier: param) unless param.blank? }
   scope :with_alt_identifier_like, ->(param) { where("alt_identifier like ?", "%#{param}%") unless param.blank? }
-  scope :with_access, ->(param) { where(access: param) unless param.blank? }
   scope :with_institution, ->(param) { where(institution: param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
+
+  # Param for discoverable should be current_user!
+  scope :discoverable, ->(current_user) {
+    # Any user can discover any item at their institution,
+    # along with 'consortia' items from any institution.
+    where("(access = 'consortia' or institution = ?)", current_user.institution) unless current_user.admin?
+  }
+  scope :readable, ->(current_user) {
+    # Inst admin can read anything at their institution.
+    # Inst user can read read any unrestricted item at their institution.
+    # Admin can read anything.
+    if current_user.institutional_admin?
+      where("institution = ?", current_user.institution)
+    elsif current_user.institutional_user?
+      where("(access != 'restricted' and institution = ?)", current_user.institution)
+    end
+  }
+  scope :writable, ->(current_user) {
+    # Inst admin can write anything at their institution.
+    # Inst user can write read any unrestricted item at their institution.
+    # Admin can read anything.
+    if current_user.institutional_admin?
+      where("(access != 'restricted' and institution = ?)", current_user.institution)
+    elsif current_user.institutional_user?
+      # This will ALWAYS be false, meaning inst user can't edit anything.
+      # Is that what we want?
+      where("(1 = 0)")
+    end
+  }
+
+
+
   # Need to add these...
   #scope :bag_name, ->(param) {}
   #scope :etag, ->(param) {}
