@@ -11,6 +11,10 @@ class IntellectualObjectPolicy < ApplicationPolicy
     end
   end
 
+  def create?
+    user.admin?
+  end
+
   def file_summary?
     if user.admin?
       true

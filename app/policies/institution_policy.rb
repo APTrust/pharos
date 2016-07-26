@@ -9,12 +9,6 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin?
   end
 
-  # for intellectual_object
-  def create_through_institution?
-    user.admin? ||
-        (user.institutional_admin? && user.institution_id == record.id)
-  end
-
   def new?
     create?
   end
