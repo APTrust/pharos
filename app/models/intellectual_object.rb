@@ -53,16 +53,8 @@ class IntellectualObject < ActiveRecord::Base
     end
   }
   scope :writable, ->(current_user) {
-    # Inst admin can write anything at their institution.
-    # Inst user can write read any unrestricted item at their institution.
-    # Admin can read anything.
-    if current_user.institutional_admin?
-      where("(access != 'restricted' and institution = ?)", current_user.institution)
-    elsif current_user.institutional_user?
-      # This will ALWAYS be false, meaning inst user can't edit anything.
-      # Is that what we want?
-      where("(1 = 0)")
-    end
+    # Only admin has write privileges for now.
+    where("(1 = 0)") unless current_user.admin?
   }
 
 
