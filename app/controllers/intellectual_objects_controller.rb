@@ -7,7 +7,7 @@ class IntellectualObjectsController < ApplicationController
   def index
     authorize @institution
     # TODO: Replace alt_action param with urls /restore/ and /dpn/
-    user_institution = @current_user.admin? ? nil : @current_user.institution
+    user_institution = current_user.admin? ? nil : current_user.institution
     # TODO: Add bag_name and etag
     @intellectual_objects = IntellectualObject
       .with_institution(user_institution)
@@ -234,10 +234,10 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def load_institution
-    if params[:institution_id]
-      @institution ||= Institution.find(params[:institution_id])
+    if current_user.admin? and params[:institution_id]
+      @institution = Institution.find(params[:institution_id])
     else
-      @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(identifier: params[:institution_identifier]).first
+      @institution = current_user.institution
     end
   end
 
