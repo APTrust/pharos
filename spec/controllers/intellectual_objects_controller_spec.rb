@@ -205,7 +205,15 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
 
 
+  # Note that no one has permission to hit the #edit method
+  # of the intellectual objects controller.
   describe 'GET #edit' do
+    let(:inst1_obj) { FactoryGirl.create(:consortial_intellectual_object, institution: inst1) }
+    let(:inst2_obj) { FactoryGirl.create(:consortial_intellectual_object, institution: inst2) }
+    after do
+      inst1_obj.destroy
+      inst2_obj.destroy
+    end
 
     describe 'when not signed in' do
       it 'should redirect to login' do
@@ -216,17 +224,44 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
-
+      it "should not let me edit my institution's objects" do
+        get :edit, intellectual_object_identifier: inst1_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it "should not let me edit other institution's objects" do
+        get :edit, intellectual_object_identifier: inst2_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
     end
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-
+      it "should not let me edit my institution's objects" do
+        get :edit, intellectual_object_identifier: inst1_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it "should not let me edit other institution's objects" do
+        get :edit, intellectual_object_identifier: inst2_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
     end
 
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
-
+      it "should not let me edit this" do
+        get :edit, intellectual_object_identifier: inst1_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it "should not let me edit this either" do
+        get :edit, intellectual_object_identifier: inst2_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
     end
 
   end # ---------------- END OF GET #edit ----------------
