@@ -276,6 +276,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     let(:event2) { FactoryGirl.build(:premis_event_ingest) }
     let(:event3) { FactoryGirl.build(:premis_event_ingest) }
 
+    after do
+      PremisEvent.delete_all
+      GenericFile.delete_all
+      IntellectualObject.delete_all
+    end
+
     describe 'when not signed in' do
       it 'should respond with redirect (html)' do
         post(:create, institution_identifier: inst1.identifier,
@@ -321,7 +327,37 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
-
+      it 'should create a simple object' do
+        post(:create, institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes, format: 'json')
+        expect(response.code).to eq '201'
+      end
+    #   it 'should create a complex object with nested relations' do
+    #     attrs = {}
+    #     attrs[:intellectual_object] = obj.attributes
+    #     gf1_attrs = gf1.attributes
+    #     gf1_attrs[:premis_events_attributes] = [event1.attributes]
+    #     gf2_attrs = gf2.attributes
+    #     gf2_attrs[:premis_events_attributes] = [event2.attributes]
+    #     attrs[:intellectual_object][:generic_files_attributes] = [gf1_attrs, gf2_attrs]
+    #     attrs[:intellectual_object][:premis_events_attributes] = [event3.attributes]
+    #     attrs[:intellectual_object].delete(:id)
+    #     attrs[:intellectual_object].delete(:permissions)
+    #     attrs[:intellectual_object].delete(:created_at)
+    #     attrs[:intellectual_object].delete(:updated_at)
+    #     attrs[:intellectual_object][:generic_files_attributes].each do |gf|
+    #       gf.delete(:permissions)
+    #       gf.delete(:created_at)
+    #       gf.delete(:updated_at)
+    #     end
+    #     attrs[:institution_identifier] = inst1.identifier
+    #     puts attrs.to_json
+    #     post(:create, intellectual_object: attrs,
+    #          institution_identifier: inst1.identifier, format: 'json')
+    #     expect(response.code).to eq '201'
+    #     saved_obj = IntellectualObject.where(identifier: obj.identifier).first
+    #     puts saved_obj.generic_files.count
+    #   end
     end
 
   end # ---------------- END OF POST #create ----------------
