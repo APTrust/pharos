@@ -13,6 +13,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst2) }
   let!(:obj2) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst1,
+                                   identifier: "test.edu/baggie",
                                    title: 'Aberdeen Wanderers',
                                    description: 'Founded in Aberdeen in 1928.') }
   let!(:obj3) { FactoryGirl.create(:institutional_intellectual_object,
@@ -26,7 +27,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   let!(:obj6) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst1,
                                    bag_name: '12345-abcde',
-                                   alt_identifier: ['test.edu/some-bag'],
+                                   alt_identifier: 'test.edu/some-bag',
                                    created_at: "2011-10-10T10:00:00Z",
                                    updated_at: "2011-10-10T10:00:00Z") }
 
@@ -80,6 +81,44 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(assigns(:intellectual_objects).size).to eq 6
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj1.id, obj2.id, obj3.id,
                                                                         obj4.id, obj5.id, obj6.id]
+      end
+    end
+
+    describe 'when signed in as any user' do
+      it 'should apply filters' do
+        [inst_user, inst_admin, sys_admin].each do |user|
+          sign_in user
+
+          get :index, created_before: '2016-07-26'
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, created_after: '2016-07-26'
+          expect(assigns(:intellectual_objects).size).to be > 1
+
+          get :index, updated_before: '2016-07-26'
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, updated_after: '2016-07-26'
+          expect(assigns(:intellectual_objects).size).to be > 1
+
+          get :index, description: 'Founded in Aberdeen in 1928.'
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, description_like: 'Aberdeen'
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, identifier: "test.edu/baggie"
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, identifier_like: "baggie"
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, alt_identifier: "test.edu/some-bag"
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, alt_identifier_like: "some-bag"
+          expect(assigns(:intellectual_objects).size).to eq 1
+        end
       end
     end
 
