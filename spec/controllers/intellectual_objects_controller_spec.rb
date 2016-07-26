@@ -138,16 +138,67 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
 
+      it "should show me my institution's object" do
+        get :show, intellectual_object_identifier: obj2
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+      end
+
+      it "should show me another institution's consortial object" do
+        get :show, intellectual_object_identifier: obj1
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj1
+      end
+
+      it "should not show me another institution's private parts" do
+        get :show, intellectual_object_identifier: obj3
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
     end
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
 
+      it "should show me my institution's object" do
+        get :show, intellectual_object_identifier: obj2
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+      end
+
+      it "should show me another institution's consortial object" do
+        get :show, intellectual_object_identifier: obj1
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj1
+      end
+
+      it "should not show me another institution's private parts" do
+        get :show, intellectual_object_identifier: obj3
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
     end
 
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
 
+      it "should show me my institution's object" do
+        get :show, intellectual_object_identifier: obj2
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+      end
+
+      it "should show me another institution's consortial object" do
+        get :show, intellectual_object_identifier: obj1
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj1
+      end
+
+      it "should show me another institution's private parts" do
+        get :show, intellectual_object_identifier: obj3
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj3
+      end
     end
 
   end # ---------------- END OF GET #show ----------------

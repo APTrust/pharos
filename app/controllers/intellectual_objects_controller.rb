@@ -8,7 +8,7 @@ class IntellectualObjectsController < ApplicationController
     authorize @institution
     # TODO: Replace alt_action param with urls /restore/ and /dpn/
     user_institution = current_user.admin? ? nil : current_user.institution
-    # TODO: Add bag_name and etag
+    # TODO: Add bag_name and etag. Add discoverable?
     @intellectual_objects = IntellectualObject
       .with_institution(user_institution)
       .with_institution(params[:institution_id])
