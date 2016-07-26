@@ -11,7 +11,8 @@ Rails.application.routes.draw do
   get 'objects', to: 'intellectual_objects#index', format: [:json, :html]
   resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/objects'
   get 'api/v2/objects', to: 'intellectual_objects#index', format: [:json, :html]
-  resources :intellectual_objects, only: [:index, :create], format: :json, path: 'member-api/v1/objects'
+  post 'api/v2/objects/:institution_identifier', to: 'intellectual_objects#create', format: :json, institution_identifier: institution_ptrn
+  resources :intellectual_objects, only: [:index], format: :json, path: 'member-api/v1/objects'
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/
