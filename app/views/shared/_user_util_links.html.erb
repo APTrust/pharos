@@ -6,10 +6,6 @@
           <li><%= link_to 'New User', new_user_path %></li>
           <li class="divider"></li>
       <% end %>
-      <li><%= link_to 'Bookmarks', root_path %></li>
-      <li><%= link_to 'Saved Searches', root_path %></li>
-      <li><%= link_to 'Search History', root_path %></li>
-      <li class="divider"></li>
       <li><%= link_to "Edit Profile", edit_user_path(current_user) %></li>
       <li class="divider"></li>
       <li><%= link_to 'Logout', destroy_user_session_path, method: :delete %></li>
