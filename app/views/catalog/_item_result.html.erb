@@ -1,0 +1,28 @@
+<% # container for a single doc -%>
+<div class="document">
+
+  <% # header bar for doc items in index view -%>
+  <section class="documentHeader clearfix">
+
+    <%- # main title container for doc partial view -%>
+    <h5 class="index_title col-sm-9 col-lg-9">
+      <%= counter %>. <%= link_to current.name, generic_file_path(current) %>
+    </h5>
+
+  </section>
+
+  <dl class="document-metadata dl-horizontal dl-invert">
+    <dt>Institution: </dt>
+    <dd><%= current.institution %></dd>
+    <dt>Etag: </dt>
+    <dd><%= current.etag %></dd>
+    <dt>Processed: </dt>
+    <dd><%= time_ago_in_words item.date %></dd>
+    <dt>Action: </dt>
+    <dd><%= current.action %></dd>
+    <dt>Stage: </dt>
+    <dd><%= current.stage %></dd>
+    <dt>Status: </dt>
+    <dd><%= current.status %></dd>
+  </dl>
+</div>

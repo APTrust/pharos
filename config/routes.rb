@@ -36,7 +36,7 @@ Rails.application.routes.draw do
   put '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
 
   # CATALOG ROUTES
-  get 'search/', to: 'catalog#search', format: [:json, :html], as: :search
+  post 'search/', to: 'catalog#search', format: [:json, :html], as: :search
   get 'api/v2/search', to: 'catalog#search', format: [:json, :html], as: :api_search
 
   # USER ROUTES
