@@ -268,22 +268,55 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
 
   describe 'POST #create' do
+    let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1) }
+    let(:obj) { FactoryGirl.build(:intellectual_object, institution: inst1) }
+    let(:gf1) { FactoryGirl.build(:generic_file, intellectual_object: obj) }
+    let(:gf2) { FactoryGirl.build(:generic_file, intellectual_object: obj) }
+    let(:event1) { FactoryGirl.build(:premis_event_ingest) }
+    let(:event2) { FactoryGirl.build(:premis_event_ingest) }
+    let(:event3) { FactoryGirl.build(:premis_event_ingest) }
 
     describe 'when not signed in' do
-      it 'should redirect to login' do
-        post :create, institution_identifier: inst1.identifier, intellectual_object: {title: 'Foo' }
+      it 'should respond with redirect (html)' do
+        post(:create, institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes)
         expect(response).to redirect_to root_url + 'users/sign_in'
+      end
+      it 'should respond unauthorized (json)' do
+        post(:create, institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes, format: 'json')
+        expect(response.code).to eq '401'
       end
     end
 
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
-
+      it 'should respond with redirect (html)' do
+        post(:create, institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes)
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        post(:create, institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes, format: 'json')
+        expect(response.code).to eq '403'
+      end
     end
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-
+      it 'should respond with redirect (html)' do
+        post(:create, institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes)
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        post(:create, institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes, format: 'json')
+        expect(response.code).to eq '403'
+      end
     end
 
     describe 'when signed in as system admin' do

@@ -33,6 +33,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def create
+    authorize IntellectualObject
     @intellectual_object = IntellectualObject.new(create_params)
     @intellectual_object.institution = Institution.find_by_identifier(params[:institution_identifier])
     if @intellectual_object.save
