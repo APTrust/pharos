@@ -129,12 +129,7 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  protected
-
-  def redirect_after_update
-    intellectual_object_path(resource)
-  end
-
+  # PUT objects/:intellectual_object_identifier/dpn
   def send_to_dpn
     authorize @intellectual_object, :dpn?
     pending = WorkItem.pending?(@intellectual_object.identifier)
@@ -154,7 +149,8 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def restore_item
+  # PUT objects/:intellectual_object_identifier/restore
+  def restore
     authorize @intellectual_object, :restore?
     pending = WorkItem.pending?(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
@@ -168,6 +164,12 @@ class IntellectualObjectsController < ApplicationController
       redirect_to @intellectual_object
       flash[:alert] = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
     end
+  end
+
+  protected
+
+  def redirect_after_update
+    intellectual_object_path(resource)
   end
 
   def prep_search_incidentals

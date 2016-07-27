@@ -485,8 +485,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        # put :send_to_dpn, intellectual_object_identifier: obj1
-        # expect(response).to redirect_to root_url + 'users/sign_in'
+        put :send_to_dpn, intellectual_object_identifier: obj1
+        expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
 
@@ -512,8 +512,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        # put :restore, intellectual_object_identifier: obj1
-        # expect(response).to redirect_to root_url + 'users/sign_in'
+        put :restore, intellectual_object_identifier: obj1
+        expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
 
