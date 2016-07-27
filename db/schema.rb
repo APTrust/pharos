@@ -75,7 +75,6 @@ ActiveRecord::Schema.define(version: 20160722201049) do
   create_table "premis_events", force: :cascade do |t|
     t.string   "identifier"
     t.string   "event_type"
-    t.text     "outcome"
     t.string   "date_time"
     t.string   "outcome_detail"
     t.string   "detail"
@@ -86,6 +85,8 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.integer  "generic_file_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.string   "outcome"
+    t.integer  "institution_id"
   end
 
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"

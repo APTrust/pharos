@@ -18,6 +18,8 @@ class CatalogController < ApplicationController
       when '*'
         generic_search
     end
+
+    #TODO: add way to filter by active/deleted/etc
     filter
     page_and_authorize
     respond_to do |format|
@@ -31,20 +33,16 @@ class CatalogController < ApplicationController
   def page_and_authorize
     params[:page] = 1 unless params[:page].present?
     params[:per_page] = 10 unless params[:per_page].present?
-    page = params[:page].to_i
-    per_page = params[:per_page].to_i
+    @page = params[:page].to_i
+    @per_page = params[:per_page].to_i
     permission_check
-    @paged_results = Kaminari.paginate_array(@authorized_results).page(page).per(per_page)
-    @next = format_next(page, per_page)
-    @previous = format_previous(page, per_page)
-
+    @paged_results = Kaminari.paginate_array(@authorized_results).page(@page).per(@per_page)
+    @next = format_next(@page, @per_page)
+    @previous = format_previous(@page, @per_page)
   end
 
   def permission_check
     @authorized_results = []
-    # consortial_results = []
-    # institution_results = []
-    # restricted_results = []
     if current_user.admin?
       @results.each { |key, value| @authorized_results += value }
     else

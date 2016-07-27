@@ -55,8 +55,6 @@ $apt_black: #180000;
   }
 }
 
-#q { width: auto; }
-
 #sortAndPerPage {
   border-top: 1px solid #DDDDDD;
   margin-top: 1em;
@@ -114,17 +112,12 @@ p.italic {
 #header-navbar .navbar-brand {@include fix-title;}
 
 #search_selectors {
-  float: left;
-  display: inline;
-  padding-top: 10px;
-  padding-bottom: 5px;
+  padding-top: 5px;
 }
 
-#search_inputs {
-  float: left;
-  display: inline;
-  padding-top: 17px;
-  padding-bottom: 5px;}
+#search_inputs input#q {
+  width: 450px;
+}
 
 .container {
   width: 1250px !important;
@@ -192,7 +185,6 @@ input#q {
     line-height: 1.2em;
   }
 }
-
 
 i.doc-action-btn {
   -moz-border-bottom-colors: none;
