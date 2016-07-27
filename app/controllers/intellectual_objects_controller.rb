@@ -130,6 +130,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   # PUT objects/:intellectual_object_identifier/dpn
+  # TODO: Expose this in the member API
   def send_to_dpn
     authorize @intellectual_object, :dpn?
     dpn_item = nil

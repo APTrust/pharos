@@ -494,6 +494,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                             institution: inst1,
                                             state: 'A',
                                             identifier: 'college.edu/pending') }
+    let!(:obj_in_dpn) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'A',
+                                            identifier: 'college.edu/in_dpn') }
+    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'D') }
     let!(:ingest) { FactoryGirl.create(:work_item,
                                        object_identifier: 'college.edu/for_dpn',
                                        action: 'Ingest',
@@ -504,6 +511,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                                 action: 'Restore',
                                                 stage: 'Requested',
                                                 status: 'Pending') }
+    let!(:dpn_item) { FactoryGirl.create(:work_item,
+                                         object_identifier: 'college.edu/in_dpn',
+                                         action: 'DPN',
+                                         stage: 'Record',
+                                         status: 'Success') }
 
     after do
       IntellectualObject.delete_all
@@ -537,7 +549,38 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response).to redirect_to intellectual_object_path(obj_for_dpn)
         expect(flash[:notice]).to include 'Your item has been queued for DPN.'
       end
-      it 'should respond empty (json)' do
+      it 'should reject items that are already in dpn (html)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_in_dpn
+        expect(response).to redirect_to intellectual_object_path(obj_in_dpn)
+        expect(flash[:alert]).to include 'This item has already been sent to DPN.'
+      end
+      it 'should reject deleted items (html)' do
+        put :send_to_dpn, intellectual_object_identifier: deleted_obj
+        expect(response).to redirect_to intellectual_object_path(deleted_obj)
+        expect(flash[:alert]).to include 'This item has been deleted and cannot be sent to DPN.'
+      end
+      it 'should reject items with pending work requests (html)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_pending
+        expect(response).to redirect_to intellectual_object_path(obj_pending)
+        expect(flash[:alert]).to include 'Your object cannot be sent to DPN at this time due to a pending'
+      end
+      it 'should reject items when DPN is disabled (html)' do
+        if Pharos::Application.config.show_send_to_dpn_button == false
+          begin
+            Pharos::Application.config.show_send_to_dpn_button = true
+            put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+          ensure
+            Pharos::Application.config.show_send_to_dpn_button = false
+          end
+          expect(response).to redirect_to intellectual_object_path(obj_for_dpn)
+          expect(flash[:alert]).to include 'Your object cannot be sent to DPN at this time due to a pending'
+        end
+      end
+    end
+
+    describe 'when signed in as system admin' do
+      before { sign_in sys_admin }
+      it 'should respond with meaningful json (json)' do
         put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
         expect(response.code).to eq '200'
         data = JSON.parse(response.body)
@@ -545,11 +588,45 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data['message']).to eq 'Your item has been queued for DPN.'
         expect(data['work_item_id']).to be > 0
       end
-    end
-
-    describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
-
+      it 'should reject items that are already in dpn (json)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_in_dpn, format: :json
+        expect(response.code).to eq '409'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'error'
+        expect(data['message']).to eq 'This item has already been sent to DPN.'
+        expect(data['work_item_id']).to eq 0
+      end
+      it 'should reject deleted items (json)' do
+        put :send_to_dpn, intellectual_object_identifier: deleted_obj, format: :json
+        expect(response.code).to eq '409'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'error'
+        expect(data['message']).to eq 'This item has been deleted and cannot be sent to DPN.'
+        expect(data['work_item_id']).to eq 0
+      end
+      it 'should reject items with pending work requests (json)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_pending, format: :json
+        expect(response.code).to eq '409'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'error'
+        expect(data['message']).to include 'Your object cannot be sent to DPN at this time due to a pending'
+        expect(data['work_item_id']).to eq 0
+      end
+      it 'should reject items when DPN is disabled (json)' do
+        if Pharos::Application.config.show_send_to_dpn_button == false
+          begin
+            Pharos::Application.config.show_send_to_dpn_button = true
+            put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+          ensure
+            Pharos::Application.config.show_send_to_dpn_button = false
+          end
+          expect(response.code).to eq '409'
+          data = JSON.parse(response.body)
+          expect(data['status']).to eq 'error'
+          expect(data['message']).to include 'Your object cannot be sent to DPN at this time due to a pending'
+          expect(data['work_item_id']).to eq 0
+        end
+      end
     end
 
   end # ---------------- END OF PUT #send_to_dpn ----------------
