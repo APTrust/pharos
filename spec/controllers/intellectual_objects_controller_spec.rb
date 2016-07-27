@@ -269,12 +269,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
   describe 'POST #create' do
     let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1) }
-    let(:obj) { FactoryGirl.build(:intellectual_object, institution: inst1) }
-    let(:gf1) { FactoryGirl.build(:generic_file, intellectual_object: obj) }
-    let(:gf2) { FactoryGirl.build(:generic_file, intellectual_object: obj) }
-    let(:event1) { FactoryGirl.build(:premis_event_ingest) }
-    let(:event2) { FactoryGirl.build(:premis_event_ingest) }
-    let(:event3) { FactoryGirl.build(:premis_event_ingest) }
 
     after do
       PremisEvent.delete_all
@@ -331,39 +325,21 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         post(:create, institution_identifier: inst1.identifier,
              intellectual_object: simple_obj.attributes, format: 'json')
         expect(response.code).to eq '201'
+        saved_obj = IntellectualObject.where(identifier: simple_obj.identifier).first
+        expect(saved_obj).to be_truthy
       end
-    #   it 'should create a complex object with nested relations' do
-    #     attrs = {}
-    #     attrs[:intellectual_object] = obj.attributes
-    #     gf1_attrs = gf1.attributes
-    #     gf1_attrs[:premis_events_attributes] = [event1.attributes]
-    #     gf2_attrs = gf2.attributes
-    #     gf2_attrs[:premis_events_attributes] = [event2.attributes]
-    #     attrs[:intellectual_object][:generic_files_attributes] = [gf1_attrs, gf2_attrs]
-    #     attrs[:intellectual_object][:premis_events_attributes] = [event3.attributes]
-    #     attrs[:intellectual_object].delete(:id)
-    #     attrs[:intellectual_object].delete(:permissions)
-    #     attrs[:intellectual_object].delete(:created_at)
-    #     attrs[:intellectual_object].delete(:updated_at)
-    #     attrs[:intellectual_object][:generic_files_attributes].each do |gf|
-    #       gf.delete(:permissions)
-    #       gf.delete(:created_at)
-    #       gf.delete(:updated_at)
-    #     end
-    #     attrs[:institution_identifier] = inst1.identifier
-    #     puts attrs.to_json
-    #     post(:create, intellectual_object: attrs,
-    #          institution_identifier: inst1.identifier, format: 'json')
-    #     expect(response.code).to eq '201'
-    #     saved_obj = IntellectualObject.where(identifier: obj.identifier).first
-    #     puts saved_obj.generic_files.count
-    #   end
     end
 
   end # ---------------- END OF POST #create ----------------
 
 
   describe 'PATCH #update' do
+
+    after do
+      PremisEvent.delete_all
+      GenericFile.delete_all
+      IntellectualObject.delete_all
+    end
 
     describe 'when not signed in' do
       it 'should redirect to login' do
@@ -374,17 +350,44 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
-
+      it 'should respond with redirect (html)' do
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}, format: :json
+        expect(response.code).to eq '403'
+      end
     end
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-
+      it 'should respond with redirect (html)' do
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}, format: :json
+        expect(response.code).to eq '403'
+      end
     end
 
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
-
+      it 'should update the object and respond with redirect (html)' do
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        expect(response).to redirect_to intellectual_object_path(obj1.identifier)
+        saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
+        expect(saved_obj.title).to eq 'Foo'
+      end
+      it 'should update the object and respond with json (json)' do
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food'}, format: :json
+        expect(response.status).to eq (200)
+        saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
+        expect(saved_obj.title).to eq 'Food'
+      end
     end
 
   end # ---------------- END OF PATCH #update ----------------

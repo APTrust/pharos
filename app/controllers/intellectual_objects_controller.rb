@@ -53,7 +53,6 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     end
-
   end
 
   def show
