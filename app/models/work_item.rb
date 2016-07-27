@@ -74,13 +74,9 @@ class WorkItem < ActiveRecord::Base
   # * Stage is Clean or (Stage is Record and Status is Success)
   # * Has the latest date of any record with the above characteristics
   def self.last_ingested_version(intellectual_object_identifier)
-    items = WorkItem.where(object_identifier: intellectual_object_identifier, action: Pharos::Application::PHAROS_ACTIONS['ingest'],
-                                stage: Pharos::Application::PHAROS_STAGES['clean']).order('date DESC').limit(1).first
-    if items.nil?
-      items = WorkItem.where(object_identifier: intellectual_object_identifier, action: Pharos::Application::PHAROS_ACTIONS['ingest'],
-                                  stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success']).order('date DESC').limit(1).first
-    end
-    items
+    conditions = "object_identifier = ? and action = 'Ingest' and " +
+      "(stage = 'Record' or stage = 'Cleanup') and status = 'Success'"
+    WorkItem.where(conditions, intellectual_object_identifier).order('date DESC').first
   end
 
   # Creates a WorkItem record showing that someone has requested
