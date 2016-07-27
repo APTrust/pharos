@@ -2,7 +2,7 @@ class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_filter :authenticate_user!
   before_action :load_institution, only: [:index, :create]
-  before_action :load_object, only: [:show, :edit, :update, :destroy]
+  before_action :load_object, only: [:show, :edit, :update, :destroy, :send_to_dpn, :restore]
 
   def index
     authorize @institution
@@ -132,20 +132,40 @@ class IntellectualObjectsController < ApplicationController
   # PUT objects/:intellectual_object_identifier/dpn
   def send_to_dpn
     authorize @intellectual_object, :dpn?
+    dpn_item = nil
+    message = ""
+    api_status_code = :ok
     pending = WorkItem.pending?(@intellectual_object.identifier)
     if Pharos::Application.config.show_send_to_dpn_button == false
-      redirect_to @intellectual_object
-      flash[:alert] = 'We are not currently sending objects to DPN.'
+      message = 'We are not currently sending objects to DPN.'
+      api_status_code = :conflict
+    elsif @intellectual_object.in_dpn?
+      message = 'This item has already been sent to DPN.'
+      api_status_code = :conflict
     elsif @intellectual_object.state == 'D'
-      redirect_to @intellectual_object
-      flash[:alert] = 'This item has been deleted and cannot be sent to DPN.'
+      message = 'This item has been deleted and cannot be sent to DPN.'
+      api_status_code = :conflict
     elsif pending == 'false'
-      WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
-      redirect_to @intellectual_object
-      flash[:notice] = 'Your item has been queued for DPN.'
+      dpn_item = WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
+      message = 'Your item has been queued for DPN.'
     else
-      redirect_to @intellectual_object
-      flash[:alert] = "Your object cannot be sent to DPN at this time due to a pending #{pending} request."
+      message = "Your object cannot be sent to DPN at this time due to a pending #{pending} request."
+      api_status_code = :conflict
+    end
+    respond_to do |format|
+      status = dpn_item.nil? ? 'error' : 'ok'
+      item_id = dpn_item.nil? ? 0 : dpn_item.id
+      format.json {
+        render :json => { status: status, message: message, work_item_id: item_id }, :status => api_status_code
+      }
+      format.html {
+        if dpn_item.nil?
+          flash[:alert] = message
+        else
+          flash[:notice] = message
+        end
+        redirect_to @intellectual_object
+      }
     end
   end
 

@@ -482,22 +482,69 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
 
   describe 'PUT #send_to_dpn' do
+    let!(:obj_for_dpn) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'A',
+                                            identifier: 'college.edu/for_dpn') }
+    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'D',
+                                            identifier: 'college.edu/deleted') }
+    let!(:obj_pending) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'A',
+                                            identifier: 'college.edu/pending') }
+    let!(:ingest) { FactoryGirl.create(:work_item,
+                                       object_identifier: 'college.edu/for_dpn',
+                                       action: 'Ingest',
+                                       stage: 'Cleanup',
+                                       status: 'Success') }
+    let!(:pending_restore) { FactoryGirl.create(:work_item,
+                                                object_identifier: 'college.edu/pending',
+                                                action: 'Restore',
+                                                stage: 'Requested',
+                                                status: 'Pending') }
+
+    after do
+      IntellectualObject.delete_all
+      WorkItem.delete_all
+    end
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        put :send_to_dpn, intellectual_object_identifier: obj1
+        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
 
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
-
+      it 'should respond with redirect (html)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+        expect(response.code).to eq '403'
+      end
     end
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-
+      it 'should respond with redirect (html)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+        expect(response).to redirect_to intellectual_object_path(obj_for_dpn)
+        expect(flash[:notice]).to include 'Your item has been queued for DPN.'
+      end
+      it 'should respond empty (json)' do
+        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+        expect(response.code).to eq '200'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'ok'
+        expect(data['message']).to eq 'Your item has been queued for DPN.'
+        expect(data['work_item_id']).to be > 0
+      end
     end
 
     describe 'when signed in as system admin' do
