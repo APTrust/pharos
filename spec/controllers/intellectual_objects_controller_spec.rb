@@ -31,16 +31,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    created_at: "2011-10-10T10:00:00Z",
                                    updated_at: "2011-10-10T10:00:00Z") }
 
-  # before do
-  #   IntellectualObject.destroy_all
-  #   Institution.destroy_all
-  # end
-
-  # after do
-  #   IntellectualObject.destroy_all
-  #   Institution.destroy_all
-  # end
-
 
   describe 'GET #index' do
 
@@ -394,6 +384,23 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
 
   describe 'DELETE #destroy' do
+    let!(:deletable_obj) { FactoryGirl.create(:institutional_intellectual_object,
+                                              institution: inst1,
+                                              state: 'A') }
+    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'D') }
+    let!(:obj_pending) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'A',
+                                            identifier: 'college.edu/item') }
+    let!(:work_item) { FactoryGirl.create(:work_item,
+                                          object_identifier: 'college.edu/item',
+                                          action: 'Restore') }
+
+    after do
+      IntellectualObject.delete_all
+    end
 
     describe 'when not signed in' do
       it 'should redirect to login' do
@@ -404,12 +411,30 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
-
+      it 'should respond with redirect (html)' do
+        delete :destroy, intellectual_object_identifier: deletable_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        delete :destroy, intellectual_object_identifier: deletable_obj, format: :json
+        expect(response.code).to eq '403'
+      end
     end
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-
+      it 'should respond with redirect (html)' do
+        delete :destroy, intellectual_object_identifier: deletable_obj
+        expect(response).to redirect_to root_url
+        expect(flash[:notice]).to include 'Delete job has been queued'
+        reloaded_object = IntellectualObject.find(deletable_obj.id)
+        expect(reloaded_object.state).to eq 'D'
+      end
+      # it 'should respond forbidden (json)' do
+      #   delete :destroy, intellectual_object_identifier: obj1, format: :json
+      #   expect(response.code).to eq '403'
+      # end
     end
 
     describe 'when signed in as system admin' do
