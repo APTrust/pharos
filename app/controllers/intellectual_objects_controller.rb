@@ -171,19 +171,37 @@ class IntellectualObjectsController < ApplicationController
   end
 
   # PUT objects/:intellectual_object_identifier/restore
+  # TODO: Expose this in the member API
   def restore
     authorize @intellectual_object, :restore?
+    message = ""
+    api_status_code = :ok
+    restore_item = nil
     pending = WorkItem.pending?(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
-      redirect_to @intellectual_object
-      flash[:alert] = 'This item has been deleted and cannot be queued for restoration.'
+      api_status_code = :conflict
+      message = 'This item has been deleted and cannot be queued for restoration.'
     elsif pending == 'false'
-      WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
-      redirect_to @intellectual_object
-      flash[:notice] = 'Your item has been queued for restoration.'
+      restore_item = WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
+      message = 'Your item has been queued for restoration.'
     else
-      redirect_to @intellectual_object
-      flash[:alert] = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
+      api_status_code = :conflict
+      message = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
+    end
+    respond_to do |format|
+      status = dpn_item.nil? ? 'error' : 'ok'
+      item_id = restore_item.nil? ? 0 : restore_item.id
+      format.json {
+        render :json => { status: status, message: message, work_item_id: item_id }, :status => api_status_code
+      }
+      format.html {
+        if dpn_item.nil?
+          flash[:alert] = message
+        else
+          flash[:notice] = message
+        end
+        redirect_to @intellectual_object
+      }
     end
   end
 

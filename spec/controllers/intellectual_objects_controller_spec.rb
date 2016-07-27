@@ -633,6 +633,33 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
 
   describe 'PUT #restore' do
+    let!(:obj_for_restore) { FactoryGirl.create(:institutional_intellectual_object,
+                                                institution: inst1,
+                                                state: 'A',
+                                                identifier: 'college.edu/for_restore') }
+    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'D',
+                                            identifier: 'college.edu/deleted') }
+    let!(:obj_pending) { FactoryGirl.create(:institutional_intellectual_object,
+                                            institution: inst1,
+                                            state: 'A',
+                                            identifier: 'college.edu/pending') }
+    let!(:ingest) { FactoryGirl.create(:work_item,
+                                       object_identifier: 'college.edu/for_restore',
+                                       action: 'Ingest',
+                                       stage: 'Cleanup',
+                                       status: 'Success') }
+    let!(:pending_restore) { FactoryGirl.create(:work_item,
+                                                object_identifier: 'college.edu/pending',
+                                                action: 'Restore',
+                                                stage: 'Requested',
+                                                status: 'Pending') }
+
+    after do
+      IntellectualObject.delete_all
+      WorkItem.delete_all
+    end
 
     describe 'when not signed in' do
       it 'should redirect to login' do
@@ -643,7 +670,15 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
-
+      it 'should respond with redirect (html)' do
+        put :restore, intellectual_object_identifier: obj_for_restore
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        put :restore, intellectual_object_identifier: obj_for_restore, format: :json
+        expect(response.code).to eq '403'
+      end
     end
 
     describe 'when signed in as institutional admin' do
