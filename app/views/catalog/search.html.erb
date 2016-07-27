@@ -1,4 +1,13 @@
-<%= render 'sort_and_per_page' %>
-<hr>
-<%= render 'search_results' %>
-<%= render 'results_pagination' %>
+<div id="sidebar" class="col-md-3 col-sm-4">
+  <%= render 'state_facet' %>
+  <%= render 'filter_results' %>
+</div>
+
+<div id="content" class="col-md-9 col-sm-8">
+  <%= render 'sort_and_per_page' %>
+  <hr>
+  <%= render 'search_results' %>
+  <%= render 'results_pagination' %>
+</div>
+
+

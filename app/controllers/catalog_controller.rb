@@ -18,6 +18,8 @@ class CatalogController < ApplicationController
       when '*'
         generic_search
     end
+
+    #TODO: add way to filter by active/deleted/etc
     filter
     page_and_authorize
     respond_to do |format|

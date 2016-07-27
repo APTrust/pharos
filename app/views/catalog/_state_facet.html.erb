@@ -1,0 +1,24 @@
+<h3>Show:</h3>
+<%= form_tag :method => :get, :class => 'search-query-form form-inline clearfix' do %>
+
+    <label class="search-scope">
+      <%= radio_button_tag 'show', 'active', params['show'].blank? || params['show'] == 'active' %>
+      <span class="label-text">Active</span>
+    </label>
+
+    <label class="search-scope">
+      <%= radio_button_tag 'show', 'all', params['show'] == 'all' %>
+      <span class="label-text">All</span>
+    </label>
+
+    <label class="search-scope">
+      <%= radio_button_tag 'show', 'deleted', params['show'] == 'deleted' %>
+      <span class="label-text">Deleted</span>
+    </label>
+
+    <noscript>
+      <button type="submit" class="search-submit btn btn-primary" id="aux-search-submit-header">
+        Filter by Work Owner
+      </button>
+    </noscript>
+<% end %>
