@@ -4,7 +4,7 @@
     <% if @previous.nil? %>
         « Previous |
     <% else %>
-        « <a href="<%= @previous %>"> Previous</a> |
+        « <a href="<%= @previous %>" rel="previous"> Previous</a> |
     <% end %>
     <span class="page_entries">
        <strong><%= @first_number %></strong> - <strong><%= @second_number %></strong> of <strong><%= @count %></strong>
@@ -12,7 +12,7 @@
     <% if @next.nil? %>
         | Next »
     <% else %>
-        | <a href="<%= @next %>">Next</a> »
+        | <a href="<%= @next %>" rel="next">Next</a> »
     <% end %>
 
   </div>

@@ -1,0 +1,52 @@
+<% unless @count < @per_page %>
+    <div class="row record-padding">
+      <div class="col-md-9">
+        <div class="pagination">
+          <ul class="pagination">
+            <% if @previous.nil? %>
+                <li class="disabled">
+                  <a href="<%= @previous %>">« Previous</a>
+                </li>
+            <% else %>
+                <li class="">
+                  <a href="<%= @previous %>">« Previous</a>
+                </li>
+            <% end %>
+            <% if @next.nil? %>
+                <li class="disabled">
+                  <a href="<%= @next %>">Next »</a>
+                </li>
+            <% else %>
+                <li class="">
+                  <a href="<%= @next %>">Next »</a>
+                </li>
+            <% end %>
+            <li class="active">
+              <a href="<%= current_path('page', '1') %>">1</a>
+            </li>
+            <li class="">
+              <a href="<%= current_path('page', '2') %>" rel="next">2</a>
+            </li>
+            <li class="">
+              <a href="<%= current_path('page', '2') %>">3</a>
+            </li>
+            <li class="">
+              <a href="<%= current_path('page', '2') %>">4</a>
+            </li>
+            <li class="">
+              <a href="<%= current_path('page', '2') %>">5</a>
+            </li>
+            <li class="disabled">
+              <a href="">…</a>
+            </li>
+            <li class="">
+              <a href="<%= current_path('page', '2') %>">487</a>
+            </li>
+            <li class="">
+              <a href="<%= current_path('page', '2') %>">488</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+<% end %>

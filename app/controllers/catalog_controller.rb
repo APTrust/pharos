@@ -41,9 +41,6 @@ class CatalogController < ApplicationController
 
   def permission_check
     @authorized_results = []
-    # consortial_results = []
-    # institution_results = []
-    # restricted_results = []
     if current_user.admin?
       @results.each { |key, value| @authorized_results += value }
     else
