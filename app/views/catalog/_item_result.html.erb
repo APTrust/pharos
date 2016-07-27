@@ -6,7 +6,7 @@
 
     <%- # main title container for doc partial view -%>
     <h5 class="index_title col-sm-9 col-lg-9">
-      <%= counter %>. <%= link_to current.name, generic_file_path(current) %>
+      <%= counter %>. <%= link_to current.name, work_item_path(current) %>
     </h5>
 
   </section>
@@ -17,7 +17,7 @@
     <dt>Etag: </dt>
     <dd><%= current.etag %></dd>
     <dt>Processed: </dt>
-    <dd><%= time_ago_in_words item.date %></dd>
+    <dd><%= time_ago_in_words current.date %></dd>
     <dt>Action: </dt>
     <dd><%= current.action %></dd>
     <dt>Stage: </dt>

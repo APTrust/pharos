@@ -1,13 +1,16 @@
 
-
-<% counter = 0 %>
-<% @paged_results.each do |current| %>
-  <% counter = counter+1 %>
-  <% if current.is_a?(IntellectualObject) %>
-    <%= render 'object_result', counter: counter, current: current %>
-  <% elsif current.is_a?(GenericFile) %>
-    <%= render 'file_result' %>
-  <% elsif current.is_a?(WorkItem) %>
-    <%= render 'item_result' %>
-  <% end %>
-<% end %>
+<h2 class="sr-only">Search Results</h2>
+<div id="documents">
+    <% counter = 0 %>
+    <% @paged_results.each do |current| %>
+        <% counter = counter+1 %>
+        <% if current.is_a?(IntellectualObject) %>
+            <%= render 'object_result', counter: counter, current: current %>
+        <% elsif current.is_a?(GenericFile) %>
+            <%= render 'file_result', counter: counter, current: current %>
+        <% elsif current.is_a?(WorkItem) %>
+            <%= render 'item_result', counter: counter, current: current %>
+        <% end %>
+        <hr>
+    <% end %>
+</div>

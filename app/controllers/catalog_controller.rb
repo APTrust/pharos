@@ -31,13 +31,12 @@ class CatalogController < ApplicationController
   def page_and_authorize
     params[:page] = 1 unless params[:page].present?
     params[:per_page] = 10 unless params[:per_page].present?
-    page = params[:page].to_i
-    per_page = params[:per_page].to_i
+    @page = params[:page].to_i
+    @per_page = params[:per_page].to_i
     permission_check
-    @paged_results = Kaminari.paginate_array(@authorized_results).page(page).per(per_page)
-    @next = format_next(page, per_page)
-    @previous = format_previous(page, per_page)
-
+    @paged_results = Kaminari.paginate_array(@authorized_results).page(@page).per(@per_page)
+    @next = format_next(@page, @per_page)
+    @previous = format_previous(@page, @per_page)
   end
 
   def permission_check
