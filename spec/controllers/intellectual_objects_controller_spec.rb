@@ -542,6 +542,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
+    # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should respond with redirect (html)' do
@@ -578,6 +579,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
+    # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should respond with meaningful json (json)' do
@@ -681,14 +683,53 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
+    # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-
+      it 'should respond with redirect (html)' do
+        put :restore, intellectual_object_identifier: obj_for_restore
+        expect(response).to redirect_to intellectual_object_path(obj_for_restore)
+        expect(flash[:notice]).to include 'Your item has been queued for restoration.'
+      end
+      it 'should reject deleted items (html)' do
+        put :restore, intellectual_object_identifier: deleted_obj
+        expect(response).to redirect_to intellectual_object_path(deleted_obj)
+        expect(flash[:alert]).to include 'This item has been deleted and cannot be queued for restoration.'
+      end
+      it 'should reject items with pending work requests (html)' do
+        put :restore, intellectual_object_identifier: obj_pending
+        expect(response).to redirect_to intellectual_object_path(obj_pending)
+        expect(flash[:alert]).to include 'cannot be queued for restoration at this time due to a pending'
+      end
     end
 
+    # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
-
+      it 'should respond with meaningful json (json)' do
+        put :restore, intellectual_object_identifier: obj_for_restore, format: :json
+        expect(response.code).to eq '200'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'ok'
+        expect(data['message']).to eq 'Your item has been queued for restoration.'
+        expect(data['work_item_id']).to be > 0
+      end
+      it 'should reject deleted items (json)' do
+        put :restore, intellectual_object_identifier: deleted_obj, format: :json
+        expect(response.code).to eq '409'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'error'
+        expect(data['message']).to eq 'This item has been deleted and cannot be queued for restoration.'
+        expect(data['work_item_id']).to eq 0
+      end
+      it 'should reject items with pending work requests (json)' do
+        put :restore, intellectual_object_identifier: obj_pending, format: :json
+        expect(response.code).to eq '409'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'error'
+        expect(data['message']).to include 'cannot be queued for restoration at this time due to a pending'
+        expect(data['work_item_id']).to eq 0
+      end
     end
 
   end # ---------------- END OF PUT #restore ----------------
