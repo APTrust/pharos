@@ -88,8 +88,13 @@ class IntellectualObjectsController < ApplicationController
     authorize @intellectual_object, :soft_delete?
     pending = WorkItem.pending?(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
-      redirect_to @intellectual_object
-      flash[:alert] = 'This item has already been deleted.'
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          redirect_to @intellectual_object
+          flash[:alert] = 'This item has already been deleted.'
+        }
+      end
     elsif pending == 'false'
       attributes = { event_type: 'delete',
                      date_time: "#{Time.now}",
@@ -110,8 +115,17 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     else
-      redirect_to @intellectual_object
-      flash[:alert] = "Your object cannot be deleted at this time due to a pending #{pending} request."
+      respond_to do |format|
+        message = "Your object cannot be deleted at this time due to a pending #{pending} request. " +
+          "You may delete this object after the #{pending} request has completed."
+        format.json {
+          render :json => { status: 'error', message: message }, :status => :conflict
+        }
+        format.html {
+          redirect_to @intellectual_object
+          flash[:alert] = message
+        }
+      end
     end
   end
 

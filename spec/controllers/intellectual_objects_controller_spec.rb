@@ -396,7 +396,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                             identifier: 'college.edu/item') }
     let!(:work_item) { FactoryGirl.create(:work_item,
                                           object_identifier: 'college.edu/item',
-                                          action: 'Restore') }
+                                          action: 'Restore',
+                                          stage: 'Requested',
+                                          status: 'Pending') }
 
     after do
       IntellectualObject.delete_all
@@ -424,21 +426,55 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-      it 'should respond with redirect (html)' do
+      it 'should create delete event and redirect (html)' do
         delete :destroy, intellectual_object_identifier: deletable_obj
         expect(response).to redirect_to root_url
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq 'delete'
       end
-      # it 'should respond forbidden (json)' do
-      #   delete :destroy, intellectual_object_identifier: obj1, format: :json
-      #   expect(response.code).to eq '403'
-      # end
+
+      it 'should not delete already deleted item' do
+        delete :destroy, intellectual_object_identifier: deleted_obj
+        expect(response).to redirect_to intellectual_object_path(deleted_obj)
+        expect(flash[:alert]).to include 'This item has already been deleted'
+      end
+
+      it 'should not delete item with pending jobs' do
+        delete :destroy, intellectual_object_identifier: obj_pending
+        expect(response).to redirect_to intellectual_object_path(obj_pending)
+        expect(flash[:alert]).to include 'Your object cannot be deleted'
+      end
     end
 
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
+
+      it 'should create delete event and return no content' do
+        delete :destroy, intellectual_object_identifier: deletable_obj, format: :json
+        expect(response.status).to eq(204)
+        expect(response.body).to be_empty
+        reloaded_object = IntellectualObject.find(deletable_obj.id)
+        expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq 'delete'
+      end
+
+      it 'should say OK and return no content if the item was previously deleted' do
+        delete :destroy, intellectual_object_identifier: deleted_obj, format: :json
+        expect(response.status).to eq(204)
+        expect(response.body).to be_empty
+      end
+
+      it 'should not delete item with pending jobs' do
+        delete :destroy, intellectual_object_identifier: obj_pending, format: :json
+        expect(response.status).to eq(409)
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq ('error')
+        expect(data['message']).to include 'Your object cannot be deleted'
+      end
 
     end
 
