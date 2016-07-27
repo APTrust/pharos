@@ -550,6 +550,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response).to redirect_to intellectual_object_path(obj_for_dpn)
         expect(flash[:notice]).to include 'Your item has been queued for DPN.'
       end
+      it 'should create a DPN work item' do
+        count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+        count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                     status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        expect(count_after).to eq(count_before + 1)
+      end
       it 'should reject items that are already in dpn (html)' do
         put :send_to_dpn, intellectual_object_identifier: obj_in_dpn
         expect(response).to redirect_to intellectual_object_path(obj_in_dpn)
@@ -589,6 +599,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data['status']).to eq 'ok'
         expect(data['message']).to eq 'Your item has been queued for DPN.'
         expect(data['work_item_id']).to be > 0
+      end
+      it 'should create a DPN work item' do
+        count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+        count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                     status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        expect(count_after).to eq(count_before + 1)
       end
       it 'should reject items that are already in dpn (json)' do
         put :send_to_dpn, intellectual_object_identifier: obj_in_dpn, format: :json
@@ -691,6 +711,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response).to redirect_to intellectual_object_path(obj_for_restore)
         expect(flash[:notice]).to include 'Your item has been queued for restoration.'
       end
+      it 'should create a restore work item' do
+        count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        put :restore, intellectual_object_identifier: obj_for_restore
+        count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                     status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        expect(count_after).to eq(count_before + 1)
+      end
       it 'should reject deleted items (html)' do
         put :restore, intellectual_object_identifier: deleted_obj
         expect(response).to redirect_to intellectual_object_path(deleted_obj)
@@ -713,6 +743,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data['status']).to eq 'ok'
         expect(data['message']).to eq 'Your item has been queued for restoration.'
         expect(data['work_item_id']).to be > 0
+      end
+      it 'should create a restore work item' do
+        count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        put :restore, intellectual_object_identifier: obj_for_restore, format: :json
+        count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                     stage: Pharos::Application::PHAROS_STAGES['requested'],
+                                     status: Pharos::Application::PHAROS_STATUSES['pend']).count
+        expect(count_after).to eq(count_before + 1)
       end
       it 'should reject deleted items (json)' do
         put :restore, intellectual_object_identifier: deleted_obj, format: :json
