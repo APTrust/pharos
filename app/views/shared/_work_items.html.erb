@@ -1,31 +1,31 @@
 <h4>Most Recent Work Items for <%= @institution.name %></h4>
 <table class="table">
-  <thead>
+    <thead>
   <tr>
-    <th>Name</th>
-    <th>Etag</th>
-    <th>Institution</th>
-    <th>Processed</th>
-    <th>Action</th>
-    <th>Stage</th>
-    <th>Status</th>
-  </tr>
+      <th>Name</th>
+      <th>Etag</th>
+      <th>Institution</th>
+      <th>Processed</th>
+      <th>Action</th>
+      <th>Stage</th>
+      <th>Status</th>
+    </tr>
   </thead>
-  <tbody>
+    <tbody>
   <% if @items.empty? %>
-      No Work Items to display.
-  <% else %>
-      <% @items.each do |item| %>
-          <tr class="<%= item.status %>">
-            <td><%= link_to item.name, work_item_path(id: item.id) %></td>
-            <td><%= item.etag %></td>
-            <td><%= item.institution %></td>
-            <td><%= time_ago_in_words item.date %></td>
-            <td><%= item.action %></td>
-            <td><%= item.stage %></td>
-            <td><%= item.status %></td>
-          </tr>
+          No Work Items to display.
+      <% else %>
+          <% @items.each do |item| %>
+                  <tr class="<%= item.status %>">
+              <td><%= link_to item.name, work_item_path(id: item.id) %></td>
+              <td><%= item.etag %></td>
+              <td><%= item.institution %></td>
+              <td><%= time_ago_in_words item.date %></td>
+              <td><%= item.action %></td>
+              <td><%= item.stage %></td>
+              <td><%= item.status %></td>
+            </tr>
+              <% end %>
       <% end %>
-  <% end %>
   </tbody>
 </table>

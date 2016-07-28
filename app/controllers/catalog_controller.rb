@@ -25,6 +25,7 @@ class CatalogController < ApplicationController
 
     #TODO: add way to filter by active/deleted/etc
     filter
+    sort
     page_and_authorize
     respond_to do |format|
       format.json { render json: {results: @paged_results, next: @next, previous: @previous} }
@@ -180,6 +181,7 @@ class CatalogController < ApplicationController
     filter_by_format if params[:file_format].present?
     filter_by_association if params[:association].present?
     filter_by_type if params[:type].present?
+    filter_by_state if params[:state].present?
   end
 
   def filter_by_status
@@ -240,6 +242,15 @@ class CatalogController < ApplicationController
     @selected[:type] = params[:type]
   end
 
+  def filter_by_state
+    unless params[:state] == 'all'
+      @results[:objects] = @results[:objects].where(state: params[:state]) unless @results[:objects].nil?
+      @results[:files] = @results[:files].where(state: params[:state]) unless @results[:files].nil?
+      @results[:items] = @results[:items].where(state: params[:state]) unless @results[:items].nil?
+      @selected[:state] = params[:state]
+    end
+  end
+
   def set_page_counts
     @count = 0
     @results.each { |key, value| @count = @count + value.count }
@@ -254,6 +265,38 @@ class CatalogController < ApplicationController
       @first_number = @second_number.to_i - 9
     end
     @second_number = @count if @second_number > @count
+  end
+
+  def sort
+    case params[:sort]
+      when 'date'
+        sort_by_date
+      when 'name'
+        sort_by_name
+      when 'institution'
+        sort_by_institution
+    end
+  end
+
+  def sort_by_date
+    @results[:objects] = @results[:objects].order('created_at').reverse_order unless @results[:objects].nil?
+    @results[:files] = @results[:files].order('created').reverse_order  unless @results[:files].nil?
+    @results[:items] = @results[:items].order('date').reverse_order  unless @results[:items].nil?
+    @selected[:sort] = params[:sort]
+  end
+
+  def sort_by_name
+    @results[:objects] = @results[:objects].order('bag_name').reverse_order unless @results[:objects].nil?
+    @results[:files] = @results[:files].order('uri').reverse_order  unless @results[:files].nil?
+    @results[:items] = @results[:items].order('name').reverse_order  unless @results[:items].nil?
+    @selected[:sort] = params[:sort]
+  end
+
+  def sort_by_institution
+    @results[:objects] = @results[:objects].order('institution_id').reverse_order unless @results[:objects].nil?
+    @results[:files] = @results[:files].order('institution_id').reverse_order  unless @results[:files].nil?
+    @results[:items] = @results[:items].order('institution_id').reverse_order  unless @results[:items].nil?
+    @selected[:sort] = params[:sort]
   end
 
   def set_filter_counts
