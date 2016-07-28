@@ -37,6 +37,7 @@ Rails.application.routes.draw do
 
   # CATALOG ROUTES
   post 'search/', to: 'catalog#search', format: [:json, :html], as: :search
+  get 'search/', to: 'catalog#search', format: [:json, :html]
   get 'api/v2/search', to: 'catalog#search', format: [:json, :html], as: :api_search
 
   # USER ROUTES
