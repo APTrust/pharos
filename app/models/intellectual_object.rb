@@ -17,8 +17,6 @@ class IntellectualObject < ActiveRecord::Base
   validate :identifier_is_unique
 
   before_save :set_bag_name
-  before_save :set_permissions
-  before_save :active_files
   before_destroy :check_for_associations
 
 
@@ -174,39 +172,6 @@ class IntellectualObject < ActiveRecord::Base
     WorkItem.last_ingested_version(self.identifier)
   end
 
-  # # This is for serializing JSON in the API.
-  # def serializable_hash(options={})
-  #   data = {
-  #       id: id,
-  #       title: title,
-  #       description: description,
-  #       access: access,
-  #       bag_name: bag_name,
-  #       identifier: identifier,
-  #       state: state,
-  #   }
-  #   data.merge!(alt_identifier: serialize_alt_identifiers)
-  #   if options.has_key?(:include)
-  #     options[:include].each do |opt|
-  #       if opt.is_a?(Hash) && opt.has_key?(:active_files)
-  #         data.merge!(active_files: serialize_active_files(opt[:active_files]))
-  #       end
-  #     end
-  #     data.merge!(premis_events: serialize_events) if options[:include].include?(:premis_events)
-  #     if options[:include].include?(:etag)
-  #       item = WorkItem.last_ingested_version(self.identifier)
-  #       data.merge!(etag: item.etag) unless item.nil?
-  #     end
-  #   end
-  #   data
-  # end
-
-  # def serialize_active_files(options={})
-  #   self.active_files.map do |file|
-  #     file.serializable_hash(options)
-  #   end
-  # end
-
   def add_event(attributes)
     event = self.premis_events.build(attributes)
     event.intellectual_object = self
@@ -214,49 +179,42 @@ class IntellectualObject < ActiveRecord::Base
     event
   end
 
-  # def serialize_events
-  #   self.premis_events.map do |event|
-  #     event.serializable_hash
-  #   end
-  # end
-
-  # def serialize_alt_identifiers
-  #   data = []
-  #   alts = alt_identifier.split(',') unless alt_identifier.nil?
-  #   unless alts.nil?
-  #     alts.each do |ident|
-  #       data.push(ident)
-  #     end
-  #   end
-  #   data
-  # end
-
-  def set_permissions
-    inst_id = self.institution.id
-    inst_admin_group = "Admin_At_#{inst_id}"
-    inst_user_group = "User_At_#{inst_id}"
-    permissions = {}
+  # Is the user allowed to discover this object?
+  def can_discover?(user)
     case access
       when 'consortia'
-        permissions[:discover_groups] = %w(admin institutional_admin institutional_user)
-        permissions[:read_groups] = %w(admin institutional_admin institutional_user)
-        permissions[:edit_groups] = ['admin', inst_admin_group]
+          true
       when 'institution'
-        permissions[:discover_groups] = ['admin', inst_admin_group, inst_user_group]
-        permissions[:read_groups] = ['admin', inst_admin_group, inst_user_group]
-        permissions[:edit_groups] = ['admin', inst_admin_group]
+          user.admin? || user.institution_id == institution_id
       when 'restricted'
-        permissions[:discover_groups] = ['admin', inst_admin_group, inst_user_group]
-        permissions[:read_groups] = ['admin', inst_admin_group]
-        permissions[:edit_groups] = ['admin', inst_admin_group]
+          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
     end
-    self.permissions = permissions
-    permissions
   end
 
-  def check_permissions
-    self.permissions
+  # Is the user allowed to read this object?
+  def can_read?(user)
+    case access
+      when 'consortia'
+          true
+      when 'institution'
+          user.admin? || user.institution_id == institution_id
+      when 'restricted'
+          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
+    end
   end
+
+  # Is the user allowed to edit this object?
+  def can_edit?(user)
+    case access
+      when 'consortia'
+          user.admin? || user.institution_id == institution_id
+      when 'institution'
+          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
+      when 'restricted'
+          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
+    end
+  end
+
 
   private
   def identifier_is_unique

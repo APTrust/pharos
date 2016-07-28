@@ -207,11 +207,6 @@ class WorkItem < ActiveRecord::Base
     return false
   end
 
-  def check_permissions
-    permissions = intellectual_object.set_permissions if intellectual_object
-    permissions
-  end
-
   private
 
   # WorkItem will not have an object identifier until

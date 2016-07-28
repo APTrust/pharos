@@ -150,11 +150,6 @@ class GenericFile < ActiveRecord::Base
     find_checksum_by_digest(digest).nil? == false
   end
 
-  def check_permissions
-    permissions = intellectual_object.permissions if intellectual_object
-    permissions
-  end
-
   private
 
   def has_right_number_of_checksums

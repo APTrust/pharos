@@ -62,17 +62,6 @@ RSpec.describe GenericFile, :type => :model do
     describe 'that is saved' do
       let(:intellectual_object) { FactoryGirl.create(:intellectual_object) }
       subject { FactoryGirl.create(:generic_file, intellectual_object: intellectual_object) }
-      describe 'permissions' do
-        after do
-          subject.destroy
-          intellectual_object.destroy
-        end
-        it 'should copy the permissions of the intellectual object it belongs to' do
-          permissions = intellectual_object.check_permissions
-          subject.save!
-          subject.check_permissions.should == permissions
-        end
-      end
       describe 'its intellectual_object' do
         after(:all)do # Must use after(:all) to avoid 'can't modify frozen Class' bug in rspec-mocks
           subject.destroy

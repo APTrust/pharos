@@ -150,36 +150,6 @@ RSpec.describe IntellectualObject, :type => :model do
 
     describe 'indexes groups' do
       let(:inst_id) { subject.institution.id }
-      describe 'with consortial access' do
-        subject { FactoryGirl.create(:consortial_intellectual_object) }
-        it 'should properly set groups' do
-          permissions = subject.set_permissions
-          expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
-          expect(permissions[:read_groups]).to eq %w(admin institutional_admin institutional_user)
-          expect(permissions[:discover_groups]).to eq %w(admin institutional_admin institutional_user)
-        end
-      end
-
-      describe 'with institutional access' do
-        subject { FactoryGirl.create(:institutional_intellectual_object) }
-        it 'should properly set groups' do
-          permissions = subject.set_permissions
-          expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
-          expect(permissions[:read_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
-          expect(permissions[:discover_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
-        end
-      end
-
-      describe 'with restricted access' do
-        subject { FactoryGirl.create(:restricted_intellectual_object) }
-        it 'should properly set groups' do
-          permissions = subject.set_permissions
-          expect(permissions[:edit_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
-          expect(permissions[:read_groups]).to eq ['admin', "Admin_At_#{inst_id}"]
-          expect(permissions[:discover_groups]).to eq ['admin', "Admin_At_#{inst_id}", "User_At_#{inst_id}"]
-        end
-      end
-
       describe '#identifier_is_unique' do
         it 'should validate uniqueness of the identifier' do
           one = FactoryGirl.create(:intellectual_object, identifier: 'test.edu/234')
