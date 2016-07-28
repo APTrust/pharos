@@ -197,10 +197,13 @@ class WorkItemsController < ApplicationController
   def items_for_something(alt_action)
     case alt_action
       when 'dpn'
+        authorize WorkItem, :items_for_dpn?
         item_action = Pharos::Application::PHAROS_ACTIONS['dpn']
       when 'restore'
+        authorize WorkItem, :items_for_restore?
         item_action = Pharos::Application::PHAROS_ACTIONS['restore']
       when 'delete'
+        authorize WorkItem, :items_for_delete?
         item_action = Pharos::Application::PHAROS_ACTIONS['delete']
         failed = Pharos::Application::PHAROS_STATUSES['fail']
     end
@@ -237,8 +240,8 @@ class WorkItemsController < ApplicationController
   end
 
   def api_search
+    authorize WorkItem, :admin_api?
     current_user.admin? ? @items = WorkItem.all : @items = WorkItem.where(institution: current_user.institution.identifier)
-    authorize @items, :admin_api?
     if Rails.env.test? || Rails.env.development?
       rewrite_params_for_sqlite
     end
@@ -348,9 +351,9 @@ class WorkItemsController < ApplicationController
 
   def work_item_params
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
-                                           :institution, :date, :note, :action,
-                                           :stage, :status, :outcome, :retry, :reviewed,
-                                           :state, :node)
+                                      :institution, :date, :note, :action,
+                                      :stage, :status, :outcome, :retry, :reviewed,
+                                      :state, :node)
   end
 
   def params_for_status_update

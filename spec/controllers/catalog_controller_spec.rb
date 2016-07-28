@@ -28,12 +28,12 @@ RSpec.describe CatalogController, type: :controller do
     @file_five = FactoryGirl.create(:generic_file, intellectual_object: @object_five)
     @file_six = FactoryGirl.create(:generic_file, intellectual_object: @object_six)
 
-    @item_one = FactoryGirl.create(:ingested_item, object_identifier: @object_one.identifier, generic_file_identifier: @file_one.identifier)
+    @item_one = FactoryGirl.create(:ingested_item, object_identifier: @object_one.identifier, generic_file_identifier: @file_one.identifier, institution_id: @another_institution.id)
     @item_two = FactoryGirl.create(:ingested_item, object_identifier: @object_two.identifier, generic_file_identifier: @file_two.identifier, etag: '1234-5678')
     @item_three = FactoryGirl.create(:ingested_item, object_identifier: @object_three.identifier, generic_file_identifier: @file_three.identifier)
-    @item_four = FactoryGirl.create(:ingested_item, object_identifier: @object_four.identifier, generic_file_identifier: @file_four.identifier, stage: 'Requested')
-    @item_five = FactoryGirl.create(:ingested_item, object_identifier: @object_five.identifier, generic_file_identifier: @file_five.identifier, name: '1234file.tar', status: 'Success')
-    @item_six = FactoryGirl.create(:ingested_item, object_identifier: @object_six.identifier, generic_file_identifier: @file_six.identifier, action: 'Ingest')
+    @item_four = FactoryGirl.create(:ingested_item, object_identifier: @object_four.identifier, generic_file_identifier: @file_four.identifier, stage: 'Requested', institution_id: @another_institution.id)
+    @item_five = FactoryGirl.create(:ingested_item, object_identifier: @object_five.identifier, generic_file_identifier: @file_five.identifier, name: '1234file.tar', status: 'Success', institution_id: @another_institution.id)
+    @item_six = FactoryGirl.create(:ingested_item, object_identifier: @object_six.identifier, generic_file_identifier: @file_six.identifier, action: 'Ingest', institution_id: @another_institution.id)
   end
 
   after(:all) do
@@ -150,14 +150,14 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should match a search on alt_identifier' do
             get :search, q: '1234', search_field: 'Alternate Identifier', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 3
-            expect(assigns(:paged_results).map &:id).to match_array [@object_two.id, @item_three.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@object_two.id]
           end
 
           it 'should match a search on bag_name' do
             get :search, q: '1234', search_field: 'Bag Name', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 3
-            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 2
+            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id]
           end
 
           it 'should match a search on title' do
@@ -174,8 +174,8 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should match a search on name' do
             get :search, q: '1234', search_field: 'Name', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 3
-            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_five.id]
           end
 
           it 'should match a search on etag' do
@@ -224,6 +224,7 @@ RSpec.describe CatalogController, type: :controller do
         describe 'for generic file searches' do
           it 'should return only the results to which you have access' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'Generic Files'
+            # file_one is consortial, 4,5,6 belong to same inst as user
             expect(assigns(:paged_results).size).to eq 4
             expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id, @file_five.id, @file_six.id]
           end
@@ -250,13 +251,17 @@ RSpec.describe CatalogController, type: :controller do
         describe 'for generic searches' do
           it 'should return only the results to which you have access' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'All Types', per_page: 20
+            # 3 inst objects
+            # 1 consortial object
+            # 4 generic files
+            # 4 work items
             expect(assigns(:paged_results).size).to eq 12
           end
 
           it 'should not return results that you do not have access to' do
             get :search, q: '1234', search_field: 'Alternate Identifier', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 1
-            expect(assigns(:paged_results).map &:id).to match_array [@item_five.id]
+            # Only obj with this alt id belongs to another inst
+            expect(assigns(:paged_results).size).to eq 0
           end
         end
       end
@@ -315,8 +320,8 @@ RSpec.describe CatalogController, type: :controller do
         describe 'for work item searches' do
           it 'should filter results by institution' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'Work Items', institution: @another_institution.id
-            expect(assigns(:paged_results).size).to eq 3
-            expect(assigns(:paged_results).map &:id).to match_array [@item_four.id, @item_five.id, @item_six.id]
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@item_one.id, @item_four.id, @item_five.id, @item_six.id]
           end
 
           it 'should filter results by access' do

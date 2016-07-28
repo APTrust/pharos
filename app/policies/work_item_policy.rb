@@ -17,7 +17,7 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def admin_api?
-    user.admin? || record.first.nil?
+    user.admin?
   end
 
   def admin_show?
@@ -25,7 +25,7 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def show?
-    record.nil? || user.admin? || (user.institution.identifier == record.institution)
+    record.nil? || user.admin? || (user.institution.id == record.institution_id)
   end
 
   def update?
@@ -54,15 +54,15 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def items_for_delete?
-    record.first.nil? || user.admin?
+    user.admin?
   end
 
   def items_for_restore?
-    record.first.nil? || user.admin?
+    user.admin?
   end
 
   def items_for_dpn?
-    record.first.nil? || user.admin?
+    user.admin?
   end
 
   def delete_test_items?

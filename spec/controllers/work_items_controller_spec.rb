@@ -3,11 +3,11 @@ require 'spec_helper'
 RSpec.describe WorkItemsController, type: :controller do
   let(:institution) { FactoryGirl.create(:institution) }
   let(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution_id: institution.id) }
-  let(:object) { FactoryGirl.create(:intellectual_object, institution: institution) }
+  let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
+  let(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
   let(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
   let!(:item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
-  let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution.identifier, status: Pharos::Application::PHAROS_STATUSES['fail']) }
+  let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, status: Pharos::Application::PHAROS_STATUSES['fail']) }
 
   after do
     WorkItem.destroy_all
@@ -226,7 +226,7 @@ RSpec.describe WorkItemsController, type: :controller do
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 institution: institutional_admin.institution.identifier,
+                                 institution_id: institutional_admin.institution.id,
                                  retry: true)
 
       end
@@ -243,8 +243,8 @@ RSpec.describe WorkItemsController, type: :controller do
           FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
         end
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
-                                 institution: institution.identifier,
-                                 retry: true)
+                            institution_id: institution.id,
+                            retry: true)
         WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
         sign_in admin_user
       end
@@ -261,9 +261,9 @@ RSpec.describe WorkItemsController, type: :controller do
       before do
         sign_in admin_user
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
-                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
-                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 retry: true)
+                            stage: Pharos::Application::PHAROS_STAGES['requested'],
+                            status: Pharos::Application::PHAROS_STATUSES['pend'],
+                            retry: true)
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -289,10 +289,10 @@ RSpec.describe WorkItemsController, type: :controller do
         sign_in institutional_admin
         2.times { FactoryGirl.create(:work_item) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
-                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
-                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 institution: institutional_admin.institution.identifier,
-                                 retry: true)
+                            stage: Pharos::Application::PHAROS_STAGES['requested'],
+                            status: Pharos::Application::PHAROS_STATUSES['pend'],
+                            institution_id: institutional_admin.institution.id,
+                            retry: true)
 
       end
 
@@ -308,8 +308,8 @@ RSpec.describe WorkItemsController, type: :controller do
           FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
         end
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
-                                 institution: institution.identifier,
-                                 retry: true)
+                            institution_id: institution.id,
+                            retry: true)
         WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
         sign_in admin_user
       end
@@ -326,9 +326,9 @@ RSpec.describe WorkItemsController, type: :controller do
       before do
         sign_in admin_user
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
-                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
-                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 retry: true)
+                            stage: Pharos::Application::PHAROS_STAGES['requested'],
+                            status: Pharos::Application::PHAROS_STATUSES['pend'],
+                            retry: true)
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -354,10 +354,10 @@ RSpec.describe WorkItemsController, type: :controller do
         sign_in institutional_admin
         2.times { FactoryGirl.create(:work_item) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
-                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
-                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 institution: institutional_admin.institution.identifier,
-                                 retry: true)
+                            stage: Pharos::Application::PHAROS_STAGES['requested'],
+                            status: Pharos::Application::PHAROS_STATUSES['pend'],
+                            institution_id: institutional_admin.institution.id,
+                            retry: true)
       end
 
       it 'restricts access to the admin API' do
@@ -373,7 +373,7 @@ RSpec.describe WorkItemsController, type: :controller do
                              action: Pharos::Application::PHAROS_ACTIONS['delete'],
                              stage: Pharos::Application::PHAROS_STAGES['requested'],
                              status: Pharos::Application::PHAROS_STATUSES['pend'],
-                             institution: institutional_admin.institution.identifier,
+                             institution: institutional_admin.institution,
                              object_identifier: object.identifier,
                              generic_file_identifier: file.identifier,
                              retry: true)
@@ -393,19 +393,20 @@ RSpec.describe WorkItemsController, type: :controller do
   end
 
   describe 'POST #delete_test_items' do
+    let!(:test_inst) { FactoryGirl.create(:institution)  }
     before do
       sign_in admin_user
       5.times do
-        FactoryGirl.create(:work_item, institution: 'test.edu')
+        FactoryGirl.create(:work_item, institution: test_inst)
       end
     end
     after do
-      WorkItem.where(institution: 'test.edu').delete_all
+      WorkItem.where(institution: test_inst).delete_all
     end
 
     it 'should return only items with the specified object_identifier' do
       post :index, alt_action: 'delete_test', format: :json
-      expect(WorkItem.where(institution: 'test.edu').count).to eq 0
+      expect(WorkItem.where(institution: test_inst).count).to eq 0
     end
   end
 
@@ -526,10 +527,10 @@ RSpec.describe WorkItemsController, type: :controller do
       before do
         sign_in institutional_admin
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
-                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
-                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 retry: false,
-                                 object_identifier: object.identifier)
+                            stage: Pharos::Application::PHAROS_STAGES['requested'],
+                            status: Pharos::Application::PHAROS_STATUSES['pend'],
+                            retry: false,
+                            object_identifier: object.identifier)
       end
 
       it 'restricts access to the admin API' do
@@ -559,9 +560,20 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'should reject a status, stage or action that is not allowed' do
         name = object.identifier.split('/')[1]
-        post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
-                                       bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: 'File',
-                                       stage: "Entry", status: 'Finalized', outcome: 'Outcome', reviewed: false}, format: 'json'
+        post(:create, work_item: {
+               name: "#{name}.tar",
+               etag: '1234567890',
+               bag_date: Time.now.utc,
+               user: 'Kelly Croswell',
+               institution: institution,
+               bucket: "aptrust.receiving.#{institution.identifier}",
+               date: Time.now.utc,
+               note: 'Note',
+               action: 'File',
+               stage: "Entry",
+               status: 'Finalized',
+               outcome: 'Outcome',
+               reviewed: false}, format: 'json')
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( { 'status' => ['Status is not one of the allowed options'],
                                                    'stage' => ['Stage is not one of the allowed options'],
@@ -571,9 +583,20 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'should accept good parameters via json' do
         name = object.identifier.split('/')[1]
         expect {
-          post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
-                                         bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
-                                         stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: false}, format: 'json'
+          post(:create, work_item: {
+                 name: "#{name}.tar",
+                 etag: '1234567890',
+                 bag_date: Time.now.utc,
+                 user: 'Kelly Croswell',
+                 institution: institution,
+                 bucket: "aptrust.receiving.#{institution.identifier}",
+                 date: Time.now.utc,
+                 note: 'Note',
+                 action: Pharos::Application::PHAROS_ACTIONS['fixity'],
+                 stage: Pharos::Application::PHAROS_STAGES['fetch'],
+                 status: Pharos::Application::PHAROS_STATUSES['fail'],
+                 outcome: 'Outcome',
+                 reviewed: false}, format: 'json')
         }.to change(WorkItem, :count).by(1)
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
@@ -582,7 +605,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'should fix an item with a null reviewed flag' do
         name = object.identifier.split('/')[1]
-        post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
+        post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution,
                                        bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
                                        stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: nil}, format: 'json'
         expect(response.status).to eq(201)
@@ -601,7 +624,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage' do
-        post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution.identifier,
+        post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution,
                                        bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
                                        stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: false},
              format: 'json'
@@ -647,7 +670,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update an item's review field to true" do
-        post :index, alt_action: 'review_selected', review: [user_id], format: 'js'
+        post :index, alt_action: 'review_selected', review: [user_id], format: :json
         expect(response.status).to eq(200)
         WorkItem.find(user_item.id).reviewed.should eq(true)
       end
@@ -656,7 +679,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
   describe 'Post #review_all' do
     let!(:failed_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail']) }
-    let!(:second_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution.identifier) }
+    let!(:second_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution) }
     describe 'as admin user' do
       before do
         sign_in admin_user
@@ -785,7 +808,7 @@ RSpec.describe WorkItemsController, type: :controller do
     let!(:item1) { FactoryGirl.create(:work_item,
                                       name: 'item1.tar',
                                       etag: 'etag1',
-                                      institution: 'inst1',
+                                      institution: institution,
                                       retry: true,
                                       reviewed: false,
                                       bag_date: '2014-10-17 14:56:56Z',
@@ -813,7 +836,7 @@ RSpec.describe WorkItemsController, type: :controller do
       # the Z at the end of the bag_date string.
       it 'filters down to the right records' do
         get(:index, alt_action: 'api_search', format: :json, name: 'item1.tar',
-            etag: 'etag1', institution: 'inst1',
+            etag: 'etag1', institution: institution,
             retry: 'true', reviewed: 'false',
             bag_date: '2014-10-17 14:56:56Z',
             action: 'Ingest', stage: 'Record',
@@ -852,8 +875,8 @@ RSpec.describe WorkItemsController, type: :controller do
   end
 
   describe 'GET #api_index' do
-    let!(:item1) { FactoryGirl.create(:work_item, name: 'item1.tar', stage: 'Unpack', institution: institutional_admin.institution.identifier) }
-    let!(:item2) { FactoryGirl.create(:work_item, name: '1238907543.tar', stage: 'Unpack', institution: institutional_admin.institution.identifier) }
+    let!(:item1) { FactoryGirl.create(:work_item, name: 'item1.tar', stage: 'Unpack', institution: institutional_admin.institution) }
+    let!(:item2) { FactoryGirl.create(:work_item, name: '1238907543.tar', stage: 'Unpack', institution: institutional_admin.institution) }
     let!(:item3) { FactoryGirl.create(:work_item, name: '1', stage: 'Unpack') }
     let!(:item4) { FactoryGirl.create(:work_item, name: '2', stage: 'Unpack') }
     let!(:item5) { FactoryGirl.create(:work_item, name: '1234567890.tar', stage: 'Unpack') }

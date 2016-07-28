@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160722201049) do
+ActiveRecord::Schema.define(version: 20160728140421) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -29,15 +29,11 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.string   "uri"
     t.float    "size"
     t.string   "identifier"
-    t.string   "intellectual_object"
     t.integer  "intellectual_object_id"
     t.datetime "created",                null: false
     t.datetime "modified",               null: false
     t.string   "permissions"
     t.string   "state"
-    t.string   "content_dsLocation"
-    t.string   "access"
-    t.integer  "institution_id"
   end
 
   add_index "generic_files", ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
@@ -49,11 +45,8 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.string   "dpn_uuid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer  "user_id"
     t.string   "state"
   end
-
-  add_index "institutions", ["user_id"], name: "index_institutions_on_user_id"
 
   create_table "intellectual_objects", force: :cascade do |t|
     t.string   "title"
@@ -62,11 +55,9 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.string   "alt_identifier"
     t.string   "access"
     t.string   "bag_name"
-    t.string   "institution"
     t.integer  "institution_id"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
-    t.string   "permissions"
     t.string   "state"
   end
 
@@ -75,6 +66,7 @@ ActiveRecord::Schema.define(version: 20160722201049) do
   create_table "premis_events", force: :cascade do |t|
     t.string   "identifier"
     t.string   "event_type"
+    t.text     "outcome"
     t.string   "date_time"
     t.string   "outcome_detail"
     t.string   "detail"
@@ -85,8 +77,6 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.integer  "generic_file_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
-    t.string   "outcome"
-    t.integer  "institution_id"
   end
 
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
@@ -117,7 +107,6 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.string   "name"
     t.string   "email"
     t.string   "phone_number"
-    t.string   "institution"
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.string   "encrypted_password",       default: "", null: false
@@ -146,7 +135,6 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.string   "etag"
     t.string   "bucket"
     t.string   "user"
-    t.string   "institution"
     t.text     "note",                    limit: 255
     t.string   "action"
     t.string   "stage"
@@ -162,14 +150,12 @@ ActiveRecord::Schema.define(version: 20160722201049) do
     t.string   "node",                    limit: 255
     t.integer  "pid",                                 default: 0
     t.boolean  "needs_admin_review",                  default: false, null: false
-    t.string   "access"
     t.integer  "institution_id"
   end
 
   add_index "work_items", ["action"], name: "index_work_items_on_action"
   add_index "work_items", ["etag", "name"], name: "index_work_items_on_etag_and_name"
   add_index "work_items", ["generic_file_id"], name: "index_work_items_on_generic_file_id"
-  add_index "work_items", ["institution"], name: "index_work_items_on_institution"
   add_index "work_items", ["intellectual_object_id"], name: "index_work_items_on_intellectual_object_id"
   add_index "work_items", ["stage"], name: "index_work_items_on_stage"
   add_index "work_items", ["status"], name: "index_work_items_on_status"

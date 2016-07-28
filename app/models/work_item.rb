@@ -1,13 +1,39 @@
 class WorkItem < ActiveRecord::Base
   paginates_per 10
 
+  belongs_to :institution
+  belongs_to :intellectual_object # may be nil
+  belongs_to :generic_file        # may be nil
   validates :name, :etag, :bag_date, :bucket, :user, :institution, :date, :note, :action, :stage, :status, :outcome, presence: true
   validate :status_is_allowed
   validate :stage_is_allowed
   validate :action_is_allowed
   validate :reviewed_not_nil
   before_save :set_object_identifier_if_ingested
-  before_save :set_access
+
+  ### Scopes
+  scope :created_before, ->(param) { where("work_items.created_at < ?", param) unless param.blank? }
+  scope :created_after, ->(param) { where("work_items.created_at > ?", param) unless param.blank? }
+  scope :updated_before, ->(param) { where("work_items.updated_at < ?", param) unless param.blank? }
+  scope :updated_after, ->(param) { where("work_items.updated_at > ?", param) unless param.blank? }
+  scope :with_name, ->(param) { where(name: param) unless param.blank? }
+  scope :with_name_like, ->(param) { where("work_items.name like ?", "%#{param}%") unless param.blank? }
+  scope :with_etag, ->(param) { where(etag: param) unless param.blank? }
+  scope :with_etag_like, ->(param) { where("work_items.etag like ?", "%#{param}%") unless param.blank? }
+  scope :with_object_identifier, ->(param) { where(object_identifier: param) unless param.blank? }
+  scope :with_object_identifier_like, ->(param) { where("work_items.object_identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_file_identifier, ->(param) { joins(:generic_file).where(generic_files: {identifier: param}) unless param.blank? }
+  scope :with_file_identifier_like, ->(param) { joins(:generic_file).where("generic_files.identifier like ?", "%#{param}%") unless param.blank? }
+
+
+  # We can't always check the permissions on the related IntellectualObject,
+  # because some work items (such as in-progress Ingest items) have no object.
+  # So for now, users can view work items belonging to their institutions.
+  # The WorkItem does not give away info about title or description, only the
+  # name of the bag/tar file, which is usually an opaque identifier.
+  scope :readable, ->(current_user) {
+    where(institution: current_user.institution) unless current_user.admin?
+  }
 
   def to_param
     "#{etag}/#{name}"
@@ -224,16 +250,6 @@ class WorkItem < ActiveRecord::Base
     end
     unless self.generic_file_identifier.blank?
       self.generic_file_id = GenericFile.where(identifier: self.generic_file_identifier).first.id
-    end
-  end
-
-  def set_access
-    if self.intellectual_object_id.blank?
-      self.access = 'restricted'
-    else
-      io = IntellectualObject.find(self.intellectual_object_id)
-      self.access = io.access
-      self.institution_id = io.institution.id
     end
   end
 

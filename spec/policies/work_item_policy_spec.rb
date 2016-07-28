@@ -24,7 +24,7 @@ describe WorkItemPolicy do
                                     institution_id: institution.id) }
     describe 'when the item is' do
       describe 'in my institution' do
-        let(:work_item) { FactoryGirl.create(:work_item, institution: institution.identifier) }
+        let(:work_item) { FactoryGirl.create(:work_item, institution: institution) }
         it do
           should_not permit(:create)
           should_not permit(:new)
@@ -56,7 +56,7 @@ describe WorkItemPolicy do
                                     institution_id: institution.id) }
     describe 'when the item is' do
       describe 'in my institution' do
-        let(:work_item) { FactoryGirl.create(:work_item, institution: institution.identifier) }
+        let(:work_item) { FactoryGirl.create(:work_item, institution: institution) }
         it do
           should_not permit(:create)
           should_not permit(:new)

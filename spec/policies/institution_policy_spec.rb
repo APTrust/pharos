@@ -93,7 +93,6 @@ describe InstitutionPolicy do
     it do
       should_not permit(:show)
       should_not permit(:create)
-      should_not permit(:create_through_institution)
       should_not permit(:new)
       should_not permit(:update)
       should_not permit(:edit)

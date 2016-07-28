@@ -17,9 +17,39 @@ class GenericFile < ActiveRecord::Base
   validate :has_right_number_of_checksums
   validate :identifier_is_unique
 
-  before_save :set_access
-
   delegate :institution, to: :intellectual_object
+
+  ### Scopes
+  scope :created_before, ->(param) { where("generic_files.created_at < ?", param) unless param.blank? }
+  scope :created_after, ->(param) { where("generic_files.created_at > ?", param) unless param.blank? }
+  scope :updated_before, ->(param) { where("generic_files.updated_at < ?", param) unless param.blank? }
+  scope :updated_after, ->(param) { where("generic_files.updated_at > ?", param) unless param.blank? }
+  scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
+  scope :with_identifier_like, ->(param) { where("generic_files.identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
+  scope :with_uri_like, ->(param) { where("generic_files.uri like ?", "%#{param}%") unless param.blank? }
+  scope :with_state, ->(param) { where(state: param) unless param.blank? }
+
+
+  scope :discoverable, ->(current_user) {
+    # Any user can discover any item at their institution,
+    # along with 'consortia' items from any institution.
+    joins(:intellectual_object)
+    .where("(intellectual_objects.access = 'consortia' or intellectual_objects.institution_id = ?)", current_user.institution.id) unless current_user.admin?
+  }
+  scope :readable, ->(current_user) {
+    # Inst admin can read anything at their institution.
+    # Inst user can read read any unrestricted item at their institution.
+    # Admin can read anything.
+    if current_user.institutional_admin?
+      joins(:intellectual_object)
+      .where("intellectual_objects.institution_id = ?", current_user.institution.id)
+    elsif current_user.institutional_user?
+      joins(:intellectual_object)
+      .where("(intellectual_objects.access != 'restricted' and intellectual_objects.institution_id = ?)", current_user.institution.id)
+    end
+  }
+
 
   def to_param
     identifier
@@ -174,18 +204,4 @@ class GenericFile < ActiveRecord::Base
     end
   end
 
-  def set_access
-    if self.intellectual_object.blank?
-      if self.intellectual_object_id.blank?
-        self.access = 'restricted'
-      else
-        io = IntellectualObject.find(self.intellectual_object_id)
-        self.access = io.access
-        self.institution_id = io.institution.id
-      end
-    else
-      self.access = self.intellectual_object.access
-      self.institution_id = self.intellectual_object.institution.id
-    end
-  end
 end
