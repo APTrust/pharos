@@ -56,10 +56,6 @@ class GenericFile < ActiveRecord::Base
     identifier
   end
 
-  def content_uri= uri
-    self.content_dsLocation = uri
-  end
-
   def soft_delete(attributes)
     user_email = attributes[:outcome_detail]
     io = IntellectualObject.find(self.intellectual_object_id)

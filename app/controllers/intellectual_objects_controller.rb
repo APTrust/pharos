@@ -247,7 +247,7 @@ class IntellectualObjectsController < ApplicationController
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :state,
                                                 generic_files_attributes:
-                                                [:id, :uri, :content_uri, :identifier,
+                                                [:id, :uri, :identifier,
                                                  :size, :created, :modified, :file_format,
                                                  checksums_attributes:
                                                  [:digest, :algorithm, :datetime, :id],
