@@ -51,8 +51,174 @@ RSpec.describe IntellectualObject, :type => :model do
       subject.bag_name.should == exp
     end
 
-    it 'should have terms_for_editing' do
-      expect(subject.terms_for_editing).to eq [:title, :description, :access]
+  end
+
+  describe 'permissions checks' do
+
+    # ----------- CONSORTIA --------------
+
+    it 'should let inst user discover consortial item' do
+
+    end
+
+    it 'should let inst admin discover consortial item' do
+
+    end
+
+    it 'should let sys admin discover consortial item' do
+
+    end
+
+    it 'should let inst user read consortial item' do
+
+    end
+
+    it 'should let inst admin read consortial item' do
+
+    end
+
+    it 'should let sys admin read consortial item' do
+
+    end
+
+    it 'should not let inst user edit consortial item' do
+
+    end
+
+    it 'should not let inst admin at other inst edit consortial item' do
+
+    end
+
+    it 'should let inst admin at same inst edit consortial item' do
+
+    end
+
+    it 'should let sys admin edit consortial item' do
+
+    end
+
+    it 'should let inst user discover own item' do
+
+    end
+
+    it "should let not inst user discover someone else's item" do
+
+    end
+
+    it 'should let inst admin discover own item' do
+
+    end
+
+    it "should not let inst admin discover someone else's item" do
+
+    end
+
+    it 'should let sys admin discover inst item' do
+
+    end
+
+    # ----------- INSTITUTION --------------
+
+    it 'should let inst user discover own item' do
+
+    end
+
+    it "should not let inst user discover someone else's item" do
+
+    end
+
+    it 'should let inst user read own item' do
+
+    end
+
+    it "should not let inst user read someone else's item" do
+
+    end
+
+    it 'should let inst admin discover own item' do
+
+    end
+
+    it "should not let inst admin discover someone else's item" do
+
+    end
+
+    it 'should let inst admin read any item' do
+
+    end
+
+    it 'should not let inst user edit own item' do
+
+    end
+
+    it "should not let inst user edit someone else's item" do
+
+    end
+
+    it 'should let inst admin edit own item' do
+
+    end
+
+    it "should not let inst admin edit someone else's item" do
+
+    end
+
+    it 'should let sys admin discover any item' do
+
+    end
+
+    it 'should let sys admin read any item' do
+
+    end
+
+    it 'should let sys admin edit any item' do
+
+    end
+
+    # ----------- RESTRICTED --------------
+
+    it 'should not let inst user discover own item' do
+
+    end
+
+    it "should not let inst user discover someone else's item" do
+
+    end
+
+    it 'should let inst admin read own item' do
+
+    end
+
+    it "should not let inst admin read other's item" do
+
+    end
+
+    it 'should not let inst user edit own item' do
+
+    end
+
+    it "should not let inst user edit someone else's item" do
+
+    end
+
+    it 'should let inst admin edit own item' do
+
+    end
+
+    it "should not let inst admin edit someone else's item" do
+
+    end
+
+    it 'should let sys admin discover any item' do
+
+    end
+
+    it 'should let sys admin read any item' do
+
+    end
+
+    it 'should let sys admin edit any item' do
+
     end
 
   end
@@ -148,7 +314,7 @@ RSpec.describe IntellectualObject, :type => :model do
       end
     end
 
-    describe 'indexes groups' do
+    describe 'unique identifier' do
       let(:inst_id) { subject.institution.id }
       describe '#identifier_is_unique' do
         it 'should validate uniqueness of the identifier' do
@@ -157,6 +323,81 @@ RSpec.describe IntellectualObject, :type => :model do
           two.should_not be_valid
           two.errors[:identifier].should include('has already been taken')
         end
+      end
+    end
+
+    describe 'scopes' do
+      it 'should find by identifier' do
+
+      end
+      it 'should find items created before' do
+
+      end
+      it 'should find items created after' do
+
+      end
+      it 'should find items updated before' do
+
+      end
+      it 'should find items updated after' do
+
+      end
+      it 'should find items with description' do
+
+      end
+      it 'should find items with description like' do
+
+      end
+      it 'should find items with identifier' do
+
+      end
+      it 'should find items with identifier like' do
+
+      end
+      it 'should find items with alt identifier' do
+
+      end
+      it 'should find items with alt identifier like' do
+
+      end
+      it 'should find items with institution' do
+
+      end
+      it 'should find items with state' do
+
+      end
+      it 'should find items with bag name like' do
+
+      end
+      it 'should find items with title like' do
+
+      end
+      it 'should find items discoverable to inst user' do
+
+      end
+      it 'should find items discoverable to inst admin' do
+
+      end
+      it 'should find items discoverable to sys admin' do
+
+      end
+      it 'should find items readable by inst user' do
+
+      end
+      it 'should find items readable by inst admin' do
+
+      end
+      it 'should find items readable by sys admin' do
+
+      end
+      it 'should find items writable by inst user' do
+
+      end
+      it 'should find items writable by inst admin' do
+
+      end
+      it 'should find items writable by sys admin' do
+
       end
     end
   end
