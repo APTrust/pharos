@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe IntellectualObject, :type => :model do
-  before(:all) do
+  after(:all) do
     IntellectualObject.destroy_all
   end
 
@@ -53,48 +53,87 @@ RSpec.describe IntellectualObject, :type => :model do
 
   end
 
-  describe 'permissions checks' do
+  describe 'permission scopes and checks' do
+    let!(:inst) { FactoryGirl.create(:institution) }
+    let!(:other_inst) { FactoryGirl.create(:institution) }
+
+    let!(:inst_user) { FactoryGirl.create(:user, :institutional_user,
+                                          institution: inst) }
+    let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+                                           institution: inst) }
+    let!(:sys_admin) { FactoryGirl.create(:user, :admin) }
+
+    let!(:obj_own_consortia) { FactoryGirl.create(:intellectual_object,
+                                                  access: 'consortia', institution: inst) }
+    let!(:obj_own_inst) { FactoryGirl.create(:intellectual_object,
+                                             access: 'institution', institution: inst) }
+    let!(:obj_own_restricted) { FactoryGirl.create(:intellectual_object,
+                                                   access: 'restricted', institution: inst) }
+    let!(:obj_other_consortia) { FactoryGirl.create(:intellectual_object,
+                                                    access: 'consortia', institution: other_inst) }
+    let!(:obj_other_inst) { FactoryGirl.create(:intellectual_object,
+                                               access: 'institution', institution: other_inst) }
+    let!(:obj_other_restricted) { FactoryGirl.create(:intellectual_object,
+                                                     access: 'restricted', institution: other_inst) }
 
     # ----------- CONSORTIA --------------
 
     it 'should let inst user discover consortial item' do
-
+      results = IntellectualObject.discoverable(inst_user)
+      expect(results).to include(obj_own_consortia)
+      expect(results).to include(obj_other_consortia)
     end
 
     it 'should let inst admin discover consortial item' do
-
+      results = IntellectualObject.discoverable(inst_admin)
+      expect(results).to include(obj_own_consortia)
+      expect(results).to include(obj_other_consortia)
     end
 
     it 'should let sys admin discover consortial item' do
-
+      results = IntellectualObject.discoverable(sys_admin)
+      expect(results).to include(obj_own_consortia)
+      expect(results).to include(obj_other_consortia)
     end
 
-    it 'should let inst user read consortial item' do
-
+    it 'should let inst user read own consortial item' do
+      results = IntellectualObject.readable(inst_user)
+      expect(results).to include(obj_own_consortia)
+      expect(results).not_to include(obj_other_consortia)
     end
 
-    it 'should let inst admin read consortial item' do
-
+    it 'should let inst admin read own consortial item' do
+      results = IntellectualObject.readable(inst_admin)
+      expect(results).to include(obj_own_consortia)
+      expect(results).not_to include(obj_other_consortia)
     end
 
-    it 'should let sys admin read consortial item' do
-
+    it 'should let sys admin read any consortial item' do
+      results = IntellectualObject.readable(sys_admin)
+      expect(results).to include(obj_own_consortia)
+      expect(results).to include(obj_other_consortia)
     end
 
-    it 'should not let inst user edit consortial item' do
-
+    it 'should not let inst user edit other consortial item' do
+      results = IntellectualObject.readable(inst_user)
+      expect(results).not_to include(obj_other_consortia)
     end
 
-    it 'should not let inst admin at other inst edit consortial item' do
-
+    it 'should not let inst admin edit other consortial item' do
+      results = IntellectualObject.writable(inst_admin)
+      expect(results).not_to include(obj_other_consortia)
     end
 
-    it 'should let inst admin at same inst edit consortial item' do
-
+    it 'should not let inst admin edit any consortial items' do
+      results = IntellectualObject.writable(inst_admin)
+      expect(results).not_to include(obj_own_consortia)
+      expect(results).not_to include(obj_other_consortia)
     end
 
     it 'should let sys admin edit consortial item' do
-
+      results = IntellectualObject.writable(sys_admin)
+      expect(results).to include(obj_own_consortia)
+      expect(results).to include(obj_other_consortia)
     end
 
     it 'should let inst user discover own item' do
@@ -326,7 +365,7 @@ RSpec.describe IntellectualObject, :type => :model do
       end
     end
 
-    describe 'scopes' do
+    describe 'scopes by attribute' do
 
       it 'should find items created before' do
 
@@ -419,6 +458,11 @@ RSpec.describe IntellectualObject, :type => :model do
       it 'should find items writable by sys admin' do
 
       end
+
+      it 'should allow chained scopes without causing a SQL error' do
+
+      end
+
     end
   end
 
