@@ -273,9 +273,9 @@ class CatalogController < ApplicationController
   end
 
   def sort_by_name
-    @results[:objects] = @results[:objects].order('bag_name').reverse_order unless @results[:objects].nil?
-    @results[:files] = @results[:files].order('uri').reverse_order  unless @results[:files].nil?
-    @results[:items] = @results[:items].order('name').reverse_order  unless @results[:items].nil?
+    @results[:objects] = @results[:objects].order('bag_name') unless @results[:objects].nil?
+    @results[:files] = @results[:files].order('uri')  unless @results[:files].nil?
+    @results[:items] = @results[:items].order('name')  unless @results[:items].nil?
     @selected[:sort] = params[:sort]
   end
 
@@ -362,6 +362,7 @@ class CatalogController < ApplicationController
     str = str << "&format=#{params[:file_format]}" if params[:file_format].present?
     str = str << "&association=#{params[:association]}" if params[:association].present?
     str = str << "&type=#{params[:type]}" if params[:type].present?
+    str = str << "&type=#{params[:sort]}" if params[:sort].present?
     str
   end
 
