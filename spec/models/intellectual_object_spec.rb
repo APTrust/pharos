@@ -136,82 +136,84 @@ RSpec.describe IntellectualObject, :type => :model do
       expect(results).to include(obj_other_consortia)
     end
 
-    it 'should let inst user discover own item' do
-
-    end
-
-    it "should let not inst user discover someone else's item" do
-
-    end
-
-    it 'should let inst admin discover own item' do
-
-    end
-
-    it "should not let inst admin discover someone else's item" do
-
-    end
-
-    it 'should let sys admin discover inst item' do
-
-    end
-
     # ----------- INSTITUTION --------------
 
     it 'should let inst user discover own item' do
-
+      results = IntellectualObject.discoverable(inst_user)
+      expect(results).to include(obj_own_inst)
     end
 
-    it "should not let inst user discover someone else's item" do
-
+    it "should let not inst user discover someone else's item" do
+      results = IntellectualObject.discoverable(inst_user)
+      expect(results).not_to include(obj_other_inst)
     end
 
     it 'should let inst user read own item' do
-
+      results = IntellectualObject.readable(inst_user)
+      expect(results).to include(obj_own_inst)
     end
 
-    it "should not let inst user read someone else's item" do
-
+    it "should let not inst user read someone else's item" do
+      results = IntellectualObject.readable(inst_user)
+      expect(results).not_to include(obj_other_inst)
     end
 
     it 'should let inst admin discover own item' do
-
+      results = IntellectualObject.discoverable(inst_admin)
+      expect(results).to include(obj_own_inst)
     end
 
     it "should not let inst admin discover someone else's item" do
-
+      results = IntellectualObject.discoverable(inst_admin)
+      expect(results).not_to include(obj_other_inst)
     end
 
-    it 'should let inst admin read any item' do
+    it 'should let inst admin read own item' do
+      results = IntellectualObject.readable(inst_admin)
+      expect(results).to include(obj_own_inst)
+    end
 
+    it "should not let inst admin read someone else's item" do
+      results = IntellectualObject.readable(inst_admin)
+      expect(results).not_to include(obj_other_inst)
     end
 
     it 'should not let inst user edit own item' do
-
+      results = IntellectualObject.writable(inst_user)
+      expect(results).not_to include(obj_own_inst)
     end
 
     it "should not let inst user edit someone else's item" do
-
+      results = IntellectualObject.writable(inst_user)
+      expect(results).not_to include(obj_other_inst)
     end
 
-    it 'should let inst admin edit own item' do
-
+    it 'should not let inst admin edit own item' do
+      results = IntellectualObject.writable(inst_admin)
+      expect(results).not_to include(obj_own_inst)
     end
 
     it "should not let inst admin edit someone else's item" do
-
+      results = IntellectualObject.writable(inst_admin)
+      expect(results).not_to include(obj_other_inst)
     end
 
-    it 'should let sys admin discover any item' do
-
+    it 'should let sys admin discover inst item' do
+      results = IntellectualObject.discoverable(sys_admin)
+      expect(results).to include(obj_own_inst)
+      expect(results).to include(obj_other_inst)
     end
 
-    it 'should let sys admin read any item' do
-
+    it 'should let sys admin read inst item' do
+      results = IntellectualObject.readable(sys_admin)
+      expect(results).to include(obj_own_inst)
+      expect(results).to include(obj_other_inst)
     end
 
-    it 'should let sys admin edit any item' do
-
+    it 'should let sys admin edit inst item' do
+      results = IntellectualObject.writable(sys_admin)
+      expect(results).to include(obj_own_inst)
+      expect(results).to include(obj_other_inst)
     end
 
     # ----------- RESTRICTED --------------
