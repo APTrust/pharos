@@ -1,11 +1,9 @@
 class IntellectualObject < ActiveRecord::Base
-  #include Auditable   # premis events
-
   belongs_to :institution
   has_many :generic_files
   has_many :premis_events
   has_many :checksums, through: :generic_files
-  accepts_nested_attributes_for :generic_files, allow_destroy: true, reject_if: :invalid_file
+  accepts_nested_attributes_for :generic_files, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
   accepts_nested_attributes_for :checksums, allow_destroy: true
 
@@ -14,7 +12,7 @@ class IntellectualObject < ActiveRecord::Base
   validates :identifier, presence: true
   validates :access, presence: true
   validates_inclusion_of :access, in: %w(consortia institution restricted), message: "#{:access} is not a valid access", if: :access
-  validate :identifier_is_unique
+  validates_uniqueness_of :identifier
 
   before_save :set_bag_name
   before_destroy :check_for_associations
@@ -65,30 +63,8 @@ class IntellectualObject < ActiveRecord::Base
     identifier
   end
 
-  # TODO: Can we get rid of this?
-  # Doesn't Rails automatically call validate on each file object before saving?
-  def invalid_file(attributes)
-    file_valid = true
-    file_valid = false if (attributes['uri'].nil? || attributes['uri'] == '')
-    file_valid = false if (attributes['size'].nil? || attributes['size'] == '')
-    file_valid = false if (attributes['created'].nil? || attributes['created'] == '')
-    file_valid = false if (attributes['modified'].nil? || attributes['modified'] == '')
-    file_valid = false if (attributes['file_format'].nil? || attributes['file_format'] == '')
-    file_valid = false if (attributes['identifier'].nil? || attributes['identifier'] == '')
-    checksums = has_right_number_of_checksums(attributes['checksums_attributes'])
-    file_valid = false if !checksums
-    file_valid = false if !unique_file_identifier(attributes)
-    !file_valid
-  end
-
   def institution_identifier
-    inst = self.identifier.split('/')
-    inst[0]
-  end
-
-  # This governs which fields show up on the editor. This is part of the expected interface for hydra-editor
-  def terms_for_editing
-    [:title, :description, :access]
+    self.institution.identifier
   end
 
   def bytes_by_format
@@ -217,18 +193,6 @@ class IntellectualObject < ActiveRecord::Base
 
 
   private
-  def identifier_is_unique
-    return if self.identifier.nil?
-    count = 0;
-    objects = IntellectualObject.where(identifier: self.identifier)
-    unless objects.count == 0
-      count +=1 if objects.count == 1 && objects.first.id != self.id
-      count = objects.count if objects.count > 1
-    end
-    if(count > 0)
-      errors.add(:identifier, 'has already been taken')
-    end
-  end
 
   def has_right_number_of_checksums(checksum_list)
     checksums_okay = true
@@ -245,19 +209,6 @@ class IntellectualObject < ActiveRecord::Base
       end
     end
     checksums_okay
-  end
-
-  def unique_file_identifier(identifier)
-    ident_check = true
-    ident_check = false if identifier.nil?
-    count = 0;
-    files = GenericFile.where(identifier: self.identifier)
-    count +=1 if files.count == 1 && files.first.id != self.id
-    count = files.count if files.count > 1
-    if(count > 0)
-      ident_check = false
-    end
-    ident_check
   end
 
   def check_for_associations

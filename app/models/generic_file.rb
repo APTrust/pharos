@@ -1,6 +1,4 @@
 class GenericFile < ActiveRecord::Base
-  #include Auditable   # premis events
-
   belongs_to :intellectual_object
   has_many :premis_events
   has_many :checksums
@@ -15,7 +13,7 @@ class GenericFile < ActiveRecord::Base
   validates :file_format, presence: true
   validates :identifier, presence: true
   validate :has_right_number_of_checksums
-  validate :identifier_is_unique
+  validates_uniqueness_of :identifier
 
   delegate :institution, to: :intellectual_object
 
@@ -190,17 +188,6 @@ class GenericFile < ActiveRecord::Base
           algorithms.push(cs)
         end
       end
-    end
-  end
-
-  def identifier_is_unique
-    return if self.identifier.nil?
-    count = 0;
-    files = GenericFile.where(identifier: self.identifier)
-    count +=1 if files.count == 1 && files.first.id != self.id
-    count = files.count if files.count > 1
-    if(count > 0)
-      errors.add(:identifier, 'has already been taken')
     end
   end
 
