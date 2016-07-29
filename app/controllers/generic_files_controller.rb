@@ -202,8 +202,7 @@ class GenericFilesController < ApplicationController
 
   def load_intellectual_object
     if params[:intellectual_object_identifier]
-      objId = params[:intellectual_object_identifier].gsub(/%2F/i, '/')
-      @intellectual_object = IntellectualObject.where(identifier: objId).first
+      @intellectual_object = IntellectualObject.find_by_identifier(params[:intellectual_object_identifier])
     elsif params[:intellectual_object_id]
       @intellectual_object = IntellectualObject.find(params[:intellectual_object_id])
     else
@@ -235,11 +234,7 @@ class GenericFilesController < ApplicationController
 
   def load_generic_file
     if params[:generic_file_identifier]
-      @generic_file ||= GenericFile.where(identifier: params[:generic_file_identifier]).first
-      if @generic_file.nil?
-        gfid = params[:generic_file_identifier].gsub(/%2F/i, '/')
-        @generic_file ||= GenericFile.where(identifier: gfid).first
-      end
+      @generic_file ||= GenericFile.find_by_identifier(params[:generic_file_identifier])
     elsif params[:id]
       @generic_file ||=GenericFile.find(params[:id])
     end

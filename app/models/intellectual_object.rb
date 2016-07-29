@@ -59,6 +59,12 @@ class IntellectualObject < ActiveRecord::Base
   #scope :bag_name, ->(param) {}
   #scope :etag, ->(param) {}
 
+  def self.find_by_identifier(identifier)
+    return nil if identifier.blank?
+    unescaped_identifier = identifier.gsub(/%2F/i, '/')
+    IntellectualObject.where(identifier: unescaped_identifier).first
+  end
+
   def to_param
     identifier
   end

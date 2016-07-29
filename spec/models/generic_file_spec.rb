@@ -185,4 +185,24 @@ RSpec.describe GenericFile, :type => :model do
     #   files.first.identifier.should == subject.identifier
     # end
   end
+
+  describe '#find_by_identifier' do
+    let(:subject) { FactoryGirl.create(:generic_file, identifier: 'abc/123') }
+    let(:subject_two) { FactoryGirl.create(:generic_file, identifier: 'xyz/789') }
+    it 'should find by identifier' do
+      subject.save!
+      subject_two.save!
+      gf1 = GenericFile.find_by_identifier('abc/123')
+      expect(gf1).to eq subject
+      gf1 = GenericFile.find_by_identifier('abc%2f123')
+      expect(gf1).to eq subject
+      gf1 = GenericFile.find_by_identifier('abc%2F123')
+      expect(gf1).to eq subject
+      gf2 = GenericFile.find_by_identifier('xyz/789')
+      expect(gf2).to eq subject_two
+      gf2 = GenericFile.find_by_identifier('i_dont_exist')
+      expect(gf2).to be_nil
+    end
+  end
+
 end

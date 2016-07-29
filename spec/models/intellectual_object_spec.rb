@@ -327,78 +327,118 @@ RSpec.describe IntellectualObject, :type => :model do
     end
 
     describe 'scopes' do
-      it 'should find by identifier' do
 
-      end
       it 'should find items created before' do
 
       end
+
       it 'should find items created after' do
 
       end
+
       it 'should find items updated before' do
 
       end
+
       it 'should find items updated after' do
 
       end
+
       it 'should find items with description' do
 
       end
+
       it 'should find items with description like' do
 
       end
+
       it 'should find items with identifier' do
 
       end
+
       it 'should find items with identifier like' do
 
       end
+
       it 'should find items with alt identifier' do
 
       end
+
       it 'should find items with alt identifier like' do
 
       end
+
       it 'should find items with institution' do
 
       end
+
       it 'should find items with state' do
 
       end
+
       it 'should find items with bag name like' do
 
       end
+
       it 'should find items with title like' do
 
       end
+
       it 'should find items discoverable to inst user' do
 
       end
+
       it 'should find items discoverable to inst admin' do
 
       end
+
       it 'should find items discoverable to sys admin' do
 
       end
+
       it 'should find items readable by inst user' do
 
       end
+
       it 'should find items readable by inst admin' do
 
       end
+
       it 'should find items readable by sys admin' do
 
       end
+
       it 'should find items writable by inst user' do
 
       end
+
       it 'should find items writable by inst admin' do
 
       end
+
       it 'should find items writable by sys admin' do
 
       end
     end
   end
+
+  describe '#find_by_identifier' do
+    let(:subject) { FactoryGirl.create(:intellectual_object, identifier: 'abc.edu/123') }
+    let(:subject_two) { FactoryGirl.create(:intellectual_object, identifier: 'xyz.edu/789') }
+    it 'should find by identifier' do
+      subject.save!
+      subject_two.save!
+      obj1 = IntellectualObject.find_by_identifier('abc.edu/123')
+      expect(obj1).to eq subject
+      obj1 = IntellectualObject.find_by_identifier('abc.edu%2f123')
+      expect(obj1).to eq subject
+      obj1 = IntellectualObject.find_by_identifier('abc.edu%2F123')
+      expect(obj1).to eq subject
+      obj2 = IntellectualObject.find_by_identifier('xyz.edu/789')
+      expect(obj2).to eq subject_two
+      obj2 = IntellectualObject.find_by_identifier('i_dont_exist')
+      expect(obj2).to be_nil
+    end
+  end
+
 end

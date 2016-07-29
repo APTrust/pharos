@@ -48,6 +48,11 @@ class GenericFile < ActiveRecord::Base
     end
   }
 
+  def self.find_by_identifier(identifier)
+    return nil if identifier.blank?
+    unescaped_identifier = identifier.gsub(/%2F/i, '/')
+    GenericFile.where(identifier: unescaped_identifier).first
+  end
 
   def to_param
     identifier
