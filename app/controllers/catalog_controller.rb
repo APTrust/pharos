@@ -32,14 +32,13 @@ class CatalogController < ApplicationController
   protected
 
   def page_and_authorize
-    params[:page] = 1 unless params[:page].present?
-    params[:per_page] = 10 unless params[:per_page].present?
     @page = params[:page].to_i
     @per_page = params[:per_page].to_i
     permission_check
     @paged_results = Kaminari.paginate_array(@authorized_results).page(@page).per(@per_page)
-    @next = format_next(@page, @per_page)
-    @previous = format_previous(@page, @per_page)
+    @next = format_next
+    @current = format_current
+    @previous = format_previous
   end
 
   def permission_check
@@ -238,6 +237,8 @@ class CatalogController < ApplicationController
   end
 
   def set_page_counts
+    params[:page] = 1 unless params[:page].present?
+    params[:per_page] = 10 unless params[:per_page].present?
     @count = 0
     @results.each { |key, value| @count = @count + value.count }
     if @count == 0
@@ -247,8 +248,8 @@ class CatalogController < ApplicationController
       @second_number = 10
       @first_number = 1
     else
-      @second_number = params[:page].to_i * 10
-      @first_number = @second_number.to_i - 9
+      @second_number = params[:page].to_i * params[:per_page].to_i
+      @first_number = (@second_number.to_i - params[:per_page].to_i) + 1
     end
     @second_number = @count if @second_number > @count
   end
@@ -321,32 +322,38 @@ class CatalogController < ApplicationController
     str == 'true'
   end
 
-  def format_next(page, per_page)
-    if @count.to_f / per_page <= page
+  def format_next
+    if @count.to_f / @per_page <= @page
       nil
     else
-      new_page = page + 1
-      new_url = "#{request.base_url}/search/?page=#{new_page}&per_page=#{per_page}"
+      new_page = @page + 1
+      new_url = "#{request.base_url}/search/?page=#{new_page}&per_page=#{@per_page}"
       new_url = add_params(new_url)
       new_url
     end
   end
 
-  def format_previous(page, per_page)
-    if page == 1
+  def format_previous
+    if @page == 1
       nil
     else
-      new_page = page - 1
-      new_url = "#{request.base_url}/search/?page=#{new_page}&per_page=#{per_page}"
+      new_page = @page - 1
+      new_url = "#{request.base_url}/search/?page=#{new_page}&per_page=#{@per_page}"
       new_url = add_params(new_url)
       new_url
     end
+  end
+
+  def format_current
+    new_url = "#{request.base_url}/search/?page=#{@page}&per_page=#{@per_page}"
+    new_url = add_params(new_url)
+    new_url
   end
 
   def add_params(str)
-    str = str << "&q=#{params[:q]}" if params[:q].present?
-    str = str << "&search_field=#{params[:search_field]}" if params[:search_field].present?
-    str = str << "&object_type=#{params[:object_type]}" if params[:object_type].present?
+    str = str << "&q=#{URI.escape(params[:q])}" if params[:q].present?
+    str = str << "&search_field=#{URI.escape(params[:search_field])}" if params[:search_field].present?
+    str = str << "&object_type=#{URI.escape(params[:object_type])}" if params[:object_type].present?
     str = str << "&institution=#{params[:institution]}" if params[:institution].present?
     str = str << "&object_action=#{params[:object_action]}" if params[:object_action].present?
     str = str << "&stage=#{params[:stage]}" if params[:stage].present?

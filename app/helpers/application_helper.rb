@@ -64,4 +64,18 @@ module ApplicationHelper
     app_version = Pharos::Application::VERSION
     return "Running Pharos ver #{app_version} on Rails #{Rails.version} under Ruby #{RUBY_VERSION}"
   end
+
+  def current_path(param, value)
+    old_path = @current
+    if old_path.include? param
+      old_path = url_for(params.except param)
+    end
+    encoded_val = URI.escape(value)
+    if old_path.include? '?'
+      new_path = "#{old_path}&#{param}=#{encoded_val}"
+    else
+      new_path = "#{old_path}?#{param}=#{encoded_val}"
+    end
+    new_path
+  end
 end
