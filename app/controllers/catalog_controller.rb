@@ -363,6 +363,7 @@ class CatalogController < ApplicationController
     str = str << "&association=#{params[:association]}" if params[:association].present?
     str = str << "&type=#{params[:type]}" if params[:type].present?
     str = str << "&type=#{params[:sort]}" if params[:sort].present?
+    str = str << "&type=#{params[:state]}" if params[:state].present?
     str
   end
 
