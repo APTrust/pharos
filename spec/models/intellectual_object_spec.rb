@@ -306,8 +306,15 @@ RSpec.describe IntellectualObject, :type => :model do
 
     describe 'with attached files' do
       before do
-        subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, size: 166311750, identifier: 'test.edu/123/data/file.xml')
-        subject.generic_files << FactoryGirl.build(:generic_file, intellectual_object: subject, file_format: 'audio/wav', size: 143732461, identifier: 'test.edu/123/data/file.wav')
+        subject.generic_files << FactoryGirl.build(:generic_file,
+                                                   intellectual_object: subject,
+                                                   size: 166311750,
+                                                   identifier: 'test.edu/123/data/file.xml')
+        subject.generic_files << FactoryGirl.build(:generic_file,
+                                                   intellectual_object: subject,
+                                                   file_format: 'audio/wav',
+                                                   size: 143732461,
+                                                   identifier: 'test.edu/123/data/file.wav')
         subject.save!
       end
 
@@ -350,10 +357,10 @@ RSpec.describe IntellectualObject, :type => :model do
       describe 'soft_delete' do
         before {
           @work_item = FactoryGirl.create(:work_item,
-                                               object_identifier: subject.identifier,
-                                               action: Pharos::Application::PHAROS_ACTIONS['ingest'],
-                                               stage: Pharos::Application::PHAROS_STAGES['record'],
-                                               status: Pharos::Application::PHAROS_STATUSES['success'])
+                                          object_identifier: subject.identifier,
+                                          action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                          stage: Pharos::Application::PHAROS_STAGES['record'],
+                                          status: Pharos::Application::PHAROS_STATUSES['success'])
         }
         after {
           @work_item.delete
@@ -402,101 +409,157 @@ RSpec.describe IntellectualObject, :type => :model do
     end
 
     describe 'scopes by attribute' do
+      let!(:inst) { FactoryGirl.create(:institution) }
+      let!(:other_inst) { FactoryGirl.create(:institution) }
+
+      let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+                                             institution: inst) }
+      let!(:obj1) { FactoryGirl.create(:intellectual_object,
+                                       institution: inst,
+                                       identifier: 'test.edu/first',
+                                       alt_identifier: 'first alt identifier',
+                                       created_at: '2011-01-01',
+                                       updated_at: '2011-01-01',
+                                       description: 'Description of first item',
+                                       bag_name: 'first_item',
+                                       title: 'Title of first item',
+                                       state: 'A') }
+      let!(:obj2) { FactoryGirl.create(:intellectual_object,
+                                       institution: inst,
+                                       identifier: 'test.edu/second',
+                                       alt_identifier: 'second alt identifier',
+                                       created_at: '2017-01-01',
+                                       updated_at: '2017-01-01',
+                                       description: 'Description of second item',
+                                       bag_name: 'second_item',
+                                       title: 'Title of second item',
+                                       state: 'A') }
+      let!(:obj3) { FactoryGirl.create(:intellectual_object,
+                                       institution: other_inst,
+                                       identifier: 'xxx',
+                                       alt_identifier: 'xxx',
+                                       created_at: '2016-01-01',
+                                       updated_at: '2016-01-01',
+                                       description: 'xxx',
+                                       bag_name: 'xxx',
+                                       title: 'xxx',
+                                       state: 'D') }
 
       it 'should find items created before' do
-
+        results = IntellectualObject.created_before('2016-07-29')
+        expect(results).to include obj1
+        expect(results).to include obj3
+        expect(results.count).to eq 2
       end
 
       it 'should find items created after' do
-
+        results = IntellectualObject.created_after('2016-07-29')
+        expect(results).to include obj2
+        expect(results.count).to eq 1
       end
 
       it 'should find items updated before' do
-
+        results = IntellectualObject.updated_before('2016-07-29')
+        expect(results).to include obj1
+        expect(results).to include obj3
+        expect(results.count).to eq 2
       end
 
       it 'should find items updated after' do
-
+        results = IntellectualObject.updated_after('2016-07-29')
+        expect(results).to include obj2
+        expect(results.count).to eq 1
       end
 
       it 'should find items with description' do
-
+        results = IntellectualObject.with_description('Description of first item')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
       end
 
       it 'should find items with description like' do
-
+        results = IntellectualObject.with_description_like('first')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
+        results = IntellectualObject.with_description_like('item')
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
       end
 
       it 'should find items with identifier' do
-
+        results = IntellectualObject.with_identifier('test.edu/first')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
       end
 
       it 'should find items with identifier like' do
-
+        results = IntellectualObject.with_identifier_like('first')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
       end
 
       it 'should find items with alt identifier' do
-
+        results = IntellectualObject.with_alt_identifier('first alt identifier')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
       end
 
       it 'should find items with alt identifier like' do
-
+        results = IntellectualObject.with_alt_identifier_like('alt ident')
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
       end
 
       it 'should find items with institution' do
-
+        results = IntellectualObject.with_institution(inst)
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
       end
 
       it 'should find items with state' do
-
+        results = IntellectualObject.with_state('A')
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
+        results = IntellectualObject.with_state('D')
+        expect(results).to include obj3
+        expect(results.count).to eq 1
       end
 
       it 'should find items with bag name like' do
-
+        results = IntellectualObject.with_bag_name_like('first')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
+        results = IntellectualObject.with_bag_name_like('item')
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
       end
 
       it 'should find items with title like' do
-
+        results = IntellectualObject.with_title_like('first')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
+        results = IntellectualObject.with_title_like('item')
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
       end
 
-      it 'should find items discoverable to inst user' do
-
-      end
-
-      it 'should find items discoverable to inst admin' do
-
-      end
-
-      it 'should find items discoverable to sys admin' do
-
-      end
-
-      it 'should find items readable by inst user' do
-
-      end
-
-      it 'should find items readable by inst admin' do
-
-      end
-
-      it 'should find items readable by sys admin' do
-
-      end
-
-      it 'should find items writable by inst user' do
-
-      end
-
-      it 'should find items writable by inst admin' do
-
-      end
-
-      it 'should find items writable by sys admin' do
-
-      end
-
-      it 'should allow chained scopes without causing a SQL error' do
-
+      it 'should allow chained scopes' do
+        results = IntellectualObject
+          .created_before('2016-01-01')
+          .updated_before('2016-01-01')
+          .with_identifier_like('edu')
+          .with_description_like('item')
+          .with_title_like('item')
+          .with_state('A')
+          .readable(inst_admin)
+        expect(results).to include obj1
+        expect(results.count).to eq 1
       end
 
     end
