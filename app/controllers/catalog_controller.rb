@@ -171,16 +171,22 @@ class CatalogController < ApplicationController
 
   def filter_by_status
     @results[:items] = @results[:items].where(status: params[:status]) unless @results[:items].nil?
+    @results.delete(:files)
+    @results.delete(:objects)
     @selected[:status] = params[:status]
   end
 
   def filter_by_stage
     @results[:items] = @results[:items].where(stage: params[:stage]) unless @results[:items].nil?
+    @results.delete(:files)
+    @results.delete(:objects)
     @selected[:stage] = params[:stage]
   end
 
   def filter_by_action
     @results[:items] = @results[:items].where(action: params[:object_action]) unless @results[:items].nil?
+    @results.delete(:files)
+    @results.delete(:objects)
     @selected[:object_action] = params[:object_action]
   end
 
@@ -202,6 +208,8 @@ class CatalogController < ApplicationController
     #TODO: make sure this is applicable to objects as well as files
     @results[:files] = @results[:files].where(file_format: params[:file_format]) unless @results[:files].nil?
     #@results[:objects] = @results[:objects].where(file_format: params[:file_format]) unless @results[:objects].nil?
+    @results.delete(:files)
+    @results.delete(:objects)
     @selected[:file_format] = params[:file_format]
   end
 
@@ -209,6 +217,7 @@ class CatalogController < ApplicationController
     @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
                                               params[:association], params[:association]) unless @results[:items].nil?
     @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results[:files].nil?
+    @results[:objects] = @results[:objects].where(id: params[:association])
     @selected[:association] = params[:association]
   end
 
@@ -232,7 +241,7 @@ class CatalogController < ApplicationController
     unless params[:state] == 'all'
       @results[:objects] = @results[:objects].where(state: params[:state]) unless @results[:objects].nil?
       @results[:files] = @results[:files].where(state: params[:state]) unless @results[:files].nil?
-      @results[:items] = []
+      @results.delete(:items)
       @selected[:state] = params[:state]
     end
   end
