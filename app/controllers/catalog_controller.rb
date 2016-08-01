@@ -228,10 +228,11 @@ class CatalogController < ApplicationController
   end
 
   def filter_by_state
+    params[:state] = 'A' if params[:state].nil?
     unless params[:state] == 'all'
       @results[:objects] = @results[:objects].where(state: params[:state]) unless @results[:objects].nil?
       @results[:files] = @results[:files].where(state: params[:state]) unless @results[:files].nil?
-      @results[:items] = @results[:items].where(state: params[:state]) unless @results[:items].nil?
+      @results[:items] = []
       @selected[:state] = params[:state]
     end
   end
