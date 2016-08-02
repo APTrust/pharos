@@ -70,7 +70,7 @@ module ApplicationHelper
     if old_path.include? param
       old_path = url_for(params.except param)
     end
-    encoded_val = URI.escape(value)
+    value.kind_of?(Fixnum) ? encoded_val = value : encoded_val = URI.escape(value)
     if old_path.include? '?'
       new_path = "#{old_path}&#{param}=#{encoded_val}"
     else

@@ -1,24 +1,24 @@
-<div id="facets" class="facets sidenav">
+<div class="facets sidenav">
 
   <div class="top-panel-heading panel-heading">
     <h3> Limit your search </h3>
   </div>
 
-  <div id="facet-panel-collapse" class="collapse panel-group">
+  <div class="panel-group">
     <div class="panel panel-default facet_limit">
-      <div class="collapsed collapse-toggle panel-heading" data-toggle="collapse">
+      <div class="collapse-toggle panel-heading" data-toggle="collapse">
         <h5 class="panel-title">
           <a data-no-turbolink="true" href="#">Institution</a>
         </h5>
       </div>
-      <div id="facet-institution" class="panel-collapse facet-content collapse">
+      <div class="panel-collapse facet-content">
         <div class="panel-body">
           <ul class="facet-values list-unstyled">
             <% @institutions.each do |institution| %>
               <% current_inst = Institution.find(institution) %>
                 <li>
-                  <span class="facet-label"><a class="facet_select" search_field=all_fields" href=""><%= current_inst.name %></a></span>
-                  <span class="facet-count"><%= @counts[:inst] %></span>
+                  <span class="facet-label"><a class="facet_select" search_field=all_fields" href="<%= current_path('institution', institution) %>"><%= current_inst.name %></a></span>
+                  <span class="facet-count"><%= @counts[institution] %></span>
                 </li>
             <% end %>
           </ul>

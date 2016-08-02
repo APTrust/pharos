@@ -146,14 +146,13 @@ class CatalogController < ApplicationController
     @stages = Pharos::Application::PHAROS_STAGES.values
     @actions = Pharos::Application::PHAROS_ACTIONS.values
     @institutions = Institution.pluck(:id)
-    @accesses = %w(Consortial Institution Restricted)
+    @accesses = %w(consortia institution restricted)
     @formats = GenericFile.distinct.pluck(:file_format)
     file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
     item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
     item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
     deduped_io_associations = file_associations | item_io_associations
     @associations = deduped_io_associations + item_gf_associations
-    @counts = {}
     @selected = {}
   end
 
@@ -297,30 +296,94 @@ class CatalogController < ApplicationController
   end
 
   def set_filter_counts
+    @counts = {}
     @results.each do |key, value|
-      if key == 'objects'
-        @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
-        @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
-        #@formats.each { |format| @counts[:formats][format] += value.where(file_format: format).count }
-      elsif key == 'files'
-        @formats.each { |format| @counts[:formats][format] += value.where(file_format: format).count }
-        @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
-        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object_id: assc).count }
-        @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
-      elsif key == 'items'
-        @statuses.each { |status| @counts[:status][status] += value.where(status: status).count }
-        @stages.each { |stage| @counts[:stage][stage] += value.where(stage: stage).count }
-        @actions.each { |action| @counts[:action][action] += value.where(action: action).count }
-        @institutions.each { |institution| @counts[:inst][institution] += value.where(institution_id: institution).count }
-        @accesses.each { |acc| @counts[:access][acc] += value.where(access: acc).count }
-        @associations.each { |assc| @counts[:related][assc] += value.where(intellectual_object_id: assc).count }
-        @associations.each { |assc| @counts[:related][assc] += value.where(generic_file_id: assc).count }
+      if key == :objects
+        set_inst_count(value)
+        set_access_count(value)
+        #set_format_count(value)
+      elsif key == :files
+        set_format_count(value)
+        set_inst_count(value)
+        set_io_assc_count(value)
+        set_access_count(value)
+      elsif key == :items
+        set_status_count(value)
+        set_stage_count(value)
+        set_action_count(value)
+        set_inst_count(value)
+        set_access_count(value)
+        set_io_assc_count(value)
+        set_gf_assc_count(value)
       end
     end
-    @counts[:type] = {}
-    @counts[:type]['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
-    @counts[:type]['Generic Files'] = @results[:files].count unless @results[:files].nil?
-    @counts[:type]['Work Items'] = @results[:items].count unless @results[:items].nil?
+    @counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
+    @counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
+    @counts['Work Items'] = @results[:items].count unless @results[:items].nil?
+  end
+
+  def set_inst_count(value)
+    @institutions.each do |institution|
+      @counts[institution].nil? ?
+          @counts[institution] = value.where(institution_id: institution).count :
+          @counts[institution] = @counts[institution] + value.where(institution_id: institution).count
+    end
+  end
+
+  def set_access_count(value)
+    @accesses.each do |acc|
+      @counts[acc].nil? ?
+          @counts[acc] = value.where(access: acc).count :
+          @counts[acc] = @counts[acc] + value.where(access: acc).count
+    end
+  end
+
+  def set_format_count(value)
+    @formats.each do |format|
+      @counts[format].nil? ?
+          @counts[format] = value.where(file_format: format).count :
+          @counts[format] = @counts[format] + value.where(file_format: format).count
+    end
+  end
+
+  def set_io_assc_count(value)
+    @associations.each do |assc|
+      @counts[assc].nil? ?
+          @counts[assc] = value.where(intellectual_object_id: assc).count :
+          @counts[assc] = @counts[assc] + value.where(intellectual_object_id: assc).count
+    end
+  end
+
+  def set_gf_assc_count(value)
+    @associations.each do |assc|
+      @counts[assc].nil? ?
+          @counts[assc] = value.where(generic_file_id: assc).count :
+          @counts[assc] = @counts[assc] + value.where(generic_file_id: assc).count
+    end
+  end
+
+  def set_status_count(value)
+    @statuses.each do |status|
+      @counts[status].nil? ?
+          @counts[status] = value.where(status: status).count :
+          @counts[status] = @counts[status] + value.where(status: status).count
+    end
+  end
+
+  def set_stage_count(value)
+    @stages.each do |stage|
+      @counts[stage].nil? ?
+          @counts[stage] = value.where(stage: stage).count :
+          @counts[stage] = @counts[stage] + value.where(stage: stage).count
+    end
+  end
+
+  def set_action_count(value)
+    @actions.each do |action|
+      @counts[action].nil? ?
+          @counts[action] = value.where(action: action).count :
+          @counts[action] = @counts[action] + value.where(action: action).count
+    end
   end
 
   def format_date
