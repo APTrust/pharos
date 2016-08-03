@@ -8,8 +8,8 @@ class GenericFile < ActiveRecord::Base
   validates :uri, presence: true
   #validates :intellectual_object, presence: true
   validates :size, presence: true
-  validates :created, presence: true
-  validates :modified, presence: true
+  validates :created_at, presence: true
+  validates :updated_at, presence: true
   validates :file_format, presence: true
   validates :identifier, presence: true
   validate :has_right_number_of_checksums
@@ -125,8 +125,8 @@ class GenericFile < ActiveRecord::Base
         id: id,
         uri: uri,
         size: size.to_i,
-        created: Time.parse(created.to_s).iso8601,
-        modified: Time.parse(modified.to_s).iso8601,
+        created_at: Time.parse(created_at.to_s).iso8601,
+        updated_at: Time.parse(updated_at.to_s).iso8601,
         file_format: file_format,
         identifier: identifier,
         state: state,

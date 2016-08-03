@@ -6,8 +6,8 @@ FactoryGirl.define do
     file_format { 'application/xml' }
     uri { 'file://test/data/filename.xml' }
     size { rand(20000..500000000) }
-    created { "#{Time.now}" }
-    modified { "#{Time.now}" }
+    created_at { "#{Time.now}" }
+    updated_at { "#{Time.now}" }
     state { 'A' }
     checksums {[ FactoryGirl.create(:checksum, algorithm: 'md5', datetime: Time.now.to_s, digest: SecureRandom.hex) ]}
   end
