@@ -47,6 +47,10 @@ class GenericFile < ActiveRecord::Base
       .where("(intellectual_objects.access != 'restricted' and intellectual_objects.institution_id = ?)", current_user.institution.id)
     end
   }
+  scope :writable, ->(current_user) {
+    # Only admin has write privileges for now.
+    where("(1 = 0)") unless current_user.admin?
+  }
 
   def self.find_by_identifier(identifier)
     return nil if identifier.blank?

@@ -205,4 +205,255 @@ RSpec.describe GenericFile, :type => :model do
     end
   end
 
+  describe 'permission scopes and checks' do
+    let!(:inst) { FactoryGirl.create(:institution) }
+    let!(:other_inst) { FactoryGirl.create(:institution) }
+
+    let!(:inst_user) { FactoryGirl.create(:user, :institutional_user,
+                                          institution: inst) }
+    let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+                                           institution: inst) }
+    let!(:sys_admin) { FactoryGirl.create(:user, :admin) }
+
+    let!(:obj_own_consortia) { FactoryGirl.create(:intellectual_object,
+                                                  access: 'consortia', institution: inst) }
+    let!(:gf_own_consortia) { FactoryGirl.create(:generic_file, intellectual_object: obj_own_consortia) }
+    let!(:obj_own_inst) { FactoryGirl.create(:intellectual_object,
+                                             access: 'institution', institution: inst) }
+    let!(:gf_own_inst) { FactoryGirl.create(:generic_file, intellectual_object: obj_own_inst) }
+    let!(:obj_own_restricted) { FactoryGirl.create(:intellectual_object,
+                                                   access: 'restricted', institution: inst) }
+    let!(:gf_own_restricted) { FactoryGirl.create(:generic_file, intellectual_object: obj_own_restricted) }
+    let!(:obj_other_consortia) { FactoryGirl.create(:intellectual_object,
+                                                    access: 'consortia', institution: other_inst) }
+    let!(:gf_other_consortia) { FactoryGirl.create(:generic_file, intellectual_object: obj_other_consortia) }
+    let!(:obj_other_inst) { FactoryGirl.create(:intellectual_object,
+                                               access: 'institution', institution: other_inst) }
+    let!(:gf_other_inst) { FactoryGirl.create(:generic_file, intellectual_object: obj_other_inst) }
+    let!(:obj_other_restricted) { FactoryGirl.create(:intellectual_object,
+                                                     access: 'restricted', institution: other_inst) }
+    let!(:gf_other_restricted) { FactoryGirl.create(:generic_file, intellectual_object: obj_other_restricted) }
+
+    # ----------- CONSORTIA --------------
+
+    it 'should let inst user discover consortial file' do
+      results = GenericFile.discoverable(inst_user)
+      expect(results).to include(gf_own_consortia)
+      expect(results).to include(gf_other_consortia)
+    end
+
+    it 'should let inst admin discover consortial file' do
+      results = GenericFile.discoverable(inst_admin)
+      expect(results).to include(gf_own_consortia)
+      expect(results).to include(gf_other_consortia)
+    end
+
+    it 'should let sys admin discover consortial file' do
+      results = GenericFile.discoverable(sys_admin)
+      expect(results).to include(gf_own_consortia)
+      expect(results).to include(gf_other_consortia)
+    end
+
+    it 'should let inst user read own consortial file' do
+      results = GenericFile.readable(inst_user)
+      expect(results).to include(gf_own_consortia)
+      expect(results).not_to include(gf_other_consortia)
+    end
+
+    it 'should let inst admin read own consortial file' do
+      results = GenericFile.readable(inst_admin)
+      expect(results).to include(gf_own_consortia)
+      expect(results).not_to include(gf_other_consortia)
+    end
+
+    it 'should let sys admin read any consortial file' do
+      results = GenericFile.readable(sys_admin)
+      expect(results).to include(gf_own_consortia)
+      expect(results).to include(gf_other_consortia)
+    end
+
+    it 'should not let inst user edit other consortial file' do
+      results = GenericFile.readable(inst_user)
+      expect(results).not_to include(gf_other_consortia)
+    end
+
+    it 'should not let inst admin edit other consortial file' do
+      results = GenericFile.writable(inst_admin)
+      expect(results).not_to include(gf_other_consortia)
+    end
+
+    it 'should not let inst admin edit any consortial files' do
+      results = GenericFile.writable(inst_admin)
+      expect(results).not_to include(gf_own_consortia)
+      expect(results).not_to include(gf_other_consortia)
+    end
+
+    it 'should let sys admin edit consortial file' do
+      results = GenericFile.writable(sys_admin)
+      expect(results).to include(gf_own_consortia)
+      expect(results).to include(gf_other_consortia)
+    end
+
+    # ----------- INSTITUTION --------------
+
+    it 'should let inst user discover own file' do
+      results = GenericFile.discoverable(inst_user)
+      expect(results).to include(gf_own_inst)
+    end
+
+    it "should let not inst user discover someone else's file" do
+      results = GenericFile.discoverable(inst_user)
+      expect(results).not_to include(gf_other_inst)
+    end
+
+    it 'should let inst user read own file' do
+      results = GenericFile.readable(inst_user)
+      expect(results).to include(gf_own_inst)
+    end
+
+    it "should let not inst user read someone else's file" do
+      results = GenericFile.readable(inst_user)
+      expect(results).not_to include(gf_other_inst)
+    end
+
+    it 'should let inst admin discover own file' do
+      results = GenericFile.discoverable(inst_admin)
+      expect(results).to include(gf_own_inst)
+    end
+
+    it "should not let inst admin discover someone else's file" do
+      results = GenericFile.discoverable(inst_admin)
+      expect(results).not_to include(gf_other_inst)
+    end
+
+    it 'should let inst admin read own file' do
+      results = GenericFile.readable(inst_admin)
+      expect(results).to include(gf_own_inst)
+    end
+
+    it "should not let inst admin read someone else's file" do
+      results = GenericFile.readable(inst_admin)
+      expect(results).not_to include(gf_other_inst)
+    end
+
+    it 'should not let inst user edit own file' do
+      results = GenericFile.writable(inst_user)
+      expect(results).not_to include(gf_own_inst)
+    end
+
+    it "should not let inst user edit someone else's file" do
+      results = GenericFile.writable(inst_user)
+      expect(results).not_to include(gf_other_inst)
+    end
+
+    it 'should not let inst admin edit own file' do
+      results = GenericFile.writable(inst_admin)
+      expect(results).not_to include(gf_own_inst)
+    end
+
+    it "should not let inst admin edit someone else's file" do
+      results = GenericFile.writable(inst_admin)
+      expect(results).not_to include(gf_other_inst)
+    end
+
+    it 'should let sys admin discover inst file' do
+      results = GenericFile.discoverable(sys_admin)
+      expect(results).to include(gf_own_inst)
+      expect(results).to include(gf_other_inst)
+    end
+
+    it 'should let sys admin read inst file' do
+      results = GenericFile.readable(sys_admin)
+      expect(results).to include(gf_own_inst)
+      expect(results).to include(gf_other_inst)
+    end
+
+    it 'should let sys admin edit inst file' do
+      results = GenericFile.writable(sys_admin)
+      expect(results).to include(gf_own_inst)
+      expect(results).to include(gf_other_inst)
+    end
+
+    # ----------- RESTRICTED --------------
+
+    it 'should let inst user discover own file' do
+      results = GenericFile.discoverable(inst_user)
+      expect(results).to include(gf_own_restricted)
+    end
+
+    it "should not let inst user discover someone else's file" do
+      results = GenericFile.discoverable(inst_user)
+      expect(results).not_to include(gf_other_restricted)
+    end
+
+    it 'should not let inst user read own file' do
+      results = GenericFile.readable(inst_user)
+      expect(results).not_to include(gf_own_restricted)
+    end
+
+    it "should not let inst user read someone else's file" do
+      results = GenericFile.readable(inst_user)
+      expect(results).not_to include(gf_other_restricted)
+    end
+
+    it 'should not let inst user edit own file' do
+      results = GenericFile.writable(inst_user)
+      expect(results).not_to include(gf_own_restricted)
+    end
+
+    it "should not let inst user edit someone else's file" do
+      results = GenericFile.writable(inst_user)
+      expect(results).not_to include(gf_other_restricted)
+    end
+
+    it 'should let inst admin discover own file' do
+      results = GenericFile.discoverable(inst_admin)
+      expect(results).to include(gf_own_restricted)
+    end
+
+    it "should not let inst admin discover other's file" do
+      results = GenericFile.discoverable(inst_admin)
+      expect(results).not_to include(gf_other_restricted)
+    end
+
+    it 'should let inst admin read own file' do
+      results = GenericFile.readable(inst_admin)
+      expect(results).to include(gf_own_restricted)
+    end
+
+    it "should not let inst admin read other's file" do
+      results = GenericFile.readable(inst_admin)
+      expect(results).not_to include(gf_other_restricted)
+    end
+
+    it 'should not let inst admin edit own file' do
+      results = GenericFile.writable(inst_admin)
+      expect(results).not_to include(gf_own_restricted)
+    end
+
+    it "should not let inst admin edit someone else's file" do
+      results = GenericFile.writable(inst_admin)
+      expect(results).not_to include(gf_other_restricted)
+    end
+
+    it 'should let sys admin discover any file' do
+      results = GenericFile.discoverable(sys_admin)
+      expect(results).to include(gf_own_restricted)
+      expect(results).to include(gf_other_restricted)
+    end
+
+    it 'should let sys admin read any file' do
+      results = GenericFile.readable(sys_admin)
+      expect(results).to include(gf_own_restricted)
+      expect(results).to include(gf_other_restricted)
+    end
+
+    it 'should let sys admin edit any file' do
+      results = GenericFile.writable(sys_admin)
+      expect(results).to include(gf_own_restricted)
+      expect(results).to include(gf_other_restricted)
+    end
+
+  end
+
 end
