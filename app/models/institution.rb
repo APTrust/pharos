@@ -16,6 +16,10 @@ class Institution < ActiveRecord::Base
     identifier
   end
 
+  def self.find_by_identifier(identifier)
+    Institution.where(identifier: identifier).first
+  end
+
   # Return the users that belong to this institution.  Sorted by name for display purposes primarily.
   def users
     User.where(institution_id: self.id).to_a.sort_by(&:name)

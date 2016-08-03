@@ -24,6 +24,16 @@ RSpec.describe Institution, :type => :model do
     end
   end
 
+  describe '#find_by_identifier' do
+    it 'should validate uniqueness of the identifier' do
+      one = FactoryGirl.create(:institution, identifier: 'test.edu')
+      two = FactoryGirl.create(:institution, identifier: 'kollege.edu')
+      Institution.find_by_identifier('test.edu').should eq one
+      Institution.find_by_identifier('kollege.edu').should eq two
+      Institution.find_by_identifier('idontexist.edu').should be nil
+    end
+  end
+
   describe 'bytes_by_format' do
     it 'should return a hash' do
       expect(subject.bytes_by_format).to eq({'all'=>0})
