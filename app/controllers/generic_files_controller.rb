@@ -52,7 +52,8 @@ class GenericFilesController < ApplicationController
         if @intellectual_object.save
           format.json { render json: array_as_json(@generic_files), status: :created }
         else
-          format.json { render status: :unprocessable_entity }
+          errors = @generic_files.map(&:errors)
+          format.json { render json: errors, status: :unprocessable_entity }
         end
       end
     else
@@ -70,36 +71,17 @@ class GenericFilesController < ApplicationController
   end
 
   def update
-    if params[:save_batch]
-      authorize @intellectual_object, :create_through_intellectual_object?
-      batch_generic_file_params
-      GenericFile.transaction do
-        @generic_files = []
-        params[:generic_files][:files].each do |gf|
-          file = GenericFile.where(identifier: gf[:identifier]).first
-          file.update(gf)
-          @generic_files.push(file)
-        end
-        # files = params[:generic_files][:files]
-        # GenericFile.update(files.keys, files.values)
-        raise ActiveRecord::Rollback
-      end
-      respond_to do |format|
-        if @generic_files
-          format.json { render json: array_as_json(@generic_files), status: :created }
-        else
-          format.json { render status: :unprocessable_entity }
-        end
-      end
+    # A.D. Aug. 3, 2016: Deleted batch update because
+    # nested params cause new events and checksums to be created,
+    # and it would require too much logic to determine which
+    # events and checksums should not be duplicated.
+    authorize @generic_file
+    @generic_file.state = 'A'
+    if resource.update(params_for_update)
+      head :no_content
     else
-      authorize @generic_file
-      @generic_file.state = 'A'
-      if resource.update(params_for_update)
-        head :no_content
-      else
-        log_model_error(resource)
-        render json: resource.errors, status: :unprocessable_entity
-      end
+      log_model_error(resource)
+      render json: resource.errors, status: :unprocessable_entity
     end
   end
 

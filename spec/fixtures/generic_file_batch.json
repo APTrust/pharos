@@ -2,8 +2,8 @@
   {
     "uri": "https://s3.amazonaws.com/aptrust.test.preservation/971983db-1eeb-4f22-427c-606cfcbff48c",
     "size": 2388,
-    "created": "2014-04-14T11:55:25-04:00",
-    "modified": "2014-04-14T11:55:25-04:00",
+    "created_at": "2014-04-14T11:55:25-04:00",
+    "updated_at": "2014-04-14T11:55:25-04:00",
     "file_format": "text/plain",
     "identifier": "virginia.edu/virginia.edu.uva-lib_2278801/data/datastream-DC",
     "checksums_attributes": [
@@ -46,8 +46,8 @@
   {
     "uri": "https://s3.amazonaws.com/aptrust.test.preservation/80180ef5-ca77-4b50-43d1-52f60fe9d4cd",
     "size": 579,
-    "created": "2014-04-14T11:55:26-04:00",
-    "modified": "2014-04-14T11:55:26-04:00",
+    "created_at": "2014-04-14T11:55:26-04:00",
+    "updated_at": "2014-04-14T11:55:26-04:00",
     "file_format": "application/xml",
     "identifier": "virginia.edu/virginia.edu.uva-lib_2278801/data/datastream-RELS-EXT",
     "checksums_attributes": [

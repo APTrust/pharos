@@ -213,7 +213,6 @@ RSpec.describe GenericFilesController, type: :controller do
 
       describe 'and assigning to an object you do have access to' do
         it 'it should create or update multiple files and their events' do
-          # First post is a create
           post(:create, save_batch: true, intellectual_object_id: batch_obj.id, generic_files: {files: gf_data},
                format: 'json')
           expect(response.code).to eq '201'
@@ -223,36 +222,6 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(return_data[1]['id']).not_to be_nil
           expect(return_data[0]['state']).to eq 'A'
           expect(return_data[1]['state']).to eq 'A'
-          expect(return_data[0]['premis_events'].count).to eq 2
-          expect(return_data[1]['premis_events'].count).to eq 2
-          expect(return_data[0]['checksums'].count).to eq 2
-          expect(return_data[1]['checksums'].count).to eq 2
-
-          # Now alter data and post again. Should be an update.
-          id1 = return_data[0]['id']
-          id2 = return_data[1]['id']
-
-          # IT IS IMPERATIVE THAT UPDATES CONTAIN THE IDS OF ALL NESTED OBJECTS
-          gf_data[0]['file_format'] = 'text/apple'
-          gf_data[0]['checksums_attributes'][0]['id'] = return_data[0]['checksums'][0]['id']
-          gf_data[0]['checksums_attributes'][1]['id'] = return_data[0]['checksums'][1]['id']
-          gf_data[1]['checksums_attributes'][0]['id'] = return_data[1]['checksums'][0]['id']
-          gf_data[1]['checksums_attributes'][1]['id'] = return_data[1]['checksums'][1]['id']
-          gf_data[0]['premis_events_attributes'][0]['id'] = return_data[0]['premis_events'][0]['id']
-          gf_data[0]['premis_events_attributes'][1]['id'] = return_data[0]['premis_events'][1]['id']
-          gf_data[1]['premis_events_attributes'][0]['id'] = return_data[1]['premis_events'][0]['id']
-          gf_data[1]['premis_events_attributes'][1]['id'] = return_data[1]['premis_events'][1]['id']
-          gf_data[1]['file_format'] = 'text/orange'
-
-          post(:update, save_batch: true, intellectual_object_identifier: batch_obj.identifier, generic_files: {files: gf_data},
-               format: 'json')
-          expect(response.code).to eq '201'
-          return_data = JSON.parse(response.body)
-          expect(return_data.count).to eq 2
-          expect(return_data[0]['id']).to eq id1
-          expect(return_data[1]['id']).to eq id2
-          expect(return_data[0]['file_format']).to eq 'text/apple'
-          expect(return_data[1]['file_format']).to eq 'text/orange'
           expect(return_data[0]['premis_events'].count).to eq 2
           expect(return_data[1]['premis_events'].count).to eq 2
           expect(return_data[0]['checksums'].count).to eq 2
