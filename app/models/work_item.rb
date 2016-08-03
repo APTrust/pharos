@@ -243,7 +243,7 @@ class WorkItem < ActiveRecord::Base
       re_single = /\.tar$/
       re_multi = /\.b\d+\.of\d+$/
       bag_basename = self.name.sub(re_single, '').sub(re_multi, '')
-      self.object_identifier = "#{self.institution}/#{bag_basename}"
+      self.object_identifier = "#{self.institution.identifier}/#{bag_basename}"
     end
     unless self.object_identifier.blank?
       self.intellectual_object_id = IntellectualObject.where(identifier: self.object_identifier).first.id
