@@ -24,6 +24,10 @@ class GenericFile < ActiveRecord::Base
   scope :updated_after, ->(param) { where("generic_files.updated_at > ?", param) unless param.blank? }
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
   scope :with_identifier_like, ->(param) { where("generic_files.identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_institution, ->(param) {
+    joins(:intellectual_object)
+    .where("intellectual_objects.institution_id = ?", param) unless param.blank?
+  }
   scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
   scope :with_uri_like, ->(param) { where("generic_files.uri like ?", "%#{param}%") unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }

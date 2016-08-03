@@ -564,12 +564,23 @@ RSpec.describe GenericFile, :type => :model do
       expect(results.count).to eq 1
     end
 
+    it 'should find items with institution' do
+      results = GenericFile.with_institution(inst)
+      expect(results).to include gf1
+      expect(results).to include gf2
+      expect(results.count).to eq 2
+      results = GenericFile.with_institution(other_inst)
+      expect(results).to include gf3
+      expect(results.count).to eq 1
+    end
+
     it 'should allow chained scopes' do
       results = GenericFile
         .created_before('2016-01-01')
         .updated_before('2016-01-01')
         .with_identifier_like('edu')
         .with_state('A')
+        .with_institution(inst)
         .readable(inst_admin)
       expect(results).to include gf1
       expect(results.count).to eq 1
