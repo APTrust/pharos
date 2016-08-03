@@ -7,6 +7,11 @@ class WorkItemsController < ApplicationController
 
   after_action :verify_authorized, :except => [:delete_test_items]
 
+  # TODO: Clean this up.
+  # 1. Change alt_actions to separate routes.
+  # 2. Are we planning on using qq?
+  # 3. Simplify filters to use the scopes defined on the WorkItem model.
+  # 4. Don't calculate @counts for JSON API calls. They should be HTML only.
   def index
     unless (session[:select_notice].nil? || session[:select_notice] == '')
       flash[:notice] = session[:select_notice]
@@ -93,17 +98,6 @@ class WorkItemsController < ApplicationController
 
   private
 
-  def delete_test_items
-    authorize WorkItem.new, :delete_test_items?
-    respond_to do |format|
-      if Rails.env.production?
-        format.json { render json: {"error" => "This call is forbidden in production!"}, status: :forbidden }
-      end
-      WorkItem.where(institution: 'test.edu').delete_all
-      format.json { render nothing: true, status: :ok }
-    end
-  end
-
   def show_reviewed
     authorize @items
     session[:show_reviewed] = params[:show_reviewed]
@@ -113,8 +107,8 @@ class WorkItemsController < ApplicationController
   end
 
   def review_all
-    current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution: current_user.institution.identifier)
-    authorize items
+    current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution: current_user.institution)
+    authorize items, :review_all?
     items.each do |item|
       if item.date < session[:purge_datetime] && (item.status == Pharos::Application::PHAROS_STATUSES['success'] || item.status == Pharos::Application::PHAROS_STATUSES['fail'])
         item.reviewed = true
@@ -144,9 +138,10 @@ class WorkItemsController < ApplicationController
     end
     set_items
     session[:select_notice] = 'Selected items have been marked for review or purge from S3 as indicated.'
+    count = @items.count || 1  # one if single item
     respond_to do |format|
-      format.js {}
-      format.html {}
+      format.json { render json: {status: 'ok', message: "Marked #{count} items as reviewed"} }
+      format.html { redirect_to :back }
     end
   end
 
@@ -194,6 +189,7 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  # TODO: Simplify and use scopes on WorkItem model.
   def items_for_something(alt_action)
     case alt_action
       when 'dpn'
@@ -225,6 +221,7 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  # TODO: Do we need this? Just use index with scopes.
   def search
     search_param = "%#{params[:qq]}%"
     field = params[:pi_search_field]
@@ -239,6 +236,7 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  # TODO: Do we need this? Just use index with scopes.
   def api_search
     authorize WorkItem, :admin_api?
     current_user.admin? ? @items = WorkItem.all : @items = WorkItem.where(institution: current_user.institution.identifier)
@@ -294,6 +292,7 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  # TODO: Do we need this? Just use index with scopes.
   def filter_items
     date = format_date if params[:updated_since].present?
     pattern = '%' + params[:name_contains] + '%' if params[:name_contains].present?
@@ -320,6 +319,8 @@ class WorkItemsController < ApplicationController
     @items = @items.where(reviewed: to_boolean(params[:reviewed])) if params[:reviewed].present?
   end
 
+  # TODO: Don't call this for JSON API requests.
+  # Move page/per_page/next/previous
   def set_various_counts
     @counts = {}
     @statuses.each { |status| @counts[status] = @items.where(status: status).count() }
@@ -351,7 +352,7 @@ class WorkItemsController < ApplicationController
 
   def work_item_params
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
-                                      :institution, :date, :note, :action,
+                                      :institution_id, :date, :note, :action,
                                       :stage, :status, :outcome, :retry, :reviewed,
                                       :state, :node)
   end
@@ -361,11 +362,12 @@ class WorkItemsController < ApplicationController
                   :state, :node, :pid, :needs_admin_review)
   end
 
+  # TODO: Do we need this? Just use index with scopes.
   def set_items
     if current_user.admin?
       params[:institution].present? ? @items = WorkItem.where(institution: params[:institution]) : @items = WorkItem.all
     else
-      @items = WorkItem.where(institution: current_user.institution.identifier)
+      @items = WorkItem.readable(current_user)
     end
     params[:institution].present? ? @institution = Institution.where(identifier: params[:institution]) : @institution = current_user.institution
     @items = @items.where(reviewed: false) unless session[:show_reviewed] == 'true'
@@ -387,12 +389,12 @@ class WorkItemsController < ApplicationController
       if Rails.env.test? || Rails.env.development?
         # Cursing ActiveRecord + SQLite. SQLite has all the milliseconds wrong!
         @work_item = WorkItem.where(etag: params[:etag],
-                                              name: params[:name])
+                                    name: params[:name])
         @work_item = @work_item.where('datetime(bag_date) = datetime(?)', params[:bag_date]).first
       else
         @work_item = WorkItem.where(etag: params[:etag],
-                                              name: params[:name],
-                                              bag_date: params[:bag_date]).first
+                                    name: params[:name],
+                                    bag_date: params[:bag_date]).first
       end
     end
     if @work_item

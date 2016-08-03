@@ -1,19 +1,19 @@
 require 'spec_helper'
 
 RSpec.describe WorkItemsController, type: :controller do
-  let(:institution) { FactoryGirl.create(:institution) }
-  let(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
-  let(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
-  let(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
+  let!(:institution) { FactoryGirl.create(:institution) }
+  let!(:admin_user) { FactoryGirl.create(:user, :admin) }
+  let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
+  let!(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
+  let!(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
   let!(:item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
   let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, status: Pharos::Application::PHAROS_STATUSES['fail']) }
 
-  after do
-    WorkItem.destroy_all
-    Institution.destroy_all
-    User.destroy_all
-  end
+  # after do
+  #   WorkItem.destroy_all
+  #   Institution.destroy_all
+  #   User.destroy_all
+  # end
 
   describe 'GET #index' do
     describe 'for admin user' do
@@ -53,10 +53,11 @@ RSpec.describe WorkItemsController, type: :controller do
         assigns(:items).should include(user_item)
       end
 
-      it 'assigns @counts' do
-        get :index
-        assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['ingest'])
-      end
+      # We don't always want to set counts when calling #index: only when format is HTML
+      # it 'assigns @counts' do
+      #   get :index
+      #   assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['ingest'])
+      # end
 
     end
   end
@@ -392,24 +393,6 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
-  describe 'POST #delete_test_items' do
-    let!(:test_inst) { FactoryGirl.create(:institution)  }
-    before do
-      sign_in admin_user
-      5.times do
-        FactoryGirl.create(:work_item, institution: test_inst)
-      end
-    end
-    after do
-      WorkItem.where(institution: test_inst).delete_all
-    end
-
-    it 'should return only items with the specified object_identifier' do
-      post :index, alt_action: 'delete_test', format: :json
-      expect(WorkItem.where(institution: test_inst).count).to eq 0
-    end
-  end
-
   describe 'POST #set_restoration_status' do
     describe 'for admin user' do
       before do
@@ -565,7 +548,7 @@ RSpec.describe WorkItemsController, type: :controller do
                etag: '1234567890',
                bag_date: Time.now.utc,
                user: 'Kelly Croswell',
-               institution: institution,
+               institution_id: institution.id,
                bucket: "aptrust.receiving.#{institution.identifier}",
                date: Time.now.utc,
                note: 'Note',
@@ -588,7 +571,7 @@ RSpec.describe WorkItemsController, type: :controller do
                  etag: '1234567890',
                  bag_date: Time.now.utc,
                  user: 'Kelly Croswell',
-                 institution: institution,
+                 institution_id: institution.id,
                  bucket: "aptrust.receiving.#{institution.identifier}",
                  date: Time.now.utc,
                  note: 'Note',
@@ -605,9 +588,20 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'should fix an item with a null reviewed flag' do
         name = object.identifier.split('/')[1]
-        post :create, work_item: {name: "#{name}.tar", etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution,
-                                       bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
-                                       stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: nil}, format: 'json'
+        post(:create,
+             work_item: { name: "#{name}.tar",
+               etag: '1234567890',
+               bag_date: Time.now.utc,
+               user: 'Kelly Croswell',
+               institution_id: institution.id,
+               bucket: "aptrust.receiving.#{institution.identifier}",
+               date: Time.now.utc,
+               note: 'Note',
+               action: Pharos::Application::PHAROS_ACTIONS['fixity'],
+               stage: Pharos::Application::PHAROS_STAGES['fetch'],
+               status: Pharos::Application::PHAROS_STATUSES['fail'],
+               outcome: 'Outcome',
+               reviewed: nil}, format: 'json')
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
         expect(assigns(:work_item).reviewed).to eq(false)
@@ -647,13 +641,13 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update an item's review field to true" do
-        post :index, alt_action: 'review_selected', review: [item_id], format: 'js'
+        post :index, alt_action: 'review_selected', review: [item_id], format: :json
         expect(response.status).to eq(200)
         WorkItem.find(item.id).reviewed.should eq(true)
       end
 
       it 'should not review a working item' do
-        post :index, alt_action: 'review_selected', review: [work_id], format: 'js'
+        post :index, alt_action: 'review_selected', review: [work_id], format: :json
         expect(response.status).to eq(200)
         WorkItem.find(working_item.id).reviewed.should eq(false)
       end
@@ -678,7 +672,7 @@ RSpec.describe WorkItemsController, type: :controller do
   end
 
   describe 'Post #review_all' do
-    let!(:failed_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail']) }
+    let!(:failed_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail'], institution: institution) }
     let!(:second_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution) }
     describe 'as admin user' do
       before do
