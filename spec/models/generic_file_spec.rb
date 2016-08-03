@@ -10,8 +10,8 @@ RSpec.describe GenericFile, :type => :model do
 
   it { should validate_presence_of(:uri) }
   it { should validate_presence_of(:size) }
-  it { should validate_presence_of(:created) }
-  it { should validate_presence_of(:modified) }
+  it { should validate_presence_of(:created_at) }
+  it { should validate_presence_of(:updated_at) }
   it { should validate_presence_of(:file_format) }
   it { should validate_presence_of(:identifier)}
 
@@ -121,8 +121,8 @@ RSpec.describe GenericFile, :type => :model do
           expect(h1.has_key?(:id)).to be true
           expect(h1.has_key?(:uri)).to be true
           expect(h1.has_key?(:size)).to be true
-          expect(h1.has_key?(:created)).to be true
-          expect(h1.has_key?(:modified)).to be true
+          expect(h1.has_key?(:created_at)).to be true
+          expect(h1.has_key?(:updated_at)).to be true
           expect(h1.has_key?(:file_format)).to be true
           expect(h1.has_key?(:identifier)).to be true
           expect(h1.has_key?(:state)).to be true
@@ -131,8 +131,8 @@ RSpec.describe GenericFile, :type => :model do
           expect(h2.has_key?(:id)).to be true
           expect(h2.has_key?(:uri)).to be true
           expect(h2.has_key?(:size)).to be true
-          expect(h2.has_key?(:created)).to be true
-          expect(h2.has_key?(:modified)).to be true
+          expect(h2.has_key?(:created_at)).to be true
+          expect(h2.has_key?(:updated_at)).to be true
           expect(h2.has_key?(:file_format)).to be true
           expect(h2.has_key?(:identifier)).to be true
           expect(h2.has_key?(:state)).to be true
@@ -453,7 +453,127 @@ RSpec.describe GenericFile, :type => :model do
       expect(results).to include(gf_own_restricted)
       expect(results).to include(gf_other_restricted)
     end
-
   end
 
+  describe 'scopes by attribute' do
+    let!(:inst) { FactoryGirl.create(:institution) }
+    let!(:other_inst) { FactoryGirl.create(:institution) }
+
+    let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+                                           institution: inst) }
+    let!(:obj1) { FactoryGirl.create(:intellectual_object,
+                                     institution: inst,
+                                     identifier: 'test.edu/first',
+                                     alt_identifier: 'first alt identifier',
+                                     created_at: '2011-01-01',
+                                     updated_at: '2011-01-01',
+                                     description: 'Description of first item',
+                                     bag_name: 'first_item',
+                                     title: 'Title of first item',
+                                     state: 'A') }
+    let!(:obj2) { FactoryGirl.create(:intellectual_object,
+                                     institution: inst,
+                                     identifier: 'test.edu/second',
+                                     alt_identifier: 'second alt identifier',
+                                     created_at: '2017-01-01',
+                                     updated_at: '2017-01-01',
+                                     description: 'Description of second item',
+                                     bag_name: 'second_item',
+                                     title: 'Title of second item',
+                                     state: 'A') }
+    let!(:obj3) { FactoryGirl.create(:intellectual_object,
+                                     institution: other_inst,
+                                     identifier: 'xxx',
+                                     alt_identifier: 'xxx',
+                                     created_at: '2016-01-01',
+                                     updated_at: '2016-01-01',
+                                     description: 'xxx',
+                                     bag_name: 'xxx',
+                                     title: 'xxx',
+                                     state: 'D') }
+    let!(:gf1) { FactoryGirl.create(:generic_file,
+                                    intellectual_object: obj1,
+                                    uri: "https://s3.kom/uri1",
+                                    identifier: 'test.edu/bag/first',
+                                    file_format: 'text/plain',
+                                    created_at: '2011-01-01',
+                                    updated_at: '2011-01-01',
+                                    state: 'A') }
+    let!(:gf2) { FactoryGirl.create(:generic_file,
+                                    intellectual_object: obj2,
+                                    uri: "https://s3.kom/uri2",
+                                    identifier: 'test.edu/bag/second',
+                                    file_format: 'application/pdf',
+                                    created_at: '2017-12-31',
+                                    updated_at: '2017-12-31',
+                                    state: 'A') }
+    let!(:gf3) { FactoryGirl.create(:generic_file,
+                                    intellectual_object: obj3,
+                                    uri: "https://s3.kom/uri2",
+                                    identifier: 'test.edu/bag/third',
+                                    file_format: 'application/pdf',
+                                    created_at: '2011-01-01',
+                                    updated_at: '2011-01-01',
+                                    state: 'D') }
+
+    it 'should find items created before' do
+      results = GenericFile.created_before('2016-07-29')
+      expect(results).to include gf1
+      expect(results).to include gf3
+      expect(results.count).to eq 2
+    end
+
+    it 'should find items created after' do
+      results = GenericFile.created_after('2016-07-29')
+      expect(results).to include gf2
+      expect(results.count).to eq 1
+    end
+
+    it 'should find items updated before' do
+      results = GenericFile.updated_before('2016-07-29')
+      expect(results).to include gf1
+      expect(results).to include gf3
+      expect(results.count).to eq 2
+    end
+
+    it 'should find items updated after' do
+      results = GenericFile.updated_after('2016-07-29')
+      expect(results).to include gf2
+      expect(results.count).to eq 1
+    end
+
+    it 'should find items with identifier' do
+      results = GenericFile.with_identifier('test.edu/bag/first')
+      expect(results).to include gf1
+      expect(results.count).to eq 1
+    end
+
+    it 'should find items with identifier like' do
+      results = GenericFile.with_identifier_like('first')
+      expect(results).to include gf1
+      expect(results.count).to eq 1
+    end
+
+    it 'should find items with state' do
+      results = GenericFile.with_state('A')
+      expect(results).to include gf1
+      expect(results).to include gf2
+      expect(results.count).to eq 2
+      results = GenericFile.with_state('D')
+      expect(results).to include gf3
+      expect(results.count).to eq 1
+    end
+
+    it 'should allow chained scopes' do
+      results = GenericFile
+        .created_before('2016-01-01')
+        .updated_before('2016-01-01')
+        .with_identifier_like('edu')
+        .with_state('A')
+        .readable(inst_admin)
+      expect(results).to include gf1
+      expect(results.count).to eq 1
+    end
+
+  end
 end
