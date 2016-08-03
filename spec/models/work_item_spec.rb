@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 ingest = Pharos::Application::PHAROS_ACTIONS['ingest']
+delete = Pharos::Application::PHAROS_ACTIONS['delete']
 restore = Pharos::Application::PHAROS_ACTIONS['restore']
 dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
 requested = Pharos::Application::PHAROS_STAGES['requested']
@@ -225,6 +226,58 @@ RSpec.describe WorkItem, :type => :model do
       wi.pid.should == 0
       wi.needs_admin_review.should == false
       wi.id.should_not be_nil
+    end
+
+    it 'should find pending ingest' do
+      setup_item(subject)
+      subject.action = ingest
+      subject.stage = record
+      subject.status = pending
+      subject.object_identifier = 'abc/123'
+      subject.save!
+
+      pending_action = WorkItem.pending_action(subject.object_identifier)
+      pending_action.should_not be_nil
+      pending_action.action.should == ingest
+    end
+
+    it 'should find pending restore' do
+      setup_item(subject)
+      subject.action = restore
+      subject.stage = record
+      subject.status = pending
+      subject.object_identifier = 'abc/123'
+      subject.save!
+
+      pending_action = WorkItem.pending_action(subject.object_identifier)
+      pending_action.should_not be_nil
+      pending_action.action.should == restore
+    end
+
+    it 'should find pending delete' do
+      setup_item(subject)
+      subject.action = delete
+      subject.stage = record
+      subject.status = pending
+      subject.object_identifier = 'abc/123'
+      subject.save!
+
+      pending_action = WorkItem.pending_action(subject.object_identifier)
+      pending_action.should_not be_nil
+      pending_action.action.should == delete
+    end
+
+    it 'should find pending DPN request' do
+      setup_item(subject)
+      subject.action = dpn
+      subject.stage = record
+      subject.status = pending
+      subject.object_identifier = 'abc/123'
+      subject.save!
+
+      pending_action = WorkItem.pending_action(subject.object_identifier)
+      pending_action.should_not be_nil
+      pending_action.action.should == dpn
     end
 
   end

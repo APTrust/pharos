@@ -86,7 +86,7 @@ class IntellectualObjectsController < ApplicationController
 
   def destroy
     authorize @intellectual_object, :soft_delete?
-    pending = WorkItem.pending?(@intellectual_object.identifier)
+    pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
       respond_to do |format|
         format.json { head :no_content }
@@ -95,7 +95,7 @@ class IntellectualObjectsController < ApplicationController
           flash[:alert] = 'This item has already been deleted.'
         }
       end
-    elsif pending == 'false'
+    elsif pending.nil?
       attributes = { event_type: 'delete',
                      date_time: "#{Time.now}",
                      detail: 'Object deleted from S3 storage',
@@ -116,8 +116,8 @@ class IntellectualObjectsController < ApplicationController
       end
     else
       respond_to do |format|
-        message = "Your object cannot be deleted at this time due to a pending #{pending} request. " +
-          "You may delete this object after the #{pending} request has completed."
+        message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +
+          "You may delete this object after the #{pending.action} request has completed."
         format.json {
           render :json => { status: 'error', message: message }, :status => :conflict
         }
@@ -136,7 +136,7 @@ class IntellectualObjectsController < ApplicationController
     dpn_item = nil
     message = ""
     api_status_code = :ok
-    pending = WorkItem.pending?(@intellectual_object.identifier)
+    pending = WorkItem.pending_action(@intellectual_object.identifier)
     if Pharos::Application.config.show_send_to_dpn_button == false
       message = 'We are not currently sending objects to DPN.'
       api_status_code = :conflict
@@ -146,11 +146,11 @@ class IntellectualObjectsController < ApplicationController
     elsif @intellectual_object.state == 'D'
       message = 'This item has been deleted and cannot be sent to DPN.'
       api_status_code = :conflict
-    elsif pending == 'false'
+    elsif pending.nil?
       dpn_item = WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
       message = 'Your item has been queued for DPN.'
     else
-      message = "Your object cannot be sent to DPN at this time due to a pending #{pending} request."
+      message = "Your object cannot be sent to DPN at this time due to a pending #{pending.action} request."
       api_status_code = :conflict
     end
     respond_to do |format|
@@ -177,16 +177,16 @@ class IntellectualObjectsController < ApplicationController
     message = ""
     api_status_code = :ok
     restore_item = nil
-    pending = WorkItem.pending?(@intellectual_object.identifier)
+    pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
       api_status_code = :conflict
       message = 'This item has been deleted and cannot be queued for restoration.'
-    elsif pending == 'false'
+    elsif pending.nil?
       restore_item = WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
       message = 'Your item has been queued for restoration.'
     else
       api_status_code = :conflict
-      message = "Your object cannot be queued for restoration at this time due to a pending #{pending} request."
+      message = "Your object cannot be queued for restoration at this time due to a pending #{pending.action} request."
     end
     respond_to do |format|
       status = restore_item.nil? ? 'error' : 'ok'

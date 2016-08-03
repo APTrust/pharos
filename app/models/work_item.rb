@@ -39,32 +39,22 @@ class WorkItem < ActiveRecord::Base
     "#{etag}/#{name}"
   end
 
-  def self.pending?(intellectual_object_identifier)
-    items = WorkItem.where(object_identifier: intellectual_object_identifier )
-    items = items.order('date DESC')
-    pending = 'false'
-    items.each do |item|
-      if item.status == Pharos::Application::PHAROS_STATUSES['success'] ||
-          item.status == Pharos::Application::PHAROS_STATUSES['fail'] ||
-          item.status == Pharos::Application::PHAROS_STATUSES['cancel']
-        pending = 'false'
-      else
-        if item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
-          pending = 'ingest'
-          break
-        elsif item.action == Pharos::Application::PHAROS_ACTIONS['restore']
-          pending = 'restore'
-          break
-        elsif item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-          pending = 'delete'
-          break
-        elsif item.action == Pharos::Application::PHAROS_ACTIONS['dpn']
-          pending = 'DPN'
-          break
-        end
-      end
-    end
-    pending
+  def self.pending_action(intellectual_object_identifier)
+    item = WorkItem
+      .where("object_identifier = ? " +
+             "and status not in (?, ?, ?) " +
+             "and action in (?, ?, ?, ?)",
+             intellectual_object_identifier,
+             Pharos::Application::PHAROS_STATUSES['success'],
+             Pharos::Application::PHAROS_STATUSES['fail'],
+             Pharos::Application::PHAROS_STATUSES['cancel'],
+             Pharos::Application::PHAROS_ACTIONS['ingest'],
+             Pharos::Application::PHAROS_ACTIONS['restore'],
+             Pharos::Application::PHAROS_ACTIONS['delete'],
+             Pharos::Application::PHAROS_ACTIONS['dpn'])
+      .order('date DESC')
+      .limit(1)
+      .first
   end
 
   def self.can_delete_file?(intellectual_object_identifier, generic_file_identifier)
