@@ -31,6 +31,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    created_at: "2011-10-10T10:00:00Z",
                                    updated_at: "2011-10-10T10:00:00Z") }
 
+  before(:all) do
+    WorkItem.delete_all
+    IntellectualObject.delete_all
+  end
 
   describe 'GET #index' do
 
