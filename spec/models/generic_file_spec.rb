@@ -511,7 +511,7 @@ RSpec.describe GenericFile, :type => :model do
                                     intellectual_object: obj3,
                                     uri: "https://s3.kom/uri2",
                                     identifier: 'test.edu/bag/third',
-                                    file_format: 'application/pdf',
+                                    file_format: 'application/xml',
                                     created_at: '2011-01-01',
                                     updated_at: '2011-01-01',
                                     state: 'D') }
@@ -574,11 +574,21 @@ RSpec.describe GenericFile, :type => :model do
       expect(results.count).to eq 1
     end
 
+    it 'should find items with file format' do
+      results = GenericFile.with_file_format('text/plain')
+      expect(results).to include gf1
+      expect(results.count).to eq 1
+      results = GenericFile.with_file_format('application/xml')
+      expect(results).to include gf3
+      expect(results.count).to eq 1
+    end
+
     it 'should allow chained scopes' do
       results = GenericFile
         .created_before('2016-01-01')
         .updated_before('2016-01-01')
         .with_identifier_like('edu')
+        .with_file_format('text/plain')
         .with_state('A')
         .with_institution(inst)
         .readable(inst_admin)

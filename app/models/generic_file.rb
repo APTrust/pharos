@@ -22,6 +22,7 @@ class GenericFile < ActiveRecord::Base
   scope :created_after, ->(param) { where("generic_files.created_at > ?", param) unless param.blank? }
   scope :updated_before, ->(param) { where("generic_files.updated_at < ?", param) unless param.blank? }
   scope :updated_after, ->(param) { where("generic_files.updated_at > ?", param) unless param.blank? }
+  scope :with_file_format, ->(param) { where(file_format: param) unless param.blank? }
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
   scope :with_identifier_like, ->(param) { where("generic_files.identifier like ?", "%#{param}%") unless param.blank? }
   scope :with_institution, ->(param) {
