@@ -5,7 +5,7 @@ FactoryGirl.define do
     bag_date { Time.now.utc }
     user { Faker::Name.name }
     institution { FactoryGirl.create(:institution) }
-    bucket { "aptrust.receiving.#{institution}" }
+    bucket { "aptrust.receiving.#{institution.identifier}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
     action { Pharos::Application::PHAROS_ACTIONS.values.sample }
@@ -22,7 +22,7 @@ FactoryGirl.define do
     bag_date { Time.now.utc }
     user { Faker::Name.name }
     institution { FactoryGirl.create(:institution) }
-    bucket { "aptrust.receiving.#{institution}" }
+    bucket { "aptrust.receiving.#{institution.identifier}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
     action { Pharos::Application::PHAROS_ACTIONS['ingest'] }
@@ -39,7 +39,7 @@ FactoryGirl.define do
     bag_date { Time.now.utc }
     user { Faker::Name.name }
     institution { FactoryGirl.create(:institution) }
-    bucket { "aptrust.receiving.#{institution}" }
+    bucket { "aptrust.receiving.#{institution.identifier}" }
     date { Time.now.utc }
     note { Faker::Lorem.sentence }
     action { Pharos::Application::PHAROS_ACTIONS.values.sample }
