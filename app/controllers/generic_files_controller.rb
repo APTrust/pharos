@@ -172,28 +172,31 @@ class GenericFilesController < ApplicationController
   end
 
   def generic_file_params
-    params[:generic_file] &&= params.require(:generic_file).permit(:id, :uri, :identifier, :size, :created,
-                                                                   :modified, :file_format, checksums_attributes:
-                                                                  [:digest, :algorithm, :datetime, :id], premis_events_attributes:
-                                                                  [:identifier, :event_type, :date_time, :outcome, :id,
-                                                                   :outcome_detail, :outcome_information, :detail, :object,
-                                                                   :agent, :intellectual_object_id, :generic_file_id,
-                                                                   :institution_id, :created_at, :updated_at])
+    params[:generic_file] &&= params.require(:generic_file)
+      .permit(:id, :uri, :identifier, :size, :created_at,
+              :updated_at, :file_format, checksums_attributes:
+              [:digest, :algorithm, :datetime, :id], premis_events_attributes:
+              [:identifier, :event_type, :date_time, :outcome, :id,
+               :outcome_detail, :outcome_information, :detail, :object,
+               :agent, :intellectual_object_id, :generic_file_id,
+               :institution_id, :created_at, :updated_at])
   end
 
   def batch_generic_file_params
-    params[:generic_files] &&= params.require(:generic_files).permit(files: [:id, :uri, :identifier, :size, :created,
-                                                                   :modified, :file_format, checksums_attributes:
-                                                                  [:digest, :algorithm, :datetime, :id], premis_events_attributes:
-                                                                  [:identifier, :event_type, :date_time, :outcome, :id,
-                                                                   :outcome_detail, :outcome_information, :detail, :object,
-                                                                   :agent, :intellectual_object_id, :generic_file_id,
-                                                                   :institution_id, :created_at, :updated_at]])
+    params[:generic_files] &&= params.require(:generic_files)
+      .permit(files: [:id, :uri, :identifier, :size, :created_at,
+                      :updated_at, :file_format, checksums_attributes:
+                      [:digest, :algorithm, :datetime, :id], premis_events_attributes:
+                      [:identifier, :event_type, :date_time, :outcome, :id,
+                       :outcome_detail, :outcome_information, :detail, :object,
+                       :agent, :intellectual_object_id, :generic_file_id,
+                       :institution_id, :created_at, :updated_at]])
   end
 
   def params_for_update
-    params[:generic_file] &&= params.require(:generic_file).permit(:uri, :identifier, :size, :created,
-                                                                   :modified, :file_format)
+    params[:generic_file] &&= params.require(:generic_file).
+      permit(:uri, :identifier, :size, :created_at,
+             :updated_at, :file_format)
   end
 
   def resource
