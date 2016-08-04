@@ -20,6 +20,18 @@
   <div class="search-widgets pull-right">
     <span class="sr-only"><%= 'Per Page' %></span>
 
+    <div id="state-dropdown" class="btn-group">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <a href="#">Object State </a>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="<%= current_path('state', 'A') %>">Active</a></li>
+        <li><a href="<%= current_path('state', 'all') %>">All</a></li>
+        <li><a href="<%= current_path('state', 'D') %>">Deleted</a></li>
+      </ul>
+    </div>
+
     <div id="per_page-dropdown" class="btn-group">
       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <%= link_to(t(:'Per page', :count => @page), "#") %>

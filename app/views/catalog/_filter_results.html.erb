@@ -1,20 +1,28 @@
-<div id="facets" class="facets sidenav">
+<div class="facets sidenav">
 
   <div class="top-panel-heading panel-heading">
-    <h4> Limit your search </h4>
+    <h3> Limit your search </h3>
   </div>
 
-  <div id="facet-panel-collapse" class="collapse panel-group">
-    <div class="panel panel-default facet_limit blacklight-institution_name_ssi ">
-      <div class="collapsed collapse-toggle panel-heading" data-toggle="collapse" data-target="#facet-institution_name_ssi">
+  <%= @inst_facet.inspect %>
+
+  <div class="panel-group">
+    <div class="panel panel-default facet_limit">
+      <div class="collapse-toggle panel-heading" data-toggle="collapse">
         <h5 class="panel-title">
           <a data-no-turbolink="true" href="#">Institution</a>
         </h5>
       </div>
-      <div id="facet-institution_name_ssi" class="panel-collapse facet-content collapse">
+      <div class="panel-collapse facet-content">
         <div class="panel-body">
           <ul class="facet-values list-unstyled">
-            <li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=Columbia+University&amp;q=&amp;search_field=all_fields">Columbia University</a></span><span class="facet-count">2</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=Georgetown+University&amp;q=&amp;search_field=all_fields">Georgetown University</a></span><span class="facet-count">51</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=Indiana+University+Bloomington&amp;q=&amp;search_field=all_fields">Indiana University Bloomington</a></span><span class="facet-count">6</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=Johns+Hopkins+University&amp;q=&amp;search_field=all_fields">Johns Hopkins University</a></span><span class="facet-count">5</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=North+Carolina+State+University&amp;q=&amp;search_field=all_fields">North Carolina State University</a></span><span class="facet-count">4,344</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=Syracuse+University&amp;q=&amp;search_field=all_fields">Syracuse University</a></span><span class="facet-count">1</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=Test+University&amp;q=&amp;search_field=all_fields">Test University</a></span><span class="facet-count">9</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=University+of+Cincinnati&amp;q=&amp;search_field=all_fields">University of Cincinnati</a></span><span class="facet-count">26</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=University+of+Maryland&amp;q=&amp;search_field=all_fields">University of Maryland</a></span><span class="facet-count">1</span></li><li><span class="facet-label"><a class="facet_select" href="/catalog?f%5Binstitution_name_ssi%5D%5B%5D=University+of+Miami&amp;q=&amp;search_field=all_fields">University of Miami</a></span><span class="facet-count">55</span></li>
+            <% @institutions.each do |institution| %>
+              <% current_inst = Institution.find(institution) %>
+                <li>
+                  <span class="facet-label"><a class="facet_select" search_field=all_fields" href="<%= current_path('institution', institution) %>"><%= current_inst.name %></a></span>
+                  <span class="facet-count"><%= @counts[institution] %></span>
+                </li>
+            <% end %>
           </ul>
         </div>
       </div>
