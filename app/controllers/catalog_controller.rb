@@ -229,11 +229,11 @@ class CatalogController < ApplicationController
     @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
     @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
     @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
-    io_inst = @results[:objects].distinct.pluck(:institution_id) unless @results[:objects].nil?
-    gf_inst = @results[:files].joins(:intellectual_object).distinct.pluck(:institution_id) unless @results[:files].nil?
-    wi_inst = @results[:items].distinct.pluck(:institution_id) unless @results[:items].nil?
-    @institutions = io_inst | gf_inst | wi_inst
-    #@institutions = Institution.pluck(:id)
+    # io_inst = @results[:objects].distinct.pluck(:institution_id) unless @results[:objects].nil?
+    # gf_inst = @results[:files].joins(:intellectual_object).distinct.pluck(:institution_id) unless @results[:files].nil?
+    # wi_inst = @results[:items].distinct.pluck(:institution_id) unless @results[:items].nil?
+    # @institutions = io_inst | gf_inst | wi_inst
+    @institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = GenericFile.distinct.pluck(:file_format)
     file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
