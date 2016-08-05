@@ -101,111 +101,105 @@ class CatalogController < ApplicationController
   end
 
   def generic_search
+    objects = IntellectualObject.discoverable(current_user)
+    files = GenericFile.discoverable(current_user)
+    items = WorkItem.readable(current_user)
     case params[:search_field]
       when 'Identifier'
-        @results[:objects] = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
-        @results[:files] = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = objects.with_identifier_like(params[:q])
+        @results[:files] = files.with_identifier_like(params[:q])
       when 'Alternate Identifier'
-        @results[:objects] = IntellectualObject.where('alt_identifier LIKE ?', "%#{params[:q]}%")
-        @results[:items] = WorkItem.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?',
-                                      "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:objects] = objects.with_alt_identifier_like(params[:q])
+        io_items = items.with_object_identifier_like(params[:q])
+        gf_items = items.with_file_identifier_like(params[:q])
+        @results[:items] = io_items | gf_items
       when 'Bag Name'
-        @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = objects.with_bag_name_like(params[:q])
+        @results[:items] = items.with_name_like(params[:q])
       when 'Title'
-        @results[:objects] = IntellectualObject.where('title LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = objects.with_title_like(params[:q])
       when 'URI'
-        @results[:files] = GenericFile.where('uri LIKE ?', "%#{params[:q]}%")
+        @results[:files] = files.with_uri_like(params[:q])
       when 'Name'
-        @results[:objects] = IntellectualObject.where('bag_name LIKE ?', "%#{params[:q]}%")
-        @results[:items] = WorkItem.where('name LIKE ?', "%#{params[:q]}%")
+        @results[:objects] = objects.with_bag_name_like(params[:q])
+        @results[:items] = items.with_name_like(params[:q])
       when 'Etag'
-        @results[:items] = WorkItem.where('etag LIKE ?', "%#{params[:q]}%")
+        @results[:items] = items.with_etag_like(params[:q])
       when 'Intellectual Object Identifier'
-        @results[:items] = WorkItem.where('object_identifier LIKE ?', "%#{params[:q]}%")
-        @results[:objects] = IntellectualObject.where('identifier LIKE ?', "%#{params[:q]}%")
+        @results[:items] = items.with_object_identifier_like(params[:q])
+        @results[:objects] = objects.with_identifier_like(params[:q])
       when 'Generic File Identifier'
-        @results[:items] = WorkItem.where('generic_file_identifier LIKE ?', "%#{params[:q]}%")
-        @results[:files] = GenericFile.where('identifier LIKE ?', "%#{params[:q]}%")
+        @results[:items] = items.with_file_identifier_like(params[:q])
+        @results[:files] = files.with_identifier_like(params[:q])
       when 'All Fields'
-        @results[:objects] = IntellectualObject.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+        @results[:objects] = objects.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                               "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        @results[:files] = GenericFile.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
-        @results[:items] = WorkItem.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+        @results[:files] = files.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:items] = items.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                       "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
   def filter
-    @selected = {}
-    filter_results
     set_filter_values
+    filter_results
     set_filter_counts
     set_page_counts
   end
 
   def filter_results
-    filter_by_status if params[:status].present?
-    filter_by_stage if params[:stage].present?
-    filter_by_action if params[:object_action].present?
-    filter_by_institution if params[:institution].present?
-    filter_by_access if params[:access].present?
-    filter_by_format if params[:file_format].present?
-    filter_by_association if params[:association].present?
-    filter_by_type if params[:type].present?
-    filter_by_state if params[:state].present?
+    filter_by_status
+    filter_by_stage
+    filter_by_action
+    filter_by_institution
+    filter_by_access
+    filter_by_association
+    filter_by_type
+    filter_by_state
+    filter_by_format
   end
 
   def filter_by_status
-    @results[:items] = @results[:items].where(status: params[:status]) unless @results[:items].nil?
+    @results[:items] = @results[:items].with_status(params[:status]) unless @results[:items].nil?
     @results.delete(:files)
     @results.delete(:objects)
-    @selected[:status] = params[:status]
   end
 
   def filter_by_stage
-    @results[:items] = @results[:items].where(stage: params[:stage]) unless @results[:items].nil?
+    @results[:items] = @results[:items].with_stage(params[:stage]) unless @results[:items].nil?
     @results.delete(:files)
     @results.delete(:objects)
-    @selected[:stage] = params[:stage]
   end
 
   def filter_by_action
-    @results[:items] = @results[:items].where(action: params[:object_action]) unless @results[:items].nil?
+    @results[:items] = @results[:items].with_action(params[:object_action]) unless @results[:items].nil?
     @results.delete(:files)
     @results.delete(:objects)
-    @selected[:object_action] = params[:object_action]
   end
 
   def filter_by_institution
-    @results[:objects] = @results[:objects].where(institution_id: params[:institution]) unless @results[:objects].nil?
-    @results[:files] = @results[:files].joins(:intellectual_object).where(intellectual_objects: { institution_id: params[:institution] }) unless @results[:files].nil?
-    @results[:items] = @results[:items].where(institution_id: params[:institution]) unless @results[:items].nil?
-    @selected[:institution] = params[:institution]
+    @results[:objects] = @results[:objects].with_institution(params[:institution]) unless @results[:objects].nil?
+    @results[:files] = @results[:files].with_institution(params[:institution]) unless @results[:files].nil?
+    @results[:items] = @results[:items].with_institution(params[:institution]) unless @results[:items].nil?
   end
 
   def filter_by_access
-    @results[:objects] = @results[:objects].where(access: params[:access]) unless @results[:objects].nil?
-    @results[:files] = @results[:files].joins(:intellectual_object).where(intellectual_objects: { access: params[:access] }) unless @results[:files].nil?
-    @results[:items] = @results[:items].joins(:intellectual_object).where(intellectual_objects: { access: params[:access] }) unless @results[:items].nil?
-    @selected[:access] = params[:access]
+    @results[:objects] = @results[:objects].with_access(params[:access]) unless @results[:objects].nil?
+    @results[:files] = @results[:files].with_access(params[:access]) unless @results[:files].nil?
+    @results[:items] = @results[:items].with_access(params[:access]) unless @results[:items].nil?
   end
 
   def filter_by_format
-    #TODO: make sure this is applicable to objects as well as files
-    @results[:files] = @results[:files].where(file_format: params[:file_format]) unless @results[:files].nil?
-    #@results[:objects] = @results[:objects].where(file_format: params[:file_format]) unless @results[:objects].nil?
-    @results.delete(:files)
-    @results.delete(:objects)
-    @selected[:file_format] = params[:file_format]
+    @results[:files] = @results[:files].with_file_format(params[:file_format]) unless @results[:files].nil?
+    @results[:objects] = @results[:objects].with_file_format(params[:file_format]) unless @results[:objects].nil?
+    @results.delete(:items)
   end
 
   def filter_by_association
     @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
                                               params[:association], params[:association]) unless @results[:items].nil?
     @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results[:files].nil?
-    @results[:objects] = @results[:objects].where(id: params[:association])
-    @selected[:association] = params[:association]
+    @results[:objects] = @results[:objects].where(id: params[:association]) unless @results[:objects].nil?
   end
 
   def filter_by_type
@@ -220,16 +214,14 @@ class CatalogController < ApplicationController
         @results.delete(:objects)
         @results.delete(:files)
     end
-    @selected[:type] = params[:type]
   end
 
   def filter_by_state
     params[:state] = 'A' if params[:state].nil?
     unless params[:state] == 'all'
-      @results[:objects] = @results[:objects].where(state: params[:state]) unless @results[:objects].nil?
-      @results[:files] = @results[:files].where(state: params[:state]) unless @results[:files].nil?
-      @results.delete(:items)
-      @selected[:state] = params[:state]
+      @results[:objects] = @results[:objects].with_state(params[:state]) unless @results[:objects].nil?
+      @results[:files] = @results[:files].with_state(params[:state]) unless @results[:files].nil?
+      @results[:items] = @results[:items].with_state(params[:state]) unless @results[:files].nil?
     end
   end
 
@@ -238,9 +230,10 @@ class CatalogController < ApplicationController
     @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
     @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
     io_inst = @results[:objects].distinct.pluck(:institution_id) unless @results[:objects].nil?
-    gf_inst = @results[:files].distinct.pluck(:institution_id) unless @results[:files].nil?
+    gf_inst = @results[:files].joins(:intellectual_object).distinct.pluck(:institution_id) unless @results[:files].nil?
     wi_inst = @results[:items].distinct.pluck(:institution_id) unless @results[:items].nil?
     @institutions = io_inst | gf_inst | wi_inst
+    #@institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = GenericFile.distinct.pluck(:file_format)
     file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
@@ -283,45 +276,42 @@ class CatalogController < ApplicationController
     @results[:objects] = @results[:objects].order('created_at').reverse_order unless @results[:objects].nil?
     @results[:files] = @results[:files].order('created').reverse_order  unless @results[:files].nil?
     @results[:items] = @results[:items].order('date').reverse_order  unless @results[:items].nil?
-    @selected[:sort] = params[:sort]
   end
 
   def sort_by_name
     @results[:objects] = @results[:objects].order('bag_name') unless @results[:objects].nil?
     @results[:files] = @results[:files].order('uri')  unless @results[:files].nil?
     @results[:items] = @results[:items].order('name')  unless @results[:items].nil?
-    @selected[:sort] = params[:sort]
   end
 
   def sort_by_institution
     @results[:objects] = @results[:objects].order('institution_id').reverse_order unless @results[:objects].nil?
-    @results[:files] = @results[:files].order('institution_id').reverse_order  unless @results[:files].nil?
+    @results[:files] = @results[:files].joins(:intellectual_object).order('institution_id').reverse_order  unless @results[:files].nil?
     @results[:items] = @results[:items].order('institution_id').reverse_order  unless @results[:items].nil?
-    @selected[:sort] = params[:sort]
   end
 
   def set_filter_counts
     @counts = {}
-    @results.each do |key, value|
-      if key == :objects
-        set_inst_count(value)
-        set_access_count(value)
-        #set_format_count(value)
-      elsif key == :files
-        set_format_count(value)
-        set_inst_count(value)
-        set_io_assc_count(value)
-        set_access_count(value)
-      elsif key == :items
-        set_status_count(value)
-        set_stage_count(value)
-        set_action_count(value)
-        set_inst_count(value)
-        set_access_count(value)
-        set_io_assc_count(value)
-        set_gf_assc_count(value)
-      end
-    end
+    # @results.each do |key, value|
+    #   if key == :objects
+    #     set_inst_count(value)
+    #     set_access_count(value)
+    #     #set_format_count(value)
+    #   elsif key == :files
+    #     set_format_count(value)
+    #     set_inst_count(value)
+    #     set_io_assc_count(value)
+    #     set_access_count(value)
+    #   elsif key == :items
+    #     set_status_count(value)
+    #     set_stage_count(value)
+    #     set_action_count(value)
+    #     set_inst_count(value)
+    #     set_access_count(value)
+    #     set_io_assc_count(value)
+    #     set_gf_assc_count(value)
+    #   end
+    # end
     @counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
     @counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
     @counts['Work Items'] = @results[:items].count unless @results[:items].nil?
@@ -337,7 +327,7 @@ class CatalogController < ApplicationController
         inst_list = "#{inst_list} , #{inst}"
       end
     end
-    @inst_facet = @results[:objects].select('institution_id, count(*)').where(institution_id: [inst_list]).group(:institution_id)
+    #@inst_facet = @results[:objects].select('institution_id, count(*)').where(institution_id: [inst_list]).group(:institution_id)
     unless @institutions.nil?
       @institutions.each do |institution|
         @counts[institution].nil? ?

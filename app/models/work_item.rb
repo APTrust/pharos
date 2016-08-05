@@ -24,7 +24,18 @@ class WorkItem < ActiveRecord::Base
   scope :with_object_identifier_like, ->(param) { where("work_items.object_identifier like ?", "%#{param}%") unless param.blank? }
   scope :with_file_identifier, ->(param) { joins(:generic_file).where(generic_files: {identifier: param}) unless param.blank? }
   scope :with_file_identifier_like, ->(param) { joins(:generic_file).where("generic_files.identifier like ?", "%#{param}%") unless param.blank? }
-
+  scope :with_status, ->(param) { where(status: param) unless param.blank? }
+  scope :with_stage, ->(param) { where(stage: param) unless param.blank? }
+  scope :with_action, ->(param) { where(action: param) unless param.blank? }
+  scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
+  scope :with_access, ->(param) {
+    joins(:intellectual_object)
+        .where("intellectual_objects.access = ?", param) unless param.blank?
+  }
+  scope :with_state, ->(param) {
+    joins(:intellectual_object)
+        .where("intellectual_objects.state = ?", param) unless param.blank?
+  }
 
   # We can't always check the permissions on the related IntellectualObject,
   # because some work items (such as in-progress Ingest items) have no object.

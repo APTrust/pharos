@@ -33,6 +33,12 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :with_bag_name_like, ->(param) { where("intellectual_objects.bag_name like ?", "%#{param}%") unless param.blank? }
   scope :with_title_like, ->(param) { where("intellectual_objects.title like ?", "%#{param}%") unless param.blank? }
+  scope :with_access, ->(param) { where(access: param) unless param.blank? }
+  scope :with_file_format, ->(param) {
+    joins(:generic_file)
+        .where("generic_files.file_format = ?", param) unless param.blank?
+  }
+  scope :with_state, ->(param) { where(state: param) unless param.blank? }
 
   scope :discoverable, ->(current_user) {
     # Any user can discover any item at their institution,
