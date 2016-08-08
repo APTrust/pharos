@@ -147,16 +147,30 @@ class CatalogController < ApplicationController
     set_page_counts
   end
 
+  def set_filter_values
+    @statuses = WorkItem.distinct.pluck(:status)
+    @stages = WorkItem.distinct.pluck(:stage)
+    @actions = WorkItem.distinct.pluck(:action)
+    @institutions = Institution.pluck(:id)
+    @accesses = %w(consortia institution restricted)
+    @formats = GenericFile.distinct.pluck(:file_format)
+    file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
+    item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
+    item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
+    deduped_io_associations = file_associations | item_io_associations
+    @associations = deduped_io_associations + item_gf_associations
+  end
+
   def filter_results
-    filter_by_status
-    filter_by_stage
-    filter_by_action
-    filter_by_institution
-    filter_by_access
-    filter_by_association
-    filter_by_type
-    filter_by_state
-    filter_by_format
+    filter_by_status unless params[:status].nil?
+    filter_by_stage unless params[:stage].nil?
+    filter_by_action unless params[:object_action].nil?
+    filter_by_institution unless params[:institution].nil?
+    filter_by_access unless params[:access].nil?
+    filter_by_association unless params[:association].nil?
+    filter_by_type unless params[:type].nil?
+    filter_by_state unless params[:state].nil?
+    filter_by_format unless params[:file_format].nil?
   end
 
   def filter_by_status
@@ -223,24 +237,6 @@ class CatalogController < ApplicationController
       @results[:files] = @results[:files].with_state(params[:state]) unless @results[:files].nil?
       @results[:items] = @results[:items].with_state(params[:state]) unless @results[:files].nil?
     end
-  end
-
-  def set_filter_values
-    @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
-    @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
-    @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
-    # io_inst = @results[:objects].distinct.pluck(:institution_id) unless @results[:objects].nil?
-    # gf_inst = @results[:files].joins(:intellectual_object).distinct.pluck(:institution_id) unless @results[:files].nil?
-    # wi_inst = @results[:items].distinct.pluck(:institution_id) unless @results[:items].nil?
-    # @institutions = io_inst | gf_inst | wi_inst
-    @institutions = Institution.pluck(:id)
-    @accesses = %w(consortia institution restricted)
-    @formats = GenericFile.distinct.pluck(:file_format)
-    file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
-    item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
-    item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
-    deduped_io_associations = file_associations | item_io_associations
-    @associations = deduped_io_associations + item_gf_associations
   end
 
   def set_page_counts
