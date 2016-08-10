@@ -150,14 +150,14 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should match a search on alt_identifier' do
             get :search, q: '1234', search_field: 'Alternate Identifier', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 1
-            expect(assigns(:paged_results).map &:id).to match_array [@object_two.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_two.id, @item_three.id, @item_five.id]
           end
 
           it 'should match a search on bag_name' do
             get :search, q: '1234', search_field: 'Bag Name', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 2
-            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
           end
 
           it 'should match a search on title' do
@@ -174,8 +174,8 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should match a search on name' do
             get :search, q: '1234', search_field: 'Name', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 1
-            expect(assigns(:paged_results).map &:id).to match_array [@item_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_five.id, @item_five.id]
           end
 
           it 'should match a search on etag' do
@@ -260,8 +260,9 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should not return results that you do not have access to' do
             get :search, q: '1234', search_field: 'Alternate Identifier', object_type: 'All Types'
-            # Only obj with this alt id belongs to another inst
-            expect(assigns(:paged_results).size).to eq 0
+            # doesn't return intellectual object with alt identifier containing terms, does return work item with terms
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_five.id]
           end
         end
       end
@@ -332,8 +333,8 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should filter results by association' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'Work Items', association: @object_four.id
-            expect(assigns(:paged_results).size).to eq 1
-            expect(assigns(:paged_results).map &:id).to match_array [@item_four.id]
+            #expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_four.id, @item_six.id]
           end
 
           it 'should filter results by status' do

@@ -210,10 +210,21 @@ class CatalogController < ApplicationController
   end
 
   def filter_by_association
-    @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
-                                              params[:association], params[:association]) unless @results[:items].nil?
+    puts "before filtering: #{@results[:items].count}"
+    puts "param: #{params[:association]}"
+    #@results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
+                                              #params[:association], params[:association]) unless @results[:items].nil?
+    io_items = @results[:items].where(intellectual_object_id: params[:association]) unless @results[:items].nil?
+    gf_items = @results[:items].where(generic_file_id: params[:association]) unless @results[:items].nil?
+    @results[:items] = io_items | gf_items unless @results[:items].nil?
     @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results[:files].nil?
     @results[:objects] = @results[:objects].where(id: params[:association]) unless @results[:objects].nil?
+    puts "Count test. io results: #{io_items.count}, gf results: #{gf_items.count}, total: #{@results[:items].count}"
+    test = GenericFile.find(gf_items.first)
+    puts "file test: #{test.id}"
+    @results[:items].each do |item|
+      puts "Item io id: #{item.intellectual_object_id}, file id: #{item.generic_file_id}"
+    end
   end
 
   def filter_by_type
