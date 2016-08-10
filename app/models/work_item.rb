@@ -247,14 +247,10 @@ class WorkItem < ActiveRecord::Base
       self.object_identifier = "#{self.institution.identifier}/#{bag_basename}"
     end
     unless self.object_identifier.blank?
-      io = IntellectualObject.where(identifier: self.object_identifier)
-      puts "testing: #{io.count}, id of first object: #{io.first.id}"
-      self.intellectual_object_id = io.first.id
+      self.intellectual_object_id = IntellectualObject.where(identifier: self.object_identifier).first.id
     end
     unless self.generic_file_identifier.blank?
-      gf = GenericFile.where(identifier: self.generic_file_identifier)
-      puts "testing: #{gf.count}, id of first file: #{gf.first.id}"
-      self.generic_file_id = gf.first.id
+      self.generic_file_id = GenericFile.where(identifier: self.generic_file_identifier).first.id
     end
   end
 

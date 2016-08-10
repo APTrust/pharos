@@ -333,8 +333,8 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should filter results by association' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'Work Items', association: @object_four.id
-            #expect(assigns(:paged_results).size).to eq 1
-            expect(assigns(:paged_results).map &:id).to match_array [@item_four.id, @item_six.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_four.id]
           end
 
           it 'should filter results by status' do
