@@ -158,7 +158,7 @@ class CatalogController < ApplicationController
     item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
     item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
     deduped_io_associations = file_associations | item_io_associations
-    @associations = deduped_io_associations + item_gf_associations
+    @associations = file_associations + deduped_io_associations
   end
 
   def filter_results
@@ -212,7 +212,7 @@ class CatalogController < ApplicationController
   def filter_by_association
     @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
                                               params[:association], params[:association]) unless @results[:items].nil?
-    @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results[:files].nil?
+    @results[:files] = @results[:files].where(generic_file_id: params[:association]) unless @results[:files].nil?
     @results[:objects] = @results[:objects].where(id: params[:association]) unless @results[:objects].nil?
   end
 

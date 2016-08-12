@@ -22,8 +22,8 @@ class WorkItem < ActiveRecord::Base
   scope :with_etag_like, ->(param) { where("work_items.etag like ?", "%#{param}%") unless param.blank? }
   scope :with_object_identifier, ->(param) { where(object_identifier: param) unless param.blank? }
   scope :with_object_identifier_like, ->(param) { where("work_items.object_identifier like ?", "%#{param}%") unless param.blank? }
-  scope :with_file_identifier, ->(param) { joins(:generic_file).where(generic_files: {identifier: param}) unless param.blank? }
-  scope :with_file_identifier_like, ->(param) { joins(:generic_file).where("generic_files.identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_file_identifier, ->(param) { where(generic_file_identifier: param) unless param.blank? }
+  scope :with_file_identifier_like, ->(param) { where("work_items.generic_file_identifier like ?", "%#{param}%") unless param.blank? }
   scope :with_status, ->(param) { where(status: param) unless param.blank? }
   scope :with_stage, ->(param) { where(stage: param) unless param.blank? }
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
