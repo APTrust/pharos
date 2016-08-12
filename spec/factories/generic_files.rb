@@ -1,7 +1,7 @@
 FactoryGirl.define do
 
   factory :generic_file do
-    sequence(:id) {|n| n}
+    #sequence(:id) {|n| n}
     intellectual_object { FactoryGirl.create(:intellectual_object) }
     identifier { "#{intellectual_object.identifier}/data/filename.xml" }
     file_format { 'application/xml' }

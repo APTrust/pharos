@@ -9,7 +9,7 @@ FactoryGirl.define do
     alt_identifier { '' }
     bag_name { identifier.split('/')[1] }
     state { 'A' }
-    sequence(:id) {|n| n}
+    #sequence(:id) {|n| n}
 
     factory :consortial_intellectual_object, class: IntellectualObject do
       access { 'consortia' }

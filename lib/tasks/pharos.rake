@@ -97,14 +97,15 @@ namespace :pharos do
         bag_name = "#{name}.tar"
         ident = "#{institution.identifier}/#{name}"
         item = FactoryGirl.create(:intellectual_object, institution: institution, identifier: ident, bag_name: bag_name)
+        item.save!
         item.add_event(FactoryGirl.attributes_for(:premis_event_ingest, detail: 'Metadata recieved from bag.', outcome_detail: 'something', outcome_information: 'Parsed as part of bag submission.'))
         item.add_event(FactoryGirl.attributes_for(:premis_event_identifier, outcome_detail: item.id, outcome_information: 'Assigned by Rake.'))
 
-        # add Work item for intellectual object
-        FactoryGirl.create(:work_item, institution: institution.identifier, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
+        #add Work item for intellectual object
+        FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
 
         5.times.each do |count|
-          FactoryGirl.create(:work_item, institution: institution.identifier)
+          FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name)
         end
 
         num_files = args[:numGenFiles].to_i

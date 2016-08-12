@@ -13,7 +13,7 @@ FactoryGirl.define do
     status { Pharos::Application::PHAROS_STATUSES.values.sample }
     outcome { Faker::Lorem.sentence }
     reviewed { false }
-    object_identifier { FactoryGirl.create(:intellectual_object).identifier }
+    intellectual_object { FactoryGirl.create(:intellectual_object) }
   end
 
   factory :ingested_item, class: WorkItem do
