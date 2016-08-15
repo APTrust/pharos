@@ -1,10 +1,11 @@
 require 'spec_helper'
 
-describe WorkItemsHelper do
+describe ApplicationHelper do
 
   describe '#current_path' do
     it 'should return an updated path with new parameters' do
-      helper.request.path = 'localhost:3000/itemresults'
+      #helper.request.path = 'localhost:3000/itemresults'
+      @current = 'localhost:3000/itemresults'
       name = 'status'
       value = 'Success'
       expected_result = 'localhost:3000/itemresults?status=Success'

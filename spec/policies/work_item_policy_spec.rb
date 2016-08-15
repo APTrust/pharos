@@ -3,10 +3,13 @@ require 'spec_helper'
 describe WorkItemPolicy do
   subject (:work_item_policy) { WorkItemPolicy.new(user, work_item) }
   let(:institution) { FactoryGirl.create(:institution) }
+  let(:intellectual_object) { FactoryGirl.create(:intellectual_object, institution: institution) }
+  let(:other_inst) { FactoryGirl.create(:institution) }
+  let(:other_int_obj) { FactoryGirl.create(:intellectual_object, institution: other_inst) }
 
   context 'for an admin user' do
     let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }
-    let(:work_item) { FactoryGirl.create(:work_item)}
+    let(:work_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: intellectual_object, object_identifier: intellectual_object.identifier)}
 
     it do
       should permit(:create)
@@ -24,7 +27,7 @@ describe WorkItemPolicy do
                                     institution_id: institution.id) }
     describe 'when the item is' do
       describe 'in my institution' do
-        let(:work_item) { FactoryGirl.create(:work_item, institution: institution) }
+        let(:work_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: intellectual_object, object_identifier: intellectual_object.identifier) }
         it do
           should_not permit(:create)
           should_not permit(:new)
@@ -37,7 +40,7 @@ describe WorkItemPolicy do
       end
 
       describe 'not in my institution' do
-        let(:work_item) { FactoryGirl.create(:work_item)}
+        let(:work_item) { FactoryGirl.create(:work_item, institution: other_inst, intellectual_object: other_int_obj, object_identifier: other_int_obj.identifier)}
         it do
           should_not permit(:create)
           should_not permit(:new)
@@ -56,7 +59,7 @@ describe WorkItemPolicy do
                                     institution_id: institution.id) }
     describe 'when the item is' do
       describe 'in my institution' do
-        let(:work_item) { FactoryGirl.create(:work_item, institution: institution) }
+        let(:work_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: intellectual_object, object_identifier: intellectual_object.identifier) }
         it do
           should_not permit(:create)
           should_not permit(:new)
@@ -69,7 +72,7 @@ describe WorkItemPolicy do
       end
 
       describe 'not in my institution' do
-        let(:work_item) { FactoryGirl.create(:work_item)}
+        let(:work_item) { FactoryGirl.create(:work_item, institution: other_inst, intellectual_object: other_int_obj, object_identifier: other_int_obj.identifier)}
         it do
           should_not permit(:create)
           should_not permit(:new)
@@ -85,7 +88,7 @@ describe WorkItemPolicy do
 
   context 'for an authenticated user without a user group' do
     let(:user) { FactoryGirl.create(:user) }
-    let(:work_item) { FactoryGirl.create(:work_item)}
+    let(:work_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: intellectual_object, object_identifier: intellectual_object.identifier)}
     it do
       should_not permit(:create)
       should_not permit(:new)

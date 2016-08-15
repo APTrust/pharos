@@ -9,11 +9,11 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def index?
-    record.first.nil? || user.admin? ||  (user.institution.identifier == record.first.institution)
+    record.first.nil? || user.admin? ||  (user.institution.id == record.first.institution_id)
   end
 
   def search?
-    record.first.nil? || user.admin? || (user.institution.identifier == record.first.institution)
+    record.first.nil? || user.admin? || (user.institution.id == record.first.institution_id)
   end
 
   def admin_api?
@@ -30,7 +30,7 @@ class WorkItemPolicy < ApplicationPolicy
 
   def update?
     user.admin? ||
-        (user.institutional_admin? && (user.institution.identifier == record.institution))
+        (user.institutional_admin? && (user.institution.id == record.institution_id))
   end
 
   def edit?
@@ -38,11 +38,11 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def mark_as_reviewed?
-    user.admin? || (user.institutional_admin? && (user.institution == record.institution))
+    user.admin? || (user.institutional_admin? && (user.institution.id == record.institution_id))
   end
 
   def review_all?
-    record.first.nil? || user.admin? || (user.institutional_admin? && (user.institution == record.first.institution))
+    record.first.nil? || user.admin? || (user.institutional_admin? && (user.institution.id == record.first.institution_id))
   end
 
   def destroy?
@@ -81,7 +81,7 @@ class WorkItemPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       else
-        scope.where(institution: user.institution.identifier)
+        scope.where(institution: user.institution.id)
       end
     end
   end
