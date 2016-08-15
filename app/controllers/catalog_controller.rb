@@ -35,16 +35,16 @@ class CatalogController < ApplicationController
     @page = params[:page].to_i
     @per_page = params[:per_page].to_i
     merge_results
-    @paged_results = Kaminari.paginate_array(@authorized_results).page(@page).per(@per_page)
+    @paged_results = Kaminari.paginate_array(@merged_results).page(@page).per(@per_page)
     @next = format_next
     @current = format_current
     @previous = format_previous
   end
 
   def merge_results
-    @authorized_results = []
-    @results.each { |key, value| @authorized_results += value }
-    @authorized_results
+    @merged_results = []
+    @results.each { |key, value| @merged_results += value }
+    @merged_results
   end
 
   def object_search
@@ -134,7 +134,7 @@ class CatalogController < ApplicationController
       when 'All Fields'
         @results[:objects] = objects.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                               "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        @results[:files] = files.where('identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:items] = items.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                       "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
@@ -158,7 +158,7 @@ class CatalogController < ApplicationController
     item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
     item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
     deduped_io_associations = file_associations | item_io_associations
-    @associations = file_associations + deduped_io_associations
+    @associations = item_gf_associations + deduped_io_associations
   end
 
   def filter_results
@@ -212,7 +212,7 @@ class CatalogController < ApplicationController
   def filter_by_association
     @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
                                               params[:association], params[:association]) unless @results[:items].nil?
-    @results[:files] = @results[:files].where(generic_file_id: params[:association]) unless @results[:files].nil?
+    @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results[:files].nil?
     @results[:objects] = @results[:objects].where(id: params[:association]) unless @results[:objects].nil?
   end
 

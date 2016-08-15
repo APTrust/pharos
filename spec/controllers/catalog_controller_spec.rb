@@ -251,10 +251,7 @@ RSpec.describe CatalogController, type: :controller do
         describe 'for generic searches' do
           it 'should return only the results to which you have access' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'All Types', per_page: 20
-            # 3 inst objects
-            # 1 consortial object
-            # 4 generic files
-            # 4 work items
+            # 3 inst objects, 1 consortial object, 4 generic files, 4 work items
             expect(assigns(:paged_results).size).to eq 12
           end
 
