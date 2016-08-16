@@ -5,52 +5,23 @@ class WorkItemsController < ApplicationController
   before_filter :init_from_params, only: :create
   before_filter :find_and_update, only: :update
 
-  after_action :verify_authorized, :except => [:delete_test_items]
-
-  # TODO: Clean this up.
-  # 1. Change alt_actions to separate routes.
-  # 2. Are we planning on using qq?
-  # 3. Simplify filters to use the scopes defined on the WorkItem model.
-  # 4. Don't calculate @counts for JSON API calls. They should be HTML only.
   def index
     unless (session[:select_notice].nil? || session[:select_notice] == '')
       flash[:notice] = session[:select_notice]
       session[:select_notice] = ''
     end
-    if params[:alt_action].present?
-      case params[:alt_action]
-        when 'show_reviewed'
-          show_reviewed
-        when 'review_all'
-          review_all
-        when 'review_selected'
-          review_selected
-        when 'set_restoration_status'
-          set_restoration_status
-        when 'ingested_since'
-          ingested_since
-        when 'delete_test'
-          delete_test_items
-        when 'restore'
-          items_for_something(params[:alt_action])
-        when 'delete'
-          items_for_something(params[:alt_action])
-        when 'dpn'
-          items_for_something(params[:alt_action])
-        when 'api_search'
-          api_search
-      end
-    elsif params[:qq].present?
-      set_items
-      search
-      filter_items
-      set_filter_values
-      set_various_counts
+    if params[:show_reviewed]
+      show_reviewed
+    elsif params[:review_all]
+      review_all
+    elsif params[:review]
+      review_selected
     else
       set_items
       filter_items
       set_filter_values
       set_various_counts
+      page_results
       if params[:format] == 'json'
         json_list = @items.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
         render json: {count: @count, next: @next, previous: @previous, results: json_list}
@@ -96,6 +67,144 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  def ingested_since
+    since = params[:since]
+    begin
+      dtSince = DateTime.parse(since)
+    rescue
+      # We'll get this below
+    end
+    respond_to do |format|
+      if dtSince == nil
+        authorize WorkItem.new, :admin_api?
+        err = { 'error' => 'Param since must be a valid datetime' }
+        format.json { render json: err, status: :bad_request }
+      else
+        @items = WorkItem.where("action='Ingest' and date >= ?", dtSince)
+        authorize @items, :admin_api?
+        format.json { render json: @items, status: :ok }
+      end
+    end
+  end
+
+  def set_restoration_status
+    # Fix Apache/Passenger passthrough of %2f-encoded slashes in identifier
+    params[:object_identifier] = params[:object_identifier].gsub(/%2F/i, "/")
+    restore = Pharos::Application::PHAROS_ACTIONS['restore']
+    @item = WorkItem.where(object_identifier: params[:object_identifier],
+                           action: restore).order(created_at: :desc).first
+    authorize (@item || WorkItem.new), :set_restoration_status?
+    if @item
+      succeeded = @item.update_attributes(params_for_status_update)
+    end
+    respond_to do |format|
+      if @item.nil?
+        error = { error: "No items for object identifier #{params[:object_identifier]}" }
+        format.json { render json: error, status: :not_found }
+      end
+      if succeeded == false
+        errors = @item.errors.full_messages
+        format.json { render json: errors, status: :bad_request }
+      else
+        format.json { render json: {result: 'OK'}, status: :ok }
+      end
+    end
+  end
+
+  def items_for_restore
+    restore = Pharos::Application::PHAROS_ACTIONS['restore']
+    requested = Pharos::Application::PHAROS_STAGES['requested']
+    pending = Pharos::Application::PHAROS_STATUSES['pend']
+    @items = WorkItem.with_action(restore)
+    @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
+    authorize @items
+    # Get items for a single object, which may consist of multiple bags.
+    # Return anything for that object identifier with action=Restore and retry=true
+    if !request[:object_identifier].blank?
+      @items = @items.with_object_identifier(request[:object_identifier])
+    else
+      # If user is not looking for a single bag, return all requested/pending items.
+      @items = @items.where(stage: requested, status: pending, retry: true)
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
+  def items_for_dpn
+    dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
+    requested = Pharos::Application::PHAROS_STAGES['requested']
+    pending = Pharos::Application::PHAROS_STATUSES['pend']
+    @items = WorkItem.with_action(dpn)
+    @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
+    authorize @items
+    # Get items for a single object, which may consist of multiple bags.
+    # Return anything for that object identifier with action=DPN and retry=true
+    if !request[:object_identifier].blank?
+      @items = @items.with_object_identifier(request[:object_identifier])
+    else
+       # If user is not looking for a single bag, return all requested/pending items.
+       @items = @items.where(stage: requested, status: pending, retry: true)
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
+  def items_for_delete
+    delete = Pharos::Application::PHAROS_ACTIONS['delete']
+    requested = Pharos::Application::PHAROS_STAGES['requested']
+    pending = Pharos::Application::PHAROS_STATUSES['pend']
+    failed = Pharos::Application::PHAROS_STATUSES['fail']
+    @items = WorkItem.with_action(delete)
+    @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
+    authorize @items
+    # Return a record for a single file?
+    if !request[:generic_file_identifier].blank?
+      @items = @items.with_file_identifier(request[:generic_file_identifier])
+    else
+      # If user is not looking for a single bag, return all requested items
+      # where retry is true and status is pending or failed.
+      @items = @items.where(stage: requested, status: [pending, failed], retry: true)
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
+  def api_search
+    authorize WorkItem, :admin_api?
+    current_user.admin? ? @items = WorkItem.all : @items = WorkItem.with_institution(current_user.institution_id)
+    if Rails.env.test? || Rails.env.development?
+      rewrite_params_for_sqlite
+    end
+    search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
+                     :retry, :reviewed, :object_identifier, :generic_file_identifier,
+                     :node, :needs_admin_review, :process_after]
+    search_fields.each do |field|
+      if params[field].present?
+        if field == :bag_date && (Rails.env.test? || Rails.env.development?)
+          @items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+        elsif field == :node and params[field] == 'null'
+          @items = @items.where('node is null')
+        elsif field == :assignment_pending_since and params[field] == 'null'
+          @items = @items.where('assignment_pending_since is null')
+        elsif field == :institution
+          @items = @items.with_institution(params[field])
+        else
+          @items = @items.where(field => params[field])
+        end
+      end
+    end
+
+    if params[:item_action].present?
+      @items = @items.with_action(params[:item_action])
+    end
+    respond_to do |format|
+      format.json { render json: @items, status: :ok }
+    end
+  end
+
   private
 
   def show_reviewed
@@ -107,7 +216,7 @@ class WorkItemsController < ApplicationController
   end
 
   def review_all
-    current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution: current_user.institution)
+    current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution_id: current_user.institution_id)
     authorize items, :review_all?
     items.each do |item|
       if item.date < session[:purge_datetime] && (item.status == Pharos::Application::PHAROS_STATUSES['success'] || item.status == Pharos::Application::PHAROS_STATUSES['fail'])
@@ -145,129 +254,6 @@ class WorkItemsController < ApplicationController
     end
   end
 
-  def set_restoration_status
-    # Fix Apache/Passenger passthrough of %2f-encoded slashes in identifier
-    params[:object_identifier] = params[:object_identifier].gsub(/%2F/i, "/")
-    restore = Pharos::Application::PHAROS_ACTIONS['restore']
-    @item = WorkItem.where(object_identifier: params[:object_identifier],
-                           action: restore).order(created_at: :desc).first
-    authorize (@item || WorkItem.new), :set_restoration_status?
-    if @item
-      succeeded = @item.update_attributes(params_for_status_update)
-    end
-    respond_to do |format|
-      if @item.nil?
-        error = { error: "No items for object identifier #{params[:object_identifier]}" }
-        format.json { render json: error, status: :not_found }
-      end
-      if succeeded == false
-        errors = @item.errors.full_messages
-        format.json { render json: errors, status: :bad_request }
-      else
-        format.json { render json: {result: 'OK'}, status: :ok }
-      end
-    end
-  end
-
-  def ingested_since
-    since = params[:since]
-    begin
-      dtSince = DateTime.parse(since)
-    rescue
-      # We'll get this below
-    end
-    respond_to do |format|
-      if dtSince == nil
-        authorize WorkItem.new, :admin_api?
-        err = { 'error' => 'Param since must be a valid datetime' }
-        format.json { render json: err, status: :bad_request }
-      else
-        @items = WorkItem.where("action='Ingest' and date >= ?", dtSince)
-        authorize @items, :admin_api?
-        format.json { render json: @items, status: :ok }
-      end
-    end
-  end
-
-  # TODO: Simplify and use scopes on WorkItem model.
-  def items_for_something(alt_action)
-    case alt_action
-      when 'dpn'
-        authorize WorkItem, :items_for_dpn?
-        item_action = Pharos::Application::PHAROS_ACTIONS['dpn']
-      when 'restore'
-        authorize WorkItem, :items_for_restore?
-        item_action = Pharos::Application::PHAROS_ACTIONS['restore']
-      when 'delete'
-        authorize WorkItem, :items_for_delete?
-        item_action = Pharos::Application::PHAROS_ACTIONS['delete']
-        failed = Pharos::Application::PHAROS_STATUSES['fail']
-    end
-    requested = Pharos::Application::PHAROS_STAGES['requested']
-    pending = Pharos::Application::PHAROS_STATUSES['pend']
-    @items = WorkItem.where(action: item_action)
-    @items = @items.where(institution: current_user.institution.identifier) unless current_user.admin?
-    authorize @items, :admin_api?
-    if !request[:object_identifier].blank?
-      @items = @items.where(object_identifier: request[:object_identifier])
-    elsif !request[:generic_file_identifier].blank?
-      @items = @items.where(generic_file_identifier: request[:generic_file_identifier])
-    else
-      failed ? @items = @items.where(stage: requested, status: [pending, failed], retry: true) :
-          @items = @items.where(stage: requested, status: pending, retry: true)
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
-
-  # TODO: Do we need this? Just use index with scopes.
-  def search
-    search_param = "%#{params[:qq]}%"
-    field = params[:pi_search_field]
-    if field == 'Name'
-      @items = @items.where('name LIKE ?', search_param)
-    elsif field == 'Etag'
-      @items = @items.where('etag LIKE ?', search_param)
-    elsif params[:qq] == '*'
-      @items = @items
-    else
-      @items = @items.where('name LIKE ? OR etag LIKE ?', search_param, search_param)
-    end
-  end
-
-  # TODO: Do we need this? Just use index with scopes.
-  def api_search
-    authorize WorkItem, :admin_api?
-    current_user.admin? ? @items = WorkItem.all : @items = WorkItem.where(institution: current_user.institution.identifier)
-    if Rails.env.test? || Rails.env.development?
-      rewrite_params_for_sqlite
-    end
-    search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
-                     :retry, :reviewed, :object_identifier, :generic_file_identifier,
-                     :node, :needs_admin_review, :process_after]
-    search_fields.each do |field|
-      if params[field].present?
-        if field == :bag_date && (Rails.env.test? || Rails.env.development?)
-          @items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
-        elsif field == :node and params[field] == 'null'
-          @items = @items.where('node is null')
-        elsif field == :assignment_pending_since and params[field] == 'null'
-          @items = @items.where('assignment_pending_since is null')
-        else
-          @items = @items.where(field => params[field])
-        end
-      end
-    end
-
-    if params[:item_action].present?
-      @items = @items.where(action: params[:item_action])
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
-
   def init_from_params
     @work_item = WorkItem.new(work_item_params)
     @work_item.user = current_user.email
@@ -286,47 +272,30 @@ class WorkItemsController < ApplicationController
     @statuses = Pharos::Application::PHAROS_STATUSES.values
     @stages = Pharos::Application::PHAROS_STAGES.values
     @actions = Pharos::Application::PHAROS_ACTIONS.values
-    @institutions = Array.new
-    Institution.all.each do |inst|
-      @institutions.push(inst.identifier) unless inst.identifier == 'aptrust.org'
-    end
+    @institutions = Institution.pluck(:id)
   end
 
-  # TODO: Do we need this? Just use index with scopes.
   def filter_items
     date = format_date if params[:updated_since].present?
     pattern = '%' + params[:name_contains] + '%' if params[:name_contains].present?
-    @items = @items.where(name: params[:name_exact]) if params[:name_exact].present?
-    @items = @items.where('name LIKE ?', pattern) if params[:name_contains].present?
-    @items = @items.where('updated_at >= ?', date) if params[:updated_since].present?
-    @selected = {}
-    if params[:status].present?
-      @items = @items.where(status: Pharos::Application::PHAROS_STATUSES[params[:status]])
-      @selected[:status] = params[:status]
-    end
-    if params[:stage].present?
-      @items = @items.where(stage: Pharos::Application::PHAROS_STAGES[params[:stage]])
-      @selected[:stage] = params[:stage]
-    end
-    if params[:item_action].present?
-      @items = @items.where(action: Pharos::Application::PHAROS_ACTIONS[params[:item_action]])
-      @selected[:item_action] = params[:item_action]
-    end
-    if params[:institution].present?
-      @items = @items.where(institution: params[:institution])
-      @selected[:institution] = params[:institution]
-    end
-    @items = @items.where(reviewed: to_boolean(params[:reviewed])) if params[:reviewed].present?
+    @items = @items.with_name(params[:name_exact])
+    @items = @items.with_name_like(pattern) if pattern
+    @items = @items.updated_after(date) if date
+    @items = @items.with_status(Pharos::Application::PHAROS_STATUSES[params[:status]])
+    @items = @items.with_stage(Pharos::Application::PHAROS_STAGES[params[:stage]])
+    @items = @items.with_action(Pharos::Application::PHAROS_ACTIONS[params[:item_action]])
+    @items = @items.with_institution(params[:institution])
+    @items = @items.reviewed(to_boolean(params[:reviewed]))
   end
 
-  # TODO: Don't call this for JSON API requests.
-  # Move page/per_page/next/previous
   def set_various_counts
-    @counts = {}
-    @statuses.each { |status| @counts[status] = @items.where(status: status).count() }
-    @stages.each { |stage| @counts[stage] = @items.where(stage: stage).count() }
-    @actions.each { |action| @counts[action] = @items.where(action: action).count() }
-    @institutions.each { |institution| @counts[institution] = @items.where(institution: institution).count() }
+    unless params[:format] == 'json'
+      @counts = {}
+      @statuses.each { |status| @counts[status] = @items.where(status: status).count() }
+      @stages.each { |stage| @counts[stage] = @items.where(stage: stage).count() }
+      @actions.each { |action| @counts[action] = @items.where(action: action).count() }
+      @institutions.each { |institution| @counts[institution] = @items.where(institution: institution).count() }
+    end
 
     @count = @items.count
     if @count == 0
@@ -340,7 +309,9 @@ class WorkItemsController < ApplicationController
       @first_number = @second_number.to_i - 9
     end
     @second_number = @count if @second_number > @count
+  end
 
+  def page_results
     params[:page] = 1 unless params[:page].present?
     params[:per_page] = 10 unless params[:per_page].present?
     page = params[:page].to_i
@@ -362,15 +333,14 @@ class WorkItemsController < ApplicationController
                   :state, :node, :pid, :needs_admin_review)
   end
 
-  # TODO: Do we need this? Just use index with scopes.
   def set_items
     if current_user.admin?
-      params[:institution].present? ? @items = WorkItem.where(institution: params[:institution]) : @items = WorkItem.all
+      params[:institution].present? ? @items = WorkItem.with_institution(params[:institution]) : @items = WorkItem.all
     else
       @items = WorkItem.readable(current_user)
     end
-    params[:institution].present? ? @institution = Institution.where(identifier: params[:institution]) : @institution = current_user.institution
-    @items = @items.where(reviewed: false) unless session[:show_reviewed] == 'true'
+    params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
+    @items = @items.reviewed(false) unless session[:show_reviewed] == 'true'
     params[:sort] = 'date' if params[:sort].nil?
     @items = @items.order(params[:sort])
     @items = @items.reverse_order if params[:sort] == 'date'

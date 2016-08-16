@@ -36,6 +36,13 @@ Rails.application.routes.draw do
   resources :work_items, format: :json, only: [:index], path: 'member-api/v1/items'
   get '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   put '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
+  get 'items/items_for_dpn', to: 'work_items#items_for_dpn', format: :json
+  get 'items/items_for_restore', to: 'work_items#items_for_restore', format: :json
+  get 'items/items_for_delete', to: 'work_items#items_for_delete', format: :json
+  get 'items/ingested_since', to: 'work_items#ingested_since', format: :json
+  get 'items/set_restoration_status', to: 'work_items#set_restoration_status', format: :json
+  get 'api/v2/items/search', to: 'work_items#api_search', format: :json
+
 
   # CATALOG ROUTES
   post 'search/', to: 'catalog#search', format: [:json, :html], as: :search

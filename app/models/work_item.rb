@@ -13,9 +13,9 @@ class WorkItem < ActiveRecord::Base
 
   ### Scopes
   scope :created_before, ->(param) { where("work_items.created_at < ?", param) unless param.blank? }
-  scope :created_after, ->(param) { where("work_items.created_at > ?", param) unless param.blank? }
+  scope :created_after, ->(param) { where("work_items.created_at >= ?", param) unless param.blank? }
   scope :updated_before, ->(param) { where("work_items.updated_at < ?", param) unless param.blank? }
-  scope :updated_after, ->(param) { where("work_items.updated_at > ?", param) unless param.blank? }
+  scope :updated_after, ->(param) { where("work_items.updated_at >= ?", param) unless param.blank? }
   scope :with_name, ->(param) { where(name: param) unless param.blank? }
   scope :with_name_like, ->(param) { where("work_items.name like ?", "%#{param}%") unless param.blank? }
   scope :with_etag, ->(param) { where(etag: param) unless param.blank? }
@@ -28,6 +28,7 @@ class WorkItem < ActiveRecord::Base
   scope :with_stage, ->(param) { where(stage: param) unless param.blank? }
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
+  scope :reviewed, ->(param) { where(reviewed: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where("intellectual_objects.access = ?", param) unless param.blank?

@@ -208,18 +208,18 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code' do
-        get :index, alt_action: 'restore', format: :json
+        get :items_for_restore, format: :json
         expect(response).to be_success
       end
 
       it 'assigns the correct @items' do
-        get :index, alt_action: 'restore', format: :json
+        get :items_for_restore, format: :json
         expect(assigns(:items).count).to eq(WorkItem.count)
       end
 
       it 'does not include items where retry == false' do
         WorkItem.update_all(retry: false)
-        get :index, alt_action: 'restore', format: :json
+        get :items_for_restore, format: :json
         expect(assigns(:items).count).to eq(0)
       end
 
@@ -238,7 +238,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts access to the admin API' do
-        get :index, alt_action: 'restore', format: :json
+        get :items_for_restore, format: :json
         expect(response.status).to eq 403
       end
     end
@@ -256,7 +256,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should return only items with the specified object_identifier' do
-        get :index, alt_action: 'restore', object_identifier: 'mickey/mouse', format: :json
+        get :items_for_restore, object_identifier: 'mickey/mouse', format: :json
         expect(assigns(:items).count).to eq(2)
       end
     end
@@ -273,18 +273,18 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code' do
-        get :index, alt_action: 'dpn', format: :json
+        get :items_for_dpn, format: :json
         expect(response).to be_success
       end
 
       it 'assigns the correct @items' do
-        get :index, alt_action: 'dpn', format: :json
+        get :items_for_dpn, format: :json
         expect(assigns(:items).count).to eq(WorkItem.count)
       end
 
       it 'does not include items where retry == false' do
         WorkItem.update_all(retry: false)
-        get :index, alt_action: 'dpn', format: :json
+        get :items_for_dpn, format: :json
         expect(assigns(:items).count).to eq(0)
       end
 
@@ -303,7 +303,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts access to the admin API' do
-        get :index, alt_action: 'dpn', format: :json
+        get :items_for_dpn, format: :json
         expect(response.status).to eq 403
       end
     end
@@ -321,7 +321,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should return only items with the specified object_identifier' do
-        get :index, alt_action: 'dpn', object_identifier: 'mickey/mouse', format: :json
+        get :items_for_dpn, object_identifier: 'mickey/mouse', format: :json
         expect(assigns(:items).count).to eq(2)
       end
     end
@@ -338,18 +338,18 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code' do
-        get :index, alt_action: 'delete', format: :json
+        get :items_for_delete, format: :json
         expect(response).to be_success
       end
 
       it 'assigns the correct @items' do
-        get :index, alt_action: 'delete', format: :json
+        get :items_for_delete, format: :json
         expect(assigns(:items).count).to eq(WorkItem.count)
       end
 
       it 'does not include items where retry == false' do
         WorkItem.update_all(retry: false)
-        get :index, alt_action: 'delete', format: :json
+        get :items_for_delete, format: :json
         expect(assigns(:items).count).to eq(0)
       end
 
@@ -367,7 +367,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts access to the admin API' do
-        get :index, alt_action: 'delete', format: :json
+        get :items_for_delete, format: :json
         expect(response.status).to eq 403
       end
     end
@@ -393,7 +393,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should return only items with the specified object_identifier' do
-        get :index, alt_action: 'delete', generic_file_identifier: file.identifier, format: :json
+        get :items_for_delete, generic_file_identifier: file.identifier, format: :json
         expect(assigns(:items).count).to eq(2)
       end
     end
@@ -411,13 +411,13 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier:object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier:object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
         expect(response).to be_success
       end
 
       it 'assigns the correct @item' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Buzz', retry: true)
         expected_item = WorkItem.where(object_identifier: object.identifier).order(created_at: :desc).first
         expect(assigns(:item).id).to eq(expected_item.id)
@@ -426,7 +426,7 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'updates the correct @item' do
         new_object = FactoryGirl.create(:intellectual_object)
         WorkItem.first.update(object_identifier: new_object.identifier, intellectual_object: new_object)
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
         update_count = WorkItem.where(object_identifier: object.identifier,
                                            stage: 'Resolve', status: 'Success', retry: true).count
@@ -435,19 +435,19 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'returns 404 for no matching records' do
         WorkItem.update_all(object_identifier: 'homer/simpson')
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Neil', retry: true)
         expect(response.status).to eq(404)
       end
 
       it 'returns 400 for bad request' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Invalid_Stage', status: 'Invalid_Status', note: 'Armstrong', retry: true)
         expect(response.status).to eq(400)
       end
 
       it 'updates node, state, pid and needs_admin_review' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
              node: '10.11.12.13', state: '{JSON data}', pid: 4321, needs_admin_review: true)
         expect(response).to be_success
@@ -460,7 +460,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'clears node, pid and needs_admin_review, updates state' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
              node: nil, pid: 0, state: '{new JSON data}', needs_admin_review: false)
         expect(response).to be_success
@@ -491,7 +491,7 @@ RSpec.describe WorkItemsController, type: :controller do
       # record (the latest). None of the older restore requests should
       # be touched.
       it 'updates the correct @items' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
         update_count = WorkItem.where(object_identifier: object.identifier,
                                            stage: 'Resolve', status: 'Success', retry: true).count
@@ -523,7 +523,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts access to the admin API' do
-        post(:index, alt_action: 'set_restoration_status', format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
         expect(response.status).to eq 403
       end
@@ -647,13 +647,13 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update an item's review field to true" do
-        post :index, alt_action: 'review_selected', review: [item_id], format: :json
+        post :index, review: [item_id], format: :json
         expect(response.status).to eq(200)
         WorkItem.find(item.id).reviewed.should eq(true)
       end
 
       it 'should not review a working item' do
-        post :index, alt_action: 'review_selected', review: [work_id], format: :json
+        post :index, review: [work_id], format: :json
         expect(response.status).to eq(200)
         WorkItem.find(working_item.id).reviewed.should eq(false)
       end
@@ -670,7 +670,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update an item's review field to true" do
-        post :index, alt_action: 'review_selected', review: [user_id], format: :json
+        post :index, review: [user_id], format: :json
         expect(response.status).to eq(200)
         WorkItem.find(user_item.id).reviewed.should eq(true)
       end
@@ -692,12 +692,12 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'should reset the purge datetime in the session variable' do
         time_before = session[:purge_datetime]
-        get :index, alt_action: 'review_all'
+        get :index, review_all: true
         session[:purge_datetime].should_not eq(time_before)
       end
 
       it "should update all item's review fields to true" do
-        get :index, alt_action: 'review_all'
+        get :index, review_all: true
         expect(response.status).to eq(302)
         WorkItem.find(failed_item.id).reviewed.should eq(true)
       end
@@ -710,7 +710,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it "should update all items associated with user's institution's review fields to true" do
-        get :index, alt_action: 'review_all'
+        get :index, review_all: true
         expect(response.status).to eq(302)
         WorkItem.find(second_item.id).reviewed.should eq(true)
       end
@@ -732,7 +732,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
     it 'admin can get items ingested since' do
       sign_in user
-      get :index, alt_action: 'ingested_since', since: '2009-01-01', format: :json
+      get :ingested_since, since: '2009-01-01', format: :json
       expect(response).to be_successful
       expect(assigns(:items).length).to eq 10
     end
@@ -740,72 +740,17 @@ RSpec.describe WorkItemsController, type: :controller do
     it 'missing date causes error' do
       sign_in user
       expected = { 'error' => 'Param since must be a valid datetime' }.to_json
-      get :index, alt_action: 'ingested_since', since: '', format: :json
+      get :ingested_since, since: '', format: :json
       expect(response.status).to eq 400
       expect(response.body).to eq expected
     end
 
     it 'non admin users can not use API ingested since route' do
       sign_in other_user
-      get :index, alt_action: 'ingested_since', since: '2009-01-01', format: :json
+      get :ingested_since, since: '2009-01-01', format: :json
       expect(response.status).to eq 403
     end
 
-  end
-
-  describe 'GET #search' do
-    let(:user) { FactoryGirl.create(:user, :admin) }
-    before do
-      WorkItem.delete_all
-    end
-
-    describe 'when not signed in' do
-      it 'should redirect to login' do
-        get :index, institution_id: 'apt:123'
-        expect(response).to redirect_to root_url + 'users/sign_in'
-      end
-    end
-
-    describe 'when some objects are in the repository and signed in' do
-      let!(:object1) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1234567890') }
-      let!(:object2) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1238907543') }
-      let!(:object3) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1') }
-      let!(:object4) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '2') }
-      let!(:item1) { FactoryGirl.create(:work_item, name: '1234567890.tar', etag: '3', object_identifier: object1.identifier) }
-      let!(:item2) { FactoryGirl.create(:work_item, name: '1238907543.tar', etag: '4', object_identifier: object1.identifier) }
-      let!(:item3) { FactoryGirl.create(:work_item, name: '1', etag: '1548cdbe82348bdd32mds', object_identifier: object1.identifier) }
-      let!(:item4) { FactoryGirl.create(:work_item, name: '2', etag: '23045ldk2383xd320932k', object_identifier: object1.identifier) }
-      before { sign_in user }
-      it 'should bring back all objects on an * search' do
-        get :index, search_field: 'All Fields', qq: '*'
-        expect(response).to be_successful
-        expect(assigns(:items).map &:id).to match_array [item1.id, item2.id, item3.id, item4.id]
-      end
-
-      it 'should match a partial search on name' do
-        get :index, search_field: 'Name', qq: '123'
-        expect(response).to be_successful
-        expect(assigns(:items).map &:id).to match_array [item1.id, item2.id]
-      end
-
-      it 'should match an exact search on name' do
-        get :index, search_field: 'Name', qq: '1238907543.tar'
-        expect(response).to be_successful
-        expect(assigns(:items).map &:id).to match_array [item2.id]
-      end
-
-      it 'should match a partial search on etag' do
-        get :index, search_field: 'Etag', qq: '32'
-        expect(response).to be_successful
-        expect(assigns(:items).map &:id).to match_array [item3.id, item4.id]
-      end
-
-      it 'should match an exact search on etag' do
-        get :index, search_field: 'Etag', qq: '1548cdbe82348bdd32mds'
-        expect(response).to be_successful
-        expect(assigns(:items).map &:id).to match_array [item3.id]
-      end
-    end
   end
 
   describe 'GET #api_search' do
@@ -829,7 +774,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns all records when no criteria specified' do
-        get :index, alt_action: 'api_search', format: :json
+        get :api_search, format: :json
         assigns(:items).should include(user_item)
         assigns(:items).should include(item)
         assigns(:items).should include(item1)
@@ -839,7 +784,7 @@ RSpec.describe WorkItemsController, type: :controller do
       # request, or SQLite search fails. Also be sure to include
       # the Z at the end of the bag_date string.
       it 'filters down to the right records' do
-        get(:index, alt_action: 'api_search', format: :json, name: 'item1.tar',
+        get(:api_search, format: :json, name: 'item1.tar',
             etag: 'etag1', institution: institution,
             retry: 'true', reviewed: 'false',
             bag_date: '2014-10-17 14:56:56Z',
@@ -852,14 +797,14 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'filters on new fields' do
-        get(:index, alt_action: 'api_search', format: :json, node: '10.11.12.13', needs_admin_review: false)
+        get(:api_search, format: :json, node: '10.11.12.13', needs_admin_review: false)
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)
       end
 
       it 'filters down to null nodes' do
-        get(:index, alt_action: 'api_search', format: :json, node: 'null')
+        get(:api_search, format: :json, node: 'null')
         assigns(:items).should include(user_item)
         assigns(:items).should include(item)
         assigns(:items).should_not include(item1)
@@ -872,7 +817,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage' do
-        get :index, alt_action: 'api_search', format: 'json'
+        get :api_search, format: 'json'
         expect(response.status).to eq 403
       end
     end
