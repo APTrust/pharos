@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160803161351) do
+ActiveRecord::Schema.define(version: 20160816201203) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -147,11 +147,12 @@ ActiveRecord::Schema.define(version: 20160803161351) do
     t.boolean  "reviewed",                            default: false
     t.string   "object_identifier"
     t.string   "generic_file_identifier"
-    t.text     "state"
     t.string   "node",                    limit: 255
     t.integer  "pid",                                 default: 0
     t.boolean  "needs_admin_review",                  default: false, null: false
     t.integer  "institution_id"
+    t.datetime "queued_at"
+    t.binary   "state"
   end
 
   add_index "work_items", ["action"], name: "index_work_items_on_action"
