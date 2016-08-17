@@ -1,4 +1,5 @@
 class WorkItemsController < ApplicationController
+  include SearchAndIndex
   respond_to :html, :json
   before_filter :authenticate_user!
   before_filter :set_item, only: :show
@@ -18,12 +19,11 @@ class WorkItemsController < ApplicationController
       review_selected
     else
       set_items
-      filter_items
-      set_filter_values
-      set_various_counts
-      page_results
+      filter
+      sort
+      page_results(@items)
       if params[:format] == 'json'
-        json_list = @items.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
+        json_list = @paged_results.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
         render json: {count: @count, next: @next, previous: @previous, results: json_list}
       end
     end
@@ -268,59 +268,6 @@ class WorkItemsController < ApplicationController
     end
   end
 
-  def set_filter_values
-    @statuses = Pharos::Application::PHAROS_STATUSES.values
-    @stages = Pharos::Application::PHAROS_STAGES.values
-    @actions = Pharos::Application::PHAROS_ACTIONS.values
-    @institutions = Institution.pluck(:id)
-  end
-
-  def filter_items
-    date = format_date if params[:updated_since].present?
-    pattern = '%' + params[:name_contains] + '%' if params[:name_contains].present?
-    @items = @items.with_name(params[:name_exact])
-    @items = @items.with_name_like(pattern) if pattern
-    @items = @items.updated_after(date) if date
-    @items = @items.with_status(Pharos::Application::PHAROS_STATUSES[params[:status]])
-    @items = @items.with_stage(Pharos::Application::PHAROS_STAGES[params[:stage]])
-    @items = @items.with_action(Pharos::Application::PHAROS_ACTIONS[params[:item_action]])
-    @items = @items.with_institution(params[:institution])
-    @items = @items.reviewed(to_boolean(params[:reviewed]))
-  end
-
-  def set_various_counts
-    unless params[:format] == 'json'
-      @counts = {}
-      @statuses.each { |status| @counts[status] = @items.where(status: status).count() }
-      @stages.each { |stage| @counts[stage] = @items.where(stage: stage).count() }
-      @actions.each { |action| @counts[action] = @items.where(action: action).count() }
-      @institutions.each { |institution| @counts[institution] = @items.where(institution: institution).count() }
-    end
-
-    @count = @items.count
-    if @count == 0
-      @second_number = 0
-      @first_number = 0
-    elsif params[:page].nil?
-      @second_number = 10
-      @first_number = 1
-    else
-      @second_number = params[:page].to_i * 10
-      @first_number = @second_number.to_i - 9
-    end
-    @second_number = @count if @second_number > @count
-  end
-
-  def page_results
-    params[:page] = 1 unless params[:page].present?
-    params[:per_page] = 10 unless params[:per_page].present?
-    page = params[:page].to_i
-    per_page = params[:per_page].to_i
-    @items = @items.page(page).per(per_page)
-    @next = format_next(page, per_page)
-    @previous = format_previous(page, per_page)
-  end
-
   def work_item_params
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
                                       :institution_id, :date, :note, :action,
@@ -390,50 +337,30 @@ class WorkItemsController < ApplicationController
     end
   end
 
-  def format_date
-    time = Time.parse(params[:updated_since])
-    time.utc.iso8601
+  def filter
+    set_filter_values
+    filter_by_status unless params[:status].nil?
+    filter_by_stage unless params[:stage].nil?
+    filter_by_action unless params[:item_action].nil?
+    filter_by_institution unless params[:institution].nil?
+    filter_by_access unless params[:access].nil?
+    filter_by_association unless params[:association].nil?
+    filter_by_state unless params[:state].nil?
+    date = format_date if params[:updated_since].present?
+    pattern = '%' + params[:name_contains] + '%' if params[:name_contains].present?
+    @items = @items.with_name(params[:name_exact])
+    @items = @items.with_name_like(pattern) if pattern
+    @items = @items.updated_after(date) if date
+    @items = @items.reviewed(to_boolean(params[:reviewed]))
+    set_status_count(@items)
+    set_stage_count(@items)
+    set_action_count(@items)
+    set_inst_count(@items)
+    set_access_count(@items)
+    set_io_assc_count(@items)
+    set_gf_assc_count(@items)
+    count = @items.count
+    set_page_counts(count)
   end
 
-  def to_boolean(str)
-    str == 'true'
-  end
-
-  def format_next(page, per_page)
-    if @count.to_f / per_page <= page
-      nil
-    else
-      path = request.fullpath.split('?').first
-      new_page = page + 1
-      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{per_page}"
-      new_url = add_params(new_url)
-      new_url
-    end
-  end
-
-  def format_previous(page, per_page)
-    if page == 1
-      nil
-    else
-      path = request.fullpath.split('?').first
-      new_page = page - 1
-      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{per_page}"
-      new_url = add_params(new_url)
-      new_url
-    end
-  end
-
-  def add_params(str)
-    str = str << "&updated_since=#{params[:updated_since]}" if params[:updated_since].present?
-    str = str << "&name_exact=#{params[:name_exact]}" if params[:name_exact].present?
-    str = str << "&name_contains=#{params[:name_contains]}" if params[:name_contains].present?
-    str = str << "&institution=#{params[:institution]}" if params[:institution].present?
-    str = str << "&actions=#{params[:item_action]}" if params[:item_action].present?
-    str = str << "&stage=#{params[:stage]}" if params[:stage].present?
-    str = str << "&status=#{params[:status]}" if params[:status].present?
-    str = str << "&reviewed=#{params[:reviewed]}" if params[:reviewed].present?
-    str = str << "&node=#{params[:node]}" if params[:node].present?
-    str = str << "&reviewed=#{params[:needs_admin_review]}" if params[:needs_admin_review].present?
-    str
-  end
 end

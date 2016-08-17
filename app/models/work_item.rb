@@ -12,18 +12,18 @@ class WorkItem < ActiveRecord::Base
   before_save :set_object_identifier_if_ingested
 
   ### Scopes
-  scope :created_before, ->(param) { where("work_items.created_at < ?", param) unless param.blank? }
-  scope :created_after, ->(param) { where("work_items.created_at >= ?", param) unless param.blank? }
-  scope :updated_before, ->(param) { where("work_items.updated_at < ?", param) unless param.blank? }
-  scope :updated_after, ->(param) { where("work_items.updated_at >= ?", param) unless param.blank? }
+  scope :created_before, ->(param) { where('work_items.created_at < ?', param) unless param.blank? }
+  scope :created_after, ->(param) { where('work_items.created_at >= ?', param) unless param.blank? }
+  scope :updated_before, ->(param) { where('work_items.updated_at < ?', param) unless param.blank? }
+  scope :updated_after, ->(param) { where('work_items.updated_at >= ?', param) unless param.blank? }
   scope :with_name, ->(param) { where(name: param) unless param.blank? }
-  scope :with_name_like, ->(param) { where("work_items.name like ?", "%#{param}%") unless param.blank? }
+  scope :with_name_like, ->(param) { where('work_items.name like ?', "%#{param}%") unless param.blank? }
   scope :with_etag, ->(param) { where(etag: param) unless param.blank? }
-  scope :with_etag_like, ->(param) { where("work_items.etag like ?", "%#{param}%") unless param.blank? }
+  scope :with_etag_like, ->(param) { where('work_items.etag like ?', "%#{param}%") unless param.blank? }
   scope :with_object_identifier, ->(param) { where(object_identifier: param) unless param.blank? }
-  scope :with_object_identifier_like, ->(param) { where("work_items.object_identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_object_identifier_like, ->(param) { where('work_items.object_identifier like ?', "%#{param}%") unless param.blank? }
   scope :with_file_identifier, ->(param) { where(generic_file_identifier: param) unless param.blank? }
-  scope :with_file_identifier_like, ->(param) { where("work_items.generic_file_identifier like ?", "%#{param}%") unless param.blank? }
+  scope :with_file_identifier_like, ->(param) { where('work_items.generic_file_identifier like ?', "%#{param}%") unless param.blank? }
   scope :with_status, ->(param) { where(status: param) unless param.blank? }
   scope :with_stage, ->(param) { where(stage: param) unless param.blank? }
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
@@ -31,11 +31,11 @@ class WorkItem < ActiveRecord::Base
   scope :reviewed, ->(param) { where(reviewed: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
-        .where("intellectual_objects.access = ?", param) unless param.blank?
+        .where('intellectual_objects.access = ?', param) unless param.blank?
   }
   scope :with_state, ->(param) {
     joins(:intellectual_object)
-        .where("intellectual_objects.state = ?", param) unless param.blank?
+        .where('intellectual_objects.state = ?', param) unless param.blank?
   }
 
   # We can't always check the permissions on the related IntellectualObject,
@@ -53,9 +53,9 @@ class WorkItem < ActiveRecord::Base
 
   def self.pending_action(intellectual_object_identifier)
     item = WorkItem
-      .where("object_identifier = ? " +
-             "and status not in (?, ?, ?) " +
-             "and action in (?, ?, ?, ?)",
+      .where('object_identifier = ? ' +
+             'and status not in (?, ?, ?) ' +
+             'and action in (?, ?, ?, ?)',
              intellectual_object_identifier,
              Pharos::Application::PHAROS_STATUSES['success'],
              Pharos::Application::PHAROS_STATUSES['fail'],

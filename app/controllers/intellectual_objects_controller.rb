@@ -1,4 +1,5 @@
 class IntellectualObjectsController < ApplicationController
+  include SearchAndIndex
   inherit_resources
   before_filter :authenticate_user!
   before_action :load_institution, only: [:index, :create]
@@ -6,10 +7,9 @@ class IntellectualObjectsController < ApplicationController
 
   def index
     authorize @institution
-    # TODO: Replace alt_action param with urls /restore/ and /dpn/
     user_institution = current_user.admin? ? nil : current_user.institution
-    # TODO: Add bag_name and etag. Add discoverable?
     @intellectual_objects = IntellectualObject
+      .discoverable
       .with_institution(user_institution)
       .with_institution(params[:institution_id])
       .with_description(params[:description])
@@ -18,12 +18,18 @@ class IntellectualObjectsController < ApplicationController
       .with_identifier_like(params[:identifier_like])
       .with_alt_identifier(params[:alt_identifier])
       .with_alt_identifier_like(params[:alt_identifier_like])
+      .with_bag_name(params[:bag_name])
+      .with_bag_name_like(params[:bag_name_like])
+      .with_etag(params[:etag])
+      .with_etag_like(params[:etag_like])
       .with_state(params[:state])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
       .updated_before(params[:updated_before])
       .updated_after(params[:updated_after])
-    prep_search_incidentals
+    filter
+    sort
+    page_results(@intellectual_objects)
     respond_to do |format|
       format.json { render json: {count: @count, next: @next, previous: @previous, results: @intellectual_objects.map{ |item| item.serializable_hash(include: [:etag])}} }
       format.html {
@@ -129,8 +135,6 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  # PUT objects/:intellectual_object_identifier/dpn
-  # TODO: Expose this in the member API
   def send_to_dpn
     authorize @intellectual_object, :dpn?
     dpn_item = nil
@@ -170,8 +174,6 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  # PUT objects/:intellectual_object_identifier/restore
-  # TODO: Expose this in the member API
   def restore
     authorize @intellectual_object, :restore?
     message = ""
@@ -210,19 +212,6 @@ class IntellectualObjectsController < ApplicationController
   def redirect_after_update
     intellectual_object_path(resource)
   end
-
-  def prep_search_incidentals
-    @count = @intellectual_objects.count
-    params[:page] = 1 unless params[:page].present?
-    params[:per_page] = 10 unless params[:per_page].present?
-    page = params[:page].to_i
-    per_page = params[:per_page].to_i
-    start = ((page - 1) * per_page)
-    @intellectual_objects = @intellectual_objects.offset(start).limit(per_page)
-    @next = format_next(page, per_page)
-    @previous = format_previous(page, per_page)
-  end
-
 
   private
 
@@ -294,39 +283,17 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def format_next(page, per_page)
-    if @count.to_f / per_page <= page
-      nil
-    else
-      path = request.fullpath.split('?').first
-      new_page = page + 1
-      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{per_page}"
-      new_url = add_params(new_url)
-      new_url
-    end
+  def filter
+    set_filter_values
+    filter_by_institution unless params[:institution].nil?
+    filter_by_access unless params[:access].nil?
+    filter_by_state unless params[:state].nil?
+    filter_by_format unless params[:file_format].nil?
+    set_inst_count(@intellectual_objects)
+    set_access_count(@intellectual_objects)
+    set_format_count(@intellectual_objects)
+    count = @intellectual_objects.count
+    set_page_counts(count)
   end
 
-  def format_previous(page, per_page)
-    if page == 1
-      nil
-    else
-      path = request.fullpath.split('?').first
-      new_page = page - 1
-      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{per_page}"
-      new_url = add_params(new_url)
-      new_url
-    end
-  end
-
-  def add_params(str)
-    str = str << "&updated_since=#{params[:updated_since]}" if params[:updated_since].present?
-    str = str << "&name_exact=#{params[:name_exact]}" if params[:name_exact].present?
-    str = str << "&name_contains=#{params[:name_contains]}" if params[:name_contains].present?
-    str = str << "&institution=#{params[:institution]}" if params[:institution].present?
-    str = str << "&institution=#{params[:institution_identifier]}" if params[:institution_identifier].present?
-    str = str << "&state=#{params[:state]}" if params[:state].present?
-    str = str << "&search_field=#{params[:search_field]}" if params[:search_field].present?
-    str = str << "&q=#{params[:q]}" if params[:q].present?
-    str
-  end
 end

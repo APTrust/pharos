@@ -1,4 +1,5 @@
 class GenericFilesController < ApplicationController
+  include SearchAndIndex
   before_filter :authenticate_user!
   before_filter :load_generic_file, only: [:show, :update, :destroy]
   before_filter :load_intellectual_object, only: [:update, :create]
@@ -18,6 +19,9 @@ class GenericFilesController < ApplicationController
       load_intellectual_object
       authorize @intellectual_object
       @generic_files = @intellectual_object.generic_files
+      filter
+      sort
+      page_results(@generic_files)
       respond_to do |format|
         format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
         format.html { super }
@@ -227,5 +231,14 @@ class GenericFilesController < ApplicationController
       @intellectual_object = @generic_file.intellectual_object
       @institution = @intellectual_object.institution
     end
+  end
+
+  def filter
+    set_filter_values
+    filter_by_state unless params[:state].nil?
+    filter_by_format unless params[:file_format].nil?
+    set_format_count(@intellectual_objects)
+    count = @generic_files.count
+    set_page_counts(count)
   end
 end
