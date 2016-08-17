@@ -12,48 +12,49 @@ module SearchAndIndex
     item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
     deduped_io_associations = file_associations | item_io_associations
     @associations = item_gf_associations + deduped_io_associations
+    @counts = {}
   end
 
   def filter_by_status
-    @results[:items] = @results[:items].with_status(params[:status]) unless @results[:items].nil?
+    @results[:items] = @results[:items].with_status(params[:status]) unless @results.nil? || @results[:items].nil?
     @results.delete(:files) unless @results.nil?
     @results.delete(:objects) unless @results.nil?
     @items = @items.with_status(params[:status]) unless @items.nil?
   end
 
   def filter_by_stage
-    @results[:items] = @results[:items].with_stage(params[:stage]) unless @results[:items].nil?
+    @results[:items] = @results[:items].with_stage(params[:stage]) unless @results.nil? || @results[:items].nil?
     @results.delete(:files) unless @results.nil?
     @results.delete(:objects) unless @results.nil?
     @items = @items.with_stage(params[:stage]) unless @items.nil?
   end
 
   def filter_by_action
-    @results[:items] = @results[:items].with_action(params[:item_action]) unless @results[:items].nil?
+    @results[:items] = @results[:items].with_action(params[:item_action]) unless @results.nil? || @results[:items].nil?
     @results.delete(:files) unless @results.nil?
     @results.delete(:objects) unless @results.nil?
     @items = @items.with_action(params[:item_action]) unless @items.nil?
   end
 
   def filter_by_institution
-    @results[:objects] = @results[:objects].with_institution(params[:institution]) unless @results[:objects].nil?
-    @results[:files] = @results[:files].with_institution(params[:institution]) unless @results[:files].nil?
-    @results[:items] = @results[:items].with_institution(params[:institution]) unless @results[:items].nil?
+    @results[:objects] = @results[:objects].with_institution(params[:institution]) unless @results.nil? || @results[:objects].nil?
+    @results[:files] = @results[:files].with_institution(params[:institution]) unless @results.nil? || @results[:files].nil?
+    @results[:items] = @results[:items].with_institution(params[:institution]) unless @results.nil? || @results[:items].nil?
     @intellectual_objects = @intellectual_objects.with_institution(params[:institution]) unless @intellectual_objects.nil?
     @items = @items.with_institution(params[:institution]) unless @items.nil?
   end
 
   def filter_by_access
-    @results[:objects] = @results[:objects].with_access(params[:access]) unless @results[:objects].nil?
-    @results[:files] = @results[:files].with_access(params[:access]) unless @results[:files].nil?
-    @results[:items] = @results[:items].with_access(params[:access]) unless @results[:items].nil?
+    @results[:objects] = @results[:objects].with_access(params[:access]) unless @results.nil? || @results[:objects].nil?
+    @results[:files] = @results[:files].with_access(params[:access]) unless @results.nil? || @results[:files].nil?
+    @results[:items] = @results[:items].with_access(params[:access]) unless @results.nil? || @results[:items].nil?
     @intellectual_objects = @intellectual_objects.with_access(params[:access]) unless @intellectual_objects.nil?
     @items = @items.with_access(params[:access]) unless @items.nil?
   end
 
   def filter_by_format
-    @results[:files] = @results[:files].with_file_format(params[:file_format]) unless @results[:files].nil?
-    @results[:objects] = @results[:objects].with_file_format(params[:file_format]) unless @results[:objects].nil?
+    @results[:files] = @results[:files].with_file_format(params[:file_format]) unless @results.nil? || @results[:files].nil?
+    @results[:objects] = @results[:objects].with_file_format(params[:file_format]) unless @results.nil? || @results[:objects].nil?
     @results.delete(:items) unless @results.nil?
     @intellectual_objects = @intellectual_objects.with_file_format(params[:file_format]) unless @intellectual_objects.nil?
     @generic_files = @generic_files.with_file_format(params[:file_format]) unless @generic_files.nil?
@@ -61,9 +62,9 @@ module SearchAndIndex
 
   def filter_by_association
     @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
-                                              params[:association], params[:association]) unless @results[:items].nil?
-    @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results[:files].nil?
-    @results[:objects] = @results[:objects].where(id: params[:association]) unless @results[:objects].nil?
+                                              params[:association], params[:association]) unless @results.nil? || @results[:items].nil?
+    @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results.nil? || @results[:files].nil?
+    @results[:objects] = @results[:objects].where(id: params[:association]) unless @results.nil? || @results[:objects].nil?
     @items = @items.where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
                            params[:association], params[:association]) unless @items.nil?
   end
@@ -85,9 +86,9 @@ module SearchAndIndex
   def filter_by_state
     params[:state] = 'A' if params[:state].nil?
     unless params[:state] == 'all'
-      @results[:objects] = @results[:objects].with_state(params[:state]) unless @results[:objects].nil?
-      @results[:files] = @results[:files].with_state(params[:state]) unless @results[:files].nil?
-      @results[:items] = @results[:items].with_state(params[:state]) unless @results[:items].nil?
+      @results[:objects] = @results[:objects].with_state(params[:state]) unless @results.nil? || @results[:objects].nil?
+      @results[:files] = @results[:files].with_state(params[:state]) unless @results.nil? || @results[:files].nil?
+      @results[:items] = @results[:items].with_state(params[:state]) unless @results.nil? || @results[:items].nil?
       @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless @intellectual_objects.nil?
       @generic_files = @generic_files.with_state(params[:state]) unless @generic_files.nil?
       @items = @items.with_state(params[:state]) unless @items.nil?
@@ -106,9 +107,9 @@ module SearchAndIndex
   end
 
   def sort_by_date
-    @results[:objects] = @results[:objects].order('created_at').reverse_order unless @results[:objects].nil?
-    @results[:files] = @results[:files].order('created_at').reverse_order unless @results[:files].nil?
-    @results[:items] = @results[:items].order('date').reverse_order unless @results[:items].nil?
+    @results[:objects] = @results[:objects].order('created_at').reverse_order unless @results.nil? || @results[:objects].nil?
+    @results[:files] = @results[:files].order('created_at').reverse_order unless @results.nil? || @results[:files].nil?
+    @results[:items] = @results[:items].order('date').reverse_order unless @results.nil? || @results[:items].nil?
     @intellectual_objects = @intellectual_objects.order('created_at').reverse_order unless @intellectual_objects.nil?
     @generic_files = @generic_files.order('created_at').reverse_order unless @generic_files.nil?
     @items = @items.order('date').reverse_order unless @items.nil?
@@ -159,8 +160,8 @@ module SearchAndIndex
     unless @accesses.nil?
       @accesses.each do |acc|
         @counts[acc].nil? ?
-            @counts[acc] = results.where(access: acc).count :
-            @counts[acc] = @counts[acc] + results.where(access: acc).count
+            @counts[acc] = results.with_access(acc).count :
+            @counts[acc] = @counts[acc] + results.with_access(acc).count
       end
     end
   end
@@ -169,8 +170,8 @@ module SearchAndIndex
     unless @formats.nil?
       @formats.each do |format|
         @counts[format].nil? ?
-            @counts[format] = results.where(file_format: format).count :
-            @counts[format] = @counts[format] + results.where(file_format: format).count
+            @counts[format] = results.with_file_format(format).count :
+            @counts[format] = @counts[format] + results.with_file_format(format).count
       end
     end
   end

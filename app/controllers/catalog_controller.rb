@@ -147,7 +147,6 @@ class CatalogController < ApplicationController
   end
 
   def set_filter_counts
-    @counts = {}
     # @results.each do |key, results|
     #   if key == :objects
     #     set_inst_count(results)

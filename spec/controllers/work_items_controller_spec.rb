@@ -38,7 +38,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'assigns @counts' do
         get :index
-        assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['ingest'])
+        assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['fixity'])
       end
 
     end
@@ -856,9 +856,9 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns the correct next and previous links' do
-        get :index, format: :json, per_page: 2, page: 2, stage: 'unpack'
-        assigns(:next).should == 'http://test.host/items.json/?page=3&per_page=2&stage=unpack'
-        assigns(:previous).should == 'http://test.host/items.json/?page=1&per_page=2&stage=unpack'
+        get :index, format: :json, per_page: 2, page: 2, stage: 'Unpack'
+        assigns(:next).should == 'http://test.host/items.json/?page=3&per_page=2&stage=Unpack&sort=date'
+        assigns(:previous).should == 'http://test.host/items.json/?page=1&per_page=2&stage=Unpack&sort=date'
       end
     end
 

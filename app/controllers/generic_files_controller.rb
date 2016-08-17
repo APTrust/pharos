@@ -237,7 +237,7 @@ class GenericFilesController < ApplicationController
     set_filter_values
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
-    set_format_count(@intellectual_objects)
+    set_format_count(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
   end

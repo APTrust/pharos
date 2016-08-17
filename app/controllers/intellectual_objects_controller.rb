@@ -9,7 +9,7 @@ class IntellectualObjectsController < ApplicationController
     authorize @institution
     user_institution = current_user.admin? ? nil : current_user.institution
     @intellectual_objects = IntellectualObject
-      .discoverable
+      .discoverable(current_user)
       .with_institution(user_institution)
       .with_institution(params[:institution_id])
       .with_description(params[:description])
