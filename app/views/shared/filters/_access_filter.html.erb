@@ -1,0 +1,25 @@
+<div id="access-parent" class="panel panel-default">
+  <div id="filter-title-access" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-access">
+    <h5 class="panel-title">
+      Access
+    </h5>
+  </div>
+  <div id="filter-access" class="panel-collapse facet-content collapse" style="height: 0px">
+    <div class="panel-body">
+      <ul class="facet-values list-unstyled">
+        <% if @selected[:access] %>
+            <script>selected("access", "<%= @selected[:access].capitalize %>", "<%=url_for(params.except :access)%>")</script>
+        <% else %>
+            <% @accesses.each do |acc| %>
+                <% unless @counts[acc] == 0 || @counts[acc].nil? %>
+                    <li>
+                      <span class="facet-label"><a href="<%= current_path('access', acc) %>"><%= acc.capitalize %></a></span>
+                      <span class="facet-count"><%= @counts[acc] %></span>
+                    </li>
+                <% end %>
+            <% end %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>

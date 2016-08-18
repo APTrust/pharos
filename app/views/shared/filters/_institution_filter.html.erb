@@ -13,7 +13,7 @@
         <% else %>
             <% @institutions.each do |institution| %>
                 <% current_inst = Institution.find(institution) %>
-                <% unless @counts[institution] == 0 %>
+                <% unless @counts[institution] == 0 || @counts[institution].nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('institution', institution) %>"><%= current_inst.name %></a></span>
                       <span class="facet-count"><%= @counts[institution] %></span>

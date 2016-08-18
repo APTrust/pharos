@@ -344,7 +344,8 @@ class WorkItemsController < ApplicationController
     filter_by_action unless params[:item_action].nil?
     filter_by_institution unless params[:institution].nil?
     filter_by_access unless params[:access].nil?
-    filter_by_association unless params[:association].nil?
+    filter_by_object_association unless params[:object_association].nil?
+    filter_by_file_association unless params[:file_association].nil?
     filter_by_state unless params[:state].nil?
     date = format_date if params[:updated_since].present?
     pattern = '%' + params[:name_contains] + '%' if params[:name_contains].present?

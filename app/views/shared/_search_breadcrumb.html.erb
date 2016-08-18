@@ -43,6 +43,21 @@
             <% if key == :institution %>
                 <span class="filterName"><%= key.capitalize %>:</span>
                 <span class="filterValue"><%= Institution.find(value).name %></span>
+            <% elsif key == :access %>
+                <span class="filterName"><%= key.capitalize %>:</span>
+                <span class="filterValue"><%= value.capitalize %></span>
+            <% elsif key == :item_action %>
+                <span class="filterName">Action:</span>
+                <span class="filterValue"><%= value.capitalize %></span>
+            <% elsif key == :file_format %>
+                <span class="filterName">Format:</span>
+                <span class="filterValue"><%= value %></span>
+            <% elsif key == :object_association %>
+                <span class="filterName">Associated Object:</span>
+                <span class="filterValue"><%= IntellectualObject.find(value).identifier %></span>
+            <% elsif key == :file_association %>
+                <span class="filterName">Associated File:</span>
+                <span class="filterValue"><%= GenericFile.find(value).identifier %></span>
             <% else %>
                 <span class="filterName"><%= key.capitalize %>:</span>
                 <span class="filterValue"><%= value %></span>

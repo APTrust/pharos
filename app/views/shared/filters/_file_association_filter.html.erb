@@ -1,0 +1,27 @@
+<div id="fassociation-parent" class="panel panel-default">
+  <div id="filter-title-fassociation" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-fassociation">
+    <h5 class="panel-title">
+      Associated File
+    </h5>
+  </div>
+  <div id="filter-fassociation" class="panel-collapse facet-content collapse" style="height: 0px">
+    <div class="panel-body">
+      <ul class="facet-values list-unstyled">
+        <% if @selected[:file_association] %>
+            <% current_file = GenericFile.find(@selected[:file_association]) %>
+            <script>selected("fassociation", "<%= current_file.identifier %>", "<%=url_for(params.except :file_association)%>")</script>
+        <% else %>
+            <% @file_associations.each do |assc| %>
+                <% unless @counts[assc] == 0 || @counts[assc].nil? || assc.nil? %>
+                    <% current_file = GenericFile.find(assc) %>
+                    <li>
+                      <span class="facet-label"><a href="<%= current_path('file_association', assc) %>"><%= current_file.identifier %></a></span>
+                      <span class="facet-count"><%= @counts[assc] %></span>
+                    </li>
+                <% end %>
+            <% end %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>

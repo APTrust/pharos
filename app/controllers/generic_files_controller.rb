@@ -237,7 +237,11 @@ class GenericFilesController < ApplicationController
     set_filter_values
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
+    filter_by_access unless params[:access].nil?
+    filter_by_institution unless params[:institution].nil?
     set_format_count(@generic_files)
+    set_access_count(@generic_files)
+    set_inst_count(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
   end

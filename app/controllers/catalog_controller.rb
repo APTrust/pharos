@@ -53,7 +53,7 @@ class CatalogController < ApplicationController
       when 'Title'
         @results[:objects] = objects.with_title_like(params[:q])
       when 'All Fields'
-        @results[:objects] = objects.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+        @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                            "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
@@ -123,7 +123,7 @@ class CatalogController < ApplicationController
         @results[:items] = items.with_file_identifier_like(params[:q])
         @results[:files] = files.with_identifier_like(params[:q])
       when 'All Fields'
-        @results[:objects] = objects.where('identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+        @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                               "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:items] = items.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
@@ -138,7 +138,8 @@ class CatalogController < ApplicationController
     filter_by_action unless params[:item_action].nil?
     filter_by_institution unless params[:institution].nil?
     filter_by_access unless params[:access].nil?
-    filter_by_association unless params[:association].nil?
+    filter_by_object_association unless params[:object_association].nil?
+    filter_by_file_association unless params[:file_association].nil?
     filter_by_type unless params[:type].nil?
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
@@ -152,21 +153,21 @@ class CatalogController < ApplicationController
     @results.each do |key, results|
       if key == :objects
         set_inst_count(results)
-        #set_access_count(results)
-        #set_format_count(results)
+        set_access_count(results)
+        set_format_count(results)
       elsif key == :files
-        #set_format_count(results)
+        set_format_count(results)
         set_inst_count(results)
-        #set_io_assc_count(results)
-        #set_access_count(results)
+        set_io_assc_count(results)
+        set_access_count(results)
       elsif key == :items
-        #set_status_count(results)
-        #set_stage_count(results)
-        #set_action_count(results)
+        set_status_count(results)
+        set_stage_count(results)
+        set_action_count(results)
         set_inst_count(results)
-        #set_access_count(results)
-        #set_io_assc_count(results)
-        #set_gf_assc_count(results)
+        set_access_count(results)
+        set_io_assc_count(results)
+        set_gf_assc_count(results)
       end
     end
     @counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?

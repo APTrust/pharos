@@ -7,11 +7,11 @@ module SearchAndIndex
     @institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = GenericFile.distinct.pluck(:file_format)
-    file_associations = GenericFile.distinct.pluck(:intellectual_object_id)
+     file_io_associations = GenericFile.distinct.pluck(:intellectual_object_id)
     item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
-    item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
-    deduped_io_associations = file_associations | item_io_associations
-    @associations = item_gf_associations + deduped_io_associations
+    @file_associations = WorkItem.distinct.pluck(:generic_file_id)
+    @object_associations = file_io_associations | item_io_associations
+    @types = ['Intellectual Objects', 'Generic Files', 'Work Items']
     @counts = {}
     @selected = {}
   end
@@ -67,25 +67,31 @@ module SearchAndIndex
     @selected[:file_format] = params[:file_format]
   end
 
-  def filter_by_association
-    @results[:items] = @results[:items].where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
-                                              params[:association], params[:association]) unless @results.nil? || @results[:items].nil?
-    @results[:files] = @results[:files].where(intellectual_object_id: params[:association]) unless @results.nil? || @results[:files].nil?
-    @results[:objects] = @results[:objects].where(id: params[:association]) unless @results.nil? || @results[:objects].nil?
-    @items = @items.where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
-                           params[:association], params[:association]) unless @items.nil?
-    @selected[:association] = params[:association]
+  def filter_by_object_association
+    @results[:items] = @results[:items].where(intellectual_object_id: params[:object_association]) unless @results.nil? || @results[:items].nil?
+    @results[:files] = @results[:files].where(intellectual_object_id: params[:object_association]) unless @results.nil? || @results[:files].nil?
+    @results.delete(:objects) unless @results.nil? || @results[:objects].nil?
+    @items = @items.where(intellectual_object_id: params[:object_association]) unless @items.nil?
+    @selected[:object_association] = params[:object_association]
+  end
+
+  def filter_by_file_association
+    @results[:items] = @results[:items].where(generic_file_id: params[:file_association]) unless @results.nil? || @results[:items].nil?
+    @results.delete(:files) unless @results.nil? || @results[:files].nil?
+    @results.delete(:objects) unless @results.nil? || @results[:objects].nil?
+    @items = @items.where(generic_file_id: params[:file_association]) unless @items.nil?
+    @selected[:file_association] = params[:file_association]
   end
 
   def filter_by_type
     case params[:type]
-      when 'intellectual_object'
+      when 'Intellectual Objects'
         @results.delete(:files)
         @results.delete(:items)
-      when 'generic_file'
+      when 'Generic Files'
         @results.delete(:objects)
         @results.delete(:items)
-      when 'work_item'
+      when 'Work Items'
         @results.delete(:objects)
         @results.delete(:files)
     end
@@ -187,8 +193,8 @@ module SearchAndIndex
   end
 
   def set_io_assc_count(results)
-    unless @associations.nil?
-      @associations.each do |assc|
+    unless @object_associations.nil?
+      @object_associations.each do |assc|
         @counts[assc].nil? ?
             @counts[assc] = results.where(intellectual_object_id: assc).count :
             @counts[assc] = @counts[assc] + results.where(intellectual_object_id: assc).count
@@ -197,8 +203,8 @@ module SearchAndIndex
   end
 
   def set_gf_assc_count(results)
-    unless @associations.nil?
-      @associations.each do |assc|
+    unless @file_associations.nil?
+      @file_associations.each do |assc|
         @counts[assc].nil? ?
             @counts[assc] = results.where(generic_file_id: assc).count :
             @counts[assc] = @counts[assc] + results.where(generic_file_id: assc).count

@@ -1,0 +1,25 @@
+<div id="type-parent" class="panel panel-default">
+  <div id="filter-title-type" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-type">
+    <h5 class="panel-title">
+      Type
+    </h5>
+  </div>
+  <div id="filter-type" class="panel-collapse facet-content collapse" style="height: 0px">
+    <div class="panel-body">
+      <ul class="facet-values list-unstyled">
+        <% if @selected[:type] %>
+            <script>selected("type", "<%= @selected[:type] %>", "<%=url_for(params.except :type)%>")</script>
+        <% else %>
+            <% @types.each do |type| %>
+                <% unless @counts[type] == 0 || @counts[type].nil? %>
+                    <li>
+                      <span class="facet-label"><a href="<%= current_path('type', type) %>"><%= type %></a></span>
+                      <span class="facet-count"><%= @counts[type] %></span>
+                    </li>
+                <% end %>
+            <% end %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
