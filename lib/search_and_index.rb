@@ -13,6 +13,7 @@ module SearchAndIndex
     deduped_io_associations = file_associations | item_io_associations
     @associations = item_gf_associations + deduped_io_associations
     @counts = {}
+    @selected = {}
   end
 
   def filter_by_status
@@ -20,6 +21,7 @@ module SearchAndIndex
     @results.delete(:files) unless @results.nil?
     @results.delete(:objects) unless @results.nil?
     @items = @items.with_status(params[:status]) unless @items.nil?
+    @selected[:status] = params[:status]
   end
 
   def filter_by_stage
@@ -27,6 +29,7 @@ module SearchAndIndex
     @results.delete(:files) unless @results.nil?
     @results.delete(:objects) unless @results.nil?
     @items = @items.with_stage(params[:stage]) unless @items.nil?
+    @selected[:stage] = params[:stage]
   end
 
   def filter_by_action
@@ -34,6 +37,7 @@ module SearchAndIndex
     @results.delete(:files) unless @results.nil?
     @results.delete(:objects) unless @results.nil?
     @items = @items.with_action(params[:item_action]) unless @items.nil?
+    @selected[:item_action] = params[:item_action]
   end
 
   def filter_by_institution
@@ -42,6 +46,7 @@ module SearchAndIndex
     @results[:items] = @results[:items].with_institution(params[:institution]) unless @results.nil? || @results[:items].nil?
     @intellectual_objects = @intellectual_objects.with_institution(params[:institution]) unless @intellectual_objects.nil?
     @items = @items.with_institution(params[:institution]) unless @items.nil?
+    @selected[:institution] = params[:institution]
   end
 
   def filter_by_access
@@ -50,6 +55,7 @@ module SearchAndIndex
     @results[:items] = @results[:items].with_access(params[:access]) unless @results.nil? || @results[:items].nil?
     @intellectual_objects = @intellectual_objects.with_access(params[:access]) unless @intellectual_objects.nil?
     @items = @items.with_access(params[:access]) unless @items.nil?
+    @selected[:access] = params[:access]
   end
 
   def filter_by_format
@@ -58,6 +64,7 @@ module SearchAndIndex
     @results.delete(:items) unless @results.nil?
     @intellectual_objects = @intellectual_objects.with_file_format(params[:file_format]) unless @intellectual_objects.nil?
     @generic_files = @generic_files.with_file_format(params[:file_format]) unless @generic_files.nil?
+    @selected[:file_format] = params[:file_format]
   end
 
   def filter_by_association
@@ -67,6 +74,7 @@ module SearchAndIndex
     @results[:objects] = @results[:objects].where(id: params[:association]) unless @results.nil? || @results[:objects].nil?
     @items = @items.where('intellectual_object_id LIKE ? OR generic_file_id LIKE ?',
                            params[:association], params[:association]) unless @items.nil?
+    @selected[:association] = params[:association]
   end
 
   def filter_by_type
@@ -81,6 +89,7 @@ module SearchAndIndex
         @results.delete(:objects)
         @results.delete(:files)
     end
+    @selected[:type] = params[:type]
   end
 
   def filter_by_state
@@ -92,6 +101,7 @@ module SearchAndIndex
       @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless @intellectual_objects.nil?
       @generic_files = @generic_files.with_state(params[:state]) unless @generic_files.nil?
       @items = @items.with_state(params[:state]) unless @items.nil?
+      @selected[:state] = params[:state]
     end
   end
 

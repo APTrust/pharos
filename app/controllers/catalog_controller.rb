@@ -5,8 +5,10 @@ class CatalogController < ApplicationController
 
   def search
     params[:q] = '%' if params[:q] == '*'
+    params[:q] = '%' if params[:q].nil?
     @results = {}
     authorize current_user
+    generic_search if params[:object_type].nil?
     case params[:object_type]
       when 'Intellectual Objects'
         object_search
