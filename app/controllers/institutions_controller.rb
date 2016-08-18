@@ -73,9 +73,9 @@ class InstitutionsController < ApplicationController
       @item_count = WorkItem.all.count
       @object_count = IntellectualObject.all.count
     else
-      @items = WorkItem.where(institution: @institution.identifier).order('date').limit(10).reverse_order
+      @items = WorkItem.with_institution(@institution.id).order('date').limit(10).reverse_order
       @size = @institution.bytes_by_format()['all']
-      @item_count = WorkItem.where(institution: @institution.identifier).count
+      @item_count = WorkItem.with_institution(@institution.id).count
       @object_count = @institution.intellectual_objects.count
     end
     @failed = @items.where(status: Pharos::Application::PHAROS_STATUSES['fail'])

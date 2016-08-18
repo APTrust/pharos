@@ -19,7 +19,7 @@
                   <tr class="<%= item.status %>">
               <td><%= link_to item.name, work_item_path(id: item.id) %></td>
               <td><%= item.etag %></td>
-              <td><%= item.institution %></td>
+              <td><%= item.institution.identifier %></td>
               <td><%= time_ago_in_words item.date %></td>
               <td><%= item.action %></td>
               <td><%= item.stage %></td>
