@@ -50,7 +50,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         sign_in inst_user
       end
       it 'should show results from my institution' do
-        get :index, {}
+        get :index, institution_identifier: inst1.identifier
         expect(response).to be_successful
         expect(assigns(:intellectual_objects).size).to eq 3
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
@@ -60,7 +60,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should show results from my institution' do
-        get :index, {}
+        get :index, institution_identifier: inst1.identifier
         expect(response).to be_successful
         expect(assigns(:intellectual_objects).size).to eq 3
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]

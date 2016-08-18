@@ -101,9 +101,7 @@ class CatalogController < ApplicationController
         @results[:files] = files.with_identifier_like(params[:q])
       when 'Alternate Identifier'
         @results[:objects] = objects.with_alt_identifier_like(params[:q])
-        io_items = items.with_object_identifier_like(params[:q])
-        gf_items = items.with_file_identifier_like(params[:q])
-        @results[:items] = io_items | gf_items
+        @results[:items] = items.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
       when 'Bag Name'
         @results[:objects] = objects.with_bag_name_like(params[:q])
         @results[:items] = items.with_name_like(params[:q])

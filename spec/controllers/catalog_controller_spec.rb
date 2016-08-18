@@ -282,11 +282,11 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_four.id]
           end
 
-          # it 'should filter results by format' do
-          #   get :search, q: '*', search_field: 'All Fields', object_type: 'Intellectual Objects', file_format: 'application/xml'
-          #   expect(assigns(:paged_results).size).to eq 6
-          #   expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_two.id, @object_three.id, @object_four.id, @object_five.id, @object_six.id]
-          # end
+          it 'should filter results by format' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Intellectual Objects', file_format: 'application/xml'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_four.id, @object_five.id, @object_six.id]
+          end
         end
 
         describe 'for generic file searches' do
@@ -308,8 +308,8 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id, @file_five.id, @file_six.id]
           end
 
-          it 'should filter results by association' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Generic Files', association: @object_four.id
+          it 'should filter results by object association' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Generic Files', object_association: @object_four.id
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).map &:id).to match_array [@file_four.id]
           end
@@ -328,8 +328,14 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).map &:id).to match_array [@item_one.id, @item_four.id]
           end
 
-          it 'should filter results by association' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Work Items', association: @object_four.id
+          it 'should filter results by object association' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Work Items', object_association: @object_four.id
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@item_four.id]
+          end
+
+          it 'should filter results by file association' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Work Items', file_association: @file_four.id
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).map &:id).to match_array [@item_four.id]
           end
@@ -352,7 +358,7 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for generic searches' do
           it 'should filter results by type' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'All Types', per_page: 20, type: 'generic_file'
+            get :search, q: '*', search_field: 'All Fields', object_type: 'All Types', per_page: 20, type: 'Generic Files'
             expect(assigns(:paged_results).size).to eq 4
             expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id, @file_five.id, @file_six.id]
           end
