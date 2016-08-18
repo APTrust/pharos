@@ -150,8 +150,8 @@ module SearchAndIndex
     unless @institutions.nil?
       @institutions.each do |institution|
         @counts[institution].nil? ?
-            @counts[institution] = results.where(institution_id: institution).count :
-            @counts[institution] = @counts[institution] + results.where(institution_id: institution).count
+            @counts[institution] = results.with_institution(institution).count :
+            @counts[institution] = @counts[institution] + results.with_institution(institution).count
       end
     end
   end

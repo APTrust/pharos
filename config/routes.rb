@@ -10,11 +10,12 @@ Rails.application.routes.draw do
   resources :intellectual_objects, only: [:show, :edit, :update, :destroy], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'objects'
   put 'objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_restore
   put 'objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_send_to_dpn
-  get 'objects', to: 'intellectual_objects#index', format: [:json, :html]
+  get 'objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :intellectual_objects
   resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/objects'
-  get 'api/v2/objects', to: 'intellectual_objects#index', format: [:json, :html]
+  get 'api/v2/objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
   post 'api/v2/objects/:institution_identifier', to: 'intellectual_objects#create', format: :json, institution_identifier: institution_ptrn
-  resources :intellectual_objects, only: [:index], format: :json, path: 'member-api/v2/objects'
+  #resources :intellectual_objects, only: [:index], format: :json, path: 'member-api/v2/objects'
+  get 'member-api/v2/objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
   put 'member-api/v2/objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: :json, intellectual_object_identifier: object_ptrn
   put 'member-api/v2/objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: :json, intellectual_object_identifier: object_ptrn
 

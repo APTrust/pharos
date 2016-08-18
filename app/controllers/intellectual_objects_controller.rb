@@ -7,7 +7,13 @@ class IntellectualObjectsController < ApplicationController
 
   def index
     authorize @institution
-    user_institution = current_user.admin? ? nil : current_user.institution
+    if current_user.admin? and params[:institution_identifier]
+      user_institution = @institution
+    elsif current_user.admin?
+      user_institution = nil
+    else
+      user_institution = current_user.institution
+    end
     @intellectual_objects = IntellectualObject
       .discoverable(current_user)
       .with_institution(user_institution)
@@ -278,6 +284,8 @@ class IntellectualObjectsController < ApplicationController
   def load_institution
     if current_user.admin? and params[:institution_id]
       @institution = Institution.find(params[:institution_id])
+    elsif current_user.admin? and params[:institution_identifier]
+      @institution = Institution.where(identifier: params[:institution_identifier]).first
     else
       @institution = current_user.institution
     end

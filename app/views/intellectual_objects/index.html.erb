@@ -1,19 +1,16 @@
-<div id="sidebar" class="col-md-3">
-  <%= render 'facets' %>
+<div id="sidebar" class="col-md-3 col-sm-4">
+  <%= render 'shared/filters/institution_filter' %>
 </div>
 
-<div id="content" class="col-md-9">
-
-  <h2 class="top-content-title">Objects for <%= @institution.name %></h2>
-  <% @page_title = t('Search', :application_name => 'something') %>
-
-  <%- if @intellectual_objects.empty? %>
-      <%= render "shared/zero_results" %>
-  <%- elsif render_grouped_response? %>
-      <%= render_grouped_document_index %>
+<div id="content" class="col-md-9 col-sm-8">
+  <h2 class="top-content-title">Intellectual Objects for <%= @institution.name %></h2>
+  <%= render 'shared/search_breadcrumb' %>
+  <%= render 'shared/sort_and_per_page' %>
+  <hr>
+  <%- if @paged_results.empty? %>
+      <%= render 'shared/zero_results' %>
   <%- else %>
-      <%= render_document_index %>
+      <%= render 'shared/search_results' %>
   <%- end %>
-
-
+  <%= render 'shared/compact_pagination' %>
 </div>

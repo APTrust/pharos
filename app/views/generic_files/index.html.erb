@@ -1,28 +1,17 @@
-<div id="sidebar" class="col-md-3">
-  <%= render 'search_sidebar' %>
+<div id="sidebar" class="col-md-3 col-sm-4">
+  <%= render 'shared/filters/institution_filter' %>
 </div>
 
-<div id="content" class="col-md-9">
-
-  <h2 class="top-content-title">Files for <%= @intellectual_object.title %></h2>
+<div id="content" class="col-md-9 col-sm-8">
+  <h2 class="top-content-title">Generic Files for <%= @intellectual_object.title %></h2>
   <h4>Object Identifier: <%= @intellectual_object.identifier %></h4>
-  <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
-
-  <%= render 'did_you_mean' %>
-
-  <%= render 'shared/constraints' %>
-
-  <%= render 'sort_and_per_page' %>
-
-  <%- if @response.empty? %>
-      <%= render "shared/zero_results" %>
-  <%- elsif render_grouped_response? %>
-      <%= render_grouped_document_index %>
+  <%= render 'shared/search_breadcrumb' %>
+  <%= render 'shared/sort_and_per_page' %>
+  <hr>
+  <%- if @paged_results.empty? %>
+      <%= render 'shared/zero_results' %>
   <%- else %>
-      <%= render_document_index %>
+      <%= render 'shared/search_results' %>
   <%- end %>
-
-  <%= render 'shared/results_pagination' %>
-
+  <%= render 'shared/compact_pagination' %>
 </div>
-Status API Training Shop Blog About

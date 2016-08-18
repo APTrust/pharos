@@ -38,7 +38,7 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_title_like, ->(param) { where('intellectual_objects.title like ?', "%#{param}%") unless param.blank? }
   scope :with_access, ->(param) { where(access: param) unless param.blank? }
   scope :with_file_format, ->(param) {
-    joins(:generic_file)
+    joins(:generic_files)
         .where('generic_files.file_format = ?', param) unless param.blank?
   }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }

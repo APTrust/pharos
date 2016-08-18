@@ -4,11 +4,11 @@
     <% counter = @first_number %>
     <% @paged_results.each do |current| %>
         <% if current.is_a?(IntellectualObject) %>
-            <%= render 'object_result', counter: counter, current: current %>
+            <%= render 'shared/individual_results/object_result', counter: counter, current: current %>
         <% elsif current.is_a?(GenericFile) %>
-            <%= render 'file_result', counter: counter, current: current %>
+            <%= render 'shared/individual_results/file_result', counter: counter, current: current %>
         <% elsif current.is_a?(WorkItem) %>
-            <%= render 'item_result', counter: counter, current: current %>
+            <%= render 'shared/individual_results/item_result', counter: counter, current: current %>
         <% end %>
         <% counter = counter+1 %>
         <hr>

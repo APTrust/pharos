@@ -53,11 +53,11 @@
     <% end %>
     <% unless @intellectual_object.state == 'D' %>
         <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_id == @intellectual_object.institution_id) %>
-            <%= link_to intellectual_objects_path(alt_action: 'restore', q: @intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
+            <%= link_to intellectual_object_restore_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
                 <i class="glyphicon glyphicon-download"></i> Restore Object
             <% end %>
             <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.institution.dpn_uuid.blank? == false && @intellectual_object.in_dpn? == false )%>
-                <%= link_to intellectual_objects_path(alt_action: 'dpn', q: @intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
+                <%= link_to intellectual_object_send_to_dpn_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
                     <i class="glyphicon glyphicon-send dpn"></i> Send Object To DPN
                 <% end %>
             <% end %>

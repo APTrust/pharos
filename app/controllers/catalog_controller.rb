@@ -147,26 +147,26 @@ class CatalogController < ApplicationController
   end
 
   def set_filter_counts
-    # @results.each do |key, results|
-    #   if key == :objects
-    #     set_inst_count(results)
-    #     set_access_count(results)
-    #     #set_format_count(results)
-    #   elsif key == :files
-    #     set_format_count(results)
-    #     set_inst_count(results)
-    #     set_io_assc_count(results)
-    #     set_access_count(results)
-    #   elsif key == :items
-    #     set_status_count(results)
-    #     set_stage_count(results)
-    #     set_action_count(results)
-    #     set_inst_count(results)
-    #     set_access_count(results)
-    #     set_io_assc_count(results)
-    #     set_gf_assc_count(results)
-    #   end
-    # end
+    @results.each do |key, results|
+      if key == :objects
+        set_inst_count(results)
+        #set_access_count(results)
+        #set_format_count(results)
+      elsif key == :files
+        #set_format_count(results)
+        set_inst_count(results)
+        #set_io_assc_count(results)
+        #set_access_count(results)
+      elsif key == :items
+        #set_status_count(results)
+        #set_stage_count(results)
+        #set_action_count(results)
+        set_inst_count(results)
+        #set_access_count(results)
+        #set_io_assc_count(results)
+        #set_gf_assc_count(results)
+      end
+    end
     @counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
     @counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
     @counts['Work Items'] = @results[:items].count unless @results[:items].nil?
