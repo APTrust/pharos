@@ -260,3 +260,46 @@ i.btn[disabled] i.btn.active {
   background-color: #ffffff;
   border-color: #ffffff;
 }
+
+.facet_limit-active {
+  border-color:#d6e9c6
+}
+
+.facet_limit-active>.panel-heading {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.facet_limit-active>.panel-heading+.panel-collapse>.panel-body {
+  border-top-color: #d6e9c6;
+  border-bottom-color: #d6e9c6;
+}
+
+.panel-success, .panel-heading, .badge, .facet_limit-active {
+  color:#dff0d8;
+}
+
+.facet-values li .selected {
+  color: #3c763d;
+}
+
+.facet-values li .remove {
+  color: #777777;
+  text-align: right;
+  padding-left: 20px;
+}
+
+.facet-values .facet-label {
+  display: table-cell;
+  padding-right: 1em;
+  text-indent: -15px;
+  padding-left: 15px;
+  padding-bottom: 6px;
+}
+
+.facet-values .facet-count {
+  display: table-cell;
+  vertical-align: top;
+  text-align: right;
+}

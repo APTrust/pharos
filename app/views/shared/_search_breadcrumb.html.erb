@@ -40,8 +40,13 @@
           <% @selected.each do |key, value| %>
         <span class="btn-group appliedFilter constraint filter">
           <span class="constraint-value btn btn-sm btn-default btn-disabled">
-            <span class="filterName"><%= key.capitalize %>:</span>
-            <span class="filterValue"><%= value %></span>
+            <% if key == :institution %>
+                <span class="filterName"><%= key.capitalize %>:</span>
+                <span class="filterValue"><%= Institution.find(value).name %></span>
+            <% else %>
+                <span class="filterName"><%= key.capitalize %>:</span>
+                <span class="filterValue"><%= value %></span>
+            <% end %>
           </span>
           <a class="btn btn-default btn-sm remove" href="<%=url_for(params.except key)%>">
             <span class="glyphicon glyphicon-remove"></span>

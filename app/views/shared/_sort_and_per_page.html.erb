@@ -1,6 +1,6 @@
 <div id="sortAndPerPage" class="clearfix">
 
-  <div class="page_links">
+  <span class="page_links">
     <% if @previous.nil? %>
         « Previous |
     <% else %>
@@ -15,9 +15,9 @@
         | <a href="<%= @next %>" rel="next">Next</a> »
     <% end %>
 
-  </div>
+  </span>
 
-  <div class="search-widgets pull-right">
+  <span class="search-widgets pull-right">
     <span class="sr-only"><%= 'Per Page' %></span>
 
     <div id="state-dropdown" class="btn-group">
@@ -58,5 +58,5 @@
         <% end %>
       </ul>
     </div>
-  </div>
+  </span>
 </div>

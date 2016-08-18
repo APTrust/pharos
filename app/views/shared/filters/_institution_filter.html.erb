@@ -1,30 +1,27 @@
-<div class="facets sidenav">
-
-  <div class="top-panel-heading panel-heading">
-    <h3> Limit your search </h3>
+<div id="institution-parent" class="panel panel-default">
+  <div id="filter-title-institution" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-institution">
+    <h5 class="panel-title">
+      Institution
+    </h5>
   </div>
-
-  <div class="panel-group">
-    <div class="panel panel-default facet_limit">
-      <div class="collapse-toggle panel-heading" data-toggle="collapse">
-        <h5 class="panel-title">
-          <a data-no-turbolink="true" href="#">Institution</a>
-        </h5>
-      </div>
-      <div class="panel-collapse facet-content">
-        <div class="panel-body">
-          <ul class="facet-values list-unstyled">
+  <div id="filter-institution" class="panel-collapse facet-content collapse" style="height: 0px">
+    <div class="panel-body">
+      <ul class="facet-values list-unstyled">
+        <% if @selected[:institution] %>
+            <% current_inst = Institution.find(@selected[:institution]) %>
+            <script>selected("institution", "<%= current_inst.name %>", "<%=url_for(params.except :institution)%>")</script>
+        <% else %>
             <% @institutions.each do |institution| %>
-              <% current_inst = Institution.find(institution) %>
-                <li>
-                  <span class="facet-label"><a class="facet_select" search_field=all_fields" href="<%= current_path('institution', institution) %>"><%= current_inst.name %></a></span>
-                  <span class="facet-count"><%= @counts[institution] %></span>
-                </li>
+                <% current_inst = Institution.find(institution) %>
+                <% unless @counts[institution] == 0 %>
+                    <li>
+                      <span class="facet-label"><a href="<%= current_path('institution', institution) %>"><%= current_inst.name %></a></span>
+                      <span class="facet-count"><%= @counts[institution] %></span>
+                    </li>
+                <% end %>
             <% end %>
-          </ul>
-        </div>
-      </div>
+        <% end %>
+      </ul>
     </div>
   </div>
-
 </div>
