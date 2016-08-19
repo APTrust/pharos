@@ -59,7 +59,7 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for intellectual object searches' do
           it 'should match an exact search on identifier' do
-            get :search, q: @object_one.identifier, search_field: 'Identifier', object_type: 'Intellectual Objects'
+            get :search, q: @object_one.identifier, search_field: 'Intellectual Object Identifier', object_type: 'Intellectual Objects'
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @object_one.id
           end
@@ -91,7 +91,7 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for generic file searches' do
           it 'should match an exact search on identifier' do
-            get :search, q: @file_one.identifier, search_field: 'Identifier', object_type: 'Generic Files'
+            get :search, q: @file_one.identifier, search_field: 'Generic File Identifier', object_type: 'Generic Files'
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @file_one.id
           end
@@ -142,12 +142,6 @@ RSpec.describe CatalogController, type: :controller do
         end
 
         describe 'for generic searches' do
-          it 'should match a search on identifier' do
-            get :search, q: '1234', search_field: 'Identifier', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 3
-            expect(assigns(:paged_results).map &:id).to match_array [@object_five.id, @file_three.id, @file_five.id]
-          end
-
           it 'should match a search on alt_identifier' do
             get :search, q: '1234', search_field: 'Alternate Identifier', object_type: 'All Types'
             expect(assigns(:paged_results).size).to eq 3

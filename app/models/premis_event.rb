@@ -15,6 +15,7 @@ class PremisEvent < ActiveRecord::Base
 
   before_save :init_identifier
   before_save :init_time
+  before_save :set_inst_id
 
   # def initialize(graph={}, subject=nil)
   #   super
@@ -105,6 +106,12 @@ class PremisEvent < ActiveRecord::Base
 
   def init_identifier
     self.identifier = SecureRandom.uuid if self.identifier.nil?
+  end
+
+  def set_inst_id
+    unless self.intellectual_object.nil?
+      self.institution_id = self.intellectual_object.institution.id
+    end
   end
 
 end

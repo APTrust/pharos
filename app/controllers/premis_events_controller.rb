@@ -1,10 +1,12 @@
 class PremisEventsController < ApplicationController
+  include SearchAndIndex
   before_filter :authenticate_user!
   before_filter :load_and_authorize_parent_object, only: [:create]
   after_action :verify_authorized, only: [:index, :create]
 
   def index
     identifier = params[:identifier].gsub(/%2F/i, '/')
+    @premis_events = PremisEvent.discoverable(current_user)
     if (identifier=~/^(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+$/)
       @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
       @obj = @intellectual_object
@@ -83,18 +85,15 @@ class PremisEventsController < ApplicationController
   end
 
   def for_selected_institution
-    return unless @institution
-    @premis_events = @premis_events.where(institution_id: @institution.id)
+    @premis_events = @premis_events.where(institution_id: @institution.id) unless @institution.nil?
   end
 
   def for_selected_object
-    return unless @intellectual_object
-    @premis_events = @premis_events.where(intellectual_object_id: @intellectual_object.id)
+    @premis_events = @premis_events.where(intellectual_object_id: @intellectual_object.id) unless @intellectual_object.nil?
   end
 
   def for_selected_file
-    return unless @generic_file
-    @premis_events = @premis_events.where(generic_file_id: @generic_file.id)
+    @premis_events = @premis_events.where(generic_file_id: @generic_file.id) unless @generic_file.nil?
   end
 
   def sort_chronologically
