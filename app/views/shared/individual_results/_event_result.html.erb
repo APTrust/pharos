@@ -1,0 +1,38 @@
+<% # container for a single doc -%>
+<div class="document">
+
+  <% # header bar for doc items in index view -%>
+  <section class="documentHeader clearfix">
+
+    <%- # main title container for doc partial view -%>
+    <h5 class="index_title col-sm-9 col-lg-9">
+      <% if current.generic_file.nil? %>
+          <% link_ident = current.intellectual_object.identifier %>
+          <%= counter %>. <%= link_to link_ident, current.intellectual_object %>
+      <% else %>
+          <% link_ident = current.generic_file.identifier %>
+          <%= counter %>. <%= link_to link_ident, current.generic_file %>
+      <% end %>
+    </h5>
+
+  </section>
+
+  <dl class="document-metadata dl-horizontal dl-invert">
+    <dt>Event Identifier: </dt>
+    <dd><%= current.identifier %></dd>
+    <dt>Event Type: </dt>
+    <dd><%= current.event_type %></dd>
+    <dt>DateTime: </dt>
+    <dd><%= current.date_time %></dd>
+    <dt>Detail: </dt>
+    <dd><%= current.detail %></dd>
+    <dt>Outcome: </dt>
+    <dd><%= current.outcome %></dd>
+    <dt>Outcome Details: </dt>
+    <dd><%= current.outcome_detail %></dd>
+    <dt>Object: </dt>
+    <dd><%= current.object %></dd>
+    <dt>Agent: </dt>
+    <dd><%= current.agent %></dd>
+  </dl>
+</div>

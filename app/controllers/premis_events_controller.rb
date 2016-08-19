@@ -7,18 +7,34 @@ class PremisEventsController < ApplicationController
     identifier = params[:identifier].gsub(/%2F/i, '/')
     if (identifier=~/^(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+$/)
       @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
-      obj = @intellectual_object
+      @obj = @intellectual_object
+      for_selected_object
     elsif (identifier=~/(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/)
       @generic_file = GenericFile.where(identifier: params[:identifier]).first
-      obj = @generic_file
+      @obj = @generic_file
+      for_selected_file
     elsif (identifier=~/(\w+\.)*\w+(\.edu|\.com|\.org)/)
       @institution = Institution.where(identifier: params[:identifier]).first
-      obj = @institution
+      @obj = @institution
+      for_selected_institution
     end
-    authorize obj
-    @document_list = obj.premis_events
+    authorize @obj
+    @events = PremisEvent
+      .discoverable(current_user)
+      .with_create_date(params[:created_at])
+      .created_before(params[:created_before])
+      .created_after(params[:created_after])
+      .with_type(params[:type])
+      .with_event_identifier(params[:event_identifier])
+      .with_object_identifier(params[:object_identifier])
+      .with_object_identifier_like(params[:object_identifier_like])
+      .with_file_identifier(params[:file_identifier])
+      .with_file_identifier_like(params[:file_identifier_like])
+    filter
+    sort
+    page_results(@premis_events)
     respond_to do |format|
-      format.json { render json: obj.premis_events.map { |event| event.serializable_hash } }
+      format.json { render json: @events.map { |event| event.serializable_hash } }
       format.html { }
     end
   end
@@ -78,7 +94,7 @@ class PremisEventsController < ApplicationController
 
   def for_selected_file
     return unless @generic_file
-    @premis_events = @premis_events.where(generic_file_id: generic_file.id)
+    @premis_events = @premis_events.where(generic_file_id: @generic_file.id)
   end
 
   def sort_chronologically
@@ -89,6 +105,22 @@ class PremisEventsController < ApplicationController
     params.require(:premis_event).permit(:identifier, :event_type, :date_time, :outcome, :outcome_detail,
         :outcome_information, :detail, :object, :agent, :intellectual_object_id, :generic_file_id,
         :institution_id, :created_at, :updated_at)
+  end
+
+  def filter
+    set_filter_values
+    filter_by_institution unless params[:institution].nil?
+    filter_by_event_type unless params[:event_type].nil?
+    filter_by_outcome unless params[:outcome].nil?
+    filter_by_file_association unless params[:file_association].nil?
+    filter_by_object_association unless params[:object_association].nil?
+    set_inst_count(@premis_events)
+    set_event_type_count(@premis_events)
+    set_outcome_count(@premis_events)
+    set_gf_assc_count(@premis_events)
+    set_io_assc_count(@premis_events)
+    count = @premis_events.count
+    set_page_counts(count)
   end
 
 end

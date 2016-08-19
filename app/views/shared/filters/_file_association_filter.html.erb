@@ -1,3 +1,4 @@
+<% unless @gf_assc_counts == {} %>
 <div id="fassociation-parent" class="panel panel-default">
   <div id="filter-title-fassociation" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-fassociation">
     <h5 class="panel-title">
@@ -12,11 +13,11 @@
             <script>selected("fassociation", "<%= current_file.identifier %>", "<%=url_for(params.except :file_association)%>")</script>
         <% else %>
             <% @file_associations.each do |assc| %>
-                <% unless @counts[assc] == 0 || @counts[assc].nil? || assc.nil? %>
+                <% unless @gf_assc_counts[assc] == 0 || @gf_assc_counts[assc].nil? || assc.nil? %>
                     <% current_file = GenericFile.find(assc) %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('file_association', assc) %>"><%= current_file.identifier %></a></span>
-                      <span class="facet-count"><%= @counts[assc] %></span>
+                      <span class="facet-count"><%= @gf_assc_counts[assc] %></span>
                     </li>
                 <% end %>
             <% end %>
@@ -25,3 +26,4 @@
     </div>
   </div>
 </div>
+<% end %>

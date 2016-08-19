@@ -1,20 +1,30 @@
-<%= render 'breadcrumb' %>
-
-<div id="sidebar" class="col-md-3">
-  <%= render 'sidebar' %>
+<div id="sidebar" class="col-md-3 col-sm-4">
+  <div class="facets sidenav">
+    <h3> Limit your search </h3>
+    <%= render 'shared/filters/institution_filter' %>
+    <%= render 'shared/filters/object_association_filter' %>
+    <%= render 'shared/filters/file_association_filter' %>
+    <%= render 'shared/filters/event_type_filter' %>
+    <%= render 'shared/filters/outcome_filter' %>
+  </div>
 </div>
 
-<div id="content" class="col-md-9">
-  <h2 class="top-content-title"> <%= event_catalog_title %> </h2>
-
-  <%= render 'shared/constraints' %>
-  <%= render 'sort_and_per_page' %>
-
-  <%- if @response.empty?  %>
+<div id="content" class="col-md-9 col-sm-8">
+  <% if @obj.kind_of?(Institution) %>
+      <% title = obj.name %>
+  <% elsif @obj.kind_of?(IntellectualObject) %>
+      <% title = obj.title %>
+  <% elsif @obj.kind_of?(IntellectualObject) %>
+      <% title = obj.identifier %>
+  <% end %>
+  <h2 class="top-content-title">Premis Events for <%= title %></h2>
+  <%= render 'shared/search_breadcrumb' %>
+  <%= render 'shared/sort_and_per_page' %>
+  <hr>
+  <%- if @paged_results.empty? %>
       <%= render 'shared/zero_results' %>
   <%- else %>
-      <%= render_document_index %>
+      <%= render 'shared/search_results' %>
   <%- end %>
-
   <%= render 'shared/compact_pagination' %>
 </div>

@@ -18,6 +18,8 @@ class CatalogController < ApplicationController
         item_search
       when 'All Types'
         generic_search
+      when 'Premis Events'
+        event_search
       when '*'
         generic_search
     end
@@ -42,8 +44,6 @@ class CatalogController < ApplicationController
     # Limit results to those the current user is allowed to read.
     objects = IntellectualObject.discoverable(current_user)
     case params[:search_field]
-      when 'Identifier'
-        @results[:objects] = objects.with_identifier_like(params[:q])
       when 'Intellectual Object Identifier'
         @results[:objects] = objects.with_identifier_like(params[:q])
       when 'Alternate Identifier'
@@ -62,8 +62,6 @@ class CatalogController < ApplicationController
     # Limit results to those the current user is allowed to read.
     files = GenericFile.discoverable(current_user)
     case params[:search_field]
-      when 'Identifier'
-        @results[:files] = files.with_identifier_like(params[:q])
       when 'Generic File Identifier'
         @results[:files] = files.with_identifier_like(params[:q])
       when 'URI'
@@ -91,14 +89,28 @@ class CatalogController < ApplicationController
     end
   end
 
+  def event_search
+    events = PremisEvent.discoverable(current_user)
+    case params[:search_field]
+      when 'Event Identifier'
+        @results[:events] = events.with_event_identifier_like(params[:q])
+      when 'Intellectual Object Identifier'
+        @results[:events] = events.with_object_identifier_like(params[:q])
+      when 'Generic File Identifier'
+        @results[:events] = events.with_file_identifier_like(params[:q])
+      when 'All Fields'
+        @results[:events] = events.joins(:intellectual_object).joins(:generic_file).where('premis_events.identifier LIKE ? OR
+                                          intellectual_objects.identifier LIKE ? OR generic_files.identifier LIKE ?',
+                                          "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+    end
+  end
+
   def generic_search
     objects = IntellectualObject.discoverable(current_user)
     files = GenericFile.discoverable(current_user)
     items = WorkItem.readable(current_user)
+    events = PremisEvent.discoverable(current_user)
     case params[:search_field]
-      when 'Identifier'
-        @results[:objects] = objects.with_identifier_like(params[:q])
-        @results[:files] = files.with_identifier_like(params[:q])
       when 'Alternate Identifier'
         @results[:objects] = objects.with_alt_identifier_like(params[:q])
         @results[:items] = items.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
@@ -117,15 +129,22 @@ class CatalogController < ApplicationController
       when 'Intellectual Object Identifier'
         @results[:items] = items.with_object_identifier_like(params[:q])
         @results[:objects] = objects.with_identifier_like(params[:q])
+        @results[:events] = events.with_object_identifier_like(params[:q])
       when 'Generic File Identifier'
         @results[:items] = items.with_file_identifier_like(params[:q])
         @results[:files] = files.with_identifier_like(params[:q])
+        @results[:events] = events.with_file_identifier_like(params[:q])
+      when 'Event Identifier'
+        @results[:events] = events.with_event_identifier_like(params[:q])
       when 'All Fields'
         @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
-                                              "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+                                          "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:items] = items.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
-                                      "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+                                          "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:events] = events.joins(:intellectual_object).joins(:generic_file).where('premis_events.identifier LIKE ? OR
+                                          intellectual_objects.identifier LIKE ? OR generic_files.identifier LIKE ?',
+                                          "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
@@ -141,6 +160,8 @@ class CatalogController < ApplicationController
     filter_by_type unless params[:type].nil?
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
+    filter_by_event_type unless params[:event_type].nil?
+    filter_by_outcome unless params[:outcome].nil?
     set_filter_counts
     count = 0
     @results.each { |key, value| count = count + value.count }
@@ -166,11 +187,19 @@ class CatalogController < ApplicationController
         set_access_count(results)
         set_io_assc_count(results)
         set_gf_assc_count(results)
+      elsif key == :events
+        set_inst_count(results)
+        set_access_count(results)
+        set_io_assc_count(results)
+        set_gf_assc_count(results)
+        set_event_type_count(results)
+        set_outcome_count(results)
       end
     end
-    @counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
-    @counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
-    @counts['Work Items'] = @results[:items].count unless @results[:items].nil?
+    @type_counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
+    @type_counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
+    @type_counts['Work Items'] = @results[:items].count unless @results[:items].nil?
+    @type_counts['Premis Events'] = @results[:events].count unless @results[:events].nil?
   end
 
 end

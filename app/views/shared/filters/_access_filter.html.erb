@@ -1,3 +1,4 @@
+<% unless @access_counts == {} %>
 <div id="access-parent" class="panel panel-default">
   <div id="filter-title-access" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-access">
     <h5 class="panel-title">
@@ -11,10 +12,10 @@
             <script>selected("access", "<%= @selected[:access].capitalize %>", "<%=url_for(params.except :access)%>")</script>
         <% else %>
             <% @accesses.each do |acc| %>
-                <% unless @counts[acc] == 0 || @counts[acc].nil? %>
+                <% unless @access_counts[acc] == 0 || @access_counts[acc].nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('access', acc) %>"><%= acc.capitalize %></a></span>
-                      <span class="facet-count"><%= @counts[acc] %></span>
+                      <span class="facet-count"><%= @access_counts[acc] %></span>
                     </li>
                 <% end %>
             <% end %>
@@ -23,3 +24,4 @@
     </div>
   </div>
 </div>
+<% end %>

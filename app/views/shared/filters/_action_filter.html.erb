@@ -1,3 +1,4 @@
+<% unless @action_counts == {} %>
 <div id="action-parent" class="panel panel-default">
   <div id="filter-title-action" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-action">
     <h5 class="panel-title">
@@ -11,10 +12,10 @@
             <script>selected("action", "<%= @selected[:item_action] %>", "<%=url_for(params.except :item_action)%>")</script>
         <% else %>
             <% @actions.each do |action| %>
-                <% unless @counts[action] == 0 || @counts[action].nil? %>
+                <% unless @action_counts[action] == 0 || @action_counts[action].nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('item_action', action) %>"><%= action %></a></span>
-                      <span class="facet-count"><%= @counts[action] %></span>
+                      <span class="facet-count"><%= @action_counts[action] %></span>
                     </li>
                 <% end %>
             <% end %>
@@ -23,3 +24,4 @@
     </div>
   </div>
 </div>
+<% end %>

@@ -1,3 +1,4 @@
+<% unless @status_counts == {} %>
 <div id="status-parent" class="panel panel-default">
   <div id="filter-title-status" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-status">
     <h5 class="panel-title">
@@ -11,10 +12,10 @@
             <script>selected("status", "<%= @selected[:status] %>", "<%=url_for(params.except :status)%>")</script>
         <% else %>
             <% @statuses.each do |status| %>
-                <% unless @counts[status] == 0 || @counts[status].nil? %>
+                <% unless @status_counts[status] == 0 || @status_counts[status].nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('status', status) %>"><%= status %></a></span>
-                      <span class="facet-count"><%= @counts[status] %></span>
+                      <span class="facet-count"><%= @status_counts[status] %></span>
                     </li>
                 <% end %>
             <% end %>
@@ -23,3 +24,4 @@
     </div>
   </div>
 </div>
+<% end %>

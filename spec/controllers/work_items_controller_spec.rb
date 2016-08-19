@@ -35,12 +35,6 @@ RSpec.describe WorkItemsController, type: :controller do
         get :index
         assigns(:institution).should eq( admin_user.institution)
       end
-
-      it 'assigns @counts' do
-        get :index
-        assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['fixity'])
-      end
-
     end
 
     describe 'for institutional admin' do
@@ -52,13 +46,6 @@ RSpec.describe WorkItemsController, type: :controller do
         get :index
         assigns(:items).should include(user_item)
       end
-
-      # We don't always want to set counts when calling #index: only when format is HTML
-      # it 'assigns @counts' do
-      #   get :index
-      #   assigns(:counts).should include(Pharos::Application::PHAROS_ACTIONS['ingest'])
-      # end
-
     end
   end
 

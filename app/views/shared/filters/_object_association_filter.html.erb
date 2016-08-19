@@ -1,3 +1,4 @@
+<% unless @io_assc_counts == {} %>
 <div id="oassociation-parent" class="panel panel-default">
   <div id="filter-title-oassociation" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-oassociation">
     <h5 class="panel-title">
@@ -12,11 +13,11 @@
             <script>selected("oassociation", "<%= current_obj.identifier %>", "<%=url_for(params.except :object_association)%>")</script>
         <% else %>
             <% @object_associations.each do |assc| %>
-                <% unless @counts[assc] == 0 || @counts[assc].nil? %>
+                <% unless @io_assc_counts[assc] == 0 || @io_assc_counts[assc].nil? %>
                     <% current_obj = IntellectualObject.find(assc) %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('object_association', assc) %>"><%= current_obj.identifier %></a></span>
-                      <span class="facet-count"><%= @counts[assc] %></span>
+                      <span class="facet-count"><%= @io_assc_counts[assc] %></span>
                     </li>
                 <% end %>
             <% end %>
@@ -25,3 +26,4 @@
     </div>
   </div>
 </div>
+<% end %>

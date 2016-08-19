@@ -58,6 +58,12 @@
             <% elsif key == :file_association %>
                 <span class="filterName">Associated File:</span>
                 <span class="filterValue"><%= GenericFile.find(value).identifier %></span>
+            <% elsif key == :outcome %>
+                <span class="filterName">Outcome:</span>
+                <span class="filterValue"><%= value.capitalize %></span>
+            <% elsif key == :event_type %>
+                <span class="filterName">Event Type:</span>
+                <span class="filterValue"><%= value.capitalize %></span>
             <% else %>
                 <span class="filterName"><%= key.capitalize %>:</span>
                 <span class="filterValue"><%= value %></span>

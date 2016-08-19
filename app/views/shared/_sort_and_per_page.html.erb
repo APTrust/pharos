@@ -19,7 +19,7 @@
 
   <span class="search-widgets pull-right">
     <span class="sr-only"><%= 'Per Page' %></span>
-
+    <% unless @premis_events %>
     <div id="state-dropdown" class="btn-group">
       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <a href="#">Object State </a>
@@ -31,6 +31,7 @@
         <li><a href="<%= current_path('state', 'D') %>">Deleted</a></li>
       </ul>
     </div>
+    <% end %>
 
     <div id="per_page-dropdown" class="btn-group">
       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">

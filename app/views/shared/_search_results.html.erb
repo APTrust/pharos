@@ -9,6 +9,8 @@
             <%= render 'shared/individual_results/file_result', counter: counter, current: current %>
         <% elsif current.is_a?(WorkItem) %>
             <%= render 'shared/individual_results/item_result', counter: counter, current: current %>
+        <% elsif current.is_a?(PremisEvent) %>
+          <%= render 'shared/individual_results/event_result', counter: counter, current: current %>
         <% end %>
         <% counter = counter+1 %>
         <hr>

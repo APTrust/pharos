@@ -1,3 +1,4 @@
+<% unless @format_counts == {} %>
 <div id="format-parent" class="panel panel-default">
   <div id="filter-title-format" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-format">
     <h5 class="panel-title">
@@ -11,10 +12,10 @@
             <script>selected("format", "<%= @selected[:file_format] %>", "<%=url_for(params.except :file_format)%>")</script>
         <% else %>
             <% @formats.each do |format| %>
-                <% unless @counts[format] == 0 || @counts[format].nil? %>
+                <% unless @format_counts[format] == 0 || @format_counts[format].nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('file_format', format) %>"><%= format %></a></span>
-                      <span class="facet-count"><%= @counts[format] %></span>
+                      <span class="facet-count"><%= @format_counts[format] %></span>
                     </li>
                 <% end %>
             <% end %>
@@ -23,3 +24,4 @@
     </div>
   </div>
 </div>
+<% end %>
