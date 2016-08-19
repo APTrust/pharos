@@ -7,13 +7,8 @@ module SearchAndIndex
     @institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = GenericFile.distinct.pluck(:file_format)
-    file_io_associations = GenericFile.distinct.pluck(:intellectual_object_id)
-    item_io_associations = WorkItem.distinct.pluck(:intellectual_object_id)
-    event_io_associations = PremisEvent.distinct.pluck(:intellectual_object_id)
-    @object_associations = file_io_associations | item_io_associations | event_io_associations
-    item_gf_associations = WorkItem.distinct.pluck(:generic_file_id)
-    event_gf_associations = PremisEvent.distinct.pluck(:generic_file_id)
-    @file_associations = item_gf_associations | event_gf_associations
+    @object_associations = IntellectualObject.pluck(:id)
+    @file_associations = GenericFile.pluck(:id)
     @types = ['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events']
     @event_types = PremisEvent.distinct.pluck(:event_type)
     @outcomes = PremisEvent.distinct.pluck(:outcome)
