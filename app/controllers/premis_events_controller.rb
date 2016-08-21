@@ -108,6 +108,7 @@ class PremisEventsController < ApplicationController
 
   def filter
     set_filter_values
+    initialize_filter_counters
     filter_by_institution unless params[:institution].nil?
     filter_by_event_type unless params[:event_type].nil?
     filter_by_outcome unless params[:outcome].nil?
@@ -120,6 +121,14 @@ class PremisEventsController < ApplicationController
     set_io_assc_count(@premis_events)
     count = @premis_events.count
     set_page_counts(count)
+  end
+
+  def set_filter_values
+    @institutions = Institution.pluck(:id)
+    @object_associations = @premis_events.distinct.pluck(:intellectual_object_id)
+    @file_associations = @premis_events.distinct.pluck(:generic_file_id)
+    @event_types = @premis_events.distinct.pluck(:event_type)
+    @outcomes = @premis_events.distinct.pluck(:outcome)
   end
 
 end

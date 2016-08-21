@@ -339,6 +339,7 @@ class WorkItemsController < ApplicationController
 
   def filter
     set_filter_values
+    initialize_filter_counters
     filter_by_status unless params[:status].nil?
     filter_by_stage unless params[:stage].nil?
     filter_by_action unless params[:item_action].nil?
@@ -364,4 +365,13 @@ class WorkItemsController < ApplicationController
     set_page_counts(count)
   end
 
+  def set_filter_values
+    @statuses = @items.distinct.pluck(:status)
+    @stages = @items.distinct.pluck(:stage)
+    @actions = @items.distinct.pluck(:action)
+    @institutions = Institution.pluck(:id)
+    @accesses = %w(consortia institution restricted)
+    @object_associations = @items.distinct.pluck(:intellectual_object_id)
+    @file_associations = @items.distinct.pluck(:generic_file_id)
+  end
 end

@@ -293,6 +293,7 @@ class IntellectualObjectsController < ApplicationController
 
   def filter
     set_filter_values
+    initialize_filter_counters
     filter_by_institution unless params[:institution].nil?
     filter_by_access unless params[:access].nil?
     filter_by_state unless params[:state].nil?
@@ -302,6 +303,12 @@ class IntellectualObjectsController < ApplicationController
     set_format_count(@intellectual_objects)
     count = @intellectual_objects.count
     set_page_counts(count)
+  end
+
+  def set_filter_values
+    @institutions = Institution.pluck(:id)
+    @accesses = %w(consortia institution restricted)
+    @formats = @intellectual_objects.joins(:generic_files).distinct.pluck(:file_format)
   end
 
 end

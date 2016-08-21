@@ -150,6 +150,7 @@ class CatalogController < ApplicationController
 
   def filter
     set_filter_values
+    initialize_filter_counters
     filter_by_status unless params[:status].nil?
     filter_by_stage unless params[:stage].nil?
     filter_by_action unless params[:item_action].nil?
@@ -168,6 +169,25 @@ class CatalogController < ApplicationController
     set_page_counts(count)
   end
 
+  def set_filter_values
+    @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
+    @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
+    @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
+    @institutions = Institution.pluck(:id)
+    @accesses = %w(consortia institution restricted)
+    @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
+    # gf_object_associations = @results[:files].distinct.pluck(:intellectual_object_id) unless @results[:files].nil?
+    # wi_object_associations = @results[:items].distinct.pluck(:intellectual_object_id) unless @results[:items].nil?
+    # event_object_associations = @results[:events].distinct.pluck(:intellectual_object_id) unless @results[:events].nil?
+    # @object_associations = gf_object_associations | wi_object_associations | event_object_associations
+    # wi_file_associations = @results[:items].distinct.pluck(:generic_file_id) unless @results[:items].nil?
+    # event_file_associations = @results[:events].distinct.pluck(:generic_file_id) unless @results[:events].nil?
+    # @file_associations = wi_file_associations | event_file_associations
+    @types = ['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events']
+    @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
+    @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
+  end
+
   def set_filter_counts
     @results.each do |key, results|
       if key == :objects
@@ -177,21 +197,21 @@ class CatalogController < ApplicationController
       elsif key == :files
         set_format_count(results)
         set_inst_count(results)
-        set_io_assc_count(results)
-        set_access_count(results)
+        #set_io_assc_count(results)
+        #set_access_count(results)
       elsif key == :items
         set_status_count(results)
         set_stage_count(results)
         set_action_count(results)
         set_inst_count(results)
         set_access_count(results)
-        set_io_assc_count(results)
-        set_gf_assc_count(results)
+        #set_io_assc_count(results)
+        #set_gf_assc_count(results)
       elsif key == :events
         set_inst_count(results)
         set_access_count(results)
-        set_io_assc_count(results)
-        set_gf_assc_count(results)
+        #set_io_assc_count(results)
+        #set_gf_assc_count(results)
         set_event_type_count(results)
         set_outcome_count(results)
       end

@@ -1,17 +1,6 @@
 module SearchAndIndex
 
-  def set_filter_values
-    @statuses = WorkItem.distinct.pluck(:status)
-    @stages = WorkItem.distinct.pluck(:stage)
-    @actions = WorkItem.distinct.pluck(:action)
-    @institutions = Institution.pluck(:id)
-    @accesses = %w(consortia institution restricted)
-    @formats = GenericFile.distinct.pluck(:file_format)
-    @object_associations = IntellectualObject.pluck(:id)
-    @file_associations = GenericFile.pluck(:id)
-    @types = ['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events']
-    @event_types = PremisEvent.distinct.pluck(:event_type)
-    @outcomes = PremisEvent.distinct.pluck(:outcome)
+  def initialize_filter_counters
     @selected = {}
     @inst_counts = {}
     @access_counts = {}
