@@ -1,0 +1,16 @@
+<div id="main-flashes">
+  <div class="flash_messages">
+    <% if flash[:alert] %>
+        <div class="alert alert-warning">
+            <%= flash[:alert] %>
+            <a class="close" data-dismiss="alert" href="#">×</a>
+        </div>
+    <% end %>
+    <% if flash[:notice] %>
+        <div class="notice">
+          <%= flash[:notice] %>
+          <a class="close" data-dismiss="alert" href="#">×</a>
+        </div>
+    <% end %>
+  </div>
+</div>

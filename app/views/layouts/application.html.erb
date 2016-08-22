@@ -8,7 +8,12 @@
 </head>
 <body>
 <%= render partial: '/shared/header_navbar' %>
-<div class="container"><%= yield %></div>
+<div class="container">
+  <div class="row">
+    <%= render partial: '/shared/flash_messages' %>
+  </div>
+  <%= yield %>
+</div>
 <%= render partial: '/shared/footer' %>
 
 </body>
