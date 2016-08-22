@@ -5,7 +5,7 @@
 <% unless (params[:q].nil? || params[:q] == '%') && @selected == {} %>
     <div id="appliedParams" class="clearfix constraints-container">
       <div class="pull-right">
-        <a class="catalog_startOverLink btn btn-sm btn-text" href="/search" id="startOverLink">Start Over</a>
+        <a class="catalog_startOverLink btn btn-sm btn-text" href="<%= start_over_link(params[:controller]) %>" id="startOverLink">Start Over</a>
       </div>
       <span class="constraints-label">You searched for: </span>
       <% unless params[:q].nil? || params[:q] == '' || params[:q] == '%' %>
