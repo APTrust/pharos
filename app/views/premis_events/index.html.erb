@@ -11,11 +11,11 @@
 
 <div id="content" class="col-md-9 col-sm-8">
   <% if @obj.kind_of?(Institution) %>
-      <% title = obj.name %>
+      <% title = @obj.name %>
   <% elsif @obj.kind_of?(IntellectualObject) %>
-      <% title = obj.title %>
+      <% title = @obj.title %>
   <% elsif @obj.kind_of?(IntellectualObject) %>
-      <% title = obj.identifier %>
+      <% title = @obj.identifier %>
   <% end %>
   <h2 class="top-content-title">Premis Events for <%= title %></h2>
   <%= render 'shared/search_breadcrumb' %>

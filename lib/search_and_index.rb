@@ -164,16 +164,18 @@ module SearchAndIndex
     @results[:objects] = @results[:objects].order('created_at').reverse_order unless @results.nil? || @results[:objects].nil?
     @results[:files] = @results[:files].order('created_at').reverse_order unless @results.nil? || @results[:files].nil?
     @results[:items] = @results[:items].order('date').reverse_order unless @results.nil? || @results[:items].nil?
+    @results[:events] = @results[:events].order('date_time').reverse_order unless @results.nil? || @results[:events].nil?
     @intellectual_objects = @intellectual_objects.order('created_at').reverse_order unless @intellectual_objects.nil?
     @generic_files = @generic_files.order('created_at').reverse_order unless @generic_files.nil?
     @items = @items.order('date').reverse_order unless @items.nil?
-    @premis_events = @premis_events.order('datetime').reverse_order unless @premis_events.nil?
+    @premis_events = @premis_events.order('date_time').reverse_order unless @premis_events.nil?
   end
 
   def sort_by_name
     @results[:objects] = @results[:objects].order('bag_name') unless @results.nil? || @results[:objects].nil?
     @results[:files] = @results[:files].order('uri') unless @results.nil? || @results[:files].nil?
     @results[:items] = @results[:items].order('name') unless @results.nil? || @results[:items].nil?
+    @results[:events] = @results[:events].order('identifier').reverse_order unless @results.nil? || @results[:events].nil?
     @intellectual_objects = @intellectual_objects.order('bag_name').reverse_order unless @intellectual_objects.nil?
     @generic_files = @generic_files.order('uri') unless @generic_files.nil?
     @items = @items.order('name') unless @items.nil?
@@ -181,13 +183,14 @@ module SearchAndIndex
   end
 
   def sort_by_institution
-    @results[:objects] = @results[:objects].order('institution_id').reverse_order unless @results.nil? || @results[:objects].nil?
-    @results[:files] = @results[:files].joins(:intellectual_object).order('institution_id').reverse_order unless @results.nil? || @results[:files].nil?
-    @results[:items] = @results[:items].order('institution_id').reverse_order unless @results.nil? || @results[:items].nil?
-    @intellectual_objects = @intellectual_objects.order('institution_id').reverse_order unless @intellectual_objects.nil?
-    @generic_files = @generic_files.joins(:intellectual_object).order('institution_id').reverse_order unless @generic_files.nil?
-    @items = @items.order('institution_id').reverse_order unless @items.nil?
-    @premis_events = @premis_events.order('institution_id').reverse_order unless @premis_events.nil?
+    @results[:objects] = @results[:objects].joins(:institution).order('institutions.name').reverse_order unless @results.nil? || @results[:objects].nil?
+    @results[:files] = @results[:files].joins(:institution).order('institutions.name').reverse_order unless @results.nil? || @results[:files].nil?
+    @results[:items] = @results[:items].joins(:institution).order('institutions.name').reverse_order unless @results.nil? || @results[:items].nil?
+    @results[:events] = @results[:events].joins(:institution).order('institutions.name').reverse_order unless @results.nil? || @results[:events].nil?
+    @intellectual_objects = @intellectual_objects.joins(:institution).order('institutions.name').reverse_order unless @intellectual_objects.nil?
+    @generic_files = @generic_files.joins(:institution).order('institutions.name').reverse_order unless @generic_files.nil?
+    @items = @items.joins(:institution).order('institutions.name').reverse_order unless @items.nil?
+    @premis_events = @premis_events.joins(:institution).order('institutions.name').reverse_order unless @premis_events.nil?
   end
 
   def set_inst_count(results)
