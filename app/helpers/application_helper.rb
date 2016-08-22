@@ -70,12 +70,13 @@ module ApplicationHelper
     if old_path.include? param
       old_path = url_for(params.except param)
     end
-    value.kind_of?(Fixnum) ? encoded_val = value : encoded_val = URI.escape(value)
-    if value.include?('+')
+    if value.kind_of?(Fixnum)
+      encoded_val = value
+    elsif value.include?('+')
       pieces = value.split('+')
       encoded_val = "#{pieces[0]}%2B#{pieces[1]}"
     else
-      encoded_val = value
+      encoded_val = URI.escape(value)
     end
     if old_path.include? '?'
       new_path = "#{old_path}&#{param}=#{encoded_val}"

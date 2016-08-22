@@ -375,7 +375,7 @@ module SearchAndIndex
     str = str << "&stage=#{params[:stage]}" if params[:stage].present?
     str = str << "&status=#{params[:status]}" if params[:status].present?
     str = str << "&access=#{params[:access]}" if params[:access].present?
-    str = str << "&format=#{params[:file_format]}" if params[:file_format].present?
+    str = str << "&file_format=#{params[:file_format]}" if params[:file_format].present?
     str = str << "&file_association=#{params[:file_association]}" if params[:file_association].present?
     str = str << "&object_association=#{params[:object_association]}" if params[:object_association].present?
     str = str << "&type=#{params[:type]}" if params[:type].present?
