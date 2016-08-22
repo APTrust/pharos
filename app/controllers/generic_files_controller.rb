@@ -24,7 +24,7 @@ class GenericFilesController < ApplicationController
       page_results(@generic_files)
       respond_to do |format|
         format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
-        format.html { super }
+        format.html { }
       end
     end
   end
