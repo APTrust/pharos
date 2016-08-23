@@ -14,7 +14,7 @@
       <% title = @obj.name %>
   <% elsif @obj.kind_of?(IntellectualObject) %>
       <% title = @obj.title %>
-  <% elsif @obj.kind_of?(IntellectualObject) %>
+  <% elsif @obj.kind_of?(GenericFile) %>
       <% title = @obj.identifier %>
   <% end %>
   <h2 class="top-content-title">Premis Events for <%= title %></h2>

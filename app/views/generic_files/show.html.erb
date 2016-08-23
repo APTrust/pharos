@@ -1,1 +1,50 @@
-<%= render ('show') %>
+<div id="content" class="col-md-10">
+  <ol class="breadcrumb">
+    <li><a href="#"><%= link_to @generic_file.intellectual_object.institution.name, @generic_file.intellectual_object.institution %></a></li>
+    <li><a href="#"><%= link_to @generic_file.intellectual_object.title, @generic_file.intellectual_object %></a></li>
+    <li class="active"><%= @generic_file.display %></li>
+  </ol>
+
+  <section class="page-header">
+    <h2><%= @generic_file.display %></h2>
+  </section>
+
+  <section class="object_info">
+    <dl class="dl-horizontal dl-invert">
+      <dt>Institution</dt>
+      <dd><%= link_to @generic_file.intellectual_object.institution.name, @generic_file.intellectual_object.institution %> [<%= @generic_file.intellectual_object.institution.brief_name %>]</dd>
+      <dt>Intellectual Object</dt>
+      <dd><%= link_to @generic_file.intellectual_object.title, @generic_file.intellectual_object %> [<%= @generic_file.intellectual_object.access %>]</dd>
+      <dt>Identifier</dt>
+      <dd><%= @generic_file.identifier %></dd>
+      <dt>URL to File</dt>
+      <dd><%= @generic_file.uri %></dd>
+      <dt>MimeType<dt>
+      <dd><%= @generic_file.file_format %></dd>
+      <dt>Filesize<dt>
+      <dd><%= number_to_human_size(@generic_file.size) %></dd>
+      <dt>Created</dt>
+      <dd><%= @generic_file.created_at %> (<%= time_ago_in_words @generic_file.created_at %>)</dd>
+      <dt>Modified</dt>
+      <dd><%= @generic_file.updated_at %> (<%= time_ago_in_words @generic_file.updated_at %>)</dd>
+      <dt>Checksums</dt>
+      <% @generic_file.checksums.each do |checksum| %>
+          <dd><strong><%= checksum.algorithm %>:</strong><%= checksum.digest %> generated <%= time_ago_in_words(checksum.datetime) %> ago</dd>
+      <% end %>
+      <% if @generic_file.state == 'D' %>
+          <dt><i><b>State</b></i></dt>
+          <dd><i>This object has been deleted.</i></dd>
+      <% end %>
+    </dl>
+  </section>
+  <section class="object_events">
+    <%= link_to events_path(@generic_file), class: 'btn doc-action-btn btn-normal' do %>
+        <i class="glyphicon glyphicon-eye-open"></i> View Events
+    <% end %>
+    <% unless @generic_file.state == 'D' %>
+        <%= destroy_link @generic_file %>
+    <% end %>
+
+  </section>
+  <br>
+</div>
