@@ -12,7 +12,7 @@
     </tr>
   </thead>
     <tbody>
-  <% if @items.empty? %>
+  <% if @items.nil? || @items.empty? %>
           No Work Items to display.
       <% else %>
           <% @items.each do |item| %>
