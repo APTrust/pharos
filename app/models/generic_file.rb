@@ -79,11 +79,12 @@ class GenericFile < ActiveRecord::Base
   end
 
   def self.find_files_in_need_of_fixity(date, options={})
-    #TODO: rewrite logic to find files where latest checksum created_at datetime is more than 90 days old
-    # rows = options[:rows] || 10
-    # start = options[:start] || 0
-    # files = GenericFile.where("object_state:A AND latest_fixity_dti:[* TO #{date}]",
-                                           #  sort: 'latest_fixity_dti asc', start: start, rows: rows)
+    rows = options[:rows] || 10
+    start = options[:start] || 0
+    files = GenericFile.joins(:premis_events).where('state = ? AND premis_events.event_type = ? AND premis_events.date_time <= ?',
+                                                    'A', 'fixity_check', date).order('premis_events.date_time').reverse_order
+    files = Kaminari.paginate_array(files).page(start).per(rows)
+    files
   end
 
   def self.bytes_by_format

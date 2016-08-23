@@ -172,18 +172,16 @@ RSpec.describe GenericFile, :type => :model do
     before do
       GenericFile.destroy_all
     end
-    # it 'should return only files with a fixity older than a given parameter' do
-    #   date = '2014-01-01T16:33:39Z'
-    #   date_two = '2014-12-12T16:33:39Z'
-    #   param = '2014-09-02T16:33:39Z'
-    #   subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
-    #   subject_two.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
-    #   files = GenericFile.find_files_in_need_of_fixity(param)
-    #   count = 0
-    #   files.each { count = count+1 }
-    #   count.should == 1
-    #   files.first.identifier.should == subject.identifier
-    # end
+    it 'should return only files with a fixity older than a given parameter' do
+      date = '2014-01-01T16:33:39Z'
+      date_two = '2014-12-12T16:33:39Z'
+      param = '2014-09-02T16:33:39Z'
+      subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
+      subject_two.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
+      files = GenericFile.find_files_in_need_of_fixity(param)
+      files.count.should == 1
+      files.first.identifier.should == subject.identifier
+    end
   end
 
   describe '#find_by_identifier' do

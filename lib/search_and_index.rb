@@ -194,16 +194,6 @@ module SearchAndIndex
   end
 
   def set_inst_count(results)
-    #Book.select('type, count(*)').where(:type => ["Banking","IT"]).group(:type)
-    # inst_list = ''
-    # @institutions.each do |inst|
-    #   if inst_list == ''
-    #     inst_list = "#{inst}"
-    #   else
-    #     inst_list = "#{inst_list} , #{inst}"
-    #   end
-    # end
-    #@inst_facet = @results[:objects].select('institution_id, count(*)').where(institution_id: [inst_list]).group(:institution_id)
     unless @institutions.nil?
       @institutions.each do |institution|
         @inst_counts[institution].nil? ?
