@@ -104,9 +104,9 @@ namespace :pharos do
         #add Work item for intellectual object
         FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
 
-        5.times.each do |count|
-          FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name)
-        end
+        # 5.times.each do |count|
+        #   FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name)
+        # end
 
         num_files = args[:numGenFiles].to_i
         num_files.times.each do |file_count|
@@ -129,7 +129,6 @@ namespace :pharos do
           }
           f = FactoryGirl.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier])
           f.save!
-
           f.add_event(FactoryGirl.attributes_for(:premis_event_validation))
           f.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
           f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))

@@ -146,7 +146,27 @@ form a {
 }
 
 .alert-warning {
-  color: #fbb450;
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+
+.alert-info {
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+  color: #31708f;
+}
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
 }
 
 form .alert {
@@ -232,6 +252,14 @@ i.doc-action-btn {
 .btn-warning{
   background-image: linear-gradient(to bottom, #fbb450, #f89406);
   color: #FFFFFF;
+}
+
+tr.Failed, dt.Failed, dd.Failed {
+  background-color: #f2dede;
+}
+
+tr.Success, dt.Success, dd.Success {
+  background-color: #dff0d8;
 }
 
 i.btn:hover,

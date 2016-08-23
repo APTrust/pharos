@@ -12,5 +12,17 @@
           <a class="close" data-dismiss="alert" href="#">×</a>
         </div>
     <% end %>
+    <% if flash[:success] %>
+        <div class="alert alert-success">
+          <%= flash[:success] %>
+          <a class="close" data-dismiss="alert" href="#">×</a>
+        </div>
+    <% end %>
+    <% if flash[:error] %>
+        <div class="alert alert-danger">
+          <%= flash[:error] %>
+          <a class="close" data-dismiss="alert" href="#">×</a>
+        </div>
+    <% end %>
   </div>
 </div>
