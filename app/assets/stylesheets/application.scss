@@ -343,3 +343,14 @@ i.btn[disabled] i.btn.active {
 dt, dd {
   line-height: 1.428571429;
 }
+
+.dl-horizontal dd {
+  margin-bottom: 6px;
+}
+
+.dl-invert dt {
+  font-weight: normal;
+  color: #777777;
+}
+
+
