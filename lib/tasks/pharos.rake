@@ -129,10 +129,10 @@ namespace :pharos do
           }
           f = FactoryGirl.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier])
           f.save!
-          f.add_event(FactoryGirl.attributes_for(:premis_event_validation))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check))
+          f.add_event(FactoryGirl.attributes_for(:premis_event_validation, institution: institution))
+          f.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: institution))
+          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: institution))
+          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, institution: institution))
           f.save!
         end
       end

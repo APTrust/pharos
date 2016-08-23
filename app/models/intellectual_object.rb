@@ -166,6 +166,7 @@ class IntellectualObject < ActiveRecord::Base
   def add_event(attributes)
     event = self.premis_events.build(attributes)
     event.intellectual_object = self
+    event.institution = self.institution
     event.save!
     event
   end

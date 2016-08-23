@@ -162,6 +162,7 @@ class GenericFile < ActiveRecord::Base
     event = self.premis_events.build(attributes)
     event.generic_file = self
     event.intellectual_object = self.intellectual_object
+    event.institution = self.intellectual_object.institution
     event.save!
     event
   end

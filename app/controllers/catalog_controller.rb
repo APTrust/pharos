@@ -90,6 +90,7 @@ class CatalogController < ApplicationController
   end
 
   def event_search
+    #TODO: find way to add generic file identifier to all fields search without compound joins which precludes events only attached to objects
     events = PremisEvent.discoverable(current_user)
     case params[:search_field]
       when 'Event Identifier'
@@ -99,9 +100,9 @@ class CatalogController < ApplicationController
       when 'Generic File Identifier'
         @results[:events] = events.with_file_identifier_like(params[:q])
       when 'All Fields'
-        @results[:events] = events.joins(:intellectual_object).joins(:generic_file).where('premis_events.identifier LIKE ? OR
-                                          intellectual_objects.identifier LIKE ? OR generic_files.identifier LIKE ?',
-                                          "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:events] = events.joins(:intellectual_object).where('premis_events.identifier LIKE ? OR
+                                          intellectual_objects.identifier LIKE ?',
+                                          "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 

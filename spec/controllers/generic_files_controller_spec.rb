@@ -9,6 +9,7 @@ RSpec.describe GenericFilesController, type: :controller do
     @institution = FactoryGirl.create(:institution)
     @another_institution = FactoryGirl.create(:institution)
     @intellectual_object = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id)
+    @another_intellectual_object = FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id)
     GenericFile.delete_all
   end
 
@@ -19,8 +20,8 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #index' do
     before do
       sign_in user
-      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
-      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
     end
 
@@ -44,8 +45,8 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #file_summary' do
     before do
       sign_in user
-      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
-      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
     end
 
@@ -84,8 +85,8 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #show' do
     before do
       sign_in user
-      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
-      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
     end
 
