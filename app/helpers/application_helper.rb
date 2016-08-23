@@ -37,12 +37,10 @@ module ApplicationHelper
   end
 
   def header_title
-    # TODO put base_title into an ENV
     base_title = 'APTrust'
   end
 
   def full_title(page_title)
-    # TODO put the base_title into an ENV
     base_title = 'APTrust'
     if page_title.empty?
       base_title

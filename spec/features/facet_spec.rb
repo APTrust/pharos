@@ -21,48 +21,39 @@ describe 'Faceting' do
       before do
         @event1 = file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
         @event2 = file.add_event(FactoryGirl.attributes_for(:premis_event_validation))
-        @event3 = file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation))
+        @event3 = file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, outcome: 'Failure'))
         file.save!
       end
 
-      # ----------------------------------------------------------------
-      # TODO: Bring these tests up to date. They are looking for
-      # Blacklight UI elements, which we're no longer using.
-      # These templates don't exist yet, and should the path be taking
-      # an institution as a parameter?
-      # ----------------------------------------------------------------
+      it 'facet by event type' do
+        visit events_path(inst)
+        page.should have_css('#documents .document', count: 3)
 
-      # it 'facet by event type' do
-      #   visit events_path(inst)
-      #   page.should have_css('#documents .document', count: 3)
+        within('#event_type-parent') do
+          click_link 'Validation'
+        end
 
-      #   within('#facets .blacklight-event_type_ssim') do
-      #     click_link 'Type 2'
-      #   end
+        page.should have_css('#documents .document', count: 1)
 
-      #   page.should have_css('#documents .document', count: 1)
+        page.should have_css('dd', text: @event2.outcome)
+        page.should have_css('dd', text: @event2.event_type)
+        page.should_not have_css('dd', text: @event1.event_type)
+      end
 
-      #   page.should have_css('dd', text: @event2.outcome.first)
-      #   page.should_not have_css('dd', text: @event1.outcome.first)
-      #   page.should have_css('dd', text: @event2.type.first)
-      #   page.should_not have_css('dd', text: @event1.type.first)
-      # end
+      it 'facet by event outcome' do
+        visit events_path(inst)
+        page.should have_css('#documents .document', count: 3)
 
-      # it 'facet by event outcome' do
-      #   visit events_path(inst)
-      #   page.should have_css('#documents .document', count: 3)
+        within('#outcome-parent') do
+          click_link 'Success'
+        end
 
-      #   within('#facets .blacklight-event_outcome_ssim') do
-      #     click_link 'Outcome 2'
-      #   end
+        page.should have_css('#documents .document', count: 2)
 
-      #   page.should have_css('#documents .document', count: 1)
-
-      #   page.should have_css('dd', text: @event2.outcome.first)
-      #   page.should_not have_css('dd', text: @event1.outcome.first)
-      #   page.should have_css('dd', text: @event2.type.first)
-      #   page.should_not have_css('dd', text: @event1.type.first)
-      # end
+        page.should have_css('dd', text: @event2.event_type)
+        page.should have_css('dd', text: @event1.event_type)
+        page.should_not have_css('dd', text: @event3.event_type)
+      end
 
     end
   end
