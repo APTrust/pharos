@@ -67,9 +67,8 @@ module ApplicationHelper
 
   def current_path(param, value)
     old_path = @current
-    if old_path.include? param
-      old_path = url_for(params.except param)
-    end
+    old_path = url_for(params.except param) if old_path.include? param
+    old_path = url_for(params.except :page) if old_path.include? 'page'
     if value.kind_of?(Fixnum)
       encoded_val = value
     elsif value.include?('+')
@@ -89,16 +88,16 @@ module ApplicationHelper
   def start_over_link(controller)
     case controller
       when 'catalog'
-        url = url_for(params.except(:sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
+        url = url_for(params.except(:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
                                     :file_association, :type, :state, :event_type, :outcome))
       when 'intellectual_objects'
-        url = url_for(params.except(:sort, :institution, :access, :file_format, :state))
+        url = url_for(params.except(:page, :sort, :institution, :access, :file_format, :state))
       when 'generic_files'
-        url = url_for(params.except(:sort, :institution, :access, :file_format, :object_association, :state))
+        url = url_for(params.except(:page, :sort, :institution, :access, :file_format, :object_association, :state))
       when 'premis_events'
-        url = url_for(params.except(:sort, :institution, :access, :object_association, :file_association, :state, :event_type, :outcome))
+        url = url_for(params.except(:page, :sort, :institution, :access, :object_association, :file_association, :state, :event_type, :outcome))
       when 'work_items'
-        url = url_for(params.except(:sort, :item_action, :institution, :stage, :status, :access, :object_association, :file_association, :state))
+        url = url_for(params.except(:page, :sort, :item_action, :institution, :stage, :status, :access, :object_association, :file_association, :state))
     end
     url
   end
