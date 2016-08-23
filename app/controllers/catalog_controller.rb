@@ -90,6 +90,7 @@ class CatalogController < ApplicationController
   end
 
   def event_search
+    #TODO: fix this nonsense
     events = PremisEvent.discoverable(current_user)
     case params[:search_field]
       when 'Event Identifier'
@@ -99,11 +100,13 @@ class CatalogController < ApplicationController
       when 'Generic File Identifier'
         @results[:events] = events.with_file_identifier_like(params[:q])
       when 'All Fields'
-        @results[:events] = events.joins('JOIN intellectual_objects ON premis_events.intellectual_object_id = intellectual_objects.id
-                                          LEFT OUTER JOIN generic_files ON premis_events.generic_file_id = generic_files.id')
-                                          .where('premis_events.identifier LIKE ? OR intellectual_objects.identifier LIKE ?
-                                          OR generic_files.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        @special_access_situation = true
+        # @results[:events] = events.joins('JOIN intellectual_objects ON premis_events.intellectual_object_id = intellectual_objects.id
+        #                                   LEFT OUTER JOIN generic_files ON premis_events.generic_file_id = generic_files.id')
+        #                                   .where('premis_events.identifier LIKE ? OR intellectual_objects.identifier LIKE ?
+        #                                   OR generic_files.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+        # @special_access_situation = true
+        @results[:events] = events.joins(:intellectual_object).where('premis_events.identifier LIKE ? OR
+                                          intellectual_objects.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
@@ -144,16 +147,17 @@ class CatalogController < ApplicationController
         @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:items] = items.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                           "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        @results[:events] = events.joins('JOIN intellectual_objects ON premis_events.intellectual_object_id = intellectual_objects.id
-                                          LEFT OUTER JOIN generic_files ON premis_events.generic_file_id = generic_files.id')
-                                .where('premis_events.identifier LIKE ? OR intellectual_objects.identifier LIKE ?
-                                          OR generic_files.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        @special_access_situation = true
+        # @results[:events] = events.joins('JOIN intellectual_objects ON premis_events.intellectual_object_id = intellectual_objects.id
+        #                                   LEFT OUTER JOIN generic_files ON premis_events.generic_file_id = generic_files.id')
+        #                         .where('premis_events.identifier LIKE ? OR intellectual_objects.identifier LIKE ?
+        #                                   OR generic_files.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+        # @special_access_situation = true
+        @results[:events] = events.joins(:intellectual_object).where('premis_events.identifier LIKE ? OR
+                                          intellectual_objects.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
   def filter
-    set_filter_values
     initialize_filter_counters
     filter_by_status unless params[:status].nil?
     filter_by_stage unless params[:stage].nil?
@@ -167,6 +171,7 @@ class CatalogController < ApplicationController
     filter_by_format unless params[:file_format].nil?
     filter_by_event_type unless params[:event_type].nil?
     filter_by_outcome unless params[:outcome].nil?
+    set_filter_values
     set_filter_counts
     count = 0
     @results.each { |key, value| count = count + value.count }
