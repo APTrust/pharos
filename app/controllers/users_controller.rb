@@ -17,7 +17,7 @@ class UsersController < ApplicationController
   def create
     @user = build_resource
     authorize @user
-    create!
+    create!(notice: 'User was successfully created.')
   end
 
   def show

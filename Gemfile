@@ -30,7 +30,7 @@ gem 'valid_email'
 gem 'rdf'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 3.0.2'
+gem 'simple_form', '~> 3.1.0'
 gem 'phony_rails'
 gem 'inherited_resources'
 gem 'uuidtools'
