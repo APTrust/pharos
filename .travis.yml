@@ -1,0 +1,26 @@
+language: ruby
+rvm:
+  - 2.3.1
+env:
+  global:
+    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+    - secure: XHjeFTlHHhdwdZfV6HzvCfovU2fRVPO3Uc7tBAHa8MRXPGaphxfvcJU4HSrDouWKemm/9As67NNocwKkLdyQ920spQ4+DJdnDnz0ifY7oLz98DBBoniXhtpaJQ1ahCl6l7754Rt5U6XNeHT71K4t5GSm4hrjHpq7mJpgRY6BzUs=
+    - secure: ZBCss4Cr2QNh0lN3JcCCZkqU3AORpnRKVZP0WEjZIJdYnxeuirkZ3IdLgYL6dUVpt1/mv5bXD19UJh6TA5JNb3fN+Kx30jXVIUVBBYqU6iHqE6yV6a3rC4QJgCob1IlZStJ9QxBNWo5nwEpEgrfJbz8s7extrYTQNq3GB2AR9a0=
+notifications:
+  email:
+    recipients:
+      - kelly.croswell@aptrust.org
+      - andrew.diamond@aptrust.org
+      - christian.dahlhausen@aptrust.org
+    on_success: change
+    on_failure: always
+  slack:
+    secure: pelbY7cgZtxgujDDqxD7LB6qZ0g0zZ8XVqebY9cfjPTsYMO9n7h5k0Hrw7DWUJlEb5jWsfIMgPy0+CUnCbM9KBGGiK1gz7MLTNlh1XWBhg4uWWZStsTX5RksIoJ+YEElGkeB3MIbq2sQzsPZwtrsUVtbUH+BfZ4YKy/pVeUvt2w=
+branches:
+  only:
+    - master
+    - develop
+before_install:
+  - gem install bundler
+before_script:
+  - bundle exec rake db:migrate RAILS_ENV=test
