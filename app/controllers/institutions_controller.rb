@@ -1,4 +1,5 @@
 class InstitutionsController < ApplicationController
+  include SearchAndIndex
   inherit_resources
   before_filter :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy]
@@ -10,8 +11,10 @@ class InstitutionsController < ApplicationController
   def index
     respond_to do |format|
       @institutions = policy_scope(Institution)
-      @sizes = find_all_sizes
-      format.json { render json: @institutions.map { |inst| inst.serializable_hash } }
+      @sizes = find_all_sizes unless request.url.include?("/api/")
+      set_page_counts(@institutions.count)
+      page_results(@institutions)
+      format.json { render json: {count: @count, next: @next, previous: @previous, results: @institutions.map{ |item| item.serializable_hash }} }
       format.html { render 'index' }
     end
   end
