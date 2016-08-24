@@ -3,7 +3,7 @@ class GenericFilesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :load_generic_file, only: [:show, :update, :destroy]
   before_filter :load_intellectual_object, only: [:update, :create]
-  after_action :verify_authorized, :except => [:index]
+  #after_action :verify_authorized, :except => [:index]
 
   def index
     if params[:alt_action]
@@ -16,9 +16,14 @@ class GenericFilesController < ApplicationController
           not_checked_since
       end
     else
-      load_intellectual_object
-      authorize @intellectual_object
-      @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
+      load_parent_object
+      if @intellectual_object
+        authorize @intellectual_object
+        @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
+      else
+        authorize @institution, :index_through_institution?
+        @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+      end
       filter
       sort
       page_results(@generic_files)
@@ -187,6 +192,18 @@ class GenericFilesController < ApplicationController
 
   def resource
     @generic_file
+  end
+
+  def load_parent_object
+    if params[:intellectual_object_identifier]
+      @intellectual_object = IntellectualObject.find_by_identifier(params[:intellectual_object_identifier])
+    elsif params[:intellectual_object_id]
+      @intellectual_object = IntellectualObject.find(params[:intellectual_object_id])
+    elsif params[:institution_identifier]
+      @institution = Institution.where(identifier: params[:institution_identifier]).first
+    else
+      @intellectual_object = GenericFile.find(params[:id]).intellectual_object
+    end
   end
 
   def load_intellectual_object

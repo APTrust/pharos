@@ -84,7 +84,7 @@ class CatalogController < ApplicationController
       when 'Generic File Identifier'
         @results[:items] = items.with_file_identifier_like(params[:q])
       when 'All Fields'
-        @results[:items] = items.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+        @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                        "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
@@ -145,7 +145,7 @@ class CatalogController < ApplicationController
         @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                           "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
-        @results[:items] = items.where('name LIKE ? OR etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+        @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                           "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
         # @results[:events] = events.joins('JOIN intellectual_objects ON premis_events.intellectual_object_id = intellectual_objects.id
         #                                   LEFT OUTER JOIN generic_files ON premis_events.generic_file_id = generic_files.id')
