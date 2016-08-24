@@ -48,6 +48,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def work_item_batch_update?
+    user.admin?
+  end
+
   # institutional_admin cannot delete institutional user
   def destroy?
     return false if user == record

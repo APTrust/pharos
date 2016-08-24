@@ -4,7 +4,6 @@ class WorkItemsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :set_item, only: :show
   before_filter :init_from_params, only: :create
-  before_filter :find_and_update, only: :update
 
   def index
     unless (session[:select_notice].nil? || session[:select_notice] == '')
@@ -57,12 +56,36 @@ class WorkItemsController < ApplicationController
   # not accessible to members. If we ever make it accessible to members,
   # we MUST NOT allow them to update :state, :node, or :pid!
   def update
-    authorize @work_item
-    respond_to do |format|
-      if @work_item.save
-        format.json { render json: @work_item, status: :ok }
-      else
-        format.json { render json: @work_item.errors, status: :unprocessable_entity }
+    if params[:save_batch]
+      authorize current_user, :work_item_batch_update?
+      WorkItem.transaction do
+        batch_work_item_update_params
+        @work_items = []
+        params[:work_items][:items].each do |current|
+          wi = WorkItem.find(current['id'])
+          wi.update(current)
+          wi.user = current_user.email
+          @work_items.push(wi)
+        end
+        raise ActiveRecord::Rollback
+      end
+      respond_to do |format|
+        if @work_items.save
+          format.json { render json: array_as_json(@work_items), status: :ok }
+        else
+          errors = @work_items.map(&:errors)
+          format.json { render json: errors, status: :unprocessable_entity }
+        end
+      end
+    else
+      find_and_update
+      authorize @work_item
+      respond_to do |format|
+        if @work_item.save
+          format.json { render json: @work_item, status: :ok }
+        else
+          format.json { render json: @work_item.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -273,6 +296,14 @@ class WorkItemsController < ApplicationController
                                       :institution_id, :date, :note, :action,
                                       :stage, :status, :outcome, :retry, :reviewed,
                                       :state, :node)
+  end
+
+  def batch_work_item_update_params
+    params[:work_items] &&= params.require(:work_items)
+                                   .permit(items: [:name, :etag, :bag_date, :bucket,
+                                                   :institution_id, :date, :note, :action,
+                                                   :stage, :status, :outcome, :retry, :reviewed,
+                                                   :state, :node, :id])
   end
 
   def params_for_status_update

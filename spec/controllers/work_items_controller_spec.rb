@@ -147,6 +147,13 @@ RSpec.describe WorkItemsController, type: :controller do
   describe 'PUT #update' do
 
     describe 'for admin' do
+      let(:current_dir) { File.dirname(__FILE__) }
+      let(:json_file) { File.join(current_dir, '..', 'fixtures', 'work_item_batch.json') }
+      let(:raw_json) { File.read(json_file) }
+      let(:wi_data) { JSON.parse(raw_json) }
+      let(:object) { FactoryGirl.create(:intellectual_object) }
+      let(:item_one) { FactoryGirl.create(:work_item, object_identifier: object.identifier) }
+      let(:item_two) { FactoryGirl.create(:work_item, object_identifier: object.identifier) }
       before do
         sign_in admin_user
       end
@@ -162,6 +169,17 @@ RSpec.describe WorkItemsController, type: :controller do
         wi_hash[:node] = ""
         put :update, id: item.id, format: 'json', work_item: wi_hash
         expect(assigns(:work_item).node).to eq('')
+      end
+
+      it 'allows the user to update an entire batch of work items' do
+        wi_data[0]['id'] = item_one.id
+        wi_data[1]['id'] = item_two.id
+        put :update, save_batch: true, work_items: {items: wi_data}
+        expect(response.code).to eq '201'
+        return_data = JSON.parse(response.body)
+        expect(return_data.count).to eq 2
+        expect(return_data[0]['id']).not_to be_nil
+        expect(return_data[1]['id']).not_to be_nil
       end
 
     end
