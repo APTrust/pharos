@@ -85,7 +85,7 @@ FactoryGirl.define do
     factory :premis_event_identifier_fail, class: 'PremisEvent' do
       outcome { 'failure' }
       detail {'Error generating S3 key'}
-      outcome_detail { '' }
+      outcome_detail { 'Identifier not set' }
       outcome_information { 'File not found' }
     end
   end

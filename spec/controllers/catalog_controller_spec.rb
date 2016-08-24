@@ -11,6 +11,7 @@ RSpec.describe CatalogController, type: :controller do
     IntellectualObject.delete_all
     GenericFile.delete_all
     WorkItem.delete_all
+    PremisEvent.delete_all
     @institution = FactoryGirl.create(:institution)
     @another_institution = FactoryGirl.create(:institution)
 
@@ -34,6 +35,13 @@ RSpec.describe CatalogController, type: :controller do
     @item_four = FactoryGirl.create(:ingested_item, object_identifier: @object_four.identifier, generic_file_identifier: @file_four.identifier, stage: 'Requested', institution_id: @another_institution.id, id: 16)
     @item_five = FactoryGirl.create(:ingested_item, object_identifier: @object_five.identifier, generic_file_identifier: @file_five.identifier, name: '1234file.tar', status: 'Success', institution_id: @another_institution.id, id: 17)
     @item_six = FactoryGirl.create(:ingested_item, object_identifier: @object_six.identifier, generic_file_identifier: @file_six.identifier, action: 'Ingest', institution_id: @another_institution.id, id: 18)
+
+    @event_one = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_one, identifier: '1234-5678')
+    @event_two = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_two, generic_file: @file_two, identifier: 'not-my-event-9876')
+    @event_three = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_three, generic_file: @file_three)
+    @event_four = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_four)
+    @event_five = FactoryGirl.create(:premis_event_ingest, intellectual_object: @object_five, generic_file: @file_five)
+    @event_six = FactoryGirl.create(:premis_event_identifier_fail, intellectual_object: @object_six, generic_file: @file_six)
   end
 
   after(:all) do
@@ -141,6 +149,32 @@ RSpec.describe CatalogController, type: :controller do
           end
         end
 
+        describe 'for premis event searches' do
+          it 'should match a search on premis event identifier' do
+            get :search, q: '1234', search_field: 'Event Identifier', object_type: 'Premis Events'
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@event_one.id]
+          end
+
+          it 'should match a search on intellectual object identifier' do
+            get :search, q: '1234', search_field: 'Intellectual Object Identifier', object_type: 'Premis Events'
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@event_five.id]
+          end
+
+          it 'should match a search on generic file identifier' do
+            get :search, q: '1234', search_field: 'Generic File Identifier', object_type: 'Premis Events'
+            expect(assigns(:paged_results).size).to eq 2
+            expect(assigns(:paged_results).map &:id).to match_array [@event_three.id, @event_five.id]
+          end
+
+          it 'should return results from multiple categories when search_field is generic' do
+            get :search, q: '1234', search_field: 'All Fields', object_type: 'Premis Events'
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_three.id, @event_five.id]
+          end
+        end
+
         describe 'for generic searches' do
           it 'should match a search on alt_identifier' do
             get :search, q: '1234', search_field: 'Alternate Identifier', object_type: 'All Types'
@@ -180,19 +214,25 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should match a search on object_identifier' do
             get :search, q: '1234', search_field: 'Intellectual Object Identifier', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 2
-            expect(assigns(:paged_results).map &:id).to match_array [@object_five.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@object_five.id, @item_five.id, @event_five.id]
           end
 
           it 'should match a search on generic_file_identifier' do
             get :search, q: '1234', search_field: 'Generic File Identifier', object_type: 'All Types'
-            expect(assigns(:paged_results).size).to eq 4
-            expect(assigns(:paged_results).map &:id).to match_array [@file_three.id, @file_five.id, @item_three.id, @item_five.id]
+            expect(assigns(:paged_results).size).to eq 6
+            expect(assigns(:paged_results).map &:id).to match_array [@file_three.id, @file_five.id, @item_three.id, @item_five.id, @event_three.id, @event_five.id]
+          end
+
+          it 'should match a search on premis event identifier' do
+            get :search, q: '1234', search_field: 'Event Identifier', object_type: 'All Types'
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@event_one.id]
           end
 
           it 'should return all results when nonspecific search terms are used' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'All Types', per_page: 20
-            expect(assigns(:paged_results).size).to eq 18
+            get :search, q: '*', search_field: 'All Fields', object_type: 'All Types', per_page: 30
+            expect(assigns(:paged_results).size).to eq 24
           end
         end
       end
@@ -242,11 +282,24 @@ RSpec.describe CatalogController, type: :controller do
           end
         end
 
+        describe 'for premis event searches' do
+          it 'should return only the results to which you have access' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events'
+            expect(assigns(:paged_results).size).to eq 4
+            expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_four.id, @event_five.id, @event_six.id]
+          end
+
+          it 'should not return results that you do not have access to' do
+            get :search, q: '9876', search_field: 'Premis Event Identifier', object_type: 'Premis Events'
+            expect(assigns(:paged_results).size).to eq 0
+          end
+        end
+
         describe 'for generic searches' do
           it 'should return only the results to which you have access' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'All Types', per_page: 20
-            # 3 inst objects, 1 consortial object, 4 generic files, 4 work items
-            expect(assigns(:paged_results).size).to eq 12
+            # 3 inst objects, 1 consortial object, 4 generic files, 4 work items, 4 events
+            expect(assigns(:paged_results).size).to eq 16
           end
 
           it 'should not return results that you do not have access to' do
@@ -347,6 +400,38 @@ RSpec.describe CatalogController, type: :controller do
           it 'should filter results by action' do
             get :search, q: '*', search_field: 'All Fields', object_type: 'Work Items', object_action: 'Ingest'
             expect(assigns(:paged_results).map &:id).to include(@item_six.id)
+          end
+        end
+
+        describe 'for premis event searches' do
+          it 'should filter by institution' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', institution: @another_institution.id
+            expect(assigns(:paged_results).map &:id).to match_array [@event_four.id, @event_five.id, @event_six.id]
+          end
+
+          it 'should filter by access' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', access: 'consortia'
+            expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_four.id]
+          end
+
+          it 'should filter by object association' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', object_association: @object_four.id
+            expect(assigns(:paged_results).map &:id).to include(@event_four.id)
+          end
+
+          it 'should filter by file association' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', file_association: @file_five.id
+            expect(assigns(:paged_results).map &:id).to include(@event_five.id)
+          end
+
+          it 'should filter by event type' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', event_type: 'ingest'
+            expect(assigns(:paged_results).map &:id).to include(@event_five.id)
+          end
+
+          it 'should filter by outcome' do
+            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', outcome: 'failure'
+            expect(assigns(:paged_results).map &:id).to include(@event_six.id)
           end
         end
 
