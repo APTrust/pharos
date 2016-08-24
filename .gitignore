@@ -7,8 +7,14 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore eclipse setting files
-/.idea
+# OS Files
+.DS_Store
+
+# IDE files
+.idea
+.project
+*.sublime-text.*
+*~
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
