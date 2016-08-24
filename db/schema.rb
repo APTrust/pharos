@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160816201203) do
+ActiveRecord::Schema.define(version: 20160824141927) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -59,6 +59,8 @@ ActiveRecord::Schema.define(version: 20160816201203) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
     t.string   "state"
+    t.string   "etag"
+    t.string   "dpn_uuid"
   end
 
   add_index "intellectual_objects", ["institution_id"], name: "index_intellectual_objects_on_institution_id"

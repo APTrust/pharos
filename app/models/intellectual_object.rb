@@ -138,7 +138,6 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def serializable_hash (options={})
-    # TODO: Add etag and DPN bag UUID to the IntelObj table
     last_ingested = self.last_ingested_version
     etag = last_ingested.nil? ? nil : last_ingested.etag
     {
@@ -152,6 +151,7 @@ class IntellectualObject < ActiveRecord::Base
       alt_identifier: [alt_identifier],
       etag: etag,
       in_dpn: in_dpn?,
+      dpn_uuid: dpn_uuid,
       file_count: gf_count,
       file_size: gf_size
     }
