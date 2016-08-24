@@ -12,7 +12,7 @@ class InstitutionsController < ApplicationController
     respond_to do |format|
       @institutions = policy_scope(Institution)
       @sizes = find_all_sizes unless request.url.include?("/api/")
-      set_page_counts(@institutions.count)
+      @count = @institutions.count
       page_results(@institutions)
       format.json { render json: {count: @count, next: @next, previous: @previous, results: @institutions.map{ |item| item.serializable_hash }} }
       format.html { render 'index' }
