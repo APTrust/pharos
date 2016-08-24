@@ -58,11 +58,7 @@ module SearchAndIndex
     @results[:objects] = @results[:objects].with_access(params[:access]) unless @results.nil? || @results[:objects].nil?
     @results[:files] = @results[:files].with_access(params[:access]) unless @results.nil? || @results[:files].nil?
     @results[:items] = @results[:items].with_access(params[:access]) unless @results.nil? || @results[:items].nil?
-    if @special_access_situation
-      @results[:events] = @results[:events].where('intellectual_objects.access = ?', params[:access]) unless @results.nil? || @results[:events].nil?
-    else
-      @results[:events] = @results[:events].with_access(params[:access]) unless @results.nil? || @results[:events].nil?
-    end
+    @results[:events] = @results[:events].with_access(params[:access]) unless @results.nil? || @results[:events].nil?
     @intellectual_objects = @intellectual_objects.with_access(params[:access]) unless @intellectual_objects.nil?
     @generic_files = @generic_files.with_access(params[:access]) unless @generic_files.nil?
     @items = @items.with_access(params[:access]) unless @items.nil?
@@ -207,20 +203,12 @@ module SearchAndIndex
     end
   end
 
-  def set_access_count(key, results)
+  def set_access_count(results)
     unless @accesses.nil?
-      if @special_access_situation && key == :events
-        @accesses.each do |acc|
-          @access_counts[acc].nil? ?
-              @access_counts[acc] = results.where('intellectual_objects.access = ?', acc).count :
-              @access_counts[acc] = @access_counts[acc] + results.where('intellectual_objects.access = ?', acc).count
-        end
-      else
-        @accesses.each do |acc|
-          @access_counts[acc].nil? ?
-              @access_counts[acc] = results.with_access(acc).count :
-              @access_counts[acc] = @access_counts[acc] + results.with_access(acc).count
-        end
+      @accesses.each do |acc|
+        @access_counts[acc].nil? ?
+            @access_counts[acc] = results.with_access(acc).count :
+            @access_counts[acc] = @access_counts[acc] + results.with_access(acc).count
       end
     end
   end

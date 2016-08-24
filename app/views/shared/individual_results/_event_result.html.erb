@@ -7,10 +7,10 @@
     <%- # main title container for doc partial view -%>
     <h5 class="index_title col-sm-9 col-lg-9">
       <% if current.generic_file.nil? %>
-          <% link_ident = current.intellectual_object.identifier %>
+          <% link_ident = current.intellectual_object_identifier %>
           <%= counter %>. <%= link_to link_ident, current.intellectual_object %>
       <% else %>
-          <% link_ident = current.generic_file.identifier %>
+          <% link_ident = current.generic_file_identifier %>
           <%= counter %>. <%= link_to link_ident, current.generic_file %>
       <% end %>
     </h5>

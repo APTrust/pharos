@@ -16,6 +16,7 @@ class PremisEvent < ActiveRecord::Base
   before_save :init_identifier
   before_save :init_time
   before_save :set_inst_id
+  before_save :set_other_identifiers
 
   # def initialize(graph={}, subject=nil)
   #   super
@@ -112,6 +113,11 @@ class PremisEvent < ActiveRecord::Base
     unless self.intellectual_object.nil?
       self.institution_id = self.intellectual_object.institution.id
     end
+  end
+
+  def set_other_identifiers
+    self.intellectual_object_identifier = self.intellectual_object.identifier unless self.intellectual_object.nil?
+    self.generic_file_identifier = self.generic_file.identifier unless self.generic_file.nil?
   end
 
 end

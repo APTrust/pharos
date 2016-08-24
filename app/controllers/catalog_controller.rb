@@ -100,13 +100,8 @@ class CatalogController < ApplicationController
       when 'Generic File Identifier'
         @results[:events] = events.with_file_identifier_like(params[:q])
       when 'All Fields'
-        # @results[:events] = events.joins('JOIN intellectual_objects ON premis_events.intellectual_object_id = intellectual_objects.id
-        #                                   LEFT OUTER JOIN generic_files ON premis_events.generic_file_id = generic_files.id')
-        #                                   .where('premis_events.identifier LIKE ? OR intellectual_objects.identifier LIKE ?
-        #                                   OR generic_files.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        # @special_access_situation = true
-        @results[:events] = events.joins(:intellectual_object).where('premis_events.identifier LIKE ? OR
-                                          intellectual_objects.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:events] = events.where('premis_events.identifier LIKE ? OR intellectual_object_identifier LIKE ?
+                                          OR generic_file_identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
@@ -147,13 +142,8 @@ class CatalogController < ApplicationController
         @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
         @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
                                           "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        # @results[:events] = events.joins('JOIN intellectual_objects ON premis_events.intellectual_object_id = intellectual_objects.id
-        #                                   LEFT OUTER JOIN generic_files ON premis_events.generic_file_id = generic_files.id')
-        #                         .where('premis_events.identifier LIKE ? OR intellectual_objects.identifier LIKE ?
-        #                                   OR generic_files.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        # @special_access_situation = true
-        @results[:events] = events.joins(:intellectual_object).where('premis_events.identifier LIKE ? OR
-                                          intellectual_objects.identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:events] = events.where('premis_events.identifier LIKE ? OR intellectual_object_identifier LIKE ?
+                                          OR generic_file_identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
     end
   end
 
@@ -201,24 +191,24 @@ class CatalogController < ApplicationController
     @results.each do |key, results|
       if key == :objects
         set_inst_count(results)
-        set_access_count(key, results)
+        set_access_count(results)
         set_format_count(results)
       elsif key == :files
         set_format_count(results)
         set_inst_count(results)
         #set_io_assc_count(results)
-        set_access_count(key, results)
+        set_access_count(results)
       elsif key == :items
         set_status_count(results)
         set_stage_count(results)
         set_action_count(results)
         set_inst_count(results)
-        set_access_count(key, results)
+        set_access_count(results)
         #set_io_assc_count(results)
         #set_gf_assc_count(results)
       elsif key == :events
         set_inst_count(results)
-        set_access_count(key, results)
+        set_access_count(results)
         #set_io_assc_count(results)
         #set_gf_assc_count(results)
         set_event_type_count(results)
