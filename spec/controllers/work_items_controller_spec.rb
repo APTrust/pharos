@@ -152,8 +152,8 @@ RSpec.describe WorkItemsController, type: :controller do
       let(:raw_json) { File.read(json_file) }
       let(:wi_data) { JSON.parse(raw_json) }
       let(:object) { FactoryGirl.create(:intellectual_object) }
-      let(:item_one) { FactoryGirl.create(:work_item, object_identifier: object.identifier) }
-      let(:item_two) { FactoryGirl.create(:work_item, object_identifier: object.identifier) }
+      let(:item_one) { FactoryGirl.create(:work_item, object_identifier: object.identifier, status: 'Failed') }
+      let(:item_two) { FactoryGirl.create(:work_item, object_identifier: object.identifier, status: 'Failed') }
       before do
         sign_in admin_user
       end
@@ -174,12 +174,14 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'allows the user to update an entire batch of work items' do
         wi_data[0]['id'] = item_one.id
         wi_data[1]['id'] = item_two.id
-        put :update, save_batch: true, work_items: {items: wi_data}
-        expect(response.code).to eq '201'
+        put :update, save_batch: true, format: 'json', work_items: {items: wi_data}
+        expect(response.code).to eq '200'
         return_data = JSON.parse(response.body)
         expect(return_data.count).to eq 2
-        expect(return_data[0]['id']).not_to be_nil
-        expect(return_data[1]['id']).not_to be_nil
+        expect(return_data[0]['id']).to eq item_one.id
+        expect(return_data[1]['id']).to eq item_two.id
+        expect(return_data[0]['status']).to eq 'Success'
+        expect(return_data[1]['status']).to eq 'Success'
       end
 
     end

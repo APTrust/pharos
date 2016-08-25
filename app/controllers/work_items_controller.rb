@@ -66,15 +66,19 @@ class WorkItemsController < ApplicationController
           wi.update(current)
           wi.user = current_user.email
           @work_items.push(wi)
+          unless wi.save
+            @incomplete = true
+            break
+          end
         end
         raise ActiveRecord::Rollback
       end
       respond_to do |format|
-        if @work_items.save
-          format.json { render json: array_as_json(@work_items), status: :ok }
-        else
+        if @incomplete
           errors = @work_items.map(&:errors)
           format.json { render json: errors, status: :unprocessable_entity }
+        else
+          format.json { render json: array_as_json(@work_items), status: :ok }
         end
       end
     else
@@ -277,6 +281,10 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  def array_as_json(list_of_work_items)
+    list_of_work_items.map { |item| item.serializable_hash }
+  end
+
   def init_from_params
     @work_item = WorkItem.new(work_item_params)
     @work_item.user = current_user.email
@@ -318,12 +326,26 @@ class WorkItemsController < ApplicationController
       @items = WorkItem.readable(current_user)
     end
     params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
-    @items = @items.reviewed(false) unless session[:show_reviewed] == 'true'
     params[:sort] = 'date' if params[:sort].nil?
-    @items = @items.order(params[:sort])
-    @items = @items.reverse_order if params[:sort] == 'date'
     authorize @items
-    session[:purge_datetime] = Time.now.utc if params[:page] == 1 || params[:page].nil?
+    @items = @items
+      .created_before(params[:created_before])
+      .created_after(params[:created_after])
+      .updated_before(params[:updated_before])
+      .updated_after(params[:updated_after])
+      .with_name(params[:name])
+      .with_name_like(params[:name_like])
+      .with_etag(params[:etag])
+      .with_etag_like(params[:etag_like])
+      .with_object_identifier(params[:object_identifier])
+      .with_object_identifier_like(params[:object_identifier_like])
+      .with_file_identifier(params[:file_identifier])
+      .with_file_identifier_like(params[:file_identifier_like])
+      .with_status(params[:status])
+      .with_stage(params[:stage])
+      .with_action(params[:item_action])
+      .with_access(params[:access])
+      .with_state(params[:state])
   end
 
   def set_item

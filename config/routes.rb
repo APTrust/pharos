@@ -36,7 +36,8 @@ Rails.application.routes.draw do
   resources :premis_events, only: [:create], format: :json, param: :identifier, path: 'api/v2/events'
 
   # WORK ITEM ROUTES
-  resources :work_items, only: [:index, :create, :show, :update], path: 'items'
+  resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
+  put 'items/', to: 'work_items#update', format: :json
   resources :work_items, path: '/api/v2/items'
   resources :work_items, format: :json, only: [:index], path: 'member-api/v1/items'
   get '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
