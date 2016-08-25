@@ -10,9 +10,12 @@ class WorkItemsController < ApplicationController
     filter
     sort
     page_results(@items)
-    if params[:format] == 'json'
-      json_list = @paged_results.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
-      render json: {count: @count, next: @next, previous: @previous, results: json_list}
+    respond_to do |format|
+      format.json {
+        json_list = @paged_results.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
+        render json: {count: @count, next: @next, previous: @previous, results: json_list}
+      }
+      format.html
     end
   end
 
@@ -227,7 +230,7 @@ class WorkItemsController < ApplicationController
   end
 
   def init_from_params
-    @work_item = WorkItem.new(work_item_params)
+    @work_item = WorkItem.new(writable_work_item_params)
     @work_item.user = current_user.email
   end
 
@@ -235,12 +238,16 @@ class WorkItemsController < ApplicationController
     # Parse date explicitly, or ActiveRecord will not find records when date format string varies.
     set_item
     if @work_item
-      @work_item.update(work_item_params)
+      @work_item.update(writable_work_item_params)
       @work_item.user = current_user.email
     end
   end
 
-  def work_item_params
+  # Changed from the default "work_item_params" because Rails was
+  # enforcing these on GET requests to the API and complaining
+  # that "work_item: {}" was empty in requests that only used
+  # a query string.
+  def writable_work_item_params
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
                                       :institution_id, :date, :note, :action,
                                       :stage, :status, :outcome, :retry,
