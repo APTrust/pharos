@@ -2,25 +2,25 @@
   <div class="flash_messages">
     <% if flash[:alert] %>
         <div class="alert alert-warning">
-            <p><%= flash[:alert] %></p>
+            <%= flash[:alert] %>
             <a class="close" data-dismiss="alert" href="#">×</a>
         </div>
     <% end %>
     <% if flash[:notice] %>
         <div class="alert alert-info">
-          <p><%= flash[:notice] %></p>
+          <%= flash[:notice] %>
           <a class="close" data-dismiss="alert" href="#">×</a>
         </div>
     <% end %>
     <% if flash[:success] %>
         <div class="alert alert-success">
-          <p><%= flash[:success] %></p>
+          <%= flash[:success] %>
           <a class="close" data-dismiss="alert" href="#">×</a>
         </div>
     <% end %>
     <% if flash[:error] %>
         <div class="alert alert-danger">
-          <p><%= flash[:error] %></p>
+          <%= flash[:error] %>
           <a class="close" data-dismiss="alert" href="#">×</a>
         </div>
     <% end %>
