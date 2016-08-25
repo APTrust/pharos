@@ -378,9 +378,8 @@ module SearchAndIndex
     str = str << "&name_contains=#{params[:name_contains]}" if params[:name_contains].present?
     str = str << "&name_exact=#{params[:name_exact]}" if params[:name_exact].present?
     str = str << "&updated_since=#{params[:updated_since]}" if params[:updated_since].present?
-    str = str << "&reviewed=#{params[:reviewed]}" if params[:reviewed].present?
     str = str << "&node=#{params[:node]}" if params[:node].present?
-    str = str << "&reviewed=#{params[:needs_admin_review]}" if params[:needs_admin_review].present?
+    str = str << "&needs_admin_review=#{params[:needs_admin_review]}" if params[:needs_admin_review].present?
     str = str << "&event_type=#{params[:event_type]}" if params[:event_type].present?
     str = str << "&outcome=#{params[:outcome]}" if params[:outcome].present?
     str

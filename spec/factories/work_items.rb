@@ -12,7 +12,6 @@ FactoryGirl.define do
     stage { Pharos::Application::PHAROS_STAGES.values.sample }
     status { Pharos::Application::PHAROS_STATUSES.values.sample }
     outcome { Faker::Lorem.sentence }
-    reviewed { false }
     intellectual_object { FactoryGirl.create(:intellectual_object) }
   end
 
@@ -29,7 +28,6 @@ FactoryGirl.define do
     stage { Pharos::Application::PHAROS_STAGES['record'] }
     status { Pharos::Application::PHAROS_STATUSES['success'] }
     outcome { Faker::Lorem.sentence }
-    reviewed { false }
     object_identifier { FactoryGirl.create(:intellectual_object).identifier }
   end
 
@@ -46,7 +44,6 @@ FactoryGirl.define do
     stage { Pharos::Application::PHAROS_STAGES.values.sample }
     status { Pharos::Application::PHAROS_STATUSES.values.sample }
     outcome { Faker::Lorem.sentence }
-    reviewed { false }
     state { Faker::Lorem.sentence }
     node { Faker::Internet.ip_v4_address }
     pid { Random::rand(5000) }

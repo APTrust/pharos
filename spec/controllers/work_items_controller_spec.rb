@@ -568,8 +568,7 @@ RSpec.describe WorkItemsController, type: :controller do
                action: 'File',
                stage: "Entry",
                status: 'Finalized',
-               outcome: 'Outcome',
-               reviewed: false}, format: 'json')
+               outcome: 'Outcome'}, format: 'json')
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( { 'status' => ['Status is not one of the allowed options'],
                                                    'stage' => ['Stage is not one of the allowed options'],
@@ -591,33 +590,11 @@ RSpec.describe WorkItemsController, type: :controller do
                  action: Pharos::Application::PHAROS_ACTIONS['fixity'],
                  stage: Pharos::Application::PHAROS_STAGES['fetch'],
                  status: Pharos::Application::PHAROS_STATUSES['fail'],
-                 outcome: 'Outcome',
-                 reviewed: false}, format: 'json')
+                 outcome: 'Outcome'}, format: 'json')
         }.to change(WorkItem, :count).by(1)
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
         expect(assigns(:work_item).name).to eq "#{name}.tar"
-      end
-
-      it 'should fix an item with a null reviewed flag' do
-        name = object.identifier.split('/')[1]
-        post(:create,
-             work_item: { name: "#{name}.tar",
-               etag: '1234567890',
-               bag_date: Time.now.utc,
-               user: 'Kelly Croswell',
-               institution_id: institution.id,
-               bucket: "aptrust.receiving.#{institution.identifier}",
-               date: Time.now.utc,
-               note: 'Note',
-               action: Pharos::Application::PHAROS_ACTIONS['fixity'],
-               stage: Pharos::Application::PHAROS_STAGES['fetch'],
-               status: Pharos::Application::PHAROS_STATUSES['fail'],
-               outcome: 'Outcome',
-               reviewed: nil}, format: 'json')
-        expect(response.status).to eq(201)
-        assigns[:work_item].should be_kind_of WorkItem
-        expect(assigns(:work_item).reviewed).to eq(false)
       end
     end
 
@@ -633,95 +610,10 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'restricts institutional admins from API usage' do
         post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution,
                                        bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
-                                       stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome', reviewed: false},
+                                       stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome'},
              format: 'json'
         expect(response.status).to eq 403
       end
-    end
-  end
-
-  describe 'Post #review_selected' do
-    describe 'as admin user' do
-      let!(:working_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['start'], institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-      let(:item_id) { "r_#{item.id}" }
-      let(:work_id) { "r_#{working_item.id}" }
-      before do
-        sign_in admin_user
-      end
-
-      after do
-        WorkItem.delete_all
-      end
-
-      it "should update an item's review field to true" do
-        post :index, review: [item_id], format: :json
-        expect(response.status).to eq(200)
-        WorkItem.find(item.id).reviewed.should eq(true)
-      end
-
-      it 'should not review a working item' do
-        post :index, review: [work_id], format: :json
-        expect(response.status).to eq(200)
-        WorkItem.find(working_item.id).reviewed.should eq(false)
-      end
-    end
-
-    describe 'as institutional_admin' do
-      let(:user_id) { "r_#{user_item.id}" }
-      before do
-        sign_in institutional_admin
-      end
-
-      after do
-        WorkItem.delete_all
-      end
-
-      it "should update an item's review field to true" do
-        post :index, review: [user_id], format: :json
-        expect(response.status).to eq(200)
-        WorkItem.find(user_item.id).reviewed.should eq(true)
-      end
-    end
-  end
-
-  describe 'Post #review_all' do
-    let!(:failed_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail'], institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-    let!(:second_item) { FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['fail'], bucket: "aptrust.receiving.#{institution.identifier}", institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-    describe 'as admin user' do
-      before do
-        sign_in admin_user
-        session[:purge_datetime] = Time.now.utc
-      end
-
-      after do
-        WorkItem.delete_all
-      end
-
-      it 'should reset the purge datetime in the session variable' do
-        time_before = session[:purge_datetime]
-        get :index, review_all: true
-        session[:purge_datetime].should_not eq(time_before)
-      end
-
-      it "should update all item's review fields to true" do
-        get :index, review_all: true
-        expect(response.status).to eq(302)
-        WorkItem.find(failed_item.id).reviewed.should eq(true)
-      end
-    end
-
-    describe 'as institutional admin user' do
-      before do
-        sign_in institutional_admin
-        session[:purge_datetime] = Time.now.utc
-      end
-
-      it "should update all items associated with user's institution's review fields to true" do
-        get :index, review_all: true
-        expect(response.status).to eq(302)
-        WorkItem.find(second_item.id).reviewed.should eq(true)
-      end
-
     end
   end
 
@@ -766,7 +658,6 @@ RSpec.describe WorkItemsController, type: :controller do
                                       etag: 'etag1',
                                       institution: institution,
                                       retry: true,
-                                      reviewed: false,
                                       bag_date: '2014-10-17 14:56:56Z',
                                       action: 'Ingest',
                                       stage: 'Record',
@@ -793,7 +684,7 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'filters down to the right records' do
         get(:api_search, format: :json, name: 'item1.tar',
             etag: 'etag1', institution: institution,
-            retry: 'true', reviewed: 'false',
+            retry: 'true',
             bag_date: '2014-10-17 14:56:56Z',
             action: 'Ingest', stage: 'Record',
             status: 'Success', object_identifier: object.identifier,

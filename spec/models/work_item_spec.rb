@@ -185,7 +185,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
       wi.retry.should == true
-      wi.reviewed.should == false
       wi.state.should be_nil
       wi.node.should be_nil
       wi.pid.should == 0
@@ -202,7 +201,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
       wi.retry.should == true
-      wi.reviewed.should == false
       wi.state.should be_nil
       wi.node.should be_nil
       wi.pid.should == 0
@@ -219,7 +217,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
       wi.retry.should == true
-      wi.reviewed.should == false
       wi.generic_file_identifier.should == 'abc/123/doc.pdf'
       wi.state.should be_nil
       wi.node.should be_nil

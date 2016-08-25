@@ -6,25 +6,13 @@ class WorkItemsController < ApplicationController
   before_filter :init_from_params, only: :create
 
   def index
-    unless (session[:select_notice].nil? || session[:select_notice] == '')
-      flash[:notice] = session[:select_notice]
-      session[:select_notice] = ''
-    end
-    if params[:show_reviewed]
-      show_reviewed
-    elsif params[:review_all]
-      review_all
-    elsif params[:review]
-      review_selected
-    else
-      set_items
-      filter
-      sort
-      page_results(@items)
-      if params[:format] == 'json'
-        json_list = @paged_results.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
-        render json: {count: @count, next: @next, previous: @previous, results: json_list}
-      end
+    set_items
+    filter
+    sort
+    page_results(@items)
+    if params[:format] == 'json'
+      json_list = @paged_results.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
+      render json: {count: @count, next: @next, previous: @previous, results: json_list}
     end
   end
 
@@ -206,7 +194,7 @@ class WorkItemsController < ApplicationController
       rewrite_params_for_sqlite
     end
     search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
-                     :retry, :reviewed, :object_identifier, :generic_file_identifier,
+                     :retry, :object_identifier, :generic_file_identifier,
                      :node, :needs_admin_review, :process_after]
     search_fields.each do |field|
       if params[field].present?
@@ -234,53 +222,6 @@ class WorkItemsController < ApplicationController
 
   private
 
-  def show_reviewed
-    authorize @items
-    session[:show_reviewed] = params[:show_reviewed]
-    respond_to do |format|
-      format.js {}
-    end
-  end
-
-  def review_all
-    current_user.admin? ? items = WorkItem.all : items = WorkItem.where(institution_id: current_user.institution_id)
-    authorize items, :review_all?
-    items.each do |item|
-      if item.date < session[:purge_datetime] && (item.status == Pharos::Application::PHAROS_STATUSES['success'] || item.status == Pharos::Application::PHAROS_STATUSES['fail'])
-        item.reviewed = true
-        item.save!
-      end
-    end
-    session[:purge_datetime] = Time.now.utc
-    redirect_to :back
-    flash[:notice] = 'All items have been marked as reviewed.'
-  rescue ActionController::RedirectBackError
-    redirect_to root_path
-    flash[:notice] = 'All items have been marked as reviewed.'
-  end
-
-  def review_selected
-    review_list = params[:review]
-    unless review_list.nil?
-      review_list.each do |item|
-        id = item.split("_")[1]
-        proc_item = WorkItem.find(id)
-        authorize proc_item, :mark_as_reviewed?
-        if (proc_item.status == Pharos::Application::PHAROS_STATUSES['success'] || proc_item.status == Pharos::Application::PHAROS_STATUSES['fail'])
-          proc_item.reviewed = true
-          proc_item.save!
-        end
-      end
-    end
-    set_items
-    session[:select_notice] = 'Selected items have been marked for review or purge from S3 as indicated.'
-    count = @items.count || 1  # one if single item
-    respond_to do |format|
-      format.json { render json: {status: 'ok', message: "Marked #{count} items as reviewed"} }
-      format.html { redirect_to :back }
-    end
-  end
-
   def array_as_json(list_of_work_items)
     list_of_work_items.map { |item| item.serializable_hash }
   end
@@ -302,7 +243,7 @@ class WorkItemsController < ApplicationController
   def work_item_params
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
                                       :institution_id, :date, :note, :action,
-                                      :stage, :status, :outcome, :retry, :reviewed,
+                                      :stage, :status, :outcome, :retry,
                                       :state, :node)
   end
 
@@ -310,7 +251,7 @@ class WorkItemsController < ApplicationController
     params[:work_items] &&= params.require(:work_items)
                                    .permit(items: [:name, :etag, :bag_date, :bucket,
                                                    :institution_id, :date, :note, :action,
-                                                   :stage, :status, :outcome, :retry, :reviewed,
+                                                   :stage, :status, :outcome, :retry,
                                                    :state, :node, :id])
   end
 
@@ -385,9 +326,6 @@ class WorkItemsController < ApplicationController
     if params[:retry].present? && params[:retry].is_a?(String)
       params[:retry] = params[:retry][0]
     end
-    if params[:reviewed].present? && params[:retry].is_a?(String)
-      params[:reviewed] = params[:reviewed][0]
-    end
   end
 
   def filter
@@ -406,7 +344,6 @@ class WorkItemsController < ApplicationController
     @items = @items.with_name(params[:name_exact])
     @items = @items.with_name_like(pattern) if pattern
     @items = @items.updated_after(date) if date
-    @items = @items.reviewed(to_boolean(params[:reviewed]))
     set_status_count(@items)
     set_stage_count(@items)
     set_action_count(@items)

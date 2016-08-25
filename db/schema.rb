@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160824185420) do
+ActiveRecord::Schema.define(version: 20160825164453) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -148,7 +148,6 @@ ActiveRecord::Schema.define(version: 20160824185420) do
     t.datetime "bag_date"
     t.datetime "date"
     t.boolean  "retry",                               default: false, null: false
-    t.boolean  "reviewed",                            default: false
     t.string   "object_identifier"
     t.string   "generic_file_identifier"
     t.string   "node",                    limit: 255

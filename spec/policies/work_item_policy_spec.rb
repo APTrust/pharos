@@ -17,7 +17,6 @@ describe WorkItemPolicy do
       should permit(:show)
       should permit(:update)
       should permit(:edit)
-      should permit(:mark_as_reviewed)
       should_not permit(:destroy)
     end
   end
@@ -34,7 +33,6 @@ describe WorkItemPolicy do
           should permit(:show)
           should permit(:update)
           should permit(:edit)
-          should permit(:mark_as_reviewed)
           should_not permit(:destroy)
         end
       end
@@ -47,7 +45,6 @@ describe WorkItemPolicy do
           should_not permit(:show)
           should_not permit(:update)
           should_not permit(:edit)
-          should_not permit(:mark_as_reviewed)
           should_not permit(:destroy)
         end
       end
@@ -66,7 +63,6 @@ describe WorkItemPolicy do
           should permit(:show)
           should_not permit(:update)
           should_not permit(:edit)
-          should_not permit(:mark_as_reviewed)
           should_not permit(:destroy)
         end
       end
@@ -79,7 +75,6 @@ describe WorkItemPolicy do
           should_not permit(:show)
           should_not permit(:update)
           should_not permit(:edit)
-          should_not permit(:mark_as_reviewed)
           should_not permit(:destroy)
         end
       end
@@ -95,7 +90,6 @@ describe WorkItemPolicy do
       should_not permit(:show)
       should_not permit(:update)
       should_not permit(:edit)
-      should_not permit(:mark_as_reviewed)
       should_not permit(:destroy)
     end
   end

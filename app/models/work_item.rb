@@ -8,7 +8,6 @@ class WorkItem < ActiveRecord::Base
   validate :status_is_allowed
   validate :stage_is_allowed
   validate :action_is_allowed
-  validate :reviewed_not_nil
   before_save :set_object_identifier_if_ingested
 
   ### Scopes
@@ -28,7 +27,6 @@ class WorkItem < ActiveRecord::Base
   scope :with_stage, ->(param) { where(stage: param) unless param.blank? }
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
-  scope :reviewed, ->(param) { where(reviewed: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?
@@ -123,7 +121,6 @@ class WorkItem < ActiveRecord::Base
     restore_item.outcome = 'Not started'
     restore_item.user = requested_by
     restore_item.retry = true
-    restore_item.reviewed = false
     restore_item.date = Time.now
     restore_item.state = nil
     restore_item.node = nil
@@ -146,7 +143,6 @@ class WorkItem < ActiveRecord::Base
     dpn_item.outcome = 'Not started'
     dpn_item.user = requested_by
     dpn_item.retry = true
-    dpn_item.reviewed = false
     dpn_item.date = Time.now
     dpn_item.state = nil
     dpn_item.node = nil
@@ -172,7 +168,6 @@ class WorkItem < ActiveRecord::Base
     delete_item.outcome = 'Not started'
     delete_item.user = requested_by
     delete_item.retry = true
-    delete_item.reviewed = false
     delete_item.date = Time.now
     delete_item.generic_file_identifier = generic_file_identifier
     delete_item.state = nil
@@ -200,10 +195,6 @@ class WorkItem < ActiveRecord::Base
     if !Pharos::Application::PHAROS_ACTIONS.values.include?(self.action)
       errors.add(:action, 'Action is not one of the allowed options')
     end
-  end
-
-  def reviewed_not_nil
-    self.reviewed = false if self.reviewed.nil?
   end
 
   # :state may contain a blob of JSON text from our micorservices.

@@ -37,14 +37,6 @@ class WorkItemPolicy < ApplicationPolicy
     update?
   end
 
-  def mark_as_reviewed?
-    user.admin? || (user.institutional_admin? && (user.institution.id == record.institution_id))
-  end
-
-  def review_all?
-    record.first.nil? || user.admin? || (user.institutional_admin? && (user.institution.id == record.first.institution_id))
-  end
-
   def destroy?
     false
   end
