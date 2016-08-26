@@ -1,13 +1,25 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# These fixtures are used in integration tests with the
+# APTrust Go services. They're not used for spec tests.
+# Note that UUIDs must be valid version 4 UUIDs for
+# any data shared with DPN. That means the third component
+# must start with 4, and the fourth component must start
+# start with 8, 9, a, or b. DPN integration tests will
+# fail otherwise.
 
-one:
-  name: 
-  brief_name: 
-  identifier: 
-  dpn_uuid: MyString
+aptrust:
+  name: APTrust
+  brief_name: aptrust
+  identifier: aptrust.org
+  dpn_uuid: 11111111-0000-4000-a000-000000000000
 
-two:
-  name: 
-  brief_name: 
-  identifier: 
-  dpn_uuid: MyString
+inst1:
+  name: Institution One
+  brief_name: inst1
+  identifier: institution1.edu
+  dpn_uuid: 22222222-0000-4000-a000-000000000000
+
+inst2:
+  name: Institution Two
+  brief_name: inst2
+  identifier: institution2.edu
+  dpn_uuid: 33333333-0000-4000-a000-000000000000

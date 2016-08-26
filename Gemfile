@@ -59,7 +59,7 @@ group :test do
 end
 
 group :production do
-  gem 'pg' #Necessary for heroku
+  gem 'pg' # Necessary for talking to our RDS instance
   gem "rails_12factor" # Necessary for heroku
 end
 
@@ -67,7 +67,7 @@ group :development, :test, :demo do
   gem 'jettywrapper'
 end
 
-group :development, :test, :demo, :production do
+group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_girl_rails'
@@ -77,4 +77,3 @@ group :development, :test, :demo, :production do
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
-
