@@ -308,7 +308,7 @@ DEPENDENCIES
   factory_girl_rails
   faker!
   figaro
-  inherited_resources
+  inherited_resources (= 1.6.0)
   jbuilder (~> 2.6)
   jettywrapper
   jquery-rails

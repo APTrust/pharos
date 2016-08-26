@@ -32,7 +32,7 @@ gem 'rdf'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.3.0'
 gem 'phony_rails'
-gem 'inherited_resources'
+gem 'inherited_resources', '1.6.0'
 gem 'uuidtools'
 
 gem 'kaminari'
