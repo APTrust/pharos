@@ -2,7 +2,7 @@
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
-require 'shoulda-matchers'
+require 'shoulda/matchers'
 require 'capybara/rails'
 require 'capybara/rspec'
 require 'coveralls'
@@ -23,6 +23,13 @@ ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 # Enable capybara to login and logout users
 include Warden::Test::Helpers
 Warden.test_mode!
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
 
 # Capybara.default_driver = :selenium
 
@@ -87,7 +94,7 @@ RSpec.configure do |config|
   end
 
   #For devise testing
-  config.include Devise::TestHelpers, :type => :controller
+  config.include Devise::Test::ControllerHelpers, :type => :controller
 
   # config.backtrace_exclusion_patterns = Array.new
 end
