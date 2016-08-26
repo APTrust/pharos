@@ -25,18 +25,15 @@ gem 'pundit'
 gem 'figaro'
 gem 'devise', '4.2.0'
 gem 'rake'
-gem 'rename'
 gem 'valid_email'
-gem 'rdf'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.3.0'
 gem 'phony_rails'
-gem 'inherited_resources'
+gem 'inherited_resources', '1.6.0'
 gem 'uuidtools'
 
 gem 'kaminari'
-gem 'minitest'
 gem 'bootstrap-sass', '~> 3.3.7'
 
 # S3 connector
@@ -45,7 +42,7 @@ gem 'aws-sdk-core'
 group :development do
   gem 'meta_request'
   gem 'better_errors'
-  gem 'binding_of_caller'
+  #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 3.3'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
@@ -63,16 +60,11 @@ group :production do
   gem "rails_12factor" # Necessary for heroku
 end
 
-group :development, :test, :demo do
-  gem 'jettywrapper'
-end
-
 group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_girl_rails'
   gem 'faker', github: 'stympy/faker'
-  gem 'quiet_assets'
   gem 'rspec-rails', '~> 3.5'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
