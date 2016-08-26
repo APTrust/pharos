@@ -1,7 +1,7 @@
 <div id="content" class="col-md-9 show-document">
-
+  <% institution = @intellectual_object.institution %>
   <ol class="breadcrumb">
-    <li><%= link_to @intellectual_object.institution.name, @intellectual_object.institution %></li>
+    <li><%= link_to institution.name, institution %></li>
     <li class="active"><%= @intellectual_object.title %></li>
   </ol>
 
@@ -12,7 +12,7 @@
   <div class="object_info">
     <dl class="dl-horizontal dl-invert">
       <dt>Institution</dt>
-      <dd><%= link_to @intellectual_object.institution.name, @intellectual_object.institution %> [<%= @intellectual_object.institution.brief_name %>]</dd>
+      <dd><%= link_to institution.name, institution %> [<%= institution.brief_name %>]</dd>
       <dt>Access</dt>
       <dd><%= @intellectual_object.access.capitalize %></dd>
       <dt>Identifier</dt>
