@@ -1,7 +1,7 @@
 # Pharos
 
-[![Code Climate](https://codeclimate.com/github/APTrust/pharos.png)](https://codeclimate.com/github/APTrust/pharos)
-[![Dependency Status](https://gemnasium.com/APTrust/pharos.png)](https://gemnasium.com/APTrust/pharos)
+[![Code Climate](https://codeclimate.com/github/APTrust/pharos.png)](https://codeclimate.com/github/APTrust/pharos.png?branch=develop)
+[![Dependency Status](https://gemnasium.com/badges/github.com/APTrust/pharos.svg)](https://gemnasium.com/github.com/APTrust/pharos)
 
 Build Status | Continuous Integration | Code Coverate
 --- | --- | ---
