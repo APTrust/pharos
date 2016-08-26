@@ -69,6 +69,7 @@ class IntellectualObjectsController < ApplicationController
 
   def show
     authorize @intellectual_object
+    @institution = @intellectual_object.institution unless @intellectual_object.nil?
     if @intellectual_object.nil? || @intellectual_object.state == 'D'
       respond_to do |format|
         format.json { render :nothing => true, :status => 404 }
