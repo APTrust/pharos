@@ -94,7 +94,7 @@ RSpec.configure do |config|
   end
 
   #For devise testing
-  config.include Devise::TestHelpers, :type => :controller
+  config.include Devise::Test::ControllerHelpers, :type => :controller
 
   # config.backtrace_exclusion_patterns = Array.new
 end
