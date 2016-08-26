@@ -271,7 +271,8 @@ class IntellectualObjectsController < ApplicationController
 
   def load_object
     if params[:intellectual_object_identifier]
-      @intellectual_object = IntellectualObject.find_by_identifier(params[:intellectual_object_identifier])
+      #@intellectual_object = IntellectualObject.find_by_identifier(params[:intellectual_object_identifier])
+      @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
       if @intellectual_object.nil?
         msg = "IntellectualObject '#{params[:intellectual_object_identifier]}' not found"
         raise ActionController::RoutingError.new(msg)
