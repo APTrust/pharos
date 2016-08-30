@@ -13,7 +13,7 @@
             <script>selected("oassociation", "<%= current_obj.identifier %>", "<%=url_for(params.except :object_association)%>")</script>
         <% else %>
             <% @object_associations.each do |assc| %>
-                <% unless @io_assc_counts[assc] == 0 || @io_assc_counts[assc].nil? %>
+                <% unless @io_assc_counts[assc] == 0 || @io_assc_counts[assc].nil? || assc.nil? %>
                     <% current_obj = IntellectualObject.find(assc) %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('object_association', assc) %>"><%= current_obj.identifier %></a></span>
