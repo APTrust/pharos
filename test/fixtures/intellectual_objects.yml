@@ -64,7 +64,7 @@ inst2_obj2:
 inst2_obj3:
   title: Third Object for Institution Two
   description: A bag of angry toads
-  identifier: institution1.edu/toads
+  identifier: institution2.edu/toads
   alt_identifier: not_frogs_toads
   access: consortia
   bag_name: toads.tar
