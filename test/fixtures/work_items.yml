@@ -360,3 +360,119 @@ item_20:
   retry: true
   pid: 0
   institution: inst2
+
+#--------------------------------------------------
+
+item_21:
+  created_at: 2016-08-20 16:01:59.765685000 Z
+  updated_at: 2016-08-20 16:01:59.765685000 Z
+  intellectual_object: inst2_obj3
+  name: toads.tar
+  etag: 25a4546c865e4073aa17b31b0708f75d
+  bucket: aptrust.receiving.institution2.edu
+  user: system.aptrust.org
+  note: Item ingested successfully
+  action: Ingest
+  stage: Cleanup
+  status: Success
+  outcome: No problems
+  bag_date: 2016-08-24 10:04:06.000000000 Z
+  date: 2016-08-24 10:12:26.000000000 Z
+  object_identifier: institution2.edu/toads
+  pid: 0
+  institution_id: inst1
+
+item_22:
+  created_at: 2016-08-20 16:01:59.775363000 Z
+  updated_at: 2016-08-20 16:01:59.775363000 Z
+  intellectual_object: inst1_obj3
+  name: glass_shards.tar
+  etag: e24527590f31492b8f362c3d3c02ec80
+  bucket: aptrust.receiving.institution1.edu
+  user: system.aptrust.org
+  note: Item ingested successfully
+  action: Ingest
+  stage: Cleanup
+  status: Success
+  outcome: No problems
+  bag_date: 2016-08-24 10:04:06.000000000 Z
+  date: 2016-08-24 10:12:26.000000000 Z
+  object_identifier: institution1.edu/glass_shards
+  pid: 0
+  institution_id: inst1
+
+item_23:
+  created_at: 2016-08-20 16:01:59.782443000 Z
+  updated_at: 2016-08-20 16:01:59.782443000 Z
+  intellectual_object: inst1_obj2
+  name: pdfs.tar
+  etag: 6b5b18c999dc4fdc9c47a2db90782cee
+  bucket: aptrust.receiving.institution1.edu
+  user: system.aptrust.org
+  note: Item ingested successfully
+  action: Ingest
+  stage: Cleanup
+  status: Success
+  outcome: No problems
+  bag_date: 2016-08-24 10:04:06.000000000 Z
+  date: 2016-08-24 10:12:26.000000000 Z
+  object_identifier: institution1.edu/pdfs
+  pid: 0
+  institution_id: inst1
+
+item_24:
+  created_at: 2016-08-20 16:01:59.789149000 Z
+  updated_at: 2016-08-20 16:01:59.789149000 Z
+  intellectual_object: inst2_obj2
+  name: coal.tar
+  etag: 0940747b1a8a42e78d2639e1093753ff
+  bucket: aptrust.receiving.institution2.edu
+  user: system.aptrust.org
+  note: Item ingested successfully
+  action: Ingest
+  stage: Cleanup
+  status: Success
+  outcome: No problems
+  bag_date: 2016-08-24 10:04:06.000000000 Z
+  date: 2016-08-24 10:12:26.000000000 Z
+  object_identifier: institution2.edu/coal
+  pid: 0
+  institution_id: inst2
+
+item_25:
+  created_at: 2016-08-20 16:01:59.795978000 Z
+  updated_at: 2016-08-20 16:01:59.795978000 Z
+  intellectual_object: inst1_obj1
+  name: photos.tar
+  etag: 1f594a4e5bb944e59c74aefe781a3726
+  bucket: aptrust.receiving.institution1.edu
+  user: system.aptrust.org
+  note: Item ingested successfully
+  action: Ingest
+  stage: Cleanup
+  status: Success
+  outcome: No problems
+  bag_date: 2016-08-24 10:04:06.000000000 Z
+  date: 2016-08-24 10:12:26.000000000 Z
+  object_identifier: institution1.edu/photos
+  pid: 0
+  institution: inst1
+
+item_26:
+  created_at: 2016-08-20 16:01:59.803320000 Z
+  updated_at: 2016-08-20 16:01:59.803320000 Z
+  intellectual_object: inst2_obj1
+  name: chocolate.tar
+  etag: 6a40fff84939474aa6f5f77bf56fb8c8
+  bucket: aptrust.receiving.institution2.edu
+  user: system.aptrust.org
+  note: Item ingested successfully
+  action: Ingest
+  stage: Cleanup
+  status: Success
+  outcome: No problems
+  bag_date: 2016-08-24 10:04:06.000000000 Z
+  date: 2016-08-24 10:12:26.000000000 Z
+  object_identifier: institution2.edu/chocolate
+  pid: 0
+  institution: inst2
