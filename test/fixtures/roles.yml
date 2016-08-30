@@ -1,0 +1,17 @@
+# These fixtures are used in integration tests with the
+# APTrust Go services. They're not used for spec tests.
+
+role_admin:
+  name: admin
+  created_at: 2016-07-28 20:23:45.709549000 Z
+  updated_at: 2016-07-28 20:23:45.709549000 Z
+
+role_inst_admin:
+  name: institutional_admin
+  created_at: 2016-07-28 20:23:45.712099000 Z
+  updated_at: 2016-07-28 20:23:45.712099000 Z
+
+role_inst_user:
+  name: institutional_user
+  created_at: 2016-07-28 20:23:45.714660000 Z
+  updated_at: 2016-07-28 20:23:45.714660000 Z

@@ -3,9 +3,6 @@
 
 # This is the admin user. The plaintext password is 'password',
 # and the plaintext encryption key is 'c3958c7b09e40af1d065020484dafa9b2a35cea0'.
-#
-# The roles table should be pre-loaded with roles 'admin', 'institutional_admin',
-# and 'institutional_user'. For integration tests, this user must be admin.
 
 user1:
   name: APTrust System
@@ -14,4 +11,4 @@ user1:
   encrypted_password: $2a$10$7aoot2KFFqikpTYVEbErYOxZijCHDPvqT4OMoFwdmsYBE9SK2PibC
   institution: aptrust
   encrypted_api_secret_key: $2a$10$QA5At7VeEexGAQtgg00rzOMcDWLOe6W72fzRiRtAx1JTjANDal2XW
-  roles: <% Role.where(name: 'admin') %>
+  roles: role_admin
