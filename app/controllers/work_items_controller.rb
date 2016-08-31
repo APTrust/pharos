@@ -7,7 +7,7 @@ class WorkItemsController < ApplicationController
 
   def index
     set_items
-    filter
+    filter unless request.format == :json
     sort
     page_results(@items)
     respond_to do |format|
@@ -281,19 +281,22 @@ class WorkItemsController < ApplicationController
       .created_after(params[:created_after])
       .updated_before(params[:updated_before])
       .updated_after(params[:updated_after])
+      .with_bag_date(params[:bag_date])
       .with_name(params[:name])
-      .with_name_like(params[:name_like])
+      .with_name_like(params[:name_contains])
       .with_etag(params[:etag])
-      .with_etag_like(params[:etag_like])
+      .with_etag_like(params[:etag_contains])
       .with_object_identifier(params[:object_identifier])
-      .with_object_identifier_like(params[:object_identifier_like])
+      .with_object_identifier_like(params[:object_identifier_contains])
       .with_file_identifier(params[:file_identifier])
-      .with_file_identifier_like(params[:file_identifier_like])
+      .with_file_identifier_like(params[:file_identifier_contains])
       .with_status(params[:status])
       .with_stage(params[:stage])
       .with_action(params[:item_action])
       .with_access(params[:access])
       .with_state(params[:state])
+    count = @items.count
+    set_page_counts(count)
   end
 
   def set_item

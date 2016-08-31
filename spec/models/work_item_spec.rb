@@ -277,5 +277,24 @@ RSpec.describe WorkItem, :type => :model do
       pending_action.action.should == dpn
     end
 
+    it 'should find ingest by name, etag, bag_date' do
+      bag_date = Time.parse('2016-08-31T19:39:39Z')
+      setup_item(subject)
+      subject.action = ingest
+      subject.stage = clean
+      subject.status = success
+      subject.object_identifier = 'abc/123'
+      subject.name = '123.tar'
+      subject.etag = '123456789'
+      subject.bag_date = bag_date
+      subject.save!
+
+      item = WorkItem
+        .with_name(subject.object_identifier)
+        .with_etag(subject.etag)
+        .with_bag_date(bag_date)
+      item.should_not be_nil
+    end
+
   end
 end
