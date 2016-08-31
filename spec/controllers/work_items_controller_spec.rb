@@ -753,6 +753,12 @@ RSpec.describe WorkItemsController, type: :controller do
         assigns(:count).should == 1
       end
 
+      it 'can find by name, etag, bag_date' do
+        get :index, format: :json, name: item1.name, etag: item1.etag, bag_date: item1.bag_date
+        assigns(:items).should include(item1)
+        assigns(:count).should == 1
+      end
+
       it 'returns the correct next and previous links' do
         get :index, format: :json, per_page: 2, page: 2, stage: 'Unpack'
         assigns(:next).should == 'http://test.host/items.json/?page=3&per_page=2&stage=Unpack&sort=date'

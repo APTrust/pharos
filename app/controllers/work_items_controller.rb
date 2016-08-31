@@ -281,6 +281,7 @@ class WorkItemsController < ApplicationController
       .created_after(params[:created_after])
       .updated_before(params[:updated_before])
       .updated_after(params[:updated_after])
+      .with_bag_date(params[:bag_date])
       .with_name(params[:name])
       .with_name_like(params[:name_contains])
       .with_etag(params[:etag])
