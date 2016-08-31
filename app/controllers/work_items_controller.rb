@@ -371,7 +371,7 @@ class WorkItemsController < ApplicationController
     @statuses = @items.distinct.pluck(:status)
     @stages = @items.distinct.pluck(:stage)
     @actions = @items.distinct.pluck(:action)
-    @institutions = Institution.pluck(:id)
+    @institutions = @items.distinct.pluck(:institution_id)
     @accesses = %w(consortia institution restricted)
     @object_associations = @items.distinct.pluck(:intellectual_object_id)
     @file_associations = @items.distinct.pluck(:generic_file_id)
