@@ -251,7 +251,9 @@ class WorkItemsController < ApplicationController
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
                                       :institution_id, :date, :note, :action,
                                       :stage, :status, :outcome, :retry,
-                                      :state, :node)
+                                      :pid, :state, :node, :object_identifier,
+                                      :generic_file_identifier, :needs_admin_review,
+                                      :queued_at)
   end
 
   def batch_work_item_update_params
