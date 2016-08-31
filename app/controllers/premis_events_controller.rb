@@ -124,7 +124,7 @@ class PremisEventsController < ApplicationController
   end
 
   def set_filter_values
-    @institutions = Institution.pluck(:id)
+    @institutions = @premis_events.distinct.pluck(:institution_id)
     @object_associations = @premis_events.distinct.pluck(:intellectual_object_id)
     @file_associations = @premis_events.distinct.pluck(:generic_file_id)
     @event_types = @premis_events.distinct.pluck(:event_type)

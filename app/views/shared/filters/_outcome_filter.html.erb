@@ -13,7 +13,7 @@
         <% else %>
             <%= %>
             <% @outcomes.each do |outcome| %>
-                <% unless @outcome_counts[outcome] == 0 || @outcome_counts[outcome].nil? %>
+                <% unless @outcome_counts[outcome] == 0 || @outcome_counts[outcome].nil? || outcome.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('outcome', outcome) %>"><%= outcome.capitalize %></a></span>
                       <span class="facet-count"><%= @outcome_counts[outcome] %></span>

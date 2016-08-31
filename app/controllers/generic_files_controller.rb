@@ -267,7 +267,7 @@ class GenericFilesController < ApplicationController
   end
 
   def set_filter_values
-    #@institutions = Institution.pluck(:id)
+    #@institutions = @generic_files.joins(:intellectual_object).distinct.pluck(:institution_id)
     #@accesses = %w(consortia institution restricted)
     @formats = @generic_files.distinct.pluck(:file_format)
     #@object_associations = @generic_files.distinct.pluck(:intellectual_object_id)

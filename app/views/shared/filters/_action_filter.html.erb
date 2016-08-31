@@ -12,7 +12,7 @@
             <script>selected("action", "<%= @selected[:item_action] %>", "<%=url_for(params.except :item_action)%>")</script>
         <% else %>
             <% @actions.each do |action| %>
-                <% unless @action_counts[action] == 0 || @action_counts[action].nil? %>
+                <% unless @action_counts[action] == 0 || @action_counts[action].nil? || action.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('item_action', action) %>"><%= action %></a></span>
                       <span class="facet-count"><%= @action_counts[action] %></span>

@@ -12,7 +12,7 @@
             <script>selected("status", "<%= @selected[:status] %>", "<%=url_for(params.except :status)%>")</script>
         <% else %>
             <% @statuses.each do |status| %>
-                <% unless @status_counts[status] == 0 || @status_counts[status].nil? %>
+                <% unless @status_counts[status] == 0 || @status_counts[status].nil? || status.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('status', status) %>"><%= status %></a></span>
                       <span class="facet-count"><%= @status_counts[status] %></span>

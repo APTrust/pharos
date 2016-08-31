@@ -102,7 +102,7 @@ event_6:
   object: APTrust Go Exchange + Amazon S3 client
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst2_obj3
-  generic_file: inst2_obj3_gf4
+  generic_file: inst2_obj3_gf3
   created_at: 2016-08-26 18:47:20.257325000 Z
   updated_at: 2016-08-26 18:47:20.257325000 Z
   intellectual_object_identifier: institution1.edu/toads
@@ -300,7 +300,7 @@ event_17:
   object: APTrust Go Exchange + Amazon S3 client
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst1_obj3
-  generic_file: inst1_obj3_gf4
+  generic_file: inst1_obj3_gf3
   created_at: 2016-08-26 18:47:20.312631000 Z
   updated_at: 2016-08-26 18:47:20.312631000 Z
   intellectual_object_identifier: institution1.edu/glass_shards
@@ -426,7 +426,7 @@ event_24:
   object: SHA-256 thingy
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst2_obj3
-  generic_file: inst2_obj3_gf4
+  generic_file: inst2_obj3_gf3
   created_at: 2016-08-26 18:53:32.125356000 Z
   updated_at: 2016-08-26 18:53:32.125356000 Z
   intellectual_object_identifier: institution1.edu/toads
@@ -497,8 +497,8 @@ event_28:
   outcome_information: New fixididdly
   object: SHA-256 thingy
   agent: https://github.com/APTrust/exchange
-  intellectual_object: inst2_obj3_gf2
-  generic_file: inst2_obj3
+  intellectual_object: inst2_obj3
+  generic_file: inst2_obj3_gf2
   created_at: 2016-08-26 18:53:32.143246000 Z
   updated_at: 2016-08-26 18:53:32.143246000 Z
   intellectual_object_identifier: institution1.edu/toads
@@ -624,7 +624,7 @@ event_35:
   object: SHA-256 thingy
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst1_obj3
-  generic_file: inst1_obj3_gf4
+  generic_file: inst1_obj3_gf3
   created_at: 2016-08-26 18:53:32.176610000 Z
   updated_at: 2016-08-26 18:53:32.176610000 Z
   intellectual_object_identifier: institution1.edu/glass_shards

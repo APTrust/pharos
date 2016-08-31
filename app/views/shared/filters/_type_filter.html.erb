@@ -11,7 +11,7 @@
             <script>selected("type", "<%= @selected[:type] %>", "<%=url_for(params.except :type)%>")</script>
         <% else %>
             <% @types.each do |type| %>
-                <% unless @type_counts[type] == 0 || @type_counts[type].nil? %>
+                <% unless @type_counts[type] == 0 || @type_counts[type].nil? || type.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('type', type) %>"><%= type %></a></span>
                       <span class="facet-count"><%= @type_counts[type] %></span>

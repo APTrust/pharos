@@ -12,7 +12,7 @@
             <script>selected("format", "<%= @selected[:file_format] %>", "<%=url_for(params.except :file_format)%>")</script>
         <% else %>
             <% @formats.each do |format| %>
-                <% unless @format_counts[format] == 0 || @format_counts[format].nil? %>
+                <% unless @format_counts[format] == 0 || @format_counts[format].nil? || format.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('file_format', format) %>"><%= format %></a></span>
                       <span class="facet-count"><%= @format_counts[format] %></span>

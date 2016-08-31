@@ -308,7 +308,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def set_filter_values
-    @institutions = Institution.pluck(:id)
+    @institutions = @intellectual_objects.distinct.pluck(:institution_id)
     @accesses = %w(consortia institution restricted)
     @formats = @intellectual_objects.joins(:generic_files).distinct.pluck(:file_format)
   end
