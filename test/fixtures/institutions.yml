@@ -23,3 +23,9 @@ inst2:
   brief_name: inst2
   identifier: institution2.edu
   dpn_uuid: 33333333-0000-4000-a000-000000000000
+
+test_inst:
+  name: Test Institution (for integration tests)
+  brief_name: test
+  identifier: test.edu
+  dpn_uuid: 44444444-0000-4000-a000-000000000000
