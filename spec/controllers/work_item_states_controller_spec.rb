@@ -40,20 +40,20 @@ RSpec.describe WorkItemStatesController, type: :controller do
     end
   end
 
-  # describe 'GET #show' do
-  #   describe 'for admin user' do
-  #     before do
-  #       sign_in admin_user
-  #     end
-  #
-  #     it 'responds successfully with both the work item and the state item set' do
-  #       get :show, work_item_id: item.id, format: :json
-  #       expect(response).to be_success
-  #       assigns(:work_item).id.should eq(item.id)
-  #       assigns(:state_item).id.should eq(state_item.id)
-  #       assigns(:state_item).state.should eq('{JSON data}')
-  #     end
-  #   end
-  # end
+  describe 'GET #show' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully with both the work item and the state item set' do
+        get :show, work_item_id: item.id, format: :json
+        expect(response).to be_success
+        assigns(:work_item).id.should eq(item.id)
+        assigns(:state_item).id.should eq(state_item.id)
+        assigns(:state_item).state.should eq('{JSON data}')
+      end
+    end
+  end
 
 end
