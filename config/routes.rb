@@ -49,6 +49,12 @@ Rails.application.routes.draw do
   get 'items/set_restoration_status', to: 'work_items#set_restoration_status', format: :json
   get 'api/v2/items/search', to: 'work_items#api_search', format: :json
 
+  # WORK ITEM STATE ROUTES
+  #resources :work_item_states, path: 'item_state', only: [:show, :update, :create], format: :json, param: :work_item_id
+  #resources :work_item_states, path: '/api/v2/item_state', only: [:show, :update, :create], format: :json, param: :work_item_id
+  post '/api/v2/item_state', to: 'work_item_states#create', format: :json
+  put '/api/v2/item_state/:work_item_id', to: 'work_item_states#update', format: :json
+  get '/api/v2/item_state/:work_item_id', to: 'work_item_states#show', format: :json
 
   # CATALOG ROUTES
   post 'search/', to: 'catalog#search', format: [:json, :html], as: :search

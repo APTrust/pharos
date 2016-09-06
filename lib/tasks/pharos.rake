@@ -46,7 +46,7 @@ namespace :pharos do
   desc 'Empty the database'
   task empty_db: :environment do
     unless Rails.env.production?
-      [User, GenericFile, IntellectualObject, Institution, Role, WorkItem, PremisEvent].each(&:destroy_all)
+      [User, GenericFile, IntellectualObject, Institution, Role, WorkItem, WorkItemState, PremisEvent].each(&:destroy_all)
     end
   end
 
@@ -102,7 +102,8 @@ namespace :pharos do
         item.add_event(FactoryGirl.attributes_for(:premis_event_identifier, outcome_detail: item.id, outcome_information: 'Assigned by Rake.'))
 
         #add Work item for intellectual object
-        FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
+        wi = FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
+        FactoryGirl.create(:work_item_state, work_item: wi)
 
         # 5.times.each do |count|
         #   FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name)

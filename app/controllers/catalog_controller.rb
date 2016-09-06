@@ -90,7 +90,6 @@ class CatalogController < ApplicationController
   end
 
   def event_search
-    #TODO: fix this nonsense
     events = PremisEvent.discoverable(current_user)
     case params[:search_field]
       when 'Event Identifier'

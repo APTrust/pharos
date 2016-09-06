@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160825164453) do
+ActiveRecord::Schema.define(version: 20160906164101) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -78,10 +78,10 @@ ActiveRecord::Schema.define(version: 20160825164453) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+    t.integer  "institution_id"
     t.string   "intellectual_object_identifier"
     t.string   "generic_file_identifier"
     t.string   "outcome"
-    t.integer  "institution_id"
   end
 
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
@@ -131,6 +131,14 @@ ActiveRecord::Schema.define(version: 20160825164453) do
   add_index "users", ["institution_id"], name: "index_users_on_institution_id"
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
+  create_table "work_item_states", force: :cascade do |t|
+    t.integer  "work_item_id"
+    t.string   "action",       null: false
+    t.binary   "state"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
   create_table "work_items", force: :cascade do |t|
     t.datetime "created_at",                                          null: false
     t.datetime "updated_at",                                          null: false
@@ -155,7 +163,7 @@ ActiveRecord::Schema.define(version: 20160825164453) do
     t.boolean  "needs_admin_review",                  default: false, null: false
     t.integer  "institution_id"
     t.datetime "queued_at"
-    t.binary   "state"
+    t.integer  "work_item_state_id"
   end
 
   add_index "work_items", ["action"], name: "index_work_items_on_action"

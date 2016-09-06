@@ -12,7 +12,7 @@ class WorkItemsController < ApplicationController
     page_results(@items)
     respond_to do |format|
       format.json {
-        json_list = @paged_results.map { |item| item.serializable_hash(except: [:state, :node, :pid]) }
+        json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
         render json: {count: @count, next: @next, previous: @previous, results: json_list}
       }
       format.html
@@ -36,7 +36,7 @@ class WorkItemsController < ApplicationController
       if current_user.admin?
         item = @work_item.serializable_hash
       else
-        item = @work_item.serializable_hash(except: [:state, :node, :pid])
+        item = @work_item.serializable_hash(except: [:node, :pid])
       end
       format.json { render json: item }
       format.html
@@ -251,7 +251,7 @@ class WorkItemsController < ApplicationController
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
                                       :institution_id, :date, :note, :action,
                                       :stage, :status, :outcome, :retry,
-                                      :pid, :state, :node, :object_identifier,
+                                      :pid, :node, :object_identifier,
                                       :generic_file_identifier, :needs_admin_review,
                                       :queued_at)
   end
@@ -261,12 +261,12 @@ class WorkItemsController < ApplicationController
                                    .permit(items: [:name, :etag, :bag_date, :bucket,
                                                    :institution_id, :date, :note, :action,
                                                    :stage, :status, :outcome, :retry,
-                                                   :state, :node, :id])
+                                                   :node, :id])
   end
 
   def params_for_status_update
     params.permit(:object_identifier, :stage, :status, :note, :retry,
-                  :state, :node, :pid, :needs_admin_review)
+                  :node, :pid, :needs_admin_review)
   end
 
   def set_items

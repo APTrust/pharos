@@ -1,14 +1,18 @@
 class WorkItem < ActiveRecord::Base
+  require 'zlib'
+
   paginates_per 10
 
   belongs_to :institution
   belongs_to :intellectual_object # may be nil
   belongs_to :generic_file        # may be nil
+  has_one :work_item_state
   validates :name, :etag, :bag_date, :bucket, :user, :institution, :date, :note, :action, :stage, :status, :outcome, presence: true
   validate :status_is_allowed
   validate :stage_is_allowed
   validate :action_is_allowed
   before_save :set_object_identifier_if_ingested
+
 
   ### Scopes
   scope :created_before, ->(param) { where('work_items.created_at < ?', param) unless param.blank? }
@@ -123,7 +127,7 @@ class WorkItem < ActiveRecord::Base
     restore_item.user = requested_by
     restore_item.retry = true
     restore_item.date = Time.now
-    restore_item.state = nil
+    restore_item.work_item_state.state = nil unless restore_item.work_item_state.nil?
     restore_item.node = nil
     restore_item.pid = 0
     restore_item.needs_admin_review = false
@@ -145,7 +149,7 @@ class WorkItem < ActiveRecord::Base
     dpn_item.user = requested_by
     dpn_item.retry = true
     dpn_item.date = Time.now
-    dpn_item.state = nil
+    dpn_item.work_item_state.state = nil unless dpn_item.work_item_state.nil?
     dpn_item.node = nil
     dpn_item.pid = 0
     dpn_item.needs_admin_review = false
@@ -171,7 +175,7 @@ class WorkItem < ActiveRecord::Base
     delete_item.retry = true
     delete_item.date = Time.now
     delete_item.generic_file_identifier = generic_file_identifier
-    delete_item.state = nil
+    delete_item.work_item_state.state = nil unless delete_item.work_item_state.nil?
     delete_item.node = nil
     delete_item.pid = 0
     delete_item.needs_admin_review = false
@@ -202,8 +206,9 @@ class WorkItem < ActiveRecord::Base
   # If it does, it's stored without extra whitespace, but we want
   # to display it in a readable format.
   def pretty_state
-    return nil if self.state.nil? || self.state.strip == ''
-    return JSON.pretty_generate(JSON.parse(self.state))
+    unzipped_state = Zlib::Inflate.inflate(self.work_item_state.state) unless self.work_item_state.nil? || self.work_item_state.state.nil?
+    return nil if unzipped_state.nil? || unzipped_state.strip == ''
+    return JSON.pretty_generate(JSON.parse(unzipped_state))
   end
 
   def ingested?

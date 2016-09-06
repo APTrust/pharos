@@ -8,6 +8,8 @@ RSpec.describe WorkItemsController, type: :controller do
   let!(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
   let!(:item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
   let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, status: Pharos::Application::PHAROS_STATUSES['fail']) }
+  let!(:state_item) { FactoryGirl.create(:work_item_state, work_item: item) }
+  let!(:user_state_item) { FactoryGirl.create(:work_item_state, work_item: user_item) }
 
   # after do
   #   WorkItem.destroy_all
@@ -77,7 +79,6 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'exposes :state, :node, or :pid for the admin user' do
         get :show, id: item.id, format: :json
         data = JSON.parse(response.body)
-        expect(data).to have_key('state')
         expect(data).to have_key('node')
         expect(data).to have_key('pid')
       end
@@ -123,7 +124,6 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'does expose :state, :node, or :id through admin #api_show' do
         get :show, id: item.id, format: :json
         data = JSON.parse(response.body)
-        expect(data).to have_key('state')
         expect(data).to have_key('node')
         expect(data).to have_key('pid')
       end
@@ -159,13 +159,13 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'accepts extended queue data - state, node, pid' do
-        wi_hash = FactoryGirl.create(:work_item_with_state).attributes
+        wi_hash = FactoryGirl.create(:work_item_extended).attributes
         put :update, id: item.id, format: 'json', work_item: wi_hash
         expect(response.status).to eq 200
       end
 
       it 'sets node to "" when params[:node] == ""' do
-        wi_hash = FactoryGirl.create(:work_item_with_state).attributes
+        wi_hash = FactoryGirl.create(:work_item_extended).attributes
         wi_hash[:node] = ""
         put :update, id: item.id, format: 'json', work_item: wi_hash
         expect(assigns(:work_item).node).to eq('')
@@ -192,7 +192,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage when updating by id' do
-        wi_hash = FactoryGirl.create(:work_item_with_state).attributes
+        wi_hash = FactoryGirl.create(:work_item_extended).attributes
         put :update, id: item.id, format: 'json', work_item: wi_hash
         expect(response.status).to eq 403
       end
@@ -453,15 +453,15 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(response.status).to eq(400)
       end
 
-      it 'updates node, state, pid and needs_admin_review' do
+      it 'updates node, pid and needs_admin_review' do
         post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             node: '10.11.12.13', state: '{JSON data}', pid: 4321, needs_admin_review: true)
+             node: '10.11.12.13', pid: 4321, needs_admin_review: true)
         expect(response).to be_success
         wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq('10.11.12.13')
-        expect(wi.state).to eq('{JSON data}')
+        #expect(wi.work_item_state.state).to eq('{JSON data}')
         expect(wi.pid).to eq(4321)
         expect(wi.needs_admin_review).to eq(true)
       end
@@ -469,12 +469,12 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'clears node, pid and needs_admin_review, updates state' do
         post(:set_restoration_status, format: :json, object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             node: nil, pid: 0, state: '{new JSON data}', needs_admin_review: false)
+             node: nil, pid: 0, needs_admin_review: false)
         expect(response).to be_success
         wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq(nil)
-        expect(wi.state).to eq('{new JSON data}')
+        #expect(wi.work_item_state.state).to eq('{new JSON data}')
         expect(wi.pid).to eq(0)
         expect(wi.needs_admin_review).to eq(false)
       end
