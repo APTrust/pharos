@@ -1,5 +1,4 @@
 class WorkItemStatesController < ApplicationController
-  require 'zlib'
   respond_to :html, :json
   before_filter :authenticate_user!
   before_filter :set_item_and_state, only: [:show, :update]
@@ -42,12 +41,10 @@ class WorkItemStatesController < ApplicationController
   end
 
   def work_item_state_params
-    params[:work_item_state][:state] = Zlib::Deflate.deflate(params[:work_item_state][:state]) if params[:work_item_state][:state]
     params.require(:work_item_state).permit(:work_item_id, :action, :state)
   end
 
   def params_for_update
-    params[:work_item_state][:state] = Zlib::Deflate.deflate(params[:work_item_state][:state]) if params[:work_item_state][:state]
     params.require(:work_item_state).permit(:action, :state)
   end
 
