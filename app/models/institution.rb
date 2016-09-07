@@ -45,9 +45,6 @@ class Institution < ActiveRecord::Base
   end
   private
 
-  # To determine uniqueness we must check all name values in all Institution objects.  This
-  # becomes problematic on update because the name exists already and the validation fails.  Therefore
-  # we must remove self from the array before testing for uniqueness.
   def name_is_unique
     return if self.name.nil?
     errors.add(:name, 'has already been taken') if Institution.where(name: self.name).reject{|r| r == self}.any?
@@ -82,6 +79,5 @@ class Institution < ActiveRecord::Base
 
     errors[:base].empty?
   end
-
 
 end

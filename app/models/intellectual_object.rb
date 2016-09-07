@@ -7,16 +7,12 @@ class IntellectualObject < ActiveRecord::Base
   accepts_nested_attributes_for :premis_events, allow_destroy: true
   accepts_nested_attributes_for :checksums, allow_destroy: true
 
-  validates :title, presence: true
-  validates :institution, presence: true
-  validates :identifier, presence: true
-  validates :access, presence: true
+  validates :title, :institution, :identifier, :access, presence: true
   validates_inclusion_of :access, in: %w(consortia institution restricted), message: "#{:access} is not a valid access", if: :access
   validates_uniqueness_of :identifier
 
   before_save :set_bag_name
   before_destroy :check_for_associations
-
 
   ### Scopes
   scope :created_before, ->(param) { where('intellectual_objects.created_at < ?', param) unless param.blank? }
@@ -42,7 +38,6 @@ class IntellectualObject < ActiveRecord::Base
         .where('generic_files.file_format = ?', param) unless param.blank?
   }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
-
   scope :discoverable, ->(current_user) {
     # Any user can discover any item at their institution,
     # along with 'consortia' items from any institution.
@@ -62,11 +57,6 @@ class IntellectualObject < ActiveRecord::Base
     # Only admin has write privileges for now.
     where('(1 = 0)') unless current_user.admin?
   }
-
-
-  # Need to add these...
-  #scope :bag_name, ->(param) {}
-  #scope :etag, ->(param) {}
 
   def self.find_by_identifier(identifier)
     return nil if identifier.blank?

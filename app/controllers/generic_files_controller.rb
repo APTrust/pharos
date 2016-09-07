@@ -3,7 +3,6 @@ class GenericFilesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :load_generic_file, only: [:show, :update, :destroy]
   before_filter :load_intellectual_object, only: [:update, :create]
-  #after_action :verify_authorized, :except => [:index]
 
   def index
     if params[:alt_action]
@@ -255,21 +254,21 @@ class GenericFilesController < ApplicationController
     initialize_filter_counters
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
-    #filter_by_access unless params[:access].nil?
+    filter_by_access unless params[:access].nil?
     #filter_by_institution unless params[:institution].nil?
-    #filter_by_object_association unless params[:object_association].nil?
+    filter_by_object_association unless params[:object_association].nil?
     set_format_count(@generic_files)
-    #set_access_count(@generic_files)
+    set_access_count(@generic_files)
     #set_inst_count(@generic_files)
-    #set_io_assc_count(@generic_files)
+    set_io_assc_count(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
   end
 
   def set_filter_values
     #@institutions = @generic_files.joins(:intellectual_object).distinct.pluck(:institution_id)
-    #@accesses = %w(consortia institution restricted)
+    @accesses = %w(consortia institution restricted)
     @formats = @generic_files.distinct.pluck(:file_format)
-    #@object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
+    @object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
   end
 end

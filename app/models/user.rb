@@ -144,32 +144,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  class NilInstitution
-    def name
-      'Deleted Institution'
-    end
-
-    def to_param
-      'deleted'
-    end
-
-    def brief_name
-      'Deleted Institution'
-    end
-
-    def users
-      []
-    end
-
-    def intellectual_objects
-      []
-    end
-
-    def bytes_by_format
-      {}
-    end
-  end
-
   private
 
   def institution_id_points_at_institution

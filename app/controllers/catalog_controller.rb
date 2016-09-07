@@ -4,8 +4,7 @@ class CatalogController < ApplicationController
   after_action :verify_authorized
 
   def search
-    params[:q] = '%' if params[:q] == '*'
-    params[:q] = '%' if params[:q].nil?
+    (params[:q] == '*' || params[:q].nil?) ? @q = '%' : @q = params[:q]
     @results = {}
     authorize current_user
     generic_search if params[:object_type].nil?
@@ -45,16 +44,16 @@ class CatalogController < ApplicationController
     objects = IntellectualObject.discoverable(current_user)
     case params[:search_field]
       when 'Intellectual Object Identifier'
-        @results[:objects] = objects.with_identifier_like(params[:q])
+        @results[:objects] = objects.with_identifier_like(@q)
       when 'Alternate Identifier'
-        @results[:objects] = objects.with_alt_identifier_like(params[:q])
+        @results[:objects] = objects.with_alt_identifier_like(@q)
       when 'Bag Name'
-        @results[:objects] = objects.with_bag_name_like(params[:q])
+        @results[:objects] = objects.with_bag_name_like(@q)
       when 'Title'
-        @results[:objects] = objects.with_title_like(params[:q])
+        @results[:objects] = objects.with_title_like(@q)
       when 'All Fields'
         @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
-                                           "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+                                           "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 
@@ -63,11 +62,11 @@ class CatalogController < ApplicationController
     files = GenericFile.discoverable(current_user)
     case params[:search_field]
       when 'Generic File Identifier'
-        @results[:files] = files.with_identifier_like(params[:q])
+        @results[:files] = files.with_identifier_like(@q)
       when 'URI'
-        @results[:files] = files.with_uri_like(params[:q])
+        @results[:files] = files.with_uri_like(@q)
       when 'All Fields'
-        @results[:files] = files.where('generic_files.identifier LIKE ? OR generic_files.uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:files] = files.where('generic_files.identifier LIKE ? OR generic_files.uri LIKE ?', "%#{@q}%", "%#{@q}%")
     end
   end
 
@@ -76,16 +75,16 @@ class CatalogController < ApplicationController
     items = WorkItem.readable(current_user)
     case params[:search_field]
       when 'Name'
-        @results[:items] = items.with_name_like(params[:q])
+        @results[:items] = items.with_name_like(@q)
       when 'Etag'
-        @results[:items] = items.with_etag_like(params[:q])
+        @results[:items] = items.with_etag_like(@q)
       when 'Intellectual Object Identifier'
-        @results[:items] = items.with_object_identifier_like(params[:q])
+        @results[:items] = items.with_object_identifier_like(@q)
       when 'Generic File Identifier'
-        @results[:items] = items.with_file_identifier_like(params[:q])
+        @results[:items] = items.with_file_identifier_like(@q)
       when 'All Fields'
         @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
-                                       "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+                                       "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 
@@ -93,14 +92,14 @@ class CatalogController < ApplicationController
     events = PremisEvent.discoverable(current_user)
     case params[:search_field]
       when 'Event Identifier'
-        @results[:events] = events.with_event_identifier_like(params[:q])
+        @results[:events] = events.with_event_identifier_like(@q)
       when 'Intellectual Object Identifier'
-        @results[:events] = events.with_object_identifier_like(params[:q])
+        @results[:events] = events.with_object_identifier_like(@q)
       when 'Generic File Identifier'
-        @results[:events] = events.with_file_identifier_like(params[:q])
+        @results[:events] = events.with_file_identifier_like(@q)
       when 'All Fields'
         @results[:events] = events.where('premis_events.identifier LIKE ? OR intellectual_object_identifier LIKE ?
-                                          OR generic_file_identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+                                          OR generic_file_identifier LIKE ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 
@@ -111,38 +110,38 @@ class CatalogController < ApplicationController
     events = PremisEvent.discoverable(current_user)
     case params[:search_field]
       when 'Alternate Identifier'
-        @results[:objects] = objects.with_alt_identifier_like(params[:q])
-        @results[:items] = items.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+        @results[:objects] = objects.with_alt_identifier_like(@q)
+        @results[:items] = items.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?', "%#{@q}%", "%#{@q}%")
       when 'Bag Name'
-        @results[:objects] = objects.with_bag_name_like(params[:q])
-        @results[:items] = items.with_name_like(params[:q])
+        @results[:objects] = objects.with_bag_name_like(@q)
+        @results[:items] = items.with_name_like(@q)
       when 'Title'
-        @results[:objects] = objects.with_title_like(params[:q])
+        @results[:objects] = objects.with_title_like(@q)
       when 'URI'
-        @results[:files] = files.with_uri_like(params[:q])
+        @results[:files] = files.with_uri_like(@q)
       when 'Name'
-        @results[:objects] = objects.with_bag_name_like(params[:q])
-        @results[:items] = items.with_name_like(params[:q])
+        @results[:objects] = objects.with_bag_name_like(@q)
+        @results[:items] = items.with_name_like(@q)
       when 'Etag'
-        @results[:items] = items.with_etag_like(params[:q])
+        @results[:items] = items.with_etag_like(@q)
       when 'Intellectual Object Identifier'
-        @results[:items] = items.with_object_identifier_like(params[:q])
-        @results[:objects] = objects.with_identifier_like(params[:q])
-        @results[:events] = events.with_object_identifier_like(params[:q])
+        @results[:items] = items.with_object_identifier_like(@q)
+        @results[:objects] = objects.with_identifier_like(@q)
+        @results[:events] = events.with_object_identifier_like(@q)
       when 'Generic File Identifier'
-        @results[:items] = items.with_file_identifier_like(params[:q])
-        @results[:files] = files.with_identifier_like(params[:q])
-        @results[:events] = events.with_file_identifier_like(params[:q])
+        @results[:items] = items.with_file_identifier_like(@q)
+        @results[:files] = files.with_identifier_like(@q)
+        @results[:events] = events.with_file_identifier_like(@q)
       when 'Event Identifier'
-        @results[:events] = events.with_event_identifier_like(params[:q])
+        @results[:events] = events.with_event_identifier_like(@q)
       when 'All Fields'
         @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
-                                          "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
-        @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%")
+                                          "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
+        @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{@q}%", "%#{@q}%")
         @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
-                                          "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+                                          "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
         @results[:events] = events.where('premis_events.identifier LIKE ? OR intellectual_object_identifier LIKE ?
-                                          OR generic_file_identifier LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+                                          OR generic_file_identifier LIKE ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 
@@ -174,13 +173,6 @@ class CatalogController < ApplicationController
     @institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
-    # gf_object_associations = @results[:files].distinct.pluck(:intellectual_object_id) unless @results[:files].nil?
-    # wi_object_associations = @results[:items].distinct.pluck(:intellectual_object_id) unless @results[:items].nil?
-    # event_object_associations = @results[:events].distinct.pluck(:intellectual_object_id) unless @results[:events].nil?
-    # @object_associations = gf_object_associations | wi_object_associations | event_object_associations
-    # wi_file_associations = @results[:items].distinct.pluck(:generic_file_id) unless @results[:items].nil?
-    # event_file_associations = @results[:events].distinct.pluck(:generic_file_id) unless @results[:events].nil?
-    # @file_associations = wi_file_associations | event_file_associations
     @types = ['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events']
     @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
     @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
@@ -195,7 +187,6 @@ class CatalogController < ApplicationController
       elsif key == :files
         set_format_count(results)
         set_inst_count(results)
-        #set_io_assc_count(results)
         set_access_count(results)
       elsif key == :items
         set_status_count(results)
@@ -203,13 +194,9 @@ class CatalogController < ApplicationController
         set_action_count(results)
         set_inst_count(results)
         set_access_count(results)
-        #set_io_assc_count(results)
-        #set_gf_assc_count(results)
       elsif key == :events
         set_inst_count(results)
         set_access_count(results)
-        #set_io_assc_count(results)
-        #set_gf_assc_count(results)
         set_event_type_count(results)
         set_outcome_count(results)
       end

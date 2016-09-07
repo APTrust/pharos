@@ -54,7 +54,6 @@ class UsersController < ApplicationController
       flash[:notice] = 'Successfully changed password.'
     else
       render :edit_password
-      #flash[:alert] = "Current password was incorrect, new password was too short, or passwords did not match. Password has not been changed."
     end
   end
 

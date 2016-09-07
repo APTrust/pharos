@@ -37,7 +37,6 @@ class GenericFile < ActiveRecord::Base
         .where('intellectual_objects.access = ?', param) unless param.blank?
   }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
-
   scope :discoverable, ->(current_user) {
     # Any user can discover any item at their institution,
     # along with 'consortia' items from any institution.

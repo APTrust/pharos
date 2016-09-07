@@ -2,13 +2,13 @@
 
 </div>
 
-<% unless (params[:q].nil? || params[:q] == '%') && @selected == {} %>
+<% unless (params[:q].nil? || params[:q] == '%' || params[:q] == '*') && @selected == {} %>
     <div id="appliedParams" class="clearfix constraints-container">
       <div class="pull-right">
         <a class="catalog_startOverLink btn btn-sm btn-text" href="<%= start_over_link(params[:controller]) %>" id="startOverLink">Start Over</a>
       </div>
       <span class="constraints-label">You searched for: </span>
-      <% unless params[:q].nil? || params[:q] == '' || params[:q] == '%' %>
+      <% unless params[:q].nil? || params[:q] == '' || params[:q] == '%' || params[:q] == '*' %>
       <span class="btn-group appliedFilter constraint query">
         <span class="constraint-value btn btn-sm btn-default btn-disabled">
           <% if params[:search_field].nil? || params[:search_field] == '' || params[:search_field] == 'All Fields' %>

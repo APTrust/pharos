@@ -40,7 +40,6 @@ class WorkItem < ActiveRecord::Base
     joins(:intellectual_object)
         .where('intellectual_objects.state = ?', param) unless param.blank?
   }
-
   # We can't always check the permissions on the related IntellectualObject,
   # because some work items (such as in-progress Ingest items) have no object.
   # So for now, users can view work items belonging to their institutions.

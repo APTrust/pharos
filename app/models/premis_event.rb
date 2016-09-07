@@ -4,25 +4,12 @@ class PremisEvent < ActiveRecord::Base
   belongs_to :intellectual_object
   belongs_to :generic_file
 
-  validates :identifier,  presence: true
-  validates :event_type,  presence: true
-  validates :date_time,  presence: true
-  validates :detail,  presence: true
-  validates :outcome,  presence: true
-  validates :outcome_detail,  presence: true
-  validates :object,  presence: true
-  validates :agent,  presence: true
+  validates :identifier, :event_type, :date_time, :detail, :outcome, :outcome_detail, :object, :agent, presence: true
 
   before_save :init_identifier
   before_save :init_time
   before_save :set_inst_id
   before_save :set_other_identifiers
-
-  # def initialize(graph={}, subject=nil)
-  #   super
-  #   init_identifier
-  #   init_time
-  # end
 
   ###SCOPES
   scope :with_type, ->(param) { where(event_type: param) unless param.blank? }
