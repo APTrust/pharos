@@ -6,6 +6,7 @@
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
   <%= favicon_link_tag 'aptrust/favicon.ico' %>
+  <%= auto_discovery_link_tag(:rss, work_items_path, title: 'Bag Status RSS Feed') %>
 </head>
 <body>
 <%= render partial: '/shared/header_navbar' %>
