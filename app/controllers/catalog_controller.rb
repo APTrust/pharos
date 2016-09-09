@@ -32,6 +32,13 @@ class CatalogController < ApplicationController
     end
   end
 
+  def feed
+    current_user.admin? ?
+        @rss_items = WorkItem.order('date').reverse_order :
+        @rss_items = WorkItem.with_institution(current_user.institution_id).order('date').reverse_order
+    format.rss { render :layout => false }
+  end
+
   protected
 
   def merge_results

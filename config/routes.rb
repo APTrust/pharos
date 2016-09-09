@@ -60,6 +60,7 @@ Rails.application.routes.draw do
   post 'search/', to: 'catalog#search', format: [:json, :html], as: :search
   get 'search/', to: 'catalog#search', format: [:json, :html]
   get 'api/v2/search', to: 'catalog#search', format: [:json, :html], as: :api_search
+  get 'feed', to: 'catalog#feed', format: :rss, as: :rss_feed
 
   # USER ROUTES
   devise_for :users

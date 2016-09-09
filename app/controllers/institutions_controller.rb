@@ -44,7 +44,6 @@ class InstitutionsController < ApplicationController
       set_recent_objects
       respond_to do |format|
         format.json { render json: @institution }
-        format.rss { render :layout => false }
         format.html
       end
     end
@@ -73,13 +72,11 @@ class InstitutionsController < ApplicationController
   def set_recent_objects
     if current_user.admin? && current_user.institution.identifier == @institution.identifier
       @items = WorkItem.order('date').limit(10).reverse_order
-      @rss_items = WorkItem.order('date').reverse_order
       @size = GenericFile.bytes_by_format['all']
       @item_count = WorkItem.all.count
       @object_count = IntellectualObject.all.count
     else
       @items = WorkItem.with_institution(@institution.id).order('date').limit(10).reverse_order
-      @rss_items = WorkItem.with_institution(@institution.id).order('date').reverse_order
       @size = @institution.bytes_by_format()['all']
       @item_count = WorkItem.with_institution(@institution.id).count
       @object_count = @institution.intellectual_objects.count
