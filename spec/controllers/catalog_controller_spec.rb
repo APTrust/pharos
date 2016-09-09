@@ -446,4 +446,17 @@ RSpec.describe CatalogController, type: :controller do
     end
   end
 
+  describe 'GET #feed' do
+    before do
+      sign_in admin_user
+    end
+
+    it 'returns an RSS feed with current work items' do
+      get :feed, format: 'rss'
+      expect(response).to be_success
+      expect(response).to render_template('catalog/feed')
+      expect(response.content_type).to eq('application/rss+xml')
+    end
+  end
+
 end

@@ -33,10 +33,13 @@ class CatalogController < ApplicationController
   end
 
   def feed
+    authorize current_user
     current_user.admin? ?
         @rss_items = WorkItem.order('date').reverse_order :
         @rss_items = WorkItem.with_institution(current_user.institution_id).order('date').reverse_order
-    format.rss { render :layout => false }
+    respond_to do |format|
+      format.rss { render :layout => false }
+    end
   end
 
   protected
