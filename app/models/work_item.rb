@@ -1,5 +1,4 @@
 class WorkItem < ActiveRecord::Base
-  require 'zlib'
 
   paginates_per 10
 
@@ -12,7 +11,6 @@ class WorkItem < ActiveRecord::Base
   validate :stage_is_allowed
   validate :action_is_allowed
   before_save :set_object_identifier_if_ingested
-
 
   ### Scopes
   scope :created_before, ->(param) { where('work_items.created_at < ?', param) unless param.blank? }
@@ -185,7 +183,6 @@ class WorkItem < ActiveRecord::Base
     delete_item
   end
 
-
   def status_is_allowed
     if !Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
       errors.add(:status, 'Status is not one of the allowed options')
@@ -208,7 +205,8 @@ class WorkItem < ActiveRecord::Base
   # If it does, it's stored without extra whitespace, but we want
   # to display it in a readable format.
   def pretty_state
-    unzipped_state = Zlib::Inflate.inflate(self.work_item_state.state) unless self.work_item_state.nil? || self.work_item_state.state.nil?
+    state_item = self.work_item_state
+    unzipped_state = state_item.unzipped_state unless state_item.nil? || state_item.state.nil?
     return nil if unzipped_state.nil? || unzipped_state.strip == ''
     return JSON.pretty_generate(JSON.parse(unzipped_state))
   end
