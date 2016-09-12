@@ -6,7 +6,6 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
   validates :uri, presence: true
-  #validates :intellectual_object, presence: true
   validates :size, presence: true
   validates :created_at, presence: true
   validates :updated_at, presence: true
@@ -111,16 +110,6 @@ class GenericFile < ActiveRecord::Base
     self.state = 'D'
     self.add_event(attributes)
     save!
-  end
-
-  def institution_identifier
-    ident = self.identifier.split('/')
-    ident[0]
-  end
-
-  def intellectual_object_identifier
-    ident = self.identifier.split('/')
-    ident[1]
   end
 
   # This is for serializing JSON in the API.
