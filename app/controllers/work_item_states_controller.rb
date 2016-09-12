@@ -28,6 +28,9 @@ class WorkItemStatesController < ApplicationController
   end
 
   def show
+    if @state_item.nil?
+      render nothing: true, status: :not_found and return
+    end
     authorize @state_item
     respond_to do |format|
       format.json { render json: @state_item.serializable_hash }
@@ -41,7 +44,11 @@ class WorkItemStatesController < ApplicationController
   end
 
   def work_item_state_params
-    params.require(:work_item_state).permit(:work_item_id, :action, :state)
+    if request.method == 'GET'
+      params.require(:work_item_id)
+    else
+      params.require(:work_item_state).permit(:work_item_id, :action, :state)
+    end
   end
 
   def params_for_update
