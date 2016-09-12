@@ -29,19 +29,11 @@ class WorkItemState < ActiveRecord::Base
   private
 
   # Returns true if state looks like plaintext.
-  # We only look at the first 50 chars, because the full
-  # string may be a few megabytes, and the gzip header
-  # in the first few bytes will contain binary data.
+  # Since our plaintext should always be JSON data,
+  # we'll do a simple test for opening and closing
+  # braces.
   def state_looks_like_plaintext
-    if state.length <= 50
-      sample = state
-    else
-      last_index = [state.length, 50].min
-      sample = state.slice(0, last_index)
-    end
-    # Regex checks for unprintable characters.
-    # If no match, we assume plaintext.
-    !sample.match(/[^[:print:]]/)
+    state.start_with?('{') && state.end_with?('}')
   end
 
   def set_action
