@@ -68,10 +68,6 @@ class IntellectualObject < ActiveRecord::Base
     identifier
   end
 
-  def institution_identifier
-    self.institution.identifier
-  end
-
   def bytes_by_format
     stats = self.generic_files.sum(:size)
     if stats
