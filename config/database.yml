@@ -30,7 +30,7 @@ integration:
 staging:
   <<: *default
   adapter: postgresql
-  database: pharos-staging
+  database: pharos_staging
   username: <%= ENV['PHAROS_DB_USER'] %>
   host:     <%= ENV['PHAROS_DB_HOST'] %>
   password: <%= ENV['PHAROS_DB_PWD'] %>
@@ -38,7 +38,7 @@ staging:
 production:
   <<: *default
   adapter: postgresql
-  database: pharos-production
+  database: pharos_production
   username: <%= ENV['PHAROS_DB_USER'] %>
   host:     <%= ENV['PHAROS_DB_HOST'] %>
   password: <%= ENV['PHAROS_DB_PWD'] %>
