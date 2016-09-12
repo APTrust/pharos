@@ -214,17 +214,7 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  protected
-
-  def redirect_after_update
-    intellectual_object_path(resource)
-  end
-
   private
-
-  def search_action_url options = {}
-    institution_intellectual_objects_path(params[:identifier] || @intellectual_object.institution.identifier)
-  end
 
   def object_as_json
     if params[:include_relations]
