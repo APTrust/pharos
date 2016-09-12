@@ -36,19 +36,6 @@ module ApplicationHelper
     end
   end
 
-  def header_title
-    base_title = 'APTrust'
-  end
-
-  def full_title(page_title)
-    base_title = 'APTrust'
-    if page_title.empty?
-      base_title
-    else
-      "#{page_title} | #{base_title}"
-    end
-  end
-
   def format_boolean_as_yes_no(boolean)
     if boolean == 'true'
       return 'Yes'
