@@ -130,7 +130,7 @@ class GenericFilesController < ApplicationController
 
   def file_summary
     data = []
-    files = GenericFile.where(state: 'A', intellectual_object_id: @intellectual_object.id)
+    files = @intellectual_object.active_files
     files.each do |file|
       summary = {}
       summary['size'] = file.size
