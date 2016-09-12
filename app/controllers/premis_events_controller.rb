@@ -8,19 +8,16 @@ class PremisEventsController < ApplicationController
     identifier = params[:identifier].gsub(/%2F/i, '/')
     @premis_events = PremisEvent.discoverable(current_user)
     if (identifier=~/^(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+$/)
-      @intellectual_object = IntellectualObject.where(identifier: params[:identifier]).first
-      @obj = @intellectual_object
+      @parent = IntellectualObject.where(identifier: params[:identifier]).first
       for_selected_object
     elsif (identifier=~/(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/)
-      @generic_file = GenericFile.where(identifier: params[:identifier]).first
-      @obj = @generic_file
+      @parent = GenericFile.where(identifier: params[:identifier]).first
       for_selected_file
     elsif (identifier=~/(\w+\.)*\w+(\.edu|\.com|\.org)/)
-      @institution = Institution.where(identifier: params[:identifier]).first
-      @obj = @institution
+      @parent = Institution.where(identifier: params[:identifier]).first
       for_selected_institution
     end
-    authorize @obj
+    authorize @parent
     @events = PremisEvent
       .discoverable(current_user)
       .with_create_date(params[:created_at])
@@ -85,19 +82,15 @@ class PremisEventsController < ApplicationController
   end
 
   def for_selected_institution
-    @premis_events = @premis_events.where(institution_id: @institution.id) unless @institution.nil?
+    @premis_events = @premis_events.where(institution_id: @parent.id) unless @parent.nil?
   end
 
   def for_selected_object
-    @premis_events = @premis_events.where(intellectual_object_id: @intellectual_object.id) unless @intellectual_object.nil?
+    @premis_events = @premis_events.where(intellectual_object_id: @parent.id) unless @parent.nil?
   end
 
   def for_selected_file
-    @premis_events = @premis_events.where(generic_file_id: @generic_file.id) unless @generic_file.nil?
-  end
-
-  def sort_chronologically
-    @premis_events = @premis_events.order('datetime')
+    @premis_events = @premis_events.where(generic_file_id: @parent.id) unless @parent.nil?
   end
 
   def premis_event_params
