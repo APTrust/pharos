@@ -41,9 +41,8 @@ class User < ActiveRecord::Base
     end
   end
 
-  def institution_identifier
-    institution = Institution.find(self.institution_id)
-    institution.identifier
+  def institution_group_suffix
+    institution_id
   end
 
   def to_s
@@ -81,20 +80,6 @@ class User < ActiveRecord::Base
     elsif(institutional_user?)
       Role.where(name: 'institutional_user').first_or_create.id
     end
-  end
-
-  def main_group
-    if(admin?)
-      'Admin'
-    elsif(institutional_admin?)
-      'Institutional Admin'
-    elsif(institutional_user?)
-      'Institutional User'
-    end
-  end
-
-  def institution_group_suffix
-    institution_id
   end
 
   def guest?
