@@ -295,12 +295,11 @@ module SearchAndIndex
 
   def set_page_counts(count)
     @count = count
+    params[:page] = 1 unless params[:page].present?
+    params[:per_page] = 10 unless params[:per_page].present?
     if @count == 0
       @second_number = 0
       @first_number = 0
-    elsif params[:page].nil?
-      @second_number = 10
-      @first_number = 1
     else
       @second_number = params[:page].to_i * params[:per_page].to_i
       @first_number = (@second_number.to_i - params[:per_page].to_i) + 1
@@ -309,8 +308,6 @@ module SearchAndIndex
   end
 
   def page_results(results)
-    params[:page] = 1 unless params[:page].present?
-    params[:per_page] = 10 unless params[:per_page].present?
     @page = params[:page].to_i
     @per_page = params[:per_page].to_i
     @paged_results = Kaminari.paginate_array(results).page(@page).per(@per_page)
