@@ -12,7 +12,10 @@ class WorkItemsController < ApplicationController
     page_results(@items)
     if @items.nil? || @items.empty?
       respond_to do |format|
-        format.json { render nothing: true, status: :not_found }
+        format.json {
+          json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          render json: {count: @count, next: @next, previous: @previous, results: json_list}
+        }
         format.html { render 'index' }
       end
     else
