@@ -22,7 +22,7 @@ class InstitutionPolicy < ApplicationPolicy
   end
 
   def show?
-    record.nil? || user.admin? ||  (user.institution_id == record.id)
+    user.admin? ||  (user.institution_id == record.id)
   end
 
   def edit?

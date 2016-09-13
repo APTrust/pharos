@@ -9,11 +9,7 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def index?
-    record.first.nil? || user.admin? ||  (user.institution.id == record.first.institution_id)
-  end
-
-  def search?
-    record.first.nil? || user.admin? || (user.institution.id == record.first.institution_id)
+    user.admin? ||  (user.institution.id == record.first.institution_id)
   end
 
   def admin_api?
@@ -25,7 +21,7 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def show?
-    record.nil? || user.admin? || (user.institution.id == record.institution_id)
+    user.admin? || (user.institution.id == record.institution_id)
   end
 
   def update?
@@ -42,7 +38,7 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def set_restoration_status?
-    record.nil? || user.admin?
+    user.admin?
   end
 
   def items_for_delete?

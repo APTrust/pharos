@@ -10,12 +10,17 @@ class WorkItemsController < ApplicationController
     filter unless request.format == :json
     sort
     page_results(@items)
-    respond_to do |format|
-      format.json {
-        json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
-        render json: {count: @count, next: @next, previous: @previous, results: json_list}
-      }
-      format.html
+    if @items.nil? || @items.empty?
+      render nothing: true, status: :not_found and return
+    else
+      authorize @items
+      respond_to do |format|
+        format.json {
+          json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          render json: {count: @count, next: @next, previous: @previous, results: json_list}
+        }
+        format.html
+      end
     end
   end
 
@@ -31,15 +36,19 @@ class WorkItemsController < ApplicationController
   end
 
   def show
-    authorize @work_item
-    respond_to do |format|
-      if current_user.admin?
-        item = @work_item.serializable_hash
-      else
-        item = @work_item.serializable_hash(except: [:node, :pid])
+    if @work_item
+      authorize @work_item
+      respond_to do |format|
+        if current_user.admin?
+          item = @work_item.serializable_hash
+        else
+          item = @work_item.serializable_hash(except: [:node, :pid])
+        end
+        format.json { render json: item }
+        format.html
       end
-      format.json { render json: item }
-      format.html
+    else
+      render nothing: true, status: :not_found and return
     end
   end
 
@@ -111,7 +120,11 @@ class WorkItemsController < ApplicationController
     restore = Pharos::Application::PHAROS_ACTIONS['restore']
     @item = WorkItem.where(object_identifier: params[:object_identifier],
                            action: restore).order(created_at: :desc).first
-    authorize (@item || WorkItem.new), :set_restoration_status?
+    if @item.nil?
+      render nothing: true, status: :not_found and return
+    else
+      authorize @item
+    end
     if @item
       succeeded = @item.update_attributes(params_for_status_update)
     end
@@ -277,7 +290,6 @@ class WorkItemsController < ApplicationController
     end
     params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
     params[:sort] = 'date' if params[:sort].nil?
-    authorize @items
     @items = @items
       .created_before(params[:created_before])
       .created_after(params[:created_after])
@@ -320,17 +332,6 @@ class WorkItemsController < ApplicationController
                                     bag_date: params[:bag_date]).first
       end
     end
-    if @work_item
-      params[:id] = @work_item.id
-    else
-      # API callers **DEPEND** on getting a 404 if the record does
-      # not exist. This is how they know that an item has not started
-      # the ingestion process. So if @work_item is nil, return
-      # 404 now. Otherwise, the call to authorize below will result
-      # in a 500 error from pundit.
-      raise ActiveRecord::RecordNotFound
-    end
-    authorize @work_item, :show?
   end
 
   def rewrite_params_for_sqlite

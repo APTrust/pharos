@@ -6,6 +6,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
   let!(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
   let!(:item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
   let!(:other_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+  let!(:lonely_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
   let!(:state_item) { FactoryGirl.create(:work_item_state, work_item: item, state: '{JSON data}') }
 
   describe 'POST #create' do
@@ -17,7 +18,6 @@ RSpec.describe WorkItemStatesController, type: :controller do
       post :create, work_item_state: { state: '{JSON data}', work_item_id: other_item.id, action: 'Success' }, format: :json
       expect(response).to be_success
       assigns(:state_item).action.should eq('Success')
-      # State '{JSON data}' should be compressed
       assigns(:state_item).state.bytes.should eq("x\x9C\xAB\xF6\n\xF6\xF7SHI,I\xAC\x05\x00\x16\x90\x03\xED".bytes)
       assigns(:state_item).unzipped_state.should eq('{JSON data}')
       assigns(:state_item).work_item_id.should eq(other_item.id)
@@ -55,6 +55,11 @@ RSpec.describe WorkItemStatesController, type: :controller do
         assigns(:state_item).id.should eq(state_item.id)
         assigns(:state_item).state.bytes.should eq("x\x9C\xAB\xF6\n\xF6\xF7SHI,I\xAC\x05\x00\x16\x90\x03\xED".bytes)
         assigns(:state_item).unzipped_state.should eq('{JSON data}')
+      end
+
+      it 'responds with a 404 error if the state item does not exist' do
+        get :show, work_item_id: lonely_item.id, format: :json
+        expect(response.status).to eq(404)
       end
     end
   end

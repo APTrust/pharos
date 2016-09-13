@@ -37,6 +37,11 @@ RSpec.describe WorkItemsController, type: :controller do
         get :index
         assigns(:institution).should eq( admin_user.institution)
       end
+
+      it 'responds with a 404 when no results are found' do
+        get :index, name: 'name_of_something_not_found'
+        expect(response.status).to eq(404)
+      end
     end
 
     describe 'for institutional admin' do
@@ -84,11 +89,8 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns 404, not 500, for item not found' do
-        expect {
-          get :show,
-              etag: 'does not exist',
-              name: 'duznot igzist',
-              bag_date: '1901-01-01' }.to raise_error(ActiveRecord::RecordNotFound)
+        get :show, etag: 'does not exist', name: 'duznot igzist', bag_date: '1901-01-01'
+        expect(response.status).to eq(404)
       end
     end
 

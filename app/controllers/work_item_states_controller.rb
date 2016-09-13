@@ -30,10 +30,11 @@ class WorkItemStatesController < ApplicationController
   def show
     if @state_item.nil?
       render nothing: true, status: :not_found and return
-    end
-    authorize @state_item
-    respond_to do |format|
-      format.json { render json: @state_item.serializable_hash }
+    else
+      authorize @state_item
+      respond_to do |format|
+        format.json { render json: @state_item.serializable_hash }
+      end
     end
   end
 
