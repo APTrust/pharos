@@ -27,7 +27,10 @@ class GenericFilesController < ApplicationController
       sort
       page_results(@generic_files)
       respond_to do |format|
-        format.json { render json: @intellectual_object.active_files.map do |f| f.serializable_hash end }
+        format.json {
+          @active_results = @generic_files.where(state: 'A')
+          render json: @active_results.map do |f| f.serializable_hash end
+        }
         format.html { }
       end
     end

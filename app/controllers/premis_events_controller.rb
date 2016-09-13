@@ -18,8 +18,7 @@ class PremisEventsController < ApplicationController
       for_selected_institution
     end
     authorize @parent
-    @events = PremisEvent
-      .discoverable(current_user)
+    @premis_events = @premis_events
       .with_create_date(params[:created_at])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
@@ -33,7 +32,7 @@ class PremisEventsController < ApplicationController
     sort
     page_results(@premis_events)
     respond_to do |format|
-      format.json { render json: @events.map { |event| event.serializable_hash } }
+      format.json { render json: @premis_events.map { |event| event.serializable_hash } }
       format.html { }
     end
   end
