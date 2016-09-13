@@ -21,6 +21,14 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def set_restoration_status?
+    user.admin?
+  end
+
+  def state_show?
+    user.admin?
+  end
+
   def show?
     user == record ||  user.admin? ||
         (user.institutional_admin? && (user.institution_id == record.institution_id))

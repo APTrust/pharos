@@ -3,6 +3,7 @@ class WorkItemStatesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :set_item_and_state, only: [:show, :update]
   before_filter :init_from_params, only: :create
+  after_action :verify_authorized
 
   def create
     authorize @state_item
@@ -29,6 +30,7 @@ class WorkItemStatesController < ApplicationController
 
   def show
     if @state_item.nil?
+      authorize current_user, :state_show?
       render nothing: true, status: :not_found and return
     else
       authorize @state_item

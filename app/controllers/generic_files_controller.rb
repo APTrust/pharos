@@ -3,6 +3,7 @@ class GenericFilesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :load_generic_file, only: [:show, :update, :destroy]
   before_filter :load_intellectual_object, only: [:update, :create]
+  after_action :verify_authorized
 
   def index
     if params[:alt_action]

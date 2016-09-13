@@ -4,6 +4,7 @@ class IntellectualObjectsController < ApplicationController
   before_filter :authenticate_user!
   before_action :load_institution, only: [:index, :create]
   before_action :load_object, only: [:show, :edit, :update, :destroy, :send_to_dpn, :restore]
+  after_action :verify_authorized
 
   def index
     authorize @institution

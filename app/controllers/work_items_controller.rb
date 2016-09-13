@@ -4,6 +4,7 @@ class WorkItemsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :set_item, only: :show
   before_filter :init_from_params, only: :create
+  after_action :verify_authorized
 
   def index
     set_items
@@ -11,6 +12,7 @@ class WorkItemsController < ApplicationController
     sort
     page_results(@items)
     if @items.nil? || @items.empty?
+      authorize current_user, :nil_index?
       respond_to do |format|
         format.json {
           json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
@@ -54,6 +56,7 @@ class WorkItemsController < ApplicationController
         format.html
       end
     else
+      authorize current_user, :nil_index?
       render nothing: true, status: :not_found and return
     end
   end
@@ -127,6 +130,7 @@ class WorkItemsController < ApplicationController
     @item = WorkItem.where(object_identifier: params[:object_identifier],
                            action: restore).order(created_at: :desc).first
     if @item.nil?
+      authorize current_user
       render nothing: true, status: :not_found and return
     else
       authorize @item
