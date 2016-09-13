@@ -38,8 +38,8 @@ RSpec.describe WorkItemsController, type: :controller do
         assigns(:institution).should eq( admin_user.institution)
       end
 
-      it 'responds with a 404 when no results are found' do
-        get :index, name: 'name_of_something_not_found'
+      it 'responds with a 404 when no results are found and the call is json' do
+        get :index, name: 'name_of_something_not_found', format: :json
         expect(response.status).to eq(404)
       end
     end
