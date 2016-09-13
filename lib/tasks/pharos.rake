@@ -302,7 +302,7 @@ namespace :pharos do
     puts 'Create an initial Super-User for APTrust...'
     aptrust = Institution.where(identifier: "aptrust.org").first
     admin_role = Role.where(name: 'admin').first
-    name = "APTrust Admin"
+    name = "APTrustAdmin"
     email = "ops@aptrust.org"
     phone_number ="4341234567"
     password ="password"
