@@ -4,7 +4,6 @@ class InstitutionsController < ApplicationController
   before_filter :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy]
   respond_to :json, :html
-
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 

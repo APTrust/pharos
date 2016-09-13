@@ -21,6 +21,10 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def nil_index?
+    true
+  end
+
   def set_restoration_status?
     user.admin?
   end
@@ -61,6 +65,14 @@ class UserPolicy < ApplicationPolicy
   end
 
   def work_item_batch_update?
+    user.admin?
+  end
+
+  def not_checked_since?
+    user.admin?
+  end
+
+  def intellectual_object_create?
     user.admin?
   end
 

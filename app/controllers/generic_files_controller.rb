@@ -13,6 +13,7 @@ class GenericFilesController < ApplicationController
           authorize @intellectual_object
           file_summary
         when 'not_checked_since'
+          authorize current_user, :not_checked_since?
           not_checked_since
       end
     else
