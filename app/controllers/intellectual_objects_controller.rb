@@ -28,7 +28,6 @@ class IntellectualObjectsController < ApplicationController
       .with_bag_name_like(params[:bag_name_like])
       .with_etag(params[:etag])
       .with_etag_like(params[:etag_like])
-      .with_state(params[:state])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
       .updated_before(params[:updated_before])

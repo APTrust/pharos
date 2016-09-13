@@ -311,7 +311,6 @@ class WorkItemsController < ApplicationController
       .with_stage(params[:stage])
       .with_action(params[:item_action])
       .with_access(params[:access])
-      .with_state(params[:state])
     count = @items.count
     set_page_counts(count)
   end
