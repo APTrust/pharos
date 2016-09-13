@@ -38,9 +38,14 @@ RSpec.describe WorkItemsController, type: :controller do
         assigns(:institution).should eq( admin_user.institution)
       end
 
-      it 'responds with a 404 when no results are found and the call is json' do
+      it 'responds with an empty results object the call is json' do
         get :index, name: 'name_of_something_not_found', format: :json
-        expect(response.status).to eq(404)
+        expect(response.status).to eq(200)
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(0)
+        expect(data['next']).to be_nil
+        expect(data['previous']).to be_nil
+        expect(data['results']).to eq([])
       end
     end
 
