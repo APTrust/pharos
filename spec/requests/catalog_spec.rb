@@ -17,7 +17,7 @@ describe 'Catalog' do
       end
 
       it 'should have APTrust footer information' do
-        expect(page).to have_content '© 2013 Academic Preservation Trust'
+        expect(page).to have_content '© 2013 - <%= Date.today.year %> Academic Preservation Trust'
       end
     end
 
