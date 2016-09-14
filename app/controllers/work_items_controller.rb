@@ -279,7 +279,7 @@ class WorkItemsController < ApplicationController
                                       :stage, :status, :outcome, :retry,
                                       :pid, :node, :object_identifier,
                                       :generic_file_identifier, :needs_admin_review,
-                                      :queued_at, :size)
+                                      :queued_at, :size, :stage_started_at)
   end
 
   def batch_work_item_update_params
@@ -287,7 +287,7 @@ class WorkItemsController < ApplicationController
                                    .permit(items: [:name, :etag, :bag_date, :bucket,
                                                    :institution_id, :date, :note, :action,
                                                    :stage, :status, :outcome, :retry,
-                                                   :node, :size, :id])
+                                                   :node, :size, :stage_started_at, :id])
   end
 
   def params_for_status_update
