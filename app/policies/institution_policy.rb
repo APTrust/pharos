@@ -38,6 +38,10 @@ class InstitutionPolicy < ApplicationPolicy
     false
   end
 
+  def reports?
+    user.admin? || user.institution_id == record.id
+  end
+
   class Scope
     attr_reader :user, :scope
 

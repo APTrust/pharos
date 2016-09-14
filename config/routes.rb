@@ -63,6 +63,9 @@ Rails.application.routes.draw do
   get 'api/v2/search', to: 'catalog#search', format: [:json, :html], as: :api_search
   get 'feed', to: 'catalog#feed', format: :rss, as: :rss_feed
 
+  # REPORT ROUTES
+  get 'reports/:identifier', to: 'reports#index', format: [:json, :html], as: :reports, identifier: institution_ptrn
+
   # USER ROUTES
   devise_for :users
 
