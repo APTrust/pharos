@@ -57,7 +57,10 @@ class WorkItemsController < ApplicationController
       end
     else
       authorize current_user, :nil_index?
-      render nothing: true, status: :not_found and return
+      respond_to do |format|
+        format.json { render nothing: true, status: :not_found }
+        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      end
     end
   end
 
@@ -328,7 +331,11 @@ class WorkItemsController < ApplicationController
       rewrite_params_for_sqlite
     end
     if params[:id].blank? == false
-      @work_item = WorkItem.find(params[:id])
+      begin
+        @work_item = WorkItem.find(params[:id])
+      rescue
+        # If we don't catch this, we get an internal server error
+      end
     else
       if Rails.env.test? || Rails.env.development?
         # Cursing ActiveRecord + SQLite. SQLite has all the milliseconds wrong!

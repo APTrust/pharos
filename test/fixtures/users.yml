@@ -2,7 +2,7 @@
 # APTrust Go services. They're not used for spec tests.
 
 # This is the admin user. The plaintext password is 'password',
-# and the plaintext encryption key is 'c3958c7b09e40af1d065020484dafa9b2a35cea0'.
+# and the plaintext API secret key is 'c3958c7b09e40af1d065020484dafa9b2a35cea0'.
 
 user1:
   name: APTrust System
