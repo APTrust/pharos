@@ -57,6 +57,9 @@ Rails.application.routes.draw do
   get '/api/v2/item_state/:work_item_id', to: 'work_item_states#show', format: :json
   get '/api/v2/item_state/:id', to: 'work_item_states#show', format: :json
 
+  # CHECKSUM ROUTES
+  get '/api/v2/checksums', to: 'checksums#index', format: :json
+
   # CATALOG ROUTES
   post 'search/', to: 'catalog#search', format: [:json, :html], as: :search
   get 'search/', to: 'catalog#search', format: [:json, :html]

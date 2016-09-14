@@ -33,6 +33,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def checksum_index?
+    user.admin?
+  end
+
   def show?
     user == record ||  user.admin? ||
         (user.institutional_admin? && (user.institution_id == record.institution_id))

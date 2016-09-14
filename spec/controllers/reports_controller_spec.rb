@@ -3,10 +3,14 @@ require 'spec_helper'
 RSpec.describe ReportsController, type: :controller do
   before :all do
     Institution.destroy_all
+    IntellectualObject.destroy_all
+    GenericFile.destroy_all
   end
 
   after do
     Institution.destroy_all
+    IntellectualObject.destroy_all
+    GenericFile.destroy_all
   end
 
   let(:institution_one) { FactoryGirl.create(:institution) }
