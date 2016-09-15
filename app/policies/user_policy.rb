@@ -47,6 +47,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
+    return false if (user.institutional_admin? && record.admin?)
     user == record || user.admin? ||
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
@@ -80,9 +81,9 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
-  # institutional_admin cannot delete institutional user
   def destroy?
     return false if user == record
+    return false if (user.institutional_admin? && record.admin?)
     user.admin? ||
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
