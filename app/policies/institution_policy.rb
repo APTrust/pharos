@@ -51,7 +51,7 @@ class InstitutionPolicy < ApplicationPolicy
     end
 
     def resolve
-      if user.admin?
+      if user.admin? || (user.institutional_admin? && user.institution.name == 'APTrust')
         scope.all
       else
         scope.where(id: user.institution_id)
