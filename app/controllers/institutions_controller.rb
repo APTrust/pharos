@@ -69,7 +69,8 @@ class InstitutionsController < ApplicationController
   end
 
   def set_recent_objects
-    if current_user.admin? && current_user.institution.identifier == @institution.identifier
+    if (current_user.admin? && current_user.institution.identifier == @institution.identifier)  ||
+        (current_user.institutional_admin? && current_user.institution.name == 'APTrust' && current_user.institution.identifier == @institution.identifier)
       @items = WorkItem.order('date').limit(10).reverse_order
       @size = GenericFile.bytes_by_format['all']
       @item_count = WorkItem.all.count
