@@ -15,9 +15,7 @@
       <tr id="<%= institution.id %>">
         <td><%= link_to_if policy(institution).show?, institution.name, institution_path(institution), class: "block-link" %></td>
         <td><%= number_to_human_size(@sizes[institution.name]) %></td>
-        <% if current_user.admin? %>
-            <td><%= edit_link institution %></td>
-        <% end %>
+        <td><%= edit_link institution %></td>
       </tr>
   <% end %>
   </tbody>
