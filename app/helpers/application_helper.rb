@@ -47,7 +47,8 @@ module ApplicationHelper
   def display_version
     return '' if Rails.env.production?
     app_version = Pharos::Application::VERSION
-    return "Running Pharos ver #{app_version} on Rails #{Rails.version} under Ruby #{RUBY_VERSION}"
+    release_version = ENV['PHAROS_RELEASE']
+    return "Pharos #{app_version} | Relase #{release_version} | Rails #{Rails.version} | Ruby #{RUBY_VERSION}"
   end
 
   def current_path(param, value)
