@@ -102,7 +102,6 @@ RSpec.describe UsersController, type: :controller do
     end
   end
 
-
   describe 'An Institutional Administrator' do
     let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
 
@@ -145,8 +144,7 @@ RSpec.describe UsersController, type: :controller do
       expect(assigns[:user]).to be_kind_of User
     end
 
-    describe 'creating Institutional User' do
-      let(:institutional_admin_role_id) { Role.where(name: 'institutional_admin').first_or_create.id}
+    describe 'creating a User' do
 
       describe 'at another institution' do
         let(:attributes) { FactoryGirl.attributes_for(:user) }
@@ -171,6 +169,7 @@ RSpec.describe UsersController, type: :controller do
             expect(assigns[:user]).to be_institutional_user
           end
         end
+
         describe 'with institutional_admin role' do
           let(:institutional_admin_role_id) {Role.where(name: 'institutional_admin').first_or_create.id}
           let(:attributes) { FactoryGirl.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_admin_role_id) }
@@ -180,6 +179,18 @@ RSpec.describe UsersController, type: :controller do
             }.to change(User, :count).by(1)
             response.should redirect_to user_url(assigns[:user])
             expect(assigns[:user]).to be_institutional_admin
+          end
+        end
+
+        describe 'with admin role' do
+          let(:admin_role_id) { Role.where(name: 'admin').first_or_create.id}
+          let(:attributes) { FactoryGirl.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: admin_role_id) }
+          it 'should be forbidden' do
+            expect {
+              post :create, user: attributes
+            }.not_to change(User, :count)
+            response.should redirect_to root_path
+            expect(flash[:alert]).to eq 'You are not authorized to access this page.'
           end
         end
       end
