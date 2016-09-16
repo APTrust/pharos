@@ -42,9 +42,10 @@ class ChecksumsController < ApplicationController
   end
 
   def filter_and_sort
-    @checksums = @checksums.joins(:generic_file).where('generic_files.identifier = ?', "#{params[:generic_file_identifier]}") if params[:generic_file_identifier]
-    @checksums = @checksums.where(algorithm: params[:algorithm]) if params[:algorithm]
-    @checksums = @checksums.where(digest: params[:digest]) if params[:digest]
+    @checksums = @checksums
+      .with_generic_file_identifier(params[:generic_file_identifier])
+      .with_algorithm(params[:algorithm])
+      .with_digest(params[:digest])
     @checksums = @checksums.order('created_at DESC')
     count = @checksums.count
     set_page_counts(count)
