@@ -235,8 +235,6 @@ class IntellectualObjectsController < ApplicationController
                                                 generic_files_attributes:
                                                 [:id, :uri, :identifier,
                                                  :size, :created, :modified, :file_format,
-                                                 checksums_attributes:
-                                                 [:digest, :algorithm, :datetime, :id],
                                                  premis_events_attributes:
                                                  [:id, :identifier, :event_type, :date_time,
                                                   :outcome, :outcome_detail,

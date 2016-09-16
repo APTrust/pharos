@@ -21,14 +21,6 @@ RSpec.describe GenericFile, :type => :model do
     expect(file.intellectual_object.identifier).to include('/')
   end
 
-  it 'should validate presence of a checksum' do
-    expect(subject.valid?).to be false
-    expect(subject.errors[:checksums]).to eq ["can't be blank"]
-    subject.checksums.push( FactoryGirl.create(:checksum, digest: '1234') )
-    expect(subject.valid?).to be false
-    expect(subject.errors[:checksums]).to be_empty
-  end
-
   describe '#identifier_is_unique' do
     it 'should validate uniqueness of the identifier' do
       one = FactoryGirl.create(:generic_file, identifier: 'test.edu')

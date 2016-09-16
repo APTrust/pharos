@@ -13,7 +13,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst2) }
   let!(:obj2) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst1,
-                                   identifier: "test.edu/baggie",
+                                   identifier: 'test.edu/baggie',
                                    title: 'Aberdeen Wanderers',
                                    description: 'Founded in Aberdeen in 1928.') }
   let!(:obj3) { FactoryGirl.create(:institutional_intellectual_object,
@@ -116,9 +116,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
-  end # ---------------- END OF GET #index
-
-
+  end
 
   describe 'GET #show' do
 
@@ -195,12 +193,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
-  end # ---------------- END OF GET #show ----------------
+  end
 
-
-
-  # Note that no one has permission to hit the #edit method
-  # of the intellectual objects controller.
   describe 'GET #edit' do
     let(:inst1_obj) { FactoryGirl.create(:consortial_intellectual_object, institution: inst1) }
     let(:inst2_obj) { FactoryGirl.create(:consortial_intellectual_object, institution: inst2) }
@@ -246,20 +240,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
-      it "should not let me edit this" do
+      it 'should not let me edit this' do
         get :edit, intellectual_object_identifier: inst1_obj
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
-      it "should not let me edit this either" do
+      it 'should not let me edit this either' do
         get :edit, intellectual_object_identifier: inst2_obj
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
     end
 
-  end # ---------------- END OF GET #edit ----------------
-
+  end
 
   describe 'POST #create' do
     let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1) }
@@ -324,8 +317,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
-  end # ---------------- END OF POST #create ----------------
-
+  end
 
   describe 'PATCH #update' do
 
@@ -384,8 +376,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
-  end # ---------------- END OF PATCH #update ----------------
-
+  end
 
   describe 'DELETE #destroy' do
     let!(:deletable_obj) { FactoryGirl.create(:institutional_intellectual_object,
@@ -482,8 +473,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     end
 
-  end # ---------------- END OF DELETE #destroy ----------------
-
+  end
 
   describe 'PUT #send_to_dpn' do
     let!(:obj_for_dpn) { FactoryGirl.create(:institutional_intellectual_object,
@@ -655,8 +645,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
-  end # ---------------- END OF PUT #send_to_dpn ----------------
-
+  end
 
   describe 'PUT #restore' do
     let!(:obj_for_restore) { FactoryGirl.create(:institutional_intellectual_object,
@@ -776,7 +765,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
-  end # ---------------- END OF PUT #restore ----------------
-
+  end
 
 end

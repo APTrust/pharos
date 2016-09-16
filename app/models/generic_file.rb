@@ -5,13 +5,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, presence: true
-  validates :size, presence: true
-  validates :created_at, presence: true
-  validates :updated_at, presence: true
-  validates :file_format, presence: true
-  validates :identifier, presence: true
-  validate :has_right_number_of_checksums
+  validates :uri, :size, :created_at, :updated_at, :file_format, :identifier, presence: true
   validates_uniqueness_of :identifier
 
   delegate :institution, to: :intellectual_object
@@ -180,23 +174,6 @@ class GenericFile < ActiveRecord::Base
   # Returns true if the GenericFile has a checksum with the specified digest.
   def has_checksum?(digest)
     find_checksum_by_digest(digest).nil? == false
-  end
-
-  private
-
-  def has_right_number_of_checksums
-    if(self.checksums.length == 0)
-      errors.add(:checksums, "can't be blank")
-    else
-      algorithms = Array.new
-      self.checksums.each do |cs|
-        if (algorithms.include? cs)
-          errors.add(:checksums, "can't have multiple checksums with same algorithm")
-        else
-          algorithms.push(cs)
-        end
-      end
-    end
   end
 
 end

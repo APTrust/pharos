@@ -85,9 +85,9 @@ class GenericFilesController < ApplicationController
 
   def update
     # A.D. Aug. 3, 2016: Deleted batch update because
-    # nested params cause new events and checksums to be created,
+    # nested params cause new events to be created,
     # and it would require too much logic to determine which
-    # events and checksums should not be duplicated.
+    # events should not be duplicated.
     authorize @generic_file
     @generic_file.state = 'A'
     if resource.update(params_for_update)
@@ -169,8 +169,7 @@ class GenericFilesController < ApplicationController
   def generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
       .permit(:id, :uri, :identifier, :size, :created_at,
-              :updated_at, :file_format, checksums_attributes:
-              [:digest, :algorithm, :datetime, :id], premis_events_attributes:
+              :updated_at, :file_format, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
                :agent, :intellectual_object_id, :generic_file_id,
@@ -180,8 +179,7 @@ class GenericFilesController < ApplicationController
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
       .permit(files: [:id, :uri, :identifier, :size, :created_at,
-                      :updated_at, :file_format, checksums_attributes:
-                      [:digest, :algorithm, :datetime, :id], premis_events_attributes:
+                      :updated_at, :file_format, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
                        :agent, :intellectual_object_id, :generic_file_id,
@@ -230,16 +228,6 @@ class GenericFilesController < ApplicationController
 
   def array_as_json(list_of_generic_files)
     list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
-  end
-
-  def remove_existing_checksums(generic_file, gf_params)
-    copy_of_params = gf_params.deep_dup
-    generic_file.checksum.each do |existing_checksum|
-      copy_of_params[:checksum_attributes].delete_if do |submitted_checksum|
-        generic_file.has_checksum?(submitted_checksum[:digest])
-      end
-    end
-    copy_of_params
   end
 
   def load_generic_file

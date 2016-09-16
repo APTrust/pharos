@@ -6,18 +6,6 @@
     "updated_at": "2014-04-14T11:55:25-04:00",
     "file_format": "text/plain",
     "identifier": "virginia.edu/virginia.edu.uva-lib_2278801/data/datastream-DC",
-    "checksums_attributes": [
-      {
-        "algorithm": "md5",
-        "digest": "44d85cf4810d6c6fe87750117633e461",
-        "datetime": "2014-04-14T11:55:25-04:00"
-      },
-      {
-        "algorithm": "sha256",
-        "digest": "248fac506a5c46b3c760312b99827b6fb5df4698d6cf9a9cdc4c54746728ab99",
-        "datetime": "2014-10-20T13:56:35Z"
-      }
-    ],
     "premis_events_attributes": [
       {
         "identifier": "00000000-1111-1111-1111-00000000",
@@ -50,18 +38,6 @@
     "updated_at": "2014-04-14T11:55:26-04:00",
     "file_format": "application/xml",
     "identifier": "virginia.edu/virginia.edu.uva-lib_2278801/data/datastream-RELS-EXT",
-    "checksums_attributes": [
-      {
-        "algorithm": "md5",
-        "digest": "ff731b9a1758618f6cc22538dede6174",
-        "datetime": "2014-04-14T11:55:26-04:00"
-      },
-      {
-        "algorithm": "sha256",
-        "digest": "299e1c23e398ec6699976cae63ef08167201500fa64bcf18062111e0c81d6a13",
-        "datetime": "2014-10-20T13:56:35Z"
-      }
-    ],
     "premis_events_attributes": [
       {
         "identifier": "00000000-3333-3333-3333-00000000",

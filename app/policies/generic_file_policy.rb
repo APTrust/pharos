@@ -17,6 +17,12 @@ class GenericFilePolicy < ApplicationPolicy
         (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)
   end
 
+  # for adding checksums
+  def create_through_generic_file?
+    user.admin?  ||
+        (user.institutional_admin? && user.institution_id == record.institution.id)
+  end
+
   def show?
     if user.admin?
       true

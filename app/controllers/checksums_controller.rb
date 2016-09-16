@@ -1,6 +1,7 @@
 class ChecksumsController < ApplicationController
   include SearchAndIndex
   before_filter :authenticate_user!
+  before_filter :load_generic_file, only: :create
   after_action :verify_authorized
 
   def index
@@ -13,7 +14,32 @@ class ChecksumsController < ApplicationController
     end
   end
 
+  def create
+    authorize @generic_file, :create_through_generic_file?
+    @checksum = @generic_file.checksums.new(checksum_params)
+    respond_to do |format|
+      if @checksum.save
+        format.json { render json: @checksum.serializable_hash, status: :created }
+      else
+        log_model_error(@checksum)
+        format.json { render json: @checksum.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   private
+
+  def checksum_params
+    params[:checksum] &&= params.require(:checksum).permit(:datetime, :algorithm, :digest)
+  end
+
+  def load_generic_file
+    if params[:generic_file_identifier]
+      @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier])
+    elsif params[:generic_file_id]
+      @generic_file = GenericFile.find(params[:generic_file_id])
+    end
+  end
 
   def filter_and_sort
     @checksums = @checksums.joins(:generic_file).where('generic_files.identifier = ?', "#{params[:generic_file_identifier]}") if params[:generic_file_identifier]

@@ -141,7 +141,6 @@ RSpec.describe GenericFilesController, type: :controller do
         post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'bar'}, format: 'json'
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( {
-                                                     'checksums' => ["can't be blank"],
                                                      'created_at' => ["can't be blank"],
                                                      'file_format' => ["can't be blank"],
                                                      'identifier' => ["can't be blank"],
@@ -178,7 +177,6 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/dog.jpg'
         end
       end
-
     end
   end
 
@@ -225,8 +223,6 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(return_data[1]['state']).to eq 'A'
           expect(return_data[0]['premis_events'].count).to eq 2
           expect(return_data[1]['premis_events'].count).to eq 2
-          expect(return_data[0]['checksums'].count).to eq 2
-          expect(return_data[1]['checksums'].count).to eq 2
         end
       end
     end
@@ -338,15 +334,15 @@ RSpec.describe GenericFilesController, type: :controller do
   end
 
   describe 'GET #not_checked_since' do
-    # describe 'when signed in as an admin user' do
-    #   before do
-    #     sign_in user
-    #   end
-    #
-    #   it 'allows access to the API endpoint' do
-    #     get :index, alt_action: 'not_checked_since', date: '2015-01-31T14:31:36Z', format: :json
-    #     expect(response.status).to eq 200
-    #   end
-    # end
+    describe 'when signed in as an admin user' do
+      before do
+        sign_in user
+      end
+
+      it 'allows access to the API endpoint' do
+        get :index, alt_action: 'not_checked_since', date: '2015-01-31T14:31:36Z', format: :json
+        expect(response.status).to eq 200
+      end
+    end
   end
 end
