@@ -22,8 +22,8 @@ RSpec.describe ChecksumsController, type: :controller do
   let!(:object_two) { FactoryGirl.create(:intellectual_object, institution: institution_two) }
   let!(:generic_file_one) { FactoryGirl.create(:generic_file, intellectual_object: object_one) }
   let!(:generic_file_two) { FactoryGirl.create(:generic_file, intellectual_object: object_two) }
-  let!(:checksum_one) { FactoryGirl.create(:checksum, generic_file: generic_file_one, algorithm: 'sha256') }
-  let!(:checksum_two) { FactoryGirl.create(:checksum, generic_file: generic_file_two, algorithm: 'md5') }
+  let!(:checksum_one) { FactoryGirl.create(:checksum, generic_file: generic_file_one, algorithm: 'sha256', digest: '87654321') }
+  let!(:checksum_two) { FactoryGirl.create(:checksum, generic_file: generic_file_two, algorithm: 'md5', digest: '12345678') }
 
   describe '#GET index' do
     describe 'for admin users' do
@@ -46,6 +46,13 @@ RSpec.describe ChecksumsController, type: :controller do
 
       it 'filters by algorithm' do
         get :index, algorithm: 'md5', format: :json
+        expect(response).to be_success
+        expect(assigns(:paged_results).size).to eq 1
+        expect(assigns(:paged_results).map &:id).to match_array [checksum_two.id]
+      end
+
+      it 'filters by digest' do
+        get :index, digest: '12345678', format: :json
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [checksum_two.id]
