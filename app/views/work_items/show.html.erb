@@ -44,7 +44,7 @@
       <tr><th>Needs Admin Review?</th>
         <td><%= @work_item.needs_admin_review %></td></tr>
       <tr><th>Note / Error</th>
-        <td><%= @work_item.note %></td></tr>
+        <td><%= simple_format(@work_item.note) %></td></tr>
       <% if current_user.admin? %>
           <tr><th>Node</th>
             <td><%= @work_item.node %></td></tr>
