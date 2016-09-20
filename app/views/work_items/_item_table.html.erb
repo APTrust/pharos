@@ -19,8 +19,10 @@
               <% else %>
                   <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.object_identifier, length: 45) %></a>
               <% end %>
-          <% else %>
+          <% elsif !item.object_identifier.blank? %>
               <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.object_identifier, length: 45) %></a>
+          <% else %>
+              <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.name, length: 45) %></a>
           <% end %></td>
         <td class="etag"><%= item.etag %></td>
         <td><%= item.institution.identifier %></td>
