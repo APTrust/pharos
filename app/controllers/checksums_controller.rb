@@ -30,7 +30,9 @@ class ChecksumsController < ApplicationController
   private
 
   def checksum_params
-    params[:checksum] &&= params.require(:checksum).permit(:datetime, :algorithm, :digest)
+    if request.method != 'GET'
+      params[:checksum] &&= params.require(:checksum).permit(:datetime, :algorithm, :digest)
+    end
   end
 
   def load_generic_file
