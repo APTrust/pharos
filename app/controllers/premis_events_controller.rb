@@ -24,6 +24,7 @@ class PremisEventsController < ApplicationController
       .created_after(params[:created_after])
       .with_type(params[:type])
       .with_event_identifier(params[:event_identifier])
+      .with_event_identifier_like(params[:event_identifier_like])
       .with_object_identifier(params[:object_identifier])
       .with_object_identifier_like(params[:object_identifier_like])
       .with_file_identifier(params[:file_identifier])
