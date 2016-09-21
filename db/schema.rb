@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160914182917) do
+ActiveRecord::Schema.define(version: 20160921140003) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20160914182917) do
     t.string   "state"
   end
 
+  add_index "generic_files", ["identifier"], name: "index_generic_files_on_identifier", unique: true
   add_index "generic_files", ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
 
   create_table "institutions", force: :cascade do |t|
@@ -63,6 +64,7 @@ ActiveRecord::Schema.define(version: 20160914182917) do
     t.string   "dpn_uuid"
   end
 
+  add_index "intellectual_objects", ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
   add_index "intellectual_objects", ["institution_id"], name: "index_intellectual_objects_on_institution_id"
 
   create_table "premis_events", force: :cascade do |t|
@@ -85,6 +87,7 @@ ActiveRecord::Schema.define(version: 20160914182917) do
   end
 
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
+  add_index "premis_events", ["identifier"], name: "index_premis_events_on_identifier", unique: true
   add_index "premis_events", ["intellectual_object_id"], name: "index_premis_events_on_intellectual_object_id"
 
   create_table "roles", force: :cascade do |t|

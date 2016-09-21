@@ -80,6 +80,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def soft_delete(attributes)
+    attributes[:identifier] = SecureRandom.uuid
     self.state = 'D'
     self.add_event(attributes)
     save!

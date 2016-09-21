@@ -5,6 +5,7 @@ class PremisEvent < ActiveRecord::Base
   belongs_to :generic_file
 
   validates :identifier, :event_type, :date_time, :detail, :outcome, :outcome_detail, :object, :agent, presence: true
+  validates_uniqueness_of :identifier
 
   before_save :init_identifier
   before_save :init_time

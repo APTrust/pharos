@@ -147,9 +147,9 @@ RSpec.describe PremisEventsController, type: :controller do
         middle_time = '2014-01-13 10:30:00 -0600'
         newest_time = '2014-01-13 10:45:00 -0600'
 
-        @event = file.add_event(event_attrs.merge(date_time: oldest_time))
-        @event2 = file.add_event(event_attrs.merge(date_time: newest_time))
-        @event3 = file.add_event(event_attrs.merge(date_time: middle_time))
+        @event = file.add_event(event_attrs.merge(date_time: oldest_time, identifier: SecureRandom.uuid))
+        @event2 = file.add_event(event_attrs.merge(date_time: newest_time, identifier: SecureRandom.uuid))
+        @event3 = file.add_event(event_attrs.merge(date_time: middle_time, identifier: SecureRandom.uuid))
         file.save!
 
         @someone_elses_event = someone_elses_file.add_event(event_attrs)
@@ -161,7 +161,7 @@ RSpec.describe PremisEventsController, type: :controller do
           get :index, identifier: file.institution.identifier
           assigns(:parent).should == file.institution
           assigns(:premis_events).length.should == 3
-          assigns(:premis_events).map(&:identifier).should == [@event2.identifier, @event3.identifier, @event.identifier]
+          assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
         end
       end
 
@@ -171,7 +171,7 @@ RSpec.describe PremisEventsController, type: :controller do
           expect(response).to be_success
           assigns(:parent).should == object
           assigns(:premis_events).length.should == 3
-          assigns(:premis_events).map(&:identifier).should == [@event2.identifier, @event3.identifier, @event.identifier]
+          assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
         end
       end
 
@@ -181,7 +181,7 @@ RSpec.describe PremisEventsController, type: :controller do
           expect(response).to be_success
           assigns(:parent).should == file
           assigns(:premis_events).length.should == 3
-          assigns(:premis_events).map(&:identifier).should == [@event2.identifier, @event3.identifier, @event.identifier]
+          assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
         end
       end
 
