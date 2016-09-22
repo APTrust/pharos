@@ -32,6 +32,58 @@ var addSearchComment = function() {
     }
 }
 
+function configureDropDownLists() {
+    ddl1 = document.getElementById('object_type');
+    ddl2 = document.getElementById('search_field');
+    var io_options = ['All Fields', 'Object Identifier', 'Alternate Identifier', 'Bag Name', 'Title'];
+    var gf_options = ['All Fields', 'File Identifier', 'URI'];
+    var event_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Event Identifier'];
+    var wi_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Name', 'Etag']
+    var all_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Event Identifier', 'Bag Name', 'Title', 'Alternate Identifier', 'URI', 'Name', 'Etag']
+
+    switch (ddl1.value) {
+        case 'All Types':
+            ddl2.options.length = 0;
+            for (i = 0; i < all_options.length; i++) {
+                createOption(ddl2, all_options[i]);
+            }
+            break;
+        case 'Intellectual Objects':
+            ddl2.options.length = 0;
+            for (i = 0; i < io_options.length; i++) {
+                createOption(ddl2, io_options[i]);
+            }
+            break;
+        case 'Generic Files':
+            ddl2.options.length = 0;
+            for (i = 0; i < gf_options.length; i++) {
+                createOption(ddl2, gf_options[i]);
+            }
+            break;
+        case 'Work Items':
+            ddl2.options.length = 0;
+            for (i = 0; i < wi_options.length; i++) {
+                createOption(ddl2, wi_options[i]);
+            }
+            break;
+        case 'Premis Events':
+            ddl2.options.length = 0;
+            for (i = 0; i < event_options.length; i++) {
+                createOption(ddl2, event_options[i]);
+            }
+            break;
+
+    }
+
+}
+
+function createOption(ddl, value) {
+    var opt = document.createElement('option');
+    opt.value = value;
+    opt.text = value;
+    ddl.options.add(opt);
+}
+
 function selected (category, filter, newpath) {
     $("#filter-"+category+" ul li").remove();
     var parent = $("#"+category+"-parent")[0];
@@ -124,6 +176,7 @@ $(document).ready(function(){
     $('#filter-type').on('hidden.bs.collapse', function () {
         $(".type-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
     })
+    configureDropDownLists();
 });
 
 $(document).ready(activate_tabs);
