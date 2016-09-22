@@ -122,13 +122,22 @@ namespace :pharos do
               {ext: 'wav', type: 'audio/wav'},
               {ext: 'pdf', type: 'application/pdf'}
           ].sample
+          create = [
+            '2016-09-21 00:00:00 -0000',
+            '2016-09-22 00:00:00 -0000',
+            '2016-09-23 00:00:00 -0000',
+            '2016-09-24 00:00:00 -0000',
+            '2016-09-25 00:00:00 -0000',
+            '2016-09-26 00:00:00 -0000',
+            '2016-09-27 00:00:00 -0000'
+          ].sample
           name = Faker::Lorem.characters(char_count=rand(5..15))
           attrs = {
               file_format: "#{format[:type]}",
               uri: "file:///#{item.identifier}/data/#{name}#{file_count}.#{format[:ext]}",
               identifier: "#{item.identifier}/data/#{name}#{file_count}.#{format[:ext]}",
           }
-          f = FactoryGirl.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier])
+          f = FactoryGirl.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier], created_at: create)
           f.save!
           f.add_event(FactoryGirl.attributes_for(:premis_event_validation, institution: institution))
           f.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: institution))

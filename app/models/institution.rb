@@ -41,8 +41,16 @@ class Institution < ActiveRecord::Base
   end
 
   def statistics
-    UsageSample.where(institution_id: id).map {|sample| sample.to_flot }
+    #sample = UsageSample.where(institution_id: id).map {|sample| sample.to_flot }
+    stats = self.generic_files.group(:created_at).sum(:size)
+    time_fixed = []
+    stats.each do |key, value|
+      current_point = [key.to_time.to_i*1000, value]
+      time_fixed.push(current_point)
+    end
+    time_fixed
   end
+
   private
 
   def name_is_unique

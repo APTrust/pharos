@@ -41,19 +41,21 @@
             <td class="bytes"><%=number_to_human_size bytes %></td>
           </tr>
       <% end %>
-      <p>Statistics Testing: <%= @institution.statistics.inspect  %></p>
     </table>
 
     <div id="chart-frame">
-      <div id="chart" style="padding: 0px; position: relative;"></div>
+      <div id="chart" style="padding: 20px; position: relative;"></div>
     </div>
     <script>
-        var d = <%=@institution.statistics.inspect %>
-                $.plot("#chart", [d], {
-                    xaxis: { mode: "time" }
-                });
+        var options = {
+            xaxis: {
+                mode: "time",
+                timeformat: "%m/%d/%y",
+                minTickSize: [1, "day"]
+            }
+        };
+        $.plot("#chart", [<%=@institution.statistics %>], options);
     </script>
-
   </div>
 
   <div class="tab-pane" id="users">
