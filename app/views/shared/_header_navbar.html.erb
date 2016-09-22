@@ -12,11 +12,13 @@
       <%= link_to image_tag("aptrust/APTrustLogo.gif", height: 75, width: 300, border: 0, alt: "APTrust Logo"), root_path, class: "navbar-brand logo-text" %>
     </div>
 
-    <div id="search-navbar" class="navbar-static-top col-md-6" role="navigation">
-      <div class="navbar-header">
-        <% if user_signed_in? %>
-          <%= render partial: '/shared/search_form' %>
-        <% end %>
+    <div class="search-container">
+      <div id="search-navbar" class="navbar-static-top col-md-6" role="navigation">
+        <div class="navbar-header">
+          <% if user_signed_in? %>
+              <%= render partial: '/shared/search_form' %>
+          <% end %>
+        </div>
       </div>
     </div>
 

@@ -53,7 +53,7 @@ class CatalogController < ApplicationController
     # Limit results to those the current user is allowed to read.
     objects = IntellectualObject.discoverable(current_user)
     case params[:search_field]
-      when 'Intellectual Object Identifier'
+      when 'Object Identifier'
         @results[:objects] = objects.with_identifier_like(@q)
       when 'Alternate Identifier'
         @results[:objects] = objects.with_alt_identifier_like(@q)
@@ -71,7 +71,7 @@ class CatalogController < ApplicationController
     # Limit results to those the current user is allowed to read.
     files = GenericFile.discoverable(current_user)
     case params[:search_field]
-      when 'Generic File Identifier'
+      when 'File Identifier'
         @results[:files] = files.with_identifier_like(@q)
       when 'URI'
         @results[:files] = files.with_uri_like(@q)
@@ -88,9 +88,9 @@ class CatalogController < ApplicationController
         @results[:items] = items.with_name_like(@q)
       when 'Etag'
         @results[:items] = items.with_etag_like(@q)
-      when 'Intellectual Object Identifier'
+      when 'Object Identifier'
         @results[:items] = items.with_object_identifier_like(@q)
-      when 'Generic File Identifier'
+      when 'File Identifier'
         @results[:items] = items.with_file_identifier_like(@q)
       when 'All Fields'
         @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
@@ -103,9 +103,9 @@ class CatalogController < ApplicationController
     case params[:search_field]
       when 'Event Identifier'
         @results[:events] = events.with_event_identifier_like(@q)
-      when 'Intellectual Object Identifier'
+      when 'Object Identifier'
         @results[:events] = events.with_object_identifier_like(@q)
-      when 'Generic File Identifier'
+      when 'File Identifier'
         @results[:events] = events.with_file_identifier_like(@q)
       when 'All Fields'
         @results[:events] = events.where('premis_events.identifier LIKE ? OR intellectual_object_identifier LIKE ?
@@ -134,11 +134,11 @@ class CatalogController < ApplicationController
         @results[:items] = items.with_name_like(@q)
       when 'Etag'
         @results[:items] = items.with_etag_like(@q)
-      when 'Intellectual Object Identifier'
+      when 'Object Identifier'
         @results[:items] = items.with_object_identifier_like(@q)
         @results[:objects] = objects.with_identifier_like(@q)
         @results[:events] = events.with_object_identifier_like(@q)
-      when 'Generic File Identifier'
+      when 'File Identifier'
         @results[:items] = items.with_file_identifier_like(@q)
         @results[:files] = files.with_identifier_like(@q)
         @results[:events] = events.with_file_identifier_like(@q)

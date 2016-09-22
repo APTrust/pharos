@@ -1,12 +1,12 @@
 <%= form_tag method: 'get', action: 'search', controller: "catalog" do %>
     <div class="input-group" id="search">
 
-      <div id="search_selectors" class="span5"><span class="input-group-addon">
+      <span class="input-group-addon">
         <label for="search_field" class="sr-only">Search</label>
         <%= select_tag(:object_type, options_for_select(['All Types', 'Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events'], h(params[:object_type])), :class=>"search_field") %>
-        <%= select_tag(:search_field, options_for_select(['All Fields', 'Intellectual Object Identifier', 'Generic File Identifier', 'Event Identifier', 'Bag Name', 'Title', 'Alternate Identifier', 'URI', 'Name', 'Etag'], h(params[:search_field])), :class=>"search_field") %>
-      </span></div>
-      <div id="search_inputs"><label for="q" class="sr-only">Search Box</label>
+        <%= select_tag(:search_field, options_for_select(['All Fields', 'Object Identifier', 'File Identifier', 'Event Identifier', 'Bag Name', 'Title', 'Alternate Identifier', 'URI', 'Name', 'Etag'], h(params[:search_field])), :class=>"search_field") %>
+      </span>
+      <label for="q" class="sr-only">Search Box</label>
       <%= text_field_tag :q, params[:q], :placeholder => 'Search...', :class => "search_q q form-control", :id => "q", :autofocus => true %>
 
       <span class="input-group-btn" class="span5">
@@ -14,6 +14,6 @@
           <span class="submit-search-text">Search</span>
           <span class="glyphicon glyphicon-search"></span>
         </button>
-        </span></div>
+        </span>
     </div>
 <% end %>

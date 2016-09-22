@@ -39,8 +39,9 @@ label.password {
   height: 75px;
 }
 
-#search-navbar {
-  margin-left: 25px;
+#user-util-collapse {
+  padding: 10px;
+  float: right;
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
@@ -111,12 +112,31 @@ p.italic {
 
 #header-navbar .navbar-brand {@include fix-title;}
 
-#search_selectors {
-  padding-top: 5px;
+#header-navbar .navbar-brand {
+  text-indent: 10px;
+  margin-left: -35px;
 }
 
-#search_inputs input#q {
-  width: 450px;
+.navbar-right {
+  margin-right: -10px;
+}
+
+#search_selectors {
+  padding-top: 5px;
+  display: inline;
+}
+
+#search-navbar {
+  padding-top: 20px;
+}
+
+.search-container {
+  width: 60%;
+}
+
+#search-navbar input {
+  line-height: 1.5;
+  height: 34px;
 }
 
 .container {
@@ -380,11 +400,6 @@ dt, dd {
 
 .form-group {
   margin-bottom: 3px;
-}
-
-#search_inputs input {
-  line-height: 1.5;
-  height: 34px;
 }
 
 

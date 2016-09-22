@@ -67,7 +67,7 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for intellectual object searches' do
           it 'should match an exact search on identifier' do
-            get :search, q: @object_one.identifier, search_field: 'Intellectual Object Identifier', object_type: 'Intellectual Objects'
+            get :search, q: @object_one.identifier, search_field: 'Object Identifier', object_type: 'Intellectual Objects'
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @object_one.id
           end
@@ -99,7 +99,7 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for generic file searches' do
           it 'should match an exact search on identifier' do
-            get :search, q: @file_one.identifier, search_field: 'Generic File Identifier', object_type: 'Generic Files'
+            get :search, q: @file_one.identifier, search_field: 'File Identifier', object_type: 'Generic Files'
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @file_one.id
           end
@@ -131,13 +131,13 @@ RSpec.describe CatalogController, type: :controller do
           end
 
           it 'should match a search on object_identifier' do
-            get :search, q: @object_three.identifier, search_field: 'Intellectual Object Identifier', object_type: 'Work Items'
+            get :search, q: @object_three.identifier, search_field: 'Object Identifier', object_type: 'Work Items'
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @item_three.id
           end
 
           it 'should match a search on file_identifier' do
-            get :search, q: @file_four.identifier, search_field: 'Generic File Identifier', object_type: 'Work Items'
+            get :search, q: @file_four.identifier, search_field: 'File Identifier', object_type: 'Work Items'
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @item_four.id
           end
@@ -157,13 +157,13 @@ RSpec.describe CatalogController, type: :controller do
           end
 
           it 'should match a search on intellectual object identifier' do
-            get :search, q: '1234', search_field: 'Intellectual Object Identifier', object_type: 'Premis Events'
+            get :search, q: '1234', search_field: 'Object Identifier', object_type: 'Premis Events'
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).map &:id).to match_array [@event_five.id]
           end
 
           it 'should match a search on generic file identifier' do
-            get :search, q: '1234', search_field: 'Generic File Identifier', object_type: 'Premis Events'
+            get :search, q: '1234', search_field: 'File Identifier', object_type: 'Premis Events'
             expect(assigns(:paged_results).size).to eq 2
             expect(assigns(:paged_results).map &:id).to match_array [@event_three.id, @event_five.id]
           end
@@ -213,13 +213,13 @@ RSpec.describe CatalogController, type: :controller do
           end
 
           it 'should match a search on object_identifier' do
-            get :search, q: '1234', search_field: 'Intellectual Object Identifier', object_type: 'All Types'
+            get :search, q: '1234', search_field: 'Object Identifier', object_type: 'All Types'
             expect(assigns(:paged_results).size).to eq 3
             expect(assigns(:paged_results).map &:id).to match_array [@object_five.id, @item_five.id, @event_five.id]
           end
 
           it 'should match a search on generic_file_identifier' do
-            get :search, q: '1234', search_field: 'Generic File Identifier', object_type: 'All Types'
+            get :search, q: '1234', search_field: 'File Identifier', object_type: 'All Types'
             expect(assigns(:paged_results).size).to eq 6
             expect(assigns(:paged_results).map &:id).to match_array [@file_three.id, @file_five.id, @item_three.id, @item_five.id, @event_three.id, @event_five.id]
           end
