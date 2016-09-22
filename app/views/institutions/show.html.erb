@@ -41,6 +41,7 @@
             <td class="bytes"><%=number_to_human_size bytes %></td>
           </tr>
       <% end %>
+      <p>Statistics Testing: <%= @institution.statistics.inspect  %></p>
     </table>
 
     <div id="chart-frame">
@@ -48,7 +49,6 @@
     </div>
     <script>
         var d = <%=@institution.statistics.inspect %>
-
                 $.plot("#chart", [d], {
                     xaxis: { mode: "time" }
                 });

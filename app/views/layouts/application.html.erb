@@ -4,6 +4,9 @@
   <title>Pharos</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <script src="//cdn.jsdelivr.net/jquery.flot/0.8.3/jquery.flot.min.js"></script>
+  <script src="//cdn.jsdelivr.net/jquery.flot/0.8.3/jquery.flot.time.js"></script>
+
   <%= csrf_meta_tags %>
   <%= favicon_link_tag 'aptrust/favicon.ico' %>
   <%= auto_discovery_link_tag(:rss, work_items_path, title: 'Bag Status RSS Feed') %>
