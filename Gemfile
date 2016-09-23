@@ -26,6 +26,7 @@ gem 'figaro'
 gem 'devise', '4.2.0'
 gem 'rake'
 gem 'valid_email'
+gem 'therubyracer'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.3.0'
