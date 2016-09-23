@@ -1,18 +1,18 @@
-var activate_tabs = function() {
+function activate_tabs() {
     $('ul.nav-tabs li:first').addClass('active');
     $('ul.nav-tabs + div.tab-content div.tab-pane:first').addClass('active');
 };
 
-var dropdown = function() {
+function dropdown() {
     $('.dropdown-toggle').dropdown();
 };
 
-var fix_search_breadcrumb = function() {
+function fix_search_breadcrumb() {
     $("a.btn-sm").removeClass("dropdown-toggle");
     $("span.btn-sm").removeClass("btn-disabled");
 }
 
-var addClickFunctions = function() {
+function addClickFunctions() {
     var buttons = $("a.btn-sm.btn-default");
     for (var i = 0; i < buttons.length; i++) {
         buttons[i].onclick = function() {
@@ -22,7 +22,7 @@ var addClickFunctions = function() {
     }
 }
 
-var addSearchComment = function() {
+function addSearchComment() {
     var value = $("#search_field").val()
     if( value == 'file_identifier') {
         jQuery('<p/>', {
@@ -109,88 +109,87 @@ function selected (category, filter, newpath) {
     $("."+category+"-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
 }
 
-function humanFileSize(size) {
-    var i = Math.floor( Math.log(size) / Math.log(1024) );
-    return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
-};
-
-$(document).ready(function(){
+function fixFilters() {
     $('#filter-access').on('shown.bs.collapse', function () {
         $(".access-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-access').on('hidden.bs.collapse', function () {
         $(".access-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-action').on('shown.bs.collapse', function () {
         $(".action-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-action').on('hidden.bs.collapse', function () {
         $(".action-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-event_type').on('shown.bs.collapse', function () {
         $(".event_type-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-event_type').on('hidden.bs.collapse', function () {
         $(".event_type-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-fassociation').on('shown.bs.collapse', function () {
         $(".fassociation-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-fassociation').on('hidden.bs.collapse', function () {
         $(".fassociation-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-format').on('shown.bs.collapse', function () {
         $(".format-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-format').on('hidden.bs.collapse', function () {
         $(".format-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-institution').on('shown.bs.collapse', function () {
         $(".institution-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-institution').on('hidden.bs.collapse', function () {
         $(".institution-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-oassociation').on('shown.bs.collapse', function () {
         $(".oassociation-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-oassociation').on('hidden.bs.collapse', function () {
         $(".oassociation-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-outcome').on('shown.bs.collapse', function () {
         $(".outcome-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-outcome').on('hidden.bs.collapse', function () {
         $(".outcome-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-stage').on('shown.bs.collapse', function () {
         $(".stage-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-stage').on('hidden.bs.collapse', function () {
         $(".stage-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-status').on('shown.bs.collapse', function () {
         $(".status-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-status').on('hidden.bs.collapse', function () {
         $(".status-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
     $('#filter-type').on('shown.bs.collapse', function () {
         $(".type-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-    })
+    });
     $('#filter-type').on('hidden.bs.collapse', function () {
         $(".type-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-    })
+    });
+}
+
+$(document).ready(function(){
+    fixFilters();
     configureDropDownLists();
+    activate_tabs();
+    dropdown();
+    fix_search_breadcrumb();
+    addClickFunctions();
+    addSearchComment();
 });
 
-$(document).ready(activate_tabs);
-$(document).on('page:load', activate_tabs);
-$(document).ready(dropdown);
-$(document).on('page:load', dropdown);
-$(document).ready(fix_search_breadcrumb);
-$(document).on('page:load', fix_search_breadcrumb);
-$(document).ready(addClickFunctions);
-$(document).on('page:load', addClickFunctions);
-$(document).ready(addSearchComment);
-$(document).on('page:load', addSearchComment);
+//$(document).on('page:load', activate_tabs);
+//$(document).on('page:load', dropdown);
+//$(document).on('page:load', fix_search_breadcrumb);
+//$(document).on('page:load', addClickFunctions);
+//$(document).on('page:load', addSearchComment);
