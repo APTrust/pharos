@@ -402,4 +402,9 @@ dt, dd {
   margin-bottom: 3px;
 }
 
+div.flot-y-axis div.flot-tick-label {
+  margin-left: -70px;
+  left: 70px !important;
+}
+
 

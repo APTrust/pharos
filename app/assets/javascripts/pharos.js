@@ -109,6 +109,11 @@ function selected (category, filter, newpath) {
     $("."+category+"-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
 }
 
+function humanFileSize(size) {
+    var i = Math.floor( Math.log(size) / Math.log(1024) );
+    return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+};
+
 $(document).ready(function(){
     $('#filter-access').on('shown.bs.collapse', function () {
         $(".access-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
