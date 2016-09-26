@@ -34,9 +34,15 @@ label.password {
   font-size: 2em;
   font-weight: bold;
   color: $apt_black;
-  text-indent: 0;
   padding: 0;
   height: 75px;
+  text-indent: 10px;
+  margin-left: -35px;
+  margin-top: 10px;
+}
+
+#header-navbar {
+  color: #45474d;
 }
 
 #user-util-collapse {
@@ -111,11 +117,6 @@ p.italic {
 }
 
 #header-navbar .navbar-brand {@include fix-title;}
-
-#header-navbar .navbar-brand {
-  text-indent: 10px;
-  margin-left: -35px;
-}
 
 .navbar-right {
   margin-right: -10px;
