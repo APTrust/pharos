@@ -42,16 +42,30 @@
           </tr>
       <% end %>
     </table>
+    <div id="chart-frame"><table>
+      <tr>
+        <td></td>
+        <td style="text-align: center;">Bytes Ingested Over Time</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <div id="chart" style="padding: 20px; position: relative;"></div>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </table></div>
 
-    <div id="chart-frame">
-      <div id="chart" style="padding: 20px; position: relative;"></div>
-    </div>
     <script>
         var options = {
             grid: {
                 margin: {
                     right: 20,
-                    left: 70
+                    left: 70,
+                    bottom: 20
                 }
             },
             xaxis: {
