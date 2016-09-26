@@ -14,12 +14,16 @@
 </head>
 <body>
 <%= render partial: '/shared/header_navbar' %>
-<div class="container">
-  <div class="row">
-    <%= render partial: '/shared/flash_messages' %>
+
+<div id="mainContainer">
+  <div class="container">
+    <div class="row">
+      <%= render partial: '/shared/flash_messages' %>
+    </div>
+    <%= yield %>
   </div>
-  <%= yield %>
 </div>
+
 <%= render partial: '/shared/footer' %>
 
 </body>

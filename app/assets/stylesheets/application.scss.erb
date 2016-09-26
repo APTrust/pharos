@@ -414,6 +414,14 @@ div.flot-y-axis div.flot-tick-label {
   color: #fff;
 }
 
+.navbar {
+    margin-bottom: 0px;
+}
+
+.footer {
+    margin-top: 0px;
+}
+
 .navbar-default .navbar-nav > li > a {
   color: #fff;
 }
@@ -422,9 +430,57 @@ div.flot-y-axis div.flot-tick-label {
   color: #c69c6d;
 }
 
-.navbar-default {
+.navbar-default, .footer {
   background-color: #18333a;
-  border-color: #e7e7e7;
+  border-color: #45474d;
 }
 
+.footer .container nav {
+  padding: 10px;
+}
 
+.footer .container nav a, .footer .container p, .footer .container em {
+  color: #fff;
+}
+
+.footer .container nav a:hover {
+  color: #c69c6d;
+}
+
+.search-btn {
+  background-image: linear-gradient(to bottom, #d39858, #c69c6d);
+  color: #fff;
+}
+
+//This is wrong, still blue.
+.search-btn:active {
+    border-color: #c69c6d;
+}
+
+#q:focus {
+  border-color: #c69c6d;
+}
+
+#mainContainer {
+  background: url(<%= asset_path 'aptrust/background.jpg' %>) no-repeat center bottom;
+  background-size: cover;
+  min-height: 580px;
+}
+
+.nav-tabs li a {
+  border-color: #ccc;
+}
+
+.nav-tabs li.active a {
+  border-color: #ccc;
+  border-bottom: transparent;
+  background-color: transparent;
+}
+
+.nav-tabs {
+  border-bottom: transparent;
+}
+
+.tab-content {
+  border-top: transparent;
+}
