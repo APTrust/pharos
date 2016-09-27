@@ -469,18 +469,24 @@ div.flot-y-axis div.flot-tick-label {
 
 .nav-tabs li a {
   border-color: #ccc;
+  color: #8a6d3b;
 }
 
-.nav-tabs li.active a {
+.nav-tabs li.active a, .nav-tabs li.active a:focus {
   border-color: #ccc;
   border-bottom: transparent;
   background-color: transparent;
+}
+
+.nav-tabs li a:hover {
+  border-color: #ccc;
+  background-image: linear-gradient(to bottom, #fff, #ccc);
 }
 
 .nav-tabs {
   border-bottom: transparent;
 }
 
-.tab-content {
+#stats table {
   border-top: transparent;
 }
