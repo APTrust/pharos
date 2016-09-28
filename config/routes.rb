@@ -30,6 +30,10 @@ Rails.application.routes.draw do
   post 'files/:intellectual_object_identifier', to: 'generic_files#update', format: [:json, :html], intellectual_object_identifier: object_ptrn
   resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/files'
 
+  # INSTITUTIONS (API)
+  # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'
+  get 'api/v2/institutions/:institution_identifier', to: 'institutions#show', format: [:json], institution_identifier: institution_ptrn
+
   # PREMIS EVENT ROUTES
   get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[\/\-\%\w\.]*/, as: :events
   post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
