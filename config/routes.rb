@@ -36,6 +36,7 @@ Rails.application.routes.draw do
 
   # PREMIS EVENT ROUTES
   get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[\/\-\%\w\.]*/, as: :events
+  get '/api/v2/events', to: 'premis_events#index', format: [:json, :html]
   post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
   resources :premis_events, only: [:create], format: :json, param: :identifier, path: 'api/v2/events'
 
