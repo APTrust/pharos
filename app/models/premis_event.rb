@@ -104,10 +104,10 @@ class PremisEvent < ActiveRecord::Base
   end
 
   def set_other_identifiers
-    if self.intellectual_object_identifier.nil?
+    if self.intellectual_object_identifier == ''
       self.intellectual_object_identifier = self.intellectual_object.identifier unless self.intellectual_object.nil?
     end
-    if self.generic_file_identifier.nil?
+    if self.generic_file_identifier == ''
       self.generic_file_identifier = self.generic_file.identifier unless self.generic_file.nil?
     end
   end
