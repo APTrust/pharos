@@ -36,14 +36,14 @@ Rails.application.routes.draw do
 
   # PREMIS EVENT ROUTES
   #get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[\/\-\%\w\.]*/, as: :events
-  get 'events/institution_identifier', to: 'premis_events#index', format: [:json, :html], identifier: institution_ptrn, as: :institution_events
-  get 'events/object_identifier', to: 'premis_events#index', format: [:json, :html], identifier: object_ptrn, as: :intellectual_object_events
-  get 'events/file_identifier', to: 'premis_events#index', format: [:json, :html], identifier: file_ptrn, as: :generic_file_events
+  get 'events/:file_identifier', to: 'premis_events#index', format: [:json, :html], file_identifier: file_ptrn, as: :generic_file_events
+  get 'events/:object_identifier', to: 'premis_events#index', format: [:json, :html], object_identifier: object_ptrn, as: :intellectual_object_events
+  get 'events/:institution_identifier', to: 'premis_events#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_events
   get '/api/v2/events', to: 'premis_events#index', format: [:json, :html]
   #post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
-  post 'events/institution_identifier', to: 'premis_events#create', format: [:json, :html], identifier: institution_ptrn
-  post 'events/object_identifier', to: 'premis_events#create', format: [:json, :html], identifier: object_ptrn
-  post 'events/file_identifier', to: 'premis_events#create', format: [:json, :html], identifier: file_ptrn
+  post 'events/:file_identifier', to: 'premis_events#create', format: [:json, :html], file_identifier: file_ptrn
+  post 'events/:object_identifier', to: 'premis_events#create', format: [:json, :html], object_identifier: object_ptrn
+  post 'events/:institution_identifier', to: 'premis_events#create', format: [:json, :html], institution_identifier: institution_ptrn
   resources :premis_events, only: [:create], format: :json, param: :identifier, path: 'api/v2/events'
 
   # WORK ITEM ROUTES
