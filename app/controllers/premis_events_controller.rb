@@ -94,6 +94,7 @@ class PremisEventsController < ApplicationController
   end
 
   def premis_event_params
+    return nil if request.method == 'GET'
     params.require(:premis_event).permit(:identifier, :event_type, :date_time, :outcome, :outcome_detail,
         :outcome_information, :detail, :object, :agent, :intellectual_object_id, :generic_file_id,
         :institution_id, :created_at, :updated_at)
@@ -125,4 +126,3 @@ class PremisEventsController < ApplicationController
   end
 
 end
-
