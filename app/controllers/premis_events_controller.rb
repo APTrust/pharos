@@ -5,16 +5,13 @@ class PremisEventsController < ApplicationController
   after_action :verify_authorized, only: [:index, :create]
 
   def index
-    identifier = params[:identifier].gsub(/%2F/i, '/')
     @premis_events = PremisEvent.discoverable(current_user)
-    if (identifier=~/^(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+$/)
-      @parent = IntellectualObject.where(identifier: params[:identifier]).first
-      for_selected_object
-    elsif (identifier=~/(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/)
-      @parent = GenericFile.where(identifier: params[:identifier]).first
-      for_selected_file
-    elsif (identifier=~/(\w+\.)*\w+(\.edu|\.com|\.org)/)
-      @parent = Institution.where(identifier: params[:identifier]).first
+    if params[:object_identifier]
+      load_intellectual_object
+    elsif params[:file_identifier]
+      load_generic_file
+    elsif params[:institution_identifier]
+      load_institution
       for_selected_institution
     end
     authorize @parent
@@ -39,22 +36,22 @@ class PremisEventsController < ApplicationController
   end
 
   def create
-    @event = @parent_object.add_event(params[:premis_event])
+    @event = @parent.add_event(params[:premis_event])
     respond_to do |format|
       format.json {
-        if @parent_object.save
+        if @parent.save
           render json: @event.serializable_hash, status: :created
         else
           render json: @event.errors, status: :unprocessable_entity
         end
       }
       format.html {
-        if @parent_object.save
+        if @parent.save
           flash[:notice] = "Successfully created new event: #{@event.identifier}"
         else
-          flash[:alert] = "Unable to create event for #{@parent_object.id} using input parameters: #{params['event']}"
+          flash[:alert] = "Unable to create event for #{@parent.id} using input parameters: #{params['event']}"
         end
-        redirect_to @parent_object
+        redirect_to @parent
       }
     end
   end
@@ -62,23 +59,32 @@ class PremisEventsController < ApplicationController
   protected
 
   def load_intellectual_object
-    identifier = params[:identifier].gsub(/%2F/i, '/')
-    @parent_object = IntellectualObject.where(identifier: identifier).first
-    params[:intellectual_object_id] = @parent_object.id
+    identifier = params[:object_identifier].gsub(/%2F/i, '/')
+    @parent = IntellectualObject.where(identifier: identifier).first
+    params[:intellectual_object_id] = @parent.id
   end
 
   def load_generic_file
-    identifier = params[:identifier].gsub(/%2F/i, '/')
-    @parent_object = GenericFile.where(identifier: identifier).first
-    params[:generic_file_id] = @parent_object.id
+    identifier = params[:file_identifier].gsub(/%2F/i, '/')
+    @parent = GenericFile.where(identifier: identifier).first
+    params[:generic_file_id] = @parent.id
+  end
+
+  def load_institution
+    identifier = params[:institution_identifier].gsub(/%2F/i, '/')
+    @parent = Institution.where(identifier: identifier).first
+    params[:institution_id] = @parent.id
   end
 
   def load_and_authorize_parent_object
-    if @parent_object.nil?
-      identifier = params[:identifier].gsub(/%2F/i, '/')
-      (identifier=~/^(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.]+$/) ? load_intellectual_object : load_generic_file
+    if @parent.nil?
+      if params[:object_identifier]
+        load_intellectual_object
+      elsif params[:file_identifier]
+        load_generic_file
+      end
     end
-    authorize @parent_object, :add_event?
+    authorize @parent, :add_event?
   end
 
   def for_selected_institution
