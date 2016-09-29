@@ -26,7 +26,7 @@ describe 'Faceting' do
       end
 
       it 'facet by event type' do
-        visit events_path(inst)
+        visit institution_events_path(inst)
         page.should have_css('#documents .document', count: 3)
 
         within('#event_type-parent') do
@@ -41,7 +41,7 @@ describe 'Faceting' do
       end
 
       it 'facet by event outcome' do
-        visit events_path(inst)
+        visit institution_events_path(inst)
         page.should have_css('#documents .document', count: 3)
 
         within('#outcome-parent') do
