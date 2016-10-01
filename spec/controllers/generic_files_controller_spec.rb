@@ -212,6 +212,9 @@ RSpec.describe GenericFilesController, type: :controller do
 
       describe 'and assigning to an object you do have access to' do
         it 'it should create or update multiple files and their events' do
+          files_before = GenericFile.count
+          events_before = PremisEvent.count
+          checksums_before = Checksum.count
           post(:create, save_batch: true, intellectual_object_id: batch_obj.id, generic_files: {files: gf_data},
                format: 'json')
           expect(response.code).to eq '201'
@@ -223,6 +226,14 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(return_data[1]['state']).to eq 'A'
           expect(return_data[0]['premis_events'].count).to eq 2
           expect(return_data[1]['premis_events'].count).to eq 2
+          expect(return_data[0]['checksums'].count).to eq 2
+          expect(return_data[1]['checksums'].count).to eq 2
+          files_after = GenericFile.count
+          events_after = PremisEvent.count
+          checksums_after = Checksum.count
+          expect(files_after).to eq(files_before + 2)
+          expect(events_after).to eq(events_before + 4)
+          expect(checksums_after).to eq(checksums_before + 4)
         end
       end
     end

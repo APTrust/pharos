@@ -192,7 +192,9 @@ class GenericFilesController < ApplicationController
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
                        :agent, :intellectual_object_id, :generic_file_id,
-                       :institution_id, :created_at, :updated_at]])
+                       :institution_id, :created_at, :updated_at],
+                      checksums_attributes:
+                      [:datetime, :algorithm, :digest, :generic_file_id]])
   end
 
   def params_for_update

@@ -29,6 +29,18 @@
         "agent": "Agent 99",
         "outcome_information": "OK"
       }
+    ],
+    "checksums_attributes": [
+      {
+        "algorithm": "md5",
+        "digest": "1234567890",
+        "datetime": "2012-01-01"
+      },
+      {
+        "algorithm": "sha256",
+        "digest": "0987654321",
+        "datetime": "2012-01-01"
+      }
     ]
   },
   {
@@ -60,6 +72,18 @@
         "object": "this object",
         "agent": "Agent 99",
         "outcome_information": "OK"
+      }
+    ],
+    "checksums_attributes": [
+      {
+        "algorithm": "md5",
+        "digest": "1234567890",
+        "datetime": "2012-01-01"
+      },
+      {
+        "algorithm": "sha256",
+        "digest": "0987654321",
+        "datetime": "2012-01-01"
       }
     ]
   }
