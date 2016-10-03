@@ -26,12 +26,8 @@ class IntellectualObjectPolicy < ApplicationPolicy
     end
   end
 
-  # for generic_file object
-  def create_through_intellectual_object?
-    user.admin?
-  end
-
-  # for adding premis events
+  # for adding premis events - restricted to admin only so other users can't create events willy nilly
+  # adding events still allowed through the soft_delete function, but only for deletion events.
   def add_event?
     user.admin?
   end
@@ -61,6 +57,7 @@ class IntellectualObjectPolicy < ApplicationPolicy
     soft_delete?
   end
 
+  # creates deletion events as part of the process of deletion
   def soft_delete?
     user.admin? ||
         (user.institutional_admin? && user.institution_id == record.institution.id)
