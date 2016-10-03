@@ -13,14 +13,12 @@ class GenericFilePolicy < ApplicationPolicy
 
   # for adding premis events
   def add_event?
-    user.admin? ||
-        (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)
+    user.admin?
   end
 
   # for adding checksums
   def create_through_generic_file?
-    user.admin?  ||
-        (user.institutional_admin? && user.institution_id == record.institution.id)
+    user.admin?
   end
 
   def show?
