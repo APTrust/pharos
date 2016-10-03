@@ -248,7 +248,15 @@ class GenericFilesController < ApplicationController
   end
 
   def array_as_json(list_of_generic_files)
-    list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+    files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+    # For consistency on the client end, make this list
+    # look like every other list the API returns.
+    {
+      count: files.count,
+      next: nil,
+      previous: nil,
+      results: files,
+    }
   end
 
   def load_generic_file

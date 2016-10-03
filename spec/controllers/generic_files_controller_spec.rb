@@ -253,15 +253,15 @@ RSpec.describe GenericFilesController, type: :controller do
           post(:create_batch, gf_data.to_json, intellectual_object_id: batch_obj.id, format: 'json')
           expect(response.code).to eq '201'
           return_data = JSON.parse(response.body)
-          expect(return_data.count).to eq 2
-          expect(return_data[0]['id']).not_to be_nil
-          expect(return_data[1]['id']).not_to be_nil
-          expect(return_data[0]['state']).to eq 'A'
-          expect(return_data[1]['state']).to eq 'A'
-          expect(return_data[0]['premis_events'].count).to eq 2
-          expect(return_data[1]['premis_events'].count).to eq 2
-          expect(return_data[0]['checksums'].count).to eq 2
-          expect(return_data[1]['checksums'].count).to eq 2
+          expect(return_data['count']).to eq 2
+          expect(return_data['results'][0]['id']).not_to be_nil
+          expect(return_data['results'][1]['id']).not_to be_nil
+          expect(return_data['results'][0]['state']).to eq 'A'
+          expect(return_data['results'][1]['state']).to eq 'A'
+          expect(return_data['results'][0]['premis_events'].count).to eq 2
+          expect(return_data['results'][1]['premis_events'].count).to eq 2
+          expect(return_data['results'][0]['checksums'].count).to eq 2
+          expect(return_data['results'][1]['checksums'].count).to eq 2
           files_after = GenericFile.count
           events_after = PremisEvent.count
           checksums_after = Checksum.count
