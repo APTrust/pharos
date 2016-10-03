@@ -51,7 +51,6 @@ RSpec.describe PremisEventsController, type: :controller do
     end
   end
 
-
   describe 'signed in as admin' do
     let(:user) { FactoryGirl.create(:user, :admin) }
     before { sign_in user }
@@ -112,7 +111,6 @@ RSpec.describe PremisEventsController, type: :controller do
       end
     end
   end
-
 
   describe 'signed in as institutional admin' do
     let(:user) { FactoryGirl.create(:user, :institutional_admin) }
