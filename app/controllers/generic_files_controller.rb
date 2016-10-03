@@ -78,7 +78,7 @@ class GenericFilesController < ApplicationController
       files = JSON.parse(request.body.read)
     rescue JSON::ParserError, Exception => e
       respond_to do |format|
-        format.json { render json: {"error": "JSON parse error: #{e.message}"}, status: 400 }
+        format.json { render json: {error: "JSON parse error: #{e.message}"}, status: 400 }
       end
     end
     GenericFile.transaction do

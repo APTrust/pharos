@@ -26,11 +26,11 @@ describe IntellectualObjectPolicy do
       describe 'in my institution' do
         let(:intellectual_object) { FactoryGirl.create(:intellectual_object, institution: institution) }
         it do
-          should permit(:create_through_intellectual_object)
+          should_not permit(:create_through_intellectual_object)
           should permit(:show)
           should_not permit(:update)
           should_not permit(:edit)
-          should permit(:add_event)
+          should_not permit(:add_event)
           should permit(:soft_delete)
           should permit(:destroy)
         end

@@ -28,14 +28,12 @@ class IntellectualObjectPolicy < ApplicationPolicy
 
   # for generic_file object
   def create_through_intellectual_object?
-    user.admin?  ||
-        (user.institutional_admin? && user.institution_id == record.institution.id)
+    user.admin?
   end
 
   # for adding premis events
   def add_event?
-    user.admin? ||
-        (user.institutional_admin? && user.institution_id == record.institution.id)
+    user.admin?
   end
 
   def show?
