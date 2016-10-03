@@ -123,12 +123,12 @@ RSpec.describe GenericFilesController, type: :controller do
       end
     end
 
-    describe 'when signed in' do
+    describe 'when signed in as inst_admin' do
       let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
       before { sign_in user }
 
-      describe "and assigning to an object you don't have access to" do
+      describe "should be forbidden" do
         let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
         it 'should be forbidden' do
           post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
@@ -136,6 +136,27 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
         end
       end
+    end
+
+    describe 'when signed in as inst_user' do
+      let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: @institution.id) }
+      let(:obj1) { @intellectual_object }
+      before { sign_in user }
+
+      describe "should be forbidden" do
+        let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
+        it 'should be forbidden' do
+          post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
+        end
+      end
+    end
+
+    describe 'when signed in as admin' do
+      let(:user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
+      let(:obj1) { @intellectual_object }
+      before { sign_in user }
 
       it 'should show errors' do
         post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'bar'}, format: 'json'
@@ -149,7 +170,6 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'should update fields' do
-        #IntellectualObject.any_instance.should_receive(:update_index)
         post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
@@ -180,18 +200,42 @@ RSpec.describe GenericFilesController, type: :controller do
     end
   end
 
-  describe 'POST #save_batch' do
+  describe 'POST #create_batch' do
     describe 'when not signed in' do
       let(:obj1) { @intellectual_object }
       it 'should show unauthorized' do
-        post(:create, save_batch: true, intellectual_object_identifier: obj1.identifier, generic_files: [],
+        post(:create_batch, intellectual_object_id: obj1.id, generic_files: [],
              format: 'json')
         expect(response.code).to eq '401'
       end
     end
 
-    describe 'when signed in' do
+    describe 'when signed in as inst admin' do
+      let(:obj1) { @intellectual_object }
       let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id) }
+
+      before { sign_in user }
+      it 'should show unauthorized' do
+        post(:create_batch, "{}", intellectual_object_id: obj1.id, generic_files: [],
+             format: 'json')
+        expect(response.code).to eq '403'
+      end
+    end
+
+    describe 'when signed in as inst user' do
+      let(:obj1) { @intellectual_object }
+      let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: @institution.id) }
+
+      before { sign_in user }
+      it 'should show unauthorized' do
+        post(:create_batch, "{}", intellectual_object_id: obj1.id, generic_files: [],
+             format: 'json')
+        expect(response.code).to eq '403'
+      end
+    end
+
+    describe 'when signed in as admin' do
+      let(:user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
       let(:obj2) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id) }
       let(:batch_obj) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id) }
       let(:current_dir) { File.dirname(__FILE__) }
@@ -201,22 +245,12 @@ RSpec.describe GenericFilesController, type: :controller do
 
       before { sign_in user }
 
-      describe "and assigning to an object you don't have access to" do
-        it 'should be forbidden' do
-          post(:create, save_batch: true, intellectual_object_identifier: obj2.identifier, generic_files: {},
-               format: 'json')
-          expect(response.code).to eq '403'
-          expect(JSON.parse(response.body)).to eq({'status'=>'error', 'message'=>'You are not authorized to access this page.'})
-        end
-      end
-
       describe 'and assigning to an object you do have access to' do
         it 'it should create or update multiple files and their events' do
           files_before = GenericFile.count
           events_before = PremisEvent.count
           checksums_before = Checksum.count
-          post(:create, save_batch: true, intellectual_object_id: batch_obj.id, generic_files: {files: gf_data},
-               format: 'json')
+          post(:create_batch, gf_data.to_json, intellectual_object_id: batch_obj.id, format: 'json')
           expect(response.code).to eq '201'
           return_data = JSON.parse(response.body)
           expect(return_data.count).to eq 2

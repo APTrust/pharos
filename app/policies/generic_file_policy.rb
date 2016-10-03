@@ -11,6 +11,10 @@ class GenericFilePolicy < ApplicationPolicy
     end
   end
 
+  def create?
+    user.admin?
+  end
+
   # for adding premis events
   def add_event?
     user.admin?
