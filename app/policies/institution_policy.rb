@@ -17,6 +17,10 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin? ||  (user.institution_id == record.id)
   end
 
+  def overview?
+    user.admin? || (user.institution_id == record.id)
+  end
+
   def index_through_institution?
     user.admin? || record.id == user.institution_id
   end

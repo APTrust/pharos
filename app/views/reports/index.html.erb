@@ -1,4 +1,8 @@
 <div id="content" class="col-md-9 col-sm-8">
   <h1>Available Reports</h1>
-  <p>There are no available reports at this time, please check back later.</p>
+  <ul>
+    <li>
+      <%= link_to "General Overview for #{@institution.name}", institution_overview_path(@institution) %>
+    </li>
+  </ul>
 </div>

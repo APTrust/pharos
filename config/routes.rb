@@ -80,6 +80,7 @@ Rails.application.routes.draw do
 
   # REPORT ROUTES
   get 'reports/:identifier', to: 'reports#index', format: [:json, :html], as: :reports, identifier: institution_ptrn
+  get 'reports/overview/:identifier', to: 'reports#overview', format: [:json, :html], as: :institution_overview, identifier: institution_ptrn
 
   # USER ROUTES
   devise_for :users
