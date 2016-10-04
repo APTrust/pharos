@@ -5,7 +5,7 @@ class PremisEventPolicy < ApplicationPolicy
   end
 
   def create?
-    user.admin? || (user.institutional_admin? && user.institution_id == record.id)
+    user.admin?
   end
 
 end

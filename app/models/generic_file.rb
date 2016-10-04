@@ -134,9 +134,10 @@ class GenericFile < ActiveRecord::Base
   def serialize_checksums
     checksums.map do |cs|
       {
-          algorithm: cs.algorithm.first,
-          digest: cs.digest.first,
+          algorithm: cs.algorithm,
+          digest: cs.digest,
           datetime: Time.parse(cs.datetime.to_s).iso8601,
+          generic_file_id: self.id,
           id: cs.id
       }
     end

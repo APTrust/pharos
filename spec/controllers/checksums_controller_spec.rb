@@ -18,6 +18,7 @@ RSpec.describe ChecksumsController, type: :controller do
   let!(:institution_two) { FactoryGirl.create(:institution) }
   let!(:admin_user) { FactoryGirl.create(:user, :admin, institution: institution_one) }
   let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution_one) }
+  let!(:admin) { FactoryGirl.create(:user, :admin) }
   let!(:object_one) { FactoryGirl.create(:intellectual_object, institution: institution_one) }
   let!(:object_two) { FactoryGirl.create(:intellectual_object, institution: institution_two) }
   let!(:generic_file_one) { FactoryGirl.create(:generic_file, intellectual_object: object_one) }
@@ -82,16 +83,23 @@ RSpec.describe ChecksumsController, type: :controller do
 
     describe 'when signed in' do
       before { sign_in institutional_admin }
-      it 'should be successful when the file belongs to your institution' do
+      it 'should be forbidden when the file belongs to your institution' do
         post :create, generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' }, format: :json
-        expect(response).to be_success
-        expect(response.status).to eq (201)
-        expect(assigns(:checksum).algorithm).to eq('md5')
+        expect(response.status).to eq (403)
       end
 
       it 'should be forbidden when the file does not belong to your institution' do
         post :create, generic_file_identifier: generic_file_two.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' }, format: :json
         expect(response.status).to eq (403)
+      end
+    end
+
+    describe 'when signed in as admin' do
+      before { sign_in admin }
+      it 'should be successful' do
+        post :create, generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' }, format: :json
+        expect(response.status).to eq (201)
+        expect(assigns(:checksum).algorithm).to eq('md5')
       end
 
       it 'should show errors' do
@@ -104,6 +112,7 @@ RSpec.describe ChecksumsController, type: :controller do
                                                      'digest' => ["can't be blank"]})
       end
     end
+
   end
 
 end

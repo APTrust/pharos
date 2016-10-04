@@ -38,7 +38,7 @@
     </dl>
   </section>
   <section class="object_events">
-    <%= link_to events_path(@generic_file), class: 'btn doc-action-btn btn-normal' do %>
+    <%= link_to generic_file_events_path(@generic_file), class: 'btn doc-action-btn btn-normal' do %>
         <i class="glyphicon glyphicon-eye-open"></i> View Events
     <% end %>
     <% unless @generic_file.state == 'D' %>
