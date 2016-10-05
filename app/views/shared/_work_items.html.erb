@@ -3,7 +3,6 @@
     <thead>
   <tr>
       <th>Name</th>
-      <th>Etag</th>
       <th>Institution</th>
       <th>Processed</th>
       <th>Action</th>
@@ -18,7 +17,6 @@
           <% @items.each do |item| %>
                   <tr class="<%= item.status %>">
               <td><%= link_to item.name, work_item_path(id: item.id) %></td>
-              <td><%= item.etag %></td>
               <td><%= item.institution.identifier %></td>
               <td><%= time_ago_in_words item.date %></td>
               <td><%= item.action %></td>
