@@ -135,7 +135,7 @@ class IntellectualObject < ActiveRecord::Base
       bag_name: bag_name,
       identifier: identifier,
       state: state,
-      alt_identifier: [alt_identifier],
+      alt_identifier: alt_identifier,
       etag: etag,
       in_dpn: in_dpn?,
       dpn_uuid: dpn_uuid,
