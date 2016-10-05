@@ -51,8 +51,8 @@ RSpec.describe PremisEventsController, type: :controller do
     end
   end
 
-  describe 'signed in as institutional admin' do
-    let(:user) { FactoryGirl.create(:user, :institutional_admin) }
+  describe 'signed in as admin' do
+    let(:user) { FactoryGirl.create(:user, :admin) }
     before { sign_in user }
 
     describe 'POST create' do
@@ -108,6 +108,19 @@ RSpec.describe PremisEventsController, type: :controller do
         post :create, file_identifier: file, premis_event: event_attrs
         file.reload
         flash[:alert].should =~ /Unable to create event/
+      end
+    end
+  end
+
+  describe 'signed in as institutional admin' do
+    let(:user) { FactoryGirl.create(:user, :institutional_admin) }
+    before { sign_in user }
+
+    describe 'POST create' do
+      it 'is forbidden' do
+        post :create, file_identifier: file, premis_event: event_attrs
+        expect(response).to redirect_to root_url
+        flash[:alert].should =~ /You are not authorized/
       end
     end
 

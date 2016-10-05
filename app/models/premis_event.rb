@@ -83,8 +83,8 @@ class PremisEvent < ActiveRecord::Base
         updated_at: updated_at,
         id: self.id
     }
-    data.merge!(intellectual_object: intellectual_object_id) if self.intellectual_object !nil?
-    data.merge!(generic_file: generic_file_id) if self.generic_file !nil?
+    data.merge!(intellectual_object_id: intellectual_object_id) if self.intellectual_object !nil?
+    data.merge!(generic_file_id: generic_file_id) if self.generic_file !nil?
     data
   end
 

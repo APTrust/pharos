@@ -11,16 +11,19 @@ class GenericFilePolicy < ApplicationPolicy
     end
   end
 
-  # for adding premis events
+  def create?
+    user.admin?
+  end
+
+  # for adding premis events - restricted to admin only so other users can't create events willy nilly
+  # adding events still allowed through the soft_delete function, but only for deletion events.
   def add_event?
-    user.admin? ||
-        (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)
+    user.admin?
   end
 
   # for adding checksums
   def create_through_generic_file?
-    user.admin?  ||
-        (user.institutional_admin? && user.institution_id == record.institution.id)
+    user.admin?
   end
 
   def show?
@@ -48,6 +51,7 @@ class GenericFilePolicy < ApplicationPolicy
     soft_delete?
   end
 
+  # creates deletion events as part of the process of deletion
   def soft_delete?
     user.admin? ||
         (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)

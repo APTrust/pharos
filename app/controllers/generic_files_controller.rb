@@ -2,7 +2,7 @@ class GenericFilesController < ApplicationController
   include SearchAndIndex
   before_filter :authenticate_user!
   before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:update, :create]
+  before_filter :load_intellectual_object, only: [:update, :create, :create_batch]
   after_action :verify_authorized
 
   def index
@@ -58,39 +58,49 @@ class GenericFilesController < ApplicationController
   end
 
   def create
-    authorize @intellectual_object, :create_through_intellectual_object?
-    if params[:save_batch]
-      GenericFile.transaction do
-        batch_generic_file_params
-        @generic_files = []
-        params[:generic_files][:files].each do |gf|
-          file = @intellectual_object.generic_files.new(gf)
-          file.state = 'A'
-          @generic_files.push(file)
-        end
-        raise ActiveRecord::Rollback
-      end
-      respond_to do |format|
-        if @intellectual_object.save
-          format.json { render json: array_as_json(@generic_files), status: :created }
-        else
-          errors = @generic_files.map(&:errors)
-          format.json { render json: errors, status: :unprocessable_entity }
-        end
-      end
-    else
-      @generic_file = @intellectual_object.generic_files.new(generic_file_params)
-      @generic_file.state = 'A'
-      respond_to do |format|
-        if @generic_file.save
-          format.json { render json: object_as_json, status: :created }
-        else
-          log_model_error(@generic_file)
-          format.json { render json: @generic_file.errors, status: :unprocessable_entity }
-        end
+    authorize @intellectual_object
+    @generic_file = @intellectual_object.generic_files.new(generic_file_params)
+    @generic_file.state = 'A'
+    respond_to do |format|
+      if @generic_file.save
+        format.json { render json: object_as_json, status: :created }
+      else
+        log_model_error(@generic_file)
+        format.json { render json: @generic_file.errors, status: :unprocessable_entity }
       end
     end
   end
+
+  # This method is open to admin only, through the admin API.
+  def create_batch
+    authorize @intellectual_object, :create?
+    begin
+      files = JSON.parse(request.body.read)
+    rescue JSON::ParserError, Exception => e
+      respond_to do |format|
+        format.json { render json: {error: "JSON parse error: #{e.message}"}, status: 400 }
+      end
+    end
+    GenericFile.transaction do
+      @generic_files = []
+      files.each do |gf|
+        file = @intellectual_object.generic_files.new(gf)
+        file.state = 'A'
+        @generic_files.push(file)
+      end
+      raise ActiveRecord::Rollback
+    end
+    respond_to do |format|
+      if @intellectual_object.save
+        format.json { render json: array_as_json(@generic_files), status: :created }
+      else
+        errors = @generic_files.map(&:errors)
+        format.json { render json: errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+
 
   def update
     # A.D. Aug. 3, 2016: Deleted batch update because
@@ -192,7 +202,9 @@ class GenericFilesController < ApplicationController
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
                        :agent, :intellectual_object_id, :generic_file_id,
-                       :institution_id, :created_at, :updated_at]])
+                       :institution_id, :created_at, :updated_at],
+                      checksums_attributes:
+                      [:datetime, :algorithm, :digest, :generic_file_id]])
   end
 
   def params_for_update
@@ -236,7 +248,15 @@ class GenericFilesController < ApplicationController
   end
 
   def array_as_json(list_of_generic_files)
-    list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+    files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+    # For consistency on the client end, make this list
+    # look like every other list the API returns.
+    {
+      count: files.count,
+      next: nil,
+      previous: nil,
+      results: files,
+    }
   end
 
   def load_generic_file

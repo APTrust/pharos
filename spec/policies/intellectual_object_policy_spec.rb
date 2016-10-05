@@ -9,7 +9,6 @@ describe IntellectualObjectPolicy do
     let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }
     let(:intellectual_object) { FactoryGirl.create(:intellectual_object) }
     it do
-      should permit(:create_through_intellectual_object)
       should permit(:show)
       should permit(:update)
       should_not permit(:edit)
@@ -26,11 +25,10 @@ describe IntellectualObjectPolicy do
       describe 'in my institution' do
         let(:intellectual_object) { FactoryGirl.create(:intellectual_object, institution: institution) }
         it do
-          should permit(:create_through_intellectual_object)
           should permit(:show)
           should_not permit(:update)
           should_not permit(:edit)
-          should permit(:add_event)
+          should_not permit(:add_event)
           should permit(:soft_delete)
           should permit(:destroy)
         end
@@ -40,7 +38,6 @@ describe IntellectualObjectPolicy do
         describe 'with consortial access' do
           let(:intellectual_object) { FactoryGirl.create(:consortial_intellectual_object) }
           it do
-            should_not permit(:create_through_intellectual_object)
             should permit(:show)
             should_not permit(:update)
             should_not permit(:edit)
@@ -53,7 +50,6 @@ describe IntellectualObjectPolicy do
         describe 'without consortial access' do
           let(:intellectual_object) { FactoryGirl.create(:restricted_intellectual_object) }
           it do
-            should_not permit(:create_through_intellectual_object)
             should_not permit(:show)
             should_not permit(:update)
             should_not permit(:edit)
@@ -75,7 +71,6 @@ describe IntellectualObjectPolicy do
           let(:intellectual_object) { FactoryGirl.create(:consortial_intellectual_object,
                                                          institution: institution) }
           it do
-            should_not permit(:create_through_intellectual_object)
             should_not permit(:update)
             should_not permit(:edit)
             should_not permit(:add_event)
@@ -100,7 +95,6 @@ describe IntellectualObjectPolicy do
         describe 'and it belongs to a consortial accessible object' do
           let(:intellectual_object) { FactoryGirl.create(:consortial_intellectual_object) }
           it do
-            should_not permit(:create_through_intellectual_object)
             should_not permit(:update)
             should_not permit(:edit)
             should_not permit(:add_event)
@@ -125,7 +119,6 @@ describe IntellectualObjectPolicy do
     let(:user) { FactoryGirl.create(:user) }
     let(:intellectual_object) { FactoryGirl.create(:intellectual_object) }
     it do
-      should_not permit(:create_through_intellectual_object)
       should_not permit(:show)
       should_not permit(:update)
       should_not permit(:edit)

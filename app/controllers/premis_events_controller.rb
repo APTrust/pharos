@@ -36,6 +36,7 @@ class PremisEventsController < ApplicationController
   end
 
   def create
+    authorize @parent, :add_event?
     @event = @parent.add_event(params[:premis_event])
     respond_to do |format|
       format.json {
