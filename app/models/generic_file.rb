@@ -122,6 +122,7 @@ class GenericFile < ActiveRecord::Base
         updated_at: Time.parse(updated_at.to_s).iso8601,
         file_format: file_format,
         identifier: identifier,
+        intellectual_object_identifier: intellectual_object.identifier,
         state: state,
     }
     if options.has_key?(:include)
