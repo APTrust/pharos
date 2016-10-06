@@ -19,6 +19,14 @@ class ReportsController < ApplicationController
     respond_to do |format|
       format.json { render json: { report: @report } }
       format.html { }
+      format.pdf do
+        # pdf = WickedPdf.new.pdf_from_string(
+        #     render_to_string('templates/pdf', layout: 'pdfs/layout_pdf'),
+        #     footer: {
+        #         content: render_to_string(layout: 'pdfs/layout_pdf')
+        #     }
+        # )
+      end
     end
   end
 
