@@ -59,7 +59,7 @@ class GenericFilesController < ApplicationController
 
   def create
     authorize @intellectual_object
-    @generic_file = @intellectual_object.generic_files.new(generic_file_params)
+    @generic_file = @intellectual_object.generic_files.new(single_generic_file_params)
     @generic_file.state = 'A'
     respond_to do |format|
       if @generic_file.save
@@ -78,7 +78,7 @@ class GenericFilesController < ApplicationController
       files = JSON.parse(request.body.read)
     rescue JSON::ParserError, Exception => e
       respond_to do |format|
-        format.json { render json: {error: "JSON parse error: #{e.message}"}, status: 400 }
+        format.json { render json: {error: "JSON parse error: #{e.message}"}, status: 400 } and return
       end
     end
     GenericFile.transaction do
@@ -100,8 +100,6 @@ class GenericFilesController < ApplicationController
     end
   end
 
-
-
   def update
     # A.D. Aug. 3, 2016: Deleted batch update because
     # nested params cause new events to be created,
@@ -109,7 +107,7 @@ class GenericFilesController < ApplicationController
     # events should not be duplicated.
     authorize @generic_file
     @generic_file.state = 'A'
-    if resource.update(params_for_update)
+    if resource.update(single_generic_file_params)
       head :no_content
     else
       log_model_error(resource)
@@ -185,14 +183,16 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  def generic_file_params
+  def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
       .permit(:id, :uri, :identifier, :size, :created_at,
               :updated_at, :file_format, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
                :agent, :intellectual_object_id, :generic_file_id,
-               :institution_id, :created_at, :updated_at])
+               :institution_id, :created_at, :updated_at],
+              checksums_attributes:
+              [:datetime, :algorithm, :digest, :generic_file_id])
   end
 
   def batch_generic_file_params
@@ -205,12 +205,6 @@ class GenericFilesController < ApplicationController
                        :institution_id, :created_at, :updated_at],
                       checksums_attributes:
                       [:datetime, :algorithm, :digest, :generic_file_id]])
-  end
-
-  def params_for_update
-    params[:generic_file] &&= params.require(:generic_file).
-      permit(:uri, :identifier, :size, :created_at,
-             :updated_at, :file_format)
   end
 
   def resource

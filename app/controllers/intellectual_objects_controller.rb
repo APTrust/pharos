@@ -47,7 +47,7 @@ class IntellectualObjectsController < ApplicationController
   def create
     authorize current_user, :intellectual_object_create?
     @intellectual_object = IntellectualObject.new(create_params)
-    @intellectual_object.institution = Institution.find_by_identifier(params[:institution_identifier])
+    @intellectual_object.state = 'A'
     if @intellectual_object.save
       respond_to do |format|
         format.json { render json: @intellectual_object, status: :created }
@@ -229,9 +229,9 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def create_params
-    params.require(:intellectual_object).permit(:id, :institution_id, :title,
+    params.require(:intellectual_object).permit(:institution_id, :title,
                                                 :description, :access, :identifier,
-                                                :bag_name, :alt_identifier, :state,
+                                                :bag_name, :alt_identifier,
                                                 generic_files_attributes:
                                                 [:id, :uri, :identifier,
                                                  :size, :created, :modified, :file_format,
