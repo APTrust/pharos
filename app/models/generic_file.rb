@@ -5,7 +5,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :created_at, :updated_at, :file_format, :identifier, presence: true
+  validates :uri, :size, :file_format, :identifier, presence: true
   validates_uniqueness_of :identifier
 
   delegate :institution, to: :intellectual_object

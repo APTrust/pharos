@@ -162,10 +162,8 @@ RSpec.describe GenericFilesController, type: :controller do
         post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'bar'}, format: 'json'
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( {
-                                                     'created_at' => ["can't be blank"],
                                                      'file_format' => ["can't be blank"],
                                                      'identifier' => ["can't be blank"],
-                                                     'updated_at' => ["can't be blank"],
                                                      'size' => ["can't be blank"]})
       end
 

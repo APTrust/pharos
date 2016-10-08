@@ -185,24 +185,24 @@ class GenericFilesController < ApplicationController
 
   def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
-      .permit(:id, :uri, :identifier, :size, :created_at,
-              :updated_at, :file_format, premis_events_attributes:
+      .permit(:id, :uri, :identifier, :size,
+              :file_format, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
                :agent, :intellectual_object_id, :generic_file_id,
-               :institution_id, :created_at, :updated_at],
+               :institution_id],
               checksums_attributes:
               [:datetime, :algorithm, :digest, :generic_file_id])
   end
 
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
-      .permit(files: [:id, :uri, :identifier, :size, :created_at,
-                      :updated_at, :file_format, premis_events_attributes:
+      .permit(files: [:id, :uri, :identifier, :size,
+                      :file_format, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
                        :agent, :intellectual_object_id, :generic_file_id,
-                       :institution_id, :created_at, :updated_at],
+                       :institution_id],
                       checksums_attributes:
                       [:datetime, :algorithm, :digest, :generic_file_id]])
   end
