@@ -61,7 +61,7 @@ group :production do
   gem "rails_12factor" # Necessary for heroku
 end
 
-group :development, :test, :staging, :production, :integration do
+group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_girl_rails'
