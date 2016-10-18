@@ -162,10 +162,8 @@ RSpec.describe GenericFilesController, type: :controller do
         post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'bar'}, format: 'json'
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( {
-                                                     'created_at' => ["can't be blank"],
                                                      'file_format' => ["can't be blank"],
                                                      'identifier' => ["can't be blank"],
-                                                     'updated_at' => ["can't be blank"],
                                                      'size' => ["can't be blank"]})
       end
 
@@ -298,6 +296,8 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       describe 'and you have access to the file' do
+        let(:new_checksum) { FactoryGirl.create(:checksum, generic_file: file) }
+        let(:new_event) { FactoryGirl.create(:premis_event_validation, generic_file: file) }
         it 'should update the file' do
           patch :update, intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(assigns[:generic_file].size).to eq 99
@@ -305,9 +305,16 @@ RSpec.describe GenericFilesController, type: :controller do
         end
 
         it 'should update the file by identifier (API)' do
+          checksum_count = file.checksums.count
+          premis_event_count = file.premis_events.count
+          file.checksums << new_checksum
+          file.premis_events << new_event
           patch :update, generic_file_identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(assigns[:generic_file].size).to eq 99
           expect(response.code).to eq '204'
+          file.reload
+          expect(file.checksums.count).to eq(checksum_count + 1)
+          expect(file.premis_events.count).to eq(premis_event_count + 1)
         end
       end
     end

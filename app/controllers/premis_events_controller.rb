@@ -35,9 +35,12 @@ class PremisEventsController < ApplicationController
     end
   end
 
+  # This is a JSON call restricted to the Admin user.
+  # The JSON is in the request body, and is parsed in
+  # load_and_authorize_parent_object
   def create
     authorize @parent, :add_event?
-    @event = @parent.add_event(params[:premis_event])
+    @event = @parent.add_event(@json_params)
     respond_to do |format|
       format.json {
         if @parent.save
@@ -45,14 +48,6 @@ class PremisEventsController < ApplicationController
         else
           render json: @event.errors, status: :unprocessable_entity
         end
-      }
-      format.html {
-        if @parent.save
-          flash[:notice] = "Successfully created new event: #{@event.identifier}"
-        else
-          flash[:alert] = "Unable to create event for #{@parent.id} using input parameters: #{params['event']}"
-        end
-        redirect_to @parent
       }
     end
   end
@@ -78,11 +73,12 @@ class PremisEventsController < ApplicationController
   end
 
   def load_and_authorize_parent_object
+    @json_params = JSON.parse(request.body.read)
     if @parent.nil?
-      if params[:object_identifier]
-        load_intellectual_object
-      elsif params[:file_identifier]
-        load_generic_file
+      if !@json_params['generic_file_identifier'].blank?
+        @parent = GenericFile.where(identifier: @json_params['generic_file_identifier']).first
+      elsif !@json_params['intellectual_object_identifier'].blank?
+        @parent = IntellectualObject.where(identifier: @json_params['intellectual_object_identifier']).first
       end
     end
     authorize @parent, :add_event?
@@ -98,13 +94,6 @@ class PremisEventsController < ApplicationController
 
   def for_selected_file
     @premis_events = @premis_events.where(generic_file_id: @parent.id) unless @parent.nil?
-  end
-
-  def premis_event_params
-    return nil if request.method == 'GET'
-    params.require(:premis_event).permit(:identifier, :event_type, :date_time, :outcome, :outcome_detail,
-        :outcome_information, :detail, :object, :agent, :intellectual_object_id, :generic_file_id,
-        :institution_id, :created_at, :updated_at)
   end
 
   def filter
