@@ -262,7 +262,7 @@ i.doc-action-btn {
 
 .btn-normal{
   background-image: linear-gradient(to bottom, #FFFFFF, #E6E6E6);
-  color: #428bca;
+  color: #2d5f6c;
 }
 
 .btn-success{
@@ -415,11 +415,11 @@ div.flot-y-axis div.flot-tick-label {
 }
 
 .navbar {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .footer {
-    margin-top: 0px;
+  margin-top: 0px;
 }
 
 .navbar-default .navbar-nav > li > a {
@@ -453,9 +453,18 @@ div.flot-y-axis div.flot-tick-label {
   border-color: #8a6d3b;
 }
 
-//This is wrong, still blue.
-#search:active, #search:focus, #search {
-  border-color: #8a6d3b !important;
+#search-btn.search-btn:focus, .input-group-btn:focus, #search-btn.search-btn:hover, .input-group-btn:hover {
+  outline: #8a6d3b !important;
+}
+
+#search-btn:active, {
+  color: #fff;
+  background-color: #8a6d3b;
+  border-color: #47381f;
+}
+
+.form-control:focus {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #d39858;
 }
 
 #q:focus {
@@ -463,31 +472,45 @@ div.flot-y-axis div.flot-tick-label {
 }
 
 #mainContainer {
-  background: url(<%= asset_path 'aptrust/background.jpg' %>) no-repeat center bottom;
-  background-size: cover;
   min-height: 580px;
 }
 
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+  background-color: #eadac8;
+  color: #45474d;
+}
+
+.breadcrumb {
+  margin-top: 20px;
+}
+
+.tab-pane {
+  margin-bottom: 15px;
+}
+
+#main-flashes {
+  margin-top: 20px;
+}
+
 .nav-tabs li a {
-  border-color: #ccc;
-  color: #8a6d3b;
+  color: #2d5f6c;
 }
 
-.nav-tabs li.active a, .nav-tabs li.active a:focus {
-  border-color: #ccc;
-  border-bottom: transparent;
-  background-color: transparent;
-}
+/*.nav-tabs li.active a, .nav-tabs li.active a:focus {*/
+  /*border-color: #ccc;*/
+  /*border-bottom: transparent;*/
+  /*background-color: transparent;*/
+/*}*/
 
-.nav-tabs li a:hover {
-  border-color: #ccc;
-  background-image: linear-gradient(to bottom, #fff, #ccc);
-}
+/*.nav-tabs li a:hover {*/
+  /*border-color: #ccc;*/
+  /*background-image: linear-gradient(to bottom, #fff, #ccc);*/
+/*}*/
 
-.nav-tabs {
-  border-bottom: transparent;
-}
+/*.nav-tabs {*/
+  /*border-bottom: transparent;*/
+/*}*/
 
-#stats table {
-  border-top: transparent;
-}
+/*#stats table {*/
+  /*border-top: transparent;*/
+/*}*/
