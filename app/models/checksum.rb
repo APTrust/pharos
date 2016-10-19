@@ -25,4 +25,16 @@ class Checksum < ActiveRecord::Base
   #   joins(:generic_file).joins(:intellectual_objects)
   #       .where('intellectual_objects.institution_id = ?', param) unless param.blank?
   # }
+
+  def serializable_hash
+    {
+      id: self.id,
+      algorithm: algorithm,
+      digest: digest,
+      datetime: Time.parse(datetime.to_s).iso8601,
+      created_at: Time.parse(created_at.to_s).iso8601,
+      updated_at: Time.parse(updated_at.to_s).iso8601,
+    }
+  end
+
 end

@@ -5,7 +5,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :created_at, :updated_at, :file_format, :identifier, presence: true
+  validates :uri, :size, :file_format, :identifier, presence: true
   validates_uniqueness_of :identifier
 
   delegate :institution, to: :intellectual_object
@@ -134,13 +134,7 @@ class GenericFile < ActiveRecord::Base
 
   def serialize_checksums
     checksums.map do |cs|
-      {
-          algorithm: cs.algorithm,
-          digest: cs.digest,
-          datetime: Time.parse(cs.datetime.to_s).iso8601,
-          generic_file_id: self.id,
-          id: cs.id
-      }
+      cs.serializable_hash
     end
   end
 

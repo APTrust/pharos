@@ -10,8 +10,6 @@ RSpec.describe GenericFile, :type => :model do
 
   it { should validate_presence_of(:uri) }
   it { should validate_presence_of(:size) }
-  it { should validate_presence_of(:created_at) }
-  it { should validate_presence_of(:updated_at) }
   it { should validate_presence_of(:file_format) }
   it { should validate_presence_of(:identifier)}
 

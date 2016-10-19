@@ -7,7 +7,11 @@ RSpec.describe PremisEventsController, type: :controller do
 
   let(:object) { FactoryGirl.create(:intellectual_object, institution: user.institution, access: 'institution') }
   let(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
-  let(:event_attrs) { FactoryGirl.attributes_for(:premis_event_fixity_generation) }
+  let(:event_attrs) { FactoryGirl.attributes_for(:premis_event_fixity_generation,
+                                                 intellectual_object_id: object.id,
+                                                 intellectual_object_identifier: object.identifier,
+                                                 generic_file_id: file.id,
+                                                 generic_file_identifier: file.identifier) }
 
   # An object and a file from a different institution:
   let(:someone_elses_object) { FactoryGirl.create(:intellectual_object, access: 'institution') }
@@ -56,59 +60,28 @@ RSpec.describe PremisEventsController, type: :controller do
     before { sign_in user }
 
     describe 'POST create' do
-      it 'creates an event for the generic file' do
-        file.premis_events.count.should == 0
-        post :create, file_identifier: file, premis_event: event_attrs
-        file.reload
-
-        file.premis_events.count.should == 1
-        response.should redirect_to generic_file_path(file)
-        assigns(:parent).should == file
-        assigns(:event).should_not be_nil
-        flash[:notice].should =~ /Successfully created new event/
-      end
 
       it 'creates an event for the generic file using generic file identifier (API)' do
         file.premis_events.count.should == 0
-        post :create, file_identifier: URI.escape(file.identifier), premis_event: event_attrs, format: :json
+        post :create, event_attrs.to_json, format: :json
         file.reload
         file.premis_events.count.should == 1
         assigns(:parent).should == file
-        # API response should be 201/created instead of redirect that the HTML client gets
         expect(response.status).to eq(201)
       end
 
-      it 'creates an event for an intellectual object' do
-        object.premis_events.count.should == 0
-        post :create, object_identifier: object, premis_event: event_attrs
-        object.reload
-        object.premis_events.count.should == 1
-        response.should redirect_to intellectual_object_path(object)
-        assigns(:parent).should == object
-        assigns(:event).should_not be_nil
-        flash[:notice].should =~ /Successfully created new event/
-      end
-
       it 'creates an event for an intellectual object by object identifier' do
+        event_attrs[:generic_file_identifier] = ''
+        event_attrs[:generic_file_id] = ''
         object.premis_events.count.should == 0
-        post :create, object_identifier: URI.escape(object.identifier), premis_event: event_attrs
+        post :create, event_attrs.to_json, format: :json
+        expect(response.status).to eq(201)
         object.reload
-
         object.premis_events.count.should == 1
-        response.should redirect_to intellectual_object_path(object)
         assigns(:parent).should == object
         assigns(:event).should_not be_nil
-        flash[:notice].should =~ /Successfully created new event/
       end
 
-
-      it 'if it fails, it prints a fail message' do
-        file.premis_events.count.should == 0
-        expect_any_instance_of(GenericFile).to receive(:save).and_return(false) # Make it fail
-        post :create, file_identifier: file, premis_event: event_attrs
-        file.reload
-        flash[:alert].should =~ /Unable to create event/
-      end
     end
   end
 
@@ -118,21 +91,19 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'POST create' do
       it 'is forbidden' do
-        post :create, file_identifier: file, premis_event: event_attrs
-        expect(response).to redirect_to root_url
-        flash[:alert].should =~ /You are not authorized/
+        post :create, event_attrs.to_json, format: :json
+        expect(response.status).to eq(403)
       end
     end
 
     describe "POST create a file where you don't have permission" do
       it 'denies access' do
         someone_elses_file.premis_events.count.should == 0
-        post :create, file_identifier: someone_elses_file, event: event_attrs
+        post :create, event_attrs.to_json, format: :json
         someone_elses_file.reload
 
         someone_elses_file.premis_events.count.should == 0
-        expect(response).to redirect_to root_url
-        flash[:alert].should =~ /You are not authorized/
+        expect(response.status).to eq(403)
       end
     end
 
@@ -145,12 +116,11 @@ RSpec.describe PremisEventsController, type: :controller do
     describe 'POST create' do
       it 'denies access' do
         file.premis_events.count.should == 0
-        post :create, file_identifier: file, event: event_attrs
+        post :create, event_attrs.to_json, format: :json
         file.reload
 
         file.premis_events.count.should == 0
-        expect(response).to redirect_to root_url
-        flash[:alert].should =~ /You are not authorized/
+        expect(response.status).to eq(403)
       end
     end
 
@@ -225,16 +195,17 @@ RSpec.describe PremisEventsController, type: :controller do
   end
 
   describe 'not signed in' do
+    let(:user) { FactoryGirl.create(:user, :institutional_user) }
     let(:file) { FactoryGirl.create(:generic_file) }
 
     describe 'POST create' do
       before do
-        post :create, identifier: file, event: event_attrs
+        post :create, event_attrs.to_json, format: :json
       end
 
-      it 'redirects to login' do
-        expect(response).to redirect_to root_url + 'users/sign_in'
-        expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
+      it 'says you are unauthorized' do
+        # This is a JSON call, so you get a 401, not a redirect
+        expect(response.status).to eq(401)
       end
     end
 

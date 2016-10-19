@@ -26,11 +26,11 @@ integration:
   <<: *default
   database: db/integration.sqlite3
 
-# Staging environment for APTrust test system
-staging:
+# Demo environment for APTrust Demo system
+demo:
   <<: *default
   adapter: postgresql
-  database: pharos_staging
+  database: pharos_demo
   username: <%= ENV['PHAROS_DB_USER'] %>
   host:     <%= ENV['PHAROS_DB_HOST'] %>
   password: <%= ENV['PHAROS_DB_PWD'] %>

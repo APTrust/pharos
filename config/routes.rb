@@ -41,11 +41,7 @@ Rails.application.routes.draw do
   get 'events/:object_identifier', to: 'premis_events#index', format: [:json, :html], object_identifier: object_ptrn, as: :intellectual_object_events
   get 'events/:institution_identifier', to: 'premis_events#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_events
   get '/api/v2/events', to: 'premis_events#index', format: [:json, :html]
-  #post 'events/:identifier', to: 'premis_events#create', format: [:json, :html], identifier: /[\/\-\%\w\.]*/
-  post 'events/:file_identifier', to: 'premis_events#create', format: [:json, :html], file_identifier: file_ptrn
-  post 'events/:object_identifier', to: 'premis_events#create', format: [:json, :html], object_identifier: object_ptrn
-  post 'events/:institution_identifier', to: 'premis_events#create', format: [:json, :html], institution_identifier: institution_ptrn
-  resources :premis_events, only: [:create], format: :json, param: :identifier, path: 'api/v2/events'
+  post '/api/v2/events', to: 'premis_events#create', format: :json
 
   # WORK ITEM ROUTES
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
