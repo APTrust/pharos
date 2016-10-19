@@ -20,12 +20,15 @@ class ReportsController < ApplicationController
       format.json { render json: { report: @report } }
       format.html { }
       format.pdf do
-        # pdf = WickedPdf.new.pdf_from_string(
-        #     render_to_string('templates/pdf', layout: 'pdfs/layout_pdf'),
-        #     footer: {
-        #         content: render_to_string(layout: 'pdfs/layout_pdf')
-        #     }
-        # )
+        # pdf = WickedPdf.new.pdf_from_html_file('/views/reports/_overview.html.erb')
+        # pdf = render_to_string pdf: 'Overview_Report', template: '_overview.html.erb', encoding: 'UTF-8'
+        # save_path = Rails.root.join('pdfs','Overview_Report.pdf')
+        # File.open(save_path, 'wb') do |file|
+        #   file << pdf
+        # end
+
+        pdf = Prawn::Document.new
+        send_data pdf.render, filename: 'overview_report.pdf', type: 'application/pdf'
       end
     end
   end

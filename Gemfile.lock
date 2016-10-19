@@ -143,12 +143,16 @@ GEM
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
     orm_adapter (0.5.0)
+    pdf-core (0.6.1)
     pg (0.18.4)
     phony (2.15.28)
     phony_rails (0.14.2)
       activesupport (>= 3.0)
       phony (~> 2.12)
     pkg-config (1.1.7)
+    prawn (2.1.0)
+      pdf-core (~> 0.6.1)
+      ttfunk (~> 1.4.0)
     pundit (1.1.0)
       activesupport (>= 3.0.0)
     rack (1.6.4)
@@ -254,6 +258,7 @@ GEM
     thread_safe (0.3.5)
     tilt (2.0.5)
     tins (1.12.0)
+    ttfunk (1.4.0)
     turbolinks (5.0.1)
       turbolinks-source (~> 5)
     turbolinks-source (5.0.0)
@@ -298,6 +303,7 @@ DEPENDENCIES
   meta_request
   pg
   phony_rails
+  prawn
   pundit
   rails (= 4.2.7.1)
   rails_12factor

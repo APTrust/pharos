@@ -1,5 +1,5 @@
 <%= render 'overview' %>
 
-<%= link_to "reports/overview/#{@institution.identifier}?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
+<%= link_to "#{@institution.identifier}?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
     <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF
 <% end %>
