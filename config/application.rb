@@ -61,6 +61,8 @@ module Pharos
         'dpn' => 'DPN'
     }
 
+    DPN_TASKS = %w(sync ingest replication restore fixity)
+
     DPN_STATUS = false
 
     APTRUST_NAME = 'APTrust'
