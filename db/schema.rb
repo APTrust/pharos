@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160929193058) do
+ActiveRecord::Schema.define(version: 20161020200548) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -80,8 +80,8 @@ ActiveRecord::Schema.define(version: 20160929193058) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.string   "outcome"
     t.integer  "institution_id"
+    t.string   "outcome"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
   end
