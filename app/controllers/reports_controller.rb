@@ -21,14 +21,11 @@ class ReportsController < ApplicationController
       format.html { }
       format.pdf do
         # pdf = WickedPdf.new.pdf_from_html_file('/views/reports/_overview.html.erb')
-        # pdf = render_to_string pdf: 'Overview_Report', template: '_overview.html.erb', encoding: 'UTF-8'
-        # save_path = Rails.root.join('pdfs','Overview_Report.pdf')
-        # File.open(save_path, 'wb') do |file|
-        #   file << pdf
-        # end
-
-        pdf = Prawn::Document.new
-        send_data pdf.render, filename: 'overview_report.pdf', type: 'application/pdf'
+        pdf = render_to_string pdf: 'Overview_Report', template: 'views/reports/_overview.html.erb', encoding: 'UTF-8'
+        save_path = Rails.root.join('pdfs','Overview_Report.pdf')
+        File.open(save_path, 'wb') do |file|
+          file << pdf
+        end
       end
     end
   end

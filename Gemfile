@@ -29,7 +29,6 @@ gem 'valid_email'
 gem 'therubyracer'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
-gem 'prawn'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.3.0'
