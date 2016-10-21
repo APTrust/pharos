@@ -34,13 +34,22 @@
   </div>
 
   <div class="tab-pane" id="stats">
-    <table class="upload_stats table">
+    <table class="table table-condensed">
+      <thead>
+      <tr>
+        <th>Type of Content</th>
+        <th>Amount Uploaded</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
       <% @institution.bytes_by_format.each do |format, bytes| %>
           <tr>
             <td class="<%=format_class(format) %>"><%= format_display(format) %></td>
             <td class="bytes"><%=number_to_human_size bytes %></td>
           </tr>
       <% end %>
+      </tbody>
     </table>
     <div id="chart-frame"><table>
       <tr>

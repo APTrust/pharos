@@ -32,6 +32,8 @@ module Pharos
 
     config.i18n.enforce_available_locales = true
 
+    #config.serve_static_assets = true
+
     #GLOBALS
     PHAROS_STATUSES = {
         'pend' => 'Pending',

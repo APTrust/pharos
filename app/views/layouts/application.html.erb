@@ -9,17 +9,21 @@
   <script src="//cdn.jsdelivr.net/jquery.flot/0.8.3/jquery.flot.symbol.js"></script>
 
   <%= csrf_meta_tags %>
-  <%= favicon_link_tag 'aptrust/favicon.ico' %>
+  <%= favicon_link_tag 'aptrust/favicon.png' %>
   <%= auto_discovery_link_tag(:rss, work_items_path, title: 'Bag Status RSS Feed') %>
 </head>
 <body>
 <%= render partial: '/shared/header_navbar' %>
-<div class="container">
-  <div class="row">
-    <%= render partial: '/shared/flash_messages' %>
+
+<div id="mainContainer">
+  <div class="container">
+    <div class="row">
+      <%= render partial: '/shared/flash_messages' %>
+    </div>
+    <%= yield %>
   </div>
-  <%= yield %>
 </div>
+
 <%= render partial: '/shared/footer' %>
 
 </body>
