@@ -41,6 +41,11 @@ RSpec.describe DpnWorkItem, type: :model do
     subject.note.should == 'Something new'
   end
 
+  it 'should properly set a state' do
+    subject.state = 'This is a new state.'
+    subject.state.should == 'This is a new state.'
+  end
+
   it 'should validate that task is one of the allowed options' do
     subject = FactoryGirl.build(:dpn_work_item, task: 'not_allowed')
     subject.should_not be_valid

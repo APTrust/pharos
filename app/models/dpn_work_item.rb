@@ -7,6 +7,7 @@ class DpnWorkItem < ActiveRecord::Base
   scope :with_node, ->(param) { where(node: param) unless param.blank? }
   scope :with_task, ->(param) { where(task: param) unless param.blank? }
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
+  scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :queued_before, ->(param) { where('dpn_work_items.queued_at < ?', param) unless param.blank? }
   scope :queued_after, ->(param) { where('dpn_work_items.queued_at > ?', param) unless param.blank? }
   scope :completed_before, ->(param) { where('dpn_work_items.completed_at < ?', param) unless param.blank? }
@@ -20,7 +21,8 @@ class DpnWorkItem < ActiveRecord::Base
         identifier: identifier,
         queued_at: queued_at,
         completed_at: completed_at,
-        note: note
+        note: note,
+        state: state
     }
   end
 

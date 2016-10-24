@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161020201433) do
+ActiveRecord::Schema.define(version: 20161024180506) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 20161020201433) do
     t.datetime "queued_at"
     t.datetime "completed_at"
     t.string   "note",         limit: 400
+    t.text     "state",        limit: 255
   end
 
   add_index "dpn_work_items", ["identifier"], name: "index_dpn_work_items_on_identifier"
