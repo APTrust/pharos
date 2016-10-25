@@ -6,5 +6,6 @@ FactoryGirl.define do
     queued_at { Time.now }
     completed_at { Time.now }
     note { 'This bag completed remarkably fast.' }
+    state {  }
   end
 end

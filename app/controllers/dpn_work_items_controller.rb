@@ -63,11 +63,11 @@ class DpnWorkItemsController < ApplicationController
   end
 
   def dpn_work_item_params
-    params.require(:dpn_work_item).permit(:node, :task, :identifier, :queued_at, :completed_at, :note)
+    params.require(:dpn_work_item).permit(:node, :task, :identifier, :queued_at, :completed_at, :note, :state)
   end
 
   def params_for_update
-    params.require(:dpn_work_item).permit(:queued_at, :completed_at, :note)
+    params.require(:dpn_work_item).permit(:queued_at, :completed_at, :note, :state)
   end
 
   def set_item
@@ -80,6 +80,7 @@ class DpnWorkItemsController < ApplicationController
                      .with_node(params[:node])
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])
+                     .with_state(params[:state])
                      .queued_before(params[:queued_before])
                      .queued_after(params[:queued_after])
                      .completed_before(params[:completed_before])
