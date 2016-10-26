@@ -6,7 +6,7 @@ class ReportsController < ApplicationController
   def index
     authorize @institution
     respond_to do |format|
-      format.json { render json: { report_list: 'There are no reports available yet. Check back later for a list.' } }
+      format.json { render json: { report_list: 'There is one report available, a general overview found at reports/overview/:identifier' } }
       format.html { }
     end
   end
