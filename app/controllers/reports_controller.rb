@@ -1,7 +1,7 @@
 class ReportsController < ApplicationController
   before_filter :authenticate_user!
   after_action :verify_authorized
-  before_filter :set_institution, only: [:index, :overview]
+  before_filter :set_institution, only: [:index, :overview, :download]
 
   def index
     authorize @institution
@@ -19,10 +19,19 @@ class ReportsController < ApplicationController
     respond_to do |format|
       format.json { render json: { report: @report } }
       format.html { }
+
+    end
+  end
+
+  def download
+    authorize @institution, :overview?
+    respond_to do |format|
       format.pdf do
-        html = render_to_string(:action => :overview, :layout => 'reports/_overview.html.erb')
+        html = render_to_string(action: :overview, layout: '/reports/test.html')
         pdf = WickedPdf.new.pdf_from_string(html)
-        send_data(pdf, :filename => 'my_pdf_name.pdf', :disposition => 'attachment')
+        send_data(pdf, filename: 'filename.pdf', disposition: 'attachment')
+
+        # save_path = Rails.root.join('pdfs','filename.pdf')
         # File.open(save_path, 'wb') do |file|
         #   file << pdf
         # end
