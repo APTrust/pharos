@@ -46,6 +46,17 @@ class WorkItem < ActiveRecord::Base
   scope :readable, ->(current_user) {
     where(institution: current_user.institution) unless current_user.admin?
   }
+  # queued returns items that have or have not been queued
+  scope :queued, ->(param) {
+    if !param.blank?
+      if param == "false"
+        where("queued_at is null")
+      elsif param == "true"
+        where("queued_at is not null")
+      end
+    end
+    }
+
 
   def to_param
     "#{etag}/#{name}"

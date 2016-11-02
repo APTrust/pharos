@@ -47,6 +47,23 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(data['previous']).to be_nil
         expect(data['results']).to eq([])
       end
+
+      it 'filters by queued' do
+        WorkItem.update_all(queued_at: nil)
+        get :index, queued: "true", format: :json
+        assigns(:items).should be_empty
+        get :index, queued: "false", format: :json
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(2)
+
+        WorkItem.update_all(queued_at: Time.now.utc)
+        get :index, queued: "false", format: :json
+        assigns(:items).should be_empty
+        get :index, queued: "true", format: :json
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(2)
+      end
+
     end
 
     describe 'for institutional admin' do
