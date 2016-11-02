@@ -141,6 +141,7 @@ class WorkItem < ActiveRecord::Base
     restore_item.needs_admin_review = false
     restore_item.size = nil
     restore_item.stage_started_at = nil
+    restore_item.queued_at = nil
     restore_item.save!
     restore_item
   end
@@ -165,6 +166,7 @@ class WorkItem < ActiveRecord::Base
     dpn_item.needs_admin_review = false
     dpn_item.size = nil
     dpn_item.stage_started_at = nil
+    dpn_item.queued_at = nil
     dpn_item.save!
     dpn_item
   end
@@ -193,6 +195,7 @@ class WorkItem < ActiveRecord::Base
     delete_item.needs_admin_review = false
     delete_item.size = nil
     delete_item.stage_started_at = nil
+    delete_item.queued_at = nil
     delete_item.save!
     delete_item
   end
