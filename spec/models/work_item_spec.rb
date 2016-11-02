@@ -301,5 +301,19 @@ RSpec.describe WorkItem, :type => :model do
       item.should_not be_nil
     end
 
+    it 'should find by queued' do
+      WorkItem.update_all(queued_at: nil)
+      items = WorkItem.queued("true")
+      items.should be_empty
+      items = WorkItem.queued("false")
+      items.should_not be_empty
+
+      WorkItem.update_all(queued_at: ingest_date)
+      items = WorkItem.queued("true")
+      items.should_not be_empty
+      items = WorkItem.queued("false")
+      items.should be_empty
+    end
+
   end
 end
