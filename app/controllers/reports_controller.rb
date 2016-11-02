@@ -20,22 +20,15 @@ class ReportsController < ApplicationController
       format.json { render json: { report: @report } }
       format.html { }
       format.pdf do
-        html = render_to_string(action: :overview, layout: 'reports/overview.pdf.erb')
-        pdf = WickedPdf.new.pdf_from_string(html)
-        send_data(pdf, filename: "Overview for #{@institution.name}", disposition: 'attachment')
+        # html = render_to_string(action: :overview, layout: 'reports/overview.pdf.erb')
+        # pdf = WickedPdf.new.pdf_from_string(html)
+        # send_data(pdf, filename: "Overview for #{@institution.name}.pdf", disposition: 'attachment')
 
-        # save_path = Rails.root.join('pdfs','filename.pdf')
-        # File.open(save_path, 'wb') do |file|
-        #   file << pdf
-        # end
+        render pdf: "Overview for #{@institution.name}.pdf",
+               disposition: "inline",
+               template: 'reports/overview.pdf.erb',
+               layout: 'reports/overview.pdf.erb'
       end
-    end
-  end
-
-  def download
-    authorize @institution, :overview?
-    respond_to do |format|
-
     end
   end
 
