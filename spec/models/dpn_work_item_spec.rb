@@ -5,7 +5,6 @@ RSpec.describe DpnWorkItem, type: :model do
     DpnWorkItem.destroy_all
   end
 
-  it { should validate_presence_of(:node) }
   it { should validate_presence_of(:task) }
   it { should validate_presence_of(:identifier) }
 

@@ -11,6 +11,19 @@ $apt_black: #180000;
 @import "users.scss";
 @import "work_items.scss";
 
+html {
+  height: 100% !important;
+}
+body {
+  min-height: 100%;
+  position: relative;
+}
+body:after {
+  content: '';
+  display: block;
+  height: 50px;
+}
+
 .simple_form label, .simple_form div.input {
   display: block;
   padding: 2px;
@@ -84,8 +97,13 @@ label.password {
 
 footer {
   margin-top: 45px;
-  padding-top: 5px;
+  padding-top: 15px;
+  padding-bottom: 10px;
   border-top:  1px solid #eaeaea;
+  width: 100%;
+  bottom: 0;
+  position: absolute;
+  height: 50px;
   color: #999;
   a {
     color: #555;
@@ -141,7 +159,7 @@ p.italic {
 }
 
 .container {
-  width: 1250px !important;
+  width: 92% !important;
 }
 
 /* MISC */
@@ -435,10 +453,12 @@ div.flot-y-axis div.flot-tick-label {
 
 .footer .container nav {
   padding: 10px;
+  display: inline;
 }
 
 .footer .container nav a, .footer .container p, .footer .container em {
   color: #fff;
+  display: inline;
 }
 
 .footer .container nav a:hover {
@@ -470,7 +490,6 @@ div.flot-y-axis div.flot-tick-label {
 }
 
 #mainContainer {
-  min-height: 580px;
   margin-bottom: 15px;
 }
 

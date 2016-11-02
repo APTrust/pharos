@@ -13,18 +13,17 @@
   <%= auto_discovery_link_tag(:rss, work_items_path, title: 'Bag Status RSS Feed') %>
 </head>
 <body>
-<%= render partial: '/shared/header_navbar' %>
 
 <div id="mainContainer">
+  <%= render partial: '/shared/header_navbar' %>
   <div class="container">
     <div class="row">
       <%= render partial: '/shared/flash_messages' %>
     </div>
     <%= yield %>
   </div>
+  <%= render partial: '/shared/footer' %>
 </div>
-
-<%= render partial: '/shared/footer' %>
 
 </body>
 </html>

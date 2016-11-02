@@ -1,6 +1,6 @@
 class DpnWorkItem < ActiveRecord::Base
 
-  validates :node, :task, :identifier, presence: true
+  validates :task, :identifier, presence: true
   validate :task_is_allowed
 
   ### Scopes

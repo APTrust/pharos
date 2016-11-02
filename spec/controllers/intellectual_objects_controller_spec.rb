@@ -590,9 +590,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
         expect(response.code).to eq '200'
         data = JSON.parse(response.body)
-        expect(data['status']).to eq 'ok'
-        expect(data['message']).to eq 'Your item has been queued for DPN.'
-        expect(data['work_item_id']).to be > 0
+        expect(data['action']).to eq 'DPN'
+        expect(data['object_identifier']).to eq obj_for_dpn.identifier
+        expect(data['status']).to eq 'Pending'
+        expect(data['note']).to eq 'Requested item be sent to DPN'
+        expect(data['id']).to be > 0
       end
       it 'should create a DPN work item' do
         count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
@@ -610,7 +612,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'
         expect(data['message']).to eq 'This item has already been sent to DPN.'
-        expect(data['work_item_id']).to eq 0
       end
       it 'should reject deleted items (json)' do
         put :send_to_dpn, intellectual_object_identifier: deleted_obj, format: :json
@@ -618,7 +619,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'
         expect(data['message']).to eq 'This item has been deleted and cannot be sent to DPN.'
-        expect(data['work_item_id']).to eq 0
       end
       it 'should reject items with pending work requests (json)' do
         put :send_to_dpn, intellectual_object_identifier: obj_pending, format: :json
@@ -626,7 +626,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'
         expect(data['message']).to include 'Your object cannot be sent to DPN at this time due to a pending'
-        expect(data['work_item_id']).to eq 0
       end
       it 'should reject items when DPN is disabled (json)' do
         if Pharos::Application.config.show_send_to_dpn_button == false
@@ -640,7 +639,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           data = JSON.parse(response.body)
           expect(data['status']).to eq 'error'
           expect(data['message']).to include 'Your object cannot be sent to DPN at this time due to a pending'
-          expect(data['work_item_id']).to eq 0
         end
       end
     end
