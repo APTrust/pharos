@@ -168,7 +168,11 @@ class IntellectualObjectsController < ApplicationController
       status = dpn_item.nil? ? 'error' : 'ok'
       item_id = dpn_item.nil? ? 0 : dpn_item.id
       format.json {
-        render :json => { status: status, message: message, work_item_id: item_id }, :status => api_status_code
+        if status == 'ok'
+          render :json => dpn_item, :status => api_status_code
+        else
+          render :json => { status: status, message: message }, :status => api_status_code
+        end
       }
       format.html {
         if dpn_item.nil?
