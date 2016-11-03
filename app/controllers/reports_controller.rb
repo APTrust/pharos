@@ -20,14 +20,15 @@ class ReportsController < ApplicationController
       format.json { render json: { report: @report } }
       format.html { }
       format.pdf do
-        # html = render_to_string(action: :overview, layout: 'reports/overview.pdf.erb')
+        # html = render_to_string(action: :overview, layout: false)
         # pdf = WickedPdf.new.pdf_from_string(html)
         # send_data(pdf, filename: "Overview for #{@institution.name}.pdf", disposition: 'attachment')
 
+        # Use this block to test layouts (PDF viewed in browser), block above provides downloadable PDF
         render pdf: "Overview for #{@institution.name}.pdf",
-               disposition: "inline",
+               disposition: 'inline',
                template: 'reports/overview.pdf.erb',
-               layout: 'reports/overview.pdf.erb'
+               layout: false
       end
     end
   end
