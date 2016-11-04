@@ -5,33 +5,33 @@
 <table class="dl-horizontal">
   <tr>
     <th align="left" width="250px">Intellectual Objects</th>
-    <th align="left"><%= @report[:intellectual_objects] %></th>
+    <th align="left" style="font-weight: 100"><%= @report[:intellectual_objects] %></th>
   </tr>
   <tr>
     <th align="left">Generic Files</th>
-    <th align="left"><%= @report[:generic_files] %></th>
+    <th align="left" style="font-weight: 100"><%= @report[:generic_files] %></th>
   </tr>
   <tr>
     <th align="left">Premis Events</th>
-    <th align="left"><%= @report[:premis_events] %></th>
+    <th align="left" style="font-weight: 100"><%= @report[:premis_events] %></th>
   </tr>
   <tr>
     <th align="left">Work Items</th>
-    <th align="left"><%= @report[:work_items] %></th>
+    <th align="left" style="font-weight: 100"><%= @report[:work_items] %></th>
   </tr>
   <tr>
     <th align="left">Average File Size</th>
-    <th align="left"><%= number_to_human_size(@report[:average_file_size]) %></th>
+    <th align="left" style="font-weight: 100"><%= number_to_human_size(@report[:average_file_size]) %></th>
   </tr>
   <tr>
     <th align="left">Total Bytes Preserved</th>
-    <th align="left"><%= number_to_human_size(@report[:bytes_by_format]['all']) %></th>
+    <th align="left" style="font-weight: 100"><%= number_to_human_size(@report[:bytes_by_format]['all']) %></th>
   </tr>
   <% @report[:bytes_by_format].each do |key, value| %>
       <% unless key == 'all' %>
           <tr>
             <th align="left"><%= key %></th>
-            <th align="left"><%= number_to_human_size(value) %></th>
+            <th align="left" style="font-weight: 100"><%= number_to_human_size(value) %></th>
           </tr>
       <% end %>
   <% end %>
