@@ -159,7 +159,6 @@ namespace :pharos do
     Rake::Task['pharos:setup'].invoke
   end
 
-
   desc 'Deletes test.edu data from Go integration tests'
   task :delete_go_data => [:environment] do
     if Rails.env.production?
@@ -282,6 +281,71 @@ namespace :pharos do
         data['encrypted_api_secret_key'] = user.encrypted_api_secret_key
         file.puts(data.to_json)
       end
+    end
+  end
+
+  desc 'Transition Fluctus data from sqlite db to Pharos'
+  task :transition_Fluctus, [:db_file] => [:environment] do
+
+    db.execute 'SELECT id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at,
+                sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at,
+                updated_at, name, phone_number, institution_pid, encrypted_api_secret_key FROM users' do |row|
+      User.create(id: row[0], email: row[1], encrypted_password: row[2], reset_password_token: row[3], reset_password_sent_at: row[4],
+                  remember_created_at: row[5], sign_in_count: row[6], current_sign_in_at: row[7], last_sign_in_at: row[8],
+                  current_sign_in_in: row[9], last_sign_in_ip: row[10], created_at: row[11], updated_at: row[12], name: row[13],
+                  phone_number: row[14], institution_id: row[15], encrypted_api_secret_key: row[16])
+    end
+
+    db.execute 'SELECT id, name, brief_name, identifier, dpn_uuid FROM institutions' do |row|
+      Institution.create(id: row[0], name: row[1], brief_name: row[2], identifier: row[3], dpn_uuid: row[4], state: 'A')
+    end
+
+    db.execute 'SELECT id, identifier, title, description, alt_identifier, access, bag_name, institution_id, state FROM
+                intellectual_objects' do |io_row|
+      current_obj = IntellectualObject.create(id: row[0], identifier: io_row[1], title: io_row[2], description: io_row[3],
+                                              alt_identifier: io_row[4], access: io_row[5], bag_name: io_row[6],
+                                              institution_id: io_row[7], state: io_row[8], etag: nil, dpn_uuid: nil)
+      db.execute "SELECT intellectual_object_id, institution_id, intellectual_object_identifier, identifier, event_type,
+                  date_time, detail, outcome, outcome_detail, outcome_information, object, agent FROM premis_events WHERE
+                  intellectual_object_id=#{current_obj.id} AND generic_file_id=#{nil}" do |pe_row|
+        PremisEvent.create(intellectual_object_id: pe_row[0], institution_id: pe_row[1], intellectual_object_identifier: pe_row[2],
+                           identifier: pe_row[3], event_type: pe_row[4], date_time: pe_row[5], detail: pe_row[6], outcome: pe_row[7],
+                           outcome_detail: pe_row[8], outcome_information: pe_row[9], object: pe_row[10], agent: pe_row[11])
+      end
+
+      db.execute "SELECT id, file_format, uri, size, intellectual_object_id, identifier, created_at, updated_at FROM
+                  generic_files WHERE intellectual_object_id=#{current_obj.id}" do |gf_row|
+        current_file = GenericFile.create(id: gf_row[0], file_format: gf_row[1], uri: gf_row[2], size: gf_row[3],
+                                          intellectual_object_id: gf_row[4], identifier: gf_row[5], created_at: gf_row[6],
+                                          updated_at: gf_row[7], state: current_obj.state)
+
+        db.execute "SELECT intellectual_object_id, institution_id, intellectual_object_identifier, identifier, event_type,
+                  date_time, detail, outcome, outcome_detail, outcome_information, object, agent, generic_file_id,
+                  generic_file_identifier FROM premis_events WHERE generic_file_id=#{current_file.id}" do |pe_gf_row_|
+          PremisEvent.create(intellectual_object_id: pe_gf_row_[0], institution_id: pe_gf_row_[1], intellectual_object_identifier: pe_gf_row_[2],
+                             identifier: pe_gf_row_[3], event_type: pe_gf_row_[4], date_time: pe_gf_row_[5], detail: pe_gf_row_[6],
+                             outcome: pe_gf_row_[7], outcome_detail: pe_gf_row_[8], outcome_information: pe_gf_row_[9], object: pe_gf_row_[10],
+                             agent: pe_gf_row_[11], generic_file_id: pe_gf_row_[12], generic_file_identifer: pe_gf_row_[13])
+        end
+        db.execute "SELECT algorithm, datetime, digest, generic_file_id FROM checksums WHERE
+                    generic_file_id=#{current_file.id}" do |ck_row|
+          Checksum.create(algorithm: ck_row[0], datetime: ck_row[1], digest: ck_row[2], generic_file_id: ck_row[3])
+        end
+      end
+    end
+
+    db.execute 'SELECT id, created_at, updated_at, name, etag, bucket, user, institution, note, action, stage, status, outcome,
+                bag_date, date, retry, reviewed, object_identifier, generic_file_identifier, state, node, pid, needs_admin_review
+                FROM processed_items' do |row|
+      inst = Institution.find_by_identifier(row[7])
+      object = IntellectualObject.find_by_identifier(row[17])
+      file = GenericFile.find_by_identifier(row[18])
+      WorkItem.create(id: row[0], created_at: row[1], updated_at: row[2], name: row[3], etag: row[4], bucket: row[5], user: row[6],
+                      institution_id: inst.id, note: row[8], action: row[9], stage: row[10], status: row[11], outcome: row[12],
+                      bag_date: row[13], date: row[14], retry: row[15], reviewed: row[16], object_identifier: row[17],
+                      generic_file_identifier: row[18], state: row[19], node: row[20], pid: row[21], needs_admin_review: row[22],
+                      intellectual_object_id: object.id, generic_file_id: file.id, queued_at: nil, work_item_state_id: nil,
+                      size: nil, stage_started_at: nil)
     end
   end
 
