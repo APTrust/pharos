@@ -46,7 +46,7 @@ namespace :pharos do
   desc 'Empty the database'
   task empty_db: :environment do
     unless Rails.env.production?
-      [User, GenericFile, IntellectualObject, Institution, Role, WorkItem, WorkItemState, PremisEvent].each(&:destroy_all)
+      [User, GenericFile, IntellectualObject, Institution, Role, WorkItem, WorkItemState, PremisEvent, DpnWorkItem].each(&:destroy_all)
     end
   end
 
