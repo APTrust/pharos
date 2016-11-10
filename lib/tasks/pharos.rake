@@ -349,13 +349,21 @@ namespace :pharos do
                 bag_date, date, retry, reviewed, object_identifier, generic_file_identifier, state, node, pid, needs_admin_review
                 FROM processed_items' do |row|
       inst = Institution.where(identifier: row[7]).first
+
+      puts "Object identifier: #{row[17]}"
       object = IntellectualObject.where(identifier: row[17]).first
+      puts "Grabbed object: #{object.identifier}"
+
+      puts "File identifier: #{row[18]}" unless row[18].nil?
       file = GenericFile.where(identifier: row[18]).first unless row[18].nil?
-      WorkItem.create(created_at: row[1], updated_at: row[2], name: row[3], etag: row[4], bucket: row[5], user: row[6],
+      puts "Grabbed file: #{file.identifier}" unless row[18].nil?
+
+      wi = WorkItem.create(created_at: row[1], updated_at: row[2], name: row[3], etag: row[4], bucket: row[5], user: row[6],
                       institution_id: inst.id, note: row[8], action: row[9], stage: row[10], status: row[11], outcome: row[12],
                       bag_date: row[13], date: row[14], retry: row[15], object_identifier: row[17], generic_file_identifier: row[18],
-                      node: row[20], pid: row[21], needs_admin_review: row[22], intellectual_object_id: object.id, generic_file_id: file.id,
+                      node: row[20], pid: row[21], needs_admin_review: row[22], intellectual_object_id: object.id,
                       queued_at: nil, work_item_state_id: nil, size: nil, stage_started_at: nil)
+      wi.generic_file_id = file.id if file
       puts '.'
     end
   end
