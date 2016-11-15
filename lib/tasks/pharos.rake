@@ -291,6 +291,7 @@ namespace :pharos do
     admin_role = Role.where(name: 'admin').first
     inst_admin_role = Role.where(name: 'institutional_admin').first
     inst_user_role = Role.where(name: 'institutional_user').first
+    changed_events = []
 
     db.execute('SELECT id, name, brief_name, identifier, dpn_uuid FROM institutions') do |inst_row|
       current_inst = Institution.create(name: inst_row[1], brief_name: inst_row[2], identifier: inst_row[3],
@@ -328,7 +329,7 @@ namespace :pharos do
                                                 alt_identifier: io_row[4], access: io_row[5], bag_name: io_row[6],
                                                 institution_id: current_inst.id, state: io_row[8], etag: nil, dpn_uuid: nil)
         counter = counter + 1
-        #puts counter
+        puts " * #{counter}"
 
         db.execute('SELECT intellectual_object_id, institution_id, intellectual_object_identifier, identifier, event_type,
                   date_time, detail, outcome, outcome_detail, outcome_information, object, agent, generic_file_id FROM
@@ -345,7 +346,7 @@ namespace :pharos do
                                            identifier: pe_identifier, event_type: pe_row[4], date_time: pe_row[5], detail: pe_row[6], outcome: pe_row[7],
                                            outcome_detail: pe_row[8], outcome_information: pe_row[9], object: pe_row[10], agent: pe_row[11])
               io_file.old_uuid = pe_row[3]
-              puts " ***** Old identifier: #{pe_row[3]}, New identifier: #{pe_identifier}"
+              changed_events.push(io_file)
             end
             io_file.save!
           end
@@ -373,7 +374,7 @@ namespace :pharos do
                                            outcome: pe_gf_row[7], outcome_detail: pe_gf_row[8], outcome_information: pe_gf_row[9], object: pe_gf_row[10],
                                            agent: pe_gf_row[11], generic_file_id: current_file.id, generic_file_identifier: pe_gf_row[13])
               gf_file.old_uuid = pe_gf_row[3]
-              puts "Old identifier: #{pe_gf_row[3]}, New identifier: #{gf_pe_identifier}"
+              changed_events.push(gf_file)
             end
             gf_file.save!
           end
@@ -437,6 +438,13 @@ namespace :pharos do
     puts "Number of checksums in Pharos: #{Checksum.all.count}"
     db.execute 'SELECT COUNT(*) FROM checksums' do |row|
       puts "Number of checksum rows in SQL db: #{row[0]}"
+    end
+
+    puts 'Following is a list of all of the events whose identifiers had to be changed:'
+    event_count = 1
+    changed_events.each do |event|
+      puts "#{event_count}. ID: #{event.id} | Previous Identifier: #{event.old_uuid} | New Identifier: #{event.identifier}"
+      event_count = event_count + 1
     end
 
   end
