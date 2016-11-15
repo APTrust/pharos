@@ -295,24 +295,24 @@ namespace :pharos do
     db.execute('SELECT id, name, brief_name, identifier, dpn_uuid FROM institutions') do |inst_row|
       current_inst = Institution.create(name: inst_row[1], brief_name: inst_row[2], identifier: inst_row[3],
                                         dpn_uuid: inst_row[4], state: 'A')
-      puts "Created Institution: #{inst_row[1]}"
+      current_inst = Institution.where(identifier: inst_row[3]).first
 
       db.execute('SELECT id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at,
                 sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at,
                 updated_at, name, phone_number, institution_pid, encrypted_api_secret_key, roles FROM users WHERE
                 institution_pid = ?', inst_row[0]) do |u_row|
         if u_row[17] == 'Inst_User'
-          user = User.create(email: u_row[1], password: 'password', reset_password_token: u_row[3], reset_password_sent_at: u_row[4],
+          user = User.create(email: u_row[1], password: 'password', reset_password_token: nil, reset_password_sent_at: nil,
                              remember_created_at: u_row[5], sign_in_count: u_row[6], current_sign_in_at: u_row[7], last_sign_in_at: u_row[8],
                              current_sign_in_ip: u_row[9], last_sign_in_ip: u_row[10], created_at: u_row[11], updated_at: u_row[12], name: u_row[13],
                              phone_number: u_row[14], institution_id: current_inst.id, encrypted_api_secret_key: u_row[16], roles: [inst_user_role])
         elsif u_row[17] == 'Inst_Admin'
-          user = User.create(email: u_row[1], password: 'password', reset_password_token: u_row[3], reset_password_sent_at: u_row[4],
+          user = User.create(email: u_row[1], password: 'password', reset_password_token: nil, reset_password_sent_at: nil,
                              remember_created_at: u_row[5], sign_in_count: u_row[6], current_sign_in_at: u_row[7], last_sign_in_at: u_row[8],
                              current_sign_in_ip: u_row[9], last_sign_in_ip: u_row[10], created_at: u_row[11], updated_at: u_row[12], name: u_row[13],
                              phone_number: u_row[14], institution_id: current_inst.id, encrypted_api_secret_key: u_row[16], roles: [inst_admin_role])
         elsif u_row[17] == 'Admin'
-          user = User.create(email: u_row[1], password: 'password', reset_password_token: u_row[3], reset_password_sent_at: u_row[4],
+          user = User.create(email: u_row[1], password: 'password', reset_password_token: nil, reset_password_sent_at: nil,
                              remember_created_at: u_row[5], sign_in_count: u_row[6], current_sign_in_at: u_row[7], last_sign_in_at: u_row[8],
                              current_sign_in_ip: u_row[9], last_sign_in_ip: u_row[10], created_at: u_row[11], updated_at: u_row[12], name: u_row[13],
                              phone_number: u_row[14], institution_id: current_inst.id, encrypted_api_secret_key: u_row[16], roles: [admin_role])
