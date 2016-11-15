@@ -295,7 +295,7 @@ namespace :pharos do
     db.execute('SELECT id, name, brief_name, identifier, dpn_uuid FROM institutions') do |inst_row|
       current_inst = Institution.create(name: inst_row[1], brief_name: inst_row[2], identifier: inst_row[3],
                                         dpn_uuid: inst_row[4], state: 'A')
-      current_inst = Institution.where(identifier: inst_row[3]).first
+       puts "Created Institution: #{current_inst.name}"
 
       db.execute('SELECT id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at,
                 sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at,
@@ -317,8 +317,7 @@ namespace :pharos do
                              current_sign_in_ip: u_row[9], last_sign_in_ip: u_row[10], created_at: u_row[11], updated_at: u_row[12], name: u_row[13],
                              phone_number: u_row[14], institution_id: current_inst.id, encrypted_api_secret_key: u_row[16], roles: [admin_role])
         end
-        user.save!
-        puts "Created User: #{u_row[13]}"
+        puts " * Created User: #{u_row[13]}"
       end
 
       counter = 0
@@ -329,15 +328,26 @@ namespace :pharos do
                                                 alt_identifier: io_row[4], access: io_row[5], bag_name: io_row[6],
                                                 institution_id: current_inst.id, state: io_row[8], etag: nil, dpn_uuid: nil)
         counter = counter + 1
-        puts counter
+        #puts counter
 
         db.execute('SELECT intellectual_object_id, institution_id, intellectual_object_identifier, identifier, event_type,
                   date_time, detail, outcome, outcome_detail, outcome_information, object, agent, generic_file_id FROM
                   premis_events WHERE intellectual_object_id = ?', io_row[0]) do |pe_row|
           if pe_row[12].nil?
-            PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_row[2],
-                               identifier: pe_row[3], event_type: pe_row[4], date_time: pe_row[5], detail: pe_row[6], outcome: pe_row[7],
-                               outcome_detail: pe_row[8], outcome_information: pe_row[9], object: pe_row[10], agent: pe_row[11])
+            io_ident_count = PremisEvent.where('identifier LIKE ?', "%#{pe_row[3]}%").count
+            if io_ident_count == 0
+              io_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_row[2],
+                                           identifier: pe_row[3], event_type: pe_row[4], date_time: pe_row[5], detail: pe_row[6], outcome: pe_row[7],
+                                           outcome_detail: pe_row[8], outcome_information: pe_row[9], object: pe_row[10], agent: pe_row[11])
+            else
+              pe_identifier = SecureRandom.hex(16)
+              io_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_row[2],
+                                           identifier: pe_identifier, event_type: pe_row[4], date_time: pe_row[5], detail: pe_row[6], outcome: pe_row[7],
+                                           outcome_detail: pe_row[8], outcome_information: pe_row[9], object: pe_row[10], agent: pe_row[11])
+              io_file.old_uuid = pe_row[3]
+              puts " ***** Old identifier: #{pe_row[3]}, New identifier: #{pe_identifier}"
+            end
+            io_file.save!
           end
         end
 
@@ -349,11 +359,23 @@ namespace :pharos do
 
           db.execute('SELECT intellectual_object_id, institution_id, intellectual_object_identifier, identifier, event_type,
                   date_time, detail, outcome, outcome_detail, outcome_information, object, agent, generic_file_id,
-                  generic_file_identifier FROM premis_events WHERE generic_file_id = ?', gf_row[0]) do |pe_gf_row_|
-            PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_gf_row_[2],
-                               identifier: pe_gf_row_[3], event_type: pe_gf_row_[4], date_time: pe_gf_row_[5], detail: pe_gf_row_[6],
-                               outcome: pe_gf_row_[7], outcome_detail: pe_gf_row_[8], outcome_information: pe_gf_row_[9], object: pe_gf_row_[10],
-                               agent: pe_gf_row_[11], generic_file_id: current_file.id, generic_file_identifier: pe_gf_row_[13])
+                  generic_file_identifier FROM premis_events WHERE generic_file_id = ?', gf_row[0]) do |pe_gf_row|
+            gf_ident_count = PremisEvent.where('identifier LIKE ?', "%#{pe_gf_row[3]}%").count
+            if gf_ident_count == 0
+              gf_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_gf_row[2],
+                                           identifier: pe_gf_row[3], event_type: pe_gf_row[4], date_time: pe_gf_row[5], detail: pe_gf_row[6],
+                                           outcome: pe_gf_row[7], outcome_detail: pe_gf_row[8], outcome_information: pe_gf_row[9], object: pe_gf_row[10],
+                                           agent: pe_gf_row[11], generic_file_id: current_file.id, generic_file_identifier: pe_gf_row[13])
+            else
+              gf_pe_identifier = SecureRandom.hex(16)
+              gf_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_gf_row[2],
+                                           identifier: gf_pe_identifier, event_type: pe_gf_row[4], date_time: pe_gf_row[5], detail: pe_gf_row[6],
+                                           outcome: pe_gf_row[7], outcome_detail: pe_gf_row[8], outcome_information: pe_gf_row[9], object: pe_gf_row[10],
+                                           agent: pe_gf_row[11], generic_file_id: current_file.id, generic_file_identifier: pe_gf_row[13])
+              gf_file.old_uuid = pe_gf_row[3]
+              puts "Old identifier: #{pe_gf_row[3]}, New identifier: #{gf_pe_identifier}"
+            end
+            gf_file.save!
           end
 
           db.execute('SELECT algorithm, datetime, digest, generic_file_id FROM checksums WHERE

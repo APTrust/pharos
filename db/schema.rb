@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161108193527) do
+ActiveRecord::Schema.define(version: 20161115151601) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20161108193527) do
     t.string   "outcome"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
+    t.string   "old_uuid"
   end
 
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
