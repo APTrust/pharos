@@ -292,6 +292,7 @@ namespace :pharos do
     inst_admin_role = Role.where(name: 'institutional_admin').first
     inst_user_role = Role.where(name: 'institutional_user').first
     changed_events = []
+    duplicate_events = []
 
     db.execute('SELECT id, name, brief_name, identifier, dpn_uuid FROM institutions') do |inst_row|
       current_inst = Institution.create(name: inst_row[1], brief_name: inst_row[2], identifier: inst_row[3],
@@ -335,11 +336,14 @@ namespace :pharos do
                   date_time, detail, outcome, outcome_detail, outcome_information, object, agent, generic_file_id FROM
                   premis_events WHERE intellectual_object_id = ?', io_row[0]) do |pe_row|
           if pe_row[12].nil?
-            io_ident_count = PremisEvent.where('identifier LIKE ?', "%#{pe_row[3]}%").count
-            if io_ident_count == 0
+            possible_dupes = PremisEvent.where('identifier LIKE ?', "%#{pe_row[3]}%")
+            if possible_dupes.count == 0
               io_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_row[2],
                                            identifier: pe_row[3], event_type: pe_row[4], date_time: pe_row[5], detail: pe_row[6], outcome: pe_row[7],
                                            outcome_detail: pe_row[8], outcome_information: pe_row[9], object: pe_row[10], agent: pe_row[11])
+            elsif check_for_duplicate(possible_dupes, pe_row)
+              puts " ***** Duplicate Event: #{pe_row[3]}"
+              duplicate_events.push(pe_row[3])
             else
               pe_identifier = SecureRandom.hex(16)
               io_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_row[2],
@@ -361,12 +365,15 @@ namespace :pharos do
           db.execute('SELECT intellectual_object_id, institution_id, intellectual_object_identifier, identifier, event_type,
                   date_time, detail, outcome, outcome_detail, outcome_information, object, agent, generic_file_id,
                   generic_file_identifier FROM premis_events WHERE generic_file_id = ?', gf_row[0]) do |pe_gf_row|
-            gf_ident_count = PremisEvent.where('identifier LIKE ?', "%#{pe_gf_row[3]}%").count
-            if gf_ident_count == 0
+            possible_dupes = PremisEvent.where('identifier LIKE ?', "%#{pe_gf_row[3]}%")
+            if possible_dupes.count == 0
               gf_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_gf_row[2],
                                            identifier: pe_gf_row[3], event_type: pe_gf_row[4], date_time: pe_gf_row[5], detail: pe_gf_row[6],
                                            outcome: pe_gf_row[7], outcome_detail: pe_gf_row[8], outcome_information: pe_gf_row[9], object: pe_gf_row[10],
                                            agent: pe_gf_row[11], generic_file_id: current_file.id, generic_file_identifier: pe_gf_row[13])
+            elsif check_for_duplicate(possible_dupes, pe_gf_row)
+              puts " ***** Duplicate Event: #{pe_gf_row[3]}"
+              duplicate_events.push(pe_gf_row[3])
             else
               gf_pe_identifier = SecureRandom.hex(16)
               gf_file = PremisEvent.create(intellectual_object_id: current_obj.id, institution_id: current_inst.id, intellectual_object_identifier: pe_gf_row[2],
@@ -447,6 +454,14 @@ namespace :pharos do
       event_count = event_count + 1
     end
 
+    puts 'Following is a list of all of the events that were duplicates:'
+    event_count = 1
+    duplicate_events.each do |identifier|
+      db.execute('SELECT * FROM premis_events WHERE identifier = ?', identifier) do |row|
+        puts "#{event_count}. #{row.inspect}"
+      end
+    end
+
   end
 
   def create_institutions(partner_list)
@@ -493,6 +508,21 @@ namespace :pharos do
                  roles: [admin_role], api_secret_key: api_key)
     puts "Created system (API) user"
 
+  end
+
+  def check_for_duplicate(dupes_array, event_array)
+    # intellectual_object_id - 0, institution_id - 1, intellectual_object_identifier - 2, identifier - 3, event_type - 4,
+    # date_time - 5, detail - 6, outcome - 7, outcome_detail - 8, outcome_information - 9, object - 10, agent - 11, generic_file_id - 12,
+    # generic_file_identifier - 13
+
+    match = false
+    dupes_array.each do |current|
+      if (current.intellectual_object_id == event_array[0]) && (current.institution_id == event_array[1]) && (current.intellectual_object_identifier == event_array[2]) &&
+          (current.event_type == event_array[4]) && (current.generic_file_id == event_array[12]) && (current.generic_file_identifier == event_array[13])
+        match = true
+      end
+    end
+    match
   end
 
 end
