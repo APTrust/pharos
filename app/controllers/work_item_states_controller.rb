@@ -48,7 +48,7 @@ class WorkItemStatesController < ApplicationController
 
   def work_item_state_params
     if request.method == 'GET'
-      params.require(:work_item_id)
+      params.require(:id)
     else
       params.require(:work_item_state).permit(:work_item_id, :action, :state)
     end
@@ -59,12 +59,13 @@ class WorkItemStatesController < ApplicationController
   end
 
   def set_item_and_state
-    if params[:work_item_id]
-      @work_item = WorkItem.find(params[:work_item_id])
-      @state_item = @work_item.work_item_state
-    elsif params[:id]
-      @state_item = WorkItemState.find(params[:id])
-      @work_item = @state_item.work_item
+    if params[:id]
+      begin
+        @state_item = WorkItemState.find(params[:id])
+        @work_item = @state_item.work_item
+      rescue
+        # Don't throw RecordNotFound. Just return 404 above.
+      end
     end
   end
 end

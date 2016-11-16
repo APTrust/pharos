@@ -6,7 +6,7 @@ class WorkItemState < ActiveRecord::Base
   before_save :set_action, :compress_state
 
   def to_param
-    work_item_id
+    id
   end
 
   def serializable_hash (options={})
