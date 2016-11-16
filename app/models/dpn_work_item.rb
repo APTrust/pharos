@@ -4,7 +4,7 @@ class DpnWorkItem < ActiveRecord::Base
   validate :task_is_allowed
 
   ### Scopes
-  scope :with_node, ->(param) { where(node: param) unless param.blank? }
+  scope :with_remote_node, ->(param) { where(remote_node: param) unless param.blank? }
   scope :with_task, ->(param) { where(task: param) unless param.blank? }
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
@@ -16,7 +16,7 @@ class DpnWorkItem < ActiveRecord::Base
   def serializable_hash (options={})
     {
         id: id,
-        node: node,
+        remote_node: remote_node,
         task: task,
         identifier: identifier,
         queued_at: queued_at,

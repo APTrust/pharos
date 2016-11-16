@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161115151601) do
+ActiveRecord::Schema.define(version: 20161116142651) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 20161115151601) do
   create_table "dpn_work_items", force: :cascade do |t|
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.string   "node",         limit: 20,        default: "", null: false
+    t.string   "remote_node",  limit: 20,        default: "", null: false
     t.string   "task",         limit: 40,        default: "", null: false
     t.string   "identifier",   limit: 40,        default: "", null: false
     t.datetime "queued_at"
@@ -37,7 +37,7 @@ ActiveRecord::Schema.define(version: 20161115151601) do
   end
 
   add_index "dpn_work_items", ["identifier"], name: "index_dpn_work_items_on_identifier"
-  add_index "dpn_work_items", ["node", "task"], name: "index_dpn_work_items_on_node_and_task"
+  add_index "dpn_work_items", ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
 
   create_table "generic_files", force: :cascade do |t|
     t.string   "file_format"
@@ -95,8 +95,8 @@ ActiveRecord::Schema.define(version: 20161115151601) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.integer  "institution_id"
     t.string   "outcome"
+    t.integer  "institution_id"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
     t.string   "old_uuid"
