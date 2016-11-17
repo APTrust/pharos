@@ -49,6 +49,12 @@ class WorkItemsController < ApplicationController
       respond_to do |format|
         if current_user.admin?
           item = @work_item.serializable_hash
+          # This should prolly go into serializable_hash, but I can't get that to work.
+          if @work_item.work_item_state.nil? == false
+            item[:work_item_state_id] = @work_item.work_item_state.id
+          else
+            item[:work_item_state_id] = nil
+          end
         else
           item = @work_item.serializable_hash(except: [:node, :pid])
         end
