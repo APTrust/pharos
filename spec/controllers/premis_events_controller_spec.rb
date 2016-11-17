@@ -16,6 +16,11 @@ RSpec.describe PremisEventsController, type: :controller do
   # An object and a file from a different institution:
   let(:someone_elses_object) { FactoryGirl.create(:intellectual_object, access: 'institution') }
   let(:someone_elses_file) { FactoryGirl.create(:generic_file, intellectual_object: someone_elses_object) }
+  let(:other_event_attrs) { FactoryGirl.attributes_for(:premis_event_fixity_generation,
+                                                 intellectual_object_id: someone_elses_object.id,
+                                                 intellectual_object_identifier: someone_elses_object.identifier,
+                                                 generic_file_id: someone_elses_file.id,
+                                                 generic_file_identifier: someone_elses_file.identifier) }
 
 
   describe 'signed in as admin user' do
@@ -24,8 +29,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'GET index' do
       before do
-        @someone_elses_event = someone_elses_file.add_event(event_attrs)
-        someone_elses_file.save!
+        @someone_elses_event = someone_elses_file.add_event(other_event_attrs)
       end
 
       it "can view events, even if it's not my institution" do
@@ -37,7 +41,7 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it "can view events, even if it's not my intellectual object" do
-        get :index, object_identifier: someone_elses_object
+        get :index, object_identifier: someone_elses_object.identifier
         expect(response).to be_success
         assigns(:parent).should == someone_elses_object
         assigns(:premis_events).length.should == 1
