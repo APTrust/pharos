@@ -464,6 +464,42 @@ namespace :pharos do
 
   end
 
+  desc 'Remove duplicate events from Pharos'
+  task :dedupe => :environment do
+    duplicates = []
+    io_counter = 1
+    IntellectualObject.all.each do |current_object|
+      type_array = []
+      current_object.premis_events.each do |event|
+        if type_array.include?(event.event_type)
+          possible_dupes = current_object.premis_events.where(event_type: event.event_type)
+          gf_ident_array = []
+          if event.event_type == 'fixity_check'
+            break
+          else
+            possible_dupes.each do |current_dupe|
+              if gf_ident_array.include?(current_dupe.generic_file_identifier)
+                duplicates.push(current_dupe)
+              else
+                gf_ident_array.push(current_dupe.generic_file_identifier)
+              end
+            end
+          end
+        else
+          type_array.push(event.event_type)
+        end
+      end
+      puts io_counter
+      io_counter = io_counter + 1
+    end
+    puts 'Below is a list of potential duplicate events in Pharos'
+    counter = 1
+    duplicates.each do |event|
+      puts "#{counter}. #{event.id}, Object Identifier: #{event.intellectual_object_identifier}, File Identifier: #{event.generic_file_identifier}, Event Type: #{event.event_type}"
+      counter = counter + 1
+    end
+  end
+
   def create_institutions(partner_list)
     partner_list.each do |partner|
       existing_inst = Institution.where(identifier: partner[2]).first
