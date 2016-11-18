@@ -56,23 +56,19 @@ class PremisEvent < ActiveRecord::Base
     identifier
   end
 
-  def serializable_hash
-    data = {
-        identifier: identifier,
-        event_type: event_type,
-        date_time: Time.parse(date_time).iso8601,
-        detail: detail,
-        outcome: outcome,
-        outcome_detail: outcome_detail,
-        object: object,
-        agent: agent,
-        outcome_information: outcome_information,
-        created_at: created_at.iso8601,
-        updated_at: updated_at.iso8601,
-        id: self.id
-    }
-    data.merge!(intellectual_object_id: intellectual_object_id) if self.intellectual_object !nil?
-    data.merge!(generic_file_id: generic_file_id) if self.generic_file !nil?
+  def serializable_hash(options={})
+    data = super(options)
+
+    # The following lines are commented out becaus they
+    # cause Rails to issue many SQL queries
+    # when we're serializing an IntellectualObject with
+    # include_all_relations = true. "Many" can mean
+    # over 100,000 in the case of large objects. I'm not
+    # even sure that any API client needs this info.
+    # If we do find a need for it, we can uncomment it.
+
+    #data.merge!(intellectual_object_id: intellectual_object_id) if self.intellectual_object !nil?
+    #data.merge!(generic_file_id: generic_file_id) if self.generic_file !nil?
     data
   end
 

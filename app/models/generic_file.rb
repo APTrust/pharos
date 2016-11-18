@@ -108,23 +108,8 @@ class GenericFile < ActiveRecord::Base
   end
 
   # This is for serializing JSON in the API.
-  # Be sure all datetimes are formatted as ISO8601,
-  # or some JSON parsers (like the golang parser)
-  # will choke on them. The datetimes we pull back
-  # from Fedora are strings that are not in ISO8601
-  # format, so we have to parse & reformat them.
   def serializable_hash(options={})
-    data = {
-        id: id,
-        uri: uri,
-        size: size.to_i,
-        created_at: Time.parse(created_at.to_s).iso8601,
-        updated_at: Time.parse(updated_at.to_s).iso8601,
-        file_format: file_format,
-        identifier: identifier,
-        intellectual_object_identifier: intellectual_object.identifier,
-        state: state,
-    }
+    data = super(options)
     if options.has_key?(:include)
       data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksums)
       data.merge!(premis_events: serialize_events) if options[:include].include?(:premis_events)

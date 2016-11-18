@@ -30,9 +30,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    alt_identifier: 'test.edu/some-bag',
                                    created_at: "2011-10-10T10:00:00Z",
                                    updated_at: "2011-10-10T10:00:00Z") }
+  let!(:file1) { FactoryGirl.create(:generic_file,
+                                    intellectual_object: obj2) }
+  let!(:event1) { FactoryGirl.create(:premis_event_ingest,
+                                     intellectual_object: obj2) }
+  let!(:event2) { FactoryGirl.create(:premis_event_ingest,
+                                     generic_file: file1) }
 
   before(:all) do
     WorkItem.delete_all
+    GenericFile.delete_all
     IntellectualObject.delete_all
   end
 
@@ -191,6 +198,37 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj3
       end
+
+      it "should serialize files when asked" do
+        get :show, intellectual_object_identifier: obj2, format: :json, include_files: 'true'
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+        data = JSON.parse(response.body)
+        expect(data.has_key?('generic_files')).to be true
+        expect(data['generic_files'][0].has_key?('checksums')).to be true
+        expect(data.has_key?('premis_events')).to be false
+      end
+
+      it "should serialize events when asked" do
+        get :show, intellectual_object_identifier: obj2, format: :json, include_events: 'true'
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+        data = JSON.parse(response.body)
+        expect(data.has_key?('premis_events')).to be true
+        expect(data.has_key?('generic_files')).to be false
+      end
+
+      it "should serialize files and events when asked" do
+        get :show, intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true'
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+        data = JSON.parse(response.body)
+        expect(data.has_key?('premis_events')).to be true
+        expect(data.has_key?('generic_files')).to be true
+        expect(data['generic_files'][0].has_key?('checksums')).to be true
+        expect(data['generic_files'][0].has_key?('premis_events')).to be true
+      end
+
     end
 
   end

@@ -83,15 +83,15 @@ RSpec.describe PremisEvent, :type => :model do
 
     it 'should set the state to deleted and index the object state' do
       h1 = subject.serializable_hash
-      expect(h1.has_key?(:identifier)).to be true
-      expect(h1.has_key?(:event_type)).to be true
-      expect(h1.has_key?(:date_time)).to be true
-      expect(h1.has_key?(:detail)).to be true
-      expect(h1.has_key?(:outcome)).to be true
-      expect(h1.has_key?(:outcome_detail)).to be true
-      expect(h1.has_key?(:outcome_information)).to be true
-      expect(h1.has_key?(:object)).to be true
-      expect(h1.has_key?(:agent)).to be true
+      expect(h1.has_key?('identifier')).to be true
+      expect(h1.has_key?('event_type')).to be true
+      expect(h1.has_key?('date_time')).to be true
+      expect(h1.has_key?('detail')).to be true
+      expect(h1.has_key?('outcome')).to be true
+      expect(h1.has_key?('outcome_detail')).to be true
+      expect(h1.has_key?('outcome_information')).to be true
+      expect(h1.has_key?('object')).to be true
+      expect(h1.has_key?('agent')).to be true
     end
   end
 end
