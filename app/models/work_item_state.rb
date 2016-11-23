@@ -11,10 +11,12 @@ class WorkItemState < ActiveRecord::Base
 
   def serializable_hash (options={})
     {
-        id: id,
-        work_item_id: work_item_id,
-        action: action,
-        state: self.unzipped_state
+      id: id,
+      work_item_id: work_item_id,
+      action: action,
+      state: self.unzipped_state,
+      created_at: created_at,
+      updated_at: updated_at
     }
   end
 
