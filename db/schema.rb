@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161116191309) do
+ActiveRecord::Schema.define(version: 20161118152858) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -42,11 +42,11 @@ ActiveRecord::Schema.define(version: 20161116191309) do
   create_table "generic_files", force: :cascade do |t|
     t.string   "file_format"
     t.string   "uri"
-    t.float    "size"
+    t.integer  "size",                   limit: 8
     t.string   "identifier"
     t.integer  "intellectual_object_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.string   "permissions"
     t.string   "state"
   end
@@ -95,8 +95,8 @@ ActiveRecord::Schema.define(version: 20161116191309) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.integer  "institution_id"
     t.string   "outcome"
+    t.integer  "institution_id"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
     t.string   "old_uuid"

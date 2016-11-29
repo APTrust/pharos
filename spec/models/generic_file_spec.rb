@@ -108,28 +108,28 @@ RSpec.describe GenericFile, :type => :model do
 
         it 'should set the state to deleted and index the object state' do
           h1 = subject.serializable_hash
-          expect(h1.has_key?(:id)).to be true
-          expect(h1.has_key?(:uri)).to be true
-          expect(h1.has_key?(:size)).to be true
-          expect(h1.has_key?(:created_at)).to be true
-          expect(h1.has_key?(:updated_at)).to be true
-          expect(h1.has_key?(:file_format)).to be true
-          expect(h1.has_key?(:identifier)).to be true
-          expect(h1.has_key?(:state)).to be true
-          expect(h1.has_key?(:intellectual_object_identifier)).to be true
+          expect(h1.has_key?('id')).to be true
+          expect(h1.has_key?('uri')).to be true
+          expect(h1.has_key?('size')).to be true
+          expect(h1.has_key?('created_at')).to be true
+          expect(h1.has_key?('updated_at')).to be true
+          expect(h1.has_key?('file_format')).to be true
+          expect(h1.has_key?('identifier')).to be true
+          expect(h1.has_key?('state')).to be true
+          expect(h1.has_key?('intellectual_object_identifier')).to be true
 
           h2 = subject.serializable_hash(include: [:checksums, :premis_events])
-          expect(h2.has_key?(:id)).to be true
-          expect(h2.has_key?(:uri)).to be true
-          expect(h2.has_key?(:size)).to be true
-          expect(h2.has_key?(:created_at)).to be true
-          expect(h2.has_key?(:updated_at)).to be true
-          expect(h2.has_key?(:file_format)).to be true
-          expect(h2.has_key?(:identifier)).to be true
-          expect(h2.has_key?(:state)).to be true
-          expect(h2.has_key?(:intellectual_object_identifier)).to be true
-          expect(h2.has_key?(:checksums)).to be true
-          expect(h2.has_key?(:premis_events)).to be true
+          expect(h2.has_key?('id')).to be true
+          expect(h2.has_key?('uri')).to be true
+          expect(h2.has_key?('size')).to be true
+          expect(h2.has_key?('created_at')).to be true
+          expect(h2.has_key?('updated_at')).to be true
+          expect(h2.has_key?('file_format')).to be true
+          expect(h2.has_key?('identifier')).to be true
+          expect(h2.has_key?('state')).to be true
+          expect(h2.has_key?('checksums')).to be true
+          expect(h2.has_key?('premis_events')).to be true
+          expect(h2.has_key?('intellectual_object_identifier')).to be true
         end
       end
 

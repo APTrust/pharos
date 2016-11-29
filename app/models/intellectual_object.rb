@@ -127,21 +127,12 @@ class IntellectualObject < ActiveRecord::Base
   def serializable_hash (options={})
     last_ingested = self.last_ingested_version
     etag = last_ingested.nil? ? nil : last_ingested.etag
-    {
-      id: id,
-      title: title,
-      description: description,
-      access: access,
-      bag_name: bag_name,
-      identifier: identifier,
-      state: state,
-      alt_identifier: alt_identifier,
-      etag: etag,
+    data = super(options)
+    data.merge(
       in_dpn: in_dpn?,
-      dpn_uuid: dpn_uuid,
       file_count: gf_count,
       file_size: gf_size
-    }
+    )
   end
 
   # Returns the WorkItem describing the last ingested
