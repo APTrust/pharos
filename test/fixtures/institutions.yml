@@ -28,4 +28,4 @@ test_inst:
   name: Test Institution (for integration tests)
   brief_name: test
   identifier: test.edu
-  dpn_uuid: 44444444-0000-4000-a000-000000000000
+  dpn_uuid: 9a000000-0000-4000-a000-000000000002
