@@ -15,7 +15,6 @@ Rails.application.routes.draw do
   resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/objects'
   get 'api/v2/objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
   post 'api/v2/objects/:institution_identifier', to: 'intellectual_objects#create', format: :json, institution_identifier: institution_ptrn
-  #resources :intellectual_objects, only: [:index], format: :json, path: 'member-api/v2/objects'
   get 'member-api/v2/objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
   get 'member-api/v2/objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: :json, intellectual_object_identifier: object_ptrn
   put 'member-api/v2/objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: :json, intellectual_object_identifier: object_ptrn
@@ -48,7 +47,7 @@ Rails.application.routes.draw do
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
   put 'items/', to: 'work_items#update', format: :json
   resources :work_items, path: '/api/v2/items'
-  resources :work_items, format: :json, only: [:index], path: 'member-api/v1/items'
+  resources :work_items, format: :json, only: [:index], path: 'member-api/v2/items'
   get '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   put '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   get 'items/items_for_dpn', to: 'work_items#items_for_dpn', format: :json
