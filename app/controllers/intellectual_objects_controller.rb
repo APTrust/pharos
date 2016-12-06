@@ -157,6 +157,9 @@ class IntellectualObjectsController < ApplicationController
     elsif @intellectual_object.state == 'D'
       message = 'This item has been deleted and cannot be sent to DPN.'
       api_status_code = :conflict
+    elsif @intellectual_object.too_big?
+      message = 'This item cannot be sent to DPN at this time because it is greater than 250GB.'
+      api_status_code = :conflict
     elsif pending.nil?
       dpn_item = WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
       message = 'Your item has been queued for DPN.'

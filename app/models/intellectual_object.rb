@@ -124,6 +124,11 @@ class IntellectualObject < ActiveRecord::Base
     generic_files.where(state: 'A')
   end
 
+  def too_big?
+    total_size = self.generic_files.sum(:size)
+    (total_size > 268435456000) ? true : false
+  end
+
   def serializable_hash (options={})
     last_ingested = self.last_ingested_version
     etag = last_ingested.nil? ? nil : last_ingested.etag
