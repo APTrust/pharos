@@ -66,7 +66,7 @@ Rails.application.routes.draw do
 
   # CHECKSUM ROUTES
   get '/api/v2/checksums', to: 'checksums#index', format: :json
-  post '/api/v2/checksums/:generic_file_identifier', to: 'checksums#create', format: :json, generic_file_identifier: file_ptrn
+  post '/api/v2/checksums/:generic_file_identifier', to: 'checksums#create', format: :json, generic_file_identifier: /.*/
 
   # CATALOG ROUTES
   post 'search/', to: 'catalog#search', format: [:json, :html], as: :search
