@@ -22,7 +22,7 @@
       <dd> <%= @intellectual_object.updated_at %> </dd>
       <dt>Description</dt>
       <dd><%= @intellectual_object.description %></dd>
-      <% unless @intellectual_object.alt_identifier.size == 0 || @intellectual_object.alt_identifier == '[]'  %>
+      <% unless @intellectual_object.alt_identifier.nil? || @intellectual_object.alt_identifier.size == 0 || @intellectual_object.alt_identifier == '[]'  %>
           <dt>Alternate Identifiers</dt>
           <% @intellectual_object.alt_identifier.each do |alt_ident| %>
               <dd><%= alt_ident %></dd>
@@ -55,7 +55,7 @@
             <%= link_to intellectual_object_restore_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
                 <i class="glyphicon glyphicon-download"></i> Restore Object
             <% end %>
-            <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.institution.dpn_uuid.blank? == false && @intellectual_object.in_dpn? == false )%>
+            <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.institution.dpn_uuid.blank? == false && @intellectual_object.in_dpn? == false && @intellectual_object.too_big? == false)%>
                 <%= link_to intellectual_object_send_to_dpn_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
                     <i class="glyphicon glyphicon-send dpn"></i> Send Object To DPN
                 <% end %>

@@ -9,8 +9,8 @@ RSpec.describe DpnWorkItem, type: :model do
   it { should validate_presence_of(:identifier) }
 
   it 'should properly set a node' do
-    subject.node = 'Chronopolis'
-    subject.node.should == 'Chronopolis'
+    subject.remote_node = 'Chronopolis'
+    subject.remote_node.should == 'Chronopolis'
   end
 
   it 'should properly set a task' do

@@ -31,7 +31,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
       end
 
       it 'responds successfully with both the action and the state updated' do
-        put :update, work_item_id: item.id, work_item_state: { action: 'NewAction', state: '{NEW JSON data}' }, format: :json
+        put :update, id: state_item.id, work_item_state: { action: 'NewAction', state: '{NEW JSON data}' }, format: :json
         expect(response).to be_success
         assigns(:work_item).id.should eq(item.id)
         assigns(:state_item).id.should eq(state_item.id)
@@ -49,7 +49,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
       end
 
       it 'responds successfully with both the work item and the state item set' do
-        get :show, work_item_id: item.id, format: :json
+        get :show, id: state_item.id, format: :json
         expect(response).to be_success
         assigns(:work_item).id.should eq(item.id)
         assigns(:state_item).id.should eq(state_item.id)
@@ -58,7 +58,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
       end
 
       it 'responds with a 404 error if the state item does not exist' do
-        get :show, work_item_id: lonely_item.id, format: :json
+        get :show, id: lonely_item.id, format: :json
         expect(response.status).to eq(404)
       end
     end

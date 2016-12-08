@@ -29,3 +29,6 @@
 
 # Ignore local rbenv setting
 .ruby-version
+
+# Import DB
+fedora_export.db

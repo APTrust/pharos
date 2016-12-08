@@ -67,7 +67,7 @@ group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_girl_rails'
-  gem 'faker', github: 'stympy/faker'
+  gem 'faker'
   gem 'rspec-rails', '~> 3.5'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'

@@ -52,7 +52,8 @@ module Pharos
         'store' => 'Store',
         'record' => 'Record',
         'clean' => 'Cleanup',
-        'resolve' => 'Resolve'
+        'resolve' => 'Resolve',
+        'package' => 'Package'
     }
 
     PHAROS_ACTIONS = {

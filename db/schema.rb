@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161031145815) do
+ActiveRecord::Schema.define(version: 20161118152858) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -25,28 +25,28 @@ ActiveRecord::Schema.define(version: 20161031145815) do
   add_index "checksums", ["generic_file_id"], name: "index_checksums_on_generic_file_id"
 
   create_table "dpn_work_items", force: :cascade do |t|
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.string   "node",         limit: 20,  default: "", null: false
-    t.string   "task",         limit: 40,  default: "", null: false
-    t.string   "identifier",   limit: 40,  default: "", null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.string   "remote_node",  limit: 20,        default: "", null: false
+    t.string   "task",         limit: 40,        default: "", null: false
+    t.string   "identifier",   limit: 40,        default: "", null: false
     t.datetime "queued_at"
     t.datetime "completed_at"
     t.string   "note",         limit: 400
-    t.text     "state",        limit: 255
+    t.text     "state",        limit: 104857600
   end
 
   add_index "dpn_work_items", ["identifier"], name: "index_dpn_work_items_on_identifier"
-  add_index "dpn_work_items", ["node", "task"], name: "index_dpn_work_items_on_node_and_task"
+  add_index "dpn_work_items", ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
 
   create_table "generic_files", force: :cascade do |t|
     t.string   "file_format"
     t.string   "uri"
-    t.float    "size"
+    t.integer  "size",                   limit: 8
     t.string   "identifier"
     t.integer  "intellectual_object_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.string   "permissions"
     t.string   "state"
   end
@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20161031145815) do
     t.string   "outcome"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
+    t.string   "old_uuid"
   end
 
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
@@ -181,7 +182,6 @@ ActiveRecord::Schema.define(version: 20161031145815) do
     t.boolean  "needs_admin_review",                  default: false, null: false
     t.integer  "institution_id"
     t.datetime "queued_at"
-    t.integer  "work_item_state_id"
     t.integer  "size"
     t.datetime "stage_started_at"
   end

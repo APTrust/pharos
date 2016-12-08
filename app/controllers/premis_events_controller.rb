@@ -14,6 +14,8 @@ class PremisEventsController < ApplicationController
       load_institution
       for_selected_institution
     end
+    params[:file_identifier] = '' if params[:file_identifier] == 'null' || params[:file_identifier] == 'blank'
+    params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
     authorize @parent
     @premis_events = @premis_events
       .with_create_date(params[:created_at])

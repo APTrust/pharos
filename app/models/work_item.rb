@@ -62,6 +62,16 @@ class WorkItem < ActiveRecord::Base
     "#{etag}/#{name}"
   end
 
+  def serializable_hash(options={})
+    data = super(options)
+    if self.work_item_state
+      data['work_item_state_id'] = self.work_item_state.id
+    else
+      data['work_item_state_id'] = nil
+    end
+    data
+  end
+
   def self.pending_action(intellectual_object_identifier)
     item = WorkItem
       .where('object_identifier = ? ' +

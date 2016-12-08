@@ -157,6 +157,9 @@ class IntellectualObjectsController < ApplicationController
     elsif @intellectual_object.state == 'D'
       message = 'This item has been deleted and cannot be sent to DPN.'
       api_status_code = :conflict
+    elsif @intellectual_object.too_big?
+      message = 'This item cannot be sent to DPN at this time because it is greater than 250GB.'
+      api_status_code = :conflict
     elsif pending.nil?
       dpn_item = WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
       message = 'Your item has been queued for DPN.'
@@ -221,10 +224,23 @@ class IntellectualObjectsController < ApplicationController
   private
 
   def object_as_json
-    if params[:include_relations]
+    if params[:include_all_relations]
       # Return only active files, but call them generic_files
-      data = @intellectual_object.serializable_hash(include: [:premis_events, active_files: { include: [:checksum, :premis_events]}])
-      data[:generic_files] = data.delete(:active_files)
+      data = @intellectual_object.serializable_hash(include: [:premis_events, active_files: { include: [:checksums, :premis_events]}])
+      data[:generic_files] = data.delete('active_files')
+      data[:state] = @intellectual_object.state
+      data
+    elsif params[:include_events]
+      # This should include events for the IntelObject only, not for GenericFiles
+      # Waiting on https://www.pivotaltracker.com/story/show/134523619
+      data = @intellectual_object.serializable_hash(include: [:premis_events])
+      data[:state] = @intellectual_object.state
+      data
+    elsif params[:include_files]
+      # Admin API will often want to get the generic files,
+      # but not the events, which add a huge amount of JSON.
+      data = @intellectual_object.serializable_hash(include: [active_files: { include: [:checksums]}])
+      data[:generic_files] = data.delete('active_files')
       data[:state] = @intellectual_object.state
       data
     else

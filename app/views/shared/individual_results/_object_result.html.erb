@@ -22,7 +22,7 @@
     <dd><%= time_ago_in_words current.updated_at %></dd>
     <dt>Description: </dt>
     <dd><%= current.description %></dd>
-    <% unless current.alt_identifier == '' || current.alt_identifier == [] %>
+    <% unless current.alt_identifier.nil? || current.alt_identifier == '' || current.alt_identifier == [] %>
         <dt>Alternate Identifiers: </dt>
         <% idents = current.alt_identifier.split(',') %>
         <% idents.each do |alt| %>
