@@ -92,7 +92,7 @@ class IntellectualObjectsController < ApplicationController
     authorize @intellectual_object
     @intellectual_object.update!(update_params)
     respond_to do |format|
-      format.json { render object_as_json}
+      format.json { render json: object_as_json }
       format.html { redirect_to intellectual_object_path(@intellectual_object) }
     end
   end
