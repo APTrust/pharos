@@ -274,7 +274,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update_params
     params.require(:intellectual_object).permit(:title, :description, :access,
-                                                :alt_identifier, :state)
+                                                :alt_identifier, :state, :dpn_uuid)
   end
 
   def load_object
