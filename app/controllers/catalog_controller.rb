@@ -192,43 +192,35 @@ class CatalogController < ApplicationController
     set_page_counts(count)
   end
 
-  # Use constants to prevent huge queries.
-  # TODO: After we transform event type names, put the list of names
-  # from https://github.com/APTrust/exchange/blob/master/constants/constants.go
-  # into config/application, and reference that below for @event_types.
-  # The current list includes old (Fluctus) event type names.
-  # Also, after data is normalized, get rid of duplicate outcome 'success'/'Success'
   def set_filter_values
-    @statuses = Pharos::Application::PHAROS_STATUSES.values unless @results[:items].nil?
-    @stages = Pharos::Application::PHAROS_STAGES.values unless @results[:items].nil?
-    @actions = Pharos::Application::PHAROS_ACTIONS.values unless @results[:items].nil?
+    @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
+    @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
+    @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
     @institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
     @types = ['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events']
-    @event_types = ['access_assignment', 'delete', 'fixity_check', 'fixity_generation',
-                    'identifier_assignment', 'ingest']  unless @results[:events].nil?
-    @outcomes = ['Success', 'success', 'failure'] unless @results[:events].nil?
+    @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
+    @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
   end
 
   def set_filter_counts
     @results.each do |key, results|
       if key == :objects
-        set_inst_count(results)
+        set_inst_count(results, key)
         set_access_count(results)
-        set_format_count(results)
       elsif key == :files
-        set_format_count(results)
-        set_inst_count(results)
+        set_format_count(results, key)
+        set_inst_count(results, key)
         set_access_count(results)
       elsif key == :items
         set_status_count(results)
         set_stage_count(results)
         set_action_count(results)
-        set_inst_count(results)
+        set_inst_count(results, key)
         set_access_count(results)
       elsif key == :events
-        set_inst_count(results)
+        set_inst_count(results, key)
         set_access_count(results)
         set_event_type_count(results)
         set_outcome_count(results)

@@ -377,7 +377,7 @@ class WorkItemsController < ApplicationController
     set_status_count(@items)
     set_stage_count(@items)
     set_action_count(@items)
-    set_inst_count(@items)
+    set_inst_count(@items, :items)
     set_access_count(@items)
     set_io_assc_count(@items)
     set_gf_assc_count(@items)

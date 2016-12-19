@@ -106,7 +106,7 @@ class PremisEventsController < ApplicationController
     filter_by_outcome unless params[:outcome].nil?
     filter_by_file_association unless params[:file_association].nil?
     filter_by_object_association unless params[:object_association].nil?
-    set_inst_count(@premis_events)
+    set_inst_count(@premis_events, :events)
     set_event_type_count(@premis_events)
     set_outcome_count(@premis_events)
     set_gf_assc_count(@premis_events)
