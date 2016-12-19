@@ -118,6 +118,19 @@ class CatalogController < ApplicationController
     files = GenericFile.discoverable(current_user)
     items = WorkItem.readable(current_user)
     events = PremisEvent.discoverable(current_user)
+
+    # Don't do any more filtering if the user didn't specify
+    # what they're looking for; otherwise, the DB will do a
+    # "like" comparison on millions of fields across millions
+    # of rows, and all of them will match.
+    if @q.blank? || @q == '%' || @q == '*'
+      @results[:objects] = objects
+      @results[:files] = files
+      @results[:items] = items
+      @results[:events] = events
+      return
+    end
+
     case params[:search_field]
       when 'Alternate Identifier'
         @results[:objects] = objects.with_alt_identifier_like(@q)
