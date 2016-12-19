@@ -244,25 +244,32 @@ module SearchAndIndex
     end
   end
 
-  def set_io_assc_count(results)
-    unless @object_associations.nil?
-      @object_associations.each do |assc|
-        @io_assc_counts[assc].nil? ?
-            @io_assc_counts[assc] = results.where(intellectual_object_id: assc).count :
-            @io_assc_counts[assc] = @io_assc_counts[assc] + results.where(intellectual_object_id: assc).count
-      end
-    end
-  end
+  # TODO: Remove the following two functions.
+  #
+  # These issue one query for each intellectual object or generic file
+  # owned by the institution. So 50,000 queries for UVA or Columbia objects.
+  # For PREMIS events, it issues millions of queries. This also causes the
+  # UI to render a list in the sidebar thousands or millions of items long.
+  #
+  # def set_io_assc_count(results)
+  #   unless @object_associations.nil?
+  #     @object_associations.each do |assc|
+  #       @io_assc_counts[assc].nil? ?
+  #           @io_assc_counts[assc] = results.where(intellectual_object_id: assc).count :
+  #           @io_assc_counts[assc] = @io_assc_counts[assc] + results.where(intellectual_object_id: assc).count
+  #     end
+  #   end
+  # end
 
-  def set_gf_assc_count(results)
-    unless @file_associations.nil?
-      @file_associations.each do |assc|
-        @gf_assc_counts[assc].nil? ?
-            @gf_assc_counts[assc] = results.where(generic_file_id: assc).count :
-            @gf_assc_counts[assc] = @gf_assc_counts[assc] + results.where(generic_file_id: assc).count
-      end
-    end
-  end
+  # def set_gf_assc_count(results)
+  #   unless @file_associations.nil?
+  #     @file_associations.each do |assc|
+  #       @gf_assc_counts[assc].nil? ?
+  #           @gf_assc_counts[assc] = results.where(generic_file_id: assc).count :
+  #           @gf_assc_counts[assc] = @gf_assc_counts[assc] + results.where(generic_file_id: assc).count
+  #     end
+  #   end
+  # end
 
   def set_status_count(results)
     unless @statuses.nil?
