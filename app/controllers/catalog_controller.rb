@@ -44,9 +44,12 @@ class CatalogController < ApplicationController
 
   protected
 
+  # Merge all objects, files, events and work items into a single flat array.
+  # Be sure to paginate this first, or it will load millions of objects into
+  # memory and crash the server.
   def merge_results
     @merged_results = []
-    @results.each { |key, value| @merged_results += value }
+    @results.each { |key, value| @merged_results += value.limit(params[:per_page].to_i) }
   end
 
   def object_search
@@ -189,16 +192,23 @@ class CatalogController < ApplicationController
     set_page_counts(count)
   end
 
+  # Use constants to prevent huge queries.
+  # TODO: After we transform event type names, put the list of names
+  # from https://github.com/APTrust/exchange/blob/master/constants/constants.go
+  # into config/application, and reference that below for @event_types.
+  # The current list includes old (Fluctus) event type names.
+  # Also, after data is normalized, get rid of duplicate outcome 'success'/'Success'
   def set_filter_values
-    @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
-    @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
-    @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
+    @statuses = Pharos::Application::PHAROS_STATUSES.values unless @results[:items].nil?
+    @stages = Pharos::Application::PHAROS_STAGES.values unless @results[:items].nil?
+    @actions = Pharos::Application::PHAROS_ACTIONS.values unless @results[:items].nil?
     @institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
     @types = ['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events']
-    @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
-    @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
+    @event_types = ['access_assignment', 'delete', 'fixity_check', 'fixity_generation',
+                    'identifier_assignment', 'ingest']  unless @results[:events].nil?
+    @outcomes = ['Success', 'success', 'failure'] unless @results[:events].nil?
   end
 
   def set_filter_counts
