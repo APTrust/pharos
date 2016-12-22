@@ -250,7 +250,7 @@ class WorkItem < ActiveRecord::Base
     elsif self.action == ingest && self.stage == record && self.status == success
       # we just finished successful ingest
       return true
-    elsif self.action == ingest && self.stage == clean
+    elsif self.action == ingest && self.stage == clean && self.status == success
       # we finished ingest and processor is cleaning up
       return true
     end
