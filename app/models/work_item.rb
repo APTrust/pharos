@@ -271,10 +271,10 @@ class WorkItem < ActiveRecord::Base
       bag_basename = self.name.sub(re_single, '').sub(re_multi, '')
       self.object_identifier = "#{self.institution.identifier}/#{bag_basename}"
     end
-    unless self.object_identifier.blank?
+    if self.intellectual_object_id.blank? && !self.object_identifier.blank?
       self.intellectual_object_id = IntellectualObject.where(identifier: self.object_identifier).first.id
     end
-    unless self.generic_file_identifier.blank?
+    if self.generic_file_id.blank? && !self.generic_file_identifier.blank?
       self.generic_file_id = GenericFile.where(identifier: self.generic_file_identifier).first.id
     end
   end

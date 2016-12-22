@@ -16,6 +16,7 @@ class PremisEventsController < ApplicationController
     end
     params[:file_identifier] = '' if params[:file_identifier] == 'null' || params[:file_identifier] == 'blank'
     params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
+
     authorize @parent
     @premis_events = @premis_events
       .with_create_date(params[:created_at])
@@ -23,7 +24,6 @@ class PremisEventsController < ApplicationController
       .created_after(params[:created_after])
       .with_type(params[:type])
       .with_event_identifier(params[:event_identifier])
-      .with_event_identifier_like(params[:event_identifier_like])
       .with_object_identifier(params[:object_identifier])
       .with_object_identifier_like(params[:object_identifier_like])
       .with_file_identifier(params[:file_identifier])
@@ -106,11 +106,12 @@ class PremisEventsController < ApplicationController
     filter_by_outcome unless params[:outcome].nil?
     filter_by_file_association unless params[:file_association].nil?
     filter_by_object_association unless params[:object_association].nil?
-    set_inst_count(@premis_events)
+    set_inst_count(@premis_events, :events)
     set_event_type_count(@premis_events)
     set_outcome_count(@premis_events)
-    set_gf_assc_count(@premis_events)
-    set_io_assc_count(@premis_events)
+    # Don't run these!
+    #set_gf_assc_count(@premis_events)
+    #set_io_assc_count(@premis_events)
     count = @premis_events.count
     set_page_counts(count)
   end

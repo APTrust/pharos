@@ -44,9 +44,12 @@ class CatalogController < ApplicationController
 
   protected
 
+  # Merge all objects, files, events and work items into a single flat array.
+  # Be sure to paginate this first, or it will load millions of objects into
+  # memory and crash the server.
   def merge_results
     @merged_results = []
-    @results.each { |key, value| @merged_results += value }
+    @results.each { |key, value| @merged_results += value.limit(params[:per_page].to_i) }
   end
 
   def object_search
@@ -118,6 +121,19 @@ class CatalogController < ApplicationController
     files = GenericFile.discoverable(current_user)
     items = WorkItem.readable(current_user)
     events = PremisEvent.discoverable(current_user)
+
+    # Don't do any more filtering if the user didn't specify
+    # what they're looking for; otherwise, the DB will do a
+    # "like" comparison on millions of fields across millions
+    # of rows, and all of them will match.
+    if @q.blank? || @q == '%' || @q == '*'
+      @results[:objects] = objects
+      @results[:files] = files
+      @results[:items] = items
+      @results[:events] = events
+      return
+    end
+
     case params[:search_field]
       when 'Alternate Identifier'
         @results[:objects] = objects.with_alt_identifier_like(@q)
@@ -191,21 +207,20 @@ class CatalogController < ApplicationController
   def set_filter_counts
     @results.each do |key, results|
       if key == :objects
-        set_inst_count(results)
+        set_inst_count(results, key)
         set_access_count(results)
-        set_format_count(results)
       elsif key == :files
-        set_format_count(results)
-        set_inst_count(results)
+        set_format_count(results, key)
+        set_inst_count(results, key)
         set_access_count(results)
       elsif key == :items
         set_status_count(results)
         set_stage_count(results)
         set_action_count(results)
-        set_inst_count(results)
+        set_inst_count(results, key)
         set_access_count(results)
       elsif key == :events
-        set_inst_count(results)
+        set_inst_count(results, key)
         set_access_count(results)
         set_event_type_count(results)
         set_outcome_count(results)

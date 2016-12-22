@@ -104,7 +104,7 @@ class GenericFile < ActiveRecord::Base
                                         user_email)
     self.state = 'D'
     self.add_event(attributes)
-    save!
+    self.save!
   end
 
   # This is for serializing JSON in the API.

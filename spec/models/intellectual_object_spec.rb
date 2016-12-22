@@ -370,10 +370,10 @@ RSpec.describe IntellectualObject, :type => :model do
 
         it 'should set the state to deleted and index the object state' do
           attributes = FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
+          subject.background_deletion(attributes)
           expect {
             subject.soft_delete(attributes)
           }.to change { subject.premis_events.count}.by(1)
-          subject.background_deletion(attributes)
           expect(subject.state).to eq 'D'
           subject.generic_files.all?{ |file| expect(file.state).to eq 'D' }
         end

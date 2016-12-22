@@ -273,10 +273,10 @@ class GenericFilesController < ApplicationController
     filter_by_access unless params[:access].nil?
     #filter_by_institution unless params[:institution].nil?
     filter_by_object_association unless params[:object_association].nil?
-    set_format_count(@generic_files)
+    set_format_count(@generic_files, :file)
     set_access_count(@generic_files)
     #set_inst_count(@generic_files)
-    set_io_assc_count(@generic_files)
+    #set_io_assc_count(@generic_files) # DO NOT RUN THIS!
     count = @generic_files.count
     set_page_counts(count)
   end

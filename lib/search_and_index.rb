@@ -193,12 +193,22 @@ module SearchAndIndex
     @premis_events = @premis_events.joins(:institution).order('institutions.name') unless @premis_events.nil?
   end
 
-  def set_inst_count(results)
+  # TODO: Discuss needs, to see which code we keep.
+  # In most cases below, we'll want to keep the uncommented code.
+  def set_inst_count(results, obj_type)
     unless @institutions.nil?
-      @institutions.each do |institution|
-        @inst_counts[institution].nil? ?
-            @inst_counts[institution] = results.with_institution(institution).count :
+      # Can't do group by for files, because we need to join to intel_obj table
+      if obj_type == :files
+        @institutions.each do |institution|
+          @inst_counts[institution].nil? ?
+          @inst_counts[institution] = results.with_institution(institution).count :
             @inst_counts[institution] = @inst_counts[institution] + results.with_institution(institution).count
+        end
+      else
+        counts = results.group(:institution_id).count
+        counts.each do |id, number|
+          @inst_counts[id].nil? ? @inst_counts[id] = number : @inst_counts[id] += number
+        end
       end
     end
   end
@@ -210,85 +220,125 @@ module SearchAndIndex
             @access_counts[acc] = results.with_access(acc).count :
             @access_counts[acc] = @access_counts[acc] + results.with_access(acc).count
       end
+      # counts = results.group(:access).count
+      # counts.each do |access, number|
+      #   @access_counts[access].nil? ? @access_counts[access] = number : @access_counts[access] += number
+      # end
     end
   end
 
-  def set_format_count(results)
+  def set_format_count(results, obj_type)
     unless @formats.nil?
-      @formats.each do |format|
-        @format_counts[format].nil? ?
-            @format_counts[format] = results.with_file_format(format).count :
+      if obj_type == :object
+        @formats.each do |format|
+          @format_counts[format].nil? ?
+          @format_counts[format] = results.with_file_format(format).count :
             @format_counts[format] = @format_counts[format] + results.with_file_format(format).count
+        end
+      else
+        counts = results.group(:file_format).order(:file_format).count
+        counts.each do |format, number|
+          @format_counts[format].nil? ? @format_counts[format] = number : @format_counts[format] += number
+        end
       end
     end
   end
 
-  def set_io_assc_count(results)
-    unless @object_associations.nil?
-      @object_associations.each do |assc|
-        @io_assc_counts[assc].nil? ?
-            @io_assc_counts[assc] = results.where(intellectual_object_id: assc).count :
-            @io_assc_counts[assc] = @io_assc_counts[assc] + results.where(intellectual_object_id: assc).count
-      end
-    end
-  end
+  # TODO: Remove the following two functions.
+  #
+  # These issue one query for each intellectual object or generic file
+  # owned by the institution. So 50,000 queries for UVA or Columbia objects.
+  # For PREMIS events, it issues millions of queries. This also causes the
+  # UI to render a list in the sidebar thousands or millions of items long.
+  #
+  # def set_io_assc_count(results)
+  #   unless @object_associations.nil?
+  #     @object_associations.each do |assc|
+  #       @io_assc_counts[assc].nil? ?
+  #           @io_assc_counts[assc] = results.where(intellectual_object_id: assc).count :
+  #           @io_assc_counts[assc] = @io_assc_counts[assc] + results.where(intellectual_object_id: assc).count
+  #     end
+  #   end
+  # end
 
-  def set_gf_assc_count(results)
-    unless @file_associations.nil?
-      @file_associations.each do |assc|
-        @gf_assc_counts[assc].nil? ?
-            @gf_assc_counts[assc] = results.where(generic_file_id: assc).count :
-            @gf_assc_counts[assc] = @gf_assc_counts[assc] + results.where(generic_file_id: assc).count
-      end
-    end
-  end
+  # def set_gf_assc_count(results)
+  #   unless @file_associations.nil?
+  #     @file_associations.each do |assc|
+  #       @gf_assc_counts[assc].nil? ?
+  #           @gf_assc_counts[assc] = results.where(generic_file_id: assc).count :
+  #           @gf_assc_counts[assc] = @gf_assc_counts[assc] + results.where(generic_file_id: assc).count
+  #     end
+  #   end
+  # end
 
   def set_status_count(results)
     unless @statuses.nil?
-      @statuses.each do |status|
-        @status_counts[status].nil? ?
-            @status_counts[status] = results.where(status: status).count :
-            @status_counts[status] = @status_counts[status] + results.where(status: status).count
+    #   @statuses.each do |status|
+    #     @status_counts[status].nil? ?
+    #         @status_counts[status] = results.where(status: status).count :
+    #         @status_counts[status] = @status_counts[status] + results.where(status: status).count
+    #   end
+      counts = results.group(:status).order(:status).count
+      counts.each do |status, number|
+        @status_counts[status].nil? ? @status_counts[status] = number : @status_counts[status] += number
       end
     end
   end
 
   def set_stage_count(results)
     unless @stages.nil?
-      @stages.each do |stage|
-        @stage_counts[stage].nil? ?
-            @stage_counts[stage] = results.where(stage: stage).count :
-            @stage_counts[stage] = @stage_counts[stage] + results.where(stage: stage).count
+    #   @stages.each do |stage|
+    #     @stage_counts[stage].nil? ?
+    #         @stage_counts[stage] = results.where(stage: stage).count :
+    #         @stage_counts[stage] = @stage_counts[stage] + results.where(stage: stage).count
+    #   end
+      counts = results.group(:stage).order(:stage).count
+      counts.each do |stage, number|
+        @stage_counts[stage].nil? ? @stage_counts[stage] = number : @stage_counts[stage] += number
       end
     end
   end
 
   def set_action_count(results)
     unless @actions.nil?
-      @actions.each do |action|
-        @action_counts[action].nil? ?
-            @action_counts[action] = results.where(action: action).count :
-            @action_counts[action] = @action_counts[action] + results.where(action: action).count
+    #   @actions.each do |action|
+    #     @action_counts[action].nil? ?
+    #         @action_counts[action] = results.where(action: action).count :
+    #         @action_counts[action] = @action_counts[action] + results.where(action: action).count
+    #   end
+      counts = results.group(:action).order(:action).count
+      counts.each do |action, number|
+        @action_counts[action].nil? ? @action_counts[action] = number : @action_counts[action] += number
       end
     end
   end
 
   def set_event_type_count(results)
     unless @event_types.nil?
-      @event_types.each do |type|
-        @event_type_counts[type].nil? ?
-            @event_type_counts[type] = results.where(event_type: type).count :
-            @event_type_counts[type] = @event_type_counts[type] + results.where(event_type: type).count
+    #   @event_types.each do |type|
+    #     @event_type_counts[type].nil? ?
+    #         @event_type_counts[type] = results.where(event_type: type).count :
+    #         @event_type_counts[type] = @event_type_counts[type] + results.where(event_type: type).count
+    #   end
+      counts = results.group(:event_type).order(:event_type).count
+      counts.each do |event_type, number|
+        @event_type_counts[event_type].nil? ? @event_type_counts[event_type] = number :
+          @event_type_counts[event_type] += number
       end
     end
   end
 
   def set_outcome_count(results)
     unless @outcomes.nil?
-      @outcomes.each do |outcome|
-        @outcome_counts[outcome].nil? ?
-            @outcome_counts[outcome] = results.where(outcome: outcome).count :
-            @outcome_counts[outcome] = @outcome_counts[outcome] + results.where(outcome: outcome).count
+    #   @outcomes.each do |outcome|
+    #     @outcome_counts[outcome].nil? ?
+    #         @outcome_counts[outcome] = results.where(outcome: outcome).count :
+    #         @outcome_counts[outcome] = @outcome_counts[outcome] + results.where(outcome: outcome).count
+    #   end
+      counts = results.group(:outcome).order(:outcome).count
+      counts.each do |outcome, number|
+        @outcome_counts[outcome].nil? ? @outcome_counts[outcome] = number :
+          @outcome_counts[outcome] += number
       end
     end
   end
