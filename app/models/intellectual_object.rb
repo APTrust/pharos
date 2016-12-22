@@ -83,11 +83,18 @@ class IntellectualObject < ActiveRecord::Base
     attributes[:identifier] = SecureRandom.uuid
     self.state = 'D'
     self.add_event(attributes)
-    save!
+    self.save!
     Thread.new() do
       background_deletion(attributes)
       ActiveRecord::Base.connection.close
     end
+  end
+
+  def background_deletion(attributes)
+    generic_files.each do |gf|
+      gf.soft_delete(attributes)
+    end
+    save!
   end
 
   def in_dpn?
@@ -103,13 +110,6 @@ class IntellectualObject < ActiveRecord::Base
       end
     end
     object_in_dpn
-  end
-
-  def background_deletion(attributes)
-    generic_files.each do |gf|
-      gf.soft_delete(attributes)
-    end
-    save!
   end
 
   def gf_count
