@@ -472,19 +472,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(reloaded_object.premis_events[0].event_type).to eq 'delete'
       end
 
-      #### THIS DOESN'T CURRENTLY WORK B/C THREADING ####
-      # it 'should delete all associated files in addition to the intellectual object' do
-      #   item = FactoryGirl.create(:work_item, object_identifier: deletable_obj_2.identifier, action: 'Ingest', stage: 'Record', status: 'Success')
-      #   item.save!
-      #   delete :destroy, intellectual_object_identifier: deletable_obj_2
-      #   expect(response).to redirect_to root_url
-      #   expect(flash[:notice]).to include 'Delete job has been queued'
-      #   reloaded_object = IntellectualObject.find(deletable_obj_2.id)
-      #   expect(reloaded_object.state).to eq 'D'
-      #   reloaded_file = GenericFile.find(assc_file.id)
-      #   expect(reloaded_file.state).to eq 'D'
-      # end
-
       it 'should not delete already deleted item' do
         delete :destroy, intellectual_object_identifier: deleted_obj
         expect(response).to redirect_to intellectual_object_path(deleted_obj)
