@@ -67,6 +67,7 @@ module Pharos
     DPN_TASKS = %w(sync ingest replication restore fixity)
 
     DPN_STATUS = false
+    DPN_SIZE_LIMIT = 268435456000 # 250GB
 
     APTRUST_NAME = 'APTrust'
     APTRUST_ID = 'aptrust.org'

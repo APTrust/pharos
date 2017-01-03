@@ -126,7 +126,7 @@ class IntellectualObject < ActiveRecord::Base
 
   def too_big?
     total_size = self.generic_files.sum(:size)
-    (total_size > 268435456000) ? true : false
+    (total_size > Pharos::Application::DPN_SIZE_LIMIT) ? true : false
   end
 
   def serializable_hash (options={})
