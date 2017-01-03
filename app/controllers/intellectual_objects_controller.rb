@@ -92,7 +92,7 @@ class IntellectualObjectsController < ApplicationController
     authorize @intellectual_object
     @intellectual_object.update!(update_params)
     respond_to do |format|
-      format.json { render object_as_json}
+      format.json { render json: object_as_json }
       format.html { redirect_to intellectual_object_path(@intellectual_object) }
     end
   end
@@ -274,7 +274,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update_params
     params.require(:intellectual_object).permit(:title, :description, :access,
-                                                :alt_identifier, :state)
+                                                :alt_identifier, :state, :dpn_uuid)
   end
 
   def load_object
@@ -307,9 +307,9 @@ class IntellectualObjectsController < ApplicationController
     filter_by_access unless params[:access].nil?
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
-    set_inst_count(@intellectual_objects)
+    set_inst_count(@intellectual_objects, :objects)
     set_access_count(@intellectual_objects)
-    set_format_count(@intellectual_objects)
+    set_format_count(@intellectual_objects, :object)
     count = @intellectual_objects.count
     set_page_counts(count)
   end

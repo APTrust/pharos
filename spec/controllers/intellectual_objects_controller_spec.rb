@@ -432,6 +432,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                           action: 'Restore',
                                           stage: 'Requested',
                                           status: 'Pending') }
+    let!(:deletable_obj_2) { FactoryGirl.create(:institutional_intellectual_object,
+                                                institution: inst1, state: 'A') }
+    let!(:assc_file) { FactoryGirl.create(:generic_file, intellectual_object: deletable_obj_2) }
 
     after do
       IntellectualObject.delete_all

@@ -83,11 +83,18 @@ class IntellectualObject < ActiveRecord::Base
     attributes[:identifier] = SecureRandom.uuid
     self.state = 'D'
     self.add_event(attributes)
-    save!
+    self.save!
     Thread.new() do
       background_deletion(attributes)
       ActiveRecord::Base.connection.close
     end
+  end
+
+  def background_deletion(attributes)
+    generic_files.each do |gf|
+      gf.soft_delete(attributes)
+    end
+    save!
   end
 
   def in_dpn?
@@ -105,13 +112,6 @@ class IntellectualObject < ActiveRecord::Base
     object_in_dpn
   end
 
-  def background_deletion(attributes)
-    generic_files.each do |gf|
-      gf.soft_delete(attributes)
-    end
-    save!
-  end
-
   def gf_count
     generic_files.where(state: 'A').count
   end
@@ -126,7 +126,7 @@ class IntellectualObject < ActiveRecord::Base
 
   def too_big?
     total_size = self.generic_files.sum(:size)
-    (total_size > 268435456000) ? true : false
+    (total_size > Pharos::Application::DPN_SIZE_LIMIT) ? true : false
   end
 
   def serializable_hash (options={})
@@ -136,7 +136,8 @@ class IntellectualObject < ActiveRecord::Base
     data.merge(
       in_dpn: in_dpn?,
       file_count: gf_count,
-      file_size: gf_size
+      file_size: gf_size,
+      institution: self.institution.identifier,
     )
   end
 

@@ -22,12 +22,8 @@
       <dd> <%= @intellectual_object.updated_at %> </dd>
       <dt>Description</dt>
       <dd><%= @intellectual_object.description %></dd>
-      <% unless @intellectual_object.alt_identifier.nil? || @intellectual_object.alt_identifier.size == 0 || @intellectual_object.alt_identifier == '[]'  %>
-          <dt>Alternate Identifiers</dt>
-          <% @intellectual_object.alt_identifier.each do |alt_ident| %>
-              <dd><%= alt_ident %></dd>
-          <% end %>
-      <% end %>
+      <dt>Alternate Identifier</dt>
+      <dd><%= @intellectual_object.alt_identifier %></dd>
       <dt>DPN Status</dt>
       <% if @intellectual_object.in_dpn? %>
           <dd>Item has been uploaded to DPN.</dd>

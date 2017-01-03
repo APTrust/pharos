@@ -14,7 +14,7 @@ class WorkItemState < ActiveRecord::Base
       id: id,
       work_item_id: work_item_id,
       action: action,
-      state: self.unzipped_state,
+      state: self.unzipped_state.force_encoding('UTF-8'),
       created_at: created_at,
       updated_at: updated_at
     }
