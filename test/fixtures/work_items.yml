@@ -4,6 +4,7 @@
 item_1:
   created_at: 2016-08-30 15:41:45.054415000 Z
   updated_at: 2016-08-30 15:41:45.054415000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_01.tar
   etag: '01010101010101010101'
   bucket: aptrust.receiving.institution1.edu
@@ -22,6 +23,7 @@ item_1:
 item_2:
   created_at: 2016-08-30 15:41:45.062115000 Z
   updated_at: 2016-08-30 15:41:45.062115000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_02.tar
   etag: '02020202020202020202'
   bucket: aptrust.receiving.institution1.edu
@@ -40,6 +42,7 @@ item_2:
 item_3:
   created_at: 2016-08-30 15:41:45.067372000 Z
   updated_at: 2016-08-30 15:41:45.067372000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_03.tar
   etag: '03030303030303030303'
   bucket: aptrust.receiving.institution1.edu
@@ -58,6 +61,7 @@ item_3:
 item_4:
   created_at: 2016-08-30 15:41:45.073193000 Z
   updated_at: 2016-08-30 15:41:45.073193000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_04.tar
   etag: '04040404040404040404'
   bucket: aptrust.receiving.institution1.edu
@@ -76,6 +80,7 @@ item_4:
 item_5:
   created_at: 2016-08-30 15:41:45.078212000 Z
   updated_at: 2016-08-30 15:41:45.078212000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_05.tar
   etag: '05050505050505050505'
   bucket: aptrust.receiving.institution1.edu
@@ -94,6 +99,7 @@ item_5:
 item_6:
   created_at: 2016-08-30 15:41:45.083798000 Z
   updated_at: 2016-08-30 15:41:45.083798000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_06.tar
   etag: '06060606060606060606'
   bucket: aptrust.receiving.institution1.edu
@@ -112,6 +118,7 @@ item_6:
 item_7:
   created_at: 2016-08-30 15:41:45.089799000 Z
   updated_at: 2016-08-30 15:41:45.089799000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_07.tar
   etag: '07070707070707070707'
   bucket: aptrust.receiving.institution1.edu
@@ -130,6 +137,7 @@ item_7:
 item_8:
   created_at: 2016-08-30 15:41:45.095017000 Z
   updated_at: 2016-08-30 15:41:45.095017000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_08.tar
   etag: 08080808080808080808
   bucket: aptrust.receiving.institution1.edu
@@ -148,6 +156,7 @@ item_8:
 item_9:
   created_at: 2016-08-30 15:41:45.100735000 Z
   updated_at: 2016-08-30 15:41:45.100735000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_09.tar
   etag: 09090909090909090909
   bucket: aptrust.receiving.institution1.edu
@@ -166,6 +175,7 @@ item_9:
 item_10:
   created_at: 2016-08-30 15:41:45.106372000 Z
   updated_at: 2016-08-30 15:41:45.106372000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_10.tar
   etag: '10101010101010101010'
   bucket: aptrust.receiving.institution1.edu
@@ -184,6 +194,7 @@ item_10:
 item_11:
   created_at: 2016-08-30 15:41:45.111411000 Z
   updated_at: 2016-08-30 15:41:45.111411000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_11.tar
   etag: '11111111111111111111'
   bucket: aptrust.receiving.institution2.edu
@@ -202,6 +213,7 @@ item_11:
 item_12:
   created_at: 2016-08-30 15:41:45.116444000 Z
   updated_at: 2016-08-30 15:41:45.116444000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_12.tar
   etag: '12121212121212121212'
   bucket: aptrust.receiving.institution2.edu
@@ -220,6 +232,7 @@ item_12:
 item_13:
   created_at: 2016-08-30 15:41:45.123159000 Z
   updated_at: 2016-08-30 15:41:45.123159000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_13.tar
   etag: '13131313131313131313'
   bucket: aptrust.receiving.institution2.edu
@@ -238,6 +251,7 @@ item_13:
 item_14:
   created_at: 2016-08-30 15:41:45.129908000 Z
   updated_at: 2016-08-30 15:41:45.129908000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_14.tar
   etag: '14141414141414141414'
   bucket: aptrust.receiving.institution2.edu
@@ -256,6 +270,7 @@ item_14:
 item_15:
   created_at: 2016-08-30 15:41:45.135253000 Z
   updated_at: 2016-08-30 15:41:45.135253000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_15.tar
   etag: '15151515151515151515'
   bucket: aptrust.receiving.institution2.edu
@@ -274,6 +289,7 @@ item_15:
 item_16:
   created_at: 2016-08-30 15:41:45.140505000 Z
   updated_at: 2016-08-30 15:41:45.140505000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_16.tar
   etag: '16161616161616161616'
   bucket: aptrust.receiving.institution2.edu
@@ -292,6 +308,7 @@ item_16:
 item_17:
   created_at: 2016-08-30 15:41:45.146547000 Z
   updated_at: 2016-08-30 15:41:45.146547000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_17.tar
   etag: '17171717171717171717'
   bucket: aptrust.receiving.institution2.edu
@@ -310,6 +327,7 @@ item_17:
 item_18:
   created_at: 2016-08-30 15:41:45.152480000 Z
   updated_at: 2016-08-30 15:41:45.152480000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_18.tar
   etag: '18181818181818181818'
   bucket: aptrust.receiving.institution2.edu
@@ -328,6 +346,7 @@ item_18:
 item_19:
   created_at: 2016-08-30 15:41:45.158070000 Z
   updated_at: 2016-08-30 15:41:45.158070000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_19.tar
   etag: '19191919191919191919'
   bucket: aptrust.receiving.institution2.edu
@@ -346,6 +365,7 @@ item_19:
 item_20:
   created_at: 2016-08-30 15:41:45.163377000 Z
   updated_at: 2016-08-30 15:41:45.163377000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   name: fake_bag_20.tar
   etag: '20202020202020202020'
   bucket: aptrust.receiving.institution2.edu
@@ -366,6 +386,7 @@ item_20:
 item_21:
   created_at: 2016-08-20 16:01:59.765685000 Z
   updated_at: 2016-08-20 16:01:59.765685000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   intellectual_object: inst2_obj3
   name: toads.tar
   etag: 25a4546c865e4073aa17b31b0708f75d
@@ -385,6 +406,7 @@ item_21:
 item_22:
   created_at: 2016-08-20 16:01:59.775363000 Z
   updated_at: 2016-08-20 16:01:59.775363000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   intellectual_object: inst1_obj3
   name: glass_shards.tar
   etag: e24527590f31492b8f362c3d3c02ec80
@@ -404,6 +426,7 @@ item_22:
 item_23:
   created_at: 2016-08-20 16:01:59.782443000 Z
   updated_at: 2016-08-20 16:01:59.782443000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   intellectual_object: inst1_obj2
   name: pdfs.tar
   etag: 6b5b18c999dc4fdc9c47a2db90782cee
@@ -423,6 +446,7 @@ item_23:
 item_24:
   created_at: 2016-08-20 16:01:59.789149000 Z
   updated_at: 2016-08-20 16:01:59.789149000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   intellectual_object: inst2_obj2
   name: coal.tar
   etag: 0940747b1a8a42e78d2639e1093753ff
@@ -442,6 +466,7 @@ item_24:
 item_25:
   created_at: 2016-08-20 16:01:59.795978000 Z
   updated_at: 2016-08-20 16:01:59.795978000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   intellectual_object: inst1_obj1
   name: photos.tar
   etag: 1f594a4e5bb944e59c74aefe781a3726
@@ -461,6 +486,7 @@ item_25:
 item_26:
   created_at: 2016-08-20 16:01:59.803320000 Z
   updated_at: 2016-08-20 16:01:59.803320000 Z
+  queued_at: 2016-08-30 15:41:45.054415000 Z
   intellectual_object: inst2_obj1
   name: chocolate.tar
   etag: 6a40fff84939474aa6f5f77bf56fb8c8

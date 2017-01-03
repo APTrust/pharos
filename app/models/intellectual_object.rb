@@ -136,7 +136,8 @@ class IntellectualObject < ActiveRecord::Base
     data.merge(
       in_dpn: in_dpn?,
       file_count: gf_count,
-      file_size: gf_size
+      file_size: gf_size,
+      institution: self.institution.identifier,
     )
   end
 
