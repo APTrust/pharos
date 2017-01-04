@@ -1,5 +1,5 @@
 class WorkItem < ActiveRecord::Base
-
+  include SearchAndIndex
   paginates_per 10
 
   belongs_to :institution
@@ -19,13 +19,13 @@ class WorkItem < ActiveRecord::Base
   scope :updated_after, ->(param) { where('work_items.updated_at >= ?', param) unless param.blank? }
   scope :with_bag_date, ->(param) { where('work_items.bag_date = ?', param) unless param.blank? }
   scope :with_name, ->(param) { where(name: param) unless param.blank? }
-  scope :with_name_like, ->(param) { where('work_items.name like ?', "%#{param}%") unless param.blank? }
+  scope :with_name_like, ->(param) { where('work_items.name like ?', "%#{param}%") unless WorkItem.empty_param(param) }
   scope :with_etag, ->(param) { where(etag: param) unless param.blank? }
-  scope :with_etag_like, ->(param) { where('work_items.etag like ?', "%#{param}%") unless param.blank? }
+  scope :with_etag_like, ->(param) { where('work_items.etag like ?', "%#{param}%") unless WorkItem.empty_param(param) }
   scope :with_object_identifier, ->(param) { where(object_identifier: param) unless param.blank? }
-  scope :with_object_identifier_like, ->(param) { where('work_items.object_identifier like ?', "%#{param}%") unless param.blank? }
+  scope :with_object_identifier_like, ->(param) { where('work_items.object_identifier like ?', "%#{param}%") unless WorkItem.empty_param(param) }
   scope :with_file_identifier, ->(param) { where(generic_file_identifier: param) unless param.blank? }
-  scope :with_file_identifier_like, ->(param) { where('work_items.generic_file_identifier like ?', "%#{param}%") unless param.blank? }
+  scope :with_file_identifier_like, ->(param) { where('work_items.generic_file_identifier like ?', "%#{param}%") unless WorkItem.empty_param(param) }
   scope :with_status, ->(param) { where(status: param) unless param.blank? }
   scope :with_stage, ->(param) { where(stage: param) unless param.blank? }
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
@@ -60,6 +60,10 @@ class WorkItem < ActiveRecord::Base
 
   def to_param
     "#{etag}/#{name}"
+  end
+
+  def self.empty_param(param)
+    (param.blank? || param.nil? || param == '*' || param == '' || param == '%') ? true : false
   end
 
   def serializable_hash(options={})

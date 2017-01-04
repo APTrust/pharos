@@ -4,7 +4,13 @@ class CatalogController < ApplicationController
   after_action :verify_authorized
 
   def search
-    (params[:q] == '*' || params[:q].nil?) ? @q = '%' : @q = params[:q]
+    if params[:q] == '*' || params[:q].nil?
+      @q = '%'
+      @empty_param = true
+    else
+      @q = params[:q]
+      @empty_param = false
+    end
     @results = {}
     authorize current_user
     generic_search if params[:object_type].nil?
@@ -15,12 +21,8 @@ class CatalogController < ApplicationController
         file_search
       when 'Work Items'
         item_search
-      when 'All Types'
-        generic_search
       when 'Premis Events'
         event_search
-      when '*'
-        generic_search
     end
     filter
     sort
@@ -55,9 +57,13 @@ class CatalogController < ApplicationController
   def object_search
     # Limit results to those the current user is allowed to read.
     objects = IntellectualObject.discoverable(current_user)
+    if @empty_param
+      @results[:objects] = objects
+      return
+    end
     case params[:search_field]
       when 'Object Identifier'
-        @results[:objects] = objects.with_identifier_like(@q)
+        @results[:objects] = objects.with_identifier(@q)
       when 'Alternate Identifier'
         @results[:objects] = objects.with_alt_identifier_like(@q)
       when 'Bag Name'
@@ -65,7 +71,7 @@ class CatalogController < ApplicationController
       when 'Title'
         @results[:objects] = objects.with_title_like(@q)
       when 'All Fields'
-        @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
+        @results[:objects] = objects.where('intellectual_objects.identifier = ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
                                            "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
@@ -73,101 +79,58 @@ class CatalogController < ApplicationController
   def file_search
     # Limit results to those the current user is allowed to read.
     files = GenericFile.discoverable(current_user)
+    if @empty_param
+      @results[:files] = files
+      return
+    end
     case params[:search_field]
       when 'File Identifier'
-        @results[:files] = files.with_identifier_like(@q)
+        @results[:files] = files.with_identifier(@q)
       when 'URI'
         @results[:files] = files.with_uri_like(@q)
       when 'All Fields'
-        @results[:files] = files.where('generic_files.identifier LIKE ? OR generic_files.uri LIKE ?', "%#{@q}%", "%#{@q}%")
+        @results[:files] = files.where('generic_files.identifier = ? OR generic_files.uri LIKE ?', "%#{@q}%", "%#{@q}%")
     end
   end
 
   def item_search
     # Limit results to those the current user is allowed to read.
     items = WorkItem.readable(current_user)
+    if @empty_param
+      @results[:items] = items
+      return
+    end
     case params[:search_field]
       when 'Name'
         @results[:items] = items.with_name_like(@q)
       when 'Etag'
         @results[:items] = items.with_etag_like(@q)
       when 'Object Identifier'
-        @results[:items] = items.with_object_identifier_like(@q)
+        @results[:items] = items.with_object_identifier(@q)
       when 'File Identifier'
-        @results[:items] = items.with_file_identifier_like(@q)
+        @results[:items] = items.with_file_identifier(@q)
       when 'All Fields'
-        @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
+        @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier = ? OR generic_file_identifier = ?',
                                        "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 
   def event_search
     events = PremisEvent.discoverable(current_user)
-    case params[:search_field]
-      when 'Event Identifier'
-        @results[:events] = events.with_event_identifier_like(@q)
-      when 'Object Identifier'
-        @results[:events] = events.with_object_identifier_like(@q)
-      when 'File Identifier'
-        @results[:events] = events.with_file_identifier_like(@q)
-      when 'All Fields'
-        @results[:events] = events.where('premis_events.identifier LIKE ? OR intellectual_object_identifier LIKE ?
-                                          OR generic_file_identifier LIKE ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
-    end
-  end
-
-  def generic_search
-    objects = IntellectualObject.discoverable(current_user)
-    files = GenericFile.discoverable(current_user)
-    items = WorkItem.readable(current_user)
-    events = PremisEvent.discoverable(current_user)
-
-    # Don't do any more filtering if the user didn't specify
-    # what they're looking for; otherwise, the DB will do a
-    # "like" comparison on millions of fields across millions
-    # of rows, and all of them will match.
-    if @q.blank? || @q == '%' || @q == '*'
-      @results[:objects] = objects
-      @results[:files] = files
-      @results[:items] = items
+    if @empty_param
       @results[:events] = events
       return
     end
-
     case params[:search_field]
-      when 'Alternate Identifier'
-        @results[:objects] = objects.with_alt_identifier_like(@q)
-        @results[:items] = items.where('object_identifier LIKE ? OR generic_file_identifier LIKE ?', "%#{@q}%", "%#{@q}%")
-      when 'Bag Name'
-        @results[:objects] = objects.with_bag_name_like(@q)
-        @results[:items] = items.with_name_like(@q)
-      when 'Title'
-        @results[:objects] = objects.with_title_like(@q)
-      when 'URI'
-        @results[:files] = files.with_uri_like(@q)
-      when 'Name'
-        @results[:objects] = objects.with_bag_name_like(@q)
-        @results[:items] = items.with_name_like(@q)
-      when 'Etag'
-        @results[:items] = items.with_etag_like(@q)
-      when 'Object Identifier'
-        @results[:items] = items.with_object_identifier_like(@q)
-        @results[:objects] = objects.with_identifier_like(@q)
-        @results[:events] = events.with_object_identifier_like(@q)
-      when 'File Identifier'
-        @results[:items] = items.with_file_identifier_like(@q)
-        @results[:files] = files.with_identifier_like(@q)
-        @results[:events] = events.with_file_identifier_like(@q)
       when 'Event Identifier'
-        @results[:events] = events.with_event_identifier_like(@q)
+        @results[:events] = events.with_event_identifier(@q)
+      when 'Object Identifier'
+        @results[:events] = events.with_object_identifier(@q)
+      when 'File Identifier'
+        @results[:events] = events.with_file_identifier(@q)
       when 'All Fields'
-        @results[:objects] = objects.where('intellectual_objects.identifier LIKE ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
-                                          "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
-        @results[:files] = files.where('generic_files.identifier LIKE ? OR uri LIKE ?', "%#{@q}%", "%#{@q}%")
-        @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier LIKE ? OR generic_file_identifier LIKE ?',
-                                          "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
-        @results[:events] = events.where('premis_events.identifier LIKE ? OR intellectual_object_identifier LIKE ?
-                                          OR generic_file_identifier LIKE ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
+        @results[:events] = events.where('premis_events.identifier = ? OR intellectual_object_identifier = ?
+                                          OR generic_file_identifier = ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 

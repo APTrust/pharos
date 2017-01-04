@@ -39,15 +39,8 @@ function configureDropDownLists() {
     var gf_options = ['All Fields', 'File Identifier', 'URI'];
     var event_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Event Identifier'];
     var wi_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Name', 'Etag']
-    var all_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Event Identifier', 'Bag Name', 'Title', 'Alternate Identifier', 'URI', 'Name', 'Etag']
 
     switch (ddl1.value) {
-        case 'All Types':
-            ddl2.options.length = 0;
-            for (i = 0; i < all_options.length; i++) {
-                createOption(ddl2, all_options[i]);
-            }
-            break;
         case 'Intellectual Objects':
             ddl2.options.length = 0;
             for (i = 0; i < io_options.length; i++) {
