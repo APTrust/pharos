@@ -169,7 +169,7 @@ RSpec.describe CatalogController, type: :controller do
           end
 
           it 'should return results from multiple categories when search_field is generic' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events'
             expect(assigns(:paged_results).size).to eq 6
             expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_two.id, @event_three.id, @event_four.id, @event_five.id, @event_six.id]
           end
@@ -224,7 +224,7 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for premis event searches' do
           it 'should return only the results to which you have access' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events'
             expect(assigns(:paged_results).size).to eq 4
             expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_four.id, @event_five.id, @event_six.id]
           end
@@ -331,32 +331,32 @@ RSpec.describe CatalogController, type: :controller do
 
         describe 'for premis event searches' do
           it 'should filter by institution' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', institution: @another_institution.id
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', institution: @another_institution.id
             expect(assigns(:paged_results).map &:id).to match_array [@event_four.id, @event_five.id, @event_six.id]
           end
 
           it 'should filter by access' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', access: 'consortia'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', access: 'consortia'
             expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_four.id]
           end
 
           it 'should filter by object association' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', object_association: @object_four.id
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', object_association: @object_four.id
             expect(assigns(:paged_results).map &:id).to include(@event_four.id)
           end
 
           it 'should filter by file association' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', file_association: @file_five.id
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', file_association: @file_five.id
             expect(assigns(:paged_results).map &:id).to include(@event_five.id)
           end
 
           it 'should filter by event type' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', event_type: 'ingest'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', event_type: 'ingest'
             expect(assigns(:paged_results).map &:id).to include(@event_five.id)
           end
 
           it 'should filter by outcome' do
-            get :search, q: '*', search_field: 'All Fields', object_type: 'Premis Events', outcome: 'failure'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', outcome: 'failure'
             expect(assigns(:paged_results).map &:id).to include(@event_six.id)
           end
         end
