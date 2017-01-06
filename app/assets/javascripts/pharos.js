@@ -37,8 +37,9 @@ function configureDropDownLists() {
     ddl2 = document.getElementById('search_field');
     var io_options = ['All Fields', 'Object Identifier', 'Alternate Identifier', 'Bag Name', 'Title'];
     var gf_options = ['All Fields', 'File Identifier', 'URI'];
-    var event_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Event Identifier'];
-    var wi_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Name', 'Etag']
+    //var event_options = ['All Fields', 'Event Identifier', 'Object Identifier', 'File Identifier'];
+    var event_options = ['Event Identifier', 'Object Identifier', 'File Identifier'];
+    var wi_options = ['All Fields', 'Object Identifier', 'File Identifier', 'Name', 'Etag'];
 
     switch (ddl1.value) {
         case 'Intellectual Objects':

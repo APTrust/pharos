@@ -128,9 +128,9 @@ class CatalogController < ApplicationController
         @results[:events] = events.with_object_identifier(@q)
       when 'File Identifier'
         @results[:events] = events.with_file_identifier(@q)
-      when 'All Fields'
-        @results[:events] = events.where('premis_events.identifier = ? OR intellectual_object_identifier = ?
-                                          OR generic_file_identifier = ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
+      # when 'All Fields'
+      #   @results[:events] = events.where('premis_events.identifier = ? OR intellectual_object_identifier = ?
+      #                                     OR generic_file_identifier = ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 
