@@ -42,13 +42,13 @@ class Institution < ActiveRecord::Base
 
   def average_file_size
     files = self.generic_files.where(state: 'A')
-    avg = files.sum(:size) / files.count
+    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
     avg
   end
 
   def average_file_size_across_repo
     files = GenericFile.where(state: 'A')
-    avg = files.sum(:size) / files.count
+    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
     avg
   end
 

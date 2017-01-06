@@ -4,7 +4,7 @@ class CatalogController < ApplicationController
   after_action :verify_authorized
 
   def search
-    if params[:q] == '*' || params[:q].nil?
+    if params[:q] == '*' || params[:q].nil? || params[:q] == ''
       @q = '%'
       @empty_param = true
     else
