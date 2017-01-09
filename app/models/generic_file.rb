@@ -1,5 +1,4 @@
 class GenericFile < ActiveRecord::Base
-  include SearchAndIndex
   belongs_to :intellectual_object
   has_many :premis_events
   has_many :checksums

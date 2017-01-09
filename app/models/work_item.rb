@@ -1,5 +1,4 @@
 class WorkItem < ActiveRecord::Base
-  include SearchAndIndex
   paginates_per 10
 
   belongs_to :institution

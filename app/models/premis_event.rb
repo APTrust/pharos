@@ -1,5 +1,4 @@
 class PremisEvent < ActiveRecord::Base
-  include SearchAndIndex
   belongs_to :institution
   belongs_to :intellectual_object
   belongs_to :generic_file

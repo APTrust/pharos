@@ -1,5 +1,4 @@
 class IntellectualObject < ActiveRecord::Base
-  include SearchAndIndex
   belongs_to :institution
   has_many :generic_files
   has_many :premis_events
