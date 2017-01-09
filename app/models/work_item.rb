@@ -275,10 +275,18 @@ class WorkItem < ActiveRecord::Base
       self.object_identifier = "#{self.institution.identifier}/#{bag_basename}"
     end
     if self.intellectual_object_id.blank? && !self.object_identifier.blank?
-      self.intellectual_object_id = IntellectualObject.where(identifier: self.object_identifier).first.id
+      # When importing data from Fluctus, we have ~215 items for
+      # which Fedora produced no IntellectualObject record, despite
+      # saying the items were ingested. In these cases, the query
+      # below produces a nil IntellectualObject, followed by an error
+      # when accessing the nil object's id. We want to import those records
+      # anyway. This problem should not be able to occur in Pharos.
+      intel_obj = IntellectualObject.where(identifier: self.object_identifier).first
+      self.intellectual_object_id = intel_obj.id unless intel_obj.nil?
     end
     if self.generic_file_id.blank? && !self.generic_file_identifier.blank?
-      self.generic_file_id = GenericFile.where(identifier: self.generic_file_identifier).first.id
+      generic_file = GenericFile.where(identifier: self.generic_file_identifier).first
+      self.generic_file_id = generic_file.id unless generic_file.nil?
     end
   end
 
