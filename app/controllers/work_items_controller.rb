@@ -76,7 +76,10 @@ class WorkItemsController < ApplicationController
         params[:work_items][:items].each do |current|
           wi = WorkItem.find(current['id'])
           wi.update(current)
-          wi.user = current_user.email
+          # Only admin can explicitly set user.
+          if !current_user.admin? || wi.user.blank?
+            wi.user = current_user.email
+          end
           @work_items.push(wi)
           unless wi.save
             @incomplete = true
@@ -257,7 +260,14 @@ class WorkItemsController < ApplicationController
 
   def init_from_params
     @work_item = WorkItem.new(writable_work_item_params)
-    @work_item.user = current_user.email
+    # When we're migrating data from Fluctus, we're
+    # connecting as admin, and we want to preserve the existing
+    # user attribute from the old system. In all other cases,
+    # when we create a WorkItem, user should be set to the
+    # current logged-in user.
+    if !current_user.admin? || @work_item.user.blank?
+      @work_item.user = current_user.email
+    end
   end
 
   def find_and_update
@@ -265,7 +275,11 @@ class WorkItemsController < ApplicationController
     set_item
     if @work_item
       @work_item.update(writable_work_item_params)
-      @work_item.user = current_user.email
+      # Never let non-admin set WorkItem.user.
+      # Admin sets user only when importing WorkItems from Fluctus.
+      if !current_user.admin? || @work_item.user.blank?
+        @work_item.user = current_user.email
+      end
     end
   end
 
@@ -277,7 +291,7 @@ class WorkItemsController < ApplicationController
     params.require(:work_item).permit(:name, :etag, :bag_date, :bucket,
                                       :institution_id, :date, :note, :action,
                                       :stage, :status, :outcome, :retry,
-                                      :pid, :node, :object_identifier,
+                                      :pid, :node, :object_identifier, :user,
                                       :generic_file_identifier, :needs_admin_review,
                                       :queued_at, :size, :stage_started_at)
   end
