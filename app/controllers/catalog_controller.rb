@@ -11,7 +11,7 @@ class CatalogController < ApplicationController
       @q = params[:q]
       @empty_param = false
     end
-    @results = {}
+    @results = []
     authorize current_user
     generic_search if params[:object_type].nil?
     case params[:object_type]
@@ -26,8 +26,7 @@ class CatalogController < ApplicationController
     end
     filter
     sort
-    merge_results
-    page_results(@merged_results)
+    page_results(@results)
     respond_to do |format|
       format.json { render json: {results: @paged_results, next: @next, previous: @previous} }
       format.html { }
@@ -46,81 +45,77 @@ class CatalogController < ApplicationController
 
   protected
 
-  # Merge all objects, files, events and work items into a single flat array.
-  # Be sure to paginate this first, or it will load millions of objects into
-  # memory and crash the server.
-  def merge_results
-    @merged_results = []
-    @results.each { |key, value| @merged_results += value.limit(params[:per_page].to_i) }
-  end
-
   def object_search
     # Limit results to those the current user is allowed to read.
     objects = IntellectualObject.discoverable(current_user)
     if @empty_param
-      @results[:objects] = objects
+      @results = objects
       return
     end
     case params[:search_field]
       when 'Object Identifier'
-        @results[:objects] = objects.with_identifier(@q)
+        @results = objects.with_identifier(@q)
       when 'Alternate Identifier'
-        @results[:objects] = objects.with_alt_identifier_like(@q)
+        @results = objects.with_alt_identifier_like(@q)
       when 'Bag Name'
-        @results[:objects] = objects.with_bag_name_like(@q)
+        @results = objects.with_bag_name_like(@q)
       when 'Title'
-        @results[:objects] = objects.with_title_like(@q)
-      end
+        @results = objects.with_title_like(@q)
+    end
+    @result_type = 'object'
   end
 
   def file_search
     # Limit results to those the current user is allowed to read.
     files = GenericFile.discoverable(current_user)
     if @empty_param
-      @results[:files] = files
+      @results = files
       return
     end
     case params[:search_field]
       when 'File Identifier'
-        @results[:files] = files.with_identifier(@q)
+        @results = files.with_identifier(@q)
       when 'URI'
-        @results[:files] = files.with_uri_like(@q)
-      end
+        @results = files.with_uri_like(@q)
+    end
+    @result_type = 'file'
   end
 
   def item_search
     # Limit results to those the current user is allowed to read.
     items = WorkItem.readable(current_user)
     if @empty_param
-      @results[:items] = items
+      @results = items
       return
     end
     case params[:search_field]
       when 'Name'
-        @results[:items] = items.with_name_like(@q)
+        @results = items.with_name_like(@q)
       when 'Etag'
-        @results[:items] = items.with_etag_like(@q)
+        @results = items.with_etag_like(@q)
       when 'Object Identifier'
-        @results[:items] = items.with_object_identifier(@q)
+        @results = items.with_object_identifier(@q)
       when 'File Identifier'
-        @results[:items] = items.with_file_identifier(@q)
-      end
+        @results = items.with_file_identifier(@q)
+    end
+    @result_type = 'item'
   end
 
   def event_search
     events = PremisEvent.discoverable(current_user)
     if @empty_param
-      @results[:events] = events
+      @results = events
       return
     end
     case params[:search_field]
       when 'Event Identifier'
-        @results[:events] = events.with_event_identifier(@q)
+        @results = events.with_event_identifier(@q)
       when 'Object Identifier'
-        @results[:events] = events.with_object_identifier(@q)
+        @results = events.with_object_identifier(@q)
       when 'File Identifier'
-        @results[:events] = events.with_file_identifier(@q)
+        @results = events.with_file_identifier(@q)
     end
+    @result_type = 'event'
   end
 
   def filter
@@ -136,43 +131,53 @@ class CatalogController < ApplicationController
     filter_by_outcome unless params[:outcome].nil?
     set_filter_values
     #set_filter_counts
-    count = 0
-    @results.each { |key, value| count = count + value.count }
+    count = @results.count
     set_page_counts(count)
   end
 
   def set_filter_values
-    params[:status] ? @statuses = [params[:status]] : @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
-    params[:stage] ? @stages = [params[:stage]] : @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
-    params[:item_action] ? @actions = [params[:item_action]] : @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id) # This will definitely lead to institutions with no results listed in the filters w/o counts
-    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted) # As will this
-    params[:file_format] ? @formats = [params[:file_format]] : @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
-    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
-    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
+    case @result_type
+      when 'object'
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id) # This will definitely lead to institutions with no results listed in the filters w/o counts
+        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted) # As will this
+      when 'file'
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
+        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
+        params[:file_format] ? @formats = [params[:file_format]] : @formats = @results.distinct.pluck(:file_format)
+      when 'item'
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
+        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
+        params[:status] ? @statuses = [params[:status]] : @statuses = @results.distinct.pluck(:status)
+        params[:stage] ? @stages = [params[:stage]] : @stages = @results.distinct.pluck(:stage)
+        params[:item_action] ? @actions = [params[:item_action]] : @actions = @results.distinct.pluck(:action)
+      when 'event'
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
+        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
+        params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @results.distinct.pluck(:event_type)
+        params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @results.distinct.pluck(:outcome)
+    end
   end
 
   def set_filter_counts
-    @results.each do |key, results|
-      if key == :objects
-        set_inst_count(results, key)
-        set_access_count(results)
-      elsif key == :files
-        set_format_count(results, key)
-        set_inst_count(results, key)
-        set_access_count(results)
-      elsif key == :items
-        set_status_count(results)
-        set_stage_count(results)
-        set_action_count(results)
-        set_inst_count(results, key)
-        set_access_count(results)
-      elsif key == :events
-        set_inst_count(results, key)
-        set_access_count(results)
-        set_event_type_count(results)
-        set_outcome_count(results)
-      end
+    case @result_type
+      when 'object'
+        set_inst_count(@results, :objects)
+        set_access_count(@results)
+      when 'file'
+        set_format_count(@results, :files)
+        set_inst_count(@results, :files)
+        set_access_count(@results)
+      when 'item'
+        set_status_count(@results)
+        set_stage_count(@results)
+        set_action_count(@results)
+        set_inst_count(@results, :items)
+        set_access_count(@results)
+      when 'event'
+        set_inst_count(@results, :events)
+        set_access_count(@results)
+        set_event_type_count(@results)
+        set_outcome_count(@results)
     end
   end
 
