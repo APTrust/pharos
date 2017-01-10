@@ -71,13 +71,13 @@ class InstitutionsController < ApplicationController
   def set_recent_objects
     if (current_user.admin? && current_user.institution.identifier == @institution.identifier)  ||
         (current_user.institutional_admin? && current_user.institution.name == 'APTrust' && current_user.institution.identifier == @institution.identifier)
-      @items = WorkItem.order('date').limit(10).reverse_order
-      @size = GenericFile.bytes_by_format['all']
+      @items = WorkItem.limit(10).order('date').reverse_order
+      @size = GenericFile.sum(:size)
       @item_count = WorkItem.all.count
       @object_count = IntellectualObject.all.count
     else
-      @items = WorkItem.with_institution(@institution.id).order('date').limit(10).reverse_order
-      @size = @institution.bytes_by_format()['all']
+      @items = WorkItem.with_institution(@institution.id).limit(10).order('date').reverse_order
+      @size = @institution.generic_files.sum(:size)
       @item_count = WorkItem.with_institution(@institution.id).count
       @object_count = @institution.intellectual_objects.count
     end
@@ -88,7 +88,7 @@ class InstitutionsController < ApplicationController
     size = {}
     total_size = 0
     Institution.all.each do |inst|
-      size[inst.name] = inst.bytes_by_format()['all']
+      size[inst.name] = inst.generic_files.sum(:size)
       total_size = size[inst.name] + total_size
     end
     size['APTrust'] = total_size
