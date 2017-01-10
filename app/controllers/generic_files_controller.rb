@@ -276,7 +276,6 @@ class GenericFilesController < ApplicationController
     set_format_count(@generic_files, :file)
     set_access_count(@generic_files)
     #set_inst_count(@generic_files)
-    #set_io_assc_count(@generic_files) # DO NOT RUN THIS!
     count = @generic_files.count
     set_page_counts(count)
   end

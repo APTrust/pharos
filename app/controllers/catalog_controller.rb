@@ -70,10 +70,7 @@ class CatalogController < ApplicationController
         @results[:objects] = objects.with_bag_name_like(@q)
       when 'Title'
         @results[:objects] = objects.with_title_like(@q)
-      # when 'All Fields'
-      #   @results[:objects] = objects.where('intellectual_objects.identifier = ? OR alt_identifier LIKE ? OR bag_name LIKE ? OR title LIKE ?',
-      #                                      "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
-    end
+      end
   end
 
   def file_search
@@ -88,9 +85,7 @@ class CatalogController < ApplicationController
         @results[:files] = files.with_identifier(@q)
       when 'URI'
         @results[:files] = files.with_uri_like(@q)
-      # when 'All Fields'
-      #   @results[:files] = files.where('generic_files.identifier = ? OR generic_files.uri LIKE ?', "%#{@q}%", "%#{@q}%")
-    end
+      end
   end
 
   def item_search
@@ -109,10 +104,7 @@ class CatalogController < ApplicationController
         @results[:items] = items.with_object_identifier(@q)
       when 'File Identifier'
         @results[:items] = items.with_file_identifier(@q)
-      # when 'All Fields'
-      #   @results[:items] = items.where('name LIKE ? OR work_items.etag LIKE ? OR object_identifier = ? OR generic_file_identifier = ?',
-      #                                  "%#{@q}%", "%#{@q}%", "%#{@q}%", "%#{@q}%")
-    end
+      end
   end
 
   def event_search
@@ -128,9 +120,6 @@ class CatalogController < ApplicationController
         @results[:events] = events.with_object_identifier(@q)
       when 'File Identifier'
         @results[:events] = events.with_file_identifier(@q)
-      # when 'All Fields'
-      #   @results[:events] = events.where('premis_events.identifier = ? OR intellectual_object_identifier = ?
-      #                                     OR generic_file_identifier = ?', "%#{@q}%", "%#{@q}%", "%#{@q}%")
     end
   end
 
@@ -141,9 +130,6 @@ class CatalogController < ApplicationController
     filter_by_action unless params[:item_action].nil?
     filter_by_institution unless params[:institution].nil?
     filter_by_access unless params[:access].nil?
-    filter_by_object_association unless params[:object_association].nil?
-    filter_by_file_association unless params[:file_association].nil?
-    filter_by_type unless params[:type].nil?
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
     filter_by_event_type unless params[:event_type].nil?
@@ -162,7 +148,6 @@ class CatalogController < ApplicationController
     @institutions = Institution.pluck(:id)
     @accesses = %w(consortia institution restricted)
     @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
-    @types = ['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events']
     @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
     @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
   end
@@ -189,10 +174,6 @@ class CatalogController < ApplicationController
         set_outcome_count(results)
       end
     end
-    @type_counts['Intellectual Objects'] = @results[:objects].count unless @results[:objects].nil?
-    @type_counts['Generic Files'] = @results[:files].count unless @results[:files].nil?
-    @type_counts['Work Items'] = @results[:items].count unless @results[:items].nil?
-    @type_counts['Premis Events'] = @results[:events].count unless @results[:events].nil?
   end
 
 end

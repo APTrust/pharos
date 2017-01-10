@@ -109,9 +109,6 @@ class PremisEventsController < ApplicationController
     set_inst_count(@premis_events, :events)
     set_event_type_count(@premis_events)
     set_outcome_count(@premis_events)
-    # Don't run these!
-    #set_gf_assc_count(@premis_events)
-    #set_io_assc_count(@premis_events)
     count = @premis_events.count
     set_page_counts(count)
   end
