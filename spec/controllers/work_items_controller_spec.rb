@@ -619,6 +619,9 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
         expect(assigns(:work_item).name).to eq "#{name}.tar"
+        # For admin user, make sure WorkItem.user is set to exactly
+        # what we specify. Non-admin can't do this.
+        expect(assigns(:work_item).user).to eq "Kelly Croswell"
       end
     end
 
