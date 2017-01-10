@@ -135,21 +135,21 @@ class CatalogController < ApplicationController
     filter_by_event_type unless params[:event_type].nil?
     filter_by_outcome unless params[:outcome].nil?
     set_filter_values
-    set_filter_counts
+    #set_filter_counts
     count = 0
     @results.each { |key, value| count = count + value.count }
     set_page_counts(count)
   end
 
   def set_filter_values
-    @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
-    @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
-    @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
-    @institutions = Institution.pluck(:id)
-    @accesses = %w(consortia institution restricted)
-    @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
-    @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
-    @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
+    params[:status] ? @statuses = [params[:status]] : @statuses = @results[:items].distinct.pluck(:status) unless @results[:items].nil?
+    params[:stage] ? @stages = [params[:stage]] : @stages = @results[:items].distinct.pluck(:stage) unless @results[:items].nil?
+    params[:item_action] ? @actions = [params[:item_action]] : @actions = @results[:items].distinct.pluck(:action) unless @results[:items].nil?
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id) # This will definitely lead to institutions with no results listed in the filters w/o counts
+    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted) # As will this
+    params[:file_format] ? @formats = [params[:file_format]] : @formats = @results[:files].distinct.pluck(:file_format) unless @results[:files].nil?
+    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @results[:events].distinct.pluck(:event_type) unless @results[:events].nil?
+    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @results[:events].distinct.pluck(:outcome) unless @results[:events].nil?
   end
 
   def set_filter_counts

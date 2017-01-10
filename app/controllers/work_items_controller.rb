@@ -384,12 +384,12 @@ class WorkItemsController < ApplicationController
   end
 
   def set_filter_values
-    @statuses = @items.distinct.pluck(:status)
-    @stages = @items.distinct.pluck(:stage)
-    @actions = @items.distinct.pluck(:action)
-    @institutions = @items.distinct.pluck(:institution_id)
-    @accesses = %w(consortia institution restricted)
-    @object_associations = @items.distinct.pluck(:intellectual_object_id)
-    @file_associations = @items.distinct.pluck(:generic_file_id)
+    params[:status] ? @statuses = [params[:status]] : @statuses = @items.distinct.pluck(:status)
+    params[:stage] ? @stages = [params[:stage]] : @stages = @items.distinct.pluck(:stage)
+    params[:item_action] ? @actions = [params[:item_action]] : @actions = @items.distinct.pluck(:action)
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = @items.distinct.pluck(:institution_id)
+    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
+    params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
+    params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
   end
 end

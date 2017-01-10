@@ -114,11 +114,11 @@ class PremisEventsController < ApplicationController
   end
 
   def set_filter_values
-    @institutions = @premis_events.distinct.pluck(:institution_id)
-    @object_associations = @premis_events.distinct.pluck(:intellectual_object_id)
-    @file_associations = @premis_events.distinct.pluck(:generic_file_id)
-    @event_types = @premis_events.distinct.pluck(:event_type)
-    @outcomes = @premis_events.distinct.pluck(:outcome)
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = @premis_events.distinct.pluck(:institution_id)
+    params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @premis_events.distinct.pluck(:intellectual_object_id)
+    params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @premis_events.distinct.pluck(:generic_file_id)
+    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @premis_events.distinct.pluck(:event_type)
+    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @premis_events.distinct.pluck(:outcome)
   end
 
 end
