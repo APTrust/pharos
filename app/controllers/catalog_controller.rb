@@ -48,6 +48,7 @@ class CatalogController < ApplicationController
   def object_search
     # Limit results to those the current user is allowed to read.
     objects = IntellectualObject.discoverable(current_user)
+    @result_type = 'object'
     if @empty_param
       @results = objects
       return
@@ -62,12 +63,12 @@ class CatalogController < ApplicationController
       when 'Title'
         @results = objects.with_title_like(@q)
     end
-    @result_type = 'object'
   end
 
   def file_search
     # Limit results to those the current user is allowed to read.
     files = GenericFile.discoverable(current_user)
+    @result_type = 'file'
     if @empty_param
       @results = files
       return
@@ -78,12 +79,12 @@ class CatalogController < ApplicationController
       when 'URI'
         @results = files.with_uri_like(@q)
     end
-    @result_type = 'file'
   end
 
   def item_search
     # Limit results to those the current user is allowed to read.
     items = WorkItem.readable(current_user)
+    @result_type = 'item'
     if @empty_param
       @results = items
       return
@@ -98,11 +99,11 @@ class CatalogController < ApplicationController
       when 'File Identifier'
         @results = items.with_file_identifier(@q)
     end
-    @result_type = 'item'
   end
 
   def event_search
     events = PremisEvent.discoverable(current_user)
+    @result_type = 'event'
     if @empty_param
       @results = events
       return
@@ -115,7 +116,6 @@ class CatalogController < ApplicationController
       when 'File Identifier'
         @results = events.with_file_identifier(@q)
     end
-    @result_type = 'event'
   end
 
   def filter

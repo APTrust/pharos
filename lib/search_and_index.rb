@@ -164,7 +164,8 @@ module SearchAndIndex
       else
         counts = results.group(:institution_id).count
         counts.each do |id, number|
-          @inst_counts[id].nil? ? @inst_counts[id] = number : @inst_counts[id] += number
+          #@inst_counts[id].nil? ? @inst_counts[id] = number : @inst_counts[id] += number
+          @inst_counts[id] = number
         end
       end
     end
