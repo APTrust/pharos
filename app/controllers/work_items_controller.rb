@@ -392,7 +392,6 @@ class WorkItemsController < ApplicationController
     set_stage_count(@items)
     set_action_count(@items)
     set_inst_count(@items, :items)
-    set_access_count(@items)
     count = @items.count
     set_page_counts(count)
   end

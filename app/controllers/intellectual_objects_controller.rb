@@ -308,7 +308,6 @@ class IntellectualObjectsController < ApplicationController
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
     set_inst_count(@intellectual_objects, :objects)
-    set_access_count(@intellectual_objects)
     set_format_count(@intellectual_objects, :object)
     count = @intellectual_objects.count
     set_page_counts(count)

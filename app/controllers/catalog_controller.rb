@@ -130,7 +130,7 @@ class CatalogController < ApplicationController
     filter_by_event_type unless params[:event_type].nil?
     filter_by_outcome unless params[:outcome].nil?
     set_filter_values
-    #set_filter_counts
+    set_filter_counts
     count = @results.count
     set_page_counts(count)
   end
@@ -166,16 +166,13 @@ class CatalogController < ApplicationController
       when 'file'
         set_format_count(@results, :files)
         set_inst_count(@results, :files)
-        set_access_count(@results)
       when 'item'
         set_status_count(@results)
         set_stage_count(@results)
         set_action_count(@results)
         set_inst_count(@results, :items)
-        set_access_count(@results)
       when 'event'
         set_inst_count(@results, :events)
-        set_access_count(@results)
         set_event_type_count(@results)
         set_outcome_count(@results)
     end

@@ -106,6 +106,7 @@ class PremisEventsController < ApplicationController
     filter_by_outcome unless params[:outcome].nil?
     filter_by_file_association unless params[:file_association].nil?
     filter_by_object_association unless params[:object_association].nil?
+    filter_by_access unless params[:access].nil?
     set_inst_count(@premis_events, :events)
     set_event_type_count(@premis_events)
     set_outcome_count(@premis_events)
@@ -115,6 +116,7 @@ class PremisEventsController < ApplicationController
 
   def set_filter_values
     params[:institution] ? @institutions = [params[:institution]] : @institutions = @premis_events.distinct.pluck(:institution_id)
+    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
     params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @premis_events.distinct.pluck(:intellectual_object_id)
     params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @premis_events.distinct.pluck(:generic_file_id)
     params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @premis_events.distinct.pluck(:event_type)

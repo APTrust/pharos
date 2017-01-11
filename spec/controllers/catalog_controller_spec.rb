@@ -175,8 +175,8 @@ RSpec.describe CatalogController, type: :controller do
           it 'should return only the results to which you have access' do
             get :search, q: '*', search_field: 'File Identifier', object_type: 'Generic Files'
             # file_one is consortial, 4,5,6 belong to same inst as user
-            expect(assigns(:paged_results).size).to eq 4
-            expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id, @file_five.id, @file_six.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@file_four.id, @file_five.id, @file_six.id]
           end
 
           it 'should not return results that you do not have access to' do
@@ -201,8 +201,8 @@ RSpec.describe CatalogController, type: :controller do
         describe 'for premis event searches' do
           it 'should return only the results to which you have access' do
             get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events'
-            expect(assigns(:paged_results).size).to eq 4
-            expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_four.id, @event_five.id, @event_six.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@event_four.id, @event_five.id, @event_six.id]
           end
 
           it 'should not return results that you do not have access to' do
@@ -247,14 +247,14 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should filter results by access' do
             get :search, q: '*', search_field: 'File Identifier', object_type: 'Generic Files', access: 'consortia'
-            expect(assigns(:paged_results).size).to eq 2
-            expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id]
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@file_four.id]
           end
 
           it 'should filter results by format' do
             get :search, q: '*', search_field: 'File Identifier', object_type: 'Generic Files', file_format: 'application/xml'
-            expect(assigns(:paged_results).size).to eq 4
-            expect(assigns(:paged_results).map &:id).to match_array [@file_one.id, @file_four.id, @file_five.id, @file_six.id]
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@file_four.id, @file_five.id, @file_six.id]
           end
 
           # it 'should filter results by object association' do
@@ -313,7 +313,7 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should filter by access' do
             get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', access: 'consortia'
-            expect(assigns(:paged_results).map &:id).to match_array [@event_one.id, @event_four.id]
+            expect(assigns(:paged_results).map &:id).to match_array [@event_four.id]
           end
 
           it 'should filter by object association' do

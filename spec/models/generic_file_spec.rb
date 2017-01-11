@@ -229,13 +229,13 @@ RSpec.describe GenericFile, :type => :model do
     it 'should let inst user discover consortial file' do
       results = GenericFile.discoverable(inst_user)
       expect(results).to include(gf_own_consortia)
-      expect(results).to include(gf_other_consortia)
+      expect(results).not_to include(gf_other_consortia)
     end
 
     it 'should let inst admin discover consortial file' do
       results = GenericFile.discoverable(inst_admin)
       expect(results).to include(gf_own_consortia)
-      expect(results).to include(gf_other_consortia)
+      expect(results).not_to include(gf_other_consortia)
     end
 
     it 'should let sys admin discover consortial file' do

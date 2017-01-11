@@ -1,4 +1,4 @@
-<% if @event_types %>
+<% unless @event_type_counts == {} %>
 <div id="event_type-parent" class="panel panel-default">
   <div id="filter-title-event_type" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-event_type">
     <h5 class="panel-title">
@@ -12,7 +12,12 @@
             <script>selected("event_type", "<%= @selected[:event_type].capitalize %>", "<%=url_for(params.except :event_type)%>")</script>
         <% else %>
             <% @event_types.each do |type| %>
-                <li><span class="facet-label"><a href="<%= current_path('event_type', type) %>"><%= type.capitalize %></a></span></li>
+                <% unless @event_type_counts[type] == 0 || @event_type_counts[type].nil? || type.nil? %>
+                    <li>
+                      <span class="facet-label"><a href="<%= current_path('event_type', type) %>"><%= type.capitalize %></a></span>
+                      <span class="facet-count"><%= @event_type_counts[type] %></span>
+                    </li>
+                <% end %>
             <% end %>
         <% end %>
       </ul>

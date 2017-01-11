@@ -31,10 +31,8 @@ class GenericFile < ActiveRecord::Base
   }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :discoverable, ->(current_user) {
-    # Any user can discover any item at their institution,
-    # along with 'consortia' items from any institution.
     joins(:intellectual_object)
-    .where("(intellectual_objects.access = 'consortia' or intellectual_objects.institution_id = ?)", current_user.institution.id) unless current_user.admin?
+    .where('intellectual_objects.institution_id = ?', current_user.institution.id) unless current_user.admin?
   }
   scope :readable, ->(current_user) {
     # Inst admin can read anything at their institution.
