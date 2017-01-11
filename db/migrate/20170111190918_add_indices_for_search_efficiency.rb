@@ -8,7 +8,7 @@ class AddIndicesForSearchEfficiency < ActiveRecord::Migration
 
     add_index :work_items, :institution_id
 
-    add_index :generic_files, :institution_id
+    #add_index :generic_files, :institution_id
     add_index :generic_files, :file_format
 
     add_index :intellectual_objects, :access
