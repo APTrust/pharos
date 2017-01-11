@@ -12,41 +12,28 @@ module SearchAndIndex
     @action_counts = {}
     @event_type_counts = {}
     @outcome_counts = {}
-    @type_counts = {}
   end
 
   def filter_by_status
-    @results[:items] = @results[:items].with_status(params[:status]) unless @results.nil? || @results[:items].nil?
-    @results.delete(:files) unless @results.nil?
-    @results.delete(:objects) unless @results.nil?
-    @results.delete(:events) unless @results.nil?
+    @results = @results.with_status(params[:status]) unless @results.nil?
     @items = @items.with_status(params[:status]) unless @items.nil?
     @selected[:status] = params[:status]
   end
 
   def filter_by_stage
-    @results[:items] = @results[:items].with_stage(params[:stage]) unless @results.nil? || @results[:items].nil?
-    @results.delete(:files) unless @results.nil?
-    @results.delete(:objects) unless @results.nil?
-    @results.delete(:events) unless @results.nil?
+    @results = @results.with_stage(params[:stage]) unless @results.nil?
     @items = @items.with_stage(params[:stage]) unless @items.nil?
     @selected[:stage] = params[:stage]
   end
 
   def filter_by_action
-    @results[:items] = @results[:items].with_action(params[:item_action]) unless @results.nil? || @results[:items].nil?
-    @results.delete(:files) unless @results.nil?
-    @results.delete(:objects) unless @results.nil?
-    @results.delete(:events) unless @results.nil?
+    @results = @results.with_action(params[:item_action]) unless @results.nil?
     @items = @items.with_action(params[:item_action]) unless @items.nil?
     @selected[:item_action] = params[:item_action]
   end
 
   def filter_by_institution
-    @results[:objects] = @results[:objects].with_institution(params[:institution]) unless @results.nil? || @results[:objects].nil?
-    @results[:files] = @results[:files].with_institution(params[:institution]) unless @results.nil? || @results[:files].nil?
-    @results[:items] = @results[:items].with_institution(params[:institution]) unless @results.nil? || @results[:items].nil?
-    @results[:events] = @results[:events].with_institution(params[:institution]) unless @results.nil? || @results[:events].nil?
+    @results = @results.with_institution(params[:institution]) unless @results.nil?
     @intellectual_objects = @intellectual_objects.with_institution(params[:institution]) unless @intellectual_objects.nil?
     @generic_files = @generic_files.with_institution(params[:institution]) unless @generic_files.nil?
     @items = @items.with_institution(params[:institution]) unless @items.nil?
@@ -55,10 +42,7 @@ module SearchAndIndex
   end
 
   def filter_by_access
-    @results[:objects] = @results[:objects].with_access(params[:access]) unless @results.nil? || @results[:objects].nil?
-    @results[:files] = @results[:files].with_access(params[:access]) unless @results.nil? || @results[:files].nil?
-    @results[:items] = @results[:items].with_access(params[:access]) unless @results.nil? || @results[:items].nil?
-    @results[:events] = @results[:events].with_access(params[:access]) unless @results.nil? || @results[:events].nil?
+    @results = @results.with_access(params[:access]) unless @results.nil?
     @intellectual_objects = @intellectual_objects.with_access(params[:access]) unless @intellectual_objects.nil?
     @generic_files = @generic_files.with_access(params[:access]) unless @generic_files.nil?
     @items = @items.with_access(params[:access]) unless @items.nil?
@@ -66,64 +50,30 @@ module SearchAndIndex
   end
 
   def filter_by_format
-    @results[:files] = @results[:files].with_file_format(params[:file_format]) unless @results.nil? || @results[:files].nil?
-    @results[:objects] = @results[:objects].with_file_format(params[:file_format]) unless @results.nil? || @results[:objects].nil?
-    @results.delete(:items) unless @results.nil? || @results[:items].nil?
-    @results.delete(:events) unless @results.nil? || @results[:events].nil?
+    @results = @results.with_file_format(params[:file_format]) unless @results.nil?
     @intellectual_objects = @intellectual_objects.with_file_format(params[:file_format]) unless @intellectual_objects.nil?
     @generic_files = @generic_files.with_file_format(params[:file_format]) unless @generic_files.nil?
     @selected[:file_format] = params[:file_format]
   end
 
   def filter_by_object_association
-    @results[:items] = @results[:items].where(intellectual_object_id: params[:object_association]) unless @results.nil? || @results[:items].nil?
-    @results[:files] = @results[:files].where(intellectual_object_id: params[:object_association]) unless @results.nil? || @results[:files].nil?
-    @results.delete(:objects) unless @results.nil? || @results[:objects].nil?
-    @results[:events] = @results[:events].where(intellectual_object_id: params[:object_association]) unless @results.nil? || @results[:events].nil?
+    @results = @results.where(intellectual_object_id: params[:object_association]) unless @results.nil?
     @items = @items.where(intellectual_object_id: params[:object_association]) unless @items.nil?
     @premis_events = @premis_events.where(intellectual_object_id: params[:object_association]) unless @premis_events.nil?
     @selected[:object_association] = params[:object_association]
   end
 
   def filter_by_file_association
-    @results[:items] = @results[:items].where(generic_file_id: params[:file_association]) unless @results.nil? || @results[:items].nil?
-    @results.delete(:files) unless @results.nil? || @results[:files].nil?
-    @results.delete(:objects) unless @results.nil? || @results[:objects].nil?
-    @results[:events] = @results[:events].where(generic_file_id: params[:file_association]) unless @results.nil? || @results[:events].nil?
+    @results = @results.where(generic_file_id: params[:file_association]) unless @results.nil?
     @items = @items.where(generic_file_id: params[:file_association]) unless @items.nil?
     @premis_events = @premis_events.where(generic_file_id: params[:file_association]) unless @premis_events.nil?
     @selected[:file_association] = params[:file_association]
   end
 
-  def filter_by_type
-    case params[:type]
-      when 'Intellectual Objects'
-        @results.delete(:files)
-        @results.delete(:items)
-        @results.delete(:events)
-      when 'Generic Files'
-        @results.delete(:objects)
-        @results.delete(:items)
-        @results.delete(:events)
-      when 'Work Items'
-        @results.delete(:objects)
-        @results.delete(:files)
-        @results.delete(:events)
-      when 'Premis Events'
-        @results.delete(:objects)
-        @results.delete(:files)
-        @results.delete(:items)
-    end
-    @selected[:type] = params[:type]
-  end
-
   def filter_by_state
     params[:state] = 'A' if params[:state].nil?
     unless params[:state] == 'all'
-      @results[:objects] = @results[:objects].with_state(params[:state]) unless @results.nil? || @results[:objects].nil?
-      @results[:files] = @results[:files].with_state(params[:state]) unless @results.nil? || @results[:files].nil?
-      @results[:items] = @results[:items].with_state(params[:state]) unless @results.nil? || @results[:items].nil?
-      @results.delete(:events) unless @results.nil? || @results[:events].nil?
+      @results = @results.with_state(params[:state]) unless @results.nil?
       @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless @intellectual_objects.nil?
       @generic_files = @generic_files.with_state(params[:state]) unless @generic_files.nil?
       @items = @items.with_state(params[:state]) unless @items.nil?
@@ -132,19 +82,13 @@ module SearchAndIndex
   end
 
   def filter_by_event_type
-    @results.delete(:objects) unless @results.nil?
-    @results.delete(:files) unless @results.nil?
-    @results.delete(:items) unless @results.nil?
-    @results[:events] = @results[:events].with_type(params[:event_type]) unless @results.nil? || @results[:events].nil?
+    @results = @results.with_type(params[:event_type]) unless @results.nil?
     @premis_events = @premis_events.with_type(params[:event_type]) unless @premis_events.nil?
     @selected[:event_type] = params[:event_type]
   end
 
   def filter_by_outcome
-    @results.delete(:objects) unless @results.nil?
-    @results.delete(:files) unless @results.nil?
-    @results.delete(:items) unless @results.nil?
-    @results[:events] = @results[:events].with_outcome(params[:outcome]) unless @results.nil? || @results[:events].nil?
+    @results = @results.with_outcome(params[:outcome]) unless @results.nil?
     @premis_events = @premis_events.with_outcome(params[:outcome]) unless @premis_events.nil?
     @selected[:outcome] = params[:outcome]
   end
@@ -161,10 +105,18 @@ module SearchAndIndex
   end
 
   def sort_by_date
-    @results[:objects] = @results[:objects].order('created_at DESC') unless @results.nil? || @results[:objects].nil?
-    @results[:files] = @results[:files].order('created_at DESC') unless @results.nil? || @results[:files].nil?
-    @results[:items] = @results[:items].order('date DESC') unless @results.nil? || @results[:items].nil?
-    @results[:events] = @results[:events].order('date_time DESC') unless @results.nil? || @results[:events].nil?
+    if @result_type
+      case @result_type
+        when 'object'
+          @results = @results.order('created_at DESC') unless @results.nil?
+        when 'file'
+          @results = @results.order('created_at DESC') unless @results.nil?
+        when 'event'
+          @results = @results.order('date_time DESC') unless @results.nil?
+        when 'item'
+          @results = @results.order('date DESC') unless @results.nil?
+      end
+    end
     @intellectual_objects = @intellectual_objects.order('created_at DESC') unless @intellectual_objects.nil?
     @generic_files = @generic_files.order('created_at DESC') unless @generic_files.nil?
     @items = @items.order('date DESC') unless @items.nil?
@@ -172,10 +124,18 @@ module SearchAndIndex
   end
 
   def sort_by_name
-    @results[:objects] = @results[:objects].order('title') unless @results.nil? || @results[:objects].nil?
-    @results[:files] = @results[:files].order('uri') unless @results.nil? || @results[:files].nil?
-    @results[:items] = @results[:items].order('name') unless @results.nil? || @results[:items].nil?
-    @results[:events] = @results[:events].order('identifier').reverse_order unless @results.nil? || @results[:events].nil?
+    if @result_type
+      case @result_type
+        when 'object'
+          @results = @results.order('title') unless @results.nil?
+        when 'file'
+          @results = @results.order('uri') unless @results.nil?
+        when 'event'
+          @results = @results.order('identifier').reverse_order unless @results.nil?
+        when 'item'
+          @results = @results.order('name') unless @results.nil?
+      end
+    end
     @intellectual_objects = @intellectual_objects.order('bag_name').reverse_order unless @intellectual_objects.nil?
     @generic_files = @generic_files.order('uri') unless @generic_files.nil?
     @items = @items.order('name') unless @items.nil?
@@ -183,10 +143,7 @@ module SearchAndIndex
   end
 
   def sort_by_institution
-    @results[:objects] = @results[:objects].joins(:institution).order('institutions.name') unless @results.nil? || @results[:objects].nil?
-    @results[:files] = @results[:files].joins(:institution).order('institutions.name') unless @results.nil? || @results[:files].nil?
-    @results[:items] = @results[:items].joins(:institution).order('institutions.name') unless @results.nil? || @results[:items].nil?
-    @results[:events] = @results[:events].joins(:institution).order('institutions.name') unless @results.nil? || @results[:events].nil?
+    @results = @results.joins(:institution).order('institutions.name') unless @results.nil?
     @intellectual_objects = @intellectual_objects.joins(:institution).order('institutions.name') unless @intellectual_objects.nil?
     @generic_files = @generic_files.joins(:institution).order('institutions.name') unless @generic_files.nil?
     @items = @items.joins(:institution).order('institutions.name') unless @items.nil?
@@ -220,10 +177,6 @@ module SearchAndIndex
             @access_counts[acc] = results.with_access(acc).count :
             @access_counts[acc] = @access_counts[acc] + results.with_access(acc).count
       end
-      # counts = results.group(:access).count
-      # counts.each do |access, number|
-      #   @access_counts[access].nil? ? @access_counts[access] = number : @access_counts[access] += number
-      # end
     end
   end
 
@@ -244,40 +197,8 @@ module SearchAndIndex
     end
   end
 
-  # TODO: Remove the following two functions.
-  #
-  # These issue one query for each intellectual object or generic file
-  # owned by the institution. So 50,000 queries for UVA or Columbia objects.
-  # For PREMIS events, it issues millions of queries. This also causes the
-  # UI to render a list in the sidebar thousands or millions of items long.
-  #
-  # def set_io_assc_count(results)
-  #   unless @object_associations.nil?
-  #     @object_associations.each do |assc|
-  #       @io_assc_counts[assc].nil? ?
-  #           @io_assc_counts[assc] = results.where(intellectual_object_id: assc).count :
-  #           @io_assc_counts[assc] = @io_assc_counts[assc] + results.where(intellectual_object_id: assc).count
-  #     end
-  #   end
-  # end
-
-  # def set_gf_assc_count(results)
-  #   unless @file_associations.nil?
-  #     @file_associations.each do |assc|
-  #       @gf_assc_counts[assc].nil? ?
-  #           @gf_assc_counts[assc] = results.where(generic_file_id: assc).count :
-  #           @gf_assc_counts[assc] = @gf_assc_counts[assc] + results.where(generic_file_id: assc).count
-  #     end
-  #   end
-  # end
-
   def set_status_count(results)
     unless @statuses.nil?
-    #   @statuses.each do |status|
-    #     @status_counts[status].nil? ?
-    #         @status_counts[status] = results.where(status: status).count :
-    #         @status_counts[status] = @status_counts[status] + results.where(status: status).count
-    #   end
       counts = results.group(:status).order(:status).count
       counts.each do |status, number|
         @status_counts[status].nil? ? @status_counts[status] = number : @status_counts[status] += number
@@ -287,11 +208,6 @@ module SearchAndIndex
 
   def set_stage_count(results)
     unless @stages.nil?
-    #   @stages.each do |stage|
-    #     @stage_counts[stage].nil? ?
-    #         @stage_counts[stage] = results.where(stage: stage).count :
-    #         @stage_counts[stage] = @stage_counts[stage] + results.where(stage: stage).count
-    #   end
       counts = results.group(:stage).order(:stage).count
       counts.each do |stage, number|
         @stage_counts[stage].nil? ? @stage_counts[stage] = number : @stage_counts[stage] += number
@@ -301,11 +217,6 @@ module SearchAndIndex
 
   def set_action_count(results)
     unless @actions.nil?
-    #   @actions.each do |action|
-    #     @action_counts[action].nil? ?
-    #         @action_counts[action] = results.where(action: action).count :
-    #         @action_counts[action] = @action_counts[action] + results.where(action: action).count
-    #   end
       counts = results.group(:action).order(:action).count
       counts.each do |action, number|
         @action_counts[action].nil? ? @action_counts[action] = number : @action_counts[action] += number
@@ -315,11 +226,6 @@ module SearchAndIndex
 
   def set_event_type_count(results)
     unless @event_types.nil?
-    #   @event_types.each do |type|
-    #     @event_type_counts[type].nil? ?
-    #         @event_type_counts[type] = results.where(event_type: type).count :
-    #         @event_type_counts[type] = @event_type_counts[type] + results.where(event_type: type).count
-    #   end
       counts = results.group(:event_type).order(:event_type).count
       counts.each do |event_type, number|
         @event_type_counts[event_type].nil? ? @event_type_counts[event_type] = number :
@@ -330,11 +236,6 @@ module SearchAndIndex
 
   def set_outcome_count(results)
     unless @outcomes.nil?
-    #   @outcomes.each do |outcome|
-    #     @outcome_counts[outcome].nil? ?
-    #         @outcome_counts[outcome] = results.where(outcome: outcome).count :
-    #         @outcome_counts[outcome] = @outcome_counts[outcome] + results.where(outcome: outcome).count
-    #   end
       counts = results.group(:outcome).order(:outcome).count
       counts.each do |outcome, number|
         @outcome_counts[outcome].nil? ? @outcome_counts[outcome] = number :

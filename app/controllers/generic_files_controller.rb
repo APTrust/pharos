@@ -276,15 +276,14 @@ class GenericFilesController < ApplicationController
     set_format_count(@generic_files, :file)
     set_access_count(@generic_files)
     #set_inst_count(@generic_files)
-    #set_io_assc_count(@generic_files) # DO NOT RUN THIS!
     count = @generic_files.count
     set_page_counts(count)
   end
 
   def set_filter_values
-    #@institutions = @generic_files.joins(:intellectual_object).distinct.pluck(:institution_id)
-    @accesses = %w(consortia institution restricted)
-    @formats = @generic_files.distinct.pluck(:file_format)
-    @object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
+    #params[:institution] ? @institutions = [params[:institution]] : @institutions = @generic_files.joins(:intellectual_object).distinct.pluck(:institution_id)
+    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
+    params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
+    params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
   end
 end

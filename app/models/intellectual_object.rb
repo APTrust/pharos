@@ -20,18 +20,18 @@ class IntellectualObject < ActiveRecord::Base
   scope :updated_before, ->(param) { where('intellectual_objects.updated_at < ?', param) unless param.blank? }
   scope :updated_after, ->(param) { where('intellectual_objects.updated_at > ?', param) unless param.blank? }
   scope :with_description, ->(param) { where(description: param) unless param.blank? }
-  scope :with_description_like, ->(param) { where('intellectual_objects.description like ?', "%#{param}%") unless param.blank? }
+  scope :with_description_like, ->(param) { where('intellectual_objects.description like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
-  scope :with_identifier_like, ->(param) { where('intellectual_objects.identifier like ?', "%#{param}%") unless param.blank? }
+  scope :with_identifier_like, ->(param) { where('intellectual_objects.identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_alt_identifier, ->(param) { where(alt_identifier: param) unless param.blank? }
-  scope :with_alt_identifier_like, ->(param) { where('intellectual_objects.alt_identifier like ?', "%#{param}%") unless param.blank? }
+  scope :with_alt_identifier_like, ->(param) { where('intellectual_objects.alt_identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_institution, ->(param) { where(institution: param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :with_bag_name, ->(param) { where(bag_name: param) unless param.blank? }
-  scope :with_bag_name_like, ->(param) { where('intellectual_objects.bag_name like ?', "%#{param}%") unless param.blank? }
+  scope :with_bag_name_like, ->(param) { where('intellectual_objects.bag_name like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_etag, ->(param) { where(etag: param) unless param.blank? }
-  scope :with_etag_like, ->(param) { where('intellectual_objects.etag like ?', "%#{param}%") unless param.blank? }
-  scope :with_title_like, ->(param) { where('intellectual_objects.title like ?', "%#{param}%") unless param.blank? }
+  scope :with_etag_like, ->(param) { where('intellectual_objects.etag like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
+  scope :with_title_like, ->(param) { where('intellectual_objects.title like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_access, ->(param) { where(access: param) unless param.blank? }
   scope :with_file_format, ->(param) {
     joins(:generic_files)
@@ -66,6 +66,10 @@ class IntellectualObject < ActiveRecord::Base
 
   def to_param
     identifier
+  end
+
+  def self.empty_param(param)
+    (param.blank? || param.nil? || param == '*' || param == '' || param == '%') ? true : false
   end
 
   def bytes_by_format

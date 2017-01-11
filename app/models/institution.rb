@@ -40,6 +40,18 @@ class Institution < ActiveRecord::Base
     end
   end
 
+  def average_file_size
+    files = self.generic_files.where(state: 'A')
+    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
+    avg
+  end
+
+  def average_file_size_across_repo
+    files = GenericFile.where(state: 'A')
+    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
+    avg
+  end
+
   def statistics
     #sample = UsageSample.where(institution_id: id).map {|sample| sample.to_flot }
     stats = self.generic_files.group(:created_at).sum(:size)
@@ -49,6 +61,28 @@ class Institution < ActiveRecord::Base
       time_fixed.push(current_point)
     end
     time_fixed
+  end
+
+  def generate_overview
+    report = {}
+    report[:bytes_by_format] = self.bytes_by_format
+    report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
+    report[:generic_files] = self.generic_files.where(state: 'A').count
+    report[:premis_events] = self.premis_events.count
+    report[:work_items] = WorkItem.with_institution(self.id).count
+    report[:average_file_size] = average_file_size
+    report
+  end
+
+  def generate_overview_apt
+    report = {}
+    report[:bytes_by_format] = GenericFile.bytes_by_format
+    report[:intellectual_objects] = IntellectualObject.where(state: 'A').count
+    report[:generic_files] = GenericFile.where(state: 'A').count
+    report[:premis_events] = PremisEvent.count
+    report[:work_items] = WorkItem.count
+    report[:average_file_size] = self.average_file_size_across_repo
+    report
   end
 
   private
