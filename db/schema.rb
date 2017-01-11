@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161118152858) do
+ActiveRecord::Schema.define(version: 20170111190918) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -51,8 +51,10 @@ ActiveRecord::Schema.define(version: 20161118152858) do
     t.string   "state"
   end
 
+  add_index "generic_files", ["file_format"], name: "index_generic_files_on_file_format"
   add_index "generic_files", ["identifier"], name: "index_generic_files_on_identifier", unique: true
   add_index "generic_files", ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
+  add_index "generic_files", [nil], name: "index_generic_files_on_institution_id"
 
   create_table "institutions", force: :cascade do |t|
     t.string   "name"
@@ -79,6 +81,7 @@ ActiveRecord::Schema.define(version: 20161118152858) do
     t.string   "dpn_uuid"
   end
 
+  add_index "intellectual_objects", ["access"], name: "index_intellectual_objects_on_access"
   add_index "intellectual_objects", ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
   add_index "intellectual_objects", ["institution_id"], name: "index_intellectual_objects_on_institution_id"
 
@@ -95,16 +98,21 @@ ActiveRecord::Schema.define(version: 20161118152858) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.string   "outcome"
     t.integer  "institution_id"
+    t.string   "outcome"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
     t.string   "old_uuid"
   end
 
+  add_index "premis_events", ["event_type"], name: "index_premis_events_on_event_type"
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
+  add_index "premis_events", ["generic_file_identifier"], name: "index_premis_events_on_generic_file_identifier"
   add_index "premis_events", ["identifier"], name: "index_premis_events_on_identifier", unique: true
+  add_index "premis_events", ["institution_id"], name: "index_premis_events_on_institution_id"
   add_index "premis_events", ["intellectual_object_id"], name: "index_premis_events_on_intellectual_object_id"
+  add_index "premis_events", ["intellectual_object_identifier"], name: "index_premis_events_on_intellectual_object_identifier"
+  add_index "premis_events", ["outcome"], name: "index_premis_events_on_outcome"
 
   create_table "roles", force: :cascade do |t|
     t.string   "name"
@@ -189,6 +197,7 @@ ActiveRecord::Schema.define(version: 20161118152858) do
   add_index "work_items", ["action"], name: "index_work_items_on_action"
   add_index "work_items", ["etag", "name"], name: "index_work_items_on_etag_and_name"
   add_index "work_items", ["generic_file_id"], name: "index_work_items_on_generic_file_id"
+  add_index "work_items", ["institution_id"], name: "index_work_items_on_institution_id"
   add_index "work_items", ["intellectual_object_id"], name: "index_work_items_on_intellectual_object_id"
   add_index "work_items", ["stage"], name: "index_work_items_on_stage"
   add_index "work_items", ["status"], name: "index_work_items_on_status"
