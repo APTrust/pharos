@@ -29,7 +29,7 @@ class PremisEvent < ActiveRecord::Base
         .where('intellectual_objects.access = ?', param) unless param.blank?
   }
   scope :discoverable, ->(current_user) {
-    where(institution: current_user.institution) unless current_user.admin?
+    where(institution_id: current_user.institution.id) unless current_user.admin?
   }
   scope :readable, ->(current_user) {
     # Inst admin can read anything at their institution.

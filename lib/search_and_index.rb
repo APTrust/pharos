@@ -108,9 +108,9 @@ module SearchAndIndex
     if @result_type
       case @result_type
         when 'object'
-          @results = @results.order('created_at DESC') unless @results.nil?
+          @results = @results.order('updated_at DESC') unless @results.nil?
         when 'file'
-          @results = @results.order('created_at DESC') unless @results.nil?
+          @results = @results.order('updated_at DESC') unless @results.nil?
         when 'event'
           @results = @results.order('date_time DESC') unless @results.nil?
         when 'item'
@@ -129,7 +129,7 @@ module SearchAndIndex
         when 'object'
           @results = @results.order('title') unless @results.nil?
         when 'file'
-          @results = @results.order('uri') unless @results.nil?
+          @results = @results.order('identifier') unless @results.nil?
         when 'event'
           @results = @results.order('identifier').reverse_order unless @results.nil?
         when 'item'
@@ -262,7 +262,8 @@ module SearchAndIndex
   def page_results(results)
     @page = params[:page].to_i
     @per_page = params[:per_page].to_i
-    @paged_results = Kaminari.paginate_array(results).page(@page).per(@per_page)
+    #@paged_results = Kaminari.paginate_array(results).page(@page).per(@per_page)
+    @paged_results = results.page(@page).per(@per_page)
     @next = format_next
     @current = format_current
     @previous = format_previous

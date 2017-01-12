@@ -13,7 +13,6 @@ class CatalogController < ApplicationController
     end
     @results = []
     authorize current_user
-    generic_search if params[:object_type].nil?
     case params[:object_type]
       when 'Intellectual Objects'
         object_search
@@ -25,6 +24,7 @@ class CatalogController < ApplicationController
         event_search
     end
     filter
+    params[:sort] = 'date' unless params[:sort]
     sort
     page_results(@results)
     respond_to do |format|
