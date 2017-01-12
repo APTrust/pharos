@@ -98,20 +98,72 @@ function selected (category, filter, newpath) {
 }
 
 function fixFilters() {
-    var filterList = ['access', 'action', 'event_type', 'fassociation', 'format', 'institution', 'oassocation', 'outcome', 'stage', 'status', 'type']
-    for (var i = 0; i < filterList.length; i++) {
-        $("#filter-"+filterList[i]).on('shown.bs.collapse', function () {
-            $("."+filterList[i]+"-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-        });
-        $("#filter-"+filterList[i]).on('hidden.bs.collapse', function () {
-            $("."+filterList[i]+"-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-        });
-    }
+    $("#filter-access").on('shown.bs.collapse', function () {
+        $(".access-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-access").on('hidden.bs.collapse', function () {
+        $(".access-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-action").on('shown.bs.collapse', function () {
+        $(".action-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-action").on('hidden.bs.collapse', function () {
+        $(".action-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-event_type").on('shown.bs.collapse', function () {
+        $(".event_type-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-event_type").on('hidden.bs.collapse', function () {
+        $(".event_type-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-format").on('shown.bs.collapse', function () {
+        $(".format-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-format").on('hidden.bs.collapse', function () {
+        $(".format-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-institution").on('shown.bs.collapse', function () {
+        $(".institution-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-institution").on('hidden.bs.collapse', function () {
+        $(".institution-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-institution").on('shown.bs.collapse', function () {
+        $(".institution-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-institution").on('hidden.bs.collapse', function () {
+        $(".institution-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-outcome").on('shown.bs.collapse', function () {
+        $(".outcome-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-outcome").on('hidden.bs.collapse', function () {
+        $(".outcome-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-stage").on('shown.bs.collapse', function () {
+        $(".stage-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-stage").on('hidden.bs.collapse', function () {
+        $(".stage-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-status").on('shown.bs.collapse', function () {
+        $(".status-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-status").on('hidden.bs.collapse', function () {
+        $(".status-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
 }
 
 $(document).ready(function(){
     fixFilters();
-    //configureDropDownLists();
     activate_tabs();
     dropdown();
     fix_search_breadcrumb();
