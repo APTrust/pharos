@@ -270,7 +270,6 @@ class GenericFilesController < ApplicationController
     initialize_filter_counters
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
-    filter_by_access unless params[:access].nil?
     #filter_by_institution unless params[:institution].nil?
     filter_by_object_association unless params[:object_association].nil?
     set_format_count(@generic_files, :file)
@@ -281,7 +280,6 @@ class GenericFilesController < ApplicationController
 
   def set_filter_values
     #params[:institution] ? @institutions = [params[:institution]] : @institutions = @generic_files.joins(:intellectual_object).distinct.pluck(:institution_id)
-    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
     params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
     params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
   end

@@ -334,7 +334,6 @@ class WorkItemsController < ApplicationController
       .with_status(params[:status])
       .with_stage(params[:stage])
       .with_action(params[:item_action])
-      .with_access(params[:access])
       .queued(params[:queued])
       .with_node(params[:node])
       .with_unempty_node(params[:node_not_empty])
@@ -381,7 +380,6 @@ class WorkItemsController < ApplicationController
     filter_by_stage unless params[:stage].nil?
     filter_by_action unless params[:item_action].nil?
     filter_by_institution unless params[:institution].nil?
-    filter_by_access unless params[:access].nil?
     filter_by_object_association unless params[:object_association].nil?
     filter_by_file_association unless params[:file_association].nil?
     filter_by_state unless params[:state].nil?
@@ -403,7 +401,6 @@ class WorkItemsController < ApplicationController
     params[:stage] ? @stages = [params[:stage]] : @stages = @items.distinct.pluck(:stage)
     params[:item_action] ? @actions = [params[:item_action]] : @actions = @items.distinct.pluck(:action)
     params[:institution] ? @institutions = [params[:institution]] : @institutions = @items.distinct.pluck(:institution_id)
-    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
     params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
     params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
   end

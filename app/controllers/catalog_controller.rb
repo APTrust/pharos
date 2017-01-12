@@ -142,17 +142,14 @@ class CatalogController < ApplicationController
         params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted) # As will this
       when 'file'
         params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
-        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
         params[:file_format] ? @formats = [params[:file_format]] : @formats = @results.distinct.pluck(:file_format)
       when 'item'
         params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
-        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
         params[:status] ? @statuses = [params[:status]] : @statuses = @results.distinct.pluck(:status)
         params[:stage] ? @stages = [params[:stage]] : @stages = @results.distinct.pluck(:stage)
         params[:item_action] ? @actions = [params[:item_action]] : @actions = @results.distinct.pluck(:action)
       when 'event'
         params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
-        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
         params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @results.distinct.pluck(:event_type)
         params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @results.distinct.pluck(:outcome)
     end
@@ -162,7 +159,7 @@ class CatalogController < ApplicationController
     case @result_type
       when 'object'
         set_inst_count(@results, :objects)
-        set_access_count(@results)
+        #set_access_count(@results)
       when 'file'
         set_format_count(@results, :files)
         set_inst_count(@results, :files)
