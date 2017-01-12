@@ -159,7 +159,7 @@ class CatalogController < ApplicationController
     case @result_type
       when 'object'
         set_inst_count(@results, :objects)
-        #set_access_count(@results)
+        set_access_count(@results)
       when 'file'
         set_format_count(@results, :files)
         set_inst_count(@results, :files)
