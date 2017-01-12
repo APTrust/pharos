@@ -4,13 +4,19 @@
       <span class="input-group-addon">
         <label for="search_field" class="sr-only">Search</label>
 
-        <select name="object_type" id="object_type" class="search_field" onchange="configureDropDownLists();"><option value="Intellectual Objects">Intellectual Objects</option>
-          <option value="Generic Files">Generic Files</option>
-          <option value="Work Items">Work Items</option>
-          <option value="Premis Events">Premis Events</option>
-        </select>
-        <select name="search_field", id="search_field", class="search_field">
-        </select>
+        <%= select_tag :object_type, options_for_select(['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events'], params[:object_type]), onchange: 'configureDropDownLists();' %>
+        <%= select_tag :search_field, options_for_select([], params[:search_field]) %>
+
+        <% if params[:search_field] %>
+          <%= javascript_tag do %>
+                configureDropDownLists();
+                adjustSearchField('<%= params[:search_field] %>')
+          <% end %>
+        <% else %>
+          <%= javascript_tag do %>
+                configureDropDownLists();
+          <% end %>
+        <% end %>
 
       </span>
       <label for="q" class="sr-only">Search Box</label>

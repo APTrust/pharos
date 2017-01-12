@@ -22,16 +22,6 @@ function addClickFunctions() {
     }
 }
 
-function addSearchComment() {
-    var value = $("#search_field").val()
-    if( value == 'file_identifier') {
-        jQuery('<p/>', {
-            class: "italic",
-            text: "*Searching by File Identifier will bring back Generic File results. Searching by any other field will bring back Intellectual Object Results."
-        }).appendTo("#search-navbar");
-    }
-}
-
 function configureDropDownLists() {
     ddl1 = document.getElementById('object_type');
     ddl2 = document.getElementById('search_field');
@@ -77,6 +67,11 @@ function createOption(ddl, value) {
     ddl.options.add(opt);
 }
 
+function adjustSearchField(param) {
+    ddl2 = document.getElementById('search_field');
+    ddl2.value = param;
+}
+
 function selected (category, filter, newpath) {
     $("#filter-"+category+" ul li").remove();
     var parent = $("#"+category+"-parent")[0];
@@ -116,16 +111,9 @@ function fixFilters() {
 
 $(document).ready(function(){
     fixFilters();
-    configureDropDownLists();
+    //configureDropDownLists();
     activate_tabs();
     dropdown();
     fix_search_breadcrumb();
     addClickFunctions();
-    addSearchComment();
 });
-
-//$(document).on('page:load', activate_tabs);
-//$(document).on('page:load', dropdown);
-//$(document).on('page:load', fix_search_breadcrumb);
-//$(document).on('page:load', addClickFunctions);
-//$(document).on('page:load', addSearchComment);
