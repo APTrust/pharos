@@ -48,6 +48,15 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(data['results']).to eq([])
       end
 
+      it 'returns work items where the node is not null' do
+        node_item = FactoryGirl.create(:work_item, node: 'services.aptrust.org')
+        get :index, node_not_empty: true, format: :json
+        expect(response.status).to eq(200)
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(1)
+        expect(data['results'][0]['id']).to eq(node_item.id)
+      end
+
       it 'filters by queued' do
         WorkItem.update_all(queued_at: nil)
         get :index, queued: "true", format: :json
