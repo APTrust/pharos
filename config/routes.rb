@@ -32,6 +32,8 @@ Rails.application.routes.draw do
   post 'files/:intellectual_object_identifier', to: 'generic_files#create', format: [:json, :html], intellectual_object_identifier: object_ptrn
   post 'files/:intellectual_object_identifier', to: 'generic_files#update', format: [:json, :html], intellectual_object_identifier: object_ptrn
   resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/files'
+  get 'member-api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: :json, intellectual_object_identifier: object_ptrn
+
 
   # INSTITUTIONS (API)
   # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'
@@ -44,6 +46,8 @@ Rails.application.routes.draw do
   get 'events/:institution_identifier', to: 'premis_events#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_events
   get '/api/v2/events', to: 'premis_events#index', format: [:json, :html]
   post '/api/v2/events', to: 'premis_events#create', format: :json
+  get 'member-api/v2/events/:file_identifier', to: 'premis_events#index', format: :json, file_identifier: file_ptrn
+  get 'member-api/v2/events/:object_identifier', to: 'premis_events#index', format: :json, object_identifier: object_ptrn
 
   # WORK ITEM ROUTES
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
