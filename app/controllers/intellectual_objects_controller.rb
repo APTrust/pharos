@@ -151,6 +151,9 @@ class IntellectualObjectsController < ApplicationController
     if Pharos::Application.config.show_send_to_dpn_button == false
       message = 'We are not currently sending objects to DPN.'
       api_status_code = :conflict
+    elsif @intellectual_object.institution.dpn_uuid == ''
+      message = 'This item cannot be sent to DPN because the depositing institution is not a DPN member.'
+      api_status_code = :conflict
     elsif @intellectual_object.in_dpn?
       message = 'This item has already been sent to DPN.'
       api_status_code = :conflict
