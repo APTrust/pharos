@@ -34,13 +34,13 @@ class GenericFilesController < ApplicationController
         .created_after(params[:created_after])
         .updated_before(params[:updated_before])
         .updated_after(params[:updated_after])
+        .with_state('A')
       filter
       sort
       page_results(@generic_files)
       respond_to do |format|
         format.json {
-          @active_results = @generic_files.where(state: 'A')
-          render json: @active_results.map do |f| f.serializable_hash end
+          render json: { count: @count, next: @next, previous: @previous, results: @generic_files.map do |f| f.serializable_hash end }
         }
         format.html { }
       end
@@ -281,6 +281,6 @@ class GenericFilesController < ApplicationController
   def set_filter_values
     #params[:institution] ? @institutions = [params[:institution]] : @institutions = @generic_files.joins(:intellectual_object).distinct.pluck(:institution_id)
     params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
-    params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
+    #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
   end
 end

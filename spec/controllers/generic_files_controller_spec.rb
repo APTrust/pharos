@@ -37,8 +37,9 @@ RSpec.describe GenericFilesController, type: :controller do
       get :index, intellectual_object_identifier: @intellectual_object.identifier, format: :json
       expect(response).to be_successful
       response_data = JSON.parse(response.body)
-      expect(response_data.select{|f| f['state'] == 'A'}.count).to eq 1
-      expect(response_data.select{|f| f['state'] != 'A'}.count).to eq 0
+      expect(response_data['count']).to eq 1
+      expect(response_data['results'][0]['state']).to eq 'A'
+
     end
   end
 

@@ -32,7 +32,7 @@ class PremisEventsController < ApplicationController
     sort
     page_results(@premis_events)
     respond_to do |format|
-      format.json { render json: @premis_events.map { |event| event.serializable_hash } }
+      format.json { render json: { count: @count, next: @next, previous: @previous, results: @premis_events.map { |event| event.serializable_hash } } }
       format.html { }
     end
   end
