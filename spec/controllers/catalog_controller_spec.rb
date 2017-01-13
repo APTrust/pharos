@@ -327,7 +327,7 @@ RSpec.describe CatalogController, type: :controller do
           end
 
           it 'should filter by event type' do
-            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', event_type: 'ingest'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', event_type: 'ingestion'
             expect(assigns(:paged_results).map &:id).to include(@event_five.id)
           end
 

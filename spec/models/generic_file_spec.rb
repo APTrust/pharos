@@ -158,21 +158,23 @@ RSpec.describe GenericFile, :type => :model do
     end
   end
 
-  describe '#find_files_in_need_of_fixity' do
-    let(:subject) { FactoryGirl.create(:generic_file) }
-    let(:subject_two) { FactoryGirl.create(:generic_file) }
+  describe '#not_checked_since' do
     before do
+      PremisEvent.destroy_all
       GenericFile.destroy_all
     end
-    it 'should return only files with a fixity older than a given parameter' do
-      date = '2014-01-01T16:33:39Z'
-      date_two = '2014-12-12T16:33:39Z'
-      param = '2014-09-02T16:33:39Z'
-      subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
-      subject_two.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
-      files = GenericFile.find_files_in_need_of_fixity(param)
-      files.count.should == 1
-      files.first.identifier.should == subject.identifier
+    it 'should return only files that have not had a fixity check since the given date' do
+      dates = ['2017-01-01T00:00:00Z', '2016-01-01T00:00:00Z', '2015-01-01T00:00:00Z']
+      10.times do |i|
+        gf = FactoryGirl.create(:generic_file, state: 'A')
+        event = gf.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
+      end
+      files = GenericFile.not_checked_since('2015-01-01T00:00:00Z', 10, 0)
+      files.count.should == 3
+      files = GenericFile.not_checked_since('2016-01-01T00:00:00Z', 10, 0)
+      files.count.should == 6
+      files = GenericFile.not_checked_since('2017-01-01T00:00:00Z', 10, 0)
+      files.count.should == 10
     end
   end
 
