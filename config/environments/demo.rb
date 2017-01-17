@@ -77,7 +77,7 @@ Rails.application.configure do
     :address => "email-smtp.us-east-1.amazonaws.com",
     :authentication => :login,
     :enable_starttls_auto => true,
-    :port    => 465,
+    :port    => 587,
     :user_name => ENV['AWS_SES_USER'],
     :password => ENV['AWS_SES_PWD']
   }
