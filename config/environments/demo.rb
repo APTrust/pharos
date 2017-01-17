@@ -79,7 +79,7 @@ Rails.application.configure do
     :enable_starttls_auto => true,
     :port    => 465,
     :user_name => ENV['AWS_SES_USER'],
-    :password => ENV['AWS_SES_PASSWORD']
+    :password => ENV['AWS_SES_PWD']
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
