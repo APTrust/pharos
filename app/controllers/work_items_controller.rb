@@ -380,8 +380,8 @@ class WorkItemsController < ApplicationController
     filter_by_stage unless params[:stage].nil?
     filter_by_action unless params[:item_action].nil?
     filter_by_institution unless params[:institution].nil?
-    filter_by_object_association unless params[:object_association].nil?
-    filter_by_file_association unless params[:file_association].nil?
+    #filter_by_object_association unless params[:object_association].nil?
+    #filter_by_file_association unless params[:file_association].nil?
     filter_by_state unless params[:state].nil?
     date = format_date if params[:updated_since].present?
     pattern = '%' + params[:name_contains] + '%' if params[:name_contains].present?
@@ -401,7 +401,7 @@ class WorkItemsController < ApplicationController
     params[:stage] ? @stages = [params[:stage]] : @stages = @items.distinct.pluck(:stage)
     params[:item_action] ? @actions = [params[:item_action]] : @actions = @items.distinct.pluck(:action)
     params[:institution] ? @institutions = [params[:institution]] : @institutions = @items.distinct.pluck(:institution_id)
-    params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
-    params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
+    #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
+    #params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
   end
 end
