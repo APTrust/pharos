@@ -271,7 +271,7 @@ class GenericFilesController < ApplicationController
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
     #filter_by_institution unless params[:institution].nil?
-    filter_by_object_association unless params[:object_association].nil?
+    #filter_by_object_association unless params[:object_association].nil?
     set_format_count(@generic_files, :file)
     #set_inst_count(@generic_files)
     count = @generic_files.count
