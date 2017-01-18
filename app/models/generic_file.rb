@@ -74,16 +74,6 @@ class GenericFile < ActiveRecord::Base
     fixity
   end
 
-  # TODO: delete this when the controller no longer references it.
-  def self.find_files_in_need_of_fixity(date, options={})
-    rows = options[:rows] || 10
-    start = options[:start] || 0
-    files = GenericFile.joins(:premis_events).where('state = ? AND premis_events.event_type = ? AND premis_events.date_time <= ?',
-                                                    'A', 'fixity_check', date).order('premis_events.date_time').reverse_order
-    files = Kaminari.paginate_array(files).page(start).per(rows)
-    files
-  end
-
   def self.bytes_by_format
     stats = GenericFile.sum(:size)
     if stats
@@ -173,6 +163,8 @@ class GenericFile < ActiveRecord::Base
   # Note that this returns active (undeleted) files only.
   # We don't do fixity checks on deleted files.
   def self.not_checked_since(since_when, limit, offset)
+    limit = 10 if limit.blank? || limit < 1
+    offset ||= 0
     # Get a list of GenericFile ids that have no "fixity check"
     # event since the specified date. Then get the actual GenericFiles
     # with those ids.

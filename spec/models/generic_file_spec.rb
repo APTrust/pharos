@@ -175,6 +175,10 @@ RSpec.describe GenericFile, :type => :model do
       files.count.should == 6
       files = GenericFile.not_checked_since('2017-01-01T00:00:00Z', 10, 0)
       files.count.should == 10
+
+      # If we don't specify limit and offset, they should default to 10, 0
+      files = GenericFile.not_checked_since('2017-01-01T00:00:00Z', nil, nil)
+      files.count.should == 10
     end
   end
 

@@ -390,11 +390,35 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when signed in as an admin user' do
       before do
         sign_in user
+        PremisEvent.destroy_all
+        GenericFile.destroy_all
       end
 
       it 'allows access to the API endpoint' do
         get :index, alt_action: 'not_checked_since', date: '2015-01-31T14:31:36Z', format: :json
         expect(response.status).to eq 200
+      end
+
+
+      it 'should return only files that have not had a fixity check since the given date' do
+        dates = ['2017-01-01T00:00:00Z', '2016-01-01T00:00:00Z', '2015-01-01T00:00:00Z']
+        10.times do |i|
+          gf = FactoryGirl.create(:generic_file, state: 'A')
+          event = gf.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
+        end
+        get :index, alt_action: 'not_checked_since', date: '2015-01-01T00:00:00Z', start: 0, rows: 10, format: :json
+        expect(assigns[:generic_files].length).to eq 3
+
+        get :index, alt_action: 'not_checked_since', date: '2016-01-01T00:00:00Z', start: 0, rows: 10, format: :json
+        expect(assigns[:generic_files].length).to eq 6
+
+        get :index, alt_action: 'not_checked_since', date: '2017-01-01T00:00:00Z', start: 0, rows: 10, format: :json
+        expect(assigns[:generic_files].length).to eq 10
+
+        # Should get max 10 results by default if we omit start and rows.
+        get :index, alt_action: 'not_checked_since', date: '2017-01-01T00:00:00Z', format: :json
+        expect(assigns[:generic_files].length).to eq 10
+
       end
     end
   end
