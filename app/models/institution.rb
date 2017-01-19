@@ -53,7 +53,6 @@ class Institution < ActiveRecord::Base
   end
 
   def statistics
-    #sample = UsageSample.where(institution_id: id).map {|sample| sample.to_flot }
     stats = self.generic_files.group(:created_at).sum(:size)
     time_fixed = []
     stats.each do |key, value|
