@@ -53,7 +53,7 @@ class Institution < ActiveRecord::Base
   end
 
   def statistics
-    stats = self.generic_files.group(:created_at).sum(:size)
+    stats = self.generic_files.order(:created_at).group(:created_at).sum(:size)
     time_fixed = []
     stats.each do |key, value|
       current_point = [key.to_time.to_i*1000, value.to_i]
