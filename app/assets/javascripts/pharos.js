@@ -97,6 +97,24 @@ function selected (category, filter, newpath) {
     $("."+category+"-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
 }
 
+function plotGraph (statistics_array) {
+    var options = {
+        grid: {
+            margin: {
+                right: 20,
+                left: 70,
+                bottom: 20
+            }
+        },
+        xaxis: {
+            mode: "time",
+            timeformat: "%m/%d/%y",
+            minTickSize: [1, "day"]
+        }
+    };
+    $.plot("#chart", [statistics_array], options);
+}
+
 function fixFilters() {
     $("#filter-access").on('shown.bs.collapse', function () {
         $(".access-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");

@@ -82,6 +82,7 @@ class InstitutionsController < ApplicationController
       @object_count = @institution.intellectual_objects.count
     end
     @failed = @items.where(status: Pharos::Application::PHAROS_STATUSES['fail'])
+    @statistics = @institution.statistics
   end
 
   def find_all_sizes

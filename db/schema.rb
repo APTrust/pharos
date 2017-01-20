@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170118182228) do
+ActiveRecord::Schema.define(version: 20170119200149) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -194,7 +194,7 @@ ActiveRecord::Schema.define(version: 20170118182228) do
     t.boolean  "needs_admin_review",                  default: false, null: false
     t.integer  "institution_id"
     t.datetime "queued_at"
-    t.integer  "size"
+    t.integer  "size",                    limit: 8
     t.datetime "stage_started_at"
   end
 
