@@ -40,7 +40,7 @@ class GenericFilesController < ApplicationController
       page_results(@generic_files)
       respond_to do |format|
         format.json {
-          render json: { count: @count, next: @next, previous: @previous, results: @generic_files.map do |f| f.serializable_hash end }
+          render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map do |f| f.serializable_hash end }
         }
         format.html { }
       end
