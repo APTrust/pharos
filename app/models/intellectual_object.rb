@@ -134,8 +134,8 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def serializable_hash (options={})
-    last_ingested = self.last_ingested_version
-    etag = last_ingested.nil? ? nil : last_ingested.etag
+    #last_ingested = self.last_ingested_version
+    #etag = last_ingested.nil? ? nil : last_ingested.etag
     data = super(options)
     data.merge(
       in_dpn: in_dpn?,
