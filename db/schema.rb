@@ -101,8 +101,8 @@ ActiveRecord::Schema.define(version: 20170119200149) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.string   "outcome"
     t.integer  "institution_id"
+    t.string   "outcome"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
     t.string   "old_uuid"
