@@ -2,7 +2,7 @@ class WorkItemsController < ApplicationController
   include SearchAndIndex
   respond_to :html, :json
   before_filter :authenticate_user!
-  before_filter :set_item, only: :show
+  before_filter :set_item, only: [:show, :retry]
   before_filter :init_from_params, only: :create
   after_action :verify_authorized
 
@@ -61,6 +61,12 @@ class WorkItemsController < ApplicationController
         format.json { render nothing: true, status: :not_found }
         format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
       end
+    end
+  end
+
+  def retry
+    if @work_item
+      authorize @work_item
     end
   end
 

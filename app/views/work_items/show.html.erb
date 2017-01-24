@@ -6,6 +6,13 @@
   <section class="page-header">
     <h2><%= @work_item.name %></h2>
   </section>
+  <section class="queue">
+    <% if current_user.admin? %>
+        <%= link_to work_item_retry_path(@work_item.id), {class: 'btn doc-action-btn btn-normal disabled'} do %>
+            <i class="glyphicon glyphicon-repeat"></i> Requeue
+        <% end %>
+    <% end %>
+  </section>
 
   <section class="queue">
     <table class="table proc_item">
