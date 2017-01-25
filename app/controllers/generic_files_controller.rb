@@ -108,7 +108,7 @@ class GenericFilesController < ApplicationController
     authorize @generic_file
     @generic_file.state = 'A'
     if resource.update(single_generic_file_params)
-      head :no_content
+      render json: object_as_json, status: :ok
     else
       log_model_error(resource)
       render json: resource.errors, status: :unprocessable_entity
