@@ -6,7 +6,7 @@
   <section class="page-header">
     <h2><%= @work_item.name %></h2>
     <% if current_user.admin? %>
-        <%= link_to work_item_retry_path(@work_item.id), {class: 'btn doc-action-btn btn-normal disabled'} do %>
+        <%= link_to work_item_retry_path(@work_item.id), {class: 'btn doc-action-btn btn-normal requeue-link disabled'} do %>
             <i class="glyphicon glyphicon-repeat"></i> Requeue
         <% end %>
     <% end %>
