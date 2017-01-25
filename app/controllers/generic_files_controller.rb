@@ -2,7 +2,7 @@ class GenericFilesController < ApplicationController
   include SearchAndIndex
   before_filter :authenticate_user!
   before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:update, :create, :create_batch]
+  before_filter :load_intellectual_object, only: [:create, :create_batch]
   after_action :verify_authorized
 
   def index
