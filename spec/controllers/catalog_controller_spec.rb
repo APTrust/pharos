@@ -89,6 +89,12 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @object_four.id
           end
+
+          it 'should strip the leading and trailing whitespace from a search term' do
+            get :search, q: "   #{@object_one.identifier}   ", search_field: 'Object Identifier', object_type: 'Intellectual Objects'
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_one.id
+          end
         end
 
         describe 'for generic file searches' do
