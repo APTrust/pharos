@@ -60,7 +60,6 @@ end
 
 group :production do
   gem 'pg' # Necessary for talking to our RDS instance
-  gem "rails_12factor" # Necessary for heroku
 end
 
 group :development, :test, :demo, :production, :integration do

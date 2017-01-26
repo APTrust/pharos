@@ -53,11 +53,10 @@ class Institution < ActiveRecord::Base
   end
 
   def statistics
-    #sample = UsageSample.where(institution_id: id).map {|sample| sample.to_flot }
-    stats = self.generic_files.group(:created_at).sum(:size)
+    stats = self.generic_files.order(:created_at).group(:created_at).sum(:size)
     time_fixed = []
     stats.each do |key, value|
-      current_point = [key.to_time.to_i*1000, value]
+      current_point = [key.to_time.to_i*1000, value.to_i]
       time_fixed.push(current_point)
     end
     time_fixed

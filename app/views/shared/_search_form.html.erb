@@ -10,7 +10,7 @@
         <% if params[:search_field] %>
           <%= javascript_tag do %>
                 configureDropDownLists();
-                adjustSearchField('<%= params[:search_field] %>')
+                adjustSearchField('<%= params[:search_field] %>');
           <% end %>
         <% else %>
           <%= javascript_tag do %>

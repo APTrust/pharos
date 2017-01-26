@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170113183113) do
+ActiveRecord::Schema.define(version: 20170119200149) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(version: 20170113183113) do
   add_index "generic_files", ["file_format"], name: "index_generic_files_on_file_format"
   add_index "generic_files", ["identifier"], name: "index_generic_files_on_identifier", unique: true
   add_index "generic_files", ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
+  add_index "generic_files", ["size"], name: "index_generic_files_on_size"
   add_index "generic_files", ["updated_at"], name: "index_generic_files_on_updated_at"
 
   create_table "institutions", force: :cascade do |t|
@@ -193,7 +194,7 @@ ActiveRecord::Schema.define(version: 20170113183113) do
     t.boolean  "needs_admin_review",                  default: false, null: false
     t.integer  "institution_id"
     t.datetime "queued_at"
-    t.integer  "size"
+    t.integer  "size",                    limit: 8
     t.datetime "stage_started_at"
   end
 

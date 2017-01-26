@@ -46,13 +46,13 @@ class WorkItemsController < ApplicationController
   def show
     if @work_item
       authorize @work_item
+      (params[:with_state_json] == 'true' && current_user.admin?) ? @show_state = true : @show_state = false
       respond_to do |format|
         if current_user.admin?
-          item = @work_item.serializable_hash
+          format.json { render json: @work_item.serializable_hash }
         else
-          item = @work_item.serializable_hash(except: [:node, :pid])
+          format.json { render json: @work_item.serializable_hash(except: [:node, :pid]) }
         end
-        format.json { render json: item }
         format.html
       end
     else
