@@ -95,6 +95,12 @@ class WorkItem < ActiveRecord::Base
       .first
   end
 
+  def requeue_item
+    self.retry = true
+    self.status = Pharos::Application::PHAROS_STATUSES['pend']
+    self.save!
+  end
+
   def self.can_delete_file?(intellectual_object_identifier, generic_file_identifier)
     items = WorkItem.where(object_identifier: intellectual_object_identifier)
     items = items.order('date DESC')

@@ -67,6 +67,18 @@ class WorkItemsController < ApplicationController
   def retry
     if @work_item
       authorize @work_item
+      @work_item.requeue_item
+      ###ISSUE HTTP POST TO NSQ######
+      respond_to do |format|
+        format.json { render json: @work_item.serializable_hash }
+        format.html
+      end
+    else
+      authorize current_user, :nil_index?
+      respond_to do |format|
+        format.json { render nothing: true, status: :not_found }
+        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      end
     end
   end
 
