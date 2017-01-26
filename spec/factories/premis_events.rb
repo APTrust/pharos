@@ -2,7 +2,7 @@ FactoryGirl.define do
 
   factory :premis_event_ingest, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'ingestion' }
+    event_type { Pharos::Application::PHAROS_EVENT_TYPES['ingest'] }
     date_time { "#{Time.now}" }
     detail { 'Completed copy to S3 storage' }
     outcome { 'success' }
@@ -19,7 +19,7 @@ FactoryGirl.define do
 
   factory :premis_event_validation, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'validation' }
+    event_type { Pharos::Application::PHAROS_EVENT_TYPES['validate'] }
     date_time { "#{Time.now}" }
     detail { 'Check against bag manifest checksum' }
     outcome { 'success' }
@@ -30,7 +30,7 @@ FactoryGirl.define do
 
   factory :premis_event_deletion, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'deletion' }
+    event_type { Pharos::Application::PHAROS_EVENT_TYPES['delete'] }
     date_time { "#{Time.now}" }
     detail { 'Marked object or file for deletion' }
     outcome { 'success' }
@@ -41,7 +41,7 @@ FactoryGirl.define do
 
   factory :premis_event_fixity_generation, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'message digest calculation' }
+    event_type { Pharos::Application::PHAROS_EVENT_TYPES['digest_calc'] }
     date_time { "#{Time.now}" }
     detail { 'Calculated new fixity value' }
     outcome { 'success' }
@@ -57,7 +57,7 @@ FactoryGirl.define do
 
   factory :premis_event_fixity_check, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'fixity check' }
+    event_type { Pharos::Application::PHAROS_EVENT_TYPES['fixity'] }
     date_time { "#{Time.now}" }
     detail { 'Fixity check against registered hash' }
     outcome { 'success' }
@@ -74,7 +74,7 @@ FactoryGirl.define do
 
   factory :premis_event_identifier, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'identifier assignment' }
+    event_type { Pharos::Application::PHAROS_EVENT_TYPES['ident_assignment'] }
     date_time { "#{Time.now}" }
     detail { 'S3 key generated for file' }
     outcome { 'success' }

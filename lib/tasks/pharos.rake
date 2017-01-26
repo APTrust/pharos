@@ -476,7 +476,7 @@ namespace :pharos do
         if type_array.include?(event.event_type)
           possible_dupes = current_object.premis_events.where(event_type: event.event_type)
           gf_ident_array = []
-          if event.event_type == 'fixity_check'
+          if event.event_type == Pharos::Application::PHAROS_EVENT_TYPES['fixity']
             break
           else
             possible_dupes.each do |current_dupe|

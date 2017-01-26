@@ -26,8 +26,8 @@ RSpec.describe PremisEvent, :type => :model do
     end
 
     it 'should properly set an event_type' do
-      subject.event_type = 'deletion'
-      subject.event_type.should == 'deletion'
+      subject.event_type = Pharos::Application::PHAROS_EVENT_TYPES['delete']
+      subject.event_type.should == Pharos::Application::PHAROS_EVENT_TYPES['delete']
     end
 
     it 'should properly set a date_time' do

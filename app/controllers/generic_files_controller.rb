@@ -124,7 +124,7 @@ class GenericFilesController < ApplicationController
       redirect_to @generic_file
       flash[:alert] = 'This file has already been deleted.'
     elsif result == 'true'
-      attributes = { event_type: 'delete',
+      attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                      date_time: "#{Time.now}",
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',

@@ -109,7 +109,7 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     elsif pending.nil?
-      attributes = { event_type: 'delete',
+      attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                      date_time: "#{Time.now}",
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',

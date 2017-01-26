@@ -469,7 +469,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'D'
         expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq 'delete'
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
       end
 
       it 'should not delete already deleted item' do
@@ -495,7 +495,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'D'
         expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq 'delete'
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
       end
 
       it 'should say OK and return no content if the item was previously deleted' do

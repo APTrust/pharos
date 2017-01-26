@@ -69,7 +69,7 @@ class GenericFile < ActiveRecord::Base
   # https://github.com/APTrust/exchange/blob/master/constants/constants.go
   def find_latest_fixity_check
     fixity = ''
-    latest = self.premis_events.where(event_type: 'fixity check').order('date_time DESC').first.date_time
+    latest = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['fixity']).order('date_time DESC').first.date_time
     fixity = latest unless latest.nil?
     fixity
   end
@@ -171,7 +171,7 @@ class GenericFile < ActiveRecord::Base
     query_template = "select gf.id from generic_files gf where state = 'A' " +
       "and gf.identifier not in " +
       "(select generic_file_identifier from premis_events " +
-      "where event_type = 'fixity check' and date_time > :since_when) " +
+      "where event_type = '#{Pharos::Application::PHAROS_EVENT_TYPES['fixity']}' and date_time > :since_when) " +
       "order by gf.created_at asc limit :limit offset :offset"
     safe_query = sanitize_sql([query_template, since_when: since_when, limit: limit, offset: offset])
     query_result = connection.exec_query(safe_query)
