@@ -11,6 +11,7 @@ class CatalogController < ApplicationController
       @q = params[:q]
       @empty_param = false
     end
+    @q = @q.strip
     @results = []
     authorize current_user
     case params[:object_type]

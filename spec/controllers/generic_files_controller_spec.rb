@@ -302,7 +302,7 @@ RSpec.describe GenericFilesController, type: :controller do
         it 'should update the file' do
           patch :update, intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(assigns[:generic_file].size).to eq 99
-          expect(response.code).to eq '204'
+          expect(response.code).to eq '200'
         end
 
         it 'should update the file by identifier (API)' do
@@ -312,7 +312,7 @@ RSpec.describe GenericFilesController, type: :controller do
           file.premis_events << new_event
           patch :update, generic_file_identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true
           expect(assigns[:generic_file].size).to eq 99
-          expect(response.code).to eq '204'
+          expect(response.code).to eq '200'
           file.reload
           expect(file.checksums.count).to eq(checksum_count + 1)
           expect(file.premis_events.count).to eq(premis_event_count + 1)
