@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170119200149) do
+ActiveRecord::Schema.define(version: 20170127175119) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
