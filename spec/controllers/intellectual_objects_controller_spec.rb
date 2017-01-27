@@ -304,7 +304,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1) }
+    let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1, ingest_state: '{[]}') }
 
     after do
       PremisEvent.delete_all
@@ -412,16 +412,18 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should update the object and respond with redirect (html)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', ingest_state: '{[A]}'}
         expect(response).to redirect_to intellectual_object_path(obj1.identifier)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Foo'
+        expect(saved_obj.ingest_state).to eq '{[A]}'
       end
       it 'should update the object and respond with json (json)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food'}, format: :json
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}'}, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'
+        expect(saved_obj.ingest_state).to eq '{[D]}'
       end
     end
 
