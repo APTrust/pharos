@@ -37,11 +37,9 @@ class IntellectualObjectsController < ApplicationController
     sort
     page_results(@intellectual_objects)
     respond_to do |format|
-      if params[:with_ingest_state] == 'true' && current_user.admin?
-        format.json { render json: {count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash(include: :ingest_state)}} }
-      else
-        format.json { render json: {count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash}} }
-      end
+      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
+          format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |item| item.serializable_hash(include: [:ingest_state]) } } } :
+          format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |item| item.serializable_hash } } }
       format.html {
         index!
       }
@@ -259,7 +257,7 @@ class IntellectualObjectsController < ApplicationController
       data
     else
       (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          @intellectual_object.serializable_hash(include: :ingest_state) :
+          @intellectual_object.serializable_hash(include: [:ingest_state]) :
           @intellectual_object.serializable_hash
 
     end

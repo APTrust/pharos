@@ -39,10 +39,10 @@ class GenericFilesController < ApplicationController
       sort
       page_results(@generic_files)
       respond_to do |format|
-        format.json {
-          render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map do |f| f.serializable_hash end }
-        }
-        format.html { }
+        (params[:with_ingest_state] == 'true' && current_user.admin?) ?
+            format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash(include: [:ingest_state]) } } } :
+            format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash } } }
+            format.html { }
       end
     end
   end
@@ -178,14 +178,17 @@ class GenericFilesController < ApplicationController
     @generic_files = GenericFile.find_files_in_need_of_fixity(params[:date], {rows: params[:rows], start: params[:start]})
     respond_to do |format|
       # Return active files only, not deleted files!
-      format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum]) } }
+      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
+          format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum, :ingest_state]) } } :
+          format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum]) } }
+
       format.html { }
     end
   end
 
   def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
-      .permit(:id, :uri, :identifier, :size,
+      .permit(:id, :uri, :identifier, :size, :ingest_state,
               :file_format, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
@@ -197,7 +200,7 @@ class GenericFilesController < ApplicationController
 
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
-      .permit(files: [:id, :uri, :identifier, :size,
+      .permit(files: [:id, :uri, :identifier, :size, :ingest_state,
                       :file_format, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
@@ -235,14 +238,21 @@ class GenericFilesController < ApplicationController
 
   def object_as_json
     if params[:include_relations]
-      @generic_file.serializable_hash(include: [:checksum, :premis_events])
+      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
+          @generic_file.serializable_hash(include: [:checksum, :premis_events, :ingest_state]) :
+          @generic_file.serializable_hash(include: [:checksum, :premis_events])
     else
-      @generic_file.serializable_hash()
+      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
+          @generic_file.serializable_hash(include: [:ingest_state]) :
+      @generic_file.serializable_hash
     end
   end
 
   def array_as_json(list_of_generic_files)
-    files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+    (params[:with_ingest_state] == 'true' && current_user.admin?) ?
+        files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events, :ingest_state]) } :
+        files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+
     # For consistency on the client end, make this list
     # look like every other list the API returns.
     {

@@ -169,7 +169,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'should update fields' do
-        post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
+        post :create, intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', ingest_state: '{[A]}', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]}, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
           expect(file.uri).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg'
@@ -300,8 +300,9 @@ RSpec.describe GenericFilesController, type: :controller do
         let(:new_checksum) { FactoryGirl.create(:checksum, generic_file: file) }
         let(:new_event) { FactoryGirl.create(:premis_event_validation, generic_file: file) }
         it 'should update the file' do
-          patch :update, intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file, generic_file: {size: 99}, format: 'json', trailing_slash: true
+          patch :update, intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file, generic_file: {size: 99, ingest_state: '{[D]}'}, format: 'json', trailing_slash: true
           expect(assigns[:generic_file].size).to eq 99
+          expect(assigns[:generic_file].ingest_state).to eq '{[D]}'
           expect(response.code).to eq '200'
         end
 

@@ -111,7 +111,23 @@ class GenericFile < ActiveRecord::Base
 
   # This is for serializing JSON in the API.
   def serializable_hash(options={})
+    options[:except].nil? ? options[:except] = :ingest_state : options[:except] = options[:except].push(:ingest_state)
+    if !options[:include].nil? && options[:include].include?(:ingest_state)
+      merge_state = true
+      options[:include].delete(:ingest_state)
+      options.delete(:include) if options[:include] == []
+    end
     data = super(options)
+    if merge_state == true
+      if self.ingest_state.nil?
+        data.merge(
+            ingest_state: '[]'
+        )
+      else
+        state = JSON.parse(self.ingest_state)
+        data.merge!(state)
+      end
+    end
     data['intellectual_object_identifier'] = self.intellectual_object.identifier
     if options.has_key?(:include)
       data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksums)
