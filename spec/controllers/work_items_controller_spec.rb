@@ -6,8 +6,8 @@ RSpec.describe WorkItemsController, type: :controller do
   let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
   let!(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
   let!(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
-  let!(:item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
-  let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, status: Pharos::Application::PHAROS_STATUSES['fail']) }
+  let!(:item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success'], retry: false) }
+  let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, status: Pharos::Application::PHAROS_STATUSES['fail'], retry: false) }
   let!(:state_item) { FactoryGirl.create(:work_item_state, work_item: item) }
   let!(:user_state_item) { FactoryGirl.create(:work_item_state, work_item: user_item) }
 
@@ -69,6 +69,19 @@ RSpec.describe WorkItemsController, type: :controller do
         get :index, queued: "false", format: :json
         assigns(:items).should be_empty
         get :index, queued: "true", format: :json
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(2)
+      end
+
+      it 'filters by retry' do
+        WorkItem.first.update(retry: true)
+        get :index, format: :json
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(2)
+        WorkItem.update_all(retry: true)
+        get :index, retry: 'false', format: :json
+        assigns(:items).should be_empty
+        get :index, retry: 'true', format: :json
         data = JSON.parse(response.body)
         expect(data['count']).to eq(2)
       end
