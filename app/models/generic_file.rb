@@ -120,9 +120,7 @@ class GenericFile < ActiveRecord::Base
     data = super(options)
     if merge_state == true
       if self.ingest_state.nil?
-        data.merge(
-            ingest_state: '[]'
-        )
+        data['ingest_state'] = '[]'
       else
         state = JSON.parse(self.ingest_state)
         data.merge!(state)

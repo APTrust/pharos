@@ -143,9 +143,7 @@ class IntellectualObject < ActiveRecord::Base
     data = super(options)
     if merge_state == true
       if self.ingest_state.nil?
-        data.merge(
-            ingest_state: '[]'
-        )
+        data['ingest_state'] = '[]'
       else
         state = JSON.parse(self.ingest_state)
         data.merge!(state)
@@ -157,6 +155,7 @@ class IntellectualObject < ActiveRecord::Base
         file_size: gf_size,
         institution: self.institution.identifier,
     )
+    data
   end
 
   # Returns the WorkItem describing the last ingested
