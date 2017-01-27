@@ -20,7 +20,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst2) }
   let!(:obj4) { FactoryGirl.create(:restricted_intellectual_object,
                                    institution: inst1,
-                                   title: "Manchester City",
+                                   title: 'Manchester City',
                                    description: 'The other Manchester team.') }
   let!(:obj5) { FactoryGirl.create(:restricted_intellectual_object,
                                    institution: inst2) }
@@ -28,8 +28,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst1,
                                    bag_name: '12345-abcde',
                                    alt_identifier: 'test.edu/some-bag',
-                                   created_at: "2011-10-10T10:00:00Z",
-                                   updated_at: "2011-10-10T10:00:00Z") }
+                                   created_at: '2011-10-10T10:00:00Z',
+                                   updated_at: '2011-10-10T10:00:00Z') }
   let!(:file1) { FactoryGirl.create(:generic_file,
                                     intellectual_object: obj2) }
   let!(:event1) { FactoryGirl.create(:premis_event_ingest,
@@ -108,16 +108,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           get :index, description_like: 'Aberdeen'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, identifier: "test.edu/baggie"
+          get :index, identifier: 'test.edu/baggie'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, identifier_like: "baggie"
+          get :index, identifier_like: 'baggie'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, alt_identifier: "test.edu/some-bag"
+          get :index, alt_identifier: 'test.edu/some-bag'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, alt_identifier_like: "some-bag"
+          get :index, alt_identifier_like: 'some-bag'
           expect(assigns(:intellectual_objects).size).to eq 1
         end
       end
@@ -199,7 +199,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(assigns(:intellectual_object)).to eq obj3
       end
 
-      it "should serialize files when asked" do
+      it 'should serialize files when asked' do
         get :show, intellectual_object_identifier: obj2, format: :json, include_files: 'true'
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
@@ -209,7 +209,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data.has_key?('premis_events')).to be false
       end
 
-      it "should serialize events when asked" do
+      it 'should serialize events when asked' do
         get :show, intellectual_object_identifier: obj2, format: :json, include_events: 'true'
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
@@ -218,8 +218,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data.has_key?('generic_files')).to be false
       end
 
-      it "should serialize files and events when asked" do
+      it 'should serialize files and events when asked' do
         get :show, intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true'
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+        data = JSON.parse(response.body)
+        expect(data.has_key?('premis_events')).to be true
+        expect(data.has_key?('generic_files')).to be true
+        expect(data['generic_files'][0].has_key?('checksums')).to be true
+        expect(data['generic_files'][0].has_key?('premis_events')).to be true
+      end
+
+      it 'should serialize files, events, and state when asked' do
+        get :show, intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true', with_ingest_state: 'true'
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
         data = JSON.parse(response.body)

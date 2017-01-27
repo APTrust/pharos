@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170127175119) do
+ActiveRecord::Schema.define(version: 20170127181045) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 20170127175119) do
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
     t.string   "state"
+    t.text     "ingest_state"
   end
 
   add_index "generic_files", ["file_format"], name: "index_generic_files_on_file_format"
@@ -81,6 +82,7 @@ ActiveRecord::Schema.define(version: 20170127175119) do
     t.string   "state"
     t.string   "etag"
     t.string   "dpn_uuid"
+    t.text     "ingest_state"
   end
 
   add_index "intellectual_objects", ["access"], name: "index_intellectual_objects_on_access"

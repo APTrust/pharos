@@ -134,14 +134,28 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def serializable_hash (options={})
-    #last_ingested = self.last_ingested_version
-    #etag = last_ingested.nil? ? nil : last_ingested.etag
+    options[:except].nil? ? options[:except] = :ingest_state : options[:except] = options[:except].push(:ingest_state)
+    if !options[:include].nil? && options[:include].include?(:ingest_state)
+      merge_state = true
+      options[:include].delete(:ingest_state)
+      options.delete(:include) if options[:include] == []
+    end
     data = super(options)
+    if merge_state == true
+      if self.ingest_state.nil?
+        data.merge(
+            ingest_state: '[]'
+        )
+      else
+        state = JSON.parse(self.ingest_state)
+        data.merge!(state)
+      end
+    end
     data.merge(
-      in_dpn: in_dpn?,
-      file_count: gf_count,
-      file_size: gf_size,
-      institution: self.institution.identifier,
+        in_dpn: in_dpn?,
+        file_count: gf_count,
+        file_size: gf_size,
+        institution: self.institution.identifier,
     )
   end
 
