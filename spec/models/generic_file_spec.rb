@@ -118,7 +118,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h1.has_key?('state')).to be true
           expect(h1.has_key?('intellectual_object_identifier')).to be true
 
-          h2 = subject.serializable_hash(include: [:checksums, :premis_events])
+          h2 = subject.serializable_hash(include: [:checksums, :premis_events, :ingest_state])
           expect(h2.has_key?('id')).to be true
           expect(h2.has_key?('uri')).to be true
           expect(h2.has_key?('size')).to be true
@@ -130,6 +130,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h2.has_key?('checksums')).to be true
           expect(h2.has_key?('premis_events')).to be true
           expect(h2.has_key?('intellectual_object_identifier')).to be true
+          expect(h2.has_key?('ingest_state')).to be true
         end
       end
 
