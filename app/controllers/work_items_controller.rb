@@ -337,6 +337,7 @@ class WorkItemsController < ApplicationController
       .queued(params[:queued])
       .with_node(params[:node])
       .with_unempty_node(params[:node_not_empty])
+      .with_empty_node(params[:node_empty])
     count = @items.count
     set_page_counts(count)
   end

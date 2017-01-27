@@ -50,10 +50,19 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'returns work items where the node is not null' do
         node_item = FactoryGirl.create(:work_item, node: 'services.aptrust.org')
-        get :index, node_not_empty: true, format: :json
+        get :index, node_not_empty: 'true', format: :json
         expect(response.status).to eq(200)
         data = JSON.parse(response.body)
         expect(data['count']).to eq(1)
+        expect(data['results'][0]['id']).to eq(node_item.id)
+      end
+
+      it 'returns work items where the node is null' do
+        node_item = FactoryGirl.create(:work_item, node: nil)
+        get :index, node_empty: true, format: :json
+        expect(response.status).to eq(200)
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(3)
         expect(data['results'][0]['id']).to eq(node_item.id)
       end
 
