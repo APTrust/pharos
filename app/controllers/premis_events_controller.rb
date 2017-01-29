@@ -57,7 +57,12 @@ class PremisEventsController < ApplicationController
   protected
 
   def load_intellectual_object
-    identifier = params[:object_identifier].gsub(/%2F/i, '/')
+    # Param names should be consistent!
+    identifier_param = params[:object_identifier]
+    if identifier_param.blank? && !params[:intellectual_object_identifier].blank?
+      identifier_param = params[:intellectual_object_identifier]
+    end
+    identifier = identifier_param.gsub(/%2F/i, '/')
     @parent = IntellectualObject.where(identifier: identifier).first
     params[:intellectual_object_id] = @parent.id
   end
