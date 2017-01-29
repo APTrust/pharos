@@ -102,10 +102,12 @@ class GenericFile < ActiveRecord::Base
     attributes[:identifier] = SecureRandom.uuid
     io = IntellectualObject.find(self.intellectual_object_id)
     WorkItem.create_delete_request(io.identifier,
-                                        self.identifier,
-                                        user_email)
+                                   self.identifier,
+                                   user_email)
     self.state = 'D'
-    self.add_event(attributes)
+    # Let exchange services create the file delete
+    # event when it actually deletes the file.
+    # self.add_event(attributes)
     self.save!
   end
 
