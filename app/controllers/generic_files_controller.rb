@@ -25,6 +25,7 @@ class GenericFilesController < ApplicationController
         authorize @institution, :index_through_institution?
         @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
       end
+      params[:state] = 'A' if params[:state].nil?
       @generic_files = @generic_files
         .with_identifier(params[:identifier])
         .with_identifier_like(params[:identifier_like])
@@ -34,7 +35,6 @@ class GenericFilesController < ApplicationController
         .created_after(params[:created_after])
         .updated_before(params[:updated_before])
         .updated_after(params[:updated_after])
-        .with_state('A')
       filter
       sort
       page_results(@generic_files)
