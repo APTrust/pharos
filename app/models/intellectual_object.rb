@@ -137,6 +137,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def all_files_deleted?
+    return false if generic_files.count == 0
     (generic_files.count == generic_files.where(state: 'D').count) ? true : false
   end
 

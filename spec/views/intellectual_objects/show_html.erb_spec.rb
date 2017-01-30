@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'intellectual_objects/show.html.erb' do
   let(:institution) { FactoryGirl.create :institution }
   let(:user) { FactoryGirl.create :user, :admin, institution: institution }
-  let(:object) { FactoryGirl.create :intellectual_object, institution: institution }
+  let(:object) { FactoryGirl.create :intellectual_object, institution: institution, state: 'A' }
 
   before do
     assign(:user, user)
