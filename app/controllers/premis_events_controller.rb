@@ -22,7 +22,7 @@ class PremisEventsController < ApplicationController
       .with_create_date(params[:created_at])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
-      .with_type(params[:type])
+      .with_type(params[:event_type])
       .with_event_identifier(params[:event_identifier])
       .with_object_identifier(params[:object_identifier])
       .with_object_identifier_like(params[:object_identifier_like])
