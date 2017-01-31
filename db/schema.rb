@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170127175119) do
+ActiveRecord::Schema.define(version: 20170131152046) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -45,9 +45,10 @@ ActiveRecord::Schema.define(version: 20170127175119) do
     t.integer  "size",                   limit: 8
     t.string   "identifier"
     t.integer  "intellectual_object_id"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at",                                                       null: false
+    t.datetime "updated_at",                                                       null: false
     t.string   "state"
+    t.datetime "last_fixity_check",                default: '2000-01-01 00:00:00', null: false
   end
 
   add_index "generic_files", ["file_format"], name: "index_generic_files_on_file_format"

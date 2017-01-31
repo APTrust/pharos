@@ -10,6 +10,7 @@ class PremisEvent < ActiveRecord::Base
   before_save :init_time
   before_save :set_inst_id
   before_save :set_other_identifiers
+  after_create :update_last_fixity_check
 
   ###SCOPES
   scope :with_type, ->(param) { where(event_type: param) unless param.blank? }
@@ -93,6 +94,15 @@ class PremisEvent < ActiveRecord::Base
     end
     if self.generic_file_identifier == ''
       self.generic_file_identifier = self.generic_file.identifier unless self.generic_file.nil?
+    end
+  end
+
+  def update_last_fixity_check
+    # Some events are related to the IntellectualObject only,
+    # and do not have an associated GenericFile.
+    if self.event_type == 'fixity check' and !self.generic_file.nil?
+      self.generic_file.last_fixity_check = self.date_time
+      self.generic_file.save!
     end
   end
 

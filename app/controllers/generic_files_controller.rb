@@ -12,18 +12,20 @@ class GenericFilesController < ApplicationController
           load_intellectual_object
           authorize @intellectual_object
           file_summary
-        when 'not_checked_since'
-          authorize current_user, :not_checked_since?
-          not_checked_since
       end
     else
-      load_parent_object
-      if @intellectual_object
-        authorize @intellectual_object
-        @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
+      if params[:not_checked_since]
+        authorize current_user, :not_checked_since?
+        @generic_files = GenericFile.not_checked_since(params[:not_checked_since])
       else
-        authorize @institution, :index_through_institution?
-        @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+        load_parent_object
+        if @intellectual_object
+          authorize @intellectual_object
+          @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
+        else
+          authorize @institution, :index_through_institution?
+          @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+        end
       end
       params[:state] = 'A' if params[:state].nil?
       @generic_files = @generic_files
@@ -166,41 +168,9 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  def not_checked_since
-    datetime = Time.parse(params[:date]) rescue nil
-    if datetime.nil?
-      raise ActionController::BadRequest.new(type: 'date', e: "Param date is missing or invalid. Hint: Use format '2015-01-31' or '2015-01-31T14:31:36Z'")
-    end
-    if current_user.admin? == false
-      logger.warn("User #{current_user.email} tried to access generic_files_controller#not_checked_since")
-      raise ActionController::Forbidden
-    end
-    since_when = params[:date]
-    limit = params[:per_page].to_i || 10
-    page = params[:page].to_i || 1
-    offset = page - 1
-    @generic_files = GenericFile.not_checked_since(since_when, limit, offset)
-    if offset == 0
-      prev_link = nil
-    else
-      prev_link = request.original_url.sub("page=#{page}", "").sub(/&$/, '')
-      prev_link += "&page=#{page - 1}"
-    end
-    if @generic_files.count == limit
-      next_link = request.original_url.sub("page=#{params[:page]}", "").sub(/&$/, '')
-      next_link += "&page=#{page + 1}"
-    else
-      next_link = nil
-    end
-    respond_to do |format|
-      format.json { render json: { count: -1, next: next_link, previous: prev_link, results: @generic_files.map { |gf| gf.serializable_hash(include: [:checksums])}}}
-      format.html { }
-    end
-  end
-
   def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
-      .permit(:id, :uri, :identifier, :size,
+      .permit(:id, :uri, :identifier, :size, :last_fixity_check,
               :file_format, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
@@ -212,7 +182,7 @@ class GenericFilesController < ApplicationController
 
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
-      .permit(files: [:id, :uri, :identifier, :size,
+      .permit(files: [:id, :uri, :identifier, :size, :last_fixity_check,
                       :file_format, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,

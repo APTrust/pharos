@@ -36,16 +36,20 @@ RSpec.describe GenericFile, :type => :model do
     let(:institution) { mock_model Institution, internal_uri: 'info:fedora/testing:123', name: 'Mock Name' }
     let(:intellectual_object) { mock_model IntellectualObject, institution: institution, identifier: 'info:fedora/testing:123/1234567' }
 
-    describe '#find_latest_fixity_check' do
+    describe '#last_fixity_check' do
       subject { FactoryGirl.create(:generic_file) }
       it 'should return the most recent fixity check' do
         date = '2014-08-01T16:33:39Z'
-        date_two = '2014-11-01T16:33:39Z'
-        date_three = '2014-10-01T16:33:39Z'
+        date_two = '2014-10-01T16:33:39Z'
+        date_three = '2014-11-01T16:33:39Z'
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
+        subject.last_fixity_check.should == date
+
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
+        subject.last_fixity_check.should == date_two
+
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_three))
-        subject.find_latest_fixity_check.should == date_two
+        subject.last_fixity_check.should == date_three
       end
     end
 
@@ -172,15 +176,11 @@ RSpec.describe GenericFile, :type => :model do
         gf = FactoryGirl.create(:generic_file, state: 'A')
         event = gf.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
       end
-      files = GenericFile.not_checked_since('2015-01-01T00:00:00Z', 10, 0)
+      files = GenericFile.not_checked_since('2015-01-01T00:00:00Z')
       files.count.should == 3
-      files = GenericFile.not_checked_since('2016-01-01T00:00:00Z', 10, 0)
+      files = GenericFile.not_checked_since('2016-01-01T00:00:00Z')
       files.count.should == 6
-      files = GenericFile.not_checked_since('2017-01-01T00:00:00Z', 10, 0)
-      files.count.should == 10
-
-      # If we don't specify limit and offset, they should default to 10, 0
-      files = GenericFile.not_checked_since('2017-01-01T00:00:00Z', nil, nil)
+      files = GenericFile.not_checked_since('2017-01-01T00:00:00Z')
       files.count.should == 10
     end
   end

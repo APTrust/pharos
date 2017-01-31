@@ -395,7 +395,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'allows access to the API endpoint' do
-        get :index, alt_action: 'not_checked_since', date: '2015-01-31T14:31:36Z', format: :json
+        get :index, not_checked_since: '2015-01-31T14:31:36Z', format: :json
         expect(response.status).to eq 200
       end
 
@@ -406,17 +406,17 @@ RSpec.describe GenericFilesController, type: :controller do
           gf = FactoryGirl.create(:generic_file, state: 'A')
           event = gf.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
         end
-        get :index, alt_action: 'not_checked_since', date: '2015-01-01T00:00:00Z', start: 0, rows: 10, format: :json
+        get :index, not_checked_since: '2015-01-01T00:00:00Z', start: 0, rows: 10, format: :json
         expect(assigns[:generic_files].length).to eq 3
 
-        get :index, alt_action: 'not_checked_since', date: '2016-01-01T00:00:00Z', start: 0, rows: 10, format: :json
+        get :index, not_checked_since: '2016-01-01T00:00:00Z', start: 0, rows: 10, format: :json
         expect(assigns[:generic_files].length).to eq 6
 
-        get :index, alt_action: 'not_checked_since', date: '2017-01-01T00:00:00Z', start: 0, rows: 10, format: :json
+        get :index, not_checked_since: '2017-01-01T00:00:00Z', start: 0, rows: 10, format: :json
         expect(assigns[:generic_files].length).to eq 10
 
         # Should get max 10 results by default if we omit start and rows.
-        get :index, alt_action: 'not_checked_since', date: '2017-01-01T00:00:00Z', format: :json
+        get :index, not_checked_since: '2017-01-01T00:00:00Z', format: :json
         expect(assigns[:generic_files].length).to eq 10
 
       end

@@ -24,6 +24,7 @@ class GenericFile < ActiveRecord::Base
   }
   scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
+  scope :not_checked_since, ->(param) { where("last_fixity_check < ?", param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
@@ -67,12 +68,12 @@ class GenericFile < ActiveRecord::Base
 
   # TODO: event_type names need to match event constants in
   # https://github.com/APTrust/exchange/blob/master/constants/constants.go
-  def find_latest_fixity_check
-    fixity = ''
-    latest = self.premis_events.where(event_type: 'fixity check').order('date_time DESC').first.date_time
-    fixity = latest unless latest.nil?
-    fixity
-  end
+  # def find_latest_fixity_check
+  #   fixity = ''
+  #   latest = self.premis_events.where(event_type: 'fixity check').order('date_time DESC').first.date_time
+  #   fixity = latest unless latest.nil?
+  #   fixity
+  # end
 
   def self.bytes_by_format
     stats = GenericFile.sum(:size)
@@ -154,32 +155,6 @@ class GenericFile < ActiveRecord::Base
   # Returns true if the GenericFile has a checksum with the specified digest.
   def has_checksum?(digest)
     find_checksum_by_digest(digest).nil? == false
-  end
-
-  # Returns a list of GenericFiles that have not had a fixity
-  # check since the specified date. Params limit and offset are
-  # integers describing how many records to return and where
-  # to start in the result set. Files are ordered by created_at
-  # (ascending). Params limit and offset are required because
-  # we really don't want to call find on a list of a million ids.
-  # Note that this returns active (undeleted) files only.
-  # We don't do fixity checks on deleted files.
-  def self.not_checked_since(since_when, limit, offset)
-    limit = 10 if limit.blank? || limit < 1
-    offset ||= 0
-    # Get a list of GenericFile ids that have no "fixity check"
-    # event since the specified date. Then get the actual GenericFiles
-    # with those ids. This query can be very slow if we have a lot
-    # of files needing fixity.
-    query_template = "select gf.id from generic_files gf where state = 'A' " +
-      "and gf.id not in " +
-      "(select generic_file_id from premis_events " +
-      "where event_type = 'fixity check' and date_time > :since_when) " +
-      "order by gf.created_at asc limit :limit offset :offset"
-    safe_query = sanitize_sql([query_template, since_when: since_when, limit: limit, offset: offset])
-    query_result = connection.exec_query(safe_query)
-    ids = query_result.rows.map { |record| record[0] }
-    GenericFile.find(ids)
   end
 
 end
