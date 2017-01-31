@@ -169,7 +169,8 @@ class GenericFile < ActiveRecord::Base
     offset ||= 0
     # Get a list of GenericFile ids that have no "fixity check"
     # event since the specified date. Then get the actual GenericFiles
-    # with those ids.
+    # with those ids. This query can be very slow if we have a lot
+    # of files needing fixity.
     query_template = "select gf.id from generic_files gf where state = 'A' " +
       "and gf.id not in " +
       "(select generic_file_id from premis_events " +
