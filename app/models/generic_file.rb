@@ -171,8 +171,8 @@ class GenericFile < ActiveRecord::Base
     # event since the specified date. Then get the actual GenericFiles
     # with those ids.
     query_template = "select gf.id from generic_files gf where state = 'A' " +
-      "and gf.identifier not in " +
-      "(select generic_file_identifier from premis_events " +
+      "and gf.id not in " +
+      "(select generic_file_id from premis_events " +
       "where event_type = 'fixity check' and date_time > :since_when) " +
       "order by gf.created_at asc limit :limit offset :offset"
     safe_query = sanitize_sql([query_template, since_when: since_when, limit: limit, offset: offset])

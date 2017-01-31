@@ -176,8 +176,8 @@ class GenericFilesController < ApplicationController
       raise ActionController::Forbidden
     end
     since_when = params[:date]
-    limit = params[:rows].to_i
-    offset = params[:start].to_i
+    limit = params[:per_page].to_i || 10
+    offset = (params[:page].to_i || 1) - 1
     @generic_files = GenericFile.not_checked_since(since_when, limit, offset)
     respond_to do |format|
       format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksums]) } }
