@@ -67,23 +67,8 @@
         <td></td>
       </tr>
     </table></div>
-
     <script>
-        var options = {
-            grid: {
-                margin: {
-                    right: 20,
-                    left: 70,
-                    bottom: 20
-                }
-            },
-            xaxis: {
-                mode: "time",
-                timeformat: "%m/%d/%y",
-                minTickSize: [1, "day"]
-            }
-        };
-        $.plot("#chart", [<%=@institution.statistics %>], options);
+        plotGraph(<%= @statistics %>);
     </script>
   </div>
 

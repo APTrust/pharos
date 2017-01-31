@@ -22,7 +22,7 @@ class PremisEventsController < ApplicationController
       .with_create_date(params[:created_at])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
-      .with_type(params[:type])
+      .with_type(params[:event_type])
       .with_event_identifier(params[:event_identifier])
       .with_object_identifier(params[:object_identifier])
       .with_object_identifier_like(params[:object_identifier_like])
@@ -32,7 +32,7 @@ class PremisEventsController < ApplicationController
     sort
     page_results(@premis_events)
     respond_to do |format|
-      format.json { render json: { count: @count, next: @next, previous: @previous, results: @premis_events.map { |event| event.serializable_hash } } }
+      format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |event| event.serializable_hash } } }
       format.html { }
     end
   end
@@ -57,7 +57,12 @@ class PremisEventsController < ApplicationController
   protected
 
   def load_intellectual_object
-    identifier = params[:object_identifier].gsub(/%2F/i, '/')
+    # Param names should be consistent!
+    identifier_param = params[:object_identifier]
+    if identifier_param.blank? && !params[:intellectual_object_identifier].blank?
+      identifier_param = params[:intellectual_object_identifier]
+    end
+    identifier = identifier_param.gsub(/%2F/i, '/')
     @parent = IntellectualObject.where(identifier: identifier).first
     params[:intellectual_object_id] = @parent.id
   end

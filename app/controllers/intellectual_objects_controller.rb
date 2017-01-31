@@ -37,7 +37,7 @@ class IntellectualObjectsController < ApplicationController
     sort
     page_results(@intellectual_objects)
     respond_to do |format|
-      format.json { render json: {count: @count, next: @next, previous: @previous, results: @intellectual_objects.map{ |item| item.serializable_hash(include: [:etag])}} }
+      format.json { render json: {count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash(include: [:etag])}} }
       format.html {
         index!
       }

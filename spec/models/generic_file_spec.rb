@@ -81,8 +81,11 @@ RSpec.describe GenericFile, :type => :model do
         it 'should set the state to deleted and index the object state' do
 
           expect {
+            # A.D. 1/29/2017: Don't create the file delete event.
+            # Let the Go services code do that when the actual
+            # deletion occurs.
             file.soft_delete(FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
-          }.to change { file.premis_events.count}.by(1)
+          }.to change { file.premis_events.count}.by(0)
           expect(file.state).to eq 'D'
         end
 

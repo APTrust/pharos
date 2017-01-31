@@ -2,7 +2,7 @@ class GenericFilesController < ApplicationController
   include SearchAndIndex
   before_filter :authenticate_user!
   before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:update, :create, :create_batch]
+  before_filter :load_intellectual_object, only: [:create, :create_batch]
   after_action :verify_authorized
 
   def index
@@ -25,6 +25,7 @@ class GenericFilesController < ApplicationController
         authorize @institution, :index_through_institution?
         @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
       end
+      params[:state] = 'A' if params[:state].nil?
       @generic_files = @generic_files
         .with_identifier(params[:identifier])
         .with_identifier_like(params[:identifier_like])
@@ -34,13 +35,12 @@ class GenericFilesController < ApplicationController
         .created_after(params[:created_after])
         .updated_before(params[:updated_before])
         .updated_after(params[:updated_after])
-        .with_state('A')
       filter
       sort
       page_results(@generic_files)
       respond_to do |format|
         format.json {
-          render json: { count: @count, next: @next, previous: @previous, results: @generic_files.map do |f| f.serializable_hash end }
+          render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map do |f| f.serializable_hash end }
         }
         format.html { }
       end
@@ -108,7 +108,7 @@ class GenericFilesController < ApplicationController
     authorize @generic_file
     @generic_file.state = 'A'
     if resource.update(single_generic_file_params)
-      head :no_content
+      render json: object_as_json, status: :ok
     else
       log_model_error(resource)
       render json: resource.errors, status: :unprocessable_entity
