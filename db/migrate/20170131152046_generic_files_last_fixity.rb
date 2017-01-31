@@ -15,7 +15,7 @@ class GenericFilesLastFixity < ActiveRecord::Migration
             if cs
               last_fixity = cs.datetime
             else
-              last_fixity = gf.last_fixity
+              last_fixity = gf.last_fixity_check
             end
           end
           gf.last_fixity_check = last_fixity

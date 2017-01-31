@@ -102,8 +102,8 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.integer  "institution_id"
     t.string   "outcome"
+    t.integer  "institution_id"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
     t.string   "old_uuid"
@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(version: 20170131152046) do
 
   add_index "premis_events", ["date_time"], name: "index_premis_events_on_date_time"
   add_index "premis_events", ["event_type"], name: "index_premis_events_on_event_type"
+  add_index "premis_events", ["generic_file_id", "event_type"], name: "index_premis_events_on_generic_file_id_and_event_type"
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
   add_index "premis_events", ["generic_file_identifier"], name: "index_premis_events_on_generic_file_identifier"
   add_index "premis_events", ["identifier"], name: "index_premis_events_on_identifier", unique: true
