@@ -177,10 +177,23 @@ class GenericFilesController < ApplicationController
     end
     since_when = params[:date]
     limit = params[:per_page].to_i || 10
-    offset = (params[:page].to_i || 1) - 1
+    page = params[:page].to_i || 1
+    offset = page - 1
     @generic_files = GenericFile.not_checked_since(since_when, limit, offset)
+    if offset == 0
+      prev_link = nil
+    else
+      prev_link = request.original_url.sub("page=#{page}", "").sub(/&$/, '')
+      prev_link += "&page=#{page - 1}"
+    end
+    if @generic_files.count == limit
+      next_link = request.original_url.sub("page=#{params[:page]}", "").sub(/&$/, '')
+      next_link += "&page=#{page + 1}"
+    else
+      next_link = nil
+    end
     respond_to do |format|
-      format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksums]) } }
+      format.json { render json: { count: -1, next: next_link, previous: prev_link, results: @generic_files.map { |gf| gf.serializable_hash(include: [:checksums])}}}
       format.html { }
     end
   end
