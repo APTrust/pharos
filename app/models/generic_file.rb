@@ -5,7 +5,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :file_format, :identifier, presence: true
+  validates :uri, :size, :file_format, :identifier, :last_fixity_check, presence: true
   validates_uniqueness_of :identifier
 
   delegate :institution, to: :intellectual_object
@@ -24,6 +24,7 @@ class GenericFile < ActiveRecord::Base
   }
   scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
+  scope :not_checked_since, ->(param) { where("last_fixity_check < ?", param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
@@ -65,22 +66,6 @@ class GenericFile < ActiveRecord::Base
     (param.blank? || param.nil? || param == '*' || param == '' || param == '%') ? true : false
   end
 
-  def find_latest_fixity_check
-    fixity = ''
-    latest = self.premis_events.where(event_type: 'fixity_check').order('date_time DESC').first.date_time
-    fixity = latest unless latest.nil?
-    fixity
-  end
-
-  def self.find_files_in_need_of_fixity(date, options={})
-    rows = options[:rows] || 10
-    start = options[:start] || 0
-    files = GenericFile.joins(:premis_events).where('state = ? AND premis_events.event_type = ? AND premis_events.date_time <= ?',
-                                                    'A', 'fixity_check', date).order('premis_events.date_time').reverse_order
-    files = Kaminari.paginate_array(files).page(start).per(rows)
-    files
-  end
-
   def self.bytes_by_format
     stats = GenericFile.sum(:size)
     if stats
@@ -102,16 +87,32 @@ class GenericFile < ActiveRecord::Base
     attributes[:identifier] = SecureRandom.uuid
     io = IntellectualObject.find(self.intellectual_object_id)
     WorkItem.create_delete_request(io.identifier,
-                                        self.identifier,
-                                        user_email)
+                                   self.identifier,
+                                   user_email)
     self.state = 'D'
-    self.add_event(attributes)
+    # Let exchange services create the file delete
+    # event when it actually deletes the file.
+    # self.add_event(attributes)
     self.save!
   end
 
   # This is for serializing JSON in the API.
   def serializable_hash(options={})
+    options[:except].nil? ? options[:except] = :ingest_state : options[:except] = options[:except].push(:ingest_state)
+    if !options[:include].nil? && options[:include].include?(:ingest_state)
+      merge_state = true
+      options[:include].delete(:ingest_state)
+      options.delete(:include) if options[:include] == []
+    end
     data = super(options)
+    if merge_state == true
+      if self.ingest_state.nil?
+        data['ingest_state'] = '[]'
+      else
+        state = JSON.parse(self.ingest_state)
+        data.merge!(state)
+      end
+    end
     data['intellectual_object_identifier'] = self.intellectual_object.identifier
     if options.has_key?(:include)
       data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksums)
@@ -153,7 +154,6 @@ class GenericFile < ActiveRecord::Base
       end
     end
     checksum
-    #checksums.select { |cs| digest.strip == cs.digest.first.to_s.strip }.first
   end
 
   # Returns true if the GenericFile has a checksum with the specified digest.

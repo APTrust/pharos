@@ -36,16 +36,20 @@ RSpec.describe GenericFile, :type => :model do
     let(:institution) { mock_model Institution, internal_uri: 'info:fedora/testing:123', name: 'Mock Name' }
     let(:intellectual_object) { mock_model IntellectualObject, institution: institution, identifier: 'info:fedora/testing:123/1234567' }
 
-    describe '#find_latest_fixity_check' do
+    describe '#last_fixity_check' do
       subject { FactoryGirl.create(:generic_file) }
       it 'should return the most recent fixity check' do
         date = '2014-08-01T16:33:39Z'
-        date_two = '2014-11-01T16:33:39Z'
-        date_three = '2014-10-01T16:33:39Z'
+        date_two = '2014-10-01T16:33:39Z'
+        date_three = '2014-11-01T16:33:39Z'
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
+        subject.last_fixity_check.should == date
+
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
+        subject.last_fixity_check.should == date_two
+
         subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_three))
-        subject.find_latest_fixity_check.should == date_two
+        subject.last_fixity_check.should == date_three
       end
     end
 
@@ -81,8 +85,11 @@ RSpec.describe GenericFile, :type => :model do
         it 'should set the state to deleted and index the object state' do
 
           expect {
+            # A.D. 1/29/2017: Don't create the file delete event.
+            # Let the Go services code do that when the actual
+            # deletion occurs.
             file.soft_delete(FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
-          }.to change { file.premis_events.count}.by(1)
+          }.to change { file.premis_events.count}.by(0)
           expect(file.state).to eq 'D'
         end
 
@@ -118,7 +125,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h1.has_key?('state')).to be true
           expect(h1.has_key?('intellectual_object_identifier')).to be true
 
-          h2 = subject.serializable_hash(include: [:checksums, :premis_events])
+          h2 = subject.serializable_hash(include: [:checksums, :premis_events, :ingest_state])
           expect(h2.has_key?('id')).to be true
           expect(h2.has_key?('uri')).to be true
           expect(h2.has_key?('size')).to be true
@@ -130,6 +137,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h2.has_key?('checksums')).to be true
           expect(h2.has_key?('premis_events')).to be true
           expect(h2.has_key?('intellectual_object_identifier')).to be true
+          expect(h2.has_key?('ingest_state')).to be true
         end
       end
 
@@ -158,21 +166,23 @@ RSpec.describe GenericFile, :type => :model do
     end
   end
 
-  describe '#find_files_in_need_of_fixity' do
-    let(:subject) { FactoryGirl.create(:generic_file) }
-    let(:subject_two) { FactoryGirl.create(:generic_file) }
+  describe '#not_checked_since' do
     before do
+      PremisEvent.destroy_all
       GenericFile.destroy_all
     end
-    it 'should return only files with a fixity older than a given parameter' do
-      date = '2014-01-01T16:33:39Z'
-      date_two = '2014-12-12T16:33:39Z'
-      param = '2014-09-02T16:33:39Z'
-      subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
-      subject_two.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
-      files = GenericFile.find_files_in_need_of_fixity(param)
-      files.count.should == 1
-      files.first.identifier.should == subject.identifier
+    it 'should return only files that have not had a fixity check since the given date' do
+      dates = ['2017-01-01T00:00:00Z', '2016-01-01T00:00:00Z', '2015-01-01T00:00:00Z']
+      10.times do |i|
+        gf = FactoryGirl.create(:generic_file, state: 'A')
+        event = gf.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
+      end
+      files = GenericFile.not_checked_since('2015-01-01T00:00:00Z')
+      files.count.should == 3
+      files = GenericFile.not_checked_since('2016-01-01T00:00:00Z')
+      files.count.should == 6
+      files = GenericFile.not_checked_since('2017-01-01T00:00:00Z')
+      files.count.should == 10
     end
   end
 

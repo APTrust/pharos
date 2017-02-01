@@ -315,5 +315,27 @@ RSpec.describe WorkItem, :type => :model do
       items.should be_empty
     end
 
+    it 'should find by node not empty' do
+      WorkItem.update_all(node: 'xyz')
+      items = WorkItem.with_unempty_node("true")
+      items.should_not be_empty
+      WorkItem.update_all(node: '')
+      items = WorkItem.with_unempty_node("true")
+      items.should be_empty
+      items = WorkItem.with_unempty_node(nil)
+      items.should_not be_empty
+    end
+
+    it 'should find by node empty' do
+      WorkItem.update_all(node: 'xyz')
+      items = WorkItem.with_empty_node("true")
+      items.should be_empty
+      items = WorkItem.with_empty_node(nil)
+      items.should_not be_empty
+      WorkItem.update_all(node: '')
+      items = WorkItem.with_empty_node("true")
+      items.should_not be_empty
+    end
+
   end
 end
