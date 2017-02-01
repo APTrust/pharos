@@ -5,7 +5,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :file_format, :identifier, presence: true
+  validates :uri, :size, :file_format, :identifier, :last_fixity_check, presence: true
   validates_uniqueness_of :identifier
 
   delegate :institution, to: :intellectual_object
@@ -65,15 +65,6 @@ class GenericFile < ActiveRecord::Base
   def self.empty_param(param)
     (param.blank? || param.nil? || param == '*' || param == '' || param == '%') ? true : false
   end
-
-  # TODO: event_type names need to match event constants in
-  # https://github.com/APTrust/exchange/blob/master/constants/constants.go
-  # def find_latest_fixity_check
-  #   fixity = ''
-  #   latest = self.premis_events.where(event_type: 'fixity check').order('date_time DESC').first.date_time
-  #   fixity = latest unless latest.nil?
-  #   fixity
-  # end
 
   def self.bytes_by_format
     stats = GenericFile.sum(:size)
@@ -149,7 +140,6 @@ class GenericFile < ActiveRecord::Base
       end
     end
     checksum
-    #checksums.select { |cs| digest.strip == cs.digest.first.to_s.strip }.first
   end
 
   # Returns true if the GenericFile has a checksum with the specified digest.
