@@ -9,6 +9,7 @@ FactoryGirl.define do
     created_at { "#{Time.now}" }
     updated_at { "#{Time.now}" }
     state { 'A' }
+    last_fixity_check { '2000-01-01' }
   end
 
 end

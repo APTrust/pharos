@@ -12,19 +12,22 @@ class GenericFilesController < ApplicationController
           load_intellectual_object
           authorize @intellectual_object
           file_summary
-        when 'not_checked_since'
-          authorize current_user, :not_checked_since?
-          not_checked_since
       end
     else
-      load_parent_object
-      if @intellectual_object
-        authorize @intellectual_object
-        @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
+      if params[:not_checked_since]
+        authorize current_user, :not_checked_since?
+        @generic_files = GenericFile.not_checked_since(params[:not_checked_since])
       else
-        authorize @institution, :index_through_institution?
-        @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+        load_parent_object
+        if @intellectual_object
+          authorize @intellectual_object
+          @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
+        else
+          authorize @institution, :index_through_institution?
+          @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+        end
       end
+      params[:state] = 'A' if params[:state].nil?
       @generic_files = @generic_files
         .with_identifier(params[:identifier])
         .with_identifier_like(params[:identifier_like])
@@ -34,7 +37,6 @@ class GenericFilesController < ApplicationController
         .created_after(params[:created_after])
         .updated_before(params[:updated_before])
         .updated_after(params[:updated_after])
-        .with_state('A')
       filter
       sort
       page_results(@generic_files)
@@ -88,7 +90,6 @@ class GenericFilesController < ApplicationController
         file.state = 'A'
         @generic_files.push(file)
       end
-      raise ActiveRecord::Rollback
     end
     respond_to do |format|
       if @intellectual_object.save
@@ -166,29 +167,9 @@ class GenericFilesController < ApplicationController
     end
   end
 
-  def not_checked_since
-    datetime = Time.parse(params[:date]) rescue nil
-    if datetime.nil?
-      raise ActionController::BadRequest.new(type: 'date', e: "Param date is missing or invalid. Hint: Use format '2015-01-31T14:31:36Z'")
-    end
-    if current_user.admin? == false
-      logger.warn("User #{current_user.email} tried to access generic_files_controller#not_checked_since")
-      raise ActionController::Forbidden
-    end
-    @generic_files = GenericFile.find_files_in_need_of_fixity(params[:date], {rows: params[:rows], start: params[:start]})
-    respond_to do |format|
-      # Return active files only, not deleted files!
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum, :ingest_state]) } } :
-          format.json { render json: @generic_files.map { |gf| gf.serializable_hash(include: [:checksum]) } }
-
-      format.html { }
-    end
-  end
-
   def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
-      .permit(:id, :uri, :identifier, :size, :ingest_state,
+      .permit(:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
               :file_format, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
@@ -200,7 +181,7 @@ class GenericFilesController < ApplicationController
 
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
-      .permit(files: [:id, :uri, :identifier, :size, :ingest_state,
+      .permit(files: [:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
                       :file_format, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
@@ -239,8 +220,8 @@ class GenericFilesController < ApplicationController
   def object_as_json
     if params[:include_relations]
       (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          @generic_file.serializable_hash(include: [:checksum, :premis_events, :ingest_state]) :
-          @generic_file.serializable_hash(include: [:checksum, :premis_events])
+          @generic_file.serializable_hash(include: [:checksums, :premis_events, :ingest_state]) :
+          @generic_file.serializable_hash(include: [:checksums, :premis_events])
     else
       (params[:with_ingest_state] == 'true' && current_user.admin?) ?
           @generic_file.serializable_hash(include: [:ingest_state]) :
@@ -280,17 +261,12 @@ class GenericFilesController < ApplicationController
     initialize_filter_counters
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
-    #filter_by_institution unless params[:institution].nil?
-    #filter_by_object_association unless params[:object_association].nil?
     set_format_count(@generic_files, :file)
-    #set_inst_count(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
   end
 
   def set_filter_values
-    #params[:institution] ? @institutions = [params[:institution]] : @institutions = @generic_files.joins(:intellectual_object).distinct.pluck(:institution_id)
     params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
-    #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @generic_files.distinct.pluck(:intellectual_object_id)
   end
 end

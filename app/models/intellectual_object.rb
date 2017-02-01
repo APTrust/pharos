@@ -128,6 +128,19 @@ class IntellectualObject < ActiveRecord::Base
     generic_files.where(state: 'A')
   end
 
+  def deleted_files
+    generic_files.where(state: 'D')
+  end
+
+  def processing_files
+    generic_files.where(state: 'I')
+  end
+
+  def all_files_deleted?
+    return false if generic_files.count == 0
+    (generic_files.count == generic_files.where(state: 'D').count) ? true : false
+  end
+
   def too_big?
     total_size = self.generic_files.sum(:size)
     (total_size > Pharos::Application::DPN_SIZE_LIMIT) ? true : false

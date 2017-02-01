@@ -338,6 +338,7 @@ class WorkItemsController < ApplicationController
       .queued(params[:queued])
       .with_node(params[:node])
       .with_unempty_node(params[:node_not_empty])
+      .with_empty_node(params[:node_empty])
     @items = @items.with_retry(params[:retry]) unless params[:retry].nil?
     count = @items.count
     set_page_counts(count)
