@@ -90,7 +90,6 @@ class GenericFilesController < ApplicationController
         file.state = 'A'
         @generic_files.push(file)
       end
-      raise ActiveRecord::Rollback
     end
     respond_to do |format|
       if @intellectual_object.save
