@@ -219,7 +219,7 @@ class GenericFilesController < ApplicationController
 
   def object_as_json
     if params[:include_relations]
-      @generic_file.serializable_hash(include: [:checksum, :premis_events])
+      @generic_file.serializable_hash(include: [:checksums, :premis_events])
     else
       @generic_file.serializable_hash()
     end
