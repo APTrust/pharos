@@ -128,21 +128,47 @@ class IntellectualObject < ActiveRecord::Base
     generic_files.where(state: 'A')
   end
 
+  def deleted_files
+    generic_files.where(state: 'D')
+  end
+
+  def processing_files
+    generic_files.where(state: 'I')
+  end
+
+  def all_files_deleted?
+    return false if generic_files.count == 0
+    (generic_files.count == generic_files.where(state: 'D').count) ? true : false
+  end
+
   def too_big?
     total_size = self.generic_files.sum(:size)
     (total_size > Pharos::Application::DPN_SIZE_LIMIT) ? true : false
   end
 
   def serializable_hash (options={})
-    #last_ingested = self.last_ingested_version
-    #etag = last_ingested.nil? ? nil : last_ingested.etag
+    options[:except].nil? ? options[:except] = :ingest_state : options[:except] = options[:except].push(:ingest_state)
+    if !options[:include].nil? && options[:include].include?(:ingest_state)
+      merge_state = true
+      options[:include].delete(:ingest_state)
+      options.delete(:include) if options[:include] == []
+    end
     data = super(options)
+    if merge_state == true
+      if self.ingest_state.nil?
+        data['ingest_state'] = '[]'
+      else
+        state = JSON.parse(self.ingest_state)
+        data.merge!(state)
+      end
+    end
     data.merge(
-      in_dpn: in_dpn?,
-      file_count: gf_count,
-      file_size: gf_size,
-      institution: self.institution.identifier,
+        in_dpn: in_dpn?,
+        file_count: gf_count,
+        file_size: gf_size,
+        institution: self.institution.identifier,
     )
+    data
   end
 
   # Returns the WorkItem describing the last ingested

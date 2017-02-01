@@ -30,7 +30,9 @@ class WorkItem < ActiveRecord::Base
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
   scope :with_node, ->(param) { where(node: param) unless param.blank? }
-  scope :with_unempty_node, ->(param) { where("node is NOT NULL and node != ''") unless param.blank? }
+  scope :with_unempty_node, ->(param) { where("node is NOT NULL and node != ''") if param == 'true' }
+  scope :with_empty_node, ->(param) { where("node is NULL or node = ''") if param == 'true' }
+  scope :with_retry, ->(param) { where(retry: param) }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?

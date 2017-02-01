@@ -10,6 +10,7 @@ class PremisEvent < ActiveRecord::Base
   before_save :init_time
   before_save :set_inst_id
   before_save :set_other_identifiers
+#  after_create :update_last_fixity_check
 
   ###SCOPES
   scope :with_type, ->(param) { where(event_type: param) unless param.blank? }
@@ -94,6 +95,24 @@ class PremisEvent < ActiveRecord::Base
     if self.generic_file_identifier == ''
       self.generic_file_identifier = self.generic_file.identifier unless self.generic_file.nil?
     end
+    if self.event_type == 'fixity check' and !self.generic_file.nil?
+      self.generic_file.last_fixity_check = self.date_time
+      self.generic_file.save
+    end
   end
+
+  #
+  # Setting this as an after_create hook seems to cause problems in Postgres
+  # when the admin API client calls the GenericFilesController#create_batch
+  # method. That method starts a transaction.
+  #
+  # def update_last_fixity_check
+  #   # Some events are related to the IntellectualObject only,
+  #   # and do not have an associated GenericFile.
+  #   if self.event_type == 'fixity check' and !self.generic_file.nil?
+  #     self.generic_file.last_fixity_check = self.date_time
+  #     self.generic_file.save!
+  #   end
+  # end
 
 end

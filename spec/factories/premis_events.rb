@@ -2,7 +2,7 @@ FactoryGirl.define do
 
   factory :premis_event_ingest, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'ingest' }
+    event_type { 'ingestion' }
     date_time { "#{Time.now}" }
     detail { 'Completed copy to S3 storage' }
     outcome { 'success' }
@@ -30,7 +30,7 @@ FactoryGirl.define do
 
   factory :premis_event_deletion, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'delete' }
+    event_type { 'deletion' }
     date_time { "#{Time.now}" }
     detail { 'Marked object or file for deletion' }
     outcome { 'success' }
@@ -41,7 +41,7 @@ FactoryGirl.define do
 
   factory :premis_event_fixity_generation, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'fixity_generation' }
+    event_type { 'message digest calculation' }
     date_time { "#{Time.now}" }
     detail { 'Calculated new fixity value' }
     outcome { 'success' }
@@ -57,7 +57,7 @@ FactoryGirl.define do
 
   factory :premis_event_fixity_check, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'fixity_check' }
+    event_type { 'fixity check' }
     date_time { "#{Time.now}" }
     detail { 'Fixity check against registered hash' }
     outcome { 'success' }
@@ -74,7 +74,7 @@ FactoryGirl.define do
 
   factory :premis_event_identifier, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }
-    event_type { 'identifier_assignment' }
+    event_type { 'identifier assignment' }
     date_time { "#{Time.now}" }
     detail { 'S3 key generated for file' }
     outcome { 'success' }
