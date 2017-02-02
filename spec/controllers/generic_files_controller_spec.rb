@@ -39,8 +39,8 @@ RSpec.describe GenericFilesController, type: :controller do
       response_data = JSON.parse(response.body)
       expect(response_data['count']).to eq 1
       expect(response_data['results'][0]['state']).to eq 'A'
-
     end
+
   end
 
   describe 'GET #file_summary' do
@@ -400,7 +400,6 @@ RSpec.describe GenericFilesController, type: :controller do
         expect(response.status).to eq 200
       end
 
-
       it 'should return only files that have not had a fixity check since the given date' do
         dates = ['2017-01-01T00:00:00Z', '2016-01-01T00:00:00Z', '2015-01-01T00:00:00Z']
         10.times do |i|
@@ -419,8 +418,20 @@ RSpec.describe GenericFilesController, type: :controller do
         # Should get max 10 results by default if we omit start and rows.
         get :index, not_checked_since: '2017-01-01T00:00:00Z', format: :json
         expect(assigns[:generic_files].length).to eq 10
-
       end
+
+      it 'includes not_checked_since in next link if necessary' do
+        3.times do
+          FactoryGirl.create(:generic_file, state: 'A', last_fixity_check: '1999-01-01')
+        end
+        get :index, not_checked_since: '2099-12-31', page: 2, per_page: 1, format: :json
+        expect(response.status).to eq(200)
+        data = JSON.parse(response.body)
+        expect(data['count']).to eq(3)
+        expect(data['next']).to include('not_checked_since=2099-12-31')
+        expect(data['previous']).to include('not_checked_since=2099-12-31')
+      end
+
     end
   end
 end
