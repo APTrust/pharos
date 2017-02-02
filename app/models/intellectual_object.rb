@@ -147,7 +147,8 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def serializable_hash (options={})
-    options[:except].nil? ? options[:except] = [:ingest_state] : options[:except] = options[:except].push(:ingest_state)
+    # Does this line need to be here?
+    #options[:except].nil? ? options[:except] = [:ingest_state] : options[:except] = options[:except].push(:ingest_state)
     if !options[:include].nil? && options[:include].include?(:ingest_state)
       merge_state = true
       options[:include].delete(:ingest_state)

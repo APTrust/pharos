@@ -98,7 +98,8 @@ class GenericFile < ActiveRecord::Base
 
   # This is for serializing JSON in the API.
   def serializable_hash(options={})
-    options[:except].nil? ? options[:except] = :ingest_state : options[:except] = options[:except].push(:ingest_state)
+    # Following line causes an internal server error.
+    # options[:except].nil? ? options[:except] = :ingest_state : options[:except] = options[:except].push(:ingest_state)
     if !options[:include].nil? && options[:include].include?(:ingest_state)
       merge_state = true
       options[:include].delete(:ingest_state)
