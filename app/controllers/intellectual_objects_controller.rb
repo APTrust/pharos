@@ -264,7 +264,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def create_params
-    params.require(:intellectual_object).permit(:institution_id, :title,
+    params.require(:intellectual_object).permit(:institution_id, :title, :etag,
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :ingest_state,
                                                 generic_files_attributes:
@@ -289,7 +289,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update_params
     params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state,
-                                                :alt_identifier, :state, :dpn_uuid)
+                                                :alt_identifier, :state, :dpn_uuid, :etag)
   end
 
   def load_object

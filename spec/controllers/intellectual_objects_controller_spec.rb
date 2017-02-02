@@ -371,11 +371,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should create a simple object' do
+        simple_obj.etag = '90908111'
         post(:create, institution_identifier: inst1.identifier,
              intellectual_object: simple_obj.attributes, format: 'json')
         expect(response.code).to eq '201'
         saved_obj = IntellectualObject.where(identifier: simple_obj.identifier).first
         expect(saved_obj).to be_truthy
+        expect(saved_obj.etag).to eq '90908111'
       end
     end
 
@@ -432,11 +434,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(saved_obj.ingest_state).to eq '{[A]}'
       end
       it 'should update the object and respond with json (json)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}'}, format: :json
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678'}, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'
         expect(saved_obj.ingest_state).to eq '{[D]}'
+        expect(saved_obj.etag).to eq '12345678'
       end
     end
 
