@@ -178,6 +178,20 @@ function fixFilters() {
     $("#filter-status").on('hidden.bs.collapse', function () {
         $(".status-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
     });
+
+    $("#filter-node").on('shown.bs.collapse', function () {
+        $(".node-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-node").on('hidden.bs.collapse', function () {
+        $(".node-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
+
+    $("#filter-queued").on('shown.bs.collapse', function () {
+        $(".queued-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    });
+    $("#filter-queued").on('hidden.bs.collapse', function () {
+        $(".queued-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    });
 }
 
 $(document).ready(function(){

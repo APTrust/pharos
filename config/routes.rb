@@ -35,7 +35,6 @@ Rails.application.routes.draw do
   resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/files'
   get 'member-api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: :json, intellectual_object_identifier: object_ptrn
 
-
   # INSTITUTIONS (API)
   # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'
   get 'api/v2/institutions/:institution_identifier', to: 'institutions#show', format: [:json], institution_identifier: institution_ptrn
@@ -87,6 +86,7 @@ Rails.application.routes.draw do
 
   # DPN Work Item Routes
   resources :dpn_work_items, path: 'api/v2/dpn_item', only: [:index, :create, :show, :update], format: :json
+  resources :dpn_work_items, path: 'dpn_item', only: [:index, :show], format: :html
 
   # USER ROUTES
   devise_for :users

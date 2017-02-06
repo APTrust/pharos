@@ -1,0 +1,28 @@
+<div id="content" class="col-md-10">
+  <ol class="breadcrumb">
+    <li><a href="#"><%= link_to current_user.institution.name, current_user.institution %></a></li>
+  </ol>
+
+  <section class="page-header">
+    <h2><%= @dpn_item.identifier %></h2>
+  </section>
+
+  <section class="queue">
+    <table class="table proc_item">
+      <tbody>
+      <tr><th>Remote Node</th>
+        <td><%= @dpn_item.institution.remote_node %></td></tr>
+      <tr><th>Task</th>
+        <td><%= @dpn_item.task %></td></tr>
+      <tr><th>Queued At</th>
+        <td><%= @dpn_item.queued_at %></td></tr>
+      <tr><th>Completed At</th>
+        <td><%= @dpn_item.completed_at %></td></tr>
+      <tr><th>Note</th>
+        <td><%= @dpn_item.note %></td></tr>
+      <tr><th>State</th>
+        <td><%= @dpn_item.state %></td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>

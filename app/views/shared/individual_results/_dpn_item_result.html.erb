@@ -1,0 +1,24 @@
+<% # container for a single doc -%>
+<div class="document">
+
+  <% # header bar for doc items in index view -%>
+  <section class="documentHeader clearfix">
+
+    <%- # main title container for doc partial view -%>
+    <h5 class="index_title col-sm-9 col-lg-9">
+      <%= counter %>. <%= link_to current.identifier, dpn_work_item_path(current.id) %>
+    </h5>
+
+  </section>
+
+  <dl class="document-metadata dl-horizontal dl-invert">
+    <dt>Remote Node: </dt>
+    <dd><%= current.remote_node %></dd>
+    <dt>Task: </dt>
+    <dd><%= current.task %></dd>
+    <dt>Queued At: </dt>
+    <dd><%= current.queued_at %></dd>
+    <dt>Completed At: </dt>
+    <dd><%= current.completed_at %></dd>
+  </dl>
+</div>
