@@ -13,7 +13,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
   let!(:admin_user) { FactoryGirl.create(:user, :admin) }
   let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin) }
   let!(:item_one) { FactoryGirl.create(:dpn_work_item, task: 'sync', remote_node: 'aptrust', identifier: '1234') }
-  let!(:item_two) { FactoryGirl.create(:dpn_work_item, task: 'ingest', remote_node: 'chronopolis', identifier: '5678') }
+  let!(:item_two) { FactoryGirl.create(:dpn_work_item, task: 'ingest', remote_node: 'chronopolis', identifier: '5678', queued_at: nil) }
 
   describe '#GET index' do
     describe 'for admin users' do
@@ -43,6 +43,13 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
       it 'filters by task' do
         get :index, task: 'sync', format: :json
+        expect(response).to be_success
+        expect(assigns(:paged_results).size).to eq 1
+        expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
+      end
+
+      it 'filters by queued status' do
+        get :index, is_queued: 'true'
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
