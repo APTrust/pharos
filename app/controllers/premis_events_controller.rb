@@ -13,6 +13,8 @@ class PremisEventsController < ApplicationController
     elsif params[:institution_identifier]
       load_institution
       for_selected_institution
+    else
+      @parent = @premis_events.first.intellectual_object
     end
     params[:file_identifier] = '' if params[:file_identifier] == 'null' || params[:file_identifier] == 'blank'
     params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
