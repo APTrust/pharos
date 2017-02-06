@@ -94,4 +94,19 @@ RSpec.describe PremisEvent, :type => :model do
       expect(h1.has_key?('agent')).to be true
     end
   end
+
+  describe 'fixity check' do
+    let(:file) { FactoryGirl.create(:generic_file, last_fixity_check: '2000-01-01') }
+
+    it 'should update last fixity date on generic file if its a fixity check' do
+      event = FactoryGirl.create(:premis_event_fixity_check, generic_file: file)
+      expect(file.last_fixity_check).to eq event.date_time
+    end
+
+    it 'should not update last fixity date on generic file if its not a fixity check' do
+      event = FactoryGirl.create(:premis_event_ingest, generic_file: file)
+      expect(file.last_fixity_check).to eq '2000-01-01'
+    end
+
+  end
 end

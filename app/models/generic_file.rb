@@ -5,7 +5,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :file_format, :identifier, presence: true
+  validates :uri, :size, :file_format, :identifier, :last_fixity_check, presence: true
   validates_uniqueness_of :identifier
 
   delegate :institution, to: :intellectual_object
@@ -24,6 +24,7 @@ class GenericFile < ActiveRecord::Base
   }
   scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
+  scope :not_checked_since, ->(param) { where("last_fixity_check < ?", param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
@@ -65,8 +66,6 @@ class GenericFile < ActiveRecord::Base
     (param.blank? || param.nil? || param == '*' || param == '' || param == '%') ? true : false
   end
 
-  # TODO: event_type names need to match event constants in
-  # https://github.com/APTrust/exchange/blob/master/constants/constants.go
   def find_latest_fixity_check
     fixity = ''
     latest = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['fixity']).order('date_time DESC').first.date_time
@@ -95,16 +94,27 @@ class GenericFile < ActiveRecord::Base
     attributes[:identifier] = SecureRandom.uuid
     io = IntellectualObject.find(self.intellectual_object_id)
     WorkItem.create_delete_request(io.identifier,
-                                        self.identifier,
-                                        user_email)
+                                   self.identifier,
+                                   user_email)
     self.state = 'D'
-    self.add_event(attributes)
+    # Let exchange services create the file delete
+    # event when it actually deletes the file.
+    # self.add_event(attributes)
     self.save!
   end
 
   # This is for serializing JSON in the API.
   def serializable_hash(options={})
     data = super(options)
+    data.delete('ingest_state')
+    if options.has_key?(:include) && options[:include].include?(:ingest_state)
+      if self.ingest_state.nil?
+        data['ingest_state'] = 'null'
+      else
+        state = JSON.parse(self.ingest_state)
+        data.merge!(ingest_state: state)
+      end
+    end
     data['intellectual_object_identifier'] = self.intellectual_object.identifier
     if options.has_key?(:include)
       data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksums)
@@ -146,7 +156,6 @@ class GenericFile < ActiveRecord::Base
       end
     end
     checksum
-    #checksums.select { |cs| digest.strip == cs.digest.first.to_s.strip }.first
   end
 
   # Returns true if the GenericFile has a checksum with the specified digest.
@@ -169,10 +178,10 @@ class GenericFile < ActiveRecord::Base
     # event since the specified date. Then get the actual GenericFiles
     # with those ids.
     query_template = "select gf.id from generic_files gf where state = 'A' " +
-      "and gf.identifier not in " +
-      "(select generic_file_identifier from premis_events " +
+      'and gf.identifier not in ' +
+      '(select generic_file_identifier from premis_events ' +
       "where event_type = '#{Pharos::Application::PHAROS_EVENT_TYPES['fixity']}' and date_time > :since_when) " +
-      "order by gf.created_at asc limit :limit offset :offset"
+      'order by gf.created_at asc limit :limit offset :offset'
     safe_query = sanitize_sql([query_template, since_when: since_when, limit: limit, offset: offset])
     query_result = connection.exec_query(safe_query)
     ids = query_result.rows.map { |record| record[0] }

@@ -15,21 +15,24 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst1,
                                    identifier: 'test.edu/baggie',
                                    title: 'Aberdeen Wanderers',
-                                   description: 'Founded in Aberdeen in 1928.') }
+                                   description: 'Founded in Aberdeen in 1928.',
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec1') }
   let!(:obj3) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst2) }
   let!(:obj4) { FactoryGirl.create(:restricted_intellectual_object,
                                    institution: inst1,
-                                   title: "Manchester City",
-                                   description: 'The other Manchester team.') }
+                                   title: 'Manchester City',
+                                   description: 'The other Manchester team.',
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec2') }
   let!(:obj5) { FactoryGirl.create(:restricted_intellectual_object,
                                    institution: inst2) }
   let!(:obj6) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst1,
                                    bag_name: '12345-abcde',
                                    alt_identifier: 'test.edu/some-bag',
-                                   created_at: "2011-10-10T10:00:00Z",
-                                   updated_at: "2011-10-10T10:00:00Z") }
+                                   created_at: '2011-10-10T10:00:00Z',
+                                   updated_at: '2011-10-10T10:00:00Z',
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec3') }
   let!(:file1) { FactoryGirl.create(:generic_file,
                                     intellectual_object: obj2) }
   let!(:event1) { FactoryGirl.create(:premis_event_ingest,
@@ -72,6 +75,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(assigns(:intellectual_objects).size).to eq 3
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
       end
+
+      it 'should have an etag for JSON calls' do
+        get :index, institution_identifier: inst1.identifier, format: :json
+        expect(response).to be_successful
+        expect(assigns(:intellectual_objects).size).to eq 3
+        data = JSON.parse(response.body)
+        expect(data['results'][0].has_key?('etag')).to be true
+        expect(data['results'][0]['etag']).not_to eq 'null'
+        #expect(data['results'][0]['etag']).to eq '4d05dc2aa07e411a55ef11bc6ade5ec1'
+      end
     end
 
     describe 'when signed in as system admin' do
@@ -108,16 +121,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           get :index, description_like: 'Aberdeen'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, identifier: "test.edu/baggie"
+          get :index, identifier: 'test.edu/baggie'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, identifier_like: "baggie"
+          get :index, identifier_like: 'baggie'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, alt_identifier: "test.edu/some-bag"
+          get :index, alt_identifier: 'test.edu/some-bag'
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, alt_identifier_like: "some-bag"
+          get :index, alt_identifier_like: 'some-bag'
           expect(assigns(:intellectual_objects).size).to eq 1
         end
       end
@@ -199,7 +212,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(assigns(:intellectual_object)).to eq obj3
       end
 
-      it "should serialize files when asked" do
+      it 'should serialize files when asked' do
         get :show, intellectual_object_identifier: obj2, format: :json, include_files: 'true'
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
@@ -209,7 +222,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data.has_key?('premis_events')).to be false
       end
 
-      it "should serialize events when asked" do
+      it 'should serialize events when asked' do
         get :show, intellectual_object_identifier: obj2, format: :json, include_events: 'true'
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
@@ -218,8 +231,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data.has_key?('generic_files')).to be false
       end
 
-      it "should serialize files and events when asked" do
+      it 'should serialize files and events when asked' do
         get :show, intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true'
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+        data = JSON.parse(response.body)
+        expect(data.has_key?('premis_events')).to be true
+        expect(data.has_key?('generic_files')).to be true
+        expect(data['generic_files'][0].has_key?('checksums')).to be true
+        expect(data['generic_files'][0].has_key?('premis_events')).to be true
+      end
+
+      it 'should serialize files, events, and state when asked' do
+        get :show, intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true', with_ingest_state: 'true'
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
         data = JSON.parse(response.body)
@@ -293,7 +317,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1) }
+    let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1, ingest_state: '{[]}') }
 
     after do
       PremisEvent.delete_all
@@ -347,11 +371,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should create a simple object' do
+        simple_obj.etag = '90908111'
         post(:create, institution_identifier: inst1.identifier,
              intellectual_object: simple_obj.attributes, format: 'json')
         expect(response.code).to eq '201'
         saved_obj = IntellectualObject.where(identifier: simple_obj.identifier).first
         expect(saved_obj).to be_truthy
+        expect(saved_obj.etag).to eq '90908111'
       end
     end
 
@@ -401,16 +427,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should update the object and respond with redirect (html)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', ingest_state: '{[A]}'}
         expect(response).to redirect_to intellectual_object_path(obj1.identifier)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Foo'
+        expect(saved_obj.ingest_state).to eq '{[A]}'
       end
       it 'should update the object and respond with json (json)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food'}, format: :json
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678'}, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'
+        expect(saved_obj.ingest_state).to eq '{[D]}'
+        expect(saved_obj.etag).to eq '12345678'
       end
     end
 

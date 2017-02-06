@@ -51,6 +51,12 @@ RSpec.describe IntellectualObject, :type => :model do
       subject.bag_name.should == exp
     end
 
+    it 'should properly set an ingest state' do
+      json = '[{ "something": "something" }]'
+      subject.ingest_state = json
+      subject.ingest_state.should == json
+    end
+
   end
 
   describe 'permission scopes and checks' do

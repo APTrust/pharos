@@ -317,6 +317,7 @@ class WorkItemsController < ApplicationController
     end
     params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
     params[:sort] = 'date' if params[:sort].nil?
+    (params[:retry] == 'true') ? params[:retry] = true : params[:retry] = false unless params[:retry].nil?
     @items = @items
       .created_before(params[:created_before])
       .created_after(params[:created_after])
@@ -337,6 +338,8 @@ class WorkItemsController < ApplicationController
       .queued(params[:queued])
       .with_node(params[:node])
       .with_unempty_node(params[:node_not_empty])
+      .with_empty_node(params[:node_empty])
+    @items = @items.with_retry(params[:retry]) unless params[:retry].nil?
     count = @items.count
     set_page_counts(count)
   end

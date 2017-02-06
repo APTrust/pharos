@@ -22,7 +22,7 @@ class PremisEventsController < ApplicationController
       .with_create_date(params[:created_at])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
-      .with_type(params[:type])
+      .with_type(params[:event_type])
       .with_event_identifier(params[:event_identifier])
       .with_object_identifier(params[:object_identifier])
       .with_object_identifier_like(params[:object_identifier_like])
@@ -57,7 +57,12 @@ class PremisEventsController < ApplicationController
   protected
 
   def load_intellectual_object
-    identifier = params[:object_identifier].gsub(/%2F/i, '/')
+    # Param names should be consistent!
+    identifier_param = params[:object_identifier]
+    if identifier_param.blank? && !params[:intellectual_object_identifier].blank?
+      identifier_param = params[:intellectual_object_identifier]
+    end
+    identifier = identifier_param.gsub(/%2F/i, '/')
     @parent = IntellectualObject.where(identifier: identifier).first
     params[:intellectual_object_id] = @parent.id
   end
@@ -100,25 +105,21 @@ class PremisEventsController < ApplicationController
 
   def filter
     set_filter_values
-    initialize_filter_counters
+    #initialize_filter_counters
     filter_by_institution unless params[:institution].nil?
     filter_by_event_type unless params[:event_type].nil?
     filter_by_outcome unless params[:outcome].nil?
-    #filter_by_file_association unless params[:file_association].nil?
-    #filter_by_object_association unless params[:object_association].nil?
-    set_inst_count(@premis_events, :events)
-    set_event_type_count(@premis_events)
-    set_outcome_count(@premis_events)
+    #set_inst_count(@premis_events, :events)
+    #set_event_type_count(@premis_events)
+    #set_outcome_count(@premis_events)
     count = @premis_events.count
     set_page_counts(count)
   end
 
   def set_filter_values
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = @premis_events.distinct.pluck(:institution_id)
-    #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @premis_events.distinct.pluck(:intellectual_object_id)
-    #params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @premis_events.distinct.pluck(:generic_file_id)
-    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @premis_events.distinct.pluck(:event_type)
-    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @premis_events.distinct.pluck(:outcome)
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
+    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = []
+    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
   end
 
 end
