@@ -10,10 +10,12 @@
         <div class="panel-body">
           <ul class="facet-values list-unstyled">
             <% if @selected[:institution] %>
-                <script>selected("institution", "<%= @selected[:institution].capitalize %>", "<%=url_for(params.except :institution)%>")</script>
+                <% current_inst = Institution.find(@selected[:institution]) %>
+                <script>selected("institution", "<%= current_inst.name %>", "<%=url_for(params.except :institution)%>")</script>
             <% else %>
                 <% @institutions.each do |inst| %>
-                    <li><span class="facet-label"><a href="<%= current_path('institution', inst) %>"><%= inst.capitalize %></a></span></li>
+                    <% current_inst = Institution.find(inst) %>
+                    <span class="facet-label"><a href="<%= current_path('institution', inst) %>"><%= current_inst.name %></a></span>
                 <% end %>
             <% end %>
           </ul>

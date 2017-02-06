@@ -24,7 +24,6 @@ class PremisEventsController < ApplicationController
       .with_create_date(params[:created_at])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
-      .with_type(params[:event_type])
       .with_event_identifier(params[:event_identifier])
       .with_object_identifier(params[:object_identifier])
       .with_object_identifier_like(params[:object_identifier_like])
@@ -107,7 +106,7 @@ class PremisEventsController < ApplicationController
 
   def filter
     set_filter_values
-    #initialize_filter_counters
+    @selected = {}
     filter_by_institution unless params[:institution].nil?
     filter_by_event_type unless params[:event_type].nil?
     filter_by_outcome unless params[:outcome].nil?
@@ -120,7 +119,7 @@ class PremisEventsController < ApplicationController
 
   def set_filter_values
     params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = []
+    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values
     params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
   end
 

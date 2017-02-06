@@ -338,7 +338,7 @@ RSpec.describe CatalogController, type: :controller do
           end
 
           it 'should filter by outcome' do
-            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', outcome: 'failure'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', outcome: 'Failure'
             expect(assigns(:paged_results).map &:id).to include(@event_six.id)
           end
         end
