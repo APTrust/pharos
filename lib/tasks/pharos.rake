@@ -64,6 +64,25 @@ namespace :pharos do
   #   raise "test failures: #{error}" if error
   # end
 
+  desc 'Create dummy dpn work items for testing'
+  task dummy_dpn: :environment do
+    if Rails.env.production?
+      puts 'Do not run in production!'
+      return
+    end
+
+    puts 'Creating queued dpn items'
+    15.times.each do
+      FactoryGirl.create(:dpn_work_item)
+    end
+
+    puts 'Created not queued dpn items'
+    15.times.each do
+      FactoryGirl.create(:dpn_work_item, queued_at: nil, completed_at: nil)
+    end
+  end
+
+
   desc 'Empty DB and add dummy information'
   task :populate_db, [:numIntObjects, :numGenFiles] => [:environment] do |_, args|
     if Rails.env.production?
@@ -476,7 +495,7 @@ namespace :pharos do
         if type_array.include?(event.event_type)
           possible_dupes = current_object.premis_events.where(event_type: event.event_type)
           gf_ident_array = []
-          if event.event_type == 'fixity_check'
+          if event.event_type == Pharos::Application::PHAROS_EVENT_TYPES['fixity']
             break
           else
             possible_dupes.each do |current_dupe|

@@ -147,28 +147,22 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def serializable_hash (options={})
-    options[:except].nil? ? options[:except] = :ingest_state : options[:except] = options[:except].push(:ingest_state)
-    if !options[:include].nil? && options[:include].include?(:ingest_state)
-      merge_state = true
-      options[:include].delete(:ingest_state)
-      options.delete(:include) if options[:include] == []
-    end
     data = super(options)
-    if merge_state == true
+    data.delete('ingest_state')
+    if options.has_key?(:include) && options[:include].include?(:ingest_state)
       if self.ingest_state.nil?
-        data['ingest_state'] = '[]'
+        data['ingest_state'] = 'null'
       else
         state = JSON.parse(self.ingest_state)
-        data.merge!(state)
+        data.merge!(ingest_state: state)
       end
     end
     data.merge(
         in_dpn: in_dpn?,
         file_count: gf_count,
         file_size: gf_size,
-        institution: self.institution.identifier,
+        institution: self.institution.identifier
     )
-    data
   end
 
   # Returns the WorkItem describing the last ingested

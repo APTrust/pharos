@@ -40,11 +40,10 @@ class GenericFilesController < ApplicationController
       filter
       sort
       page_results(@generic_files)
+      (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
       respond_to do |format|
-        (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-            format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash(include: [:ingest_state]) } } } :
-            format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash } } }
-            format.html { }
+        format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash(options_hash) } } }
+        format.html { }
       end
     end
   end
@@ -125,7 +124,7 @@ class GenericFilesController < ApplicationController
       redirect_to @generic_file
       flash[:alert] = 'This file has already been deleted.'
     elsif result == 'true'
-      attributes = { event_type: 'delete',
+      attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                      date_time: "#{Time.now}",
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',
@@ -218,21 +217,23 @@ class GenericFilesController < ApplicationController
   end
 
   def object_as_json
-    if params[:include_relations]
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          @generic_file.serializable_hash(include: [:checksums, :premis_events, :ingest_state]) :
-          @generic_file.serializable_hash(include: [:checksums, :premis_events])
+    if params[:with_ingest_state] == 'true' && current_user.admin? && params[:include_relations]
+      options_hash = {include: [:checksums, :premis_events, :ingest_state]}
+    elsif params[:with_ingest_state] == 'true' && current_user.admin?
+      options_hash = {include: [:ingest_state]}
+    elsif params[:include_relations]
+      options_hash = {include: [:checksums, :premis_events]}
     else
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          @generic_file.serializable_hash(include: [:ingest_state]) :
-      @generic_file.serializable_hash
+      options_hash = {}
     end
+    @generic_file.serializable_hash(options_hash)
   end
 
   def array_as_json(list_of_generic_files)
     (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-        files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events, :ingest_state]) } :
-        files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+        options_hash = {include: [:checksums, :premis_events, :ingest_state]} :
+        options_hash = {include: [:checksums, :premis_events]}
+    files = list_of_generic_files.map { |gf| gf.serializable_hash(options_hash) }
 
     # For consistency on the client end, make this list
     # look like every other list the API returns.

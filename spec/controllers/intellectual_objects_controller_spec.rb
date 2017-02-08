@@ -15,13 +15,15 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst1,
                                    identifier: 'test.edu/baggie',
                                    title: 'Aberdeen Wanderers',
-                                   description: 'Founded in Aberdeen in 1928.') }
+                                   description: 'Founded in Aberdeen in 1928.',
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec1') }
   let!(:obj3) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst2) }
   let!(:obj4) { FactoryGirl.create(:restricted_intellectual_object,
                                    institution: inst1,
                                    title: 'Manchester City',
-                                   description: 'The other Manchester team.') }
+                                   description: 'The other Manchester team.',
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec2') }
   let!(:obj5) { FactoryGirl.create(:restricted_intellectual_object,
                                    institution: inst2) }
   let!(:obj6) { FactoryGirl.create(:institutional_intellectual_object,
@@ -29,7 +31,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    bag_name: '12345-abcde',
                                    alt_identifier: 'test.edu/some-bag',
                                    created_at: '2011-10-10T10:00:00Z',
-                                   updated_at: '2011-10-10T10:00:00Z') }
+                                   updated_at: '2011-10-10T10:00:00Z',
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec3') }
   let!(:file1) { FactoryGirl.create(:generic_file,
                                     intellectual_object: obj2) }
   let!(:event1) { FactoryGirl.create(:premis_event_ingest,
@@ -71,6 +74,16 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response).to be_successful
         expect(assigns(:intellectual_objects).size).to eq 3
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
+      end
+
+      it 'should have an etag for JSON calls' do
+        get :index, institution_identifier: inst1.identifier, format: :json
+        expect(response).to be_successful
+        expect(assigns(:intellectual_objects).size).to eq 3
+        data = JSON.parse(response.body)
+        expect(data['results'][0].has_key?('etag')).to be true
+        expect(data['results'][0]['etag']).not_to eq 'null'
+        #expect(data['results'][0]['etag']).to eq '4d05dc2aa07e411a55ef11bc6ade5ec1'
       end
     end
 
@@ -358,11 +371,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should create a simple object' do
+        simple_obj.etag = '90908111'
         post(:create, institution_identifier: inst1.identifier,
              intellectual_object: simple_obj.attributes, format: 'json')
         expect(response.code).to eq '201'
         saved_obj = IntellectualObject.where(identifier: simple_obj.identifier).first
         expect(saved_obj).to be_truthy
+        expect(saved_obj.etag).to eq '90908111'
       end
     end
 
@@ -419,11 +434,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(saved_obj.ingest_state).to eq '{[A]}'
       end
       it 'should update the object and respond with json (json)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}'}, format: :json
+        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678'}, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'
         expect(saved_obj.ingest_state).to eq '{[D]}'
+        expect(saved_obj.etag).to eq '12345678'
       end
     end
 
@@ -482,7 +498,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'D'
         expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq 'delete'
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
       end
 
       it 'should not delete already deleted item' do
@@ -508,7 +524,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'D'
         expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq 'delete'
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
       end
 
       it 'should say OK and return no content if the item was previously deleted' do

@@ -64,6 +64,27 @@ module Pharos
         'dpn' => 'DPN'
     }
 
+    PHAROS_EVENT_TYPES = {
+	      'access_assignment' => 'access assignment',
+        'capture' => 'capture',
+        'compress' => 'compression',
+        'create' => 'creation',
+        'deaccess' => 'deaccession',
+        'decompress' => 'decompression',
+        'decrypt' => 'decryption',
+        'delete' => 'deletion',
+        'digest_calc' => 'message digest calculation',
+        'fixity' => 'fixity check',
+        'ident_assignment' => 'identifier assignment',
+        'ingest' => 'ingestion',
+        'migrate' => 'migration',
+        'normal' => 'normalization',
+        'replicate' => 'replication',
+        'sig_validate' => 'digital signature validation',
+        'validate' => 'validation',
+        'virus_check' => 'virus check'
+    }
+
     DPN_TASKS = %w(sync ingest replication restore fixity)
 
     DPN_STATUS = false

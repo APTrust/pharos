@@ -332,6 +332,8 @@ module SearchAndIndex
     str = str << "&needs_admin_review=#{params[:needs_admin_review]}" if params[:needs_admin_review].present?
     str = str << "&event_type=#{params[:event_type]}" if params[:event_type].present?
     str = str << "&outcome=#{params[:outcome]}" if params[:outcome].present?
+    str = str << "&not_checked_since=#{params[:not_checked_since]}" if params[:not_checked_since].present?
+    str = str << "&identifier_like=#{params[:identifier_like]}" if params[:identifier_like].present?
     str
   end
 end

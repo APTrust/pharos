@@ -333,12 +333,12 @@ RSpec.describe CatalogController, type: :controller do
           end
 
           it 'should filter by event type' do
-            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', event_type: 'ingestion'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']
             expect(assigns(:paged_results).map &:id).to include(@event_five.id)
           end
 
           it 'should filter by outcome' do
-            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', outcome: 'failure'
+            get :search, q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', outcome: 'Failure'
             expect(assigns(:paged_results).map &:id).to include(@event_six.id)
           end
         end

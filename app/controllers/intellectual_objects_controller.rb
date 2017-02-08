@@ -36,10 +36,9 @@ class IntellectualObjectsController < ApplicationController
     filter
     sort
     page_results(@intellectual_objects)
+    (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
     respond_to do |format|
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |item| item.serializable_hash(include: [:ingest_state]) } } } :
-          format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |item| item.serializable_hash } } }
+      format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |item| item.serializable_hash(options_hash) } } }
       format.html {
         index!
       }
@@ -111,7 +110,7 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     elsif pending.nil?
-      attributes = { event_type: 'delete',
+      attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                      date_time: "#{Time.now}",
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',
@@ -229,42 +228,20 @@ class IntellectualObjectsController < ApplicationController
   private
 
   def object_as_json
-    if params[:include_all_relations]
-      # Return only active files, but call them generic_files
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          data = @intellectual_object.serializable_hash(include: [:ingest_state, :premis_events, active_files: {include: [:checksums, :premis_events]}]) :
-          data = @intellectual_object.serializable_hash(include: [:premis_events, active_files: {include: [:checksums, :premis_events]}])
-      data[:generic_files] = data.delete('active_files')
-      data[:state] = @intellectual_object.state
-      data
-    elsif params[:include_events]
-      # This should include events for the IntelObject only, not for GenericFiles
-      # Waiting on https://www.pivotaltracker.com/story/show/134523619
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          data = @intellectual_object.serializable_hash(include: [:premis_events, :ingest_state]) :
-          data = @intellectual_object.serializable_hash(include: [:premis_events])
-
-      data[:state] = @intellectual_object.state
-      data
-    elsif params[:include_files]
-      # Admin API will often want to get the generic files,
-      # but not the events, which add a huge amount of JSON.
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          data = @intellectual_object.serializable_hash(include: [:ingest_state, active_files: {include: [:checksums]}]) :
-          data = @intellectual_object.serializable_hash(include: [active_files: {include: [:checksums]}])
-      data[:generic_files] = data.delete('active_files')
-      data[:state] = @intellectual_object.state
-      data
-    else
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          @intellectual_object.serializable_hash(include: [:ingest_state]) :
-          @intellectual_object.serializable_hash
-
-    end
+    include_list = []
+    include_list.push(:premis_events, active_files: {include: [:checksums, :premis_events]}) if params[:include_all_relations]
+    include_list.push(:premis_events) if params[:include_events]
+    include_list.push(active_files: {include: [:checksums]}) if params[:include_files]
+    include_list.push(:ingest_state) if (params[:with_ingest_state] == 'true' && current_user.admin?)
+    options_hash = {include: include_list}
+    data = @intellectual_object.serializable_hash(options_hash)
+    data[:state] = @intellectual_object.state
+    data[:generic_files] = data.delete('active_files') if params[:include_all_relations] || params[:include_files]
+    data
   end
 
   def create_params
-    params.require(:intellectual_object).permit(:institution_id, :title,
+    params.require(:intellectual_object).permit(:institution_id, :title, :etag,
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :ingest_state,
                                                 generic_files_attributes:
@@ -289,7 +266,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update_params
     params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state,
-                                                :alt_identifier, :state, :dpn_uuid)
+                                                :alt_identifier, :state, :dpn_uuid, :etag)
   end
 
   def load_object
