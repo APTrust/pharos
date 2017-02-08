@@ -93,5 +93,11 @@ module Pharos
     APTRUST_NAME = 'APTrust'
     APTRUST_ID = 'aptrust.org'
 
+    if Rails.env.production?
+      NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'
+    elsif RAILS.env.development?
+      NSQ_BASE_URL = 'http://demo-services.aptrust.org:4151'
+    end
+
   end
 end

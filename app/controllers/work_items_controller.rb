@@ -67,11 +67,18 @@ class WorkItemsController < ApplicationController
   def retry
     if @work_item
       authorize @work_item
-      @work_item.requeue_item
-      ###ISSUE HTTP POST TO NSQ######
-      respond_to do |format|
-        format.json { render json: @work_item.serializable_hash }
-        format.html
+      if @work_item.status == Pharos::Application::PHAROS_STATUSES['success']
+        respond_to do |format|
+          render :json => { status: 'error', message: 'Work Items that have succeeded cannot be requeued.' }, :status => :conflict
+          format.html
+        end
+      else
+        @work_item.requeue_item
+        ###ISSUE HTTP POST TO NSQ######
+        respond_to do |format|
+          format.json { render json: '' }
+          format.html
+        end
       end
     else
       authorize current_user, :nil_index?
