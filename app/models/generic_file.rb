@@ -52,10 +52,13 @@ class GenericFile < ActiveRecord::Base
     where('(1 = 0)') unless current_user.admin?
   }
 
+  #TODO: fix this up - right now it's causing nil policy errors if the
+  # file in question has a legitimate %2F as part of the identifier
   def self.find_by_identifier(identifier)
     return nil if identifier.blank?
     unescaped_identifier = identifier.gsub(/%2F/i, '/')
     GenericFile.where(identifier: unescaped_identifier).first
+    #GenericFile.where(identifier: identifier).first
   end
 
   def to_param
