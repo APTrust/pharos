@@ -125,7 +125,7 @@ class GenericFilesController < ApplicationController
       flash[:alert] = 'This file has already been deleted.'
     elsif result == 'true'
       attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                     date_time: "#{Time.now}",
+                     date_time: Time.now.utc.iso8601,
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',
                      outcome_detail: current_user.email,
