@@ -102,16 +102,20 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def in_dpn?
-    object_in_dpn = false
-    dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
-    record = Pharos::Application::PHAROS_STAGES['record']
-    success = Pharos::Application::PHAROS_STATUSES['success']
-    dpn_items = WorkItem.where(object_identifier: self.identifier, action: dpn)
-    dpn_items.each do |item|
-      if item.stage == record && item.status == success
-        object_in_dpn = true
-        break
+    if self.dpn_uuid.nil? || self.dpn_uuid.blank? || self.dpn_uuid.empty?
+      object_in_dpn = false
+      dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
+      record = Pharos::Application::PHAROS_STAGES['record']
+      success = Pharos::Application::PHAROS_STATUSES['success']
+      dpn_items = WorkItem.where(object_identifier: self.identifier, action: dpn)
+      dpn_items.each do |item|
+        if item.stage == record && item.status == success
+          object_in_dpn = true
+          break
+        end
       end
+    else
+      object_in_dpn = true
     end
     object_in_dpn
   end
