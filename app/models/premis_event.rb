@@ -60,7 +60,7 @@ class PremisEvent < ActiveRecord::Base
   def serializable_hash(options={})
     data = super(options)
 
-    # The following lines are commented out becaus they
+    # The following lines are commented out because they
     # cause Rails to issue many SQL queries
     # when we're serializing an IntellectualObject with
     # include_all_relations = true. "Many" can mean
@@ -70,6 +70,9 @@ class PremisEvent < ActiveRecord::Base
 
     #data.merge!(intellectual_object_id: intellectual_object_id) if self.intellectual_object !nil?
     #data.merge!(generic_file_id: generic_file_id) if self.generic_file !nil?
+
+    # This column is a string, but should be a datetime
+    data[:date_time] = Time.parse(self.date_time).utc.iso8601
     data
   end
 
