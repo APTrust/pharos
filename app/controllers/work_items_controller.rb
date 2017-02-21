@@ -408,27 +408,28 @@ class WorkItemsController < ApplicationController
   def issue_requeue_http_post(stage)
     params = {'work_item_id' => "#{@work_item.id}"}
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic"), params)
+      uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
-      x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic"), params)
+      uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if stage == 'fetch'
-        x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic"), params)
+        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic")
       elsif stage == 'store'
-        x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_store_topic"), params)
+        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_store_topic")
       elsif stage == 'record'
-        x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_record_topic"), params)
+        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_record_topic")
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn']
       if stage == 'package'
-        x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic"), params)
+        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
       elsif stage == 'store'
-        x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic"), params)
+        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
       elsif stage == 'record'
-        x = Net::HTTP.post_form(URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic"), params)
+        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
       end
     end
-    puts x.body
+    response = Net::HTTP.post_form(uri, params)
+    response
   end
 
   def filter
