@@ -24,7 +24,7 @@ class WorkItemPolicy < ApplicationPolicy
     user.admin? || (user.institution.id == record.institution_id)
   end
 
-  def retry?
+  def requeue?
     user.admin?
   end
 
