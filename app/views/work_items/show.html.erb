@@ -6,8 +6,23 @@
   <section class="page-header">
     <h2><%= @work_item.name %></h2>
     <% if current_user.admin? %>
-        <%= requeue_link(@work_item) %>
+        <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
+            <%= requeue_link(@work_item) %>
+        <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] %>
+            <%= link_to requeue_work_item_path(@work_item.id), class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreResponse();' do %>
+                <i class="glyphicon glyphicon-repeat"></i> Requeue
+            <% end %>
+        <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
+            <%= link_to requeue_work_item_path(@work_item.id), class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestResponse();' do %>
+                <i class="glyphicon glyphicon-repeat"></i> Requeue
+            <% end %>
+        <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
+            <%= link_to requeue_work_item_path(@work_item.id), class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnResponse();' do %>
+                <i class="glyphicon glyphicon-repeat"></i> Requeue
+            <% end %>
+        <% end %>
     <% end %>
+    <div id="dialog"></div>
   </section>
 
   <section class="queue">

@@ -194,6 +194,64 @@ function fixFilters() {
     });
 }
 
+function restoreResponse(){
+    $("#dialog").dialog({
+        autoOpen: true,
+        buttons: {
+
+            Yes: function() {
+
+                alert("Yes!");
+                $(this).dialog("close");
+            },
+            No: function() {
+
+                alert("No!");
+                $(this).dialog("close");
+
+            },
+            Maybe: function() {
+
+                alert("Maybe!");
+                $(this).dialog("close");
+            }
+
+        },
+        width: "400px"
+
+    });
+}
+
+function ingestResponse(){
+    $("#dialog").dialog({
+        autoOpen: true,
+        buttons: {
+            Yes: function() {
+
+                alert("Yes!");
+                $(this).dialog("close");
+            },
+            No: function() {
+
+                alert("No!");
+                $(this).dialog("close");
+
+            },
+            Maybe: function() {
+
+                alert("Maybe!");
+                $(this).dialog("close");
+            }
+
+        },
+        width: "400px"
+    });
+}
+
+function dpnResponse(){
+
+}
+
 $(document).ready(function(){
     fixFilters();
     activate_tabs();
