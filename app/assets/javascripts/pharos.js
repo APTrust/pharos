@@ -194,58 +194,111 @@ function fixFilters() {
     });
 }
 
-function restoreResponse(){
-    $("#dialog").dialog({
-        autoOpen: true,
+$( function() {
+
+    function addUser() {
+        var valid = true;
+        allFields.removeClass( "ui-state-error" );
+
+        valid = valid && checkLength( name, "username", 3, 16 );
+        valid = valid && checkLength( email, "email", 6, 80 );
+        valid = valid && checkLength( password, "password", 5, 16 );
+
+        valid = valid && checkRegexp( name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter." );
+        valid = valid && checkRegexp( email, emailRegex, "eg. ui@jquery.com" );
+        valid = valid && checkRegexp( password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
+
+        if ( valid ) {
+            $( "#users tbody" ).append( "<tr>" +
+                "<td>" + name.val() + "</td>" +
+                "<td>" + email.val() + "</td>" +
+                "<td>" + password.val() + "</td>" +
+                "</tr>" );
+            dialog.dialog( "close" );
+        }
+        return valid;
+    }
+
+
+
+    form = dialog.find( "form" ).on( "submit", function( event ) {
+        event.preventDefault();
+        addUser();
+    });
+} );
+
+function restoreRequeueSetUp(){
+    dialog = $("#dialog-form-restore").dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
         buttons: {
-
-            Yes: function() {
-
-                alert("Yes!");
-                $(this).dialog("close");
-            },
-            No: function() {
-
-                alert("No!");
-                $(this).dialog("close");
-
-            },
-            Maybe: function() {
-
-                alert("Maybe!");
-                $(this).dialog("close");
+            "Requeue": restoreResponse(),
+            Cancel: function() {
+                dialog.dialog("close");
             }
-
         },
-        width: "400px"
-
+        close: function() {
+            form[ 0 ].reset();
+            allFields.removeClass("ui-state-error");
+        }
+    });
+    $("#requeue_restore").button().on("click", function() {
+        dialog.dialog("open");
     });
 }
 
-function ingestResponse(){
-    $("#dialog").dialog({
-        autoOpen: true,
+function ingestRequeueSetUp(){
+    dialog = $("#dialog-form-ingest").dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
         buttons: {
-            Yes: function() {
-
-                alert("Yes!");
-                $(this).dialog("close");
-            },
-            No: function() {
-
-                alert("No!");
-                $(this).dialog("close");
-
-            },
-            Maybe: function() {
-
-                alert("Maybe!");
-                $(this).dialog("close");
+            "Requeue": ingestResponse(),
+            Cancel: function() {
+                dialog.dialog("close");
             }
-
         },
-        width: "400px"
+        close: function() {
+            form[ 0 ].reset();
+            allFields.removeClass("ui-state-error");
+        }
     });
+    $("#requeue_ingest").button().on("click", function() {
+        dialog.dialog("open");
+    });
+}
+
+function dpnRequeueSetUp(){
+    dialog = $("#dialog-form-dpn").dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            "Requeue": dpnResponse(),
+            Cancel: function() {
+                dialog.dialog("close");
+            }
+        },
+        close: function() {
+            form[ 0 ].reset();
+            allFields.removeClass("ui-state-error");
+        }
+    });
+    $("#requeue_dpn").button().on("click", function() {
+        dialog.dialog("open");
+    });
+}
+
+function restoreResponse(){
+
+}
+
+function ingestResponse(){
+
 }
 
 function dpnResponse(){
