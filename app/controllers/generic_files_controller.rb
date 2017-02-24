@@ -245,10 +245,31 @@ class GenericFilesController < ApplicationController
     }
   end
 
+  # def load_generic_file
+  #   if params[:generic_file_identifier]
+  #     @generic_file = GenericFile.where(identifier: params[:generic_file_identifier]).first
+  #     @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier]) if @generic_file.nil?
+  #   elsif params[:id]
+  #     @generic_file ||= GenericFile.find(params[:id])
+  #   end
+  #   unless @generic_file.nil?
+  #     @intellectual_object = @generic_file.intellectual_object
+  #     @institution = @intellectual_object.institution
+  #   end
+  # end
+
   def load_generic_file
     if params[:generic_file_identifier]
-      @generic_file = GenericFile.where(identifier: params[:generic_file_identifier]).first
-      @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier]) if @generic_file.nil?
+      identifier = params[:generic_file_identifier]
+      @generic_file = GenericFile.where(identifier: identifier).first
+      # PivotalTracker https://www.pivotaltracker.com/story/show/140235557
+      if @generic_file.nil? && looks_like_fedora_file(identifier)
+        fixed_identifier = fix_fedora_filename(identifier)
+        if fixed_identifier != identifier
+          logger.info("Rewrote #{identifier} -> #{fixed_identifier}")
+          @generic_file = GenericFile.where(identifier: fixed_identifier).first
+        end
+      end
     elsif params[:id]
       @generic_file ||= GenericFile.find(params[:id])
     end
@@ -257,6 +278,38 @@ class GenericFilesController < ApplicationController
       @institution = @intellectual_object.institution
     end
   end
+
+  # If this looks like a file that Fedora exported,
+  # it will need some special handling.
+  def looks_like_fedora_file(filename)
+    filename.include?('fedora') || filename.include?('datastreamStore')
+  end
+
+  # Oh, the horror!
+  # https://www.pivotaltracker.com/story/show/140235557
+  def fix_fedora_filename(filename)
+    match = filename.match(/\/[0-9a-f]{2}\//)
+    return filename if match.nil?
+
+    # Split the filename at the dirname after datastreamStore or objectStore.
+    # That dirname always consists of two hex letters.
+    dirname = match[0]
+    parts = filename.split(dirname, 2)
+
+    return filename if parts.count < 2
+
+    # Now URL-encode slashes and colons AFTER the dirname,
+    # and use capitals, because Postgres is case-sensitive.
+    # Second arg to URI.encode forces it to escape slashes
+    # and colons, which the encoder would otherwise let through
+    start_of_name = parts[0]
+    end_of_name = parts[1]
+    encoded_end = URI.encode(end_of_name, "/:")
+
+    # Now rebuild and return the fixed file name.
+    return "#{start_of_name}#{dirname}#{encoded_end}"
+  end
+
 
   def filter
     set_filter_values
