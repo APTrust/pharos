@@ -245,19 +245,6 @@ class GenericFilesController < ApplicationController
     }
   end
 
-  # def load_generic_file
-  #   if params[:generic_file_identifier]
-  #     @generic_file = GenericFile.where(identifier: params[:generic_file_identifier]).first
-  #     @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier]) if @generic_file.nil?
-  #   elsif params[:id]
-  #     @generic_file ||= GenericFile.find(params[:id])
-  #   end
-  #   unless @generic_file.nil?
-  #     @intellectual_object = @generic_file.intellectual_object
-  #     @institution = @intellectual_object.institution
-  #   end
-  # end
-
   def load_generic_file
     if params[:generic_file_identifier]
       identifier = params[:generic_file_identifier]
