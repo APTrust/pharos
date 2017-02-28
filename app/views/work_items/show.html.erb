@@ -5,6 +5,7 @@
 
   <section class="page-header">
     <h2><%= @work_item.name %></h2>
+    <p id="work_item_id" class="hidden"><%= @work_item.id %></p>
     <% if current_user.admin? %>
         <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
             <%= requeue_link(@work_item) %>
@@ -14,6 +15,10 @@
             <button id="requeue_ingest" class="btn doc-action-btn btn-normal requeue-link glyphicon glyphicon-repeat"> Requeue</button>
         <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
             <button id="requeue_dpn" class="btn doc-action-btn btn-normal requeue-link glyphicon glyphicon-repeat"> Requeue</button>
+        <% else %>
+            <%= link_to requeue_work_item_path(@work_item.id), class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreResponse();' do %>
+                <i class="glyphicon glyphicon-repeat"></i> Requeue
+            <% end %>
         <% end %>
     <% end %>
     <%= render 'requeue_forms' %>

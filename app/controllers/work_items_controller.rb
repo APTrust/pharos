@@ -76,7 +76,8 @@ class WorkItemsController < ApplicationController
         end
       else
         options = {}
-        #need to add check for deleting work_item_state and stage variable
+        options[:stage] = params[:item_stage] if params[:item_stage]
+        options[:work_item_state_delete] = 'true' if params[:delete_state_item] && params[:delete_state_item] == 'true'
         @work_item.requeue_item(options)
         options[:stage] ? issue_requeue_http_post(options[:stage]) : issue_requeue_http_post('')
         respond_to do |format|
