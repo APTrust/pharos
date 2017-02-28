@@ -4,6 +4,7 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
   let(:file) { FactoryGirl.create(:generic_file) }
   let(:inst_user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id)}
+  let(:crazy_file) { FactoryGirl.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0') }
 
   before(:all) do
     @institution = FactoryGirl.create(:institution)
@@ -110,6 +111,11 @@ RSpec.describe GenericFilesController, type: :controller do
     it 'should show the file by identifier for API users' do
       get :show, generic_file_identifier: URI.encode(file.identifier)
       expect(assigns(:generic_file)).to eq file
+    end
+
+    it 'responds with the file even when the file identifier is crazy' do
+      get :show, generic_file_identifier: crazy_file.identifier
+      expect(assigns(:generic_file)).to eq crazy_file
     end
 
   end

@@ -37,7 +37,8 @@ class ChecksumsController < ApplicationController
 
   def load_generic_file
     if params[:generic_file_identifier]
-      @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier])
+      @generic_file ||= GenericFile.where(identifier: params[:generic_file_identifier]).first
+      @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier]) if @generic_file.nil?
     elsif params[:generic_file_id]
       @generic_file = GenericFile.find(params[:generic_file_id])
     end

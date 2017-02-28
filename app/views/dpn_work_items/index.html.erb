@@ -44,17 +44,12 @@
     </span>
   </div>
   <hr>
+
   <%- if @paged_results.empty? %>
       <%= render 'shared/zero_results' %>
   <%- else %>
       <h2 class="sr-only">Search Results</h2>
-      <div id="documents">
-        <% counter = @first_number %>
-        <% @paged_results.each do |current| %>
-            <%= render 'shared/individual_results/dpn_item_result', counter: counter, current: current %>
-            <% counter = counter+1 %>
-        <% end %>
-      </div>
+      <%= render 'item_table' %>
   <%- end %>
   <%= render 'shared/compact_pagination' %>
 </div>
