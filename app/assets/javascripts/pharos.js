@@ -195,13 +195,14 @@ function fixFilters() {
 }
 
 function restoreRequeueSetUp(){
+    var form, dialog;
     dialog = $("#dialog-form-restore").dialog({
         autoOpen: false,
         height: 400,
         width: 350,
         modal: true,
         buttons: {
-            "Requeue": restoreResponse(),
+            "Requeue": restoreResponse,
             Cancel: function() {
                 dialog.dialog("close");
             }
@@ -210,6 +211,10 @@ function restoreRequeueSetUp(){
             form[ 0 ].reset();
             allFields.removeClass("ui-state-error");
         }
+    });
+    form = dialog.find( "form" ).on( "submit", function( event ) {
+        event.preventDefault();
+        restoreResponse();
     });
     $("#requeue_restore").button().on("click", function() {
         dialog.dialog("open");
@@ -217,13 +222,14 @@ function restoreRequeueSetUp(){
 }
 
 function ingestRequeueSetUp(){
+    var form, dialog;
     dialog = $("#dialog-form-ingest").dialog({
         autoOpen: false,
         height: 400,
         width: 350,
         modal: true,
         buttons: {
-            "Requeue": ingestResponse(),
+            "Requeue": ingestResponse,
             Cancel: function() {
                 dialog.dialog("close");
             }
@@ -232,6 +238,10 @@ function ingestRequeueSetUp(){
             form[ 0 ].reset();
             allFields.removeClass("ui-state-error");
         }
+    });
+    form = dialog.find( "form" ).on( "submit", function( event ) {
+        event.preventDefault();
+        ingestResponse();
     });
     $("#requeue_ingest").button().on("click", function() {
         dialog.dialog("open");
@@ -239,13 +249,14 @@ function ingestRequeueSetUp(){
 }
 
 function dpnRequeueSetUp(){
+    var form, dialog;
     dialog = $("#dialog-form-dpn").dialog({
         autoOpen: false,
         height: 400,
         width: 350,
         modal: true,
         buttons: {
-            "Requeue": dpnResponse(),
+            "Requeue": dpnResponse,
             Cancel: function() {
                 dialog.dialog("close");
             }
@@ -254,6 +265,10 @@ function dpnRequeueSetUp(){
             form[ 0 ].reset();
             allFields.removeClass("ui-state-error");
         }
+    });
+    form = dialog.find( "form" ).on( "submit", function( event ) {
+        event.preventDefault();
+        dpnResponse();
     });
     $("#requeue_dpn").button().on("click", function() {
         dialog.dialog("open");
