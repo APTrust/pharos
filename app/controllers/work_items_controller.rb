@@ -79,7 +79,7 @@ class WorkItemsController < ApplicationController
         options[:stage] = params[:item_stage] if params[:item_stage]
         options[:work_item_state_delete] = 'true' if params[:delete_state_item] && params[:delete_state_item] == 'true'
         @work_item.requeue_item(options)
-        options[:stage] ? issue_requeue_http_post(options[:stage]) : issue_requeue_http_post('')
+        options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
         respond_to do |format|
           format.json { render json: '' }
           format.html
@@ -407,7 +407,7 @@ class WorkItemsController < ApplicationController
   end
 
   def issue_requeue_http_post(stage)
-    params = {'work_item_id' => "#{@work_item.id}"}
+    nsq_params = {'work_item_id' => "#{@work_item.id}"}
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
       uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
@@ -429,7 +429,7 @@ class WorkItemsController < ApplicationController
         uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
       end
     end
-    response = Net::HTTP.post_form(uri, params)
+    response = Net::HTTP.post_form(uri, nsq_params)
     response
   end
 
