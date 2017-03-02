@@ -19,7 +19,7 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.6'
 # bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0', group: :doc
+gem 'sdoc', '~> 0.4.2', group: :doc
 
 gem 'pundit'
 gem 'figaro'
@@ -55,7 +55,7 @@ end
 group :test do
   gem 'capybara', '2.12.1'
   gem 'shoulda-matchers', '~> 3.1.1'
-  gem 'coveralls', require: false
+  gem 'coveralls', '0.8.19', require: false
 end
 
 group :production do
