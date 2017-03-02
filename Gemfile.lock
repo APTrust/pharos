@@ -253,7 +253,7 @@ GEM
     turbolinks-source (5.0.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (3.0.2)
+    uglifier (3.1.2)
       execjs (>= 0.3.0, < 3)
     uuidtools (2.1.5)
     valid_email (0.0.13)
@@ -266,7 +266,7 @@ GEM
       debug_inspector
       railties (>= 4.2)
     wicked_pdf (1.1.0)
-    wkhtmltopdf-binary (0.12.3)
+    wkhtmltopdf-binary (0.12.3.1)
     xpath (2.0.0)
       nokogiri (~> 1.3)
 
