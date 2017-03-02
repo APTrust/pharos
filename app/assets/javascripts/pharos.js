@@ -209,7 +209,6 @@ function restoreRequeueSetUp(){
         },
         close: function() {
             form[ 0 ].reset();
-            allFields.removeClass("ui-state-error");
         }
     });
     form = dialog.find( "form" ).on( "submit", function( event ) {
@@ -236,7 +235,6 @@ function ingestRequeueSetUp(){
         },
         close: function() {
             form[ 0 ].reset();
-            allFields.removeClass("ui-state-error");
         }
     });
     form = dialog.find( "form" ).on( "submit", function( event ) {
@@ -263,7 +261,6 @@ function dpnRequeueSetUp(){
         },
         close: function() {
             form[ 0 ].reset();
-            allFields.removeClass("ui-state-error");
         }
     });
     form = dialog.find( "form" ).on( "submit", function( event ) {
