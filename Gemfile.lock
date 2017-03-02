@@ -297,7 +297,7 @@ DEPENDENCIES
   jquery-rails
   kaminari
   meta_request
-  pg (= 0.19.0)
+  pg
   phony_rails
   pundit
   rails (= 4.2.7.1)
