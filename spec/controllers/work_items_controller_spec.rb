@@ -168,36 +168,36 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
-  describe 'GET #retry' do
+  describe 'GET #requeue' do
     describe 'for admin user' do
       before do
         sign_in admin_user
       end
       it 'responds successfully with an HTTP 200 status code' do
-        get :retry, id: item.id
+        get :requeue, id: item.id
         expect(response).to be_success
       end
 
-      it 'renders the retry template' do
-        get :retry, id: item.id
-        expect(response).to render_template('retry')
+      it 'renders the requeue template' do
+        get :requeue, id: item.id
+        expect(response).to render_template('requeue')
       end
 
       it 'assigns the requested item as @work_item' do
-        get :retry, id: item.id
+        get :requeue, id: item.id
         assigns(:work_item).id.should eq(item.id)
       end
 
       it 'assigns the requested institution as @institution' do
-        get :retry, id: item.id
+        get :requeue, id: item.id
         assigns(:institution).should eq( admin_user.institution)
       end
 
-      it 'updates the status and retry attribute of the item' do
+      it 'updates the status and requeue attribute of the item' do
         new_item = FactoryGirl.create(:ingested_item)
-        get :retry, id: new_item.id, format: :json
+        get :requeue, id: new_item.id, format: :json
         assigns(:work_item).status.should eq(Pharos::Application::PHAROS_STATUSES['pend'])
-        assigns(:work_item).retry.should eq(true)
+        assigns(:work_item).requeue.should eq(true)
       end
 
     end
@@ -208,7 +208,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'does not allow the user to requeue the item' do
-        get :retry, id: item.id, format: :json
+        get :requeue, id: item.id, format: :json
         expect(response.status).to eq 403
       end
 

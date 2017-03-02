@@ -71,8 +71,8 @@ class WorkItemsController < ApplicationController
       authorize @work_item
       if @work_item.status == Pharos::Application::PHAROS_STATUSES['success']
         respond_to do |format|
-          render :json => { status: 'error', message: 'Work Items that have succeeded cannot be requeued.' }, :status => :conflict
-          format.html
+          format.json { render :json => { status: 'error', message: 'Work Items that have succeeded cannot be requeued.' }, :status => :conflict }
+          format.html { }
         end
       else
         options = {}

@@ -19,7 +19,7 @@ describe 'work_items/show.html.erb' do
 
   describe 'A user with access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, destroy?: true)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, destroy?: true, requeue?: true)
       render
     end
 
@@ -30,7 +30,7 @@ describe 'work_items/show.html.erb' do
 
   describe 'A user without access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: false, destroy?: false)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: false, destroy?: false, requeue?: false)
       render
     end
 
