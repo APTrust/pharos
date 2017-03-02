@@ -48,8 +48,8 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.datetime "created_at",                                                       null: false
     t.datetime "updated_at",                                                       null: false
     t.string   "state"
-    t.text     "ingest_state"
     t.datetime "last_fixity_check",                default: '2000-01-01 00:00:00', null: false
+    t.text     "ingest_state"
   end
 
   add_index "generic_files", ["file_format"], name: "index_generic_files_on_file_format"
@@ -104,8 +104,8 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.integer  "institution_id"
     t.string   "outcome"
+    t.integer  "institution_id"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
     t.string   "old_uuid"

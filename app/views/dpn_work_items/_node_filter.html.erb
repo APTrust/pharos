@@ -1,0 +1,28 @@
+<% unless @node_counts == {} %>
+    <div id="node-parent" class="panel panel-default">
+      <div id="filter-title-node" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-node">
+        <h5 class="panel-title">
+          Remote Node <span class="node-carat glyphicon glyphicon-chevron-right"></span>
+        </h5>
+
+      </div>
+      <div id="filter-node" class="panel-collapse facet-content collapse" style="height: 0px">
+        <div class="panel-body">
+          <ul class="facet-values list-unstyled">
+            <% if @selected[:remote_node] %>
+                <script>selected("node", "<%= @selected[:remote_node].capitalize %>", "<%=url_for(params.except :remote_node)%>")</script>
+            <% else %>
+                <% @nodes.each do |node| %>
+                    <% unless @node_counts[node] == 0 || @node_counts[node].nil? || node.nil? %>
+                        <li>
+                          <span class="facet-label"><a href="<%= current_path('remote_node', node) %>"><%= node.capitalize %></a></span>
+                          <span class="facet-count"><%= @node_counts[node] %></span>
+                        </li>
+                    <% end %>
+                <% end %>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+<% end %>

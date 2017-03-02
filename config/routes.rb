@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   delete 'api/v2/objects/:intellectual_object_identifier/delete', to: 'intellectual_objects#destroy', format: :json, intellectual_object_identifier: object_ptrn
 
   # GENERIC FILE ROUTES
-  file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%]+/
+  file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%\@]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
   get 'files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files
@@ -34,7 +34,6 @@ Rails.application.routes.draw do
   put '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#update', format: :json, intellectual_object_identifier: object_ptrn
   resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/files'
   get 'member-api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: :json, intellectual_object_identifier: object_ptrn
-
 
   # INSTITUTIONS (API)
   # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'
@@ -87,6 +86,7 @@ Rails.application.routes.draw do
 
   # DPN Work Item Routes
   resources :dpn_work_items, path: 'api/v2/dpn_item', only: [:index, :create, :show, :update], format: :json
+  resources :dpn_work_items, path: 'dpn_item', only: [:index, :show], format: :html
 
   # USER ROUTES
   devise_for :users

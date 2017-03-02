@@ -40,11 +40,10 @@ class GenericFilesController < ApplicationController
       filter
       sort
       page_results(@generic_files)
+      (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
       respond_to do |format|
-        (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-            format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash(include: [:ingest_state]) } } } :
-            format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash } } }
-            format.html { }
+        format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash(options_hash) } } }
+        format.html { }
       end
     end
   end
@@ -125,8 +124,8 @@ class GenericFilesController < ApplicationController
       redirect_to @generic_file
       flash[:alert] = 'This file has already been deleted.'
     elsif result == 'true'
-      attributes = { event_type: 'delete',
-                     date_time: "#{Time.now}",
+      attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                     date_time: Time.now.utc.iso8601,
                      detail: 'Object deleted from S3 storage',
                      outcome: 'Success',
                      outcome_detail: current_user.email,
@@ -218,21 +217,23 @@ class GenericFilesController < ApplicationController
   end
 
   def object_as_json
-    if params[:include_relations]
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          @generic_file.serializable_hash(include: [:checksums, :premis_events, :ingest_state]) :
-          @generic_file.serializable_hash(include: [:checksums, :premis_events])
+    if params[:with_ingest_state] == 'true' && current_user.admin? && params[:include_relations]
+      options_hash = {include: [:checksums, :premis_events, :ingest_state]}
+    elsif params[:with_ingest_state] == 'true' && current_user.admin?
+      options_hash = {include: [:ingest_state]}
+    elsif params[:include_relations]
+      options_hash = {include: [:checksums, :premis_events]}
     else
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-          @generic_file.serializable_hash(include: [:ingest_state]) :
-      @generic_file.serializable_hash
+      options_hash = {}
     end
+    @generic_file.serializable_hash(options_hash)
   end
 
   def array_as_json(list_of_generic_files)
     (params[:with_ingest_state] == 'true' && current_user.admin?) ?
-        files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events, :ingest_state]) } :
-        files = list_of_generic_files.map { |gf| gf.serializable_hash(include: [:checksums, :premis_events]) }
+        options_hash = {include: [:checksums, :premis_events, :ingest_state]} :
+        options_hash = {include: [:checksums, :premis_events]}
+    files = list_of_generic_files.map { |gf| gf.serializable_hash(options_hash) }
 
     # For consistency on the client end, make this list
     # look like every other list the API returns.
@@ -246,15 +247,56 @@ class GenericFilesController < ApplicationController
 
   def load_generic_file
     if params[:generic_file_identifier]
-      @generic_file ||= GenericFile.find_by_identifier(params[:generic_file_identifier])
+      identifier = params[:generic_file_identifier]
+      @generic_file = GenericFile.where(identifier: identifier).first
+      # PivotalTracker https://www.pivotaltracker.com/story/show/140235557
+      if @generic_file.nil? && looks_like_fedora_file(identifier)
+        fixed_identifier = fix_fedora_filename(identifier)
+        if fixed_identifier != identifier
+          logger.info("Rewrote #{identifier} -> #{fixed_identifier}")
+          @generic_file = GenericFile.where(identifier: fixed_identifier).first
+        end
+      end
     elsif params[:id]
-      @generic_file ||=GenericFile.find(params[:id])
+      @generic_file ||= GenericFile.find(params[:id])
     end
     unless @generic_file.nil?
       @intellectual_object = @generic_file.intellectual_object
       @institution = @intellectual_object.institution
     end
   end
+
+  # If this looks like a file that Fedora exported,
+  # it will need some special handling.
+  def looks_like_fedora_file(filename)
+    filename.include?('fedora') || filename.include?('datastreamStore')
+  end
+
+  # Oh, the horror!
+  # https://www.pivotaltracker.com/story/show/140235557
+  def fix_fedora_filename(filename)
+    match = filename.match(/\/[0-9a-f]{2}\//)
+    return filename if match.nil?
+
+    # Split the filename at the dirname after datastreamStore or objectStore.
+    # That dirname always consists of two hex letters.
+    dirname = match[0]
+    parts = filename.split(dirname, 2)
+
+    return filename if parts.count < 2
+
+    # Now URL-encode slashes and colons AFTER the dirname,
+    # and use capitals, because Postgres is case-sensitive.
+    # Second arg to URI.encode forces it to escape slashes
+    # and colons, which the encoder would otherwise let through
+    start_of_name = parts[0]
+    end_of_name = parts[1]
+    encoded_end = URI.encode(end_of_name, "/:")
+
+    # Now rebuild and return the fixed file name.
+    return "#{start_of_name}#{dirname}#{encoded_end}"
+  end
+
 
   def filter
     set_filter_values

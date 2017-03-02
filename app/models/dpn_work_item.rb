@@ -12,6 +12,8 @@ class DpnWorkItem < ActiveRecord::Base
   scope :queued_after, ->(param) { where('dpn_work_items.queued_at > ?', param) unless param.blank? }
   scope :completed_before, ->(param) { where('dpn_work_items.completed_at < ?', param) unless param.blank? }
   scope :completed_after, ->(param) { where('dpn_work_items.completed_at > ?', param) unless param.blank? }
+  scope :is_queued, ->(param) { where("queued_at is NOT NULL") if param == 'true' }
+  scope :is_not_queued, ->(param) { where("queued_at is NULL") if param == 'true' }
 
   def serializable_hash (options={})
     {

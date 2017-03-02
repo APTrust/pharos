@@ -13,6 +13,7 @@ class DpnWorkItemsController < ApplicationController
     page_results(@dpn_items)
     respond_to do |format|
       format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash } } }
+      format.html { }
     end
   end
 
@@ -52,6 +53,7 @@ class DpnWorkItemsController < ApplicationController
       authorize @dpn_item
       respond_to do |format|
         format.json { render json: @dpn_item.serializable_hash }
+        format.html { }
       end
     end
   end
@@ -79,7 +81,6 @@ class DpnWorkItemsController < ApplicationController
 
   def filter_and_sort
     @dpn_items = @dpn_items
-                     .with_remote_node(params[:remote_node])
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])
                      .with_state(params[:state])
@@ -88,7 +89,27 @@ class DpnWorkItemsController < ApplicationController
                      .completed_before(params[:completed_before])
                      .completed_after(params[:completed_after])
     @dpn_items = @dpn_items.order('queued_at DESC')
+    @selected = {}
+    filter_by_node
+    filter_by_queued
     count = @dpn_items.count
     set_page_counts(count)
+  end
+
+  def filter_by_node
+    @dpn_items = @dpn_items.with_remote_node(params[:remote_node])
+    @selected[:remote_node] = params[:remote_node] if params[:remote_node]
+    params[:remote_node] ? @nodes = [params[:remote_node]] : @nodes = %w(chron hathi sdr tdr aptrust)
+    @node_counts = {}
+    @nodes.each { |node| @node_counts[node] = @dpn_items.with_remote_node(node).count }
+  end
+
+  def filter_by_queued
+    @dpn_items = @dpn_items.is_queued(params[:is_queued]).is_not_queued(params[:is_not_queued])
+    @selected[:queued] = 'Has been queued' if params[:is_queued]
+    @selected[:queued] = 'Has not been queued' if params[:is_not_queued]
+    @queued_counts = {}
+    @queued_counts[:is_queued] = @dpn_items.is_queued('true').count
+    @queued_counts[:is_not_queued] = @dpn_items.is_not_queued('true').count
   end
 end
