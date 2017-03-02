@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3', '1.3.11'
+gem 'sqlite3', '1.3.13'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -17,9 +17,9 @@ gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.6'
+gem 'jbuilder', '~> 2.6.3'
 # bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0', group: :doc
+gem 'sdoc', '~> 0.4.2', group: :doc
 
 gem 'pundit'
 gem 'figaro'
@@ -31,9 +31,9 @@ gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 3.3.0'
+gem 'simple_form', '~> 3.4.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.6.0'
+gem 'inherited_resources', '1.7.0'
 gem 'uuidtools'
 
 gem 'kaminari'
@@ -53,9 +53,9 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '2.8.1'
+  gem 'capybara', '2.12.1'
   gem 'shoulda-matchers', '~> 3.1.1'
-  gem 'coveralls', require: false
+  gem 'coveralls', '0.8.19', require: false
 end
 
 group :production do

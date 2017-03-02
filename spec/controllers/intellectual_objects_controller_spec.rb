@@ -560,7 +560,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                             identifier: 'college.edu/pending') }
     let!(:obj_in_dpn) { FactoryGirl.create(:institutional_intellectual_object,
                                             institution: inst1,
-                                            state: 'A',
+                                            state: 'A', dpn_uuid: '1234-5678',
                                             identifier: 'college.edu/in_dpn') }
     let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
                                             institution: inst1,
