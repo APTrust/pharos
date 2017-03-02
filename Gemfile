@@ -59,7 +59,7 @@ group :test do
 end
 
 group :production do
-  gem 'pg' # Necessary for talking to our RDS instance
+  gem 'pg', '0.18.4' # Necessary for talking to our RDS instance
 end
 
 group :development, :test, :demo, :production, :integration do
