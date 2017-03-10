@@ -28,6 +28,11 @@ class DpnWorkItem < ActiveRecord::Base
     }
   end
 
+  def pretty_state
+    return nil if self.state.nil? || self.state.strip == ''
+    return JSON.pretty_generate(JSON.parse(self.state))
+  end
+
   private
 
   def task_is_allowed
