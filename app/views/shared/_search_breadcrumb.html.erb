@@ -8,6 +8,14 @@
         <a class="catalog_startOverLink btn btn-sm btn-text" href="<%= start_over_link(params[:controller]) %>" id="startOverLink">Start Over</a>
       </div>
       <span class="constraints-label">You searched for: </span>
+      <% unless params[:object_type].nil? || params[:object_type] == '' || params[:object_type] == 'All Types' %>
+        <span class="btn-group appliedFilter constraint filter">
+          <span class="constraint-value btn btn-sm btn-default btn-disabled">
+            <span class="filterName">Result Type:</span>
+            <span class="filterValue"><%= params[:object_type] %></span>
+          </span>
+        </span>
+      <% end %>
       <% unless params[:q].nil? || params[:q] == '' || params[:q] == '%' || params[:q] == '*' %>
       <span class="btn-group appliedFilter constraint query">
         <span class="constraint-value btn btn-sm btn-default btn-disabled">
@@ -23,14 +31,6 @@
           <span class="sr-only">Remove constraint <%= params[:q] %></span>
         </a>
       </span>
-      <% end %>
-      <% unless params[:object_type].nil? || params[:object_type] == '' || params[:object_type] == 'All Types' %>
-        <span class="btn-group appliedFilter constraint filter">
-          <span class="constraint-value btn btn-sm btn-default btn-disabled">
-            <span class="filterName">Result Type:</span>
-            <span class="filterValue"><%= params[:object_type] %></span>
-          </span>
-        </span>
       <% end %>
       <% if @selected %>
           <% @selected.each do |key, value| %>
