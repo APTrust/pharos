@@ -23,6 +23,8 @@ class CatalogController < ApplicationController
         item_search
       when 'Premis Events'
         event_search
+      when 'DPN Items'
+        dpn_item_search
     end
     filter
     params[:sort] = 'date' unless params[:sort]
@@ -119,6 +121,19 @@ class CatalogController < ApplicationController
     end
   end
 
+  def dpn_item_search
+    items = DpnWorkItem.discoverable(current_user)
+    @result_type = 'dpn_item'
+    if @empty_param
+      @results = items
+      return
+    end
+    case params[:search_field]
+      when 'Item Identifier'
+        @results = items.with_identifier(@q)
+    end
+  end
+
   def filter
     initialize_filter_counters
     filter_by_status unless params[:status].nil?
@@ -153,6 +168,8 @@ class CatalogController < ApplicationController
         params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
         params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @results.distinct.pluck(:event_type)
         params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @results.distinct.pluck(:outcome)
+      when 'dpn_item'
+        #do nothing for now
     end
   end
 
@@ -173,6 +190,8 @@ class CatalogController < ApplicationController
         set_inst_count(@results, :events)
         set_event_type_count(@results)
         set_outcome_count(@results)
+      when 'dpn_item'
+        #do nothing for now
     end
   end
 
