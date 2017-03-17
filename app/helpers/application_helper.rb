@@ -36,6 +36,24 @@ module ApplicationHelper
     end
   end
 
+  def dpn_process_time(item)
+    if item.completed_at && item.queued_at
+      process_time = ((item.completed_at - item.queued_at) / 1.hour).round(2)
+      if process_time == 1
+        process_final = '1 hour'
+      else
+        process_final = "#{process_time} hours"
+      end
+    elsif item.completed_at.nil? && item.queued_at.nil?
+      process_final = 'N/A'
+    elsif item.completed_at.nil?
+      process_final = 'In Progress'
+    elsif item.queued_at.nil?
+      process_final = 'Item is Magic'
+    end
+    process_final
+  end
+
   def format_boolean_as_yes_no(boolean)
     if boolean == 'true'
       return 'Yes'
