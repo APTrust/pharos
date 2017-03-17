@@ -13,7 +13,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def delete_institution?
-    user.admin?
+    false
   end
 
   def index?
