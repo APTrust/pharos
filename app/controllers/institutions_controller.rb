@@ -58,6 +58,11 @@ class InstitutionsController < ApplicationController
     update!
   end
 
+  def destroy
+    authorize current_user, :delete_institution?
+    destroy!
+  end
+
   private
   def load_institution
     @institution = params[:institution_identifier].nil? ? current_user.institution : Institution.where(identifier: params[:institution_identifier]).first

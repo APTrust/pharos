@@ -6,6 +6,7 @@
     <th>Task</th>
     <th>Queued At</th>
     <th>Completed At</th>
+    <th>Processing Time</th>
   </tr>
   </thead>
   <tbody>
@@ -16,6 +17,7 @@
         <td><%= item.task %></td>
         <td><%= item.queued_at %></td>
         <td><%= item.completed_at %></td>
+        <td><%= ((item.completed_at - item.queued_at) / 1.hour).round %></td>
       </tr>
   <% end %>
   </tbody>

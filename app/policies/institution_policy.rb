@@ -39,7 +39,7 @@ class InstitutionPolicy < ApplicationPolicy
   end
 
   def destroy?
-    false
+    user.admin?
   end
 
   def reports?
