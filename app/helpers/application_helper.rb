@@ -36,6 +36,10 @@ module ApplicationHelper
     end
   end
 
+  def get_institution_for_tabs
+    @inst = current_user.institution
+  end
+
   def format_boolean_as_yes_no(boolean)
     if boolean == 'true'
       return 'Yes'
