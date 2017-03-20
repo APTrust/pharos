@@ -2,13 +2,13 @@
   <h1><%= @institution.name %></h1>
 </div>
 
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs" id="inst_show_tabs">
   <li><a href="#summary" data-toggle="tab">Summary</a></li>
   <li><a href="#stats" data-toggle="tab">Statistics</a></li>
   <li><a href="#users" data-toggle="tab">Users</a></li>
 </ul>
 
-<div class="tab-content">
+<div class="tab-content" id="inst_show_content">
   <div class="tab-pane" id="summary">
 
     <dl class="dl-horizontal">

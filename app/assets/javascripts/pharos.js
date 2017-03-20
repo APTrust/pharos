@@ -1,6 +1,6 @@
 function activate_tabs() {
-    $('ul.nav-tabs li:first').addClass('active');
-    $('ul.nav-tabs + div.tab-content div.tab-pane:first').addClass('active');
+    $('#inst_show_tabs li:first').addClass('active');
+    $('div.tab-content div.tab-pane:first').addClass('active');
 };
 
 function dropdown() {
@@ -199,6 +199,32 @@ function fixFilters() {
     $("#filter-queued").on('hidden.bs.collapse', function () {
         $(".queued-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
     });
+}
+
+function tabbed_nav(controller) {
+    switch (controller) {
+        case 'institutions':
+            $('#inst_tab').addClass('active');
+            break;
+        case 'intellectual_objects':
+            $('#io_tab').addClass('active');
+            break;
+        case 'generic_files':
+            $('#gf_tab').addClass('active');
+            break;
+        case 'work_items':
+            $('#wi_tab').addClass('active');
+            break;
+        case 'premis_events':
+            $('#pe_tab').addClass('active');
+            break;
+        case 'dpn_work_items':
+            $('#dpn_tab').addClass('active');
+            break;
+        case 'reports':
+            $('#rep_tab').addClass('active');
+            break;
+    }
 }
 
 $(document).ready(function(){

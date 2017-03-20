@@ -20,8 +20,8 @@ describe 'institutions/show.html.erb' do
       rendered.should have_css('h1', text: institution.name)
     end
 
-    it 'has a link to view associated objects' do
-      rendered.should have_link('Objects')
+    it 'has a link to view associated users' do
+      rendered.should have_link('Users')
     end
   end
 end

@@ -23,17 +23,18 @@
         <div id="navigation_tabs">
           <% if user_signed_in? %>
               <ul class="nav nav-tabs">
-                <li><%= link_to 'Institutions', root_path %></li>
-                <li><%= link_to 'Objects', intellectual_objects_path(@institution, sort: 'date') %></li>
-                <li><%= link_to 'Files', institution_files_path(@institution, sort: 'date') %></li>
-                <li><%= link_to 'Events', institution_events_path(@institution) %></li>
-                <li><%= link_to 'Work Items', work_items_path %></li>
+                <li id="inst_tab"><%= link_to 'Institutions', root_path %></li>
+                <li id="io_tab"><%= link_to 'Objects', intellectual_objects_path(current_user.institution, sort: 'date') %></li>
+                <li id="gf_tab"><%= link_to 'Files', institution_files_path(current_user.institution, sort: 'date') %></li>
+                <li id="pe_tab"><%= link_to 'Events', institution_events_path(current_user.institution) %></li>
+                <li id="wi_tab"><%= link_to 'Work Items', work_items_path %></li>
                 <% if current_user.admin? %>
-                    <li><%= link_to 'DPN Items', dpn_work_items_path %></li>
+                    <li id="dpn_tab"><%= link_to 'DPN Items', dpn_work_items_path %></li>
                 <% end %>
-                <li><%= link_to 'Reports', reports_path(@institution.identifier) %></li>
+                <li id="rep_tab"><%= link_to 'Reports', reports_path(current_user.institution.identifier) %></li>
               </ul>
           <% end %>
+          <script>tabbed_nav('<%= params[:controller]%>');</script>
         </div>
       </div>
     </div>
