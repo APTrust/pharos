@@ -12,6 +12,7 @@ RSpec.describe CatalogController, type: :controller do
     GenericFile.delete_all
     WorkItem.delete_all
     PremisEvent.delete_all
+    DpnWorkItem.delete_all
     @institution = FactoryGirl.create(:institution)
     @another_institution = FactoryGirl.create(:institution)
 
@@ -42,6 +43,10 @@ RSpec.describe CatalogController, type: :controller do
     @event_four = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_four)
     @event_five = FactoryGirl.create(:premis_event_ingest, intellectual_object: @object_five, generic_file: @file_five)
     @event_six = FactoryGirl.create(:premis_event_identifier_fail, intellectual_object: @object_six, generic_file: @file_six)
+
+    @dpn_one = FactoryGirl.create(:dpn_work_item, identifier: '1234-5678')
+    @dpn_two = FactoryGirl.create(:dpn_work_item)
+    @dpn_three = FactoryGirl.create(:dpn_work_item)
   end
 
   after(:all) do
@@ -49,6 +54,8 @@ RSpec.describe CatalogController, type: :controller do
     IntellectualObject.delete_all
     GenericFile.delete_all
     WorkItem.delete_all
+    PremisEvent.delete_all
+    DpnWorkItem.delete_all
   end
 
   describe 'GET #search' do
@@ -157,6 +164,20 @@ RSpec.describe CatalogController, type: :controller do
           end
         end
 
+        describe 'for dpn item searches' do
+          it 'should match a search on an item identifier' do
+            get :search, q: @dpn_one.identifier, search_field: 'Item Identifier', object_type: 'DPN Items'
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id]
+          end
+
+          it 'should bring back all results when the query is generic' do
+            get :search, q: '*', search_field: 'Item Identifier', object_type: 'DPN Items'
+            expect(assigns(:paged_results).size).to eq 3
+            expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id, @dpn_two.id, @dpn_three.id]
+          end
+        end
+
       end
 
       describe 'as an institutional admin user' do
@@ -213,6 +234,13 @@ RSpec.describe CatalogController, type: :controller do
 
           it 'should not return results that you do not have access to' do
             get :search, q: '9876', search_field: 'Event Identifier', object_type: 'Premis Events'
+            expect(assigns(:paged_results).size).to eq 0
+          end
+        end
+
+        describe 'for dpn item searches' do
+          it 'should not return results that you do not have access to' do
+            get :search, q: '*', search_field: 'Item Identifier', object_type: 'DPN Items'
             expect(assigns(:paged_results).size).to eq 0
           end
         end

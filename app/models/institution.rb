@@ -84,6 +84,16 @@ class Institution < ActiveRecord::Base
     report
   end
 
+  def self.breakdown
+    report = {}
+    Institution.all.each do |inst|
+      size = inst.generic_files.sum(:size)
+      name = inst.name
+      report[name] = size
+    end
+    report
+  end
+
   private
 
   def name_is_unique

@@ -84,6 +84,7 @@ Rails.application.routes.draw do
   # REPORT ROUTES
   get 'reports/:identifier', to: 'reports#index', format: [:json, :html], as: :reports, identifier: institution_ptrn
   get 'reports/overview/:identifier', to: 'reports#overview', format: [:json, :html, :pdf], as: :institution_overview, identifier: institution_ptrn
+  get 'reports/institution_breakdown', to: 'reports#institution_breakdown', format: [:json, :html, :pdf], as: :institution_breakdown
 
   # DPN Work Item Routes
   resources :dpn_work_items, path: 'api/v2/dpn_item', only: [:index, :create, :show, :update], format: :json

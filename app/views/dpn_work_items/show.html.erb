@@ -21,7 +21,9 @@
       <tr><th>Note</th>
         <td><%= @dpn_item.note %></td></tr>
       <tr><th>State</th>
-        <td><%= @dpn_item.state %></td></tr>
+        <td><div style="overflow:auto;max-width:800px;max-height:600px;"><pre>
+          <%= @dpn_item.pretty_state %></pre></div>
+        </td></tr>
       </tbody>
     </table>
   </section>

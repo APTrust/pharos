@@ -29,6 +29,7 @@ function configureDropDownLists() {
     var gf_options = ['File Identifier', 'URI'];
     var event_options = ['Event Identifier', 'Object Identifier', 'File Identifier'];
     var wi_options = ['Object Identifier', 'File Identifier', 'Name', 'Etag'];
+    var dpn_options = ['Item Identifier'];
 
     switch (ddl1.value) {
         case 'Intellectual Objects':
@@ -53,6 +54,12 @@ function configureDropDownLists() {
             ddl2.options.length = 0;
             for (i = 0; i < event_options.length; i++) {
                 createOption(ddl2, event_options[i]);
+            }
+            break;
+        case 'DPN Items':
+            ddl2.options.length = 0;
+            for (i = 0; i < dpn_options.length; i++) {
+                createOption(ddl2, dpn_options[i]);
             }
             break;
 

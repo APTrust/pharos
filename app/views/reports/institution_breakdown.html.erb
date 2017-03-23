@@ -1,0 +1,12 @@
+<h2>Institution Data Usage</h2>
+
+<dl class="dl-horizontal">
+  <% @report.each do |key, value| %>
+      <dt><%= key %></dt>
+      <dd><%= number_to_human_size(value) %></dd>
+  <% end %>
+</dl>
+
+<%= link_to "?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
+    <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF
+<% end %>

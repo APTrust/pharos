@@ -1,0 +1,14 @@
+<%= render partial: 'header' %>
+
+<h2 align="center">Institution Data Usage</h2>
+
+<table class="dl-horizontal">
+  <% @report.each do |key, value| %>
+      <tr width="600px">
+        <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap;"><%= key %></th>
+        <th width="400px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= number_to_human_size(value) %></th>
+      </tr>
+  <% end %>
+</table>
+
+<%= render partial: 'footer' %>

@@ -33,6 +33,20 @@ class ReportsController < ApplicationController
     end
   end
 
+  def institution_breakdown
+    authorize current_user
+    @report = Institution.breakdown
+    respond_to do |format|
+      format.json { render json: { report: @report } }
+      format.html { }
+      format.pdf do
+        html = render_to_string(action: :institution_breakdown, layout: false)
+        pdf = WickedPdf.new.pdf_from_string(html)
+        send_data(pdf, filename: 'Institution Breakdown.pdf', disposition: 'attachment')
+      end
+    end
+  end
+
   private
 
   def set_institution

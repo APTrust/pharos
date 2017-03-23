@@ -8,6 +8,14 @@ class UserPolicy < ApplicationPolicy
     create?
   end
 
+  def institution_breakdown?
+    user.admin? || (user.institutional_admin? && user.institution.identifier == 'aptrust.org')
+  end
+
+  def delete_institution?
+    false
+  end
+
   def index?
     user.admin? ||
         (user.institutional_admin? && (user.institution_id == record.institution_id))
