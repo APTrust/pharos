@@ -5,7 +5,7 @@
   <div id="dialog-form-ingest" class="">
     <form>
       <fieldset>
-        <label for="stage">What stage would you like to requeue to?</label>
+        <label for="stage">What stage would you like to requeue to?</label><br>
         <% if @work_item.stage == Pharos::Application::PHAROS_STAGES['store'] %>
             <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
             <input type="radio" name="stage" value="Pharos::Application::PHAROS_STAGES['store']"> Store
@@ -20,7 +20,7 @@
   </div>
   <div class="">
     <div class="">
-      <button type="button" id="ingest_form_submit" class="">Requeue Item</button>
+      <button type="submit" id="ingest_form_submit" class="">Requeue Item</button>
       <button type="button" id="ingest_form_cancel" class="">Cancel</button>
     </div>
   </div>

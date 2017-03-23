@@ -5,7 +5,7 @@
   <div id="dialog-form-dpn" class="">
     <form>
       <fieldset>
-        <label for="stage">What stage would you like to requeue to?</label>
+        <label for="stage">What stage would you like to requeue to?</label><br>
         <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['package'] %>"> Package (Start from scratch)<br>
         <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['store'] %>"> Store<br>
         <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['record'] %>"> Record
@@ -14,7 +14,7 @@
   </div>
   <div class="">
     <div class="">
-      <button type="button" id="dpn_form_submit" class="">Requeue Item</button>
+      <button type="submit" id="dpn_form_submit" class="">Requeue Item</button>
       <button type="button" id="dp _form_cancel" class="">Cancel</button>
     </div>
   </div>

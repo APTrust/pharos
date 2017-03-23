@@ -201,135 +201,53 @@ function fixFilters() {
     });
 }
 
-function restoreRequeueSetUp(){
-    // var form, dialog;
-    // dialog = $("#dialog-form-restore").dialog({
-    //     autoOpen: false,
-    //     height: 400,
-    //     width: 350,
-    //     modal: true,
-    //     buttons: {
-    //         "Requeue": restoreResponse,
-    //         Cancel: function() {
-    //             dialog.dialog("close");
-    //         }
-    //     },
-    //     close: function() {
-    //         form[ 0 ].reset();
-    //     }
-    // });
-    // form = dialog.find( "form" ).on( "submit", function( event ) {
-    //     event.preventDefault();
-    //     restoreResponse();
-    // });
-    // $("#requeue_restore").button().on("click", function() {
-    //     dialog.dialog("open");
-    // });
-
+function restoreRequeue(){
    $('#restore_form').removeClass('hidden');
    $('#restore_form_submit').on("click", function() {
-       restoreResponse();
+       if ($('#state-item').is(':checked')) {
+           var checked = 'true';
+       } else {
+           var checked = 'false';
+       }
+       var id = $('#work_item_id').text();
+       $.get('/items/'+id+'/requeue', {delete_state_item: checked},
+           function(data) {
+               alert(data);
+           });
    });
    $('#restore_form_cancel').on("click", function() {
         $('#restore_form').addClass('hidden');
    });
 }
 
-function ingestRequeueSetUp(){
-    // var form, dialog;
-    // dialog = $("#dialog-form-ingest").dialog({
-    //     autoOpen: false,
-    //     height: 400,
-    //     width: 350,
-    //     modal: true,
-    //     buttons: {
-    //         "Requeue": ingestResponse,
-    //         Cancel: function() {
-    //             dialog.dialog("close");
-    //         }
-    //     },
-    //     close: function() {
-    //         form[ 0 ].reset();
-    //     }
-    // });
-    // form = dialog.find( "form" ).on( "submit", function( event ) {
-    //     event.preventDefault();
-    //     ingestResponse();
-    // });
-    // $("#requeue_ingest").button().on("click", function() {
-    //     dialog.dialog("open");
-    // });
+function ingestRequeue(){
     $('#ingest_form').removeClass('hidden');
     $('#ingest_form_submit').on("click", function() {
-        ingestResponse();
+        var stage = $('input[name="stage"]:checked').val();
+        var id = $('#work_item_id').text();
+        $.get('/items/'+id+'/requeue', {item_stage: stage},
+            function(data) {
+                alert(data);
+            });
     });
     $('#ingest_form_cancel').on("click", function() {
         $('#ingest_form').addClass('hidden');
     });
 }
 
-function dpnRequeueSetUp(){
-    // var form, dialog;
-    // dialog = $("#dialog-form-dpn").dialog({
-    //     autoOpen: false,
-    //     height: 400,
-    //     width: 350,
-    //     modal: true,
-    //     buttons: {
-    //         "Requeue": dpnResponse,
-    //         Cancel: function() {
-    //             dialog.dialog("close");
-    //         }
-    //     },
-    //     close: function() {
-    //         form[ 0 ].reset();
-    //     }
-    // });
-    // form = dialog.find( "form" ).on( "submit", function( event ) {
-    //     event.preventDefault();
-    //     dpnResponse();
-    // });
-    // $("#requeue_dpn").button().on("click", function() {
-    //     dialog.dialog("open");
-    // });
+function dpnRequeue(){
     $('#dpn_form').removeClass('hidden');
     $('#dpn_form_submit').on("click", function() {
-        dpnResponse();
+        var stage = $('input[name="stage"]:checked').val();
+        var id = $('#work_item_id').text();
+        $.get('/items/'+id+'/requeue', {item_stage: stage},
+            function(data) {
+                alert(data);
+            });
     });
     $('#dpn_form_cancel').on("click", function() {
         $('#dpn_form').addClass('hidden');
     });
-}
-
-function restoreResponse(){
-  if ($('#state-item').is(':checked')) {
-      var checked = 'true';
-  } else {
-      var checked = 'false';
-  }
-  var id = $('#work_item_id').text();
-  $.get('/items/'+id+'/requeue', {delete_state_item: checked},
-      function(data) {
-          alert(data);
-      });
-}
-
-function ingestResponse(){
-    var stage = $('input[name="stage"]:checked').val();
-    var id = $('#work_item_id').text();
-    $.get('/items/'+id+'/requeue', {item_stage: stage},
-        function(data) {
-            alert(data);
-        });
-}
-
-function dpnResponse(){
-    var stage = $('input[name="stage"]:checked').val();
-    var id = $('#work_item_id').text();
-    $.get('/items/'+id+'/requeue', {item_stage: stage},
-        function(data) {
-            alert(data);
-        });
 }
 
 $(document).ready(function(){

@@ -10,15 +10,15 @@
         <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
             <%= requeue_link(@work_item) %>
         <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] %>
-            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeueSetUp();' do %>
+            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
                 <i class="glyphicon glyphicon-repeat"></i> Requeue
             <% end %>
         <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
-            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeueSetUp();' do %>
+            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
                 <i class="glyphicon glyphicon-repeat"></i> Requeue
             <% end %>
         <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
-            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeueSetUp();' do %>
+            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
                 <i class="glyphicon glyphicon-repeat"></i> Requeue
             <% end %>
         <% end %>
