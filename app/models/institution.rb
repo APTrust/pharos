@@ -123,11 +123,18 @@ class Institution < ActiveRecord::Base
     if User.where(institution_id: self.id).count != 0
       errors[:base] << "Cannot delete #{self.name} because some Users are associated with this Institution"
     end
-
     if self.intellectual_objects.count != 0
       errors[:base] << "Cannot delete #{self.name} because Intellectual Objects are associated with this Institution"
     end
-
+    if self.generic_files.count != 0
+      errors[:base] << "Cannot delete #{self.name} because Generic Files are associated with this Institution"
+    end
+    if self.premis_events.count != 0
+      errors[:base] << "Cannot delete #{self.name} because Premis Events are associated with this Institution"
+    end
+    if WorkItem.where(institution_id: self.id).count != 0
+      errors[:base] << "Cannot delete #{self.name} because Work Items are associated with this Institution"
+    end
     errors[:base].empty?
   end
 
