@@ -1,0 +1,27 @@
+<div id="ingest_form" class="hidden">
+  <div class="">
+    <span id="ui-id-1" class="">Confirm Requeue for Ingest</span>
+  </div>
+  <div id="dialog-form-ingest" class="">
+    <form>
+      <fieldset>
+        <label for="stage">What stage would you like to requeue to?</label>
+        <% if @work_item.stage == Pharos::Application::PHAROS_STAGES['store'] %>
+            <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
+            <input type="radio" name="stage" value="Pharos::Application::PHAROS_STAGES['store']"> Store
+        <% elsif @work_item.stage == Pharos::Application::PHAROS_STAGES['record'] %>
+            <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
+            <input type="radio" name="stage" value="Pharos::Application::PHAROS_STAGES['record']"> Record
+        <% else %>
+            <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
+        <% end %>
+      </fieldset>
+    </form>
+  </div>
+  <div class="">
+    <div class="">
+      <button type="button" id="ingest_form_submit" class="">Requeue Item</button>
+      <button type="button" id="ingest_form_cancel" class="">Cancel</button>
+    </div>
+  </div>
+</div>
