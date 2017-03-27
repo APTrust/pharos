@@ -4,7 +4,10 @@
   </ol>
 
   <section class="page-header">
-    <h2><%= @work_item.name %></h2>
+    <h2 class="long_names"><%= @work_item.name %></h2>
+  </section>
+
+  <section>
     <p id="work_item_id" class="hidden"><%= @work_item.id %></p>
     <% if current_user.admin? %>
         <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
@@ -23,9 +26,7 @@
             <% end %>
         <% end %>
     <% end %>
-  </section>
-
-  <section>
+    <br><br>
     <%= render 'ingest_requeue_form' %>
     <%= render 'restore_requeue_form' %>
     <%= render 'dpn_requeue_form' %>
