@@ -8,10 +8,10 @@
         <label for="stage">What stage would you like to requeue to?</label><br>
         <% if @work_item.stage == Pharos::Application::PHAROS_STAGES['store'] %>
             <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
-            <input type="radio" name="stage" value="Pharos::Application::PHAROS_STAGES['store']"> Store
+            <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['store'] %>"> Store
         <% elsif @work_item.stage == Pharos::Application::PHAROS_STAGES['record'] %>
             <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
-            <input type="radio" name="stage" value="Pharos::Application::PHAROS_STAGES['record']"> Record
+            <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['record'] %>"> Record
         <% else %>
             <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
         <% end %>
