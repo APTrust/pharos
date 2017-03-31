@@ -16,6 +16,7 @@ describe InstitutionPolicy do
         should permit(:edit)
         should permit(:add_user)
         should_not permit(:destroy)
+        #should permit(:destroy) #only turn this line on and above line off when deleting an institution. Otherwise, deletion should be OFF.
       end
     end
 

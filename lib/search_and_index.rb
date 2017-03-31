@@ -115,6 +115,8 @@ module SearchAndIndex
           @results = @results.order('date_time DESC') unless @results.nil?
         when 'item'
           @results = @results.order('date DESC') unless @results.nil?
+        when 'dpn_item'
+          @results = @results.order('queued_at DESC') unless @results.nil?
       end
     end
     @intellectual_objects = @intellectual_objects.order('created_at DESC') unless @intellectual_objects.nil?
@@ -134,6 +136,8 @@ module SearchAndIndex
           @results = @results.order('identifier').reverse_order unless @results.nil?
         when 'item'
           @results = @results.order('name') unless @results.nil?
+        when 'dpn_item'
+          @results = @results.order ('identifier') unless @results.nil?
       end
     end
     @intellectual_objects = @intellectual_objects.order('bag_name').reverse_order unless @intellectual_objects.nil?
