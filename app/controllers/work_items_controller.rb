@@ -81,8 +81,11 @@ class WorkItemsController < ApplicationController
         @work_item.requeue_item(options)
         options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
         respond_to do |format|
-          format.json { render json: '' }
-          format.html
+          format.json { render json: { status: response.status, body: response.body } }
+          format.html {
+            render 'show'
+            flash[:notice] = response.body
+          }
         end
       end
     else
@@ -407,29 +410,28 @@ class WorkItemsController < ApplicationController
   end
 
   def issue_requeue_http_post(stage)
-    nsq_params = {'work_item_id' => "#{@work_item.id}"}
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
-      uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
-      if stage == 'fetch'
-        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic")
-      elsif stage == 'store'
-        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_store_topic")
-      elsif stage == 'record'
-        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_record_topic")
+      if stage == Pharos::Application::PHAROS_STAGES['fetch']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['store']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_store_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['record']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_record_topic")
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn']
-      if stage == 'package'
-        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
-      elsif stage == 'store'
-        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
-      elsif stage == 'record'
-        uri = URI.parse("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
+      if stage == Pharos::Application::PHAROS_STAGES['package']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['store']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['record']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
       end
     end
-    response = Net::HTTP.post_form(uri, nsq_params)
+    response = Net::HTTP.post_form(uri, 'work_item_id' =>"#{@work_item.id}")
     response
   end
 
