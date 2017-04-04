@@ -6,6 +6,7 @@
     <form>
       <fieldset>
         <label for="stage">What stage would you like to requeue to?</label><br>
+        <p id="dpn_error" class="hidden alert alert-error">This field is required.</p>
         <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['package'] %>"> Package (Start from scratch)<br>
         <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['store'] %>"> Store<br>
         <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['record'] %>"> Record

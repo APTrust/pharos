@@ -6,6 +6,7 @@
     <form>
       <fieldset>
         <label for="stage">What stage would you like to requeue to?</label><br>
+        <p id="ingest_error" class="hidden alert alert-error">This field is required.</p>
         <% if @work_item.stage == Pharos::Application::PHAROS_STAGES['store'] %>
             <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br>
             <input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['store'] %>"> Store

@@ -224,11 +224,18 @@ function ingestRequeue(){
     $('#ingest_form').removeClass('hidden');
     $('#ingest_form_submit').on("click", function() {
         var stage = $('input[name="stage"]:checked').val();
-        var id = $('#work_item_id').text();
-        $.get('/items/'+id+'/requeue', {item_stage: stage},
-            function(data) {
-                alert(data);
-            });
+        if (stage == ('Fetch' || 'Store' || 'Record')) {
+            if (!$('#ingest_error').hasClass('hidden')) {
+                $('#ingest_error').addClass('hidden');
+            }
+            var id = $('#work_item_id').text();
+            $.get('/items/'+id+'/requeue', {item_stage: stage},
+                function(data) {
+                    alert(data);
+                });
+        } else {
+            $('#ingest_error').removeClass('hidden');
+        }
     });
     $('#ingest_form_cancel').on("click", function() {
         $('#ingest_form').addClass('hidden');
@@ -239,11 +246,18 @@ function dpnRequeue(){
     $('#dpn_form').removeClass('hidden');
     $('#dpn_form_submit').on("click", function() {
         var stage = $('input[name="stage"]:checked').val();
-        var id = $('#work_item_id').text();
-        $.get('/items/'+id+'/requeue', {item_stage: stage},
-            function(data) {
-                alert(data);
-            });
+        if (stage == ('Package' || 'Store' || 'Record')) {
+            if (!$('#ingest_error').hasClass('hidden')) {
+                $('#ingest_error').addClass('hidden');
+            }
+            var id = $('#work_item_id').text();
+            $.get('/items/'+id+'/requeue', {item_stage: stage},
+                function(data) {
+                    alert(data);
+                });
+        } else {
+            $('#dpn_error').removeClass('hidden');
+        }
     });
     $('#dpn_form_cancel').on("click", function() {
         $('#dpn_form').addClass('hidden');
