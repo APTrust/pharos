@@ -23,7 +23,7 @@ gem 'sdoc', '~> 0.4.2', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.2.0'
+gem 'devise', '4.2.1'
 gem 'rake'
 gem 'valid_email'
 gem 'therubyracer'
@@ -55,7 +55,7 @@ end
 group :test do
   gem 'capybara', '2.13.0'
   gem 'shoulda-matchers', '~> 3.1.1'
-  gem 'coveralls', '0.8.19', require: false
+  gem 'coveralls', '0.8.20', require: false
 end
 
 group :production do
