@@ -105,7 +105,7 @@ GEM
       actionpack (>= 4.1, < 5.1)
       activesupport (>= 4.1, < 5.1)
     i18n (0.8.1)
-    inherited_resources (1.7.0)
+    inherited_resources (1.7.1)
       actionpack (>= 3.2, < 5.1)
       has_scope (~> 0.6)
       railties (>= 3.2, < 5.1)
@@ -292,7 +292,7 @@ DEPENDENCIES
   factory_girl_rails
   faker
   figaro
-  inherited_resources (= 1.7.0)
+  inherited_resources (= 1.7.1)
   jbuilder (~> 2.6.3)
   jquery-rails
   kaminari
