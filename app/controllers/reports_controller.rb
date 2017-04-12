@@ -1,7 +1,7 @@
 class ReportsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
+  before_action :set_institution, only: [:index, :overview, :download]
   after_action :verify_authorized
-  before_filter :set_institution, only: [:index, :overview, :download]
 
   def index
     authorize @institution

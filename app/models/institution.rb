@@ -135,7 +135,11 @@ class Institution < ActiveRecord::Base
     if WorkItem.where(institution_id: self.id).count != 0
       errors[:base] << "Cannot delete #{self.name} because Work Items are associated with this Institution"
     end
-    errors[:base].empty?
+    if errors[:base].empty?
+      true
+    else
+      throw(:abort)
+    end
   end
 
 end

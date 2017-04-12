@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'application_helper'
 
 describe 'users/show.html.erb' do
   let(:user) { FactoryGirl.create :user }

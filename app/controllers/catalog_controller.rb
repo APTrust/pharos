@@ -1,6 +1,6 @@
 class CatalogController < ApplicationController
   include SearchAndIndex
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   after_action :verify_authorized
 
   def search

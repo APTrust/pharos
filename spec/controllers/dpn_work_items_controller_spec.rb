@@ -3,11 +3,11 @@ require 'spec_helper'
 RSpec.describe DpnWorkItemsController, type: :controller do
 
   before :all do
-    DpnWorkItem.destroy_all
+    DpnWorkItem.delete_all
   end
 
   after do
-    DpnWorkItem.destroy_all
+    DpnWorkItem.delete_all
   end
 
   let!(:admin_user) { FactoryGirl.create(:user, :admin) }
@@ -28,28 +28,28 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
 
       it 'filters by identifier' do
-        get :index, identifier: '1234', format: :json
+        get :index, params: { identifier: '1234' }, format: :json
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
       end
 
       it 'filters by remote node' do
-        get :index, remote_node: 'chronopolis', format: :json
+        get :index, params: { remote_node: 'chronopolis' }, format: :json
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_two.id]
       end
 
       it 'filters by task' do
-        get :index, task: 'sync', format: :json
+        get :index, params: { task: 'sync' }, format: :json
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
       end
 
       it 'filters by queued status' do
-        get :index, is_queued: 'true'
+        get :index, params: { is_queued: 'true' }
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
@@ -75,7 +75,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     end
 
     it 'successfully creates the dpn item' do
-      post :create, dpn_work_item: { remote_node: 'aptrust', task: 'sync', identifier: '12345678', state: 'Active' }, format: :json
+      post :create, params: { dpn_work_item: { remote_node: 'aptrust', task: 'sync', identifier: '12345678', state: 'Active' } }, format: :json
       expect(response).to be_success
       assigns(:dpn_item).remote_node.should eq('aptrust')
       assigns(:dpn_item).task.should eq('sync')
@@ -89,7 +89,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
 
       it 'denies access' do
-        post :create, dpn_work_item: { remote_node: 'aptrust', task: 'sync', identifier: '12345678' }, format: :json
+        post :create, params: { dpn_work_item: { remote_node: 'aptrust', task: 'sync', identifier: '12345678' } }, format: :json
         expect(response.status).to eq(403)
       end
     end
@@ -102,7 +102,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
 
       it 'responds successfully with both the action and the state updated' do
-        put :update, id: item_one.id, dpn_work_item: { note: 'Testing the update method', state: 'NEW'}, format: :json
+        put :update, params: { id: item_one.id, dpn_work_item: { note: 'Testing the update method', state: 'NEW'} }, format: :json
         expect(response).to be_success
         assigns(:dpn_item).id.should eq(item_one.id)
         assigns(:dpn_item).note.should eq('Testing the update method')
@@ -110,7 +110,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
 
       it 'responds with a 404 error if the dpn item does not exist' do
-        put :update, id: '2345336', dpn_work_item: { note: 'Testing the update method'}, format: :json
+        put :update, params: { id: '2345336', dpn_work_item: { note: 'Testing the update method'} }, format: :json
         expect(response.status).to eq(404)
       end
     end
@@ -121,7 +121,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
 
       it 'denies access' do
-        put :update, id: item_one.id, dpn_work_item: { note: 'Testing the update method'}, format: :json
+        put :update, params: { id: item_one.id, dpn_work_item: { note: 'Testing the update method'} }, format: :json
         expect(response.status).to eq(403)
       end
     end
@@ -134,14 +134,14 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
 
       it 'responds successfully with both the work item and the state item set' do
-        get :show, id: item_two.id, format: :json
+        get :show, params: { id: item_two.id }, format: :json
         expect(response).to be_success
         assigns(:dpn_item).id.should eq(item_two.id)
         assigns(:dpn_item).remote_node.should eq('chronopolis')
       end
 
       it 'responds with a 404 error if the dpn item does not exist' do
-        get :show, id: '2345336', format: :json
+        get :show, params: { id: '2345336' }, format: :json
         expect(response.status).to eq(404)
       end
     end
@@ -152,7 +152,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
 
       it 'denies access' do
-        get :show, id: item_one.id, format: :json
+        get :show, params: { id: item_one.id }, format: :json
         expect(response.status).to eq(403)
       end
     end

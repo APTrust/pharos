@@ -1,9 +1,9 @@
 class WorkItemsController < ApplicationController
   include SearchAndIndex
   respond_to :html, :json
-  before_filter :authenticate_user!
-  before_filter :set_item, only: :show
-  before_filter :init_from_params, only: :create
+  before_action :authenticate_user!
+  before_action :set_item, only: :show
+  before_action :init_from_params, only: :create
   after_action :verify_authorized
 
   def index
@@ -58,7 +58,7 @@ class WorkItemsController < ApplicationController
     else
       authorize current_user, :nil_index?
       respond_to do |format|
-        format.json { render nothing: true, status: :not_found }
+        format.json { render body: nil, status: :not_found }
         format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
       end
     end
@@ -137,7 +137,7 @@ class WorkItemsController < ApplicationController
                            action: restore).order(created_at: :desc).first
     if @item.nil?
       authorize current_user
-      render nothing: true, status: :not_found and return
+      render body: nil, status: :not_found and return
     else
       authorize @item
     end

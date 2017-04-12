@@ -1,9 +1,9 @@
 class DpnWorkItemsController < ApplicationController
   include SearchAndIndex
   respond_to :json
-  before_filter :authenticate_user!
-  before_filter :set_item, only: [:show, :update]
-  before_filter :init_from_params, only: :create
+  before_action :authenticate_user!
+  before_action :set_item, only: [:show, :update]
+  before_action :init_from_params, only: :create
   after_action :verify_authorized
 
   def index
@@ -32,7 +32,7 @@ class DpnWorkItemsController < ApplicationController
   def update
     if @dpn_item.nil?
       authorize current_user, :dpn_show?
-      render nothing: true, status: :not_found and return
+      render body: nil, status: :not_found and return
     else
       @dpn_item.update(params_for_update)
       authorize @dpn_item
@@ -49,7 +49,7 @@ class DpnWorkItemsController < ApplicationController
   def show
     if @dpn_item.nil?
       authorize current_user, :dpn_show?
-      render nothing: true, status: :not_found and return
+      render body: nil, status: :not_found and return
     else
       authorize @dpn_item
       respond_to do |format|

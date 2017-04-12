@@ -1,7 +1,7 @@
 class ChecksumsController < ApplicationController
   include SearchAndIndex
-  before_filter :authenticate_user!
-  before_filter :load_generic_file, only: :create
+  before_action :authenticate_user!
+  before_action :load_generic_file, only: :create
   after_action :verify_authorized
 
   def index

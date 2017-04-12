@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe DpnWorkItem, type: :model do
   before(:all) do
-    DpnWorkItem.destroy_all
+    DpnWorkItem.delete_all
   end
 
   it { should validate_presence_of(:task) }

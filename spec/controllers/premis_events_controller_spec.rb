@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe PremisEventsController, type: :controller do
   after do
-    Institution.destroy_all
+    Institution.delete_all
   end
 
   let(:object) { FactoryGirl.create(:intellectual_object, institution: user.institution, access: 'institution') }
@@ -33,7 +33,7 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it "can view events, even if it's not my institution" do
-        get :index, institution_identifier: someone_elses_file.institution.identifier
+        get :index, params: { institution_identifier: someone_elses_file.institution.identifier }
         expect(response).to be_success
         assigns(:parent).should == someone_elses_file.institution
         assigns(:premis_events).length.should == 1
@@ -41,7 +41,7 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it "can view events, even if it's not my intellectual object" do
-        get :index, object_identifier: someone_elses_object.identifier
+        get :index, params: { object_identifier: someone_elses_object.identifier }
         expect(response).to be_success
         assigns(:parent).should == someone_elses_object
         assigns(:premis_events).length.should == 1
@@ -49,7 +49,7 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it 'can view objects events by object identifier (API)' do
-        get :index, object_identifier: someone_elses_object.identifier
+        get :index, params: { object_identifier: someone_elses_object.identifier }
         expect(response).to be_success
         assigns(:parent).should == someone_elses_object
         assigns(:premis_events).length.should == 1
@@ -57,17 +57,12 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
     end
-  end
-
-  describe 'signed in as admin' do
-    let(:user) { FactoryGirl.create(:user, :admin) }
-    before { sign_in user }
 
     describe 'POST create' do
 
       it 'creates an event for the generic file using generic file identifier (API)' do
         file.premis_events.count.should == 0
-        post :create, event_attrs.to_json, format: :json
+        post :create, params: event_attrs.to_json, format: :json
         file.reload
         file.premis_events.count.should == 1
         assigns(:parent).should == file
@@ -78,7 +73,7 @@ RSpec.describe PremisEventsController, type: :controller do
         event_attrs[:generic_file_identifier] = ''
         event_attrs[:generic_file_id] = ''
         object.premis_events.count.should == 0
-        post :create, event_attrs.to_json, format: :json
+        post :create, params: event_attrs.to_json, format: :json
         expect(response.status).to eq(201)
         object.reload
         object.premis_events.count.should == 1
@@ -95,7 +90,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'POST create' do
       it 'is forbidden' do
-        post :create, event_attrs.to_json, format: :json
+        post :create, params: event_attrs.to_json, format: :json
         expect(response.status).to eq(403)
       end
     end
@@ -103,7 +98,7 @@ RSpec.describe PremisEventsController, type: :controller do
     describe "POST create a file where you don't have permission" do
       it 'denies access' do
         someone_elses_file.premis_events.count.should == 0
-        post :create, event_attrs.to_json, format: :json
+        post :create, params: event_attrs.to_json, format: :json
         someone_elses_file.reload
 
         someone_elses_file.premis_events.count.should == 0
@@ -120,7 +115,7 @@ RSpec.describe PremisEventsController, type: :controller do
     describe 'POST create' do
       it 'denies access' do
         file.premis_events.count.should == 0
-        post :create, event_attrs.to_json, format: :json
+        post :create, params: event_attrs.to_json, format: :json
         file.reload
 
         file.premis_events.count.should == 0
@@ -145,7 +140,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe 'events for an institution' do
         it 'shows the events for that institution, sorted by time' do
-          get :index, institution_identifier: file.institution.identifier
+          get :index, params: { institution_identifier: file.institution.identifier }
           assigns(:parent).should == file.institution
           assigns(:premis_events).length.should == 3
           assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
@@ -154,7 +149,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe 'events for an intellectual object' do
         it 'shows the events for that object, sorted by time' do
-          get :index, object_identifier: object
+          get :index, params: { object_identifier: object }
           expect(response).to be_success
           assigns(:parent).should == object
           assigns(:premis_events).length.should == 3
@@ -164,7 +159,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe 'events for a generic file' do
         it 'shows the events for that file, sorted by time' do
-          get :index, file_identifier: file
+          get :index, params: { file_identifier: file }, format: :html
           expect(response).to be_success
           assigns(:parent).should == file
           assigns(:premis_events).length.should == 3
@@ -174,7 +169,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe "for an institution where you don't have permission" do
         it 'denies access' do
-          get :index, institution_identifier: someone_elses_file.institution.identifier
+          get :index, params: { institution_identifier: someone_elses_file.institution.identifier }
           expect(response).to redirect_to root_url
           flash[:alert].should =~ /You are not authorized/
         end
@@ -182,7 +177,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe "for an intellectual object where you don't have permission" do
         it 'denies access' do
-          get :index, object_identifier: someone_elses_object
+          get :index, params: { object_identifier: someone_elses_object }
           expect(response).to redirect_to root_url
           flash[:alert].should =~ /You are not authorized/
         end
@@ -190,7 +185,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       describe "for a generic file where you don't have permission" do
         it 'denies access' do
-          get :index, file_identifier: someone_elses_file
+          get :index, params: { file_identifier: someone_elses_file }, format: :html
           expect(response).to redirect_to root_url
           flash[:alert].should =~ /You are not authorized/
         end
@@ -204,7 +199,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'POST create' do
       before do
-        post :create, event_attrs.to_json, format: :json
+        post :create, params: event_attrs, format: :json
       end
 
       it 'says you are unauthorized' do
@@ -215,7 +210,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'GET index' do
       before do
-        get :index, institution_identifier: file.institution.identifier
+        get :index, params: { institution_identifier: file.institution.identifier }
       end
 
       it 'redirects to login' do
