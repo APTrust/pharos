@@ -1,6 +1,6 @@
 function activate_tabs() {
-    $('ul.nav-tabs li:first').addClass('active');
-    $('ul.nav-tabs + div.tab-content div.tab-pane:first').addClass('active');
+    $('#inst_show_tabs li:first').addClass('active');
+    $('div.tab-content div.tab-pane:first').addClass('active');
 };
 
 function dropdown() {
@@ -242,26 +242,52 @@ function ingestRequeue(){
     });
 }
 
-function dpnRequeue(){
+function dpnRequeue() {
     $('#dpn_form').removeClass('hidden');
-    $('#dpn_form_submit').on("click", function() {
+    $('#dpn_form_submit').on("click", function () {
         var stage = $('input[name="stage"]:checked').val();
         if (stage == ('Package' || 'Store' || 'Record')) {
             if (!$('#ingest_error').hasClass('hidden')) {
                 $('#ingest_error').addClass('hidden');
             }
             var id = $('#work_item_id').text();
-            $.get('/items/'+id+'/requeue', {item_stage: stage},
-                function(data) {
+            $.get('/items/' + id + '/requeue', {item_stage: stage},
+                function (data) {
                     alert(data);
                 });
         } else {
             $('#dpn_error').removeClass('hidden');
         }
     });
-    $('#dpn_form_cancel').on("click", function() {
+    $('#dpn_form_cancel').on("click", function () {
         $('#dpn_form').addClass('hidden');
     });
+}
+
+function tabbed_nav(controller) {
+    switch (controller) {
+        case 'institutions':
+            $('#inst_tab').addClass('active');
+            break;
+        case 'intellectual_objects':
+            $('#io_tab').addClass('active');
+            break;
+        case 'generic_files':
+            $('#gf_tab').addClass('active');
+            break;
+        case 'work_items':
+            $('#wi_tab').addClass('active');
+            break;
+        case 'premis_events':
+            $('#pe_tab').addClass('active');
+            break;
+        case 'dpn_work_items':
+            $('#dpn_tab').addClass('active');
+            break;
+        case 'reports':
+            $('#rep_tab').addClass('active');
+            break;
+    }
 }
 
 $(document).ready(function(){

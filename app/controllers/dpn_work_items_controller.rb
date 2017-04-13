@@ -8,6 +8,7 @@ class DpnWorkItemsController < ApplicationController
 
   def index
     authorize current_user, :dpn_index?
+    @institution = current_user.institution
     @dpn_items = DpnWorkItem.all
     filter_and_sort
     page_results(@dpn_items)

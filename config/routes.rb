@@ -27,8 +27,8 @@ Rails.application.routes.draw do
   file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%\@]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
+  get 'files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files
   get 'files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files
-  get 'files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn
   post '/api/v2/files/:intellectual_object_id/create_batch', to: 'generic_files#create_batch', format: :json
   post '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#create', format: :json, intellectual_object_identifier: object_ptrn
   put '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#update', format: :json, intellectual_object_identifier: object_ptrn

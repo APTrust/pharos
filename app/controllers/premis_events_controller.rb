@@ -18,8 +18,8 @@ class PremisEventsController < ApplicationController
     end
     params[:file_identifier] = '' if params[:file_identifier] == 'null' || params[:file_identifier] == 'blank'
     params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
-
     authorize @parent
+    @institution = current_user.institution
     @premis_events = @premis_events
       .with_create_date(params[:created_at])
       .created_before(params[:created_before])

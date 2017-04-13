@@ -36,6 +36,10 @@ module ApplicationHelper
     end
   end
 
+  def get_institution_for_tabs
+    @inst = current_user.institution
+  end
+
   def dpn_process_time(item)
     if item.completed_at && item.queued_at
       process_time = ((item.completed_at - item.queued_at) / 1.hour).round(2)

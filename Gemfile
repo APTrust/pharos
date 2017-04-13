@@ -24,7 +24,7 @@ gem 'sdoc', '~> 0.4.2', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.2.0'
+gem 'devise', '4.2.1'
 gem 'rake'
 gem 'valid_email'
 gem 'therubyracer'
@@ -34,7 +34,7 @@ gem 'wkhtmltopdf-binary'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.4.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.7.0'
+gem 'inherited_resources', '1.7.1'
 gem 'uuidtools'
 
 gem 'kaminari'
@@ -54,9 +54,9 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '2.12.1'
+  gem 'capybara', '2.13.0'
   gem 'shoulda-matchers', '~> 3.1.1'
-  gem 'coveralls', '0.8.19', require: false
+  gem 'coveralls', '0.8.20', require: false
 end
 
 group :production do
