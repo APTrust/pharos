@@ -113,27 +113,27 @@ class WorkItem < ActiveRecord::Base
       self.work_item_state.delete if options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if options[:stage]
-        if options[:stage] == 'fetch'
+        if options[:stage] == Pharos::Application::PHAROS_STAGES['fetch']
           self.stage = Pharos::Application::PHAROS_STAGES['receive']
           self.note = 'Item is pending ingest'
-          self.work_item_state.delete
-        elsif options[:stage] == 'store'
+          self.work_item_state.delete if self.work_item_state
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['store']
           self.stage = Pharos::Application::PHAROS_STAGES['store']
           self.note = 'Item is pending storage'
-        elsif options[:stage] == 'record'
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['record']
           self.stage = Pharos::Application::PHAROS_STAGES['record']
           self.note = 'Item is pending record'
         end
       end
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['dpn']
-      if options[:stage] == 'package'
+      if options[:stage] == Pharos::Application::PHAROS_STAGES['package']
         self.stage = Pharos::Application::PHAROS_STAGES['requested']
         self.note = 'Requested item be sent to DPN'
-        self.work_item_state.delete
-      elsif options[:stage] == 'store'
+        self.work_item_state.delete if self.work_item_state
+      elsif options[:stage] == Pharos::Application::PHAROS_STAGES['store']
         self.stage = Pharos::Application::PHAROS_STAGES['store']
         self.note = 'Packaging completed, awaiting storage'
-      elsif options[:stage] == 'record'
+      elsif options[:stage] == Pharos::Application::PHAROS_STAGES['record']
         self.stage = Pharos::Application::PHAROS_STAGES['record']
         self.note = 'Bag copied to long-term storage'
       end

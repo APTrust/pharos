@@ -193,13 +193,6 @@ RSpec.describe WorkItemsController, type: :controller do
         assigns(:institution).should eq( admin_user.institution)
       end
 
-      it 'updates the status and requeue attribute of the item' do
-        new_item = FactoryGirl.create(:ingested_item)
-        get :requeue, id: new_item.id, format: :json
-        assigns(:work_item).status.should eq(Pharos::Application::PHAROS_STATUSES['pend'])
-        assigns(:work_item).requeue.should eq(true)
-      end
-
     end
 
     describe 'for institutional admin' do
