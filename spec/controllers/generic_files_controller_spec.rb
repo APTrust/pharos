@@ -255,7 +255,7 @@ RSpec.describe GenericFilesController, type: :controller do
           files_before = GenericFile.count
           events_before = PremisEvent.count
           checksums_before = Checksum.count
-          post(:create_batch, params: { intellectual_object_id: batch_obj.id }, request: {body: gf_data.to_json }, format: 'json')
+          post :create_batch, params: { intellectual_object_id: batch_obj.id }, body: gf_data.to_json, format: :json
           expect(response.code).to eq '201'
           return_data = JSON.parse(response.body)
           expect(return_data['count']).to eq 2

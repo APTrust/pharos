@@ -297,7 +297,6 @@ class GenericFilesController < ApplicationController
     return "#{start_of_name}#{dirname}#{encoded_end}"
   end
 
-
   def filter
     set_filter_values
     initialize_filter_counters

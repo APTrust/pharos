@@ -812,7 +812,6 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'can find by name, etag, bag_date' do
-        puts "input check: #{item1.name}, #{item1.etag}, #{item1.bag_date}"
         get :index, format: :json, params: { name: item1.name, etag: item1.etag, bag_date: item1.bag_date }
         assigns(:items).should include(item1)
         assigns(:count).should == 1

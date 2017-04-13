@@ -62,7 +62,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it 'creates an event for the generic file using generic file identifier (API)' do
         file.premis_events.count.should == 0
-        post :create, params: event_attrs.to_json, format: :json
+        post :create, body: event_attrs.to_json, format: :json
         file.reload
         file.premis_events.count.should == 1
         assigns(:parent).should == file
@@ -73,7 +73,7 @@ RSpec.describe PremisEventsController, type: :controller do
         event_attrs[:generic_file_identifier] = ''
         event_attrs[:generic_file_id] = ''
         object.premis_events.count.should == 0
-        post :create, params: event_attrs.to_json, format: :json
+        post :create, body: event_attrs.to_json, format: :json
         expect(response.status).to eq(201)
         object.reload
         object.premis_events.count.should == 1
@@ -90,7 +90,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
     describe 'POST create' do
       it 'is forbidden' do
-        post :create, params: event_attrs.to_json, format: :json
+        post :create, body: event_attrs.to_json, format: :json
         expect(response.status).to eq(403)
       end
     end
@@ -98,7 +98,7 @@ RSpec.describe PremisEventsController, type: :controller do
     describe "POST create a file where you don't have permission" do
       it 'denies access' do
         someone_elses_file.premis_events.count.should == 0
-        post :create, params: event_attrs.to_json, format: :json
+        post :create, body: event_attrs.to_json, format: :json
         someone_elses_file.reload
 
         someone_elses_file.premis_events.count.should == 0
@@ -115,7 +115,7 @@ RSpec.describe PremisEventsController, type: :controller do
     describe 'POST create' do
       it 'denies access' do
         file.premis_events.count.should == 0
-        post :create, params: event_attrs.to_json, format: :json
+        post :create, body: event_attrs.to_json, format: :json
         file.reload
 
         file.premis_events.count.should == 0
