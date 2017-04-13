@@ -93,5 +93,10 @@ module Pharos
     APTRUST_NAME = 'APTrust'
     APTRUST_ID = 'aptrust.org'
 
+    PARAMS_HASH = [:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
+                              :file_association, :type, :state, :event_type, :outcome, :q, :search_field, :object_type,
+                              :item_action, :stage, :status, :sort, :institution_identifier, :name_contains, :name_exact,
+                              :updated_since, :node, :needs_admin_review, :not_checked_since, :identifier_like]
+
   end
 end

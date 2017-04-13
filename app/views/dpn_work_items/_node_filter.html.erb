@@ -10,7 +10,7 @@
         <div class="panel-body">
           <ul class="facet-values list-unstyled">
             <% if @selected[:remote_node] %>
-                <script>selected("node", "<%= @selected[:remote_node].capitalize %>", "<%=url_for(params.except :remote_node)%>")</script>
+                <script>selected("node", "<%= @selected[:remote_node].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :remote_node)%>")</script>
             <% else %>
                 <% @nodes.each do |node| %>
                     <% unless @node_counts[node] == 0 || @node_counts[node].nil? || node.nil? %>

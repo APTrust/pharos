@@ -9,7 +9,7 @@
     <div class="panel-body">
       <ul class="facet-values list-unstyled">
         <% if @selected[:stage] %>
-            <script>selected("stage", "<%= @selected[:stage] %>", "<%=url_for(params.except :stage)%>")</script>
+            <script>selected("stage", "<%= @selected[:stage] %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :stage)%>")</script>
         <% else %>
             <% @stages.each do |stage| %>
                 <% unless @stage_counts[stage] == 0 || @stage_counts[stage].nil? || stage.nil? %>

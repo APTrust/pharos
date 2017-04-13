@@ -10,9 +10,9 @@
         <div class="panel-body">
           <ul class="facet-values list-unstyled">
             <% if @selected[:queued] == 'Has been queued' %>
-                <script>selected("queued", "<%= @selected[:queued].capitalize %>", "<%=url_for(params.except :is_queued)%>")</script>
+                <script>selected("queued", "<%= @selected[:queued].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :is_queued)%>")</script>
             <% elsif @selected[:queued] == 'Has not been queued' %>
-                <script>selected("queued", "<%= @selected[:queued].capitalize %>", "<%=url_for(params.except :is_not_queued)%>")</script>
+                <script>selected("queued", "<%= @selected[:queued].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :is_not_queued)%>")</script>
             <% else %>
                 <li>
                   <span class="facet-label"><a href="<%= current_path('is_queued', 'true') %>">Is Queued</a></span>

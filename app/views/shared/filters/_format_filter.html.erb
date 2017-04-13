@@ -9,7 +9,7 @@
     <div class="panel-body">
       <ul class="facet-values list-unstyled">
         <% if @selected[:file_format] %>
-            <script>selected("format", "<%= @selected[:file_format] %>", "<%=url_for(params.except :file_format)%>")</script>
+            <script>selected("format", "<%= @selected[:file_format] %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :file_format)%>")</script>
         <% else %>
             <% @formats.each do |format| %>
                 <% unless @format_counts[format] == 0 || @format_counts[format].nil? || format.nil? %>

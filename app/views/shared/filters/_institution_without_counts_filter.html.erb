@@ -10,7 +10,7 @@
           <ul class="facet-values list-unstyled">
             <% if @selected[:institution] %>
                 <% current_inst = Institution.find(@selected[:institution]) %>
-                <script>selected("institution", "<%= current_inst.name %>", "<%=url_for(params.except :institution)%>")</script>
+                <script>selected("institution", "<%= current_inst.name %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :institution)%>")</script>
             <% else %>
                 <% @institutions.each do |inst| %>
                     <% current_inst = Institution.find(inst) %>

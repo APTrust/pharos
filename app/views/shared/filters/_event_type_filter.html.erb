@@ -9,7 +9,7 @@
     <div class="panel-body">
       <ul class="facet-values list-unstyled">
         <% if @selected[:event_type] %>
-            <script>selected("event_type", "<%= @selected[:event_type].capitalize %>", "<%=url_for(params.except :event_type)%>")</script>
+            <script>selected("event_type", "<%= @selected[:event_type].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :event_type)%>")</script>
         <% else %>
             <% @event_types.each do |type| %>
                 <% unless @event_type_counts[type] == 0 || @event_type_counts[type].nil? || type.nil? %>

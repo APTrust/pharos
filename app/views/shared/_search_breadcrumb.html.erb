@@ -26,7 +26,7 @@
             <span class="filterValue"><%= params[:q] %></span>
           <% end %>
         </span>
-        <a class="btn btn-default btn-sm remove" href="<%=url_for(params.except :q)%>">
+        <a class="btn btn-default btn-sm remove" href="<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :q)%>">
           <span class="glyphicon glyphicon-remove"></span>
           <span class="sr-only">Remove constraint <%= params[:q] %></span>
         </a>
@@ -65,7 +65,7 @@
                 <span class="filterValue"><%= value %></span>
             <% end %>
           </span>
-          <a class="btn btn-default btn-sm remove" href="<%=url_for(params.except key)%>">
+          <a class="btn btn-default btn-sm remove" href="<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except key)%>">
             <span class="glyphicon glyphicon-remove"></span>
             <span class="sr-only">Remove constraint <%= key %>: <%= value %></span>
           </a>

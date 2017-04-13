@@ -9,7 +9,7 @@
     <div class="panel-body">
       <ul class="facet-values list-unstyled">
         <% if @selected[:outcome] %>
-            <script>selected("outcome", "<%= @selected[:outcome].capitalize %>", "<%=url_for(params.except :outcome)%>")</script>
+            <script>selected("outcome", "<%= @selected[:outcome].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :outcome)%>")</script>
         <% else %>
             <%= %>
             <% @outcomes.each do |outcome| %>

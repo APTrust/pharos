@@ -9,7 +9,7 @@
     <div class="panel-body">
       <ul class="facet-values list-unstyled">
         <% if @selected[:item_action] %>
-            <script>selected("action", "<%= @selected[:item_action] %>", "<%=url_for(params.except :item_action)%>")</script>
+            <script>selected("action", "<%= @selected[:item_action] %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :item_action)%>")</script>
         <% else %>
             <% @actions.each do |action| %>
                 <% unless @action_counts[action] == 0 || @action_counts[action].nil? || action.nil? %>
