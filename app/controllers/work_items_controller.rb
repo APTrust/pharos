@@ -228,6 +228,8 @@ class WorkItemsController < ApplicationController
     search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
                      :retry, :object_identifier, :generic_file_identifier,
                      :node, :needs_admin_review, :process_after]
+    params[:retry] = to_boolean(params[:retry]) if params[:retry]
+    params[:needs_admin_review] = to_boolean(params[:needs_admin_review]) if params[:needs_admin_review]
     search_fields.each do |field|
       if params[field].present?
         if field == :bag_date && (Rails.env.test? || Rails.env.development?)
@@ -317,7 +319,8 @@ class WorkItemsController < ApplicationController
     end
     params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
     params[:sort] = 'date' if params[:sort].nil?
-    (params[:retry] == 'true') ? params[:retry] = true : params[:retry] = false unless params[:retry].nil?
+    params[:retry] = to_boolean(params[:retry]) if params[:retry]
+    datetime_format = '%a, %d %b %Y %H:%M:%S UTC +00:00'
     @items = @items
       .created_before(params[:created_before])
       .created_after(params[:created_after])
@@ -406,5 +409,9 @@ class WorkItemsController < ApplicationController
     params[:institution] ? @institutions = [params[:institution]] : @institutions = @items.distinct.pluck(:institution_id)
     #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
     #params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
+  end
+
+  def to_boolean(str)
+    str == 'true'
   end
 end

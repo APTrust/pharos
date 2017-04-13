@@ -285,8 +285,9 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when not signed in' do
       it 'should redirect to login' do
         patch :update, params: { intellectual_object_identifier: file.intellectual_object, generic_file_identifier: file, trailing_slash: true }
-        expect(response).to redirect_to root_url + 'users/sign_in'
-        expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
+        expect(response.code).to eq '401'
+        #expect(response).to redirect_to root_url + 'users/sign_in'
+        #expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
     end
 
@@ -346,8 +347,9 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when not signed in' do
       it 'should redirect to login' do
         delete :destroy, params: { generic_file_identifier: file }
-        expect(response).to redirect_to root_url + 'users/sign_in'
-        expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
+        expect(response.code).to eq '401'
+        #expect(response).to redirect_to root_url + 'users/sign_in'
+        #expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
     end
 

@@ -221,7 +221,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'sets node to "" when params[:node] == ""' do
         wi_hash = FactoryGirl.create(:work_item_extended).attributes
-        wi_hash[:node] = ""
+        wi_hash['node'] = ""
         put :update, params: { id: item.id, format: 'json', work_item: wi_hash }
         expect(assigns(:work_item).node).to eq('')
       end
@@ -522,10 +522,10 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'clears node, pid and needs_admin_review, updates state' do
-        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
+        post :set_restoration_status, params: { object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             node: nil, pid: 0, needs_admin_review: false })
-        expect(response).to be_success
+             node: nil, pid: 0, needs_admin_review: false }, format: :json
+             expect(response).to be_success
         wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq(nil)
@@ -812,6 +812,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'can find by name, etag, bag_date' do
+        puts "input check: #{item1.name}, #{item1.etag}, #{item1.bag_date}"
         get :index, format: :json, params: { name: item1.name, etag: item1.etag, bag_date: item1.bag_date }
         assigns(:items).should include(item1)
         assigns(:count).should == 1
