@@ -16,7 +16,7 @@ class WorkItem < ActiveRecord::Base
   scope :created_after, ->(param) { where('work_items.created_at >= ?', param) unless param.blank? }
   scope :updated_before, ->(param) { where('work_items.updated_at < ?', param) unless param.blank? }
   scope :updated_after, ->(param) { where('work_items.updated_at >= ?', param) unless param.blank? }
-  scope :with_bag_date, ->(param) { where(bag_date: param) unless param.blank? }
+  scope :with_bag_date, ->(param1, param2) { where('work_items.bag_date >= ? AND work_items.bag_date < ?', param1, param2) unless param1.blank? || param2.blank? }
   scope :with_name, ->(param) { where(name: param) unless param.blank? }
   scope :with_name_like, ->(param) { where('work_items.name like ?', "%#{param}%") unless WorkItem.empty_param(param) }
   scope :with_etag, ->(param) { where(etag: param) unless param.blank? }

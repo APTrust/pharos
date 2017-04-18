@@ -294,10 +294,13 @@ RSpec.describe WorkItem, :type => :model do
       subject.bag_date = bag_date
       subject.save!
 
+      bag_date_1 = subject.bag_date
+      bag_date_2 = subject.bag_date + 1.seconds
+
       item = WorkItem
         .with_name(subject.object_identifier)
         .with_etag(subject.etag)
-        .with_bag_date(bag_date)
+        .with_bag_date(bag_date_1, bag_date_2)
       item.should_not be_nil
     end
 

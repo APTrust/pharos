@@ -741,7 +741,7 @@ RSpec.describe WorkItemsController, type: :controller do
       # the Z at the end of the bag_date string.
       it 'filters down to the right records' do
         get(:api_search, format: :json, params: { name: 'item1.tar',
-            etag: 'etag1', institution: institution,
+            etag: 'etag1', institution: institution.id,
             retry: 'true',
             bag_date: '2014-10-17 14:56:56Z',
             action: 'Ingest', stage: 'Record',

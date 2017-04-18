@@ -132,6 +132,7 @@ class WorkItemsController < ApplicationController
   def set_restoration_status
     # Fix Apache/Passenger passthrough of %2f-encoded slashes in identifier
     params[:object_identifier] = params[:object_identifier].gsub(/%2F/i, "/")
+    params[:node] = nil if params[:node] && params[:node] == ''
     restore = Pharos::Application::PHAROS_ACTIONS['restore']
     @item = WorkItem.where(object_identifier: params[:object_identifier],
                            action: restore).order(created_at: :desc).first
@@ -233,7 +234,10 @@ class WorkItemsController < ApplicationController
     search_fields.each do |field|
       if params[field].present?
         if field == :bag_date && (Rails.env.test? || Rails.env.development?)
-          @items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+          #@items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+          bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
+          bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
+          @items = @items.with_bag_date(bag_date1, bag_date2)
         elsif field == :node and params[field] == 'null'
           @items = @items.where('node is null')
         elsif field == :assignment_pending_since and params[field] == 'null'
@@ -320,13 +324,14 @@ class WorkItemsController < ApplicationController
     params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
     params[:sort] = 'date' if params[:sort].nil?
     params[:retry] = to_boolean(params[:retry]) if params[:retry]
-    datetime_format = '%a, %d %b %Y %H:%M:%S UTC +00:00'
+    bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
+    bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
     @items = @items
       .created_before(params[:created_before])
       .created_after(params[:created_after])
       .updated_before(params[:updated_before])
       .updated_after(params[:updated_after])
-      .with_bag_date(params[:bag_date])
+      .with_bag_date(bag_date1, bag_date2)
       .with_name(params[:name])
       .with_name_like(params[:name_contains])
       .with_etag(params[:etag])
