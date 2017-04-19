@@ -18,10 +18,10 @@
       <tr><th>Etag</th>
         <td><%= @work_item.etag %></td></tr>
       <tr><th>Object Identifier</th>
-        <td class="identifier"><%= @work_item.object_identifier %></td></tr>
+        <td class="identifier"><%= link_to @work_item.object_identifier, intellectual_object_path(@work_item.intellectual_object) %></td></tr>
       <% unless @work_item.generic_file_identifier.nil? %>
           <tr><th>Generic File Identifier</th>
-            <td class="identifier"><%= @work_item.generic_file_identifier %></td></tr>
+            <td class="identifier"><%= link_to @work_item.generic_file_identifier, generic_file_path(@work_item.generic_file) %></td></tr>
       <% end %>
       <tr><th>Bag Date</th>
         <td><%= @work_item.bag_date %></td></tr>
