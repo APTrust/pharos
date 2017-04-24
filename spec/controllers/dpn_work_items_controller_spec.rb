@@ -48,11 +48,18 @@ RSpec.describe DpnWorkItemsController, type: :controller do
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
       end
 
-      it 'filters by queued status' do
-        get :index, params: { is_queued: 'true' }
+      it 'filters by queued items' do
+        get :index, params: { queued: 'is_queued' }
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
+      end
+
+      it 'filters by not queued items' do
+        get :index, params: { queued: 'is_not_queued' }
+        expect(response).to be_success
+        expect(assigns(:paged_results).size).to eq 1
+        expect(assigns(:paged_results).map &:id).to match_array [item_two.id]
       end
     end
 
