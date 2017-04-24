@@ -92,8 +92,11 @@ class DpnWorkItemsController < ApplicationController
     @dpn_items = @dpn_items.order('queued_at DESC')
     @selected = {}
     filter_by_node
-    filter_by_queued
+    filter_by_queued if params[:queued]
     count = @dpn_items.count
+    @queued_counts = {}
+    @queued_counts[:is_queued] = @dpn_items.is_queued('true').count
+    @queued_counts[:is_not_queued] = @dpn_items.is_not_queued('true').count
     set_page_counts(count)
   end
 
@@ -106,11 +109,12 @@ class DpnWorkItemsController < ApplicationController
   end
 
   def filter_by_queued
-    @dpn_items = @dpn_items.is_queued(params[:is_queued]).is_not_queued(params[:is_not_queued])
-    @selected[:queued] = 'Has been queued' if params[:is_queued]
-    @selected[:queued] = 'Has not been queued' if params[:is_not_queued]
-    @queued_counts = {}
-    @queued_counts[:is_queued] = @dpn_items.is_queued('true').count
-    @queued_counts[:is_not_queued] = @dpn_items.is_not_queued('true').count
+    if params[:queued] == 'is_queued'
+      @dpn_items = @dpn_items.is_queued('true')
+      @selected[:queued] = 'Has been queued'
+    elsif params[:queued] == 'is_not_queued'
+      @dpn_items = @dpn_items.is_not_queued('true')
+      @selected[:queued] = 'Has not been queued'
+    end
   end
 end
