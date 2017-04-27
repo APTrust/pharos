@@ -15,7 +15,7 @@
                 <% unless @event_type_counts[type] == 0 || @event_type_counts[type].nil? || type.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('event_type', type) %>"><%= type.capitalize %></a></span>
-                      <span class="facet-count"><%= @event_type_counts[type] %></span>
+                      <span class="facet-count">(<%= @event_type_counts[type] %>)</span>
                     </li>
                 <% end %>
             <% end %>

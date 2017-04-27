@@ -408,10 +408,10 @@ class WorkItemsController < ApplicationController
   end
 
   def set_filter_values
-    params[:status] ? @statuses = [params[:status]] : @statuses = @items.distinct.pluck(:status)
-    params[:stage] ? @stages = [params[:stage]] : @stages = @items.distinct.pluck(:stage)
-    params[:item_action] ? @actions = [params[:item_action]] : @actions = @items.distinct.pluck(:action)
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = @items.distinct.pluck(:institution_id)
+    params[:status] ? @statuses = [params[:status]] : @statuses = Pharos::Application::PHAROS_STATUSES.values
+    params[:stage] ? @stages = [params[:stage]] : @stages = Pharos::Application::PHAROS_STAGES.values
+    params[:item_action] ? @actions = [params[:item_action]] : @actions = Pharos::Application::PHAROS_ACTIONS.values
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
     #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
     #params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
   end

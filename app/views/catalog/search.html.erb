@@ -1,7 +1,11 @@
 <div id="sidebar" class="col-md-3 col-sm-4">
   <div class="facets sidenav">
     <h3> Limit your search </h3>
-    <%= render 'shared/filters/institution_filter' %>
+    <% if @result_type == 'event' %>
+        <%= render 'shared/filters/institution_without_counts_filter' %>
+    <% else %>
+        <%= render 'shared/filters/institution_filter' %>
+    <% end %>
     <%= render 'shared/filters/access_filter' %>
     <%= render 'shared/filters/format_filter' %>
     <%= render 'shared/filters/status_filter' %>
@@ -9,6 +13,8 @@
     <%= render 'shared/filters/action_filter' %>
     <%= render 'shared/filters/event_type_without_counts_filter' %>
     <%= render 'shared/filters/outcome_without_counts_filter' %>
+    <%= render 'shared/filters/node_filter' %>
+    <%= render 'shared/filters/queued_filter' %>
   </div>
 </div>
 

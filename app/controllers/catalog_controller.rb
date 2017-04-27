@@ -145,6 +145,8 @@ class CatalogController < ApplicationController
     filter_by_format unless params[:file_format].nil?
     filter_by_event_type unless params[:event_type].nil?
     filter_by_outcome unless params[:outcome].nil?
+    filter_by_node unless params[:remote_node].nil?
+    filter_by_queued unless params[:queued].nil?
     set_filter_values
     set_filter_counts
     count = @results.count
@@ -161,15 +163,16 @@ class CatalogController < ApplicationController
         params[:file_format] ? @formats = [params[:file_format]] : @formats = @results.distinct.pluck(:file_format)
       when 'item'
         params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
-        params[:status] ? @statuses = [params[:status]] : @statuses = @results.distinct.pluck(:status)
-        params[:stage] ? @stages = [params[:stage]] : @stages = @results.distinct.pluck(:stage)
-        params[:item_action] ? @actions = [params[:item_action]] : @actions = @results.distinct.pluck(:action)
+        params[:status] ? @statuses = [params[:status]] : @statuses = Pharos::Application::PHAROS_STATUSES.values
+        params[:stage] ? @stages = [params[:stage]] : @stages = Pharos::Application::PHAROS_STAGES.values
+        params[:item_action] ? @actions = [params[:item_action]] : @actions = Pharos::Application::PHAROS_ACTIONS.values
       when 'event'
         params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
-        params[:event_type] ? @event_types = [params[:event_type]] : @event_types = @results.distinct.pluck(:event_type)
-        params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = @results.distinct.pluck(:outcome)
+        params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values
+        params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
       when 'dpn_item'
-        #do nothing for now
+        params[:remote_node] ? @nodes = [params[:remote_node]] : @nodes = %w(chron hathi sdr tdr aptrust)
+        @queued_filter = true
     end
   end
 
@@ -187,11 +190,12 @@ class CatalogController < ApplicationController
         set_action_count(@results)
         set_inst_count(@results, :items)
       when 'event'
-        set_inst_count(@results, :events)
+        #set_inst_count(@results, :events)
         #set_event_type_count(@results)
         #set_outcome_count(@results)
       when 'dpn_item'
-        #do nothing for now
+        set_node_count(@results)
+        set_queued_count(@results)
     end
   end
 

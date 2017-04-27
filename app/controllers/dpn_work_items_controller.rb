@@ -91,30 +91,23 @@ class DpnWorkItemsController < ApplicationController
                      .completed_after(params[:completed_after])
     @dpn_items = @dpn_items.order('queued_at DESC')
     @selected = {}
-    filter_by_node
+    initialize_filter_counters
+    filter_by_node if params[:remote_node]
     filter_by_queued if params[:queued]
     count = @dpn_items.count
-    @queued_counts = {}
-    @queued_counts[:is_queued] = @dpn_items.is_queued('true').count
-    @queued_counts[:is_not_queued] = @dpn_items.is_not_queued('true').count
+    set_filter_values
+    set_filter_counts
     set_page_counts(count)
   end
 
-  def filter_by_node
-    @dpn_items = @dpn_items.with_remote_node(params[:remote_node])
-    @selected[:remote_node] = params[:remote_node] if params[:remote_node]
+  def set_filter_values
     params[:remote_node] ? @nodes = [params[:remote_node]] : @nodes = %w(chron hathi sdr tdr aptrust)
-    @node_counts = {}
-    @nodes.each { |node| @node_counts[node] = @dpn_items.with_remote_node(node).count }
+    @queued_filter = true
   end
 
-  def filter_by_queued
-    if params[:queued] == 'is_queued'
-      @dpn_items = @dpn_items.is_queued('true')
-      @selected[:queued] = 'Has been queued'
-    elsif params[:queued] == 'is_not_queued'
-      @dpn_items = @dpn_items.is_not_queued('true')
-      @selected[:queued] = 'Has not been queued'
-    end
+  def set_filter_counts
+    set_node_count(@dpn_items)
+    set_queued_count(@dpn_items)
   end
+
 end

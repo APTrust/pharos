@@ -9,18 +9,16 @@
       <div id="filter-queued" class="panel-collapse facet-content collapse" style="height: 0px">
         <div class="panel-body">
           <ul class="facet-values list-unstyled">
-            <% if @selected[:queued] == 'Has been queued' %>
-                <script>selected("queued", "<%= @selected[:queued].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :queued)%>")</script>
-            <% elsif @selected[:queued] == 'Has not been queued' %>
+            <% if @selected[:queued] %>
                 <script>selected("queued", "<%= @selected[:queued].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :queued)%>")</script>
             <% else %>
                 <li>
                   <span class="facet-label"><a href="<%= current_path('queued', 'is_queued') %>">Is Queued</a></span>
-                  <span class="facet-count"><%= @queued_counts[:is_queued] %></span>
+                  <span class="facet-count">(<%= @queued_counts[:is_queued] %>)</span>
                 </li>
                 <li>
                   <span class="facet-label"><a href="<%= current_path('queued', 'is_not_queued') %>">Is Not Queued</a></span>
-                  <span class="facet-count"><%= @queued_counts[:is_not_queued] %></span>
+                  <span class="facet-count">(<%= @queued_counts[:is_not_queued] %>)</span>
                 </li>
             <% end %>
           </ul>

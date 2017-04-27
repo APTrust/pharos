@@ -15,7 +15,7 @@
                 <% unless @action_counts[action] == 0 || @action_counts[action].nil? || action.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('item_action', action) %>"><%= action %></a></span>
-                      <span class="facet-count"><%= @action_counts[action] %></span>
+                      <span class="facet-count">(<%= @action_counts[action] %>)</span>
                     </li>
                 <% end %>
             <% end %>

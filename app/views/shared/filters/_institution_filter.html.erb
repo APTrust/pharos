@@ -17,7 +17,7 @@
                 <% unless @inst_counts[institution] == 0 || @inst_counts[institution].nil? || institution.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('institution', institution) %>"><%= current_inst.name %></a></span>
-                      <span class="facet-count"><%= @inst_counts[institution] %></span>
+                      <span class="facet-count">(<%= @inst_counts[institution] %>)</span>
                     </li>
                 <% end %>
             <% end %>
