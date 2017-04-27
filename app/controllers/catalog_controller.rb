@@ -188,8 +188,8 @@ class CatalogController < ApplicationController
         set_inst_count(@results, :items)
       when 'event'
         set_inst_count(@results, :events)
-        set_event_type_count(@results)
-        set_outcome_count(@results)
+        #set_event_type_count(@results)
+        #set_outcome_count(@results)
       when 'dpn_item'
         #do nothing for now
     end
