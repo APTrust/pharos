@@ -98,7 +98,7 @@ module Pharos
                     :item_action, :stage, :status, :sort, :institution_identifier, :name_contains, :name_exact, :method,
                     :updated_since, :node, :needs_admin_review, :not_checked_since, :identifier_like, :per_page, :utf8,
                     :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
-                    :object_identifier]
+                    :object_identifier, :format]
 
   end
 end

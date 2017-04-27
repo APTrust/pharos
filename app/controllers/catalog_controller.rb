@@ -190,6 +190,7 @@ class CatalogController < ApplicationController
         set_action_count(@results)
         set_inst_count(@results, :items)
       when 'event'
+        ######## These are all turned off because they make event searching too time consuming ############
         #set_inst_count(@results, :events)
         #set_event_type_count(@results)
         #set_outcome_count(@results)
