@@ -24,7 +24,11 @@ class GenericFilesController < ApplicationController
           @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
         else
           authorize @institution, :index_through_institution?
-          @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+          if current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID
+            @generic_files = GenericFile.all
+          else
+            @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+          end
         end
       end
       params[:state] = 'A' if params[:state].nil?
@@ -300,14 +304,17 @@ class GenericFilesController < ApplicationController
   def filter
     set_filter_values
     initialize_filter_counters
+    filter_by_institution unless params[:institution].nil?
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
-    set_format_count(@generic_files, :file)
+    set_format_count(@generic_files, :files)
+    set_inst_count(@generic_files, :files)
     count = @generic_files.count
     set_page_counts(count)
   end
 
   def set_filter_values
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
     params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
   end
 end

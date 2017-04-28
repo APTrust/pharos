@@ -24,7 +24,7 @@
           <% if user_signed_in? %>
               <% get_institution_for_tabs %>
               <ul class="nav nav-tabs">
-                <li id="inst_tab"><%= link_to 'Institutions', root_path %></li>
+                <li id="inst_tab"><%= link_to 'Institution', institution_path(@inst) %></li>
                 <li id="io_tab"><%= link_to 'Objects', intellectual_objects_path(@inst, sort: 'date') %></li>
                 <li id="gf_tab"><%= link_to 'Files', institution_files_path(@inst, sort: 'date') %></li>
                 <li id="pe_tab"><%= link_to 'Events', institution_events_path(@inst) %></li>

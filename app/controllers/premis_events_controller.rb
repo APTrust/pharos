@@ -93,7 +93,9 @@ class PremisEventsController < ApplicationController
   end
 
   def for_selected_institution
-    @premis_events = @premis_events.where(institution_id: @parent.id) unless @parent.nil?
+    unless @parent.nil?
+      (current_user.admin? && @parent.identifier == Pharos::Application::APTRUST_ID) ? @premis_events = PremisEvent.all : @premis_events = @premis_events.where(institution_id: @parent.id)
+    end
   end
 
   def for_selected_object

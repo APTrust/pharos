@@ -9,7 +9,7 @@ class IntellectualObjectsController < ApplicationController
   def index
     authorize @institution
     if current_user.admin? and params[:institution_identifier]
-      user_institution = @institution
+      params[:institution_identifier] == Pharos::Application::APTRUST_ID ? user_institution = nil : user_institution = @institution
     elsif current_user.admin?
       user_institution = nil
     else

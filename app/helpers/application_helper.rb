@@ -45,7 +45,12 @@ module ApplicationHelper
   end
 
   def get_institution_for_tabs
-    @inst = current_user.institution
+    if @institution
+      @inst = @institution
+    else
+      @inst = current_user.institution
+    end
+
   end
 
   def dpn_process_time(item)
