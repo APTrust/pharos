@@ -24,7 +24,7 @@ class GenericFile < ActiveRecord::Base
   }
   scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
-  scope :not_checked_since, ->(param) { where("last_fixity_check < ?", param) unless param.blank? }
+  scope :not_checked_since, ->(param) { where("last_fixity_check < ? and state='A'", param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)

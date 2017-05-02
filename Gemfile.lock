@@ -41,7 +41,7 @@ GEM
     arel (6.0.4)
     autoprefixer-rails (6.7.6)
       execjs
-    aws-sdk-core (2.9.7)
+    aws-sdk-core (2.9.8)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
     aws-sigv4 (1.0.0)
