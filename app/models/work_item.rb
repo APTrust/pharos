@@ -97,6 +97,50 @@ class WorkItem < ActiveRecord::Base
       .first
   end
 
+  def requeue_item(options={})
+    self.status = Pharos::Application::PHAROS_STATUSES['pend']
+    self.retry = true
+    self.needs_admin_review = false
+    self.node = nil
+    self.pid = 0
+    self.queued_at = nil
+    if self.action == Pharos::Application::PHAROS_ACTIONS['delete']
+      self.stage = Pharos::Application::PHAROS_STAGES['requested']
+      self.note = 'Delete requested'
+    elsif self.action == Pharos::Application::PHAROS_ACTIONS['restore']
+      self.stage = Pharos::Application::PHAROS_STAGES['requested']
+      self.note = 'Restore requested'
+      self.work_item_state.delete if options[:work_item_state_delete]
+    elsif self.action == Pharos::Application::PHAROS_ACTIONS['ingest']
+      if options[:stage]
+        if options[:stage] == Pharos::Application::PHAROS_STAGES['fetch']
+          self.stage = Pharos::Application::PHAROS_STAGES['receive']
+          self.note = 'Item is pending ingest'
+          self.work_item_state.delete if self.work_item_state
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['store']
+          self.stage = Pharos::Application::PHAROS_STAGES['store']
+          self.note = 'Item is pending storage'
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['record']
+          self.stage = Pharos::Application::PHAROS_STAGES['record']
+          self.note = 'Item is pending record'
+        end
+      end
+    elsif self.action == Pharos::Application::PHAROS_ACTIONS['dpn']
+      if options[:stage] == Pharos::Application::PHAROS_STAGES['package']
+        self.stage = Pharos::Application::PHAROS_STAGES['requested']
+        self.note = 'Requested item be sent to DPN'
+        self.work_item_state.delete if self.work_item_state
+      elsif options[:stage] == Pharos::Application::PHAROS_STAGES['store']
+        self.stage = Pharos::Application::PHAROS_STAGES['store']
+        self.note = 'Packaging completed, awaiting storage'
+      elsif options[:stage] == Pharos::Application::PHAROS_STAGES['record']
+        self.stage = Pharos::Application::PHAROS_STAGES['record']
+        self.note = 'Bag copied to long-term storage'
+      end
+    end
+    self.save!
+  end
+
   def self.can_delete_file?(intellectual_object_identifier, generic_file_identifier)
     items = WorkItem.where(object_identifier: intellectual_object_identifier)
     items = items.order('date DESC')

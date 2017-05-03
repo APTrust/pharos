@@ -1,5 +1,6 @@
 class GenericFilesController < ApplicationController
   include SearchAndIndex
+  respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_generic_file, only: [:show, :update, :destroy]
   before_action :load_intellectual_object, only: [:create, :create_batch]

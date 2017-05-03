@@ -1,8 +1,10 @@
 class WorkItemsController < ApplicationController
   include SearchAndIndex
+  require 'uri'
+  require 'net/http'
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :set_item, only: :show
+  before_action :set_item, only: [:show, :requeue]
   before_action :init_from_params, only: :create
   after_action :verify_authorized
 
@@ -59,6 +61,37 @@ class WorkItemsController < ApplicationController
       authorize current_user, :nil_index?
       respond_to do |format|
         format.json { render body: nil, status: :not_found }
+        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      end
+    end
+  end
+
+  def requeue
+    if @work_item
+      authorize @work_item
+      if @work_item.status == Pharos::Application::PHAROS_STATUSES['success']
+        respond_to do |format|
+          format.json { render :json => { status: 'error', message: 'Work Items that have succeeded cannot be requeued.' }, :status => :conflict }
+          format.html { }
+        end
+      else
+        options = {}
+        options[:stage] = params[:item_stage] if params[:item_stage]
+        options[:work_item_state_delete] = 'true' if params[:delete_state_item] && params[:delete_state_item] == 'true'
+        @work_item.requeue_item(options)
+        options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
+        respond_to do |format|
+          format.json { render json: { status: response.code, body: response.body } }
+          format.html {
+            render 'show'
+            flash[:notice] = response.body
+          }
+        end
+      end
+    else
+      authorize current_user, :nil_index?
+      respond_to do |format|
+        format.json { render nothing: true, status: :not_found }
         format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
       end
     end
@@ -382,6 +415,37 @@ class WorkItemsController < ApplicationController
     if params[:retry].present? && params[:retry].is_a?(String)
       params[:retry] = params[:retry][0]
     end
+  end
+
+  def issue_requeue_http_post(stage)
+    if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
+    elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
+    elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
+      if stage == Pharos::Application::PHAROS_STAGES['fetch']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['store']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_store_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['record']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_record_topic")
+      end
+    elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn']
+      if stage == Pharos::Application::PHAROS_STAGES['package']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['store']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
+      elsif stage == Pharos::Application::PHAROS_STAGES['record']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
+      end
+    end
+
+    # Post WorkItem.id as the request body.
+    # It's just a number, like 15771, not a key-value http form pair.
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri)
+    request.body = @work_item.id.to_s
+    http.request(request)
   end
 
   def filter

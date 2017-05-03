@@ -24,6 +24,10 @@ class WorkItemPolicy < ApplicationPolicy
     user.admin? || (user.institution.id == record.institution_id)
   end
 
+  def requeue?
+    user.admin?
+  end
+
   def update?
     user.admin? ||
         (user.institutional_admin? && (user.institution.id == record.institution_id))

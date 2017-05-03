@@ -168,6 +168,46 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
+  describe 'GET #requeue' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+      it 'responds successfully with an HTTP 200 status code' do
+        get :requeue, id: item.id
+        expect(response).to be_success
+      end
+
+      it 'renders the requeue template' do
+        get :requeue, id: item.id
+        expect(response).to render_template('requeue')
+      end
+
+      it 'assigns the requested item as @work_item' do
+        get :requeue, id: item.id
+        assigns(:work_item).id.should eq(item.id)
+      end
+
+      it 'assigns the requested institution as @institution' do
+        get :requeue, id: item.id
+        assigns(:institution).should eq( admin_user.institution)
+      end
+
+    end
+
+    describe 'for institutional admin' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'does not allow the user to requeue the item' do
+        get :requeue, id: item.id, format: :json
+        expect(response.status).to eq 403
+      end
+
+    end
+  end
+
   # Special show method for the admin API that exposes some attributes
   # of WorkItem that we don't want to show to normal users.
   describe 'GET #api_show' do

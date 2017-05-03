@@ -1,5 +1,6 @@
 class PremisEventsController < ApplicationController
   include SearchAndIndex
+  respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_and_authorize_parent_object, only: [:create]
   after_action :verify_authorized, only: [:index, :create]

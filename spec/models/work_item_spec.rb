@@ -157,6 +157,42 @@ RSpec.describe WorkItem, :type => :model do
     subject.pretty_state.should == pretty_json.strip
   end
 
+  it 'requeue_item should reset the status, stage, and action to the appropriate fields' do
+    subject = FactoryGirl.create(:work_item)
+
+    subject.status = Pharos::Application::PHAROS_STATUSES['fail']
+    subject.action = Pharos::Application::PHAROS_ACTIONS['delete']
+    subject.stage = Pharos::Application::PHAROS_STAGES['validate']
+    subject.requeue_item
+    subject.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+    subject.action.should == Pharos::Application::PHAROS_ACTIONS['delete']
+    subject.stage.should ==  Pharos::Application::PHAROS_STAGES['requested']
+
+    subject.status = Pharos::Application::PHAROS_STATUSES['fail']
+    subject.action = Pharos::Application::PHAROS_ACTIONS['restore']
+    subject.stage = Pharos::Application::PHAROS_STAGES['validate']
+    subject.requeue_item
+    subject.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+    subject.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
+    subject.stage.should ==  Pharos::Application::PHAROS_STAGES['requested']
+
+    subject.status = Pharos::Application::PHAROS_STATUSES['fail']
+    subject.action = Pharos::Application::PHAROS_ACTIONS['ingest']
+    subject.stage = Pharos::Application::PHAROS_STAGES['validate']
+    subject.requeue_item(stage: Pharos::Application::PHAROS_STAGES['fetch'])
+    subject.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+    subject.action.should == Pharos::Application::PHAROS_ACTIONS['ingest']
+    subject.stage.should ==  Pharos::Application::PHAROS_STAGES['receive']
+
+    subject.status = Pharos::Application::PHAROS_STATUSES['fail']
+    subject.action = Pharos::Application::PHAROS_ACTIONS['dpn']
+    subject.stage = Pharos::Application::PHAROS_STAGES['validate']
+    subject.requeue_item(stage: Pharos::Application::PHAROS_STAGES['package'])
+    subject.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+    subject.action.should == Pharos::Application::PHAROS_ACTIONS['dpn']
+    subject.stage.should ==  Pharos::Application::PHAROS_STAGES['requested']
+  end
+
   describe 'work queue methods' do
     ingest_date = Time.parse('2014-06-01')
     before do

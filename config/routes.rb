@@ -62,6 +62,7 @@ Rails.application.routes.draw do
   get 'items/ingested_since', to: 'work_items#ingested_since', format: :json
   get 'items/set_restoration_status', to: 'work_items#set_restoration_status', format: :json
   get 'api/v2/items/search', to: 'work_items#api_search', format: :json
+  get 'items/:id/requeue', to: 'work_items#requeue', format: [:json, :html], as: :requeue_work_item
 
   # WORK ITEM STATE ROUTES
   #resources :work_item_states, path: 'item_state', only: [:show, :update, :create], format: :json, param: :work_item_id

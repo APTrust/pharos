@@ -100,5 +100,13 @@ module Pharos
                     :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
                     :object_identifier, :format]
 
+    if Rails.env.production?
+      NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'
+    elsif Rails.env.demo?
+      NSQ_BASE_URL = 'http://demo-services.aptrust.org:4151'
+    elsif Rails.env.development?
+      NSQ_BASE_URL = 'http://localhost:4151'
+    end
+
   end
 end

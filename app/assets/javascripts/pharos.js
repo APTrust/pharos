@@ -201,6 +201,69 @@ function fixFilters() {
     });
 }
 
+function restoreRequeue(){
+   $('#restore_form').removeClass('hidden');
+   $('#restore_form_submit').on("click", function() {
+       if ($('#state-item').is(':checked')) {
+           var checked = 'true';
+       } else {
+           var checked = 'false';
+       }
+       var id = $('#work_item_id').text();
+       $.get('/items/'+id+'/requeue', {delete_state_item: checked},
+           function(data) {
+               alert(data);
+           });
+   });
+   $('#restore_form_cancel').on("click", function() {
+        $('#restore_form').addClass('hidden');
+   });
+}
+
+function ingestRequeue(){
+    $('#ingest_form').removeClass('hidden');
+    $('#ingest_form_submit').on("click", function() {
+        var stage = $('input[name="stage"]:checked').val();
+        if (stage == "Fetch" || stage == "Store" || stage == "Record") {
+            if (!$('#ingest_error').hasClass('hidden')) {
+                $('#ingest_error').addClass('hidden');
+            }
+            var id = $('#work_item_id').text();
+            $.get('/items/'+id+'/requeue', {item_stage: stage},
+                function(data) {
+                    alert(data);
+                });
+        } else {
+            $('#ingest_error').removeClass('hidden');
+        }
+    });
+    $('#ingest_form_cancel').on("click", function() {
+        $('#ingest_form').addClass('hidden');
+    });
+}
+
+function dpnRequeue() {
+    $('#dpn_form').removeClass('hidden');
+    $('#dpn_form_submit').on("click", function () {
+        var stage = $('input[name="stage"]:checked').val();
+        if (stage == "Package" || stage == "Store" || stage == "Record") {
+            if (!$('#ingest_error').hasClass('hidden')) {
+                $('#ingest_error').addClass('hidden');
+            }
+            var id = $('#work_item_id').text();
+            $.get('/items/' + id + '/requeue', {item_stage: stage},
+                function (data) {
+                    alert(data);
+                });
+        } else {
+            $('#dpn_error').removeClass('hidden');
+        }
+    });
+    $('#dpn_form_cancel').on("click", function () {
+        $('#dpn_form').addClass('hidden');
+    });
+}
+
 function tabbed_nav(controller) {
     switch (controller) {
         case 'institutions':
