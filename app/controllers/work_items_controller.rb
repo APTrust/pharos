@@ -81,7 +81,7 @@ class WorkItemsController < ApplicationController
         @work_item.requeue_item(options)
         options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
         respond_to do |format|
-          format.json { render json: { status: response.status, body: response.body } }
+          format.json { render json: { status: response.code, body: response.body } }
           format.html {
             render 'show'
             flash[:notice] = response.body
@@ -431,8 +431,13 @@ class WorkItemsController < ApplicationController
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
       end
     end
-    response = Net::HTTP.post_form(uri, 'work_item_id' =>"#{@work_item.id}")
-    response
+
+    # Post WorkItem.id as the request body.
+    # It's just a number, like 15771, not a key-value http form pair.
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri)
+    request.body = @work_item.id.to_s
+    http.request(request)
   end
 
   def filter
