@@ -15,7 +15,7 @@ module ApplicationHelper
     content ||= '<i class="glyphicon glyphicon-trash"></i> Delete'
     options[:class] = 'btn doc-action-btn btn-danger btn-sm' if options[:class].nil?
     options[:method] = :delete if options[:method].nil?
-    options[:data] = { confirm: 'Are you sure?' } if options[:confirm].nil?
+    options[:data] = { confirm: 'Are you sure you want to delete this?' } if options[:confirm].nil?
     link_to(content.html_safe, object, options) if policy(object).destroy?
   end
 
@@ -23,7 +23,7 @@ module ApplicationHelper
     content ||= '<i class="glyphicon glyphicon-warning-sign"></i> Reset User Password'
     options[:class] = 'btn doc-action-btn btn-danger btn-sm' if options[:class].nil?
     options[:method] = :get if options[:method].nil?
-    options[:data] = { confirm: 'Are you sure?' }if options[:confirm].nil?
+    options[:data] = { confirm: "Are you sure you want to reset this user's password?" }if options[:confirm].nil?
     link_to(content.html_safe, [:admin_password_reset, object], options) if policy(object).admin_password_reset?
   end
 
