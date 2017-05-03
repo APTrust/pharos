@@ -10,20 +10,22 @@
   <section>
     <p id="work_item_id" class="hidden"><%= @work_item.id %></p>
     <% if current_user.admin? %>
-        <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
-            <%= requeue_link(@work_item) %>
-        <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] %>
-            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
-                <i class="glyphicon glyphicon-repeat"></i> Requeue
-            <% end %>
-        <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
-            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
-                <i class="glyphicon glyphicon-repeat"></i> Requeue
-            <% end %>
-        <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
-            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
-                <i class="glyphicon glyphicon-repeat"></i> Requeue
-            <% end %>
+        <% unless @work_item.status == Pharos::Application::PHAROS_STATUSES['success'] %>
+          <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
+              <%= requeue_link(@work_item) %>
+          <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] %>
+              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
+                  <i class="glyphicon glyphicon-repeat"></i> Requeue
+              <% end %>
+          <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
+              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
+                  <i class="glyphicon glyphicon-repeat"></i> Requeue
+              <% end %>
+          <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
+              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
+                  <i class="glyphicon glyphicon-repeat"></i> Requeue
+              <% end %>
+          <% end %>
         <% end %>
     <% end %>
     <br><br>

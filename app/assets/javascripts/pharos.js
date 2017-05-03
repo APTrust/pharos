@@ -224,7 +224,7 @@ function ingestRequeue(){
     $('#ingest_form').removeClass('hidden');
     $('#ingest_form_submit').on("click", function() {
         var stage = $('input[name="stage"]:checked').val();
-        if (stage == ('Fetch' || 'Store' || 'Record')) {
+        if (stage == "Fetch" || stage == "Store" || stage == "Record") {
             if (!$('#ingest_error').hasClass('hidden')) {
                 $('#ingest_error').addClass('hidden');
             }
@@ -246,7 +246,7 @@ function dpnRequeue() {
     $('#dpn_form').removeClass('hidden');
     $('#dpn_form_submit').on("click", function () {
         var stage = $('input[name="stage"]:checked').val();
-        if (stage == ('Package' || 'Store' || 'Record')) {
+        if (stage == "Package" || stage == "Store" || stage == "Record") {
             if (!$('#ingest_error').hasClass('hidden')) {
                 $('#ingest_error').addClass('hidden');
             }
