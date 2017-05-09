@@ -15,7 +15,7 @@
   <% elsif @parent.kind_of?(GenericFile) %>
       <% title = @parent.identifier %>
   <% end %>
-  <h2 class="top-content-title">Premis Events for <%= title %></h2>
+  <h2 class="top-content-title long_names">Premis Events for <%= title %></h2>
   <%= render 'shared/search_breadcrumb' %>
   <%= render 'shared/sort_and_per_page' %>
   <hr>

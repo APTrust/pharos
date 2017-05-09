@@ -9,7 +9,7 @@
 
 <div id="content" class="col-md-9 col-sm-8">
   <% if @intellectual_object %>
-      <h2 class="top-content-title">Generic Files for <%= @intellectual_object.title %></h2>
+      <h2 class="top-content-title long_names">Generic Files for <%= @intellectual_object.title %></h2>
       <h4>Object Identifier: <%= @intellectual_object.identifier %></h4>
       <p><b>This Object has: <%= @intellectual_object.active_files.count %> Active Files, <%= @intellectual_object.processing_files.count %>
         Processing Files, and <%= @intellectual_object.deleted_files.count %> Deleted Files</b></p>
