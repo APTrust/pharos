@@ -35,7 +35,7 @@ gem 'wkhtmltopdf-binary'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.4.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.7.1'
+gem 'inherited_resources', '1.7.2'
 gem 'uuidtools'
 
 gem 'kaminari'
@@ -45,7 +45,7 @@ gem 'bootstrap-sass', '~> 3.3.7'
 gem 'aws-sdk-core'
 
 group :development do
-  gem 'meta_request'
+  gem 'meta_request', '=0.4.0'
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
@@ -69,7 +69,7 @@ group :development, :test, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_girl_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.5'
+  gem 'rspec-rails', '~> 3.6'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
