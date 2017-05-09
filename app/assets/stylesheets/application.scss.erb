@@ -62,11 +62,6 @@ label.password {
   color: #45474d;
 }
 
-#user-util-collapse {
-  padding: 10px;
-  float: right;
-}
-
 @media (min-width: 768px) and (max-width: 979px) {
   .logo-text {
     width: auto;
@@ -141,7 +136,13 @@ p.italic {
 #header-navbar .navbar-brand {@include fix-title;}
 
 .navbar-right {
-  margin-right: -10px;
+  margin-right: 0px;
+  align: right;
+}
+
+.navbar-right ul {
+  align: right;
+  float: right;
 }
 
 #search_selectors {
@@ -150,16 +151,36 @@ p.italic {
 }
 
 #search-navbar {
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 .search-container {
-  width: 60%;
+  width: 55%;
 }
 
 #search-navbar input {
   line-height: 1.5;
   height: 34px;
+}
+
+#header-navbar div.container {
+  width: 100% !important;
+  padding: 0px 0px 0px 30px;
+}
+
+#logo-area {
+  width: 25%;
+}
+
+#user-util-collapse {
+  padding: 5px 10px 0px 0px;
+  float: right;
+  width: 20%;
+}
+
+ul.navbar-nav li.dropdown a.dropdown-toggle {
+  padding-top: 7px;
+  padding-bottom: 7px;
 }
 
 .container {
@@ -223,7 +244,8 @@ form .alert {
 .auditinfo h3 { font-weight: bold; }
 
 input#q {
-  width: 260px;
+  width: 205px;
+  height: 35px;
 }
 
 #chart-frame {
@@ -447,11 +469,15 @@ div.flot-y-axis div.flot-tick-label {
 }
 
 .navbar-default .navbar-nav > li > a {
-  color: #fff;
+  color: #ffffff;
 }
 
 .navbar-default .navbar-nav > li > a:hover {
   color: #c69c6d;
+}
+
+.navbar-default .navbar-nav > li > a:active, .navbar-default .navbar-nav > li > a:visited {
+  color: #ffffff;
 }
 
 .navbar-default, .footer {
@@ -477,6 +503,7 @@ div.flot-y-axis div.flot-tick-label {
   background-image: linear-gradient(to bottom, #d39858, #8a6d3b);
   color: #fff;
   border-color: #8a6d3b;
+  height: 35px;
 }
 
 #search-btn.search-btn:focus, .input-group-btn:focus, #search-btn.search-btn:hover, .input-group-btn:hover {
