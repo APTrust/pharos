@@ -3,6 +3,7 @@ class PremisEventsController < ApplicationController
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_and_authorize_parent_object, only: [:create]
+  before_action :set_format
   after_action :verify_authorized, only: [:index, :create]
 
   def index
@@ -124,6 +125,12 @@ class PremisEventsController < ApplicationController
     params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
     params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values
     params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
+  end
+
+  private
+
+  def set_format
+    request.format = 'html' unless request.format == 'json'
   end
 
 end

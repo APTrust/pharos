@@ -4,6 +4,7 @@ class GenericFilesController < ApplicationController
   before_action :authenticate_user!
   before_action :load_generic_file, only: [:show, :update, :destroy]
   before_action :load_intellectual_object, only: [:create, :create_batch]
+  before_action :set_format
   after_action :verify_authorized
 
   def index
@@ -317,5 +318,11 @@ class GenericFilesController < ApplicationController
   def set_filter_values
     params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
     params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
+  end
+
+  private
+
+  def set_format
+    request.format = 'html' unless request.format == 'json'
   end
 end
