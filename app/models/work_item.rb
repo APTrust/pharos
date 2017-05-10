@@ -261,14 +261,14 @@ class WorkItem < ActiveRecord::Base
     delete_item
   end
 
-  def self.failed_ingest(datetime)
-    WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS['ingest'])
+  def self.failed_action(datetime, action)
+    WorkItem.with_action(action)
         .with_status(Pharos::Application::PHAROS_STATUSES['fail'])
         .updated_after(datetime)
   end
 
-  def self.failed_ingest_count(datetime)
-    WorkItem.failed_ingest(datetime).count
+  def self.failed_action_count(datetime, action)
+    WorkItem.failed_action(datetime, action).count
   end
 
   def status_is_allowed

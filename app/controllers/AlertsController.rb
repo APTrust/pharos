@@ -26,20 +26,20 @@ class AlertsController < ApplicationController
 
   def get_summary_counts(datetime)
     @failed_fixity_count = PremisEvent.failed_fixity_check_count(datetime)
-    @failed_ingest_count = WorkItem.failed_ingest_count(datetime)
-    @failed_restoration_count
-    @failed_deletion_count
-    @failed_dpn_ingest_count
+    @failed_ingest_count = WorkItem.failed_action_count(datetime, Pharos::Application::PHAROS_ACTIONS['ingest'])
+    @failed_restoration_count = WorkItem.failed_action_count(datetime, Pharos::Application::PHAROS_ACTIONS['restore'])
+    @failed_deletion_count = WorkItem.failed_action_count(datetime, Pharos::Application::PHAROS_ACTIONS['delete'])
+    @failed_dpn_ingest_count = WorkItem.failed_action_count(datetime, Pharos::Application::PHAROS_ACTIONS['dpn'])
     @failed_dpn_replication_count
     @stalled_work_item_count
   end
 
   def get_index_lists(datetime)
     @failed_fixity_checks = PremisEvent.failed_fixity_checks(datetime)
-    @failed_ingests = WorkItem.failed_ingest(datetime)
-    @failed_restorations
-    @failed_deletions
-    @failed_dpn_ingests
+    @failed_ingests = WorkItem.failed_action(datetime, Pharos::Application::PHAROS_ACTIONS['ingest'])
+    @failed_restorations = WorkItem.failed_action(datetime, Pharos::Application::PHAROS_ACTIONS['restore'])
+    @failed_deletions = WorkItem.failed_action(datetime, Pharos::Application::PHAROS_ACTIONS['delete'])
+    @failed_dpn_ingests = WorkItem.failed_action(datetime, Pharos::Application::PHAROS_ACTIONS['dpn'])
     @failed_dpn_replications
     @stalled_work_items
   end
@@ -48,9 +48,9 @@ class AlertsController < ApplicationController
   #
   # x failed fixity checks (from PremisEvents) DONE
   # x failed ingests (from WorkItems) DONE
-  # x failed restorations (from WorkItems)
-  # x failed deletions (from WorkItems)
-  # x failed DPN ingests (from WorkItems)
+  # x failed restorations (from WorkItems) DONE
+  # x failed deletions (from WorkItems) DONE
+  # x failed DPN ingests (from WorkItems) DONE
   # x failed DPN replications (from DPN Work Items)
   # x stalled work items (from WorkItems)
   #

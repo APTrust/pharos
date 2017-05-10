@@ -377,15 +377,15 @@ RSpec.describe WorkItem, :type => :model do
 
   describe 'alert methods' do
     describe 'for failed ingest' do
-      it 'failed_ingest should return a list of work items that have failed to ingest' do
+      it 'failed_ingest should return a list of work items that have failed a specific action' do
         item = FactoryGirl.create(:work_item, action: ingest, status: failed)
-        items = WorkItem.failed_ingest(Time.now - 24.hours)
+        items = WorkItem.failed_action(Time.now - 24.hours, ingest)
         expect(items.first).to eq item
       end
 
-      it 'failed_ingest_count should return the number of work items that have failed to ingest' do
+      it 'failed_ingest_count should return the number of work items that have failed a specific action' do
         item = FactoryGirl.create(:work_item, action: ingest, status: failed)
-        count = WorkItem.failed_ingest_count(Time.now - 24.hours)
+        count = WorkItem.failed_action_count(Time.now - 24.hours, ingest)
         expect(count).to eq 1
       end
     end
