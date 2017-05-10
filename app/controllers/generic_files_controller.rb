@@ -246,6 +246,7 @@ class GenericFilesController < ApplicationController
   end
 
   def load_generic_file
+    fix_embedded_question_marks if params[:c]
     if params[:generic_file_identifier]
       identifier = params[:generic_file_identifier]
       @generic_file = GenericFile.where(identifier: identifier).first
@@ -295,6 +296,11 @@ class GenericFilesController < ApplicationController
 
     # Now rebuild and return the fixed file name.
     return "#{start_of_name}#{dirname}#{encoded_end}"
+  end
+
+  def fix_embedded_question_marks
+    whole_identifier = "#{params[:generic_file_identifier]}?c=#{params[:c]}"
+    params[:generic_file_identifier] = whole_identifier
   end
 
 
