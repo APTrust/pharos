@@ -31,7 +31,7 @@ class AlertsController < ApplicationController
     @failed_deletion_count = WorkItem.failed_action_count(datetime, Pharos::Application::PHAROS_ACTIONS['delete'])
     @failed_dpn_ingest_count = WorkItem.failed_action_count(datetime, Pharos::Application::PHAROS_ACTIONS['dpn'])
     @failed_dpn_replication_count
-    @stalled_work_item_count
+    @stalled_work_item_count = WorkItem.stalled_items_count
   end
 
   def get_index_lists(datetime)
@@ -41,7 +41,7 @@ class AlertsController < ApplicationController
     @failed_deletions = WorkItem.failed_action(datetime, Pharos::Application::PHAROS_ACTIONS['delete'])
     @failed_dpn_ingests = WorkItem.failed_action(datetime, Pharos::Application::PHAROS_ACTIONS['dpn'])
     @failed_dpn_replications
-    @stalled_work_items
+    @stalled_work_items = WorkItem.stalled_items
   end
 
   # The summary method will return the following counts:

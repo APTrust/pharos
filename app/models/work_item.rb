@@ -16,6 +16,7 @@ class WorkItem < ActiveRecord::Base
   scope :created_after, ->(param) { where('work_items.created_at >= ?', param) unless param.blank? }
   scope :updated_before, ->(param) { where('work_items.updated_at < ?', param) unless param.blank? }
   scope :updated_after, ->(param) { where('work_items.updated_at >= ?', param) unless param.blank? }
+  scope :queued_before, ->(param) { where('Work_items.queued_at < ?', param) unless param.blank? }
   scope :with_bag_date, ->(param) { where('work_items.bag_date = ?', param) unless param.blank? }
   scope :with_name, ->(param) { where(name: param) unless param.blank? }
   scope :with_name_like, ->(param) { where('work_items.name like ?', "%#{param}%") unless WorkItem.empty_param(param) }
@@ -269,6 +270,15 @@ class WorkItem < ActiveRecord::Base
 
   def self.failed_action_count(datetime, action)
     WorkItem.failed_action(datetime, action).count
+  end
+
+  def self.stalled_items
+    WorkItem.where('queued_at < ? AND (status = ? OR status = ?)', (Time.now - 12.hours),
+                   Pharos::Application::PHAROS_STATUSES['pend'], Pharos::Application::PHAROS_STATUSES['start'])
+  end
+
+  def self.stalled_items_count
+    WorkItem.stalled_items.count
   end
 
   def status_is_allowed
