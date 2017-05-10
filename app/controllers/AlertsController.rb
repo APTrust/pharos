@@ -4,7 +4,8 @@ class AlertsController < ApplicationController
 
   def index
     authorize current_user, :alert_index?
-    get_index_lists
+    params[:since] = (DateTime.now - 24.hours) unless params[:since]
+    get_index_lists(params[:since])
     respond_to do |format|
       format.json { render json: {  } }
       format.html { }
@@ -27,8 +28,8 @@ class AlertsController < ApplicationController
     @failed_fixity_count = PremisEvent.failed_fixity_check_count(datetime)
   end
 
-  def get_index_lists
-    @failed_fixity_checks = PremisEvent.failed_fixity_checks
+  def get_index_lists(datetime)
+    @failed_fixity_checks = PremisEvent.failed_fixity_checks(datetime)
   end
 
   # The summary method will return the following counts:
