@@ -261,6 +261,16 @@ class WorkItem < ActiveRecord::Base
     delete_item
   end
 
+  def self.failed_ingest(datetime)
+    WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS['ingest'])
+        .with_status(Pharos::Application::PHAROS_STATUSES['fail'])
+        .updated_after(datetime)
+  end
+
+  def self.failed_ingest_count(datetime)
+    WorkItem.failed_ingest(datetime).count
+  end
+
   def status_is_allowed
     if !Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
       errors.add(:status, 'Status is not one of the allowed options')

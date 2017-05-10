@@ -26,16 +26,28 @@ class AlertsController < ApplicationController
 
   def get_summary_counts(datetime)
     @failed_fixity_count = PremisEvent.failed_fixity_check_count(datetime)
+    @failed_ingest_count = WorkItem.failed_ingest_count(datetime)
+    @failed_restoration_count
+    @failed_deletion_count
+    @failed_dpn_ingest_count
+    @failed_dpn_replication_count
+    @stalled_work_item_count
   end
 
   def get_index_lists(datetime)
     @failed_fixity_checks = PremisEvent.failed_fixity_checks(datetime)
+    @failed_ingests = WorkItem.failed_ingest(datetime)
+    @failed_restorations
+    @failed_deletions
+    @failed_dpn_ingests
+    @failed_dpn_replications
+    @stalled_work_items
   end
 
   # The summary method will return the following counts:
   #
   # x failed fixity checks (from PremisEvents) DONE
-  # x failed ingests (from WorkItems)
+  # x failed ingests (from WorkItems) DONE
   # x failed restorations (from WorkItems)
   # x failed deletions (from WorkItems)
   # x failed DPN ingests (from WorkItems)
