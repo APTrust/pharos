@@ -50,4 +50,18 @@ RSpec.describe DpnWorkItem, type: :model do
     subject.should_not be_valid
     subject.errors[:task].should include('Task is not one of the allowed options')
   end
+
+  describe 'alert methods' do
+    it 'stalled_dpn_replications should return a list of dpn work items that have stalled during dpn replication' do
+      item = FactoryGirl.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
+      items = DpnWorkItem.stalled_dpn_replications
+      expect(items.first).to eq item
+    end
+
+    it 'stalled_dpn_replication_counts should return the number of dpn work items that have stalled during dpn replication' do
+      item = FactoryGirl.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
+      count = DpnWorkItem.stalled_dpn_replication_count
+      expect(count).to eq 1
+    end
+  end
 end
