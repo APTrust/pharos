@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170131152046) do
+ActiveRecord::Schema.define(version: 20170510183645) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -48,8 +48,8 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.datetime "created_at",                                                       null: false
     t.datetime "updated_at",                                                       null: false
     t.string   "state"
-    t.datetime "last_fixity_check",                default: '2000-01-01 00:00:00', null: false
     t.text     "ingest_state"
+    t.datetime "last_fixity_check",                default: '2000-01-01 00:00:00', null: false
   end
 
   add_index "generic_files", ["file_format"], name: "index_generic_files_on_file_format"
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 20170131152046) do
   end
 
   add_index "premis_events", ["date_time"], name: "index_premis_events_on_date_time"
+  add_index "premis_events", ["event_type", "outcome"], name: "index_premis_events_on_event_type_and_outcome"
   add_index "premis_events", ["event_type"], name: "index_premis_events_on_event_type"
   add_index "premis_events", ["generic_file_id", "event_type"], name: "index_premis_events_on_generic_file_id_and_event_type"
   add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
