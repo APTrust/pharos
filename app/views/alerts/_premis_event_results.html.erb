@@ -1,0 +1,22 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th>Event Identifier</th>
+    <th>DateTime</th>
+    <th>Detail</th>
+    <th>Outcome</th>
+    <th>Outcome Detail</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% events.each do |event| %>
+      <tr>
+        <td><%= event.identifier %></td>
+        <td><%= time_ago_in_words event.date_time %></td>
+        <td><%= event.detail %></td>
+        <td><%= event.outcome %></td>
+        <td><%= event.outcome_detail %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
