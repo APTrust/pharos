@@ -89,6 +89,8 @@ class DpnWorkItemsController < ApplicationController
                      .queued_after(params[:queued_after])
                      .completed_before(params[:completed_before])
                      .completed_after(params[:completed_after])
+                     .is_completed(params[:is_completed])
+                     .is_not_completed(params[:is_not_completed])
     order = params[:sort] || 'queued_at DESC'
     @dpn_items = @dpn_items.order(order)
     @selected = {}
