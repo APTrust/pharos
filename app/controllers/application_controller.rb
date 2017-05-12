@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   def after_sign_in_path_for(resource)
-    root_path()
+    session['user_return_to'] || root_path
   end
 
   private
