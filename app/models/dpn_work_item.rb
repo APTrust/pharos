@@ -14,6 +14,8 @@ class DpnWorkItem < ActiveRecord::Base
   scope :completed_after, ->(param) { where('dpn_work_items.completed_at > ?', param) unless param.blank? }
   scope :is_queued, ->(param) { where("queued_at is NOT NULL") if param == 'true' }
   scope :is_not_queued, ->(param) { where("queued_at is NULL") if param == 'true' }
+  scope :is_completed, ->(param) { where("completed_at is NOT NULL") if param == 'true' }
+  scope :is_not_completed, ->(param) { where("completed_at is NULL") if param == 'true' }
   scope :discoverable, ->(current_user) { where('(1 = 0)') unless current_user.admin? }
 
   def serializable_hash (options={})
