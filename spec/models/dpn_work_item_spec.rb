@@ -51,6 +51,35 @@ RSpec.describe DpnWorkItem, type: :model do
     subject.errors[:task].should include('Task is not one of the allowed options')
   end
 
+
+  describe 'filters' do
+    let(:item1) { FactoryGirl.create(:dpn_work_item) }
+    let(:item2) { FactoryGirl.create(:dpn_work_item) }
+    let(:item3) { FactoryGirl.create(:dpn_work_item) }
+
+    it 'should filter by complete' do
+      item1.completed_at = nil
+      item2.completed_at = Time.now.utc
+      item3.completed_at = Time.now.utc
+      item1.save
+      item2.save
+      item3.save
+      items = DpnWorkItem.is_completed('true')
+      items.count.should == 2
+    end
+
+    it 'should filter by incomplete' do
+      item1.completed_at = nil
+      item2.completed_at = Time.now.utc
+      item3.completed_at = Time.now.utc
+      item1.save
+      item2.save
+      item3.save
+      items = DpnWorkItem.is_not_completed('true')
+      items.count.should == 1
+    end
+  end
+
   describe 'alert methods' do
     it 'stalled_dpn_replications should return a list of dpn work items that have stalled during dpn replication' do
       item = FactoryGirl.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
