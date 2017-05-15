@@ -91,8 +91,8 @@ class DpnWorkItemsController < ApplicationController
                      .completed_after(params[:completed_after])
                      .is_completed(params[:is_completed])
                      .is_not_completed(params[:is_not_completed])
-    order = params[:sort] || 'queued_at DESC'
-    @dpn_items = @dpn_items.order(order)
+    params[:sort] = 'queued_at DESC' unless params[:sort]
+    @dpn_items = @dpn_items.order(params[:sort])
     @selected = {}
     initialize_filter_counters
     filter_by_node if params[:remote_node]
