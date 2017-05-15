@@ -67,6 +67,10 @@ group :production do
   gem 'pg' # Necessary for talking to our RDS instance
 end
 
+group :integration do
+  gem 'pg'
+end
+
 group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
