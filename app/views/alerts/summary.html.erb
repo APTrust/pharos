@@ -1,0 +1,19 @@
+<div id="content" class="col-md-9 col-sm-8">
+  <h1>Alerts Summary</h1>
+  <dl class="dl-horizontal alert_summary">
+    <dt>Failed Fixity Checks</dt>
+    <dd><%= @alerts_summary[:failed_fixity_count] %></dd>
+    <dt>Failed Ingests</dt>
+    <dd><%= @alerts_summary[:failed_ingest_count] %></dd>
+    <dt>Failed Restorations</dt>
+    <dd><%= @alerts_summary[:failed_restoration_count] %></dd>
+    <dt>Failed Deletions</dt>
+    <dd><%= @alerts_summary[:failed_deletion_count] %></dd>
+    <dt>Failed DPN Ingests</dt>
+    <dd><%= @alerts_summary[:failed_dpn_ingest_count] %></dd>
+    <dt>Stalled DPN Replications</dt>
+    <dd><%= @alerts_summary[:stalled_dpn_replication_count] %></dd>
+    <dt>Stalled Work Items</dt>
+    <dd><%= @alerts_summary[:stalled_work_item_count] %></dd>
+  </dl>
+</div>

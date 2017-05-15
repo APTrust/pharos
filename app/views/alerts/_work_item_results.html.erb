@@ -1,0 +1,35 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Institution</th>
+    <th>Processed</th>
+    <th>Action</th>
+    <th>Stage</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% work_items.each do |item| %>
+      <tr class=>
+        <td><% if item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
+              <% unless item.generic_file_identifier.nil? %>
+                  <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.generic_file_identifier, length: 70) %></a>
+              <% else %>
+                  <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.object_identifier, length: 70) %></a>
+              <% end %>
+          <% elsif !item.object_identifier.blank? %>
+              <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.object_identifier, length: 70) %></a>
+          <% else %>
+              <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.name, length: 70) %></a>
+          <% end %>
+        </td>
+        <td><%= item.institution.identifier %></td>
+        <td><%= item.date %></td>
+        <td><%= item.action %></td>
+        <td><%= item.stage %></td>
+        <td><%= item.status %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

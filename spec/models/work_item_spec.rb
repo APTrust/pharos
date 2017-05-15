@@ -11,6 +11,7 @@ clean = Pharos::Application::PHAROS_STAGES['clean']
 success = Pharos::Application::PHAROS_STATUSES['success']
 failed = Pharos::Application::PHAROS_STATUSES['fail']
 pending = Pharos::Application::PHAROS_STATUSES['pend']
+started = Pharos::Application::PHAROS_STATUSES['start']
 
 # Creates an item we can save. We'll set action, stage and status
 # for various tests below
@@ -376,5 +377,36 @@ RSpec.describe WorkItem, :type => :model do
       items.should_not be_empty
     end
 
+  end
+
+  describe 'alert methods' do
+    describe 'for failed ingest' do
+      it 'failed_ingest should return a list of work items that have failed a specific action' do
+        item = FactoryGirl.create(:work_item, action: ingest, status: failed)
+        items = WorkItem.failed_action(Time.now - 24.hours, ingest)
+        expect(items.first).to eq item
+      end
+
+      it 'failed_ingest_count should return the number of work items that have failed a specific action' do
+        item = FactoryGirl.create(:work_item, action: ingest, status: failed)
+        count = WorkItem.failed_action_count(Time.now - 24.hours, ingest)
+        expect(count).to eq 1
+      end
+
+      it 'stalled_items should return a list of work items queued 12+ hours ago that have not succeeded, failed, or cancelled' do
+        item1 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
+        item2 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: started)
+        items = WorkItem.stalled_items
+        expect(items.first.id).to eq item1.id
+        expect(items.last.id).to eq item2.id
+      end
+
+      it 'stalled_item_counts should return the number of work items queued 12+ hours ago that have not succeeded, failed, or cancelled' do
+        item1 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
+        item2 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: started)
+        count = WorkItem.stalled_items_count
+        expect(count).to eq 2
+      end
+    end
   end
 end

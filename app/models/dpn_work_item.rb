@@ -14,6 +14,8 @@ class DpnWorkItem < ActiveRecord::Base
   scope :completed_after, ->(param) { where('dpn_work_items.completed_at > ?', param) unless param.blank? }
   scope :is_queued, ->(param) { where("queued_at is NOT NULL") if param == 'true' }
   scope :is_not_queued, ->(param) { where("queued_at is NULL") if param == 'true' }
+  scope :is_completed, ->(param) { where("completed_at is NOT NULL") if param == 'true' }
+  scope :is_not_completed, ->(param) { where("completed_at is NULL") if param == 'true' }
   scope :discoverable, ->(current_user) { where('(1 = 0)') unless current_user.admin? }
 
   def serializable_hash (options={})
@@ -32,6 +34,14 @@ class DpnWorkItem < ActiveRecord::Base
   def pretty_state
     return nil if self.state.nil? || self.state.strip == ''
     return JSON.pretty_generate(JSON.parse(self.state))
+  end
+
+  def self.stalled_dpn_replications
+    DpnWorkItem.queued_before(Time.now - 24.hours).is_not_completed('true')
+  end
+
+  def self.stalled_dpn_replication_count
+    DpnWorkItem.stalled_dpn_replications.count
   end
 
   private

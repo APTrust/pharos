@@ -12,6 +12,14 @@ class UserPolicy < ApplicationPolicy
     user.admin? || (user.institutional_admin? && user.institution.identifier == 'aptrust.org')
   end
 
+  def alert_summary?
+    user.admin?
+  end
+
+  def alert_index?
+    user.admin?
+  end
+
   def delete_institution?
     false
   end
