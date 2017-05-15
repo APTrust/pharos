@@ -25,7 +25,7 @@ gem 'sdoc', '~> 0.4.2', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.2.1'
+gem 'devise', '4.3'
 gem 'rake'
 gem 'valid_email'
 gem 'therubyracer'
@@ -42,7 +42,7 @@ gem 'kaminari'
 gem 'bootstrap-sass', '~> 3.3.7'
 
 # S3 connector
-gem 'aws-sdk-core'
+#gem 'aws-sdk-core'
 
 group :development do
   gem 'meta_request', '=0.4.0'
