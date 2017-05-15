@@ -48,14 +48,14 @@ RSpec.describe AlertsController, type: :controller do
       end
 
       it 'returns only the specified alert type if the type parameter is used (json)' do
-        get :index, type: 'fixity', format: :json
+        get :index, params: { type: 'fixity' }, format: :json
         expect(response).to be_success
         assigns(:alerts_list)[:failed_fixity_checks].count.should eq 1
         assigns(:alerts_list)[:failed_ingests].should be nil
       end
 
       it 'filters by the since parameter when supplied' do
-        get :index, since: (Time.now - 48.hours)
+        get :index, params: { since: (Time.now - 48.hours) }
         expect(response).to be_success
         assigns(:alerts_list)[:failed_fixity_checks].count.should eq 2
       end
@@ -110,7 +110,7 @@ RSpec.describe AlertsController, type: :controller do
       end
 
       it 'filters by the since parameter when supplied' do
-        get :summary, since: (Time.now - 48.hours)
+        get :summary, params: { since: (Time.now - 48.hours) }
         assigns(:alerts_summary)[:failed_fixity_count].should eq 2
       end
     end
