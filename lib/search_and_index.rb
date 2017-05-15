@@ -271,9 +271,13 @@ module SearchAndIndex
 
   def set_node_count(results)
     unless @nodes.nil?
-      counts = results.group(:remote_node).order(:remote_node).count
-      counts.each do |node, number|
-        @node_counts[node].nil? ? @node_counts[node] = number : @node_counts[node] +=number
+      begin
+        counts = results.group(:remote_node).count
+        counts.each do |node, number|
+          @node_counts[node].nil? ? @node_counts[node] = number : @node_counts[node] +=number
+        end
+      rescue Exception => ex
+        logger.error ex.backtrace
       end
     end
   end
