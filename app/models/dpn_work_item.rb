@@ -44,6 +44,13 @@ class DpnWorkItem < ActiveRecord::Base
     DpnWorkItem.stalled_dpn_replications.count
   end
 
+  def requeue_item(delete_state)
+    if delete_state == 'true'
+      self.state.delete
+      self.save!
+    end
+  end
+
   private
 
   def task_is_allowed

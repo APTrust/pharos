@@ -93,6 +93,7 @@ Rails.application.routes.draw do
   # DPN WORK ITEM ROUTES
   resources :dpn_work_items, path: 'api/v2/dpn_item', only: [:index, :create, :show, :update], format: :json
   resources :dpn_work_items, path: 'dpn_item', only: [:index, :show], format: :html
+  get 'dpn_item/:id/requeue', to: 'dpn_items#requeue', format: [:json, :html], as: :requeue_dpn_item
 
   # USER ROUTES
   devise_for :users
