@@ -7,6 +7,7 @@
     <th>Queued At</th>
     <th>Completed At</th>
     <th>Processing Time</th>
+    <th>Note</th>
   </tr>
   </thead>
   <tbody>
@@ -15,9 +16,10 @@
         <td><%= link_to item.identifier, dpn_work_item_path(item.id) %></td>
         <td><%= item.remote_node %></td>
         <td><%= item.task %></td>
-        <td><%= item.queued_at %></td>
-        <td><%= item.completed_at %></td>
+        <td><%= truncate(item.queued_at, length: 10) %></td>
+        <td><%= truncate(item.completed_at, length: 10) %></td>
         <td><%= dpn_process_time(item) %></td>
+        <th><%= truncate(item.note, length: 50) %></th>
       </tr>
   <% end %>
   </tbody>
