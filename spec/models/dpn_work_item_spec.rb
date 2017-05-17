@@ -8,9 +8,14 @@ RSpec.describe DpnWorkItem, type: :model do
   it { should validate_presence_of(:task) }
   it { should validate_presence_of(:identifier) }
 
-  it 'should properly set a node' do
+  it 'should properly set a remote node' do
     subject.remote_node = 'Chronopolis'
     subject.remote_node.should == 'Chronopolis'
+  end
+
+  it 'should properly set a processing node' do
+    subject.processing_node = 'Hathi Trust'
+    subject.processing_node.should == 'Hathi Trust'
   end
 
   it 'should properly set a task' do
@@ -43,6 +48,11 @@ RSpec.describe DpnWorkItem, type: :model do
   it 'should properly set a state' do
     subject.state = 'This is a new state.'
     subject.state.should == 'This is a new state.'
+  end
+
+  it 'should properly set a pid' do
+    subject.pid = 14
+    subject.pid.should == 14
   end
 
   it 'should validate that task is one of the allowed options' do

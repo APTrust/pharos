@@ -5,8 +5,10 @@ class DpnWorkItem < ActiveRecord::Base
 
   ### Scopes
   scope :with_remote_node, ->(param) { where(remote_node: param) unless param.blank? }
+  scope :with_processing_node, ->(param) { where(processing_node: param) unless param.blank? }
   scope :with_task, ->(param) { where(task: param) unless param.blank? }
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
+  scope :with_pid, ->(param) { where(pid: param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :queued_before, ->(param) { where('dpn_work_items.queued_at < ?', param) unless param.blank? }
   scope :queued_after, ->(param) { where('dpn_work_items.queued_at > ?', param) unless param.blank? }
@@ -22,12 +24,14 @@ class DpnWorkItem < ActiveRecord::Base
     {
         id: id,
         remote_node: remote_node,
+        processing_node: processing_node,
         task: task,
         identifier: identifier,
         queued_at: queued_at,
         completed_at: completed_at,
         note: note,
-        state: state
+        state: state,
+        pid: pid
     }
   end
 

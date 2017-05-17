@@ -25,6 +25,8 @@
       <tbody>
       <tr><th>Remote Node</th>
         <td><%= @dpn_item.remote_node %></td></tr>
+      <tr><th>Processing Node</th>
+        <td><%= @dpn_item.processing_node %></td></tr>
       <tr><th>Task</th>
         <td><%= @dpn_item.task %></td></tr>
       <tr><th>Queued At</th>
@@ -33,6 +35,8 @@
         <td><%= @dpn_item.completed_at %></td></tr>
       <tr><th>Note</th>
         <td><%= @dpn_item.note %></td></tr>
+      <tr><th>PID</th>
+        <td><%= @dpn_item.pid %></td></tr>
       <tr><th>State</th>
         <td><div style="overflow:auto;max-width:800px;max-height:600px;"><pre>
           <%= @dpn_item.pretty_state %></pre></div>
