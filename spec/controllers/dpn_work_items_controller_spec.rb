@@ -165,4 +165,39 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     end
   end
 
+  describe 'GET #requeue' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+      it 'responds successfully with an HTTP 200 status code' do
+        get :requeue, params: { id: item_one.id, delete_state_item: 'false', task: 'store' }
+        expect(response).to be_success
+      end
+
+      it 'renders the requeue template' do
+        get :requeue, params: { id: item_one.id, delete_state_item: 'false', task: 'store' }
+        expect(response).to render_template('requeue')
+      end
+
+      it 'assigns the requested item as @dpn_item' do
+        get :requeue, params: { id: item_one.id, delete_state_item: 'false', task: 'store' }
+        assigns(:dpn_item).id.should eq(item_one.id)
+      end
+
+    end
+
+    describe 'for institutional admin' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'does not allow the user to requeue the item' do
+        get :requeue, params: { id: item_one.id, delete_state_item: 'false', task: 'store' }, format: :json
+        expect(response.status).to eq 403
+      end
+
+    end
+  end
+
 end

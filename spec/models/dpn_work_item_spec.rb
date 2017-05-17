@@ -80,6 +80,20 @@ RSpec.describe DpnWorkItem, type: :model do
     end
   end
 
+  describe 'requeue' do
+    let(:item1) { FactoryGirl.create(:dpn_work_item, state: 'This needs a state.') }
+
+    it 'should delete the state when the state box is checked' do
+      item1.requeue_item('true')
+      item1.state.should == ''
+    end
+
+    it 'should not delete the state when the state box is not checked' do
+      item1.requeue_item('false')
+      item1.state.should == 'This needs a state.'
+    end
+  end
+
   describe 'alert methods' do
     it 'stalled_dpn_replications should return a list of dpn work items that have stalled during dpn replication' do
       item = FactoryGirl.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)

@@ -46,7 +46,7 @@ class DpnWorkItem < ActiveRecord::Base
 
   def requeue_item(delete_state)
     if delete_state == 'true'
-      self.state.delete
+      self.state = ''
       self.save!
     end
   end

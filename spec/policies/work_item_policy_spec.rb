@@ -17,6 +17,7 @@ describe WorkItemPolicy do
       should permit(:show)
       should permit(:update)
       should permit(:edit)
+      should permit(:requeue)
       should_not permit(:destroy)
     end
   end
@@ -34,6 +35,7 @@ describe WorkItemPolicy do
           should permit(:update)
           should permit(:edit)
           should_not permit(:destroy)
+          should_not permit(:requeue)
         end
       end
 
@@ -46,6 +48,7 @@ describe WorkItemPolicy do
           should_not permit(:update)
           should_not permit(:edit)
           should_not permit(:destroy)
+          should_not permit(:requeue)
         end
       end
     end
@@ -64,6 +67,7 @@ describe WorkItemPolicy do
           should_not permit(:update)
           should_not permit(:edit)
           should_not permit(:destroy)
+          should_not permit(:requeue)
         end
       end
 
@@ -76,6 +80,7 @@ describe WorkItemPolicy do
           should_not permit(:update)
           should_not permit(:edit)
           should_not permit(:destroy)
+          should_not permit(:requeue)
         end
       end
     end
@@ -91,6 +96,7 @@ describe WorkItemPolicy do
       should_not permit(:update)
       should_not permit(:edit)
       should_not permit(:destroy)
+      should_not permit(:requeue)
     end
   end
 end

@@ -10,11 +10,11 @@
         <% if @dpn_item.task == 'replication' %>
             <label><input type="radio" name="task" value="copy"> Copy</label><br>
             <label><input type="radio" name="task" value="validation"> Validation</label><br>
-            <label><input type="radio" name="task" value="store"> Store</label>
+            <label><input type="radio" name="task" value="store"> Store</label><br>
         <% elsif @dpn_item.task == 'ingest' %>
             <label><input type="radio" name="task" value="package"> Package</label><br>
             <label><input type="radio" name="task" value="store"> Store</label><br>
-            <label><input type="radio" name="task" value="record"> Record</label>
+            <label><input type="radio" name="task" value="record"> Record</label><br>
         <% end %>
         <label for="dpn_state_item">Delete DPN Item State</label>
         <input type="checkbox" name="dpn_state_item" id="dpn_state_item" class="text ui-widget-content ui-corner-all">
