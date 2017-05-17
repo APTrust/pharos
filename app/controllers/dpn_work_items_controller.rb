@@ -67,12 +67,12 @@ class DpnWorkItemsController < ApplicationController
 
   def dpn_work_item_params
     if request.method != 'GET'
-      params.require(:dpn_work_item).permit(:remote_node, :task, :identifier, :queued_at, :completed_at, :note, :state)
+      params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid)
     end
   end
 
   def params_for_update
-    params.require(:dpn_work_item).permit(:remote_node, :task, :identifier, :queued_at, :completed_at, :note, :state)
+    params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid)
   end
 
   def set_item

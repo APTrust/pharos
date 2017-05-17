@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170510183645) do
+ActiveRecord::Schema.define(version: 20170517171329) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -23,15 +23,17 @@ ActiveRecord::Schema.define(version: 20170510183645) do
   end
 
   create_table "dpn_work_items", force: :cascade do |t|
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.string   "remote_node",  limit: 20,        default: "", null: false
-    t.string   "task",         limit: 40,        default: "", null: false
-    t.string   "identifier",   limit: 40,        default: "", null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.string   "remote_node",     limit: 20,        default: "", null: false
+    t.string   "task",            limit: 40,        default: "", null: false
+    t.string   "identifier",      limit: 40,        default: "", null: false
     t.datetime "queued_at"
     t.datetime "completed_at"
-    t.string   "note",         limit: 400
-    t.text     "state",        limit: 104857600
+    t.string   "note",            limit: 400
+    t.text     "state",           limit: 104857600
+    t.string   "processing_node", limit: 255
+    t.integer  "pid",                               default: 0
     t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
     t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
   end
