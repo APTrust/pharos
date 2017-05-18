@@ -65,19 +65,33 @@ class PremisEventsController < ApplicationController
     if identifier_param.blank? && !params[:intellectual_object_identifier].blank?
       identifier_param = params[:intellectual_object_identifier]
     end
-    identifier = identifier_param.gsub(/%2F/i, '/')
+    identifier = identifier_param.gsub(/%2F/i, '/').gsub(/%3F/i, '?')
     @parent = IntellectualObject.where(identifier: identifier).first
+    if @parent.nil? # This might have occurred because a '.html' or '.json' was appended to clarify the format. Try removing it.
+      5.times do
+        identifier.chop!
+      end
+      @parent = IntellectualObject.where(identifier: identifier).first
+    end
     params[:intellectual_object_id] = @parent.id
+    params[:object_identifier] = identifier
   end
 
   def load_generic_file
-    identifier = params[:file_identifier].gsub(/%2F/i, '/')
+    identifier = params[:file_identifier].gsub(/%2F/i, '/').gsub(/%3F/i, '?')
     @parent = GenericFile.where(identifier: identifier).first
+    if @parent.nil? # This might have occurred because a '.html' or '.json' was appended to clarify the format. Try removing it.
+      5.times do
+        identifier.chop!
+      end
+      @parent = GenericFile.where(identifier: identifier).first
+    end
     params[:generic_file_id] = @parent.id
+    params[:file_identifier] = identifier
   end
 
   def load_institution
-    identifier = params[:institution_identifier].gsub(/%2F/i, '/')
+    identifier = params[:institution_identifier].gsub(/%2F/i, '/').gsub(/%3F/i, '?')
     @parent = Institution.where(identifier: identifier).first
     params[:institution_id] = @parent.id
   end
@@ -130,7 +144,7 @@ class PremisEventsController < ApplicationController
   private
 
   def set_format
-    request.format = 'html' unless request.format == 'json'
+    request.format = 'html' unless request.format == 'json' || request.format == 'html'
   end
 
 end

@@ -270,7 +270,6 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def load_object
-    # fix_embedded_question_marks if params[:c]
     if params[:intellectual_object_identifier]
       @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
       if @intellectual_object.nil?
@@ -282,11 +281,6 @@ class IntellectualObjectsController < ApplicationController
     end
     @institution = @intellectual_object.institution unless @intellectual_object.nil?
   end
-
-  # def fix_embedded_question_marks
-  #   whole_identifier = "#{params[:intellectual_object_identifier]}?c=#{params[:c]}"
-  #   params[:intellectual_object_identifier] = whole_identifier
-  # end
 
   def load_institution
     if current_user.admin? and params[:institution_id]

@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   resources :institutions, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'api/v2/institutions'
 
   # INTELLECTUAL OBJECT ROUTES
-  #object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%]+/
+  # object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%]+/ ### This is the old pattern if we decide to stop allowing question marks
   object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=]+/
   resources :intellectual_objects, only: [:show, :edit, :update, :destroy], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'objects'
   get 'objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_restore
@@ -25,7 +25,7 @@ Rails.application.routes.draw do
   delete 'api/v2/objects/:intellectual_object_identifier/delete', to: 'intellectual_objects#destroy', format: :json, intellectual_object_identifier: object_ptrn
 
   # GENERIC FILE ROUTES
-  #file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%\@]+/
+  # file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%\@]+/ ### This is the old pattern if we decide to stop allowing question marks
   file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
