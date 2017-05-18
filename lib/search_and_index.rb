@@ -128,15 +128,15 @@ module SearchAndIndex
     if @result_type
       case @result_type
         when 'object'
-          @results = @results.order('updated_at DESC') unless @results.nil?
+          @results = @results.order('intellectual_objects.updated_at DESC') unless @results.nil?
         when 'file'
-          @results = @results.order('updated_at DESC') unless @results.nil?
+          @results = @results.order('generic_files.updated_at DESC') unless @results.nil?
         when 'event'
-          @results = @results.order('date_time DESC') unless @results.nil?
+          @results = @results.order('premis_events.date_time DESC') unless @results.nil?
         when 'item'
-          @results = @results.order('date DESC') unless @results.nil?
+          @results = @results.order('work_items.date DESC') unless @results.nil?
         when 'dpn_item'
-          @results = @results.order('queued_at DESC') unless @results.nil?
+          @results = @results.order('dpn_work_items.queued_at DESC') unless @results.nil?
       end
     end
     @intellectual_objects = @intellectual_objects.order('created_at DESC') unless @intellectual_objects.nil?

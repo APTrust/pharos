@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :user, class: 'User' do
     name { Faker::Name.name }
-    email { Faker::Internet.email }
+    email { "#{Faker::Internet.user_name}@#{Faker::Internet.domain_name}.com" }
     phone_number { 4345551234 }
     password { 'password' }
     institution_id { FactoryGirl.create(:institution).id }
