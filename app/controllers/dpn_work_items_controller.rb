@@ -1,8 +1,10 @@
 class DpnWorkItemsController < ApplicationController
   include SearchAndIndex
-  respond_to :json
+  require 'uri'
+  require 'net/http'
+  respond_to :html, :json
   before_action :authenticate_user!
-  before_action :set_item, only: [:show, :update]
+  before_action :set_item, only: [:show, :update, :requeue]
   before_action :init_from_params, only: :create
   after_action :verify_authorized
 
@@ -59,6 +61,35 @@ class DpnWorkItemsController < ApplicationController
     end
   end
 
+  def requeue
+    if @dpn_item
+      authorize @dpn_item
+      if @dpn_item.task == 'ingest' || @dpn_item.task == 'replication'
+        (params[:delete_state_item] && params[:delete_state_item] == 'true') ? delete_state = 'true' : delete_state = 'false'
+        @dpn_item.requeue_item(delete_state)
+        response = issue_requeue_http_post(params[:task])
+        respond_to do |format|
+          format.json { render json: { status: response.code, body: response.body } }
+          format.html {
+            render 'show'
+            flash[:notice] = response.body
+          }
+        end
+      else
+        respond_to do |format|
+          format.json { render :json => { status: 'error', message: 'This DPN Item is not eligible for requeue.' }, :status => :conflict }
+          format.html { }
+        end
+      end
+    else
+      authorize current_user, :nil_index?
+      respond_to do |format|
+        format.json { render nothing: true, status: :not_found }
+        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      end
+    end
+  end
+
   private
 
   def init_from_params
@@ -78,6 +109,30 @@ class DpnWorkItemsController < ApplicationController
   def set_item
     @dpn_item = DpnWorkItem.find(params[:id])
   rescue ActiveRecord::RecordNotFound
+  end
+
+  def issue_requeue_http_post(task)
+    if @dpn_item.task == 'replication'
+      if task == 'copy'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_copy_topic")
+      elsif task == 'validation'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_validation_topic")
+      elsif task == 'store'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_replication_store_topic")
+      end
+    elsif @dpn_item.task == 'ingest'
+      if task == 'package'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
+      elsif task == 'store'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
+      elsif task == 'record'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
+      end
+    end
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri)
+    request.body = @dpn_item.id.to_s
+    http.request(request)
   end
 
   def filter_and_sort

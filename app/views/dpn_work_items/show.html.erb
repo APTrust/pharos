@@ -7,6 +7,19 @@
     <h2><%= @dpn_item.identifier %></h2>
   </section>
 
+  <section>
+    <p id="dpn_item_id" class="hidden"><%= @dpn_item.id %></p>
+    <% if current_user.admin? %>
+        <% if @dpn_item.task == 'replication' || @dpn_item.task == 'ingest' %>
+            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnItemRequeue();' do %>
+                <i class="glyphicon glyphicon-repeat"></i> Requeue
+            <% end %>
+        <% end %>
+    <% end %>
+    <br><br>
+    <%= render 'requeue_form' %>
+  </section>
+
   <section class="queue">
     <table class="table proc_item">
       <tbody>

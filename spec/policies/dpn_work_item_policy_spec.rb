@@ -12,6 +12,7 @@ describe DpnWorkItemPolicy do
       should permit(:index)
       should permit(:show)
       should permit(:update)
+      should permit(:requeue)
     end
   end
 
@@ -24,6 +25,7 @@ describe DpnWorkItemPolicy do
       should_not permit(:index)
       should_not permit(:show)
       should_not permit(:update)
+      should_not permit(:requeue)
     end
   end
 
@@ -36,6 +38,7 @@ describe DpnWorkItemPolicy do
       should_not permit(:index)
       should_not permit(:show)
       should_not permit(:update)
+      should_not permit(:requeue)
     end
   end
 end

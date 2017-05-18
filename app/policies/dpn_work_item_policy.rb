@@ -14,4 +14,8 @@ class DpnWorkItemPolicy < ApplicationPolicy
   def index?
     user.admin?
   end
+
+  def requeue?
+    user.admin?
+  end
 end

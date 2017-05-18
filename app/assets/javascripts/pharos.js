@@ -205,7 +205,7 @@ function fixFilters() {
 function restoreRequeue(){
    $('#restore_form').removeClass('hidden');
    $('#restore_form_submit').on("click", function() {
-       if ($('#state-item').is(':checked')) {
+       if ($('#state_item').is(':checked')) {
            var checked = 'true';
        } else {
            var checked = 'false';
@@ -262,6 +262,33 @@ function dpnRequeue() {
     });
     $('#dpn_form_cancel').on("click", function () {
         $('#dpn_form').addClass('hidden');
+    });
+}
+
+function dpnItemRequeue() {
+    $('#dpn_item_form').removeClass('hidden');
+    $('#dpn_item_form_submit').on("click", function () {
+        if ($('#dpn_state_item').is(':checked')) {
+            var checked = 'true';
+        } else {
+            var checked = 'false';
+        }
+        var task = $('input[name="task"]:checked').val();
+        if (task == "copy" || task == "validation" || task == "store" || task == 'package' || task == 'record') {
+            if (!$('#dpn_item_error').hasClass('hidden')) {
+                $('#dpn_item_error').addClass('hidden');
+            }
+            var id = $('#dpn_item_id').text();
+            $.get('/dpn_items/' + id + '/requeue', {task: task, delete_state_item: checked},
+                function (data) {
+                    alert(data);
+                });
+        } else {
+            $('#dpn_item_error').removeClass('hidden');
+        }
+    });
+    $('#dpn_item_form_cancel').on("click", function () {
+        $('#dpn_item_form').addClass('hidden');
     });
 }
 

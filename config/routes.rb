@@ -93,8 +93,9 @@ Rails.application.routes.draw do
   get 'alerts/summary', to: 'alerts#summary', format: [:json, :html], as: :alerts_summary
 
   # DPN WORK ITEM ROUTES
-  resources :dpn_work_items, path: 'api/v2/dpn_item', only: [:index, :create, :show, :update], format: :json
-  resources :dpn_work_items, path: 'dpn_item', only: [:index, :show], format: :html
+  resources :dpn_work_items, path: 'api/v2/dpn_items', only: [:index, :create, :show, :update], format: :json
+  resources :dpn_work_items, path: 'dpn_items', only: [:index, :show], format: :html
+  get 'dpn_items/:id/requeue', to: 'dpn_work_items#requeue', format: [:json, :html], as: :requeue_dpn_item
 
   # USER ROUTES
   devise_for :users
