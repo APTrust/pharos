@@ -323,6 +323,6 @@ class GenericFilesController < ApplicationController
   private
 
   def set_format
-    request.format = 'html' unless request.format == 'json'
+    request.format = 'html' unless request.format == 'json' || request.format == 'html'
   end
 end
