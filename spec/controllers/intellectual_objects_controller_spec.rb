@@ -13,7 +13,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst2) }
   let!(:obj2) { FactoryGirl.create(:institutional_intellectual_object,
                                    institution: inst1,
-                                   identifier: 'test.edu/baggie',
+                                   identifier: 'test.edu/baggie?c=152',
                                    title: 'Aberdeen Wanderers',
                                    description: 'Founded in Aberdeen in 1928.',
                                    etag: '4d05dc2aa07e411a55ef11bc6ade5ec1') }
@@ -121,7 +121,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           get :index, params: { description_like: 'Aberdeen' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { identifier: 'test.edu/baggie' }
+          get :index, params: { identifier: 'test.edu/baggie?c=152' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { identifier_like: 'baggie' }
@@ -166,6 +166,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         get :show, params: { intellectual_object_identifier: obj3 }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+      it 'should allow the object identifier to contain a question mark' do
+        get :show, params: { intellectual_object_identifier: obj2 }
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
       end
     end
 

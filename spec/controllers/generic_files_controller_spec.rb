@@ -5,6 +5,7 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:file) { FactoryGirl.create(:generic_file) }
   let(:inst_user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id)}
   let(:crazy_file) { FactoryGirl.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0') }
+  let(:question_file) { FactoryGirl.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161') }
 
   before(:all) do
     @institution = FactoryGirl.create(:institution)
@@ -116,6 +117,11 @@ RSpec.describe GenericFilesController, type: :controller do
     it 'responds with the file even when the file identifier is crazy' do
       get :show, params: { generic_file_identifier: crazy_file.identifier }
       expect(assigns(:generic_file)).to eq crazy_file
+    end
+
+    it 'should allow files with question marks in the identifier' do
+      get :show, params: { generic_file_identifier: question_file.identifier }
+      expect(assigns(:generic_file)).to eq question_file
     end
 
   end

@@ -14,8 +14,10 @@ RSpec.describe PremisEventsController, type: :controller do
                                                  generic_file_identifier: file.identifier) }
 
   # An object and a file from a different institution:
-  let(:someone_elses_object) { FactoryGirl.create(:intellectual_object, access: 'institution') }
-  let(:someone_elses_file) { FactoryGirl.create(:generic_file, intellectual_object: someone_elses_object) }
+  let(:someone_elses_object) { FactoryGirl.create(:intellectual_object, access: 'institution',
+                                                 identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161') }
+  let(:someone_elses_file) { FactoryGirl.create(:generic_file, intellectual_object: someone_elses_object,
+                                                 identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161') }
   let(:other_event_attrs) { FactoryGirl.attributes_for(:premis_event_fixity_generation,
                                                  intellectual_object_id: someone_elses_object.id,
                                                  intellectual_object_identifier: someone_elses_object.identifier,
