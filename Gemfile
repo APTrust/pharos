@@ -33,7 +33,7 @@ gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 3.4.0'
+gem 'simple_form', '~> 3.5.0'
 gem 'phony_rails'
 gem 'inherited_resources', '1.7.2'
 gem 'uuidtools'
@@ -63,12 +63,8 @@ group :test do
   gem 'coveralls', '0.8.21', require: false
 end
 
-group :production do
+group :production, :integration do
   gem 'pg' # Necessary for talking to our RDS instance
-end
-
-group :integration do
-  gem 'pg'
 end
 
 group :development, :test, :demo, :production, :integration do
