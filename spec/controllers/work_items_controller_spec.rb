@@ -12,9 +12,9 @@ RSpec.describe WorkItemsController, type: :controller do
   let!(:user_state_item) { FactoryGirl.create(:work_item_state, work_item: user_item) }
 
   # after do
-  #   WorkItem.destroy_all
-  #   Institution.destroy_all
-  #   User.destroy_all
+  #   WorkItem.delete_all
+  #   Institution.delete_all
+  #   User.delete_all
   # end
 
   describe 'GET #index' do
@@ -39,7 +39,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'responds with an empty results object the call is json' do
-        get :index, name: 'name_of_something_not_found', format: :json
+        get :index, params: { name: 'name_of_something_not_found' }, format: :json
         expect(response.status).to eq(200)
         data = JSON.parse(response.body)
         expect(data['count']).to eq(0)
@@ -50,7 +50,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'returns work items where the node is not null' do
         node_item = FactoryGirl.create(:work_item, node: 'services.aptrust.org')
-        get :index, node_not_empty: 'true', format: :json
+        get :index, params: { node_not_empty: 'true' }, format: :json
         expect(response.status).to eq(200)
         data = JSON.parse(response.body)
         expect(data['count']).to eq(1)
@@ -59,7 +59,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'returns work items where the node is null' do
         node_item = FactoryGirl.create(:work_item, node: nil)
-        get :index, node_empty: true, format: :json
+        get :index, params: { node_empty: true }, format: :json
         expect(response.status).to eq(200)
         data = JSON.parse(response.body)
         expect(data['count']).to eq(3)
@@ -68,16 +68,16 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'filters by queued' do
         WorkItem.update_all(queued_at: nil)
-        get :index, queued: "true", format: :json
+        get :index, params: { queued: "true" }, format: :json
         assigns(:items).should be_empty
-        get :index, queued: "false", format: :json
+        get :index, params: { queued: "false" }, format: :json
         data = JSON.parse(response.body)
         expect(data['count']).to eq(2)
 
         WorkItem.update_all(queued_at: Time.now.utc)
-        get :index, queued: "false", format: :json
+        get :index, params: { queued: "false" }, format: :json
         assigns(:items).should be_empty
-        get :index, queued: "true", format: :json
+        get :index, params: { queued: "true" }, format: :json
         data = JSON.parse(response.body)
         expect(data['count']).to eq(2)
       end
@@ -88,9 +88,9 @@ RSpec.describe WorkItemsController, type: :controller do
         data = JSON.parse(response.body)
         expect(data['count']).to eq(2)
         WorkItem.update_all(retry: true)
-        get :index, retry: 'false', format: :json
+        get :index, params: { retry: 'false' }, format: :json
         assigns(:items).should be_empty
-        get :index, retry: 'true', format: :json
+        get :index, params: { retry: 'true' }, format: :json
         data = JSON.parse(response.body)
         expect(data['count']).to eq(2)
       end
@@ -115,34 +115,34 @@ RSpec.describe WorkItemsController, type: :controller do
         sign_in admin_user
       end
       it 'responds successfully with an HTTP 200 status code' do
-        get :show, id: item.id
+        get :show, params: { id: item.id }
         expect(response).to be_success
       end
 
       it 'renders the show template' do
-        get :show, id: item.id
+        get :show, params: { id: item.id }
         expect(response).to render_template('show')
       end
 
       it 'assigns the requested item as @work_item' do
-        get :show, id: item.id
+        get :show, params: { id: item.id }
         assigns(:work_item).id.should eq(item.id)
       end
 
       it 'assigns the requested institution as @institution' do
-        get :show, id: item.id
+        get :show, params: { id: item.id }
         assigns(:institution).should eq( admin_user.institution)
       end
 
       it 'exposes :state, :node, or :pid for the admin user' do
-        get :show, id: item.id, format: :json
+        get :show, params: { id: item.id }, format: :json
         data = JSON.parse(response.body)
         expect(data).to have_key('node')
         expect(data).to have_key('pid')
       end
 
       it 'returns 404, not 500, for item not found' do
-        get :show, etag: 'does not exist', name: 'duznot igzist', bag_date: '1901-01-01'
+        get :show, params: { etag: 'does not exist', name: 'duznot igzist', bag_date: '1901-01-01' }
         expect(response.status).to eq(404)
       end
     end
@@ -153,12 +153,12 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       # it 'restricts API usage' do
-      #   get :show, etag: item.etag, name: item.name, bag_date: item.bag_date, format: 'json'
+      #   get :show, params: { etag: item.etag, name: item.name, bag_date: item.bag_date }, format: 'json'
       #   expect(response.status).to eq 403
       # end
 
       it 'does not expose :state, :node, or :pid to non-admins' do
-        get :show, id: item.id, format: :json
+        get :show, params: { id: item.id }, format: :json
         data = JSON.parse(response.body)
         expect(data).to_not have_key('state')
         expect(data).to_not have_key('node')
@@ -174,22 +174,22 @@ RSpec.describe WorkItemsController, type: :controller do
         sign_in admin_user
       end
       it 'responds successfully with an HTTP 200 status code' do
-        get :requeue, id: item.id
+        get :requeue, params: { id: item.id }
         expect(response).to be_success
       end
 
       it 'renders the requeue template' do
-        get :requeue, id: item.id
+        get :requeue, params: { id: item.id }
         expect(response).to render_template('requeue')
       end
 
       it 'assigns the requested item as @work_item' do
-        get :requeue, id: item.id
+        get :requeue, params: { id: item.id }
         assigns(:work_item).id.should eq(item.id)
       end
 
       it 'assigns the requested institution as @institution' do
-        get :requeue, id: item.id
+        get :requeue, params: { id: item.id }
         assigns(:institution).should eq( admin_user.institution)
       end
 
@@ -201,7 +201,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'does not allow the user to requeue the item' do
-        get :requeue, id: item.id, format: :json
+        get :requeue, params: { id: item.id }, format: :json
         expect(response.status).to eq 403
       end
 
@@ -217,7 +217,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'does expose :state, :node, or :id through admin #api_show' do
-        get :show, id: item.id, format: :json
+        get :show, params: { id: item.id }, format: :json
         data = JSON.parse(response.body)
         expect(data).to have_key('node')
         expect(data).to have_key('pid')
@@ -229,7 +229,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'does NOT expose :state, :node, or :id through admin #api_show' do
-        get :show, id: item.id, format: :json
+        get :show, params: { id: item.id }, format: :json
         expect(response.status).to eq 200
         data = JSON.parse(response.body)
         expect(data).not_to have_key('state')
@@ -255,21 +255,21 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'accepts extended queue data - state, node, pid' do
         wi_hash = FactoryGirl.create(:work_item_extended).attributes
-        put :update, id: item.id, format: 'json', work_item: wi_hash
+        put :update, params: { id: item.id, format: 'json', work_item: wi_hash }
         expect(response.status).to eq 200
       end
 
       it 'sets node to "" when params[:node] == ""' do
         wi_hash = FactoryGirl.create(:work_item_extended).attributes
-        wi_hash[:node] = ""
-        put :update, id: item.id, format: 'json', work_item: wi_hash
+        wi_hash['node'] = ""
+        put :update, params: { id: item.id, format: 'json', work_item: wi_hash }
         expect(assigns(:work_item).node).to eq('')
       end
 
       it 'allows the user to update an entire batch of work items' do
         wi_data[0]['id'] = item_one.id
         wi_data[1]['id'] = item_two.id
-        put :update, save_batch: true, format: 'json', work_items: {items: wi_data}
+        put :update, params: { save_batch: true, format: 'json', work_items: {items: wi_data} }
         expect(response.code).to eq '200'
         return_data = JSON.parse(response.body)
         expect(return_data.count).to eq 2
@@ -288,12 +288,12 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'restricts institutional admins from API usage when updating by id' do
         wi_hash = FactoryGirl.create(:work_item_extended).attributes
-        put :update, id: item.id, format: 'json', work_item: wi_hash
+        put :update, params: { id: item.id, format: 'json', work_item: wi_hash }
         expect(response.status).to eq 403
       end
 
       # it 'restricts institutional admins from API usage when updating by etag' do
-      #   put :update, etag: item.etag, name: item.name, bag_date: item.bag_date, format: 'json'
+      #   put :update, params: { etag: item.etag, name: item.name, bag_date: item.bag_date }, format: 'json'
       #   expect(response.status).to eq 403
       # end
     end
@@ -358,7 +358,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should return only items with the specified object_identifier' do
-        get :items_for_restore, object_identifier: 'mickey/mouse', format: :json
+        get :items_for_restore, params: { object_identifier: 'mickey/mouse' }, format: :json
         expect(assigns(:items).count).to eq(2)
       end
     end
@@ -423,7 +423,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should return only items with the specified object_identifier' do
-        get :items_for_dpn, object_identifier: 'mickey/mouse', format: :json
+        get :items_for_dpn, params: { object_identifier: 'mickey/mouse' }, format: :json
         expect(assigns(:items).count).to eq(2)
       end
     end
@@ -495,7 +495,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'should return only items with the specified object_identifier' do
-        get :items_for_delete, generic_file_identifier: file.identifier, format: :json
+        get :items_for_delete, params: { generic_file_identifier: file.identifier }, format: :json
         expect(assigns(:items).count).to eq(2)
       end
     end
@@ -513,14 +513,14 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code' do
-        post(:set_restoration_status, format: :json, object_identifier:object.identifier,
-             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
+        post(:set_restoration_status, format: :json, params: { object_identifier:object.identifier,
+             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true })
         expect(response).to be_success
       end
 
       it 'assigns the correct @item' do
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
-             stage: 'Resolve', status: 'Success', note: 'Buzz', retry: true)
+        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
+             stage: 'Resolve', status: 'Success', note: 'Buzz', retry: true })
         expected_item = WorkItem.where(object_identifier: object.identifier).order(created_at: :desc).first
         expect(assigns(:item).id).to eq(expected_item.id)
       end
@@ -528,8 +528,8 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'updates the correct @item' do
         new_object = FactoryGirl.create(:intellectual_object)
         WorkItem.first.update(object_identifier: new_object.identifier, intellectual_object: new_object)
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
-             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
+        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
+             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true })
         update_count = WorkItem.where(object_identifier: object.identifier,
                                            stage: 'Resolve', status: 'Success', retry: true).count
         expect(update_count).to eq(1)
@@ -537,21 +537,21 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'returns 404 for no matching records' do
         WorkItem.update_all(object_identifier: 'homer/simpson')
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
-             stage: 'Resolve', status: 'Success', note: 'Neil', retry: true)
+        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
+             stage: 'Resolve', status: 'Success', note: 'Neil', retry: true })
         expect(response.status).to eq(404)
       end
 
       it 'returns 400 for bad request' do
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
-             stage: 'Invalid_Stage', status: 'Invalid_Status', note: 'Armstrong', retry: true)
+        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
+             stage: 'Invalid_Stage', status: 'Invalid_Status', note: 'Armstrong', retry: true })
         expect(response.status).to eq(400)
       end
 
       it 'updates node, pid and needs_admin_review' do
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
+        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             node: '10.11.12.13', pid: 4321, needs_admin_review: true)
+             node: '10.11.12.13', pid: 4321, needs_admin_review: true })
         expect(response).to be_success
         wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
@@ -562,10 +562,10 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'clears node, pid and needs_admin_review, updates state' do
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
+        post :set_restoration_status, params: { object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
-             node: nil, pid: 0, needs_admin_review: false)
-        expect(response).to be_success
+             node: nil, pid: 0, needs_admin_review: false }, format: :json
+             expect(response).to be_success
         wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq(nil)
@@ -593,8 +593,8 @@ RSpec.describe WorkItemsController, type: :controller do
       # record (the latest). None of the older restore requests should
       # be touched.
       it 'updates the correct @items' do
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
-             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true)
+        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
+             stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true })
         update_count = WorkItem.where(object_identifier: object.identifier,
                                            stage: 'Resolve', status: 'Success', retry: true).count
         # Should be only one item updated...
@@ -625,8 +625,8 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts access to the admin API' do
-        post(:set_restoration_status, format: :json, object_identifier: object.identifier,
-             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true)
+        post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
+             stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true })
         expect(response.status).to eq 403
       end
     end
@@ -645,13 +645,13 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'should reject no parameters' do
         expect {
-          post :create, {}
+          post :create, params: {}
         }.to raise_error ActionController::ParameterMissing
       end
 
       it 'should reject a status, stage or action that is not allowed' do
         name = object.identifier.split('/')[1]
-        post(:create, work_item: {
+        post(:create, params: { work_item: {
                name: "#{name}.tar",
                etag: '1234567890',
                bag_date: Time.now.utc,
@@ -663,7 +663,7 @@ RSpec.describe WorkItemsController, type: :controller do
                action: 'File',
                stage: "Entry",
                status: 'Finalized',
-               outcome: 'Outcome'}, format: 'json')
+               outcome: 'Outcome'} }, format: 'json')
         expect(response.code).to eq '422' #Unprocessable Entity
         expect(JSON.parse(response.body)).to eq( { 'status' => ['Status is not one of the allowed options'],
                                                    'stage' => ['Stage is not one of the allowed options'],
@@ -673,7 +673,7 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'should accept good parameters via json' do
         name = object.identifier.split('/')[1]
         expect {
-          post(:create, work_item: {
+          post(:create, params: { work_item: {
                  name: "#{name}.tar",
                  etag: '1234567890',
                  bag_date: Time.now.utc,
@@ -685,7 +685,7 @@ RSpec.describe WorkItemsController, type: :controller do
                  action: Pharos::Application::PHAROS_ACTIONS['fixity'],
                  stage: Pharos::Application::PHAROS_STAGES['fetch'],
                  status: Pharos::Application::PHAROS_STATUSES['fail'],
-                 outcome: 'Outcome'}, format: 'json')
+                 outcome: 'Outcome'} }, format: 'json')
         }.to change(WorkItem, :count).by(1)
         expect(response.status).to eq(201)
         assigns[:work_item].should be_kind_of WorkItem
@@ -706,9 +706,9 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage' do
-        post :create, work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution,
+        post :create, params: { work_item: {name: '123456.tar', etag: '1234567890', bag_date: Time.now.utc, user: 'Kelly Croswell', institution: institution,
                                        bucket: "aptrust.receiving.#{institution.identifier}", date: Time.now.utc, note: 'Note', action: Pharos::Application::PHAROS_ACTIONS['fixity'],
-                                       stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome'},
+                                       stage: Pharos::Application::PHAROS_STAGES['fetch'], status: Pharos::Application::PHAROS_STATUSES['fail'], outcome: 'Outcome'} },
              format: 'json'
         expect(response.status).to eq 403
       end
@@ -720,7 +720,7 @@ RSpec.describe WorkItemsController, type: :controller do
     let(:other_user) { FactoryGirl.create(:user, :institutional_admin) }
     before do
       10.times do FactoryGirl.create(:ingested_item) end
-      get :show, id: item.id
+      get :show, params: { id: item.id }
     end
 
     after do
@@ -729,7 +729,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
     it 'admin can get items ingested since' do
       sign_in user
-      get :ingested_since, since: '2009-01-01', format: :json
+      get :ingested_since, params: { since: '2009-01-01' }, format: :json
       expect(response).to be_successful
       expect(assigns(:items).length).to eq 10
     end
@@ -737,14 +737,14 @@ RSpec.describe WorkItemsController, type: :controller do
     it 'missing date causes error' do
       sign_in user
       expected = { 'error' => 'Param since must be a valid datetime' }.to_json
-      get :ingested_since, since: '', format: :json
+      get :ingested_since, params: { since: '' }, format: :json
       expect(response.status).to eq 400
       expect(response.body).to eq expected
     end
 
     it 'non admin users can not use API ingested since route' do
       sign_in other_user
-      get :ingested_since, since: '2009-01-01', format: :json
+      get :ingested_since, params: { since: '2009-01-01' }, format: :json
       expect(response.status).to eq 403
     end
 
@@ -780,27 +780,27 @@ RSpec.describe WorkItemsController, type: :controller do
       # request, or SQLite search fails. Also be sure to include
       # the Z at the end of the bag_date string.
       it 'filters down to the right records' do
-        get(:api_search, format: :json, name: 'item1.tar',
-            etag: 'etag1', institution: institution,
+        get(:api_search, format: :json, params: { name: 'item1.tar',
+            etag: 'etag1', institution: institution.id,
             retry: 'true',
             bag_date: '2014-10-17 14:56:56Z',
             action: 'Ingest', stage: 'Record',
             status: 'Success', object_identifier: object.identifier,
-            generic_file_identifier: file.identifier)
+            generic_file_identifier: file.identifier })
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)
       end
 
       it 'filters on new fields' do
-        get(:api_search, format: :json, node: '10.11.12.13', needs_admin_review: false)
+        get(:api_search, format: :json, params: { node: '10.11.12.13', needs_admin_review: false })
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)
       end
 
       it 'filters down to null nodes' do
-        get(:api_search, format: :json, node: 'null')
+        get(:api_search, format: :json, params: { node: 'null' })
         assigns(:items).should include(user_item)
         assigns(:items).should include(item)
         assigns(:items).should_not include(item1)
@@ -844,7 +844,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'filters down to the right records and has the right count' do
-        get :index, format: :json, name_contains: 'item1'
+        get :index, format: :json, params: { name_contains: 'item1' }
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)
@@ -852,15 +852,15 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'can find by name, etag, bag_date' do
-        get :index, format: :json, name: item1.name, etag: item1.etag, bag_date: item1.bag_date
+        get :index, format: :json, params: { name: item1.name, etag: item1.etag, bag_date: item1.bag_date }
         assigns(:items).should include(item1)
         assigns(:count).should == 1
       end
 
       it 'returns the correct next and previous links' do
-        get :index, format: :json, per_page: 2, page: 2, stage: 'Unpack'
-        assigns(:next).should == 'http://test.host/items.json/?page=3&per_page=2&stage=Unpack&sort=date'
-        assigns(:previous).should == 'http://test.host/items.json/?page=1&per_page=2&stage=Unpack&sort=date'
+        get :index, format: :json, params: { per_page: 2, page: 2, stage: 'Unpack' }
+        assigns(:next).should == 'http://test.host/items.json?page=3&per_page=2&sort=date&stage=Unpack'
+        assigns(:previous).should == 'http://test.host/items.json?page=1&per_page=2&sort=date&stage=Unpack'
       end
     end
 

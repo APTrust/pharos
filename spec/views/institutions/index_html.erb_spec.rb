@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'application_helper'
 
 describe 'institutions/index.html.erb' do
   let(:institution) { FactoryGirl.create :institution }

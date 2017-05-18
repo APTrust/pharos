@@ -3,9 +3,9 @@ require 'zlib'
 
 RSpec.describe WorkItemState, type: :model do
   before(:all) do
-    WorkItem.destroy_all
-    IntellectualObject.destroy_all
-    GenericFile.destroy_all
+    WorkItem.delete_all
+    IntellectualObject.delete_all
+    GenericFile.delete_all
   end
 
   it { should validate_presence_of(:action) }

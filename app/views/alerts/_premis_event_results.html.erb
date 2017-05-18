@@ -1,0 +1,18 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th>File Identifier</th>
+    <th>Event Identifier</th>
+    <th>Date & Time</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% events.each do |event| %>
+      <tr>
+        <td><a href="<%= generic_file_path(generic_file_identifier: event.generic_file_identifier) %>" ><%= truncate(event.generic_file_identifier, length: 80) %></a></td>
+        <td><%= event.identifier %></td>
+        <td><%= event.date_time %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

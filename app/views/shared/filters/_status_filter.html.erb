@@ -9,13 +9,13 @@
     <div class="panel-body">
       <ul class="facet-values list-unstyled">
         <% if @selected[:status] %>
-            <script>selected("status", "<%= @selected[:status] %>", "<%=url_for(params.except :status)%>")</script>
+            <script>selected("status", "<%= @selected[:status] %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :status)%>")</script>
         <% else %>
             <% @statuses.each do |status| %>
                 <% unless @status_counts[status] == 0 || @status_counts[status].nil? || status.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('status', status) %>"><%= status %></a></span>
-                      <span class="facet-count"><%= @status_counts[status] %></span>
+                      <span class="facet-count">(<%= @status_counts[status] %>)</span>
                     </li>
                 <% end %>
             <% end %>

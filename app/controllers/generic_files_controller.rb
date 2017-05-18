@@ -1,8 +1,10 @@
 class GenericFilesController < ApplicationController
   include SearchAndIndex
-  before_filter :authenticate_user!
-  before_filter :load_generic_file, only: [:show, :update, :destroy]
-  before_filter :load_intellectual_object, only: [:create, :create_batch]
+  respond_to :html, :json
+  before_action :authenticate_user!
+  before_action :load_generic_file, only: [:show, :update, :destroy]
+  before_action :load_intellectual_object, only: [:create, :create_batch]
+  before_action :set_format
   after_action :verify_authorized
 
   def index
@@ -24,7 +26,11 @@ class GenericFilesController < ApplicationController
           @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
         else
           authorize @institution, :index_through_institution?
-          @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+          if current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID
+            @generic_files = GenericFile.all
+          else
+            @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+          end
         end
       end
       params[:state] = 'A' if params[:state].nil?
@@ -246,7 +252,7 @@ class GenericFilesController < ApplicationController
   end
 
   def load_generic_file
-    fix_embedded_question_marks if params[:c]
+    # fix_embedded_question_marks if params[:c]
     if params[:generic_file_identifier]
       identifier = params[:generic_file_identifier]
       @generic_file = GenericFile.where(identifier: identifier).first
@@ -298,23 +304,31 @@ class GenericFilesController < ApplicationController
     return "#{start_of_name}#{dirname}#{encoded_end}"
   end
 
-  def fix_embedded_question_marks
-    whole_identifier = "#{params[:generic_file_identifier]}?c=#{params[:c]}"
-    params[:generic_file_identifier] = whole_identifier
-  end
-
+  # def fix_embedded_question_marks
+  #   whole_identifier = "#{params[:generic_file_identifier]}?c=#{params[:c]}"
+  #   params[:generic_file_identifier] = whole_identifier
+  # end
 
   def filter
     set_filter_values
     initialize_filter_counters
+    filter_by_institution unless params[:institution].nil?
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
-    set_format_count(@generic_files, :file)
+    set_format_count(@generic_files, :files)
+    set_inst_count(@generic_files, :files)
     count = @generic_files.count
     set_page_counts(count)
   end
 
   def set_filter_values
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
     params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
+  end
+
+  private
+
+  def set_format
+    request.format = 'html' unless request.format == 'json'
   end
 end

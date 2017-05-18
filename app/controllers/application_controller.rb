@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  before_filter do
+  before_action do
     resource = controller_path.singularize.gsub('/', '_').to_sym 
     method = "#{resource}_params"
     params[resource] &&= send(method) if respond_to?(method, true)
@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   def after_sign_in_path_for(resource)
-    root_path()
+    session['user_return_to'] || root_path
   end
 
   private

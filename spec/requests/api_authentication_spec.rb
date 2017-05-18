@@ -26,7 +26,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
     it 'should not update the object' do
       params = update_fields.to_json
       headers = initial_headers.merge(login_headers)
-      response = patch(intellectual_object_path(obj), params, headers)
+      response = patch(intellectual_object_path(obj), headers: headers, params: params)
       response.should == 403
       #obj.reload.title.should == new_title
     end
@@ -38,7 +38,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
     it 'fails to log in' do
       params = update_fields.to_json
       headers = initial_headers.merge(login_headers)
-      response = patch(intellectual_object_path(obj), params, headers)
+      response = patch(intellectual_object_path(obj), headers: headers, params: params)
       response.should == 401
       obj.reload.title.should == old_title
     end
@@ -50,7 +50,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
     it 'fails to log in' do
       params = update_fields.to_json
       headers = initial_headers.merge(login_headers)
-      response = patch(intellectual_object_path(obj), params, headers)
+      response = patch(intellectual_object_path(obj), headers: headers, params: params)
       response.should == 401
       obj.reload.title.should == old_title
     end
@@ -63,7 +63,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
     it 'cannot log in via API request' do
       params = update_fields.to_json
       headers = initial_headers.merge(login_headers)
-      response = patch(intellectual_object_path(obj), params, headers)
+      response = patch(intellectual_object_path(obj), headers: headers, params: params)
       response.should == 401
       obj.reload.title.should == old_title
     end

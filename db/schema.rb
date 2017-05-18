@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170131152046) do
+ActiveRecord::Schema.define(version: 20170517171329) do
 
   create_table "checksums", force: :cascade do |t|
     t.string   "algorithm"
@@ -20,24 +19,24 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.integer  "generic_file_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.index ["generic_file_id"], name: "index_checksums_on_generic_file_id"
   end
-
-  add_index "checksums", ["generic_file_id"], name: "index_checksums_on_generic_file_id"
 
   create_table "dpn_work_items", force: :cascade do |t|
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.string   "remote_node",  limit: 20,        default: "", null: false
-    t.string   "task",         limit: 40,        default: "", null: false
-    t.string   "identifier",   limit: 40,        default: "", null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.string   "remote_node",     limit: 20,        default: "", null: false
+    t.string   "task",            limit: 40,        default: "", null: false
+    t.string   "identifier",      limit: 40,        default: "", null: false
     t.datetime "queued_at"
     t.datetime "completed_at"
-    t.string   "note",         limit: 400
-    t.text     "state",        limit: 104857600
+    t.string   "note",            limit: 400
+    t.text     "state",           limit: 104857600
+    t.string   "processing_node", limit: 255
+    t.integer  "pid",                               default: 0
+    t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
+    t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
   end
-
-  add_index "dpn_work_items", ["identifier"], name: "index_dpn_work_items_on_identifier"
-  add_index "dpn_work_items", ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
 
   create_table "generic_files", force: :cascade do |t|
     t.string   "file_format"
@@ -48,15 +47,14 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.datetime "created_at",                                                       null: false
     t.datetime "updated_at",                                                       null: false
     t.string   "state"
-    t.datetime "last_fixity_check",                default: '2000-01-01 00:00:00', null: false
     t.text     "ingest_state"
+    t.datetime "last_fixity_check",                default: '2000-01-01 00:00:00', null: false
+    t.index ["file_format"], name: "index_generic_files_on_file_format"
+    t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
+    t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
+    t.index ["size"], name: "index_generic_files_on_size"
+    t.index ["updated_at"], name: "index_generic_files_on_updated_at"
   end
-
-  add_index "generic_files", ["file_format"], name: "index_generic_files_on_file_format"
-  add_index "generic_files", ["identifier"], name: "index_generic_files_on_identifier", unique: true
-  add_index "generic_files", ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
-  add_index "generic_files", ["size"], name: "index_generic_files_on_size"
-  add_index "generic_files", ["updated_at"], name: "index_generic_files_on_updated_at"
 
   create_table "institutions", force: :cascade do |t|
     t.string   "name"
@@ -66,9 +64,8 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string   "state"
+    t.index ["name"], name: "index_institutions_on_name"
   end
-
-  add_index "institutions", ["name"], name: "index_institutions_on_name"
 
   create_table "intellectual_objects", force: :cascade do |t|
     t.string   "title"
@@ -84,12 +81,11 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.string   "etag"
     t.string   "dpn_uuid"
     t.text     "ingest_state"
+    t.index ["access"], name: "index_intellectual_objects_on_access"
+    t.index ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
+    t.index ["institution_id"], name: "index_intellectual_objects_on_institution_id"
+    t.index ["updated_at"], name: "index_intellectual_objects_on_updated_at"
   end
-
-  add_index "intellectual_objects", ["access"], name: "index_intellectual_objects_on_access"
-  add_index "intellectual_objects", ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
-  add_index "intellectual_objects", ["institution_id"], name: "index_intellectual_objects_on_institution_id"
-  add_index "intellectual_objects", ["updated_at"], name: "index_intellectual_objects_on_updated_at"
 
   create_table "premis_events", force: :cascade do |t|
     t.string   "identifier"
@@ -104,23 +100,23 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.integer  "generic_file_id"
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.string   "outcome"
     t.integer  "institution_id"
+    t.string   "outcome"
     t.string   "intellectual_object_identifier", default: "", null: false
     t.string   "generic_file_identifier",        default: "", null: false
     t.string   "old_uuid"
+    t.index ["date_time"], name: "index_premis_events_on_date_time"
+    t.index ["event_type", "outcome"], name: "index_premis_events_on_event_type_and_outcome"
+    t.index ["event_type"], name: "index_premis_events_on_event_type"
+    t.index ["generic_file_id", "event_type"], name: "index_premis_events_on_generic_file_id_and_event_type"
+    t.index ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
+    t.index ["generic_file_identifier"], name: "index_premis_events_on_generic_file_identifier"
+    t.index ["identifier"], name: "index_premis_events_on_identifier", unique: true
+    t.index ["institution_id"], name: "index_premis_events_on_institution_id"
+    t.index ["intellectual_object_id"], name: "index_premis_events_on_intellectual_object_id"
+    t.index ["intellectual_object_identifier"], name: "index_premis_events_on_intellectual_object_identifier"
+    t.index ["outcome"], name: "index_premis_events_on_outcome"
   end
-
-  add_index "premis_events", ["date_time"], name: "index_premis_events_on_date_time"
-  add_index "premis_events", ["event_type"], name: "index_premis_events_on_event_type"
-  add_index "premis_events", ["generic_file_id", "event_type"], name: "index_premis_events_on_generic_file_id_and_event_type"
-  add_index "premis_events", ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
-  add_index "premis_events", ["generic_file_identifier"], name: "index_premis_events_on_generic_file_identifier"
-  add_index "premis_events", ["identifier"], name: "index_premis_events_on_identifier", unique: true
-  add_index "premis_events", ["institution_id"], name: "index_premis_events_on_institution_id"
-  add_index "premis_events", ["intellectual_object_id"], name: "index_premis_events_on_intellectual_object_id"
-  add_index "premis_events", ["intellectual_object_identifier"], name: "index_premis_events_on_intellectual_object_identifier"
-  add_index "premis_events", ["outcome"], name: "index_premis_events_on_outcome"
 
   create_table "roles", force: :cascade do |t|
     t.string   "name"
@@ -131,10 +127,9 @@ ActiveRecord::Schema.define(version: 20170131152046) do
   create_table "roles_users", id: false, force: :cascade do |t|
     t.integer "role_id"
     t.integer "user_id"
+    t.index ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
+    t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
   end
-
-  add_index "roles_users", ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
-  add_index "roles_users", ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
 
   create_table "usage_samples", force: :cascade do |t|
     t.datetime "created_at",     null: false
@@ -160,11 +155,10 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.string   "last_sign_in_ip"
     t.integer  "institution_id"
     t.text     "encrypted_api_secret_key"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["institution_id"], name: "index_users_on_institution_id"
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
-
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
-  add_index "users", ["institution_id"], name: "index_users_on_institution_id"
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
   create_table "work_item_states", force: :cascade do |t|
     t.integer  "work_item_id"
@@ -200,15 +194,14 @@ ActiveRecord::Schema.define(version: 20170131152046) do
     t.datetime "queued_at"
     t.integer  "size",                    limit: 8
     t.datetime "stage_started_at"
+    t.index ["action"], name: "index_work_items_on_action"
+    t.index ["date"], name: "index_work_items_on_date"
+    t.index ["etag", "name"], name: "index_work_items_on_etag_and_name"
+    t.index ["generic_file_id"], name: "index_work_items_on_generic_file_id"
+    t.index ["institution_id"], name: "index_work_items_on_institution_id"
+    t.index ["intellectual_object_id"], name: "index_work_items_on_intellectual_object_id"
+    t.index ["stage"], name: "index_work_items_on_stage"
+    t.index ["status"], name: "index_work_items_on_status"
   end
-
-  add_index "work_items", ["action"], name: "index_work_items_on_action"
-  add_index "work_items", ["date"], name: "index_work_items_on_date"
-  add_index "work_items", ["etag", "name"], name: "index_work_items_on_etag_and_name"
-  add_index "work_items", ["generic_file_id"], name: "index_work_items_on_generic_file_id"
-  add_index "work_items", ["institution_id"], name: "index_work_items_on_institution_id"
-  add_index "work_items", ["intellectual_object_id"], name: "index_work_items_on_intellectual_object_id"
-  add_index "work_items", ["stage"], name: "index_work_items_on_stage"
-  add_index "work_items", ["status"], name: "index_work_items_on_status"
 
 end

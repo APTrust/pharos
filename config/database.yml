@@ -24,7 +24,12 @@ test:
 # tests.
 integration:
   <<: *default
-  database: db/integration.sqlite3
+  adapter: postgresql
+  database: pharos_integration
+  username: pharos
+  host:     localhost
+  password: pharos
+
 
 # Demo environment for APTrust Demo system
 demo:

@@ -1,7 +1,9 @@
 class PremisEventsController < ApplicationController
   include SearchAndIndex
-  before_filter :authenticate_user!
-  before_filter :load_and_authorize_parent_object, only: [:create]
+  respond_to :html, :json
+  before_action :authenticate_user!
+  before_action :load_and_authorize_parent_object, only: [:create]
+  before_action :set_format
   after_action :verify_authorized, only: [:index, :create]
 
   def index
@@ -93,7 +95,9 @@ class PremisEventsController < ApplicationController
   end
 
   def for_selected_institution
-    @premis_events = @premis_events.where(institution_id: @parent.id) unless @parent.nil?
+    unless @parent.nil?
+      (current_user.admin? && @parent.identifier == Pharos::Application::APTRUST_ID) ? @premis_events = PremisEvent.all : @premis_events = @premis_events.where(institution_id: @parent.id)
+    end
   end
 
   def for_selected_object
@@ -121,6 +125,12 @@ class PremisEventsController < ApplicationController
     params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
     params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values
     params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
+  end
+
+  private
+
+  def set_format
+    request.format = 'html' unless request.format == 'json'
   end
 
 end

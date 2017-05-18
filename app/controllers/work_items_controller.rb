@@ -3,9 +3,9 @@ class WorkItemsController < ApplicationController
   require 'uri'
   require 'net/http'
   respond_to :html, :json
-  before_filter :authenticate_user!
-  before_filter :set_item, only: [:show, :requeue]
-  before_filter :init_from_params, only: :create
+  before_action :authenticate_user!
+  before_action :set_item, only: [:show, :requeue]
+  before_action :init_from_params, only: :create
   after_action :verify_authorized
 
   def index
@@ -60,7 +60,7 @@ class WorkItemsController < ApplicationController
     else
       authorize current_user, :nil_index?
       respond_to do |format|
-        format.json { render nothing: true, status: :not_found }
+        format.json { render body: nil, status: :not_found }
         format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
       end
     end
@@ -165,12 +165,13 @@ class WorkItemsController < ApplicationController
   def set_restoration_status
     # Fix Apache/Passenger passthrough of %2f-encoded slashes in identifier
     params[:object_identifier] = params[:object_identifier].gsub(/%2F/i, "/")
+    params[:node] = nil if params[:node] && params[:node] == ''
     restore = Pharos::Application::PHAROS_ACTIONS['restore']
     @item = WorkItem.where(object_identifier: params[:object_identifier],
                            action: restore).order(created_at: :desc).first
     if @item.nil?
       authorize current_user
-      render nothing: true, status: :not_found and return
+      render body: nil, status: :not_found and return
     else
       authorize @item
     end
@@ -261,10 +262,15 @@ class WorkItemsController < ApplicationController
     search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
                      :retry, :object_identifier, :generic_file_identifier,
                      :node, :needs_admin_review, :process_after]
+    params[:retry] = to_boolean(params[:retry]) if params[:retry]
+    params[:needs_admin_review] = to_boolean(params[:needs_admin_review]) if params[:needs_admin_review]
     search_fields.each do |field|
       if params[field].present?
         if field == :bag_date && (Rails.env.test? || Rails.env.development?)
-          @items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+          #@items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+          bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
+          bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
+          @items = @items.with_bag_date(bag_date1, bag_date2)
         elsif field == :node and params[field] == 'null'
           @items = @items.where('node is null')
         elsif field == :assignment_pending_since and params[field] == 'null'
@@ -350,13 +356,15 @@ class WorkItemsController < ApplicationController
     end
     params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
     params[:sort] = 'date' if params[:sort].nil?
-    (params[:retry] == 'true') ? params[:retry] = true : params[:retry] = false unless params[:retry].nil?
+    params[:retry] = to_boolean(params[:retry]) if params[:retry]
+    bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
+    bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
     @items = @items
       .created_before(params[:created_before])
       .created_after(params[:created_after])
       .updated_before(params[:updated_before])
       .updated_after(params[:updated_after])
-      .with_bag_date(params[:bag_date])
+      .with_bag_date(bag_date1, bag_date2)
       .with_name(params[:name])
       .with_name_like(params[:name_contains])
       .with_etag(params[:etag])
@@ -464,11 +472,15 @@ class WorkItemsController < ApplicationController
   end
 
   def set_filter_values
-    params[:status] ? @statuses = [params[:status]] : @statuses = @items.distinct.pluck(:status)
-    params[:stage] ? @stages = [params[:stage]] : @stages = @items.distinct.pluck(:stage)
-    params[:item_action] ? @actions = [params[:item_action]] : @actions = @items.distinct.pluck(:action)
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = @items.distinct.pluck(:institution_id)
+    params[:status] ? @statuses = [params[:status]] : @statuses = Pharos::Application::PHAROS_STATUSES.values
+    params[:stage] ? @stages = [params[:stage]] : @stages = Pharos::Application::PHAROS_STAGES.values
+    params[:item_action] ? @actions = [params[:item_action]] : @actions = Pharos::Application::PHAROS_ACTIONS.values
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
     #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
     #params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
+  end
+
+  def to_boolean(str)
+    str == 'true'
   end
 end

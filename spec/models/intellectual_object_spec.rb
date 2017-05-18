@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe IntellectualObject, :type => :model do
   after(:all) do
-    IntellectualObject.destroy_all
+    IntellectualObject.delete_all
   end
 
   it { should validate_presence_of(:title) }
@@ -337,7 +337,7 @@ RSpec.describe IntellectualObject, :type => :model do
 
     describe 'with generic files' do
       after do
-        subject.generic_files.destroy_all
+        subject.generic_files.delete_all
       end
 
       subject { FactoryGirl.create(:intellectual_object) }

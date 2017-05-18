@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Role, :type => :model do
   before(:all) do
-    Role.destroy_all
+    Role.delete_all
   end
 
   it { should validate_presence_of(:name) }

@@ -230,7 +230,11 @@ class IntellectualObject < ActiveRecord::Base
     unless generic_file_ids.empty?
       errors[:base] << "Cannot delete #{self.id} because Generic Files are associated with it"
     end
-    errors[:base].empty?
+    if errors[:base].empty?
+      true
+    else
+      throw(:abort)
+    end
   end
 
   def set_bag_name

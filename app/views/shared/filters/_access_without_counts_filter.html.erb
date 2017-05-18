@@ -10,7 +10,7 @@
         <div class="panel-body">
           <ul class="facet-values list-unstyled">
             <% if @selected[:access] %>
-                <script>selected("access", "<%= @selected[:access].capitalize %>", "<%=url_for(params.except :access)%>")</script>
+                <script>selected("access", "<%= @selected[:access].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :access)%>")</script>
             <% else %>
                 <% @accesses.each do |acc| %>
                     <li><span class="facet-label"><a href="<%= current_path('access', acc) %>"><%= acc.capitalize %></a></span></li>

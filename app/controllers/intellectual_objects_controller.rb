@@ -1,7 +1,7 @@
 class IntellectualObjectsController < ApplicationController
   include SearchAndIndex
   inherit_resources
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   before_action :load_institution, only: [:index, :create]
   before_action :load_object, only: [:show, :edit, :update, :destroy, :send_to_dpn, :restore]
   after_action :verify_authorized
@@ -9,7 +9,7 @@ class IntellectualObjectsController < ApplicationController
   def index
     authorize @institution
     if current_user.admin? and params[:institution_identifier]
-      user_institution = @institution
+      params[:institution_identifier] == Pharos::Application::APTRUST_ID ? user_institution = nil : user_institution = @institution
     elsif current_user.admin?
       user_institution = nil
     else
@@ -270,7 +270,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def load_object
-    fix_embedded_question_marks if params[:c]
+    # fix_embedded_question_marks if params[:c]
     if params[:intellectual_object_identifier]
       @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
       if @intellectual_object.nil?
@@ -283,10 +283,10 @@ class IntellectualObjectsController < ApplicationController
     @institution = @intellectual_object.institution unless @intellectual_object.nil?
   end
 
-  def fix_embedded_question_marks
-    whole_identifier = "#{params[:intellectual_object_identifier]}?c=#{params[:c]}"
-    params[:intellectual_object_identifier] = whole_identifier
-  end
+  # def fix_embedded_question_marks
+  #   whole_identifier = "#{params[:intellectual_object_identifier]}?c=#{params[:c]}"
+  #   params[:intellectual_object_identifier] = whole_identifier
+  # end
 
   def load_institution
     if current_user.admin? and params[:institution_id]

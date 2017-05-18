@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe UsersController, type: :controller do
   after do
-    Institution.destroy_all
+    Institution.delete_all
   end
 
   describe 'An APTrust Administrator' do
@@ -22,7 +22,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it 'can show an Institutional Administrators' do
-      get :show, id: institutional_admin
+      get :show, params: { id: institutional_admin }
       response.should be_successful
       expect(assigns[:user]).to eq institutional_admin
     end
@@ -39,13 +39,13 @@ RSpec.describe UsersController, type: :controller do
 
       it 'unless no parameters are passed' do
         expect {
-          post :create, {}
+          post :create, params: {}
         }.to_not change(User, :count)
       end
 
       it 'when the parameters are valid' do
         expect {
-          post :create, user: attributes
+          post :create, params: { user: attributes }
         }.to change(User, :count).by(1)
         response.should redirect_to user_url(assigns[:user])
         expect(assigns[:user]).to be_institutional_admin
@@ -53,14 +53,14 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it 'can edit Institutional Administrators' do
-      get :edit, id: institutional_admin
+      get :edit, params: { id: institutional_admin }
       response.should be_successful
       expect(assigns[:user]).to eq institutional_admin
     end
 
     it 'can perform a password reset' do
       password = institutional_admin.password
-      get :admin_password_reset, id: institutional_admin
+      get :admin_password_reset, params: { id: institutional_admin }
       expect(assigns[:user]).to eq institutional_admin
       expect(assigns[:user].password).not_to eq password
     end
@@ -69,19 +69,19 @@ RSpec.describe UsersController, type: :controller do
       let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
 
       it 'when the parameters are valid' do
-        put :update, id: institutional_admin, user: {name: 'Frankie'}
+        put :update, params: { id: institutional_admin, user: {name: 'Frankie'} }
         response.should redirect_to user_url(institutional_admin)
         expect(flash[:notice]).to eq 'User was successfully updated.'
         expect(assigns[:user].name).to eq 'Frankie'
       end
       it 'when the parameters are invalid' do
-        put :update, id: institutional_admin, user: {phone_number: 'f121'}
+        put :update, params: { id: institutional_admin, user: {phone_number: 'f121'} }
         response.should be_successful
         expect(assigns[:user].errors.include?(:phone_number)).to be true
       end
 
       it 'cannot set api_secret_key in an update' do
-        patch :update, id: institutional_admin, user: { name: 'Frankie', api_secret_key: '123' }
+        patch :update, params: { id: institutional_admin, user: { name: 'Frankie', api_secret_key: '123' } }
         institutional_admin.reload
 
         expect(institutional_admin.name).to eq 'Frankie'
@@ -91,7 +91,7 @@ RSpec.describe UsersController, type: :controller do
       end
 
       it 'cannot set encrypted_api_secret_key in an update' do
-        patch :update, id: institutional_admin, user: { name: 'Frankie', encrypted_api_secret_key: '123' }
+        patch :update, params: { id: institutional_admin, user: { name: 'Frankie', encrypted_api_secret_key: '123' } }
         institutional_admin.reload
 
         expect(institutional_admin.name).to eq 'Frankie'
@@ -122,7 +122,7 @@ RSpec.describe UsersController, type: :controller do
       describe 'at my institution' do
         let(:user_at_institution) {  FactoryGirl.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
         it 'can show the Institutional Users for my institution' do
-          get :show, id: user_at_institution
+          get :show, params: { id: user_at_institution }
           response.should be_successful
           expect(assigns[:user]).to eq user_at_institution
         end
@@ -131,7 +131,7 @@ RSpec.describe UsersController, type: :controller do
       describe 'at a different institution' do
         let(:user_of_different_institution) {  FactoryGirl.create(:user, :institutional_user) }
         it "can't show" do
-          get :show, id: user_of_different_institution
+          get :show, params: { id: user_of_different_institution }
           response.should redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -150,7 +150,7 @@ RSpec.describe UsersController, type: :controller do
         let(:attributes) { FactoryGirl.attributes_for(:user) }
         it "shouldn't work" do
           expect {
-            post :create, user: attributes
+            post :create, params: { user: attributes }
           }.not_to change(User, :count)
           response.should redirect_to root_path
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
@@ -163,7 +163,7 @@ RSpec.describe UsersController, type: :controller do
           let(:attributes) { FactoryGirl.attributes_for(:user, :institution_id=>institutional_admin.institution_id, role_ids: institutional_user_role_id) }
           it 'should be successful' do
             expect {
-              post :create, user: attributes
+              post :create, params: { user: attributes }
             }.to change(User, :count).by(1)
             response.should redirect_to user_url(assigns[:user])
             expect(assigns[:user]).to be_institutional_user
@@ -175,7 +175,7 @@ RSpec.describe UsersController, type: :controller do
           let(:attributes) { FactoryGirl.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_admin_role_id) }
           it 'should be successful' do
             expect {
-              post :create, user: attributes
+              post :create, params: { user: attributes }
             }.to change(User, :count).by(1)
             response.should redirect_to user_url(assigns[:user])
             expect(assigns[:user]).to be_institutional_admin
@@ -187,7 +187,7 @@ RSpec.describe UsersController, type: :controller do
           let(:attributes) { FactoryGirl.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: admin_role_id) }
           it 'should be forbidden' do
             expect {
-              post :create, user: attributes
+              post :create, params: { user: attributes }
             }.not_to change(User, :count)
             response.should redirect_to root_path
             expect(flash[:alert]).to eq 'You are not authorized to access this page.'
@@ -200,7 +200,7 @@ RSpec.describe UsersController, type: :controller do
       describe 'from my institution' do
         let(:user_at_institution) {  FactoryGirl.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
         it 'should be successful' do
-          get :edit, id: user_at_institution
+          get :edit, params: { id: user_at_institution }
           response.should be_successful
           expect(assigns[:user]).to eq user_at_institution
         end
@@ -208,7 +208,7 @@ RSpec.describe UsersController, type: :controller do
       describe 'from another institution' do
         let(:user_of_different_institution) {  FactoryGirl.create(:user, :institutional_user) }
         it 'should show an error' do
-          get :edit, id: user_of_different_institution
+          get :edit, params: { id: user_of_different_institution }
           response.should be_redirect
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -220,7 +220,7 @@ RSpec.describe UsersController, type: :controller do
       describe 'from my institution' do
         let(:user_at_institution) {  FactoryGirl.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
         it 'should be successful' do
-          patch :update, id: user_at_institution, user: {name: 'Frankie'}
+          patch :update, params: { id: user_at_institution, user: {name: 'Frankie'} }
           response.should redirect_to user_url(user_at_institution)
           expect(assigns[:user]).to eq user_at_institution
         end
@@ -228,7 +228,7 @@ RSpec.describe UsersController, type: :controller do
       describe 'from another institution' do
         let(:user_of_different_institution) {  FactoryGirl.create(:user, :institutional_user) }
         it 'should show an error message' do
-          patch :update, id: user_of_different_institution, user: {name: 'Frankie'}
+          patch :update, params: { id: user_of_different_institution, user: {name: 'Frankie'} }
           response.should be_redirect
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
@@ -241,7 +241,7 @@ RSpec.describe UsersController, type: :controller do
     before { sign_in user }
 
     it 'generates a new API key' do
-      patch :generate_api_key, id: user.id
+      patch :generate_api_key, params: { id: user.id }
       user.reload
 
       expect(assigns[:user]).to eq user
@@ -253,7 +253,7 @@ RSpec.describe UsersController, type: :controller do
 
     it 'prints a message if it is unable to make the key' do
       User.any_instance.should_receive(:save).and_return(false)
-      patch :generate_api_key, id: user.id
+      patch :generate_api_key, params: { id: user.id }
       user.reload
 
       response.should redirect_to user_path(user)

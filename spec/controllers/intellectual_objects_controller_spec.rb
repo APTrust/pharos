@@ -50,7 +50,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        get :index, institution_identifier: 'apt.edu'
+        get :index, params: { institution_identifier: 'apt.edu' }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -60,7 +60,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         sign_in inst_user
       end
       it 'should show results from my institution' do
-        get :index, institution_identifier: inst1.identifier
+        get :index, params: { institution_identifier: inst1.identifier }
         expect(response).to be_successful
         expect(assigns(:intellectual_objects).size).to eq 3
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
@@ -70,14 +70,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should show results from my institution' do
-        get :index, institution_identifier: inst1.identifier
+        get :index, params: { institution_identifier: inst1.identifier }
         expect(response).to be_successful
         expect(assigns(:intellectual_objects).size).to eq 3
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj2.id, obj4.id, obj6.id]
       end
 
       it 'should have an etag for JSON calls' do
-        get :index, institution_identifier: inst1.identifier, format: :json
+        get :index, params: { institution_identifier: inst1.identifier, format: :json }
         expect(response).to be_successful
         expect(assigns(:intellectual_objects).size).to eq 3
         data = JSON.parse(response.body)
@@ -90,7 +90,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should show all results' do
-        get :index, {}
+        get :index, params: {}
         expect(response).to be_successful
         expect(assigns(:intellectual_objects).size).to eq 6
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj1.id, obj2.id, obj3.id,
@@ -103,34 +103,34 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         [inst_user, inst_admin, sys_admin].each do |user|
           sign_in user
 
-          get :index, created_before: '2016-07-26'
+          get :index, params: { created_before: '2016-07-26' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, created_after: '2016-07-26'
+          get :index, params: { created_after: '2016-07-26' }
           expect(assigns(:intellectual_objects).size).to be > 1
 
-          get :index, updated_before: '2016-07-26'
+          get :index, params: { updated_before: '2016-07-26' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, updated_after: '2016-07-26'
+          get :index, params: { updated_after: '2016-07-26' }
           expect(assigns(:intellectual_objects).size).to be > 1
 
-          get :index, description: 'Founded in Aberdeen in 1928.'
+          get :index, params: { description: 'Founded in Aberdeen in 1928.' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, description_like: 'Aberdeen'
+          get :index, params: { description_like: 'Aberdeen' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, identifier: 'test.edu/baggie'
+          get :index, params: { identifier: 'test.edu/baggie' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, identifier_like: 'baggie'
+          get :index, params: { identifier_like: 'baggie' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, alt_identifier: 'test.edu/some-bag'
+          get :index, params: { alt_identifier: 'test.edu/some-bag' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, alt_identifier_like: 'some-bag'
+          get :index, params: { alt_identifier_like: 'some-bag' }
           expect(assigns(:intellectual_objects).size).to eq 1
         end
       end
@@ -142,7 +142,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        get :show, intellectual_object_identifier: obj1
+        get :show, params: { intellectual_object_identifier: obj1 }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -151,19 +151,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in inst_user }
 
       it "should show me my institution's object" do
-        get :show, intellectual_object_identifier: obj2
+        get :show, params: { intellectual_object_identifier: obj2 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
       end
 
       it "should show me another institution's consortial object" do
-        get :show, intellectual_object_identifier: obj1
+        get :show, params: { intellectual_object_identifier: obj1 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
       end
 
       it "should not show me another institution's private parts" do
-        get :show, intellectual_object_identifier: obj3
+        get :show, params: { intellectual_object_identifier: obj3 }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -173,19 +173,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in inst_admin }
 
       it "should show me my institution's object" do
-        get :show, intellectual_object_identifier: obj2
+        get :show, params: { intellectual_object_identifier: obj2 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
       end
 
       it "should show me another institution's consortial object" do
-        get :show, intellectual_object_identifier: obj1
+        get :show, params: { intellectual_object_identifier: obj1 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
       end
 
       it "should not show me another institution's private parts" do
-        get :show, intellectual_object_identifier: obj3
+        get :show, params: { intellectual_object_identifier: obj3 }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -195,25 +195,25 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in sys_admin }
 
       it "should show me my institution's object" do
-        get :show, intellectual_object_identifier: obj2
+        get :show, params: { intellectual_object_identifier: obj2 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
       end
 
       it "should show me another institution's consortial object" do
-        get :show, intellectual_object_identifier: obj1
+        get :show, params: { intellectual_object_identifier: obj1 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj1
       end
 
       it "should show me another institution's private parts" do
-        get :show, intellectual_object_identifier: obj3
+        get :show, params: { intellectual_object_identifier: obj3 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj3
       end
 
       it 'should serialize files when asked' do
-        get :show, intellectual_object_identifier: obj2, format: :json, include_files: 'true'
+        get :show, params: { intellectual_object_identifier: obj2, format: :json, include_files: 'true' }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
         data = JSON.parse(response.body)
@@ -223,7 +223,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should serialize events when asked' do
-        get :show, intellectual_object_identifier: obj2, format: :json, include_events: 'true'
+        get :show, params: { intellectual_object_identifier: obj2, format: :json, include_events: 'true' }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
         data = JSON.parse(response.body)
@@ -232,7 +232,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should serialize files and events when asked' do
-        get :show, intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true'
+        get :show, params: { intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true' }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
         data = JSON.parse(response.body)
@@ -243,7 +243,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should serialize files, events, and state when asked' do
-        get :show, intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true', with_ingest_state: 'true'
+        get :show, params: { intellectual_object_identifier: obj2, format: :json, include_all_relations: 'true', with_ingest_state: 'true' }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
         data = JSON.parse(response.body)
@@ -267,7 +267,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        get :edit, intellectual_object_identifier: obj1
+        get :edit, params: { intellectual_object_identifier: obj1 }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -275,12 +275,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
       it "should not let me edit my institution's objects" do
-        get :edit, intellectual_object_identifier: inst1_obj
+        get :edit, params: { intellectual_object_identifier: inst1_obj }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it "should not let me edit other institution's objects" do
-        get :edit, intellectual_object_identifier: inst2_obj
+        get :edit, params: { intellectual_object_identifier: inst2_obj }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -289,12 +289,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it "should not let me edit my institution's objects" do
-        get :edit, intellectual_object_identifier: inst1_obj
+        get :edit, params: { intellectual_object_identifier: inst1_obj }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it "should not let me edit other institution's objects" do
-        get :edit, intellectual_object_identifier: inst2_obj
+        get :edit, params: { intellectual_object_identifier: inst2_obj }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -303,12 +303,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should not let me edit this' do
-        get :edit, intellectual_object_identifier: inst1_obj
+        get :edit, params: { intellectual_object_identifier: inst1_obj }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should not let me edit this either' do
-        get :edit, intellectual_object_identifier: inst2_obj
+        get :edit, params: { intellectual_object_identifier: inst2_obj }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -327,13 +327,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should respond with redirect (html)' do
-        post(:create, institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes)
+        post(:create, params: { institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes })
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
       it 'should respond unauthorized (json)' do
-        post(:create, institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes, format: 'json')
+        post(:create, params: { institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes }, format: 'json')
         expect(response.code).to eq '401'
       end
     end
@@ -341,14 +341,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
       it 'should respond with redirect (html)' do
-        post(:create, institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes)
+        post(:create, params: { institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes })
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should respond forbidden (json)' do
-        post(:create, institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes, format: 'json')
+        post(:create, params: { institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes }, format: 'json')
         expect(response.code).to eq '403'
       end
     end
@@ -356,14 +356,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should respond with redirect (html)' do
-        post(:create, institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes)
+        post(:create, params: { institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes })
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should respond forbidden (json)' do
-        post(:create, institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes, format: 'json')
+        post(:create, params: { institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes }, format: 'json')
         expect(response.code).to eq '403'
       end
     end
@@ -372,8 +372,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in sys_admin }
       it 'should create a simple object' do
         simple_obj.etag = '90908111'
-        post(:create, institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes, format: 'json')
+        post(:create, params: { institution_identifier: inst1.identifier,
+             intellectual_object: simple_obj.attributes }, format: 'json')
         expect(response.code).to eq '201'
         saved_obj = IntellectualObject.where(identifier: simple_obj.identifier).first
         expect(saved_obj).to be_truthy
@@ -393,7 +393,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'} }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -401,12 +401,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
       it 'should respond with redirect (html)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'} }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should respond forbidden (json)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}, format: :json
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'} }, format: :json
         expect(response.code).to eq '403'
       end
     end
@@ -414,12 +414,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should respond with redirect (html)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'} }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should respond forbidden (json)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'}, format: :json
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'} }, format: :json
         expect(response.code).to eq '403'
       end
     end
@@ -427,14 +427,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should update the object and respond with redirect (html)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', ingest_state: '{[A]}'}
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', ingest_state: '{[A]}'} }
         expect(response).to redirect_to intellectual_object_path(obj1.identifier)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Foo'
         expect(saved_obj.ingest_state).to eq '{[A]}'
       end
       it 'should update the object and respond with json (json)' do
-        patch :update, intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678'}, format: :json
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678'} }, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'
@@ -471,7 +471,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        delete :destroy, intellectual_object_identifier: obj1
+        delete :destroy, params: { intellectual_object_identifier: obj1 }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -479,12 +479,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
       it 'should respond with redirect (html)' do
-        delete :destroy, intellectual_object_identifier: deletable_obj
+        delete :destroy, params: { intellectual_object_identifier: deletable_obj }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should respond forbidden (json)' do
-        delete :destroy, intellectual_object_identifier: deletable_obj, format: :json
+        delete :destroy, params: { intellectual_object_identifier: deletable_obj }, format: :json
         expect(response.code).to eq '403'
       end
     end
@@ -492,7 +492,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should create delete event and redirect (html)' do
-        delete :destroy, intellectual_object_identifier: deletable_obj
+        delete :destroy, params: { intellectual_object_identifier: deletable_obj }
         expect(response).to redirect_to root_url
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)
@@ -502,13 +502,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should not delete already deleted item' do
-        delete :destroy, intellectual_object_identifier: deleted_obj
+        delete :destroy, params: { intellectual_object_identifier: deleted_obj }
         expect(response).to redirect_to intellectual_object_path(deleted_obj)
         expect(flash[:alert]).to include 'This item has already been deleted'
       end
 
       it 'should not delete item with pending jobs' do
-        delete :destroy, intellectual_object_identifier: obj_pending
+        delete :destroy, params: { intellectual_object_identifier: obj_pending }
         expect(response).to redirect_to intellectual_object_path(obj_pending)
         expect(flash[:alert]).to include 'Your object cannot be deleted'
       end
@@ -518,7 +518,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in sys_admin }
 
       it 'should create delete event and return no content' do
-        delete :destroy, intellectual_object_identifier: deletable_obj, format: :json
+        delete :destroy, params: { intellectual_object_identifier: deletable_obj }, format: :json
         expect(response.status).to eq(204)
         expect(response.body).to be_empty
         reloaded_object = IntellectualObject.find(deletable_obj.id)
@@ -528,13 +528,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
 
       it 'should say OK and return no content if the item was previously deleted' do
-        delete :destroy, intellectual_object_identifier: deleted_obj, format: :json
+        delete :destroy, params: { intellectual_object_identifier: deleted_obj }, format: :json
         expect(response.status).to eq(204)
         expect(response.body).to be_empty
       end
 
       it 'should not delete item with pending jobs' do
-        delete :destroy, intellectual_object_identifier: obj_pending, format: :json
+        delete :destroy, params: { intellectual_object_identifier: obj_pending }, format: :json
         expect(response.status).to eq(409)
         data = JSON.parse(response.body)
         expect(data['status']).to eq ('error')
@@ -588,7 +588,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -596,12 +596,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
       it 'should respond with redirect (html)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should respond forbidden (json)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }, format: :json
         expect(response.code).to eq '403'
       end
     end
@@ -610,7 +610,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should respond with redirect (html)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }
         expect(response).to redirect_to intellectual_object_path(obj_for_dpn)
         expect(flash[:notice]).to include 'Your item has been queued for DPN.'
       end
@@ -618,24 +618,24 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                       stage: Pharos::Application::PHAROS_STAGES['requested'],
                                       status: Pharos::Application::PHAROS_STATUSES['pend']).count
-        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }
         count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
         expect(count_after).to eq(count_before + 1)
       end
       it 'should reject items that are already in dpn (html)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_in_dpn
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_in_dpn }
         expect(response).to redirect_to intellectual_object_path(obj_in_dpn)
         expect(flash[:alert]).to include 'This item has already been sent to DPN.'
       end
       it 'should reject deleted items (html)' do
-        put :send_to_dpn, intellectual_object_identifier: deleted_obj
+        put :send_to_dpn, params: { intellectual_object_identifier: deleted_obj }
         expect(response).to redirect_to intellectual_object_path(deleted_obj)
         expect(flash[:alert]).to include 'This item has been deleted and cannot be sent to DPN.'
       end
       it 'should reject items with pending work requests (html)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_pending
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_pending }
         expect(response).to redirect_to intellectual_object_path(obj_pending)
         expect(flash[:alert]).to include 'Your object cannot be sent to DPN at this time due to a pending'
       end
@@ -643,7 +643,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         if Pharos::Application.config.show_send_to_dpn_button == false
           begin
             Pharos::Application.config.show_send_to_dpn_button = true
-            put :send_to_dpn, intellectual_object_identifier: obj_for_dpn
+            put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }
           ensure
             Pharos::Application.config.show_send_to_dpn_button = false
           end
@@ -657,7 +657,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should respond with meaningful json (json)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }, format: :json
         expect(response.code).to eq '200'
         data = JSON.parse(response.body)
         expect(data['action']).to eq 'DPN'
@@ -670,28 +670,28 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                       stage: Pharos::Application::PHAROS_STAGES['requested'],
                                       status: Pharos::Application::PHAROS_STATUSES['pend']).count
-        put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }, format: :json
         count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
         expect(count_after).to eq(count_before + 1)
       end
       it 'should reject items that are already in dpn (json)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_in_dpn, format: :json
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_in_dpn }, format: :json
         expect(response.code).to eq '409'
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'
         expect(data['message']).to eq 'This item has already been sent to DPN.'
       end
       it 'should reject deleted items (json)' do
-        put :send_to_dpn, intellectual_object_identifier: deleted_obj, format: :json
+        put :send_to_dpn, params: { intellectual_object_identifier: deleted_obj }, format: :json
         expect(response.code).to eq '409'
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'
         expect(data['message']).to eq 'This item has been deleted and cannot be sent to DPN.'
       end
       it 'should reject items with pending work requests (json)' do
-        put :send_to_dpn, intellectual_object_identifier: obj_pending, format: :json
+        put :send_to_dpn, params: { intellectual_object_identifier: obj_pending }, format: :json
         expect(response.code).to eq '409'
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'
@@ -701,7 +701,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         if Pharos::Application.config.show_send_to_dpn_button == false
           begin
             Pharos::Application.config.show_send_to_dpn_button = true
-            put :send_to_dpn, intellectual_object_identifier: obj_for_dpn, format: :json
+            put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }, format: :json
           ensure
             Pharos::Application.config.show_send_to_dpn_button = false
           end
@@ -746,7 +746,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        put :restore, intellectual_object_identifier: obj1
+        put :restore, params: { intellectual_object_identifier: obj1 }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
@@ -754,12 +754,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before { sign_in inst_user }
       it 'should respond with redirect (html)' do
-        put :restore, intellectual_object_identifier: obj_for_restore
+        put :restore, params: { intellectual_object_identifier: obj_for_restore }
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
       it 'should respond forbidden (json)' do
-        put :restore, intellectual_object_identifier: obj_for_restore, format: :json
+        put :restore, params: { intellectual_object_identifier: obj_for_restore, format: :json }
         expect(response.code).to eq '403'
       end
     end
@@ -768,7 +768,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should respond with redirect (html)' do
-        put :restore, intellectual_object_identifier: obj_for_restore
+        put :restore, params: { intellectual_object_identifier: obj_for_restore }
         expect(response).to redirect_to intellectual_object_path(obj_for_restore)
         expect(flash[:notice]).to include 'Your item has been queued for restoration.'
       end
@@ -776,19 +776,19 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                       stage: Pharos::Application::PHAROS_STAGES['requested'],
                                       status: Pharos::Application::PHAROS_STATUSES['pend']).count
-        put :restore, intellectual_object_identifier: obj_for_restore
+        put :restore, params: { intellectual_object_identifier: obj_for_restore }
         count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
         expect(count_after).to eq(count_before + 1)
       end
       it 'should reject deleted items (html)' do
-        put :restore, intellectual_object_identifier: deleted_obj
+        put :restore, params: { intellectual_object_identifier: deleted_obj }
         expect(response).to redirect_to intellectual_object_path(deleted_obj)
         expect(flash[:alert]).to include 'This item has been deleted and cannot be queued for restoration.'
       end
       it 'should reject items with pending work requests (html)' do
-        put :restore, intellectual_object_identifier: obj_pending
+        put :restore, params: { intellectual_object_identifier: obj_pending }
         expect(response).to redirect_to intellectual_object_path(obj_pending)
         expect(flash[:alert]).to include 'cannot be queued for restoration at this time due to a pending'
       end
@@ -798,7 +798,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should respond with meaningful json (json)' do
-        put :restore, intellectual_object_identifier: obj_for_restore, format: :json
+        put :restore, params: { intellectual_object_identifier: obj_for_restore, format: :json }
         expect(response.code).to eq '200'
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'ok'
@@ -809,14 +809,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                       stage: Pharos::Application::PHAROS_STAGES['requested'],
                                       status: Pharos::Application::PHAROS_STATUSES['pend']).count
-        put :restore, intellectual_object_identifier: obj_for_restore, format: :json
+        put :restore, params: { intellectual_object_identifier: obj_for_restore }, format: :json
         count_after = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                      stage: Pharos::Application::PHAROS_STAGES['requested'],
                                      status: Pharos::Application::PHAROS_STATUSES['pend']).count
         expect(count_after).to eq(count_before + 1)
       end
       it 'should reject deleted items (json)' do
-        put :restore, intellectual_object_identifier: deleted_obj, format: :json
+        put :restore, params: { intellectual_object_identifier: deleted_obj }, format: :json
         expect(response.code).to eq '409'
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'
@@ -824,7 +824,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data['work_item_id']).to eq 0
       end
       it 'should reject items with pending work requests (json)' do
-        put :restore, intellectual_object_identifier: obj_pending, format: :json
+        put :restore, params: { intellectual_object_identifier: obj_pending }, format: :json
         expect(response.code).to eq '409'
         data = JSON.parse(response.body)
         expect(data['status']).to eq 'error'

@@ -93,6 +93,13 @@ module Pharos
     APTRUST_NAME = 'APTrust'
     APTRUST_ID = 'aptrust.org'
 
+    PARAMS_HASH = [:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
+                    :file_association, :type, :state, :event_type, :outcome, :q, :search_field, :object_type,
+                    :item_action, :stage, :status, :sort, :institution_identifier, :name_contains, :name_exact, :method,
+                    :updated_since, :node, :needs_admin_review, :not_checked_since, :identifier_like, :per_page, :utf8,
+                    :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
+                    :object_identifier, :format]
+
     if Rails.env.production?
       NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'
     elsif Rails.env.demo?

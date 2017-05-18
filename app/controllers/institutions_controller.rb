@@ -1,7 +1,7 @@
 class InstitutionsController < ApplicationController
   include SearchAndIndex
   inherit_resources
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy]
   respond_to :json, :html
   after_action :verify_authorized, :except => :index
@@ -33,7 +33,7 @@ class InstitutionsController < ApplicationController
     authorize @institution || Institution.new
     if @institution.nil? || @institution.state == 'D'
       respond_to do |format|
-        format.json {render :nothing => true, :status => 404}
+        format.json {render body: nil, :status => 404}
         format.html {
           redirect_to root_path
           flash[:alert] = 'The institution you requested does not exist or has been deleted.'

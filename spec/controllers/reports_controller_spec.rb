@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe ReportsController, type: :controller do
   before :all do
     Institution.delete_all
-    IntellectualObject.destroy_all
-    GenericFile.destroy_all
+    IntellectualObject.delete_all
+    GenericFile.delete_all
 
     @institution_one =  FactoryGirl.create(:institution)
     @institution_two = FactoryGirl.create(:institution, identifier: 'aptrust.org')
@@ -20,8 +20,8 @@ RSpec.describe ReportsController, type: :controller do
 
   after :all do
     Institution.delete_all
-    IntellectualObject.destroy_all
-    GenericFile.destroy_all
+    IntellectualObject.delete_all
+    GenericFile.delete_all
   end
 
   describe 'GET #index' do
@@ -31,12 +31,12 @@ RSpec.describe ReportsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
-        get :index, identifier: @institution_one.identifier
+        get :index, params: { identifier: @institution_one.identifier }
         expect(response).to be_success
       end
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
-        get :index, identifier: @institution_two.identifier
+        get :index, params: { identifier: @institution_two.identifier }
         expect(response).to be_success
       end
     end
@@ -47,18 +47,18 @@ RSpec.describe ReportsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
-        get :index, identifier: @institution_two.identifier
+        get :index, params: { identifier: @institution_two.identifier }
         expect(response).to be_success
       end
 
       it 'denies access when the institution is not their own (html)' do
-        get :index, identifier: @institution_one.identifier
+        get :index, params: { identifier: @institution_one.identifier }
         expect(response.status).to eq(302)
         flash[:alert].should =~ /You are not authorized/
       end
 
       it 'denies access when the institution is not their own (json)' do
-        get :index, identifier: @institution_one.identifier, format: :json
+        get :index, params: { identifier: @institution_one.identifier }, format: :json
         expect(response.status).to eq(403)
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe ReportsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
-        get :overview, identifier: @institution_one.identifier
+        get :overview, params: { identifier: @institution_one.identifier }
         expect(response).to be_success
         expect(assigns(:report)[:generic_files]).to eq(1)
         expect(assigns(:report)[:intellectual_objects]).to eq(1)
@@ -80,7 +80,7 @@ RSpec.describe ReportsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
-        get :overview, identifier: @institution_two.identifier
+        get :overview, params: { identifier: @institution_two.identifier }
         expect(response).to be_success
       end
     end
@@ -91,7 +91,7 @@ RSpec.describe ReportsController, type: :controller do
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
-        get :overview, identifier: @institution_two.identifier
+        get :overview, params: { identifier: @institution_two.identifier }
         expect(response).to be_success
         expect(assigns(:report)[:generic_files]).to eq(1)
         expect(assigns(:report)[:intellectual_objects]).to eq(1)
@@ -99,13 +99,13 @@ RSpec.describe ReportsController, type: :controller do
       end
 
       it 'denies access when the institution is not their own (html)' do
-        get :overview, identifier: @institution_one.identifier
+        get :overview, params: { identifier: @institution_one.identifier }
         expect(response.status).to eq(302)
         flash[:alert].should =~ /You are not authorized/
       end
 
       it 'denies access when the institution is not their own (json)' do
-        get :overview, identifier: @institution_one.identifier, format: :json
+        get :overview, params: { identifier: @institution_one.identifier }, format: :json
         expect(response.status).to eq(403)
       end
     end

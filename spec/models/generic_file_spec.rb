@@ -76,7 +76,7 @@ RSpec.describe GenericFile, :type => :model do
         end
         after do
           file.destroy
-          intellectual_object.destroy
+          intellectual_object.delete
           @parent_work_item.delete
         end
 
@@ -168,8 +168,8 @@ RSpec.describe GenericFile, :type => :model do
 
   describe '#not_checked_since' do
     before do
-      PremisEvent.destroy_all
-      GenericFile.destroy_all
+      PremisEvent.delete_all
+      GenericFile.delete_all
     end
     it 'should return only files that have not had a fixity check since the given date' do
       dates = ['2017-01-01T00:00:00Z', '2016-01-01T00:00:00Z', '2015-01-01T00:00:00Z']

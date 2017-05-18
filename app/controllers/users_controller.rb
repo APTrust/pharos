@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   inherit_resources
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index

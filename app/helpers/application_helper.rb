@@ -36,8 +36,21 @@ module ApplicationHelper
     end
   end
 
+  def format_display(format)
+    format == 'all' ? 'Total Content Upload' : format
+  end
+
+  def format_class(format)
+    format.split('/')[-1].downcase.gsub(/\s/, '_') + '_label' unless format.split('/')[-1].nil?
+  end
+
   def get_institution_for_tabs
-    @inst = current_user.institution
+    if @institution
+      @inst = @institution
+    else
+      @inst = current_user.institution
+    end
+
   end
 
   def dpn_process_time(item)
@@ -75,8 +88,8 @@ module ApplicationHelper
 
   def current_path(param, value)
     old_path = @current
-    old_path = url_for(params.except param) if old_path.include? param
-    old_path = url_for(params.except :page) if old_path.include? 'page'
+    old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except param) if old_path.include? param
+    old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except :page) if old_path.include? 'page'
     if value.kind_of?(Fixnum)
       encoded_val = value
     elsif value.include?('+')
@@ -90,22 +103,24 @@ module ApplicationHelper
     else
       new_path = "#{old_path}?#{param}=#{encoded_val}"
     end
+    # params[param] = encoded_val
+    # new_path = url_for(params.permit(Pharos::Application::PARAMS_HASH))
     new_path
   end
 
   def start_over_link(controller)
     case controller
       when 'catalog'
-        url = url_for(params.except(:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
                                     :file_association, :type, :state, :event_type, :outcome))
       when 'intellectual_objects'
-        url = url_for(params.except(:page, :sort, :institution, :access, :file_format, :state))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format, :state))
       when 'generic_files'
-        url = url_for(params.except(:page, :sort, :institution, :access, :file_format, :object_association, :state))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format, :object_association, :state))
       when 'premis_events'
-        url = url_for(params.except(:page, :sort, :institution, :access, :object_association, :file_association, :state, :event_type, :outcome))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :object_association, :file_association, :state, :event_type, :outcome))
       when 'work_items'
-        url = url_for(params.except(:page, :sort, :item_action, :institution, :stage, :status, :access, :object_association, :file_association, :state))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage, :status, :access, :object_association, :file_association, :state))
     end
     url
   end

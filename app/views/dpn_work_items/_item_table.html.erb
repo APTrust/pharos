@@ -7,17 +7,19 @@
     <th>Queued At</th>
     <th>Completed At</th>
     <th>Processing Time</th>
+    <th>Note</th>
   </tr>
   </thead>
   <tbody>
   <% @paged_results.each do |item| %>
       <tr>
-        <td><%= link_to item.identifier, dpn_work_item_path(item.id) %></td>
+        <td><a href="<%= dpn_work_item_path(id: item.id) %>" ><%= truncate(item.identifier, length: 50) %></a></td>
         <td><%= item.remote_node %></td>
         <td><%= item.task %></td>
-        <td><%= item.queued_at %></td>
-        <td><%= item.completed_at %></td>
+        <td><%= truncate(item.queued_at.to_s, length: 13) %></td>
+        <td><%= truncate(item.completed_at.to_s, length: 13) %></td>
         <td><%= dpn_process_time(item) %></td>
+        <th><%= truncate(item.note, length: 50) %></th>
       </tr>
   <% end %>
   </tbody>

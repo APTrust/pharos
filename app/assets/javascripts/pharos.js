@@ -1,6 +1,7 @@
 function activate_tabs() {
     $('#inst_show_tabs li:first').addClass('active');
     $('div.tab-content div.tab-pane:first').addClass('active');
+    $('#alert_index_tabs li:first').addClass('active');
 };
 
 function dropdown() {
@@ -286,6 +287,9 @@ function tabbed_nav(controller) {
             break;
         case 'reports':
             $('#rep_tab').addClass('active');
+            break;
+        case 'alerts':
+            $('#alert_tab').addClass('active');
             break;
     }
 }

@@ -12,6 +12,8 @@ module SearchAndIndex
     @action_counts = {}
     @event_type_counts = {}
     @outcome_counts = {}
+    @queued_counts = {}
+    @node_counts = {}
   end
 
   def filter_by_status
@@ -91,6 +93,24 @@ module SearchAndIndex
     @results = @results.with_outcome(params[:outcome]) unless @results.nil?
     @premis_events = @premis_events.with_outcome(params[:outcome]) unless @premis_events.nil?
     @selected[:outcome] = params[:outcome]
+  end
+
+  def filter_by_node
+    @results = @results.with_remote_node(params[:remote_node]) unless @results.nil?
+    @dpn_items = @dpn_items.with_remote_node(params[:remote_node]) unless @dpn_items.nil?
+    @selected[:remote_node] = params[:remote_node] if params[:remote_node]
+  end
+
+  def filter_by_queued
+    if params[:queued] == 'is_queued'
+      @results = @results.is_queued('true') unless @results.nil?
+      @dpn_items = @dpn_items.is_queued('true') unless @dpn_items.nil?
+      @selected[:queued] = 'Has been queued'
+    elsif params[:queued] == 'is_not_queued'
+      @results = @results.is_not_queued('true') unless @results.nil?
+      @dpn_items = @dpn_items.is_not_queued('true') unless @dpn_items.nil?
+      @selected[:queued] = 'Has not been queued'
+    end
   end
 
   def sort
@@ -249,6 +269,24 @@ module SearchAndIndex
     end
   end
 
+  def set_node_count(results)
+    unless @nodes.nil?
+      begin
+        counts = results.group(:remote_node).count
+        counts.each do |node, number|
+          @node_counts[node].nil? ? @node_counts[node] = number : @node_counts[node] +=number
+        end
+      rescue Exception => ex
+        logger.error ex.backtrace
+      end
+    end
+  end
+
+  def set_queued_count(results)
+    @queued_counts[:is_queued] = results.is_queued('true').count
+    @queued_counts[:is_not_queued] = results.is_not_queued('true').count
+  end
+
   def set_page_counts(count)
     @count = count
     params[:page] = 1 unless params[:page].present?
@@ -283,9 +321,12 @@ module SearchAndIndex
   end
 
   def format_current
-    path = request.fullpath.split('?').first
-    new_url = "#{request.base_url}#{path}?page=#{@page}&per_page=#{@per_page}"
-    new_url = add_params(new_url)
+    #path = request.fullpath.split('?').first
+    #new_url = "#{request.base_url}#{path}?page=#{@page}&per_page=#{@per_page}"
+    #new_url = add_params(new_url)
+    params[:page] = @page
+    params[:per_page] = @per_page
+    new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
     new_url
   end
 
@@ -293,10 +334,13 @@ module SearchAndIndex
     if @count.to_f / @per_page <= @page
       nil
     else
-      path = request.fullpath.split('?').first
+      #path = request.fullpath.split('?').first
       new_page = @page + 1
-      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{@per_page}"
-      new_url = add_params(new_url)
+      params[:page] = new_page
+      params[:per_page] = @per_page
+      new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+      #new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{@per_page}"
+      #new_url = add_params(new_url)
       new_url
     end
   end
@@ -305,10 +349,13 @@ module SearchAndIndex
     if @page == 1
       nil
     else
-      path = request.fullpath.split('?').first
+      #path = request.fullpath.split('?').first
       new_page = @page - 1
-      new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{@per_page}"
-      new_url = add_params(new_url)
+      params[:page] = new_page
+      params[:per_page] = @per_page
+      new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+      #new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{@per_page}"
+      #new_url = add_params(new_url)
       new_url
     end
   end

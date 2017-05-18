@@ -1,7 +1,7 @@
 class ChecksumsController < ApplicationController
   include SearchAndIndex
-  before_filter :authenticate_user!
-  before_filter :load_generic_file, only: :create
+  before_action :authenticate_user!
+  before_action :load_generic_file, only: :create
   after_action :verify_authorized
 
   def index
@@ -49,7 +49,8 @@ class ChecksumsController < ApplicationController
       .with_generic_file_identifier(params[:generic_file_identifier])
       .with_algorithm(params[:algorithm])
       .with_digest(params[:digest])
-    @checksums = @checksums.order('created_at DESC')
+    # PT #145151935: Sort by datetime, not created_at
+    @checksums = @checksums.order('datetime DESC')
     count = @checksums.count
     set_page_counts(count)
   end

@@ -24,13 +24,14 @@
           <% if user_signed_in? %>
               <% get_institution_for_tabs %>
               <ul class="nav nav-tabs">
-                <li id="inst_tab"><%= link_to 'Institutions', root_path %></li>
+                <li id="inst_tab"><%= link_to 'Institution', institution_path(@inst) %></li>
                 <li id="io_tab"><%= link_to 'Objects', intellectual_objects_path(@inst, sort: 'date') %></li>
                 <li id="gf_tab"><%= link_to 'Files', institution_files_path(@inst, sort: 'date') %></li>
                 <li id="pe_tab"><%= link_to 'Events', institution_events_path(@inst) %></li>
                 <li id="wi_tab"><%= link_to 'Work Items', work_items_path %></li>
                 <% if current_user.admin? %>
                     <li id="dpn_tab"><%= link_to 'DPN Items', dpn_work_items_path %></li>
+                    <li id="alert_tab"><%= link_to 'Alerts', alerts_path %></li>
                 <% end %>
                 <li id="rep_tab"><%= link_to 'Reports', reports_path(@inst.identifier) %></li>
               </ul>

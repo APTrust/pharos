@@ -3,15 +3,15 @@ require 'spec_helper'
 RSpec.describe ChecksumsController, type: :controller do
 
   before :all do
-    Institution.destroy_all
-    GenericFile.destroy_all
-    Checksum.destroy_all
+    Institution.delete_all
+    GenericFile.delete_all
+    Checksum.delete_all
   end
 
   after do
-    Institution.destroy_all
-    GenericFile.destroy_all
-    Checksum.destroy_all
+    Institution.delete_all
+    GenericFile.delete_all
+    Checksum.delete_all
   end
 
   let!(:institution_one) { FactoryGirl.create(:institution) }
@@ -39,21 +39,21 @@ RSpec.describe ChecksumsController, type: :controller do
       end
 
       it 'filters by generic file identifier' do
-        get :index, generic_file_identifier: generic_file_one.identifier, format: :json
+        get :index, params: { generic_file_identifier: generic_file_one.identifier }, format: :json
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [checksum_one.id]
       end
 
       it 'filters by algorithm' do
-        get :index, algorithm: 'md5', format: :json
+        get :index, params: { algorithm: 'md5' }, format: :json
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [checksum_two.id]
       end
 
       it 'filters by digest' do
-        get :index, digest: '12345678', format: :json
+        get :index, params: { digest: '12345678' }, format: :json
         expect(response).to be_success
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [checksum_two.id]
@@ -76,7 +76,7 @@ RSpec.describe ChecksumsController, type: :controller do
   describe 'POST create' do
     describe 'when not signed in' do
       it 'should redirect to login' do
-        post :create, generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5' }, format: :json
+        post :create, params: { generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5' } }, format: :json
         expect(response.status).to eq (401)
       end
     end
@@ -84,12 +84,12 @@ RSpec.describe ChecksumsController, type: :controller do
     describe 'when signed in' do
       before { sign_in institutional_admin }
       it 'should be forbidden when the file belongs to your institution' do
-        post :create, generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' }, format: :json
+        post :create, params: { generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' } }, format: :json
         expect(response.status).to eq (403)
       end
 
       it 'should be forbidden when the file does not belong to your institution' do
-        post :create, generic_file_identifier: generic_file_two.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' }, format: :json
+        post :create, params: { generic_file_identifier: generic_file_two.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' } }, format: :json
         expect(response.status).to eq (403)
       end
     end
@@ -97,13 +97,13 @@ RSpec.describe ChecksumsController, type: :controller do
     describe 'when signed in as admin' do
       before { sign_in admin }
       it 'should be successful' do
-        post :create, generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' }, format: :json
+        post :create, params: { generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' } }, format: :json
         expect(response.status).to eq (201)
         expect(assigns(:checksum).algorithm).to eq('md5')
       end
 
       it 'should show errors' do
-        post :create, generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5' }, format: :json
+        post :create, params: { generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5' } }, format: :json
         expect(response.status).to eq (422)
         # we should test for algorithm errors too but the checksum param can't be blank and there are only
         # three allowed attributes, all of which are required
