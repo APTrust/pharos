@@ -120,11 +120,11 @@ class IntellectualObjectsController < ApplicationController
                      outcome_information: "Action requested by user from #{current_user.institution_id}",
                      identifier: SecureRandom.uuid
       }
-      resource.soft_delete(attributes)
+      @intellectual_object.soft_delete(attributes)
       respond_to do |format|
         format.json { head :no_content }
         format.html {
-          flash[:notice] = "Delete job has been queued for object: #{resource.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
+          flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
           redirect_to root_path
         }
       end

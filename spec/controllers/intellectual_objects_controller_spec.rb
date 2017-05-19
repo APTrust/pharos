@@ -46,6 +46,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     IntellectualObject.delete_all
   end
 
+  after(:all) do
+    IntellectualObject.delete_all
+    WorkItem.delete_all
+    Institution.delete_all
+    PremisEvent.delete_all
+    GenericFile.delete_all
+  end
+
   describe 'GET #index' do
 
     describe 'when not signed in' do
@@ -471,7 +479,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                                 institution: inst1, state: 'A') }
     let!(:assc_file) { FactoryGirl.create(:generic_file, intellectual_object: deletable_obj_2) }
 
-    after do
+    after(:all) do
       IntellectualObject.delete_all
     end
 
@@ -498,7 +506,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
       it 'should create delete event and redirect (html)' do
-        delete :destroy, params: { intellectual_object_identifier: deletable_obj }
+        delete :destroy, params: { intellectual_object_identifier: deletable_obj.identifier }
         expect(response).to redirect_to root_url
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)

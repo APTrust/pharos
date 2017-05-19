@@ -3,6 +3,9 @@ require 'spec_helper'
 RSpec.describe IntellectualObject, :type => :model do
   after(:all) do
     IntellectualObject.delete_all
+    WorkItem.delete_all
+    Institution.delete_all
+    PremisEvent.delete_all
   end
 
   it { should validate_presence_of(:title) }
@@ -333,13 +336,8 @@ RSpec.describe IntellectualObject, :type => :model do
   end
 
   describe 'A saved instance' do
-    after { subject.destroy }
 
     describe 'with generic files' do
-      after do
-        subject.generic_files.delete_all
-      end
-
       subject { FactoryGirl.create(:intellectual_object) }
 
       before do
@@ -368,9 +366,9 @@ RSpec.describe IntellectualObject, :type => :model do
                                           stage: Pharos::Application::PHAROS_STAGES['record'],
                                           status: Pharos::Application::PHAROS_STATUSES['success'])
         }
-        after {
-          @work_item.delete
-        }
+        # after {
+        #   @work_item.delete
+        # }
         let(:intellectual_object_delete_job) { double('intellectual object') }
         let(:generic_file_delete_job) { double('file') }
 
@@ -406,6 +404,7 @@ RSpec.describe IntellectualObject, :type => :model do
       let(:inst_id) { subject.institution.id }
       describe '#identifier_is_unique' do
         it 'should validate uniqueness of the identifier' do
+          #puts "here"
           one = FactoryGirl.create(:intellectual_object, identifier: 'test.edu/234')
           two = FactoryGirl.build(:intellectual_object, identifier: 'test.edu/234')
           two.should_not be_valid
