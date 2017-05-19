@@ -6,6 +6,7 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:inst_user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id)}
   let(:crazy_file) { FactoryGirl.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0') }
   let(:question_file) { FactoryGirl.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161') }
+  let(:parens_file) { FactoryGirl.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf') }
 
   before(:all) do
     @institution = FactoryGirl.create(:institution)
@@ -122,6 +123,11 @@ RSpec.describe GenericFilesController, type: :controller do
     it 'should allow files with question marks in the identifier' do
       get :show, params: { generic_file_identifier: question_file.identifier }
       expect(assigns(:generic_file)).to eq question_file
+    end
+
+    it 'should allow files with parentheses in the identifier' do
+      get :show, params: { generic_file_identifier: parens_file.identifier }
+      expect(assigns(:generic_file)).to eq parens_file
     end
 
   end
