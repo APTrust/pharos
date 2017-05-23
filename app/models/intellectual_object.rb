@@ -88,9 +88,11 @@ class IntellectualObject < ActiveRecord::Base
     self.state = 'D'
     self.add_event(attributes)
     self.save!
-    Thread.new() do
-      background_deletion(attributes)
-      ActiveRecord::Base.connection.close
+    unless Rails.env.test?
+      Thread.new() do
+        background_deletion(attributes)
+        ActiveRecord::Base.connection.close
+      end
     end
   end
 
