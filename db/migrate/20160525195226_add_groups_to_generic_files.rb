@@ -1,4 +1,4 @@
-class AddGroupsToGenericFiles < ActiveRecord::Migration
+class AddGroupsToGenericFiles < ActiveRecord::Migration[4.2]
   def change
     add_column :generic_files, :read_groups, :string
     add_column :generic_files, :edit_groups, :string

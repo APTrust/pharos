@@ -1,4 +1,4 @@
-class RenameEventProperties < ActiveRecord::Migration
+class RenameEventProperties < ActiveRecord::Migration[4.2]
   def change
     change_table :premis_events do |t|
       t.rename :event_identifier, :identifier

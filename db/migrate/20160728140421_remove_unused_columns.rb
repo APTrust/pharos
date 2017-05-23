@@ -1,4 +1,4 @@
-class RemoveUnusedColumns < ActiveRecord::Migration
+class RemoveUnusedColumns < ActiveRecord::Migration[4.2]
   def change
     remove_column :generic_files, :intellectual_object, :string
     remove_column :generic_files, :content_dsLocation, :string

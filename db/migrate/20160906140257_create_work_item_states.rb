@@ -1,4 +1,4 @@
-class CreateWorkItemStates < ActiveRecord::Migration
+class CreateWorkItemStates < ActiveRecord::Migration[4.2]
   def change
     create_table :work_item_states do |t|
       t.integer :work_item_id

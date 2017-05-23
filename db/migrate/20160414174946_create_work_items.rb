@@ -1,4 +1,4 @@
-class CreateWorkItems < ActiveRecord::Migration
+class CreateWorkItems < ActiveRecord::Migration[4.2]
   def change
     create_table :work_items do |t|
       t.timestamps null: false

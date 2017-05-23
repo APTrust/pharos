@@ -1,4 +1,4 @@
-class AddIndicesForSearchEfficiency < ActiveRecord::Migration
+class AddIndicesForSearchEfficiency < ActiveRecord::Migration[4.2]
   def change
     add_index :premis_events, :intellectual_object_identifier
     add_index :premis_events, :generic_file_identifier

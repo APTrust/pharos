@@ -1,4 +1,4 @@
-class AddDetailsToWorkItems < ActiveRecord::Migration
+class AddDetailsToWorkItems < ActiveRecord::Migration[4.2]
   def change
     add_column :work_items, :name, :string
     add_column :work_items, :etag, :string

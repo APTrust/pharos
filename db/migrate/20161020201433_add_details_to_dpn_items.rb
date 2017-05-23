@@ -1,4 +1,4 @@
-class AddDetailsToDpnItems < ActiveRecord::Migration
+class AddDetailsToDpnItems < ActiveRecord::Migration[4.2]
   def change
     add_column :dpn_work_items, :node, :string, limit: 20, default: '', null: false
     add_column :dpn_work_items, :task, :string, limit: 40, default: '', null: false

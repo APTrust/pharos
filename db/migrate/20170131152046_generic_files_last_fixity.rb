@@ -1,4 +1,4 @@
-class GenericFilesLastFixity < ActiveRecord::Migration
+class GenericFilesLastFixity < ActiveRecord::Migration[4.2]
   def up
     puts "This migration takes a long time to run!"
     add_index :premis_events, [:generic_file_id, :event_type]

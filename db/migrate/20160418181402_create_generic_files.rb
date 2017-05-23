@@ -1,4 +1,4 @@
-class CreateGenericFiles < ActiveRecord::Migration
+class CreateGenericFiles < ActiveRecord::Migration[4.2]
   def change
     create_table :generic_files do |t|
       t.string :file_format

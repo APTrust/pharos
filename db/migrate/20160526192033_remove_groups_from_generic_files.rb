@@ -1,4 +1,4 @@
-class RemoveGroupsFromGenericFiles < ActiveRecord::Migration
+class RemoveGroupsFromGenericFiles < ActiveRecord::Migration[4.2]
   def change
     remove_column :generic_files, :read_groups, :string
     remove_column :generic_files, :edit_groups, :string

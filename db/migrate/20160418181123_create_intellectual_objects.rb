@@ -1,4 +1,4 @@
-class CreateIntellectualObjects < ActiveRecord::Migration
+class CreateIntellectualObjects < ActiveRecord::Migration[4.2]
   def change
     create_table :intellectual_objects do |t|
       t.string :title

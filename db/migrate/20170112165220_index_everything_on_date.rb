@@ -1,4 +1,4 @@
-class IndexEverythingOnDate < ActiveRecord::Migration
+class IndexEverythingOnDate < ActiveRecord::Migration[4.2]
   def change
     add_index :institutions, :name
     add_index :work_items, :date

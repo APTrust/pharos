@@ -1,4 +1,4 @@
-class FixDpnStateAgain < ActiveRecord::Migration
+class FixDpnStateAgain < ActiveRecord::Migration[4.2]
   def change
     # This is the same as the previous migration, but we have to
     # explicitly specify a limit, because if we don't, this
