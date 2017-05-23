@@ -1,5 +1,4 @@
 require 'bcrypt'
-require 'valid_email'
 
 class User < ActiveRecord::Base
   belongs_to :institution, foreign_key: :institution_id
@@ -13,14 +12,13 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :recoverable, :rememberable, :trackable,
          :timeoutable, :validatable
 
-  validates :email, presence: true
+  validates :email, presence: true, uniqueness: true
+  validate :email_is_valid
   validates :phone_number, presence: true
   validates :role_ids, presence: true
-  validates :email, uniqueness: true
   validates :institution_id, presence: true
   validate :institution_id_points_at_institution
   validates :name, presence: true
-  #validates :email, email: true
   phony_normalize :phone_number, :default_country_code => 'US'
   validates_plausible_phone :phone_number
   #validate :phone_number_length
@@ -133,6 +131,10 @@ class User < ActiveRecord::Base
 
   def institution_id_points_at_institution
     errors.add(:institution_id, 'is not a valid institution') unless Institution.exists?(institution_id)
+  end
+
+  def email_is_valid
+    errors.add(:email, 'is invalid') if !EmailValidator.valid?(email)
   end
 
   def phone_number_length

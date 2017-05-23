@@ -4,10 +4,11 @@ FactoryGirl.define do
     email { "#{Faker::Internet.user_name}@#{Faker::Internet.domain_name}.com" }
     phone_number { 4345551234 }
     password { 'password' }
-    institution_id { FactoryGirl.create(:institution).id }
     roles { [Role.where(name: 'public').first_or_create] }
+    institution_id { FactoryGirl.create(:institution).id }
 
     factory :aptrust_user, class: 'User' do
+      roles { [Role.where(name: 'admin').first_or_create] }
       institution_id {
         aptrust_institution = Institution.where(name: 'APTrust')
         if aptrust_institution.count == 1
