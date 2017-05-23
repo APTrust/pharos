@@ -17,9 +17,10 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *integration
+  <<: *default
   database: travis_ci_test
   username: postgres
+  host:     localhost
 
 # Database for integration tests. This will be emptied between
 # tests.
