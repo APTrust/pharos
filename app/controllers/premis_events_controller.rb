@@ -4,6 +4,7 @@ class PremisEventsController < ApplicationController
   before_action :authenticate_user!
   before_action :load_and_authorize_parent_object, only: [:create]
   before_action :set_format
+  after_action :check_for_failed_fixity, only: :create
   after_action :verify_authorized, only: [:index, :create]
 
   def index
@@ -145,6 +146,14 @@ class PremisEventsController < ApplicationController
 
   def set_format
     request.format = 'html' unless request.format == 'json' || request.format == 'html'
+  end
+
+  def check_for_failed_fixity
+    if @event.event_type == Pharos::Application::PHAROS_EVENT_TYPES['fixity'] && @event.outcome == 'Failure'
+
+    else
+      return
+    end
   end
 
 end

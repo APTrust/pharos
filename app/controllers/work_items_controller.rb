@@ -6,6 +6,7 @@ class WorkItemsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_item, only: [:show, :requeue]
   before_action :init_from_params, only: :create
+  after_action :check_for_completed_restoration, only: :update
   after_action :verify_authorized
 
   def index
@@ -482,5 +483,15 @@ class WorkItemsController < ApplicationController
 
   def to_boolean(str)
     str == 'true'
+  end
+
+  def check_for_completed_restoration
+    if @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] &&
+        @work_item.stage == Pharos::Application::PHAROS_STAGES['record'] &&
+        @work_item.status == Pharos::Application::PHAROS_STATUSES['success']
+
+    else
+      return
+    end
   end
 end
