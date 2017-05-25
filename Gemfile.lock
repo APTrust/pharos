@@ -293,7 +293,7 @@ DEPENDENCIES
   bootstrap-sass (~> 3.3.7)
   byebug
   capybara (= 2.14.0)
-  coffee-rails (~> 4.2.2)
+  coffee-rails (~> 4.2.1)
   coveralls (= 0.8.21)
   devise (= 4.3)
   email_validator
