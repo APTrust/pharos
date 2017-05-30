@@ -49,7 +49,7 @@ gem 'mail', '>= 2.6.6.rc1'
 #gem 'aws-sdk-core'
 
 group :development do
-  gem 'meta_request', '=0.4.2'
+  gem 'meta_request', '=0.4.3'
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
