@@ -99,6 +99,9 @@ Rails.application.routes.draw do
   resources :dpn_work_items, path: 'dpn_items', only: [:index, :show], format: :html
   get 'dpn_items/:id/requeue', to: 'dpn_work_items#requeue', format: [:json, :html], as: :requeue_dpn_item
 
+  # EMAIL ROUTES
+  resources :email, path: 'email_logs', only: [:index, :show], format: [:json]
+
   # USER ROUTES
   devise_for :users
 

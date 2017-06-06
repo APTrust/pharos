@@ -489,7 +489,8 @@ class WorkItemsController < ApplicationController
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] &&
         @work_item.stage == Pharos::Application::PHAROS_STAGES['record'] &&
         @work_item.status == Pharos::Application::PHAROS_STATUSES['success']
-
+      log = Email.log_restoration(@work_item.id)
+      NotificationMailer.restoration_notification(@work_item, log).deliver!
     else
       return
     end

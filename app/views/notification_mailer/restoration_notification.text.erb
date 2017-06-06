@@ -1,0 +1,8 @@
+Admin Users at <%= @item_institution.name %>,
+
+This email notification is to inform you that one of your restoration requests has successfully completed.
+The finished record of the restoration can be found at the following link:
+
+<a href="<%= work_item_path(id: @item.id) %>" ><%= @item.object_identifier %></a>
+
+Please contact the APTrust team by replying to this email if you have any questions.

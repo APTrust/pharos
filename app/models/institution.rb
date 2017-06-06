@@ -25,6 +25,12 @@ class Institution < ActiveRecord::Base
     User.where(institution_id: self.id).to_a.sort_by(&:name)
   end
 
+  def admin_users
+    admin_role = Role.where(name: 'admin').first
+    users = User.where(institution_id: self.id, role_id: admin_role.id)
+    users
+  end
+
   def serializable_hash(options={})
     { id: id, name: name, brief_name: brief_name, identifier: identifier, dpn_uuid: dpn_uuid }
   end

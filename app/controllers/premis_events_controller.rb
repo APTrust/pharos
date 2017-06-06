@@ -150,7 +150,8 @@ class PremisEventsController < ApplicationController
 
   def check_for_failed_fixity
     if @event.event_type == Pharos::Application::PHAROS_EVENT_TYPES['fixity'] && @event.outcome == 'Failure'
-
+      log = Email.log_fixity_fail(@event.identifier)
+      NotificationMailer.failed_fixity_notification(@event, log).deliver!
     else
       return
     end
