@@ -262,23 +262,36 @@ class WorkItem < ActiveRecord::Base
     delete_item
   end
 
-  def self.failed_action(datetime, action)
-    WorkItem.with_action(action)
-        .with_status(Pharos::Application::PHAROS_STATUSES['fail'])
-        .updated_after(datetime)
+  def self.failed_action(datetime, action, user)
+    if user.admin?
+      WorkItem.with_action(action)
+          .with_status(Pharos::Application::PHAROS_STATUSES['fail'])
+          .updated_after(datetime)
+    else
+      WorkItem.with_action(action)
+          .with_status(Pharos::Application::PHAROS_STATUSES['fail'])
+          .updated_after(datetime)
+          .with_institution(user.institution_id)
+    end
   end
 
-  def self.failed_action_count(datetime, action)
-    WorkItem.failed_action(datetime, action).count
+  def self.failed_action_count(datetime, action, user)
+    WorkItem.failed_action(datetime, action, user).count
   end
 
-  def self.stalled_items
-    WorkItem.where('queued_at < ? AND (status = ? OR status = ?)', (Time.now - 12.hours),
-                   Pharos::Application::PHAROS_STATUSES['pend'], Pharos::Application::PHAROS_STATUSES['start'])
+  def self.stalled_items(user)
+    if user.admin?
+      WorkItem.where('queued_at < ? AND (status = ? OR status = ?)', (Time.now - 12.hours),
+                     Pharos::Application::PHAROS_STATUSES['pend'], Pharos::Application::PHAROS_STATUSES['start'])
+    else
+      WorkItem.where('queued_at < ? AND (status = ? OR status = ?)', (Time.now - 12.hours),
+                     Pharos::Application::PHAROS_STATUSES['pend'], Pharos::Application::PHAROS_STATUSES['start'])
+                     .with_institution(user.institution_id)
+    end
   end
 
-  def self.stalled_items_count
-    WorkItem.stalled_items.count
+  def self.stalled_items_count(user)
+    WorkItem.stalled_items(user).count
   end
 
   def status_is_allowed

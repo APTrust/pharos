@@ -10,6 +10,7 @@ RSpec.describe AlertsController, type: :controller do
     @institution_one =  FactoryGirl.create(:institution, identifier: 'aptrust.org')
     @institution_two = FactoryGirl.create(:institution)
     @admin_user = FactoryGirl.create(:user, :admin, institution: @institution_one)
+    @institutional_admin = FactoryGirl.create(:user, :institutional_admin, institution: @institution_two)
     @institutional_user = FactoryGirl.create(:user, :institutional_user, institution: @institution_two)
     @failed_fixity = FactoryGirl.create(:premis_event_fixity_check_fail)
     @failed_fixity_two = FactoryGirl.create(:premis_event_fixity_check_fail, created_at: (Time.now - 36.hours))
@@ -61,7 +62,18 @@ RSpec.describe AlertsController, type: :controller do
       end
     end
 
-    describe 'for institutional users or institutional admins' do
+    describe 'for institutional admins' do
+      before do
+        sign_in @institutional_admin
+      end
+
+      it 'allows access (html)' do
+        get :index
+        expect(response).to be_success
+      end
+    end
+
+    describe 'for institutional users' do
       before do
         sign_in @institutional_user
       end
@@ -115,7 +127,18 @@ RSpec.describe AlertsController, type: :controller do
       end
     end
 
-    describe 'for institutional users or institutional admins' do
+    describe 'for institutional admins' do
+      before do
+        sign_in @institutional_admin
+      end
+
+      it 'allows access (html)' do
+        get :summary
+        expect(response).to be_success
+      end
+    end
+
+    describe 'for institutional users' do
       before do
         sign_in @institutional_user
       end

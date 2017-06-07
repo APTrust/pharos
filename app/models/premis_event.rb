@@ -76,14 +76,21 @@ class PremisEvent < ActiveRecord::Base
     data
   end
 
-  def self.failed_fixity_checks(datetime)
-    PremisEvent.with_type(Pharos::Application::PHAROS_EVENT_TYPES['fixity'])
-        .with_outcome('Failure')
-        .created_after(datetime)
+  def self.failed_fixity_checks(datetime, user)
+    if user.admin?
+      PremisEvent.with_type(Pharos::Application::PHAROS_EVENT_TYPES['fixity'])
+          .with_outcome('Failure')
+          .created_after(datetime)
+    else
+      PremisEvent.with_type(Pharos::Application::PHAROS_EVENT_TYPES['fixity'])
+          .with_outcome('Failure')
+          .created_after(datetime)
+          .with_institution(user.institution_id)
+    end
   end
 
-  def self.failed_fixity_check_count(datetime)
-    PremisEvent.failed_fixity_checks(datetime).count
+  def self.failed_fixity_check_count(datetime, user)
+    PremisEvent.failed_fixity_checks(datetime, user).count
   end
 
   private

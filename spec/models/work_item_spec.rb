@@ -382,29 +382,33 @@ RSpec.describe WorkItem, :type => :model do
   describe 'alert methods' do
     describe 'for failed ingest' do
       it 'failed_ingest should return a list of work items that have failed a specific action' do
+        user = FactoryGirl.create(:user, :admin)
         item = FactoryGirl.create(:work_item, action: ingest, status: failed)
-        items = WorkItem.failed_action(Time.now - 24.hours, ingest)
+        items = WorkItem.failed_action(Time.now - 24.hours, ingest, user)
         expect(items.first).to eq item
       end
 
       it 'failed_ingest_count should return the number of work items that have failed a specific action' do
+        user = FactoryGirl.create(:user, :admin)
         item = FactoryGirl.create(:work_item, action: ingest, status: failed)
-        count = WorkItem.failed_action_count(Time.now - 24.hours, ingest)
+        count = WorkItem.failed_action_count(Time.now - 24.hours, ingest, user)
         expect(count).to eq 1
       end
 
       it 'stalled_items should return a list of work items queued 12+ hours ago that have not succeeded, failed, or cancelled' do
+        user = FactoryGirl.create(:user, :admin)
         item1 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
         item2 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: started)
-        items = WorkItem.stalled_items
+        items = WorkItem.stalled_items(user)
         expect(items.first.id).to eq item1.id
         expect(items.last.id).to eq item2.id
       end
 
       it 'stalled_item_counts should return the number of work items queued 12+ hours ago that have not succeeded, failed, or cancelled' do
+        user = FactoryGirl.create(:user, :admin)
         item1 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
         item2 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: started)
-        count = WorkItem.stalled_items_count
+        count = WorkItem.stalled_items_count(user)
         expect(count).to eq 2
       end
     end
