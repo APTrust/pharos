@@ -55,12 +55,20 @@ class GenericFilesController < ApplicationController
   end
 
   def show
-    authorize @generic_file
-    respond_to do |format|
-      format.json { render json: object_as_json }
-      format.html {
-        @events = Kaminari.paginate_array(@generic_file.premis_events).page(params[:page]).per(10)
-      }
+    if @generic_file
+      authorize @generic_file
+      respond_to do |format|
+        format.json { render json: object_as_json }
+        format.html {
+          @events = Kaminari.paginate_array(@generic_file.premis_events).page(params[:page]).per(10)
+        }
+      end
+    else
+      authorize current_user, :nil_file?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.' }, status: :not_found }
+        format.html { redirect_to root_url, alert: 'This file could not be found. Please check to make sure the identifier was properly escaped.' }
+      end
     end
   end
 
