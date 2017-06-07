@@ -12,7 +12,7 @@ RSpec.describe AlertsController, type: :controller do
     @admin_user = FactoryGirl.create(:user, :admin, institution: @institution_one)
     @institutional_admin = FactoryGirl.create(:user, :institutional_admin, institution: @institution_two)
     @institutional_user = FactoryGirl.create(:user, :institutional_user, institution: @institution_two)
-    @failed_fixity = FactoryGirl.create(:premis_event_fixity_check_fail)
+    @failed_fixity = FactoryGirl.create(:premis_event_fixity_check_fail, institution: @institution_two)
     @failed_fixity_two = FactoryGirl.create(:premis_event_fixity_check_fail, created_at: (Time.now - 36.hours))
     @ingest_fail = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['ingest'], status: Pharos::Application::PHAROS_STATUSES['fail'])
     @restore_fail = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['restore'], status: Pharos::Application::PHAROS_STATUSES['fail'])
@@ -67,9 +67,11 @@ RSpec.describe AlertsController, type: :controller do
         sign_in @institutional_admin
       end
 
-      it 'allows access (html)' do
-        get :index
+      it 'allows access only to alerts on their content (html)' do
+        get :index, params: { since: (Time.now - 48.hours) }
         expect(response).to be_success
+        assigns(:alerts_list)[:failed_fixity_checks].first.should eq(@failed_fixity)
+        assigns(:alerts_list)[:failed_fixity_checks].count.should eq 1
       end
     end
 
