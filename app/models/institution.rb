@@ -26,9 +26,10 @@ class Institution < ActiveRecord::Base
   end
 
   def admin_users
-    admin_role = Role.where(name: 'admin').first
-    users = User.where(institution_id: self.id, role_id: admin_role.id)
-    users
+    admin_users = []
+    users = User.where(institution_id: self.id)
+    users.each { |user| admin_users.push(user) if user.institutional_admin? }
+    admin_users
   end
 
   def serializable_hash(options={})

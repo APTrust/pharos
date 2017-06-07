@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170517171329) do
+ActiveRecord::Schema.define(version: 20170606170218) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -36,6 +36,16 @@ ActiveRecord::Schema.define(version: 20170517171329) do
     t.integer "pid", default: 0
     t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
     t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
+  end
+
+  create_table "emails", force: :cascade do |t|
+    t.string "email_type"
+    t.string "event_identifier"
+    t.integer "item_id"
+    t.text "email_text"
+    t.text "user_list"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "generic_files", force: :cascade do |t|
@@ -100,8 +110,8 @@ ActiveRecord::Schema.define(version: 20170517171329) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "outcome"
     t.integer "institution_id"
+    t.string "outcome"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"

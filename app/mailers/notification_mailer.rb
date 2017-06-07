@@ -17,7 +17,7 @@ class NotificationMailer < ApplicationMailer
   def restoration_notification(work_item, email_log)
     @item_institution = work_item.institution
     @item = work_item
-    users = @item_institution.institution.admin_users
+    users = @item_institution.admin_users
     emails = []
     users.each { |user| emails.push(user.email) }
     emails.push('help@aptrust.org')

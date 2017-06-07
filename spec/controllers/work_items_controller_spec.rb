@@ -279,6 +279,16 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(return_data[1]['status']).to eq 'Success'
       end
 
+      it 'creates an email log if the item being updated is a completed restoration' do
+        wi_hash = FactoryGirl.create(:work_item_extended, action: Pharos::Application::PHAROS_ACTIONS['restore'],
+            stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success']).attributes
+        post :update, params: { id: item.id, work_item: wi_hash }, format: :json
+        expect(response.status).to eq(200)
+        email_log = Email.where(item_id: item.id)
+        expect(email_log.count).to eq(1)
+        expect(email_log[0].email_type).to eq('restoration')
+      end
+
     end
 
     describe 'for institutional admin' do

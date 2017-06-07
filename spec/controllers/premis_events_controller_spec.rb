@@ -12,6 +12,12 @@ RSpec.describe PremisEventsController, type: :controller do
                                                  intellectual_object_identifier: object.identifier,
                                                  generic_file_id: file.id,
                                                  generic_file_identifier: file.identifier) }
+  let(:fixity_fail) { FactoryGirl.attributes_for(:premis_event_fixity_check_fail,
+                                                 intellectual_object_id: object.id,
+                                                 intellectual_object_identifier: object.identifier,
+                                                 generic_file_id: file.id,
+                                                 generic_file_identifier: file.identifier,
+                                                 identifier: '1234-5678-9012-3456') }
 
   # An object and a file from a different institution:
   let(:someone_elses_object) { FactoryGirl.create(:intellectual_object, access: 'institution',
@@ -81,6 +87,14 @@ RSpec.describe PremisEventsController, type: :controller do
         object.premis_events.count.should == 1
         assigns(:parent).should == object
         assigns(:event).should_not be_nil
+      end
+
+      it 'creates an email log if the event created is a failed fixity check' do
+        post :create, body: fixity_fail.to_json, format: :json
+        expect(response.status).to eq(201)
+        email_log = Email.where(event_identifier: '1234-5678-9012-3456')
+        expect(email_log.count).to eq(1)
+        expect(email_log[0].email_type).to eq('fixity')
       end
 
     end
