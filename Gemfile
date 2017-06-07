@@ -19,7 +19,7 @@ gem 'jquery-ui-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.6.4'
+gem 'jbuilder', '~> 2.7.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.2', group: :doc
 
@@ -48,7 +48,7 @@ gem 'mail', '>= 2.6.6.rc1'
 #gem 'aws-sdk-core'
 
 group :development do
-  gem 'meta_request', '=0.4.2'
+  gem 'meta_request', '=0.4.3'
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views

@@ -13,11 +13,11 @@ class UserPolicy < ApplicationPolicy
   end
 
   def alert_summary?
-    user.admin?
+    user.admin? || user.institutional_admin?
   end
 
   def alert_index?
-    user.admin?
+    user.admin? || user.institutional_admin?
   end
 
   def delete_institution?
@@ -38,6 +38,10 @@ class UserPolicy < ApplicationPolicy
   end
 
   def nil_index?
+    true
+  end
+
+  def nil_file?
     true
   end
 

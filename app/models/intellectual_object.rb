@@ -37,7 +37,6 @@ class IntellectualObject < ActiveRecord::Base
     joins(:generic_files)
         .where('generic_files.file_format = ?', param) unless param.blank?
   }
-  scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :discoverable, ->(current_user) {
     # Any user can discover any item at their institution,
     # along with 'consortia' items from any institution.

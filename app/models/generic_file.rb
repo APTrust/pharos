@@ -30,7 +30,6 @@ class GenericFile < ActiveRecord::Base
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?
   }
-  scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :discoverable, ->(current_user) {
     joins(:intellectual_object)
     .where('intellectual_objects.institution_id = ?', current_user.institution.id) unless current_user.admin?

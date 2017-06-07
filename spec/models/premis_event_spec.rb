@@ -112,16 +112,18 @@ RSpec.describe PremisEvent, :type => :model do
 
   describe 'failed_fixity_checks' do
     it 'should return the events with a failed outcome and a fixity check type' do
+      user = FactoryGirl.create(:user, :admin)
       event = FactoryGirl.create(:premis_event_fixity_check_fail)
-      events = PremisEvent.failed_fixity_checks(Time.now - 24.hours)
+      events = PremisEvent.failed_fixity_checks(Time.now - 24.hours, user)
       expect(events.first).to eq event
     end
   end
 
   describe 'failed_fixity_check_counts' do
     it 'should return a count of the number of failed fixity check events' do
+      user = FactoryGirl.create(:user, :admin)
       event = FactoryGirl.create(:premis_event_fixity_check_fail)
-      count = PremisEvent.failed_fixity_check_count(Time.now - 24.hours)
+      count = PremisEvent.failed_fixity_check_count(Time.now - 24.hours, user)
       expect(count).to eq 1
     end
   end
