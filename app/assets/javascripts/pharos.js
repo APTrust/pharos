@@ -281,7 +281,7 @@ function dpnItemRequeue() {
             var id = $('#dpn_item_id').text();
             $.get('/dpn_items/' + id + '/requeue', {task: task, delete_state_item: checked},
                 function (data) {
-                    alert(data);
+                    alert('DPN Item has been requeued.');
                 });
         } else {
             $('#dpn_item_error').removeClass('hidden');
