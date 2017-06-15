@@ -213,7 +213,7 @@ function restoreRequeue(){
        var id = $('#work_item_id').text();
        $.get('/items/'+id+'/requeue', {delete_state_item: checked},
            function(data) {
-               alert(data);
+               alert('Item has been requeued.');
            });
    });
    $('#restore_form_cancel').on("click", function() {
@@ -232,7 +232,7 @@ function ingestRequeue(){
             var id = $('#work_item_id').text();
             $.get('/items/'+id+'/requeue', {item_stage: stage},
                 function(data) {
-                    alert(data);
+                    alert('Item has been requeued.');
                 });
         } else {
             $('#ingest_error').removeClass('hidden');
@@ -254,7 +254,7 @@ function dpnRequeue() {
             var id = $('#work_item_id').text();
             $.get('/items/' + id + '/requeue', {item_stage: stage},
                 function (data) {
-                    alert(data);
+                    alert('Item has been requeued.');
                 });
         } else {
             $('#dpn_error').removeClass('hidden');
@@ -281,7 +281,7 @@ function dpnItemRequeue() {
             var id = $('#dpn_item_id').text();
             $.get('/dpn_items/' + id + '/requeue', {task: task, delete_state_item: checked},
                 function (data) {
-                    alert(data);
+                    alert('DPN Item has been requeued.');
                 });
         } else {
             $('#dpn_item_error').removeClass('hidden');
