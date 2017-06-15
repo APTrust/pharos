@@ -8,4 +8,8 @@ class PremisEventPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def show?
+    user.admin? || user.institution_id == record.id
+  end
+
 end

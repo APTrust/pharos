@@ -1,11 +1,11 @@
 class EmailPolicy < ApplicationPolicy
 
   def index?
-    current_user.admin?
+    user.admin?
   end
 
   def show?
-    current_user.admin?
+    user.admin?
   end
 
 end

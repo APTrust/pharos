@@ -3,6 +3,7 @@ class PremisEventsController < ApplicationController
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_and_authorize_parent_object, only: [:create]
+  before_action :load_event, only: [:show]
   before_action :set_format
   after_action :check_for_failed_fixity, only: :create
   after_action :verify_authorized, only: [:index, :create]
@@ -58,6 +59,22 @@ class PremisEventsController < ApplicationController
     end
   end
 
+  def show
+    if @event
+      authorize @event
+      respond_to do |format|
+        format.json { render json: @event.serializable_hash }
+        format.html { }
+      end
+    else
+      authorize current_user, :nil_event?
+      respond_to do |format|
+        format.json { render nothing: true, status: :not_found }
+        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      end
+    end
+  end
+
   protected
 
   def load_intellectual_object
@@ -107,6 +124,10 @@ class PremisEventsController < ApplicationController
       end
     end
     authorize @parent, :add_event?
+  end
+
+  def load_event
+    @event = PremisEvent.find(params[:id])
   end
 
   def for_selected_institution

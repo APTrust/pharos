@@ -45,6 +45,10 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def nil_event?
+    true
+  end
+
   def set_restoration_status?
     user.admin?
   end

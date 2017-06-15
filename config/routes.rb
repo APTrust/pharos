@@ -48,8 +48,10 @@ Rails.application.routes.draw do
   get 'events/:file_identifier', to: 'premis_events#index', format: [:json, :html], file_identifier: file_ptrn, as: :generic_file_events
   get 'events/:object_identifier', to: 'premis_events#index', format: [:json, :html], object_identifier: object_ptrn, as: :intellectual_object_events
   get 'events/:institution_identifier', to: 'premis_events#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_events
+  get 'events/:id', to: 'premis_events#show', format: [:json, :html], as: :premis_event
   get '/api/v2/events', to: 'premis_events#index', format: [:json, :html]
   post '/api/v2/events', to: 'premis_events#create', format: :json
+  get '/api/v2/events/:id', to: 'premis_events#show', format: [:json, :html]
   get 'member-api/v2/events/:file_identifier', to: 'premis_events#index', format: :json, file_identifier: file_ptrn
   get 'member-api/v2/events/:object_identifier', to: 'premis_events#index', format: :json, object_identifier: object_ptrn
 
@@ -100,7 +102,7 @@ Rails.application.routes.draw do
   get 'dpn_items/:id/requeue', to: 'dpn_work_items#requeue', format: [:json, :html], as: :requeue_dpn_item
 
   # EMAIL ROUTES
-  resources :email, path: 'email_logs', only: [:index, :show], format: [:json]
+  resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]
 
   # USER ROUTES
   devise_for :users

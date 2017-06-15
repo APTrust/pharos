@@ -19,9 +19,11 @@ class Email < ApplicationRecord
 
   def has_proper_association
     if self.email_type == 'fixity'
-      errors.add(:event_identifer, 'must not be blank for a failed fixity check email') if self.event_identifier.nil?
+      errors.add(:event_identifier, 'must not be blank for a failed fixity check email') if self.event_identifier.nil?
+      errors.add(:item_id, 'must be left blank for a failed fixity check email') unless self.item_id.nil?
     elsif self.email_type == 'restoration'
       errors.add(:item_id, 'must not be blank for a restoration notification email') if self.item_id.nil?
+      errors.add(:event_identifier, 'must be left blank for a restoration notification email') unless self.event_identifier.nil?
     end
   end
 end

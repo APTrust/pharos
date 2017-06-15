@@ -1,0 +1,44 @@
+<div id="content" class="col-md-10">
+  <ol class="breadcrumb">
+    <li><a href="#"><%= link_to @event.institution.name, @event.institution %></a></li>
+    <li><a href="#"><%= link_to @event.intellectual_object.title, @event.intellectual_object %></a></li>
+    <% if @event.generic_file_identifier != '' %>
+        <li><a href="#"><%= link_to @event.generic_file.identifier, @event.generic_file %></a></li>
+    <% end %>
+    <li class="active"><%= @event.identifier %></li>
+  </ol>
+  <ol class="breadcrumb">
+    <li><a href="#"><%= link_to current_user.institution.name, current_user.institution %></a></li>
+  </ol>
+
+  <section class="page-header">
+    <h2><%= @event.identifier %></h2>
+  </section>
+
+  <section class="queue">
+    <table class="table indiv_event">
+      <tbody>
+      <tr><th>Event Identifier</th>
+        <td><%= @event.identifier %></td></tr>
+      <tr><th>Event Type</th>
+        <td><%= @event.event_type %></td></tr>
+      <tr><th>DateTime</th>
+        <td><%= time_ago_in_words @event.date_time %></td></tr>
+      <tr><th>Detail</th>
+        <td><%= @event.detail %></td></tr>
+      <tr><th>Outcome</th>
+        <td><%= @event.outcome %></td></tr>
+      <tr><th>Outcome Details</th>
+        <td><%= @event.outcome_detail %></td></tr>
+      <tr><th>Object</th>
+        <td><%= @event.object %></td></tr>
+      <tr><th>Agent</th>
+        <td><%= @event.agent %></td></tr>
+      <tr><th>Created At</th>
+        <td><%= @event.created_at %></td></tr>
+      <tr><th>Updated At</th>
+        <td><%= @event.updated_at %></td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>

@@ -49,9 +49,9 @@ class PremisEvent < ActiveRecord::Base
     where('(1 = 0)') unless current_user.admin?
   }
 
-  def to_param
-    identifier
-  end
+  # def to_param
+  #   identifier
+  # end
 
   def self.empty_param(param)
     (param.blank? || param.nil? || param == '*' || param == '' || param == '%') ? true : false
