@@ -90,13 +90,14 @@ RSpec.describe PremisEventsController, type: :controller do
       end
 
       it 'creates an email log if the event created is a failed fixity check' do
-        post :create, body: fixity_fail.to_json, format: :json
+        expect { post :create, body: fixity_fail.to_json, format: :json }.to change(Email, :count).by(1)
         expect(response.status).to eq(201)
         email_log = Email.where(event_identifier: '1234-5678-9012-3456')
         expect(email_log.count).to eq(1)
         expect(email_log[0].email_type).to eq('fixity')
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to eq("Admin Users at #{assigns(:event).institution.name},\r\n\r\nThis email notification is to inform you that one of your files failed a fixity check.\r\nThe failed fixity check can be found at the following link:\r\n\r\n<a href=\"http://localhost:3000/events/#{assigns(:event).id}\" >#{assigns(:event).identifier}</a>\r\n\r\nPlease contact the APTrust team by replying to this email if you have any questions.\r\n")
       end
-
     end
   end
 

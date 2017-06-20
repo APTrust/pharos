@@ -4,6 +4,7 @@ class NotificationMailer < ApplicationMailer
   def failed_fixity_notification(event, email_log)
     @event_institution = event.institution
     @event = event
+    @event_url = premis_event_url(id: @event.id)
     users = @event_institution.admin_users
     emails = []
     users.each { |user| emails.push(user.email) }
@@ -17,6 +18,7 @@ class NotificationMailer < ApplicationMailer
   def restoration_notification(work_item, email_log)
     @item_institution = work_item.institution
     @item = work_item
+    @item_url = work_item_url(id: @item.id)
     users = @item_institution.admin_users
     emails = []
     users.each { |user| emails.push(user.email) }

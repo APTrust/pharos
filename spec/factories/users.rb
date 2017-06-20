@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :user, class: 'User' do
     name { Faker::Name.name }
-    email { "#{Faker::Internet.user_name}@#{Faker::Internet.domain_name}.com" }
+    email { "#{Faker::Internet.user_name}@#{Faker::Internet.domain_name}" }
     phone_number { 4345551234 }
     password { 'password' }
     roles { [Role.where(name: 'public').first_or_create] }

@@ -889,4 +889,37 @@ RSpec.describe WorkItemsController, type: :controller do
       end
     end
   end
+
+  describe 'PUT #update for completed restoration' do
+    describe 'for admin' do
+      let(:current_dir) { File.dirname(__FILE__) }
+      let(:json_file) { File.join(current_dir, '..', 'fixtures', 'work_item_batch.json') }
+      let(:raw_json) { File.read(json_file) }
+      let(:wi_data) { JSON.parse(raw_json) }
+      let(:institution) { FactoryGirl.create(:institution) }
+      let(:object) { FactoryGirl.create(:intellectual_object, institution_id: institution.id) }
+      let(:item_one) { FactoryGirl.create(:work_item, institution_id: institution.id, intellectual_object_id: object.id, object_identifier: object.identifier) }
+      before do
+        sign_in admin_user
+        WorkItem.delete_all
+      end
+
+      it 'triggers an email notification' do
+        wi_hash = FactoryGirl.create(:work_item_extended).attributes
+        wi_hash['action'] = Pharos::Application::PHAROS_ACTIONS['restore']
+        wi_hash['status'] = Pharos::Application::PHAROS_STATUSES['success']
+        wi_hash['stage'] = Pharos::Application::PHAROS_STAGES['record']
+        expect { put :update, params: { id: item_one.id, format: 'json', work_item: wi_hash }
+        }.to change(Email, :count).by(1)
+        expect(assigns(:work_item).stage).to eq('Record')
+        expect(assigns(:work_item).status).to eq('Success')
+        expect(assigns(:work_item).action).to eq('Restore')
+        email_log = Email.where(item_id: assigns(:work_item).id)
+        expect(email_log.count).to eq(1)
+        expect(email_log[0].email_type).to eq('restoration')
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to eq("Admin Users at #{assigns(:work_item).institution.name},\r\n\r\nThis email notification is to inform you that one of your restoration requests has successfully completed.\r\nThe finished record of the restoration can be found at the following link:\r\n\r\n<a href=\"http://localhost:3000/items/#{assigns(:work_item).id}\" >#{assigns(:work_item).object_identifier}</a>\r\n\r\nPlease contact the APTrust team by replying to this email if you have any questions.\r\n")
+      end
+    end
+  end
 end
