@@ -279,15 +279,15 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(return_data[1]['status']).to eq 'Success'
       end
 
-      it 'creates an email log if the item being updated is a completed restoration' do
-        wi_hash = FactoryGirl.create(:work_item_extended, action: Pharos::Application::PHAROS_ACTIONS['restore'],
-            stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success']).attributes
-        post :update, params: { id: item.id, work_item: wi_hash }, format: :json
-        expect(response.status).to eq(200)
-        email_log = Email.where(item_id: item.id)
-        expect(email_log.count).to eq(1)
-        expect(email_log[0].email_type).to eq('restoration')
-      end
+      # it 'creates an email log if the item being updated is a completed restoration' do
+      #   wi_hash = FactoryGirl.create(:work_item_extended, action: Pharos::Application::PHAROS_ACTIONS['restore'],
+      #       stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success']).attributes
+      #   post :update, params: { id: item.id, work_item: wi_hash }, format: :json
+      #   expect(response.status).to eq(200)
+      #   email_log = Email.where(item_id: item.id)
+      #   expect(email_log.count).to eq(1)
+      #   expect(email_log[0].email_type).to eq('restoration')
+      # end
 
     end
 
@@ -890,36 +890,51 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
-  describe 'PUT #update for completed restoration' do
-    describe 'for admin' do
-      let(:current_dir) { File.dirname(__FILE__) }
-      let(:json_file) { File.join(current_dir, '..', 'fixtures', 'work_item_batch.json') }
-      let(:raw_json) { File.read(json_file) }
-      let(:wi_data) { JSON.parse(raw_json) }
-      let(:institution) { FactoryGirl.create(:institution) }
-      let(:object) { FactoryGirl.create(:intellectual_object, institution_id: institution.id) }
-      let(:item_one) { FactoryGirl.create(:work_item, institution_id: institution.id, intellectual_object_id: object.id, object_identifier: object.identifier) }
-      before do
-        sign_in admin_user
-        WorkItem.delete_all
-      end
+  # describe 'PUT #update for completed restoration' do
+  #   describe 'for admin' do
+  #     let(:current_dir) { File.dirname(__FILE__) }
+  #     let(:json_file) { File.join(current_dir, '..', 'fixtures', 'work_item_batch.json') }
+  #     let(:raw_json) { File.read(json_file) }
+  #     let(:wi_data) { JSON.parse(raw_json) }
+  #     let(:institution) { FactoryGirl.create(:institution) }
+  #     let(:object) { FactoryGirl.create(:intellectual_object, institution_id: institution.id) }
+  #     let(:item_one) { FactoryGirl.create(:work_item, institution_id: institution.id, intellectual_object_id: object.id, object_identifier: object.identifier) }
+  #     before do
+  #       sign_in admin_user
+  #       WorkItem.delete_all
+  #     end
+  #
+  #     it 'triggers an email notification' do
+  #       wi_hash = FactoryGirl.create(:work_item_extended).attributes
+  #       wi_hash['action'] = Pharos::Application::PHAROS_ACTIONS['restore']
+  #       wi_hash['status'] = Pharos::Application::PHAROS_STATUSES['success']
+  #       wi_hash['stage'] = Pharos::Application::PHAROS_STAGES['record']
+  #       expect { put :update, params: { id: item_one.id, format: 'json', work_item: wi_hash }
+  #       }.to change(Email, :count).by(1)
+  #       expect(assigns(:work_item).stage).to eq('Record')
+  #       expect(assigns(:work_item).status).to eq('Success')
+  #       expect(assigns(:work_item).action).to eq('Restore')
+  #       email_log = Email.where(item_id: assigns(:work_item).id)
+  #       expect(email_log.count).to eq(1)
+  #       expect(email_log[0].email_type).to eq('restoration')
+  #       email = ActionMailer::Base.deliveries.last
+  #       expect(email.body.encoded).to eq("Admin Users at #{assigns(:work_item).institution.name},\r\n\r\nThis email notification is to inform you that one of your restoration requests has successfully completed.\r\nThe finished record of the restoration can be found at the following link:\r\n\r\n<a href=\"http://localhost:3000/items/#{assigns(:work_item).id}\" >#{assigns(:work_item).object_identifier}</a>\r\n\r\nPlease contact the APTrust team by replying to this email if you have any questions.\r\n")
+  #     end
+  #   end
+  # end
 
-      it 'triggers an email notification' do
-        wi_hash = FactoryGirl.create(:work_item_extended).attributes
-        wi_hash['action'] = Pharos::Application::PHAROS_ACTIONS['restore']
-        wi_hash['status'] = Pharos::Application::PHAROS_STATUSES['success']
-        wi_hash['stage'] = Pharos::Application::PHAROS_STAGES['record']
-        expect { put :update, params: { id: item_one.id, format: 'json', work_item: wi_hash }
-        }.to change(Email, :count).by(1)
-        expect(assigns(:work_item).stage).to eq('Record')
-        expect(assigns(:work_item).status).to eq('Success')
-        expect(assigns(:work_item).action).to eq('Restore')
-        email_log = Email.where(item_id: assigns(:work_item).id)
-        expect(email_log.count).to eq(1)
-        expect(email_log[0].email_type).to eq('restoration')
-        email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to eq("Admin Users at #{assigns(:work_item).institution.name},\r\n\r\nThis email notification is to inform you that one of your restoration requests has successfully completed.\r\nThe finished record of the restoration can be found at the following link:\r\n\r\n<a href=\"http://localhost:3000/items/#{assigns(:work_item).id}\" >#{assigns(:work_item).object_identifier}</a>\r\n\r\nPlease contact the APTrust team by replying to this email if you have any questions.\r\n")
-      end
+  describe 'GET #notify_of_successful_restoration' do
+    before do
+      sign_in admin_user
+    end
+    it 'creates an email log of the notification email containing the restored items' do
+      restored_item = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                         status: Pharos::Application::PHAROS_STATUSES['success'],
+                                         stage: Pharos::Application::PHAROS_STAGES['record'])
+      expect { get :notify_of_successful_restoration, format: :json }.to change(Email, :count).by(1)
+      expect(response.status).to eq(204)
+      email = ActionMailer::Base.deliveries.last
+      expect(email.body.encoded).to include("http://localhost:3000/items?institution=#{restored_item.institution.id}&item_action=Restore&stage=Record&status=Success")
     end
   end
 end

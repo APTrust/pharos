@@ -5,6 +5,8 @@ class WorkItem < ActiveRecord::Base
   belongs_to :intellectual_object # may be nil
   belongs_to :generic_file        # may be nil
   has_one :work_item_state
+  has_and_belongs_to_many :emails
+
   validates :name, :etag, :bag_date, :bucket, :user, :institution, :date, :note, :action, :stage, :status, :outcome, presence: true
   validate :status_is_allowed
   validate :stage_is_allowed

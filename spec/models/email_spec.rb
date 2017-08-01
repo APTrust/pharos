@@ -41,4 +41,20 @@ RSpec.describe Email, type: :model do
     subject.errors[:item_id].should include('must not be blank for a restoration notification email')
     subject.errors[:event_identifier].should include('must be left blank for a restoration notification email')
   end
+
+  it 'validates that a multiple fixity email has events and not items' do
+    item = FactoryGirl.create(:work_item)
+    subject = FactoryGirl.create(:multiple_fixity_email, premis_events: [], work_items: [item])
+    subject.should_not be_valid
+    #subject.errors[:premis_events].should include('There must be at least one event associated with this type')
+    subject.errors[:work_items].should include('There must be no items associated with this type')
+  end
+
+  it 'validates that a multiple restoration email has items and not events' do
+    event = FactoryGirl.create(:premis_event_fixity_check_fail)
+    subject = FactoryGirl.create(:multiple_restoration_email, premis_events: [event], work_items: [])
+    subject.should_not be_valid
+    #subject.errors[:work_items].should include('There must be at least one item associated with this type')
+    subject.errors[:premis_events].should include('There must be no events associated with this type')
+  end
 end

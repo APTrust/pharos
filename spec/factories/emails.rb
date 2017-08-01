@@ -12,4 +12,14 @@ FactoryGirl.define do
     item_id { FactoryGirl.create(:work_item).id }
     email_text { 'This is the text of the email to be sent.' }
   end
+
+  factory :multiple_fixity_email, class: 'Email' do
+    email_type { 'multiple_fixity' }
+    premis_events {  }
+  end
+
+  factory :multiple_restoration_email, class: 'Email' do
+    email_type { 'multiple_restoration' }
+    work_items {  }
+  end
 end

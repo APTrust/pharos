@@ -12,13 +12,6 @@ RSpec.describe PremisEventsController, type: :controller do
                                                  intellectual_object_identifier: object.identifier,
                                                  generic_file_id: file.id,
                                                  generic_file_identifier: file.identifier) }
-  let(:fixity_fail) { FactoryGirl.attributes_for(:premis_event_fixity_check_fail,
-                                                 intellectual_object_id: object.id,
-                                                 intellectual_object_identifier: object.identifier,
-                                                 generic_file_id: file.id,
-                                                 generic_file_identifier: file.identifier,
-                                                 identifier: '1234-5678-9012-3456') }
-
   # An object and a file from a different institution:
   let(:someone_elses_object) { FactoryGirl.create(:intellectual_object, access: 'institution',
                                                  identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161') }
@@ -89,14 +82,29 @@ RSpec.describe PremisEventsController, type: :controller do
         assigns(:event).should_not be_nil
       end
 
-      it 'creates an email log if the event created is a failed fixity check' do
-        expect { post :create, body: fixity_fail.to_json, format: :json }.to change(Email, :count).by(1)
-        expect(response.status).to eq(201)
-        email_log = Email.where(event_identifier: '1234-5678-9012-3456')
-        expect(email_log.count).to eq(1)
-        expect(email_log[0].email_type).to eq('fixity')
+      # it 'creates an email log if the event created is a failed fixity check' do
+      #   expect { post :create, body: fixity_fail.to_json, format: :json }.to change(Email, :count).by(1)
+      #   expect(response.status).to eq(201)
+      #   email_log = Email.where(event_identifier: '1234-5678-9012-3456')
+      #   expect(email_log.count).to eq(1)
+      #   expect(email_log[0].email_type).to eq('fixity')
+      #   email = ActionMailer::Base.deliveries.last
+      #   expect(email.body.encoded).to eq("Admin Users at #{assigns(:event).institution.name},\r\n\r\nThis email notification is to inform you that one of your files failed a fixity check.\r\nThe failed fixity check can be found at the following link:\r\n\r\n<a href=\"http://localhost:3000/events/#{assigns(:event).id}\" >#{assigns(:event).identifier}</a>\r\n\r\nPlease contact the APTrust team by replying to this email if you have any questions.\r\n")
+      # end
+    end
+
+    describe 'GET notify_of_failed_fixity' do
+      it 'creates an email log of the notification email containing the failed fixity checks' do
+        fixity_fail = FactoryGirl.create(:premis_event_fixity_check_fail,
+                                         intellectual_object_id: object.id,
+                                         intellectual_object_identifier: object.identifier,
+                                         generic_file_id: file.id,
+                                         generic_file_identifier: file.identifier,
+                                         identifier: '1234-5678-9012-3456')
+        expect { get :notify_of_failed_fixity, format: :json }.to change(Email, :count).by(1)
+        expect(response.status).to eq(204)
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to eq("Admin Users at #{assigns(:event).institution.name},\r\n\r\nThis email notification is to inform you that one of your files failed a fixity check.\r\nThe failed fixity check can be found at the following link:\r\n\r\n<a href=\"http://localhost:3000/events/#{assigns(:event).id}\" >#{assigns(:event).identifier}</a>\r\n\r\nPlease contact the APTrust team by replying to this email if you have any questions.\r\n")
+        expect(email.body.encoded).to include("http://localhost:3000/events/#{fixity_fail.institution.identifier}?event_type=Fixity+Check&outcome=Failure")
       end
     end
   end

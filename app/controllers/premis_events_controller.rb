@@ -5,7 +5,7 @@ class PremisEventsController < ApplicationController
   before_action :load_and_authorize_parent_object, only: [:create]
   before_action :load_event, only: [:show]
   before_action :set_format
-  after_action :check_for_failed_fixity, only: :create
+  #after_action :check_for_failed_fixity, only: :create
   after_action :verify_authorized, only: [:index, :create]
 
   def index
@@ -72,6 +72,19 @@ class PremisEventsController < ApplicationController
         format.json { render nothing: true, status: :not_found }
         format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
       end
+    end
+  end
+
+  def notify_of_failed_fixity
+    authorize current_user
+    params[:since] = (DateTime.now - 24.hours) unless params[:since]
+    @events = PremisEvent.failed_fixity_checks(params[:since], current_user)
+    institutions = @events.distinct.pluck(:institution_id)
+    institutions.each do |inst|
+      inst_events = @events.where(institution_id: inst)
+      institution = Institution.find(inst)
+      log = Email.log_multiple_fixity_fail(inst_events)
+      NotificationMailer.multiple_failed_fixity_notification(@events, log, institution).deliver!
     end
   end
 

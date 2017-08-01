@@ -29,4 +29,33 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'Restoration complete on one of your work items')
   end
 
+  def multiple_failed_fixity_notification(events, email_log, event_institution)
+    @event_institution = event_institution
+    @events = events
+    @events_url = institution_events_url(@event_institution, event_type: 'Fixity Check', outcome: 'Failure')
+    users = @event_institution.admin_users
+    emails = []
+    users.each { |user| emails.push(user.email) }
+    emails.push('help@aptrust.org')
+    email_log.user_list = emails.join('; ')
+    email_log.save!
+    mail(to: emails, subject: 'Failed fixity check on one or more of your files')
+  end
+
+  def multiple_restoration_notification(work_items, email_log, item_institution)
+    @item_institution = item_institution
+    @items = work_items
+    @items_url = work_items_url(institution: @item_institution.id,
+                                stage: Pharos::Application::PHAROS_STAGES['record'],
+                                item_action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                status: Pharos::Application::PHAROS_STATUSES['success'])
+    users = @item_institution.admin_users
+    emails = []
+    users.each { |user| emails.push(user.email) }
+    emails.push('help@aptrust.org')
+    email_log.user_list = emails.join('; ')
+    email_log.save!
+    mail(to: emails, subject: 'Restoration notification on one or more of your bags')
+  end
+
 end

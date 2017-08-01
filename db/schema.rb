@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170606170218) do
+ActiveRecord::Schema.define(version: 20170801171053) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -46,6 +46,20 @@ ActiveRecord::Schema.define(version: 20170606170218) do
     t.text "user_list"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "emails_premis_events", id: false, force: :cascade do |t|
+    t.integer "premis_event_id"
+    t.integer "email_id"
+    t.index ["email_id"], name: "index_emails_premis_events_on_email_id"
+    t.index ["premis_event_id"], name: "index_emails_premis_events_on_premis_event_id"
+  end
+
+  create_table "emails_work_items", id: false, force: :cascade do |t|
+    t.integer "work_item_id"
+    t.integer "email_id"
+    t.index ["email_id"], name: "index_emails_work_items_on_email_id"
+    t.index ["work_item_id"], name: "index_emails_work_items_on_work_item_id"
   end
 
   create_table "generic_files", force: :cascade do |t|

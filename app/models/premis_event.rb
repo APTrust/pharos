@@ -2,6 +2,7 @@ class PremisEvent < ActiveRecord::Base
   belongs_to :institution
   belongs_to :intellectual_object
   belongs_to :generic_file
+  has_and_belongs_to_many :emails
 
   validates :identifier, :event_type, :date_time, :detail, :outcome, :outcome_detail, :object, :agent, presence: true
   validates_uniqueness_of :identifier

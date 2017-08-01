@@ -6,7 +6,7 @@ class WorkItemsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_item, only: [:show, :requeue]
   before_action :init_from_params, only: :create
-  after_action :check_for_completed_restoration, only: :update
+  #after_action :check_for_completed_restoration, only: :update
   after_action :verify_authorized
 
   def index
@@ -251,6 +251,22 @@ class WorkItemsController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: @items, status: :ok }
+    end
+  end
+
+  def notify_of_successful_restoration
+    authorize current_user
+    params[:since] = (DateTime.now - 24.hours) unless params[:since]
+    @items = WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS['restore'])
+                     .with_status(Pharos::Application::PHAROS_STATUSES['success'])
+                     .with_stage(Pharos::Application::PHAROS_STAGES['record'])
+                     .updated_after(params[:since])
+    institutions = @items.distinct.pluck(:institution_id)
+    institutions.each do |inst|
+      inst_items = @items.where(institution_id: inst)
+      institution = Institution.find(inst)
+      log = Email.log_multiple_restoration(inst_items)
+      NotificationMailer.multiple_restoration_notification(@items, log, institution).deliver!
     end
   end
 

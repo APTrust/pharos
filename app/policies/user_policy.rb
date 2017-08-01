@@ -53,6 +53,14 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def notify_of_failed_fixity?
+    user.admin?
+  end
+
+  def notify_of_successful_restoration?
+    user.admin?
+  end
+
   def state_show?
     user.admin?
   end
