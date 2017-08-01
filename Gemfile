@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.1.1'
+gem 'rails', '5.1.2'
 gem 'rails-controller-testing'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '1.3.13'
@@ -58,8 +58,8 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '2.14.3'
-  gem 'shoulda-matchers', '~> 3.1.1'
+  gem 'capybara', '2.14.4'
+  gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.21', require: false
 end
 
