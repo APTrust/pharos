@@ -10,7 +10,7 @@ Please contact the APTrust team by replying to this email if you have any questi
 
 <% @items.each do |item| %>
     <ul>
-      <li><a href="<%= work_item_path(item) %>" ><%= item.object_identifier %></a></li>
+      <li><a href="<%= work_item_url(item) %>" ><%= item.object_identifier %></a></li>
     </ul>
 <% end %>
 

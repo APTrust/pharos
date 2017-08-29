@@ -10,6 +10,6 @@ Please contact the APTrust team by replying to this email if you have any questi
 
 <% @events.each do |event| %>
     <ul>
-      <li><a href="<%= premis_event_path(event) %>" ><%= event.identifier %></a></li>
+      <li><a href="<%= premis_event_url(event) %>" ><%= event.identifier %></a></li>
     </ul>
 <% end %>
