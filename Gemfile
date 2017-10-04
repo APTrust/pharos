@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.1.2'
+gem 'rails', '5.1.4'
 gem 'rails-controller-testing'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '1.3.13'
@@ -58,7 +58,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '2.14.4'
+  gem 'capybara', '2.15.1'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.21', require: false
 end
@@ -72,7 +72,7 @@ group :development, :test, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_girl_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.6'
+  gem 'rspec-rails', '~> 3.6.1'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
