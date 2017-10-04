@@ -32,6 +32,17 @@ class Institution < ActiveRecord::Base
     admin_users
   end
 
+  def deletion_admin_user(requesting_user)
+    confirming_users = []
+    admin_users = self.admin_users
+    if admin_users.count == 1
+      confirming_users.push(admin_users.first)
+    else
+      admin_users.each { |user| confirming_users.push(user) if user.name != requesting_user.name }
+    end
+    confirming_users
+  end
+
   def serializable_hash(options={})
     { id: id, name: name, brief_name: brief_name, identifier: identifier, dpn_uuid: dpn_uuid }
   end

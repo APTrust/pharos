@@ -98,7 +98,7 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def destroy
+  def confirmed_destroy
     authorize @intellectual_object, :soft_delete?
     pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
@@ -131,7 +131,7 @@ class IntellectualObjectsController < ApplicationController
     else
       respond_to do |format|
         message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +
-          "You may delete this object after the #{pending.action} request has completed."
+            "You may delete this object after the #{pending.action} request has completed."
         format.json {
           render :json => { status: 'error', message: message }, :status => :conflict
         }
@@ -141,6 +141,10 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     end
+  end
+
+  def destroy
+
   end
 
   def send_to_dpn
