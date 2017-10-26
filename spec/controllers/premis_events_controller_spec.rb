@@ -102,7 +102,7 @@ RSpec.describe PremisEventsController, type: :controller do
                                          generic_file_identifier: file.identifier,
                                          identifier: '1234-5678-9012-3456')
         expect { get :notify_of_failed_fixity, format: :json }.to change(Email, :count).by(1)
-        expect(response.status).to eq(204)
+        expect(response.status).to eq(200)
         email = ActionMailer::Base.deliveries.last
         expect(email.body.encoded).to include("http://localhost:3000/events/#{fixity_fail.institution.identifier}?event_type=Fixity+Check&outcome=Failure")
       end

@@ -932,7 +932,7 @@ RSpec.describe WorkItemsController, type: :controller do
                                          status: Pharos::Application::PHAROS_STATUSES['success'],
                                          stage: Pharos::Application::PHAROS_STAGES['record'])
       expect { get :notify_of_successful_restoration, format: :json }.to change(Email, :count).by(1)
-      expect(response.status).to eq(204)
+      expect(response.status).to eq(200)
       email = ActionMailer::Base.deliveries.last
       expect(email.body.encoded).to include("http://localhost:3000/items?institution=#{restored_item.institution.id}&item_action=Restore&stage=Record&status=Success")
     end

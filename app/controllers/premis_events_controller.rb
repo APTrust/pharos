@@ -80,14 +80,25 @@ class PremisEventsController < ApplicationController
     params[:since] = (DateTime.now - 24.hours) unless params[:since]
     @events = PremisEvent.failed_fixity_checks(params[:since], current_user)
     institutions = @events.distinct.pluck(:institution_id)
+    number_of_emails = 0
+    inst_list = []
     institutions.each do |inst|
       inst_events = @events.where(institution_id: inst)
       institution = Institution.find(inst)
       log = Email.log_multiple_fixity_fail(inst_events)
       NotificationMailer.multiple_failed_fixity_notification(@events, log, institution).deliver!
+      number_of_emails = number_of_emails + 1
+      inst_list.push(institution.name)
     end
-    respond_to do |format|
-      format.json { render json: { message: 'Failed fixity email has been sent.' }, status: 204 }
+    if number_of_emails == 0
+      respond_to do |format|
+        format.json { render json: { message: 'No new failed fixity checks, no emails sent.' }, status: 204 }
+      end
+    else
+      inst_pretty = inst_list.join(', ')
+      respond_to do |format|
+        format.json { render json: { message: "#{number_of_emails} sent. Institutions that received a failed fixity notification: #{inst_pretty}." }, status: 200 }
+      end
     end
   end
 
