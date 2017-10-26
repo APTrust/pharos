@@ -268,6 +268,9 @@ class WorkItemsController < ApplicationController
       log = Email.log_multiple_restoration(inst_items)
       NotificationMailer.multiple_restoration_notification(@items, log, institution).deliver!
     end
+    respond_to do |format|
+      format.json { render json: { message: 'Restoration email has been sent.' }, status: 204 }
+    end
   end
 
   def api_search

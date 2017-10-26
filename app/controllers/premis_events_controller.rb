@@ -86,6 +86,9 @@ class PremisEventsController < ApplicationController
       log = Email.log_multiple_fixity_fail(inst_events)
       NotificationMailer.multiple_failed_fixity_notification(@events, log, institution).deliver!
     end
+    respond_to do |format|
+      format.json { render json: { message: 'Failed fixity email has been sent.' }, status: 204 }
+    end
   end
 
   protected

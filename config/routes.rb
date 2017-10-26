@@ -54,8 +54,8 @@ Rails.application.routes.draw do
   get '/api/v2/events/:id', to: 'premis_events#show', format: [:json, :html]
   get 'member-api/v2/events/:file_identifier', to: 'premis_events#index', format: :json, file_identifier: file_ptrn
   get 'member-api/v2/events/:object_identifier', to: 'premis_events#index', format: :json, object_identifier: object_ptrn
-  get 'events/failed_fixity_notification', to: 'premis_events#notify_of_failed_fixity', format: :json
-  get '/api/v2/events/failed_fixity_notification', to: 'premis_events#notify_of_failed_fixity', format: :json
+  get 'events/notifications/failed_fixity', to: 'premis_events#notify_of_failed_fixity', format: :json
+  get '/api/v2/events/notifications/failed_fixity', to: 'premis_events#notify_of_failed_fixity', format: :json
 
   # WORK ITEM ROUTES
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
@@ -71,8 +71,8 @@ Rails.application.routes.draw do
   get 'items/set_restoration_status', to: 'work_items#set_restoration_status', format: :json
   get 'api/v2/items/search', to: 'work_items#api_search', format: :json
   get 'items/:id/requeue', to: 'work_items#requeue', format: [:json, :html], as: :requeue_work_item
-  get 'items/restoration_notification', to: 'work_items#notify_of_successful_restoration', format: :json
-  get '/api/v2/items/restoration_notification', to: 'work_items#notify_of_successful_restoration', format: :json
+  get 'items/notifications/successful_restoration', to: 'work_items#notify_of_successful_restoration', format: :json
+  get '/api/v2/items/notifications/successful_restoration', to: 'work_items#notify_of_successful_restoration', format: :json
 
   # WORK ITEM STATE ROUTES
   #resources :work_item_states, path: 'item_state', only: [:show, :update, :create], format: :json, param: :work_item_id
