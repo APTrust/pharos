@@ -50,20 +50,6 @@ namespace :pharos do
     end
   end
 
-  # desc 'Run ci'
-  # task :travis do
-  #   puts 'Updating Solr config'
-  #   Rake::Task['jetty:config'].invoke
-  #
-  #   require 'jettywrapper'
-  #   jetty_params = Jettywrapper.load_config
-  #   puts 'Starting Jetty'
-  #   error = Jettywrapper.wrap(jetty_params) do
-  #     Rake::Task['rspec'].invoke
-  #   end
-  #   raise "test failures: #{error}" if error
-  # end
-
   desc 'Create dummy dpn work items for testing'
   task dummy_dpn: :environment do
     if Rails.env.production?
