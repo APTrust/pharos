@@ -42,6 +42,41 @@ namespace :pharos do
     puts "You should be able to log in as ops@aptrust.org, with password 'password'"
   end
 
+  desc 'Set up user API key'
+  task :set_user_api_key, [:user_email, :hex_length] => :environment do |_, args|
+    args.with_defaults(:hex_length => 20)
+    email = args[:user_email].to_s
+    length = args[:hex_length].to_i
+    user = User.where(email: email).first
+    if user
+      user.generate_api_key(length)
+      user.save! ?
+          puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}" :
+          puts 'ERROR: Unable to create API key.'
+    else
+      puts "A user with email address #{email} could not be found. Please double check your inputs and the existence of said user."
+    end
+  end
+
+  desc 'Update user API key'
+  task :update_user_api_key, [:user_email, :api_key] => :environment do |_, args|
+    email = args[:user_email].to_s
+    hex_key = args[:api_key].to_s
+    user = User.where(email: email).first
+    if user
+      if user.api_secret_key == hex_key
+        puts 'The passed in API key matches the key that is already stored in the DB, no need to update.'
+      else
+        user.api_secret_key = hex_key
+        user.save! ?
+            puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}" :
+            puts 'ERROR: Unable to create API key.'
+      end
+    else
+      puts "A user with email address #{email} could not be found. Please double check your inputs and the existence of said user."
+    end
+  end
+
   # Restricted only to non-production environments
   desc 'Empty the database'
   task empty_db: :environment do
@@ -67,7 +102,6 @@ namespace :pharos do
       FactoryGirl.create(:dpn_work_item, queued_at: nil, completed_at: nil)
     end
   end
-
 
   desc 'Empty DB and add dummy information'
   task :populate_db, [:numIntObjects, :numGenFiles] => [:environment] do |_, args|
