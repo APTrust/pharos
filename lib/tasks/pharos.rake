@@ -37,7 +37,7 @@ namespace :pharos do
       create_roles(roles)
       create_users()
     else
-      puts "Nothing to do: Institution, groups, and admin user already exist."
+      puts 'Nothing to do: Institution, groups, and admin user already exist.'
     end
     puts "You should be able to log in as ops@aptrust.org, with password 'password'"
   end
@@ -50,9 +50,11 @@ namespace :pharos do
     user = User.where(email: email).first
     if user
       user.generate_api_key(length)
-      user.save! ?
-          puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}" :
-          puts 'ERROR: Unable to create API key.'
+      if user.save!
+        puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}"
+      else
+        puts 'ERROR: Unable to create API key.'
+      end
     else
       puts "A user with email address #{email} could not be found. Please double check your inputs and the existence of said user."
     end
@@ -68,9 +70,11 @@ namespace :pharos do
         puts 'The passed in API key matches the key that is already stored in the DB, no need to update.'
       else
         user.api_secret_key = hex_key
-        user.save! ?
-            puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}" :
-            puts 'ERROR: Unable to create API key.'
+        if user.save!
+          puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}"
+        else
+          puts 'ERROR: Unable to create API key.'
+        end
       end
     else
       puts "A user with email address #{email} could not be found. Please double check your inputs and the existence of said user."
