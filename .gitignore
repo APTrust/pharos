@@ -12,6 +12,7 @@
 
 # IDE files
 .idea
+*/.idea
 .project
 *.sublime-text.*
 *~
