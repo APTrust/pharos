@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ## Simple helper program is designed to curl private Pharos API endpoints
 # in order to trigger email notifications about failed or stuck repository ingests.
 # It requires a post request. It takes four inputs as params:
