@@ -49,6 +49,10 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def object_create?
+    user.admin?
+  end
+
   def set_restoration_status?
     user.admin?
   end
