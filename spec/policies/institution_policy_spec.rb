@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe InstitutionPolicy do
   subject (:institution_policy) { InstitutionPolicy.new(user, institution) }
-  let(:institution) { FactoryGirl.create(:institution) }
-  let(:other_institution) { FactoryGirl.create(:institution) }
+  let(:institution) { FactoryBot.create(:institution) }
+  let(:other_institution) { FactoryBot.create(:institution) }
 
   context 'for an admin user' do
-    let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }
+    let(:user) { FactoryBot.create(:user, :admin, institution_id: institution.id) }
     describe 'access any institution' do
       it do
         should permit(:create)
@@ -21,7 +21,7 @@ describe InstitutionPolicy do
     end
 
     describe "access an intellectual object's institution" do
-      let(:intellectual_object) { FactoryGirl.create(:intellectual_object) }
+      let(:intellectual_object) { FactoryBot.create(:intellectual_object) }
       let(:institution) { intellectual_object.institution}
       it { should permit(:add_user)}
     end
@@ -30,7 +30,7 @@ describe InstitutionPolicy do
   context 'for an institutional admin user' do
     describe 'when the institution is' do
       describe 'in my institution' do
-        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: institution.id) }
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: institution.id) }
         it do
           should permit(:show)
           should_not permit(:create)
@@ -43,7 +43,7 @@ describe InstitutionPolicy do
       end
 
       describe 'not in my institution' do
-        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: other_institution.id) }
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: other_institution.id) }
         it do
           should_not permit(:create)
           should_not permit(:new)
@@ -60,7 +60,7 @@ describe InstitutionPolicy do
   context 'for an institutional user' do
     describe 'when the institution is' do
       describe 'in my institution' do
-        let(:user) { FactoryGirl.create(:user, :institutional_user,
+        let(:user) { FactoryBot.create(:user, :institutional_user,
                                         institution_id: institution.id) }
         it do
           should permit(:show)
@@ -74,7 +74,7 @@ describe InstitutionPolicy do
       end
 
       describe 'not in my institution' do
-        let(:user) { FactoryGirl.create(:user, :institutional_user,
+        let(:user) { FactoryBot.create(:user, :institutional_user,
                                         institution_id: other_institution.id) }
         it do
           should_not permit(:create)
@@ -90,7 +90,7 @@ describe InstitutionPolicy do
   end
 
   context 'for an authenticated user without a user group' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     it do
       should_not permit(:show)
       should_not permit(:create)

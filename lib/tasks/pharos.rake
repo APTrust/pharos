@@ -98,12 +98,12 @@ namespace :pharos do
 
     puts 'Creating queued dpn items'
     15.times.each do
-      FactoryGirl.create(:dpn_work_item)
+      FactoryBot.create(:dpn_work_item)
     end
 
     puts 'Created not queued dpn items'
     15.times.each do
-      FactoryGirl.create(:dpn_work_item, queued_at: nil, completed_at: nil)
+      FactoryBot.create(:dpn_work_item, queued_at: nil, completed_at: nil)
     end
   end
 
@@ -130,7 +130,7 @@ namespace :pharos do
       num_users = rand(1..5)
       num_users.times.each do |count|
         puts "== Creating user #{count+1} of #{num_users} for #{institution.name}"
-        FactoryGirl.create(:user, :institutional_user, institution_id: institution.id)
+        FactoryBot.create(:user, :institutional_user, institution_id: institution.id)
       end
 
       num_items = args[:numIntObjects].to_i
@@ -139,17 +139,17 @@ namespace :pharos do
         name = "#{SecureRandom.uuid}"
         bag_name = "#{name}.tar"
         ident = "#{institution.identifier}/#{name}"
-        item = FactoryGirl.create(:intellectual_object, institution: institution, identifier: ident, bag_name: bag_name)
+        item = FactoryBot.create(:intellectual_object, institution: institution, identifier: ident, bag_name: bag_name)
         item.save!
-        item.add_event(FactoryGirl.attributes_for(:premis_event_ingest, detail: 'Metadata recieved from bag.', outcome_detail: 'something', outcome_information: 'Parsed as part of bag submission.'))
-        item.add_event(FactoryGirl.attributes_for(:premis_event_identifier, outcome_detail: item.id, outcome_information: 'Assigned by Rake.'))
+        item.add_event(FactoryBot.attributes_for(:premis_event_ingest, detail: 'Metadata recieved from bag.', outcome_detail: 'something', outcome_information: 'Parsed as part of bag submission.'))
+        item.add_event(FactoryBot.attributes_for(:premis_event_identifier, outcome_detail: item.id, outcome_information: 'Assigned by Rake.'))
 
         #add Work item for intellectual object
-        wi = FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
-        FactoryGirl.create(:work_item_state, work_item: wi)
+        wi = FactoryBot.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
+        FactoryBot.create(:work_item_state, work_item: wi)
 
         # 5.times.each do |count|
-        #   FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name)
+        #   FactoryBot.create(:work_item, institution: institution, intellectual_object: item, name: name)
         # end
 
         num_files = args[:numGenFiles].to_i
@@ -180,12 +180,12 @@ namespace :pharos do
               uri: "file:///#{item.identifier}/data/#{name}#{file_count}.#{format[:ext]}",
               identifier: "#{item.identifier}/data/#{name}#{file_count}.#{format[:ext]}",
           }
-          f = FactoryGirl.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier], created_at: create)
+          f = FactoryBot.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier], created_at: create)
           f.save!
-          f.add_event(FactoryGirl.attributes_for(:premis_event_validation, institution: institution))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: institution))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: institution))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_validation, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_fixity_check, institution: institution))
           f.save!
         end
       end

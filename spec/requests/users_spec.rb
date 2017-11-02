@@ -9,8 +9,8 @@ describe 'Users' do
   describe 'DELETE users', :type => :feature do
     before do
       User.delete_all
-      @user = FactoryGirl.create(:user, :admin)
-      @user2 = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user, :admin)
+      @user2 = FactoryBot.create(:user)
     end
 
     it 'should provide message after delete with name of deleted user' do

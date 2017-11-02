@@ -9,9 +9,9 @@ describe 'Faceting' do
   end
 
   describe 'Logged in as institutional_admin' do
-    let(:file) { FactoryGirl.create(:generic_file) }
+    let(:file) { FactoryBot.create(:generic_file) }
     let(:inst) { file.institution }
-    let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: inst.id) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: inst.id) }
 
     before do
       login_as user
@@ -19,9 +19,9 @@ describe 'Faceting' do
 
     describe 'Events list' do
       before do
-        @event1 = file.add_event(FactoryGirl.attributes_for(:premis_event_ingest))
-        @event2 = file.add_event(FactoryGirl.attributes_for(:premis_event_validation))
-        @event3 = file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, outcome: 'Failure'))
+        @event1 = file.add_event(FactoryBot.attributes_for(:premis_event_ingest))
+        @event2 = file.add_event(FactoryBot.attributes_for(:premis_event_validation))
+        @event3 = file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, outcome: 'Failure'))
         file.save!
       end
 

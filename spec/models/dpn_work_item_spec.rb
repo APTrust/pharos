@@ -56,16 +56,16 @@ RSpec.describe DpnWorkItem, type: :model do
   end
 
   it 'should validate that task is one of the allowed options' do
-    subject = FactoryGirl.build(:dpn_work_item, task: 'not_allowed')
+    subject = FactoryBot.build(:dpn_work_item, task: 'not_allowed')
     subject.should_not be_valid
     subject.errors[:task].should include('Task is not one of the allowed options')
   end
 
 
   describe 'filters' do
-    let(:item1) { FactoryGirl.create(:dpn_work_item) }
-    let(:item2) { FactoryGirl.create(:dpn_work_item) }
-    let(:item3) { FactoryGirl.create(:dpn_work_item) }
+    let(:item1) { FactoryBot.create(:dpn_work_item) }
+    let(:item2) { FactoryBot.create(:dpn_work_item) }
+    let(:item3) { FactoryBot.create(:dpn_work_item) }
 
     it 'should filter by complete' do
       item1.completed_at = nil
@@ -91,7 +91,7 @@ RSpec.describe DpnWorkItem, type: :model do
   end
 
   describe 'requeue' do
-    let(:item1) { FactoryGirl.create(:dpn_work_item, state: 'This needs a state.') }
+    let(:item1) { FactoryBot.create(:dpn_work_item, state: 'This needs a state.') }
 
     it 'should delete the state when the state box is checked' do
       item1.requeue_item('true')
@@ -106,13 +106,13 @@ RSpec.describe DpnWorkItem, type: :model do
 
   describe 'alert methods' do
     it 'stalled_dpn_replications should return a list of dpn work items that have stalled during dpn replication' do
-      item = FactoryGirl.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
+      item = FactoryBot.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
       items = DpnWorkItem.stalled_dpn_replications
       expect(items.first).to eq item
     end
 
     it 'stalled_dpn_replication_counts should return the number of dpn work items that have stalled during dpn replication' do
-      item = FactoryGirl.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
+      item = FactoryBot.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
       count = DpnWorkItem.stalled_dpn_replication_count
       expect(count).to eq 1
     end

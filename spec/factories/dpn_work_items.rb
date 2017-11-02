@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :dpn_work_item do
     remote_node { %w(chron hathi sdr tdr aptrust).sample }
     processing_node { %w(chron hathi sdr tdr aptrust).sample }

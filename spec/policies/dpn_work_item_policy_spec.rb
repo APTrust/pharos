@@ -4,8 +4,8 @@ describe DpnWorkItemPolicy do
   subject (:dpn_work_item_policy) { DpnWorkItemPolicy.new(user, dpn_item) }
 
   context 'for an admin user' do
-    let(:user) { FactoryGirl.create(:user, :admin) }
-    let(:dpn_item) { FactoryGirl.build(:dpn_work_item)}
+    let(:user) { FactoryBot.create(:user, :admin) }
+    let(:dpn_item) { FactoryBot.build(:dpn_work_item)}
 
     it 'access any dpn work item' do
       should permit(:create)
@@ -17,8 +17,8 @@ describe DpnWorkItemPolicy do
   end
 
   context 'for an institutional admin user' do
-    let(:user) { FactoryGirl.create(:user, :institutional_admin) }
-    let(:dpn_item) { FactoryGirl.build(:dpn_work_item)}
+    let(:user) { FactoryBot.create(:user, :institutional_admin) }
+    let(:dpn_item) { FactoryBot.build(:dpn_work_item)}
 
     it 'not access any dpn work item' do
       should_not permit(:create)
@@ -30,8 +30,8 @@ describe DpnWorkItemPolicy do
   end
 
   context 'for an institutional user' do
-    let(:user) { FactoryGirl.create(:user, :institutional_user) }
-    let(:dpn_item) { FactoryGirl.build(:dpn_work_item)}
+    let(:user) { FactoryBot.create(:user, :institutional_user) }
+    let(:dpn_item) { FactoryBot.build(:dpn_work_item)}
 
     it 'not access any dpn work item' do
       should_not permit(:create)

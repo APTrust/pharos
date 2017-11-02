@@ -10,10 +10,10 @@ RSpec.describe EmailsController, type: :controller do
     Email.delete_all
   end
 
-  let!(:email_one) { FactoryGirl.create(:fixity_email) }
-  let!(:email_two) { FactoryGirl.create(:restoration_email) }
-  let!(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin) }
+  let!(:email_one) { FactoryBot.create(:fixity_email) }
+  let!(:email_two) { FactoryBot.create(:restoration_email) }
+  let!(:admin_user) { FactoryBot.create(:user, :admin) }
+  let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin) }
 
   describe '#GET index' do
     describe 'for admin users' do
