@@ -8,7 +8,7 @@ RSpec.describe UsageSample, :type => :model do
 
   describe 'on an institution' do
     size = 184512282
-    before(:all) { @file =  FactoryGirl.create(:generic_file, size: size ) }
+    before(:all) { @file =  FactoryBot.create(:generic_file, size: size ) }
     after :all do
       @file.delete
       # active_fedora is clearning out the relationship when it's deleted so we can't use it, so cache.

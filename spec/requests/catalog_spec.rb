@@ -24,7 +24,7 @@ describe 'Catalog' do
     describe 'for authenticated' do
       describe 'admin users' do
         before(:all) do
-          @user = FactoryGirl.create(:user, :admin)
+          @user = FactoryBot.create(:user, :admin)
           login_as(@user)
         end
 
@@ -41,7 +41,7 @@ describe 'Catalog' do
 
       describe 'institutional_admin users' do
         before(:all) do
-          @user = FactoryGirl.create(:aptrust_user, :institutional_admin)
+          @user = FactoryBot.create(:aptrust_user, :institutional_admin)
           login_as(@user)
         end
 
@@ -58,7 +58,7 @@ describe 'Catalog' do
 
       describe 'institutional_user users' do
         before(:all) do
-          @user = FactoryGirl.create(:aptrust_user, :institutional_user)
+          @user = FactoryBot.create(:aptrust_user, :institutional_user)
           login_as(@user)
         end
 

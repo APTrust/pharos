@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 RSpec.describe WorkItemsController, type: :controller do
-  let!(:institution) { FactoryGirl.create(:institution) }
-  let!(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
-  let!(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
-  let!(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
-  let!(:item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success'], retry: false) }
-  let!(:user_item) { FactoryGirl.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, status: Pharos::Application::PHAROS_STATUSES['fail'], retry: false) }
-  let!(:state_item) { FactoryGirl.create(:work_item_state, work_item: item) }
-  let!(:user_state_item) { FactoryGirl.create(:work_item_state, work_item: user_item) }
+  let!(:institution) { FactoryBot.create(:institution) }
+  let!(:admin_user) { FactoryBot.create(:user, :admin) }
+  let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+  let!(:object) { FactoryBot.create(:intellectual_object, institution: institution, access: 'institution') }
+  let!(:file) { FactoryBot.create(:generic_file, intellectual_object: object) }
+  let!(:item) { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success'], retry: false) }
+  let!(:user_item) { FactoryBot.create(:work_item, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, status: Pharos::Application::PHAROS_STATUSES['fail'], retry: false) }
+  let!(:state_item) { FactoryBot.create(:work_item_state, work_item: item) }
+  let!(:user_state_item) { FactoryBot.create(:work_item_state, work_item: user_item) }
 
   # after do
   #   WorkItem.delete_all
@@ -49,7 +49,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns work items where the node is not null' do
-        node_item = FactoryGirl.create(:work_item, node: 'services.aptrust.org')
+        node_item = FactoryBot.create(:work_item, node: 'services.aptrust.org')
         get :index, params: { node_not_empty: 'true' }, format: :json
         expect(response.status).to eq(200)
         data = JSON.parse(response.body)
@@ -58,7 +58,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns work items where the node is null' do
-        node_item = FactoryGirl.create(:work_item, node: nil)
+        node_item = FactoryBot.create(:work_item, node: nil)
         get :index, params: { node_empty: true }, format: :json
         expect(response.status).to eq(200)
         data = JSON.parse(response.body)
@@ -246,21 +246,21 @@ RSpec.describe WorkItemsController, type: :controller do
       let(:json_file) { File.join(current_dir, '..', 'fixtures', 'work_item_batch.json') }
       let(:raw_json) { File.read(json_file) }
       let(:wi_data) { JSON.parse(raw_json) }
-      let(:object) { FactoryGirl.create(:intellectual_object) }
-      let(:item_one) { FactoryGirl.create(:work_item, object_identifier: object.identifier, status: 'Failed') }
-      let(:item_two) { FactoryGirl.create(:work_item, object_identifier: object.identifier, status: 'Failed') }
+      let(:object) { FactoryBot.create(:intellectual_object) }
+      let(:item_one) { FactoryBot.create(:work_item, object_identifier: object.identifier, status: 'Failed') }
+      let(:item_two) { FactoryBot.create(:work_item, object_identifier: object.identifier, status: 'Failed') }
       before do
         sign_in admin_user
       end
 
       it 'accepts extended queue data - state, node, pid' do
-        wi_hash = FactoryGirl.create(:work_item_extended).attributes
+        wi_hash = FactoryBot.create(:work_item_extended).attributes
         put :update, params: { id: item.id, format: 'json', work_item: wi_hash }
         expect(response.status).to eq 200
       end
 
       it 'sets node to "" when params[:node] == ""' do
-        wi_hash = FactoryGirl.create(:work_item_extended).attributes
+        wi_hash = FactoryBot.create(:work_item_extended).attributes
         wi_hash['node'] = ""
         put :update, params: { id: item.id, format: 'json', work_item: wi_hash }
         expect(assigns(:work_item).node).to eq('')
@@ -280,7 +280,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       # it 'creates an email log if the item being updated is a completed restoration' do
-      #   wi_hash = FactoryGirl.create(:work_item_extended, action: Pharos::Application::PHAROS_ACTIONS['restore'],
+      #   wi_hash = FactoryBot.create(:work_item_extended, action: Pharos::Application::PHAROS_ACTIONS['restore'],
       #       stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success']).attributes
       #   post :update, params: { id: item.id, work_item: wi_hash }, format: :json
       #   expect(response.status).to eq(200)
@@ -297,7 +297,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'restricts institutional admins from API usage when updating by id' do
-        wi_hash = FactoryGirl.create(:work_item_extended).attributes
+        wi_hash = FactoryBot.create(:work_item_extended).attributes
         put :update, params: { id: item.id, format: 'json', work_item: wi_hash }
         expect(response.status).to eq 403
       end
@@ -340,7 +340,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
-        2.times { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+        2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -358,7 +358,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'with object_identifier param' do
       before do
         3.times do
-          FactoryGirl.create(:work_item,institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
+          FactoryBot.create(:work_item,institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
         end
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                             institution_id: institution.id,
@@ -405,7 +405,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
-        2.times { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+        2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                             stage: Pharos::Application::PHAROS_STAGES['requested'],
                             status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -423,7 +423,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'with object_identifier param' do
       before do
         3.times do
-          FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, intellectual_object: object, object_identifier: object.identifier)
+          FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, intellectual_object: object, object_identifier: object.identifier)
         end
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                             institution_id: institution.id,
@@ -470,7 +470,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
-        2.times { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+        2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
                             stage: Pharos::Application::PHAROS_STAGES['requested'],
                             status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -487,7 +487,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'with object_identifier param' do
       before do
         3.times do
-          FactoryGirl.create(:work_item,
+          FactoryBot.create(:work_item,
                              action: Pharos::Application::PHAROS_ACTIONS['delete'],
                              stage: Pharos::Application::PHAROS_STAGES['requested'],
                              status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -497,7 +497,7 @@ RSpec.describe WorkItemsController, type: :controller do
                              generic_file_identifier: file.identifier,
                              retry: true)
         end
-        new_file = FactoryGirl.create(:generic_file)
+        new_file = FactoryBot.create(:generic_file)
         wi = WorkItem.last
         wi.generic_file_identifier = new_file.identifier
         wi.save
@@ -536,7 +536,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'updates the correct @item' do
-        new_object = FactoryGirl.create(:intellectual_object)
+        new_object = FactoryBot.create(:intellectual_object)
         WorkItem.first.update(object_identifier: new_object.identifier, intellectual_object: new_object)
         post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Aldrin', retry: true })
@@ -644,7 +644,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
   describe 'Post #create' do
     describe 'for admin user' do
-      let (:attributes) { FactoryGirl.attributes_for(:work_item) }
+      let (:attributes) { FactoryBot.attributes_for(:work_item) }
       before do
         sign_in admin_user
       end
@@ -726,10 +726,10 @@ RSpec.describe WorkItemsController, type: :controller do
   end
 
   describe 'GET #ingested_since' do
-    let(:user) { FactoryGirl.create(:user, :admin) }
-    let(:other_user) { FactoryGirl.create(:user, :institutional_admin) }
+    let(:user) { FactoryBot.create(:user, :admin) }
+    let(:other_user) { FactoryBot.create(:user, :institutional_admin) }
     before do
-      10.times do FactoryGirl.create(:ingested_item) end
+      10.times do FactoryBot.create(:ingested_item) end
       get :show, params: { id: item.id }
     end
 
@@ -761,7 +761,7 @@ RSpec.describe WorkItemsController, type: :controller do
   end
 
   describe 'GET #api_search' do
-    let!(:item1) { FactoryGirl.create(:work_item,
+    let!(:item1) { FactoryBot.create(:work_item,
                                       name: 'item1.tar',
                                       etag: 'etag1',
                                       institution: institution,
@@ -830,16 +830,16 @@ RSpec.describe WorkItemsController, type: :controller do
   end
 
   describe 'GET #api_index' do
-    let!(:object1) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: 'item1') }
-    let!(:object2) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1238907543') }
-    let!(:object3) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1') }
-    let!(:object4) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '2') }
-    let!(:object5) { FactoryGirl.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1234567890') }
-    let!(:item1) { FactoryGirl.create(:work_item, object_identifier: object1.identifier, name: 'item1.tar', stage: 'Unpack', institution: institutional_admin.institution, intellectual_object: object1) }
-    let!(:item2) { FactoryGirl.create(:work_item, object_identifier: object2.identifier, name: '1238907543.tar', stage: 'Unpack', institution: institutional_admin.institution, intellectual_object: object2) }
-    let!(:item3) { FactoryGirl.create(:work_item, object_identifier: object3.identifier, name: '1', stage: 'Unpack', intellectual_object: object3) }
-    let!(:item4) { FactoryGirl.create(:work_item, object_identifier: object4.identifier, name: '2', stage: 'Unpack', intellectual_object: object4) }
-    let!(:item5) { FactoryGirl.create(:work_item, object_identifier: object5.identifier, name: '1234567890.tar', stage: 'Unpack', intellectual_object: object5) }
+    let!(:object1) { FactoryBot.create(:intellectual_object, institution: institutional_admin.institution, identifier: 'item1') }
+    let!(:object2) { FactoryBot.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1238907543') }
+    let!(:object3) { FactoryBot.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1') }
+    let!(:object4) { FactoryBot.create(:intellectual_object, institution: institutional_admin.institution, identifier: '2') }
+    let!(:object5) { FactoryBot.create(:intellectual_object, institution: institutional_admin.institution, identifier: '1234567890') }
+    let!(:item1) { FactoryBot.create(:work_item, object_identifier: object1.identifier, name: 'item1.tar', stage: 'Unpack', institution: institutional_admin.institution, intellectual_object: object1) }
+    let!(:item2) { FactoryBot.create(:work_item, object_identifier: object2.identifier, name: '1238907543.tar', stage: 'Unpack', institution: institutional_admin.institution, intellectual_object: object2) }
+    let!(:item3) { FactoryBot.create(:work_item, object_identifier: object3.identifier, name: '1', stage: 'Unpack', intellectual_object: object3) }
+    let!(:item4) { FactoryBot.create(:work_item, object_identifier: object4.identifier, name: '2', stage: 'Unpack', intellectual_object: object4) }
+    let!(:item5) { FactoryBot.create(:work_item, object_identifier: object5.identifier, name: '1234567890.tar', stage: 'Unpack', intellectual_object: object5) }
 
     describe 'for an admin user' do
       before do
@@ -896,16 +896,16 @@ RSpec.describe WorkItemsController, type: :controller do
   #     let(:json_file) { File.join(current_dir, '..', 'fixtures', 'work_item_batch.json') }
   #     let(:raw_json) { File.read(json_file) }
   #     let(:wi_data) { JSON.parse(raw_json) }
-  #     let(:institution) { FactoryGirl.create(:institution) }
-  #     let(:object) { FactoryGirl.create(:intellectual_object, institution_id: institution.id) }
-  #     let(:item_one) { FactoryGirl.create(:work_item, institution_id: institution.id, intellectual_object_id: object.id, object_identifier: object.identifier) }
+  #     let(:institution) { FactoryBot.create(:institution) }
+  #     let(:object) { FactoryBot.create(:intellectual_object, institution_id: institution.id) }
+  #     let(:item_one) { FactoryBot.create(:work_item, institution_id: institution.id, intellectual_object_id: object.id, object_identifier: object.identifier) }
   #     before do
   #       sign_in admin_user
   #       WorkItem.delete_all
   #     end
   #
   #     it 'triggers an email notification' do
-  #       wi_hash = FactoryGirl.create(:work_item_extended).attributes
+  #       wi_hash = FactoryBot.create(:work_item_extended).attributes
   #       wi_hash['action'] = Pharos::Application::PHAROS_ACTIONS['restore']
   #       wi_hash['status'] = Pharos::Application::PHAROS_STATUSES['success']
   #       wi_hash['stage'] = Pharos::Application::PHAROS_STAGES['record']
@@ -928,7 +928,7 @@ RSpec.describe WorkItemsController, type: :controller do
       sign_in admin_user
     end
     it 'creates an email log of the notification email containing the restored items' do
-      restored_item = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['restore'],
+      restored_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                          status: Pharos::Application::PHAROS_STATUSES['success'],
                                          stage: Pharos::Application::PHAROS_STAGES['record'])
       expect { get :notify_of_successful_restoration, format: :json }.to change(Email, :count).by(1)

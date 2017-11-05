@@ -423,7 +423,7 @@ class WorkItemsController < ApplicationController
     end
     if params[:id].blank? == false
       begin
-        @work_item = WorkItem.find(params[:id])
+        @work_item = WorkItem.readable(current_user).find(params[:id])
       rescue
         # If we don't catch this, we get an internal server error
       end

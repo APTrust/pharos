@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe WorkItemStatesController, type: :controller do
-  let!(:institution) { FactoryGirl.create(:institution) }
-  let!(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let!(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
-  let!(:item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
-  let!(:other_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-  let!(:lonely_item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-  let!(:state_item) { FactoryGirl.create(:work_item_state, work_item: item, state: '{JSON data}') }
+  let!(:institution) { FactoryBot.create(:institution) }
+  let!(:admin_user) { FactoryBot.create(:user, :admin) }
+  let!(:object) { FactoryBot.create(:intellectual_object, institution: institution, access: 'institution') }
+  let!(:item) { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }
+  let!(:other_item) { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+  let!(:lonely_item) { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+  let!(:state_item) { FactoryBot.create(:work_item_state, work_item: item, state: '{JSON data}') }
 
   describe 'POST #create' do
     before do

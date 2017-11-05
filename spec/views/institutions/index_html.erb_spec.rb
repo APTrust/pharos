@@ -2,8 +2,8 @@ require 'spec_helper'
 require 'application_helper'
 
 describe 'institutions/index.html.erb' do
-  let(:institution) { FactoryGirl.create :institution }
-  let(:user) { FactoryGirl.create(:user, :admin, institution: institution) }
+  let(:institution) { FactoryBot.create :institution }
+  let(:user) { FactoryBot.create(:user, :admin, institution: institution) }
   let(:sizes) { { 'APTrust' => 500, 'University of Virginia' => 500 } }
 
   before do

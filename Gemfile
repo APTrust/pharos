@@ -42,7 +42,7 @@ gem 'kaminari'
 gem 'bootstrap-sass', '~> 3.3.7'
 
 # This gem isn't required directly but is required in dependencies and needs specific updating due to a security warning
-gem 'mail', '>= 2.6.6.rc1'
+gem 'mail', '>= 2.7.0'
 
 # S3 connector
 #gem 'aws-sdk-core'
@@ -70,9 +70,9 @@ end
 group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.6.1'
+  gem 'rspec-rails', '~> 3.7.1'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end

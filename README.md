@@ -71,7 +71,7 @@ testing you could do the following in code or at command line.
 gf = GenericFile.first
 
 # Then add the event as attributes
-gf.add_event(FactoryGirl.attributes_for(:premis_events_fixity_check_fail))
+gf.add_event(FactoryBot.attributes_for(:premis_events_fixity_check_fail))
 gf.save
 ````
 ## Statistics sampling

@@ -3,11 +3,11 @@ require 'spec_helper'
 describe 'Adding a new user' do
   before do
     Institution.destroy_all
-    FactoryGirl.create(:aptrust) if Institution.where(name: 'APTrust').empty?
+    FactoryBot.create(:aptrust) if Institution.where(name: 'APTrust').empty?
     Role.where(name: 'institutional_admin').first_or_create
   end
 
-  let(:admin_user) { FactoryGirl.create(:user, :admin) }
+  let(:admin_user) { FactoryBot.create(:user, :admin) }
   it 'should work' do
     login_as admin_user
 

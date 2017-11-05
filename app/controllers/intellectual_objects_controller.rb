@@ -277,7 +277,7 @@ class IntellectualObjectsController < ApplicationController
         raise ActionController::RoutingError.new(msg)
       end
     else
-      @intellectual_object ||= IntellectualObject.find(params[:id])
+      @intellectual_object ||= IntellectualObject.readable(current_user).find(params[:id])
     end
     @institution = @intellectual_object.institution unless @intellectual_object.nil?
   end

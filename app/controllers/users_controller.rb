@@ -87,7 +87,7 @@ class UsersController < ApplicationController
 
   # If an id is passed through params, use it.  Otherwise default to show the current user.
   def set_user
-    @user = params[:id].nil? ? current_user : User.find(params[:id])
+    @user = params[:id].nil? ? current_user : User.readable(current_user).find(params[:id])
   end
 
   def build_resource_params
