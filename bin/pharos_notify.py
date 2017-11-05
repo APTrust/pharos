@@ -18,7 +18,7 @@ import logging
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 PHAROS_API_USER = os.getenv('PHAROS_API_USER')
-PHAROS_API_KEY = os.getenv('PHAROS_API_TOKEN')
+PHAROS_API_KEY = os.getenv('PHAROS_API_KEY')
 
 PHAROS_HOST = os.getenv('PHAROS_HOST')
 PHAROS_URL = { 'failed_fixity' : 'https://' + PHAROS_HOST + '/api/v2/notifications/failed_fixity',
