@@ -262,11 +262,25 @@ class WorkItemsController < ApplicationController
                      .with_stage(Pharos::Application::PHAROS_STAGES['record'])
                      .updated_after(params[:since])
     institutions = @items.distinct.pluck(:institution_id)
+    number_of_emails = 0
+    inst_list = []
     institutions.each do |inst|
       inst_items = @items.where(institution_id: inst)
       institution = Institution.find(inst)
       log = Email.log_multiple_restoration(inst_items)
       NotificationMailer.multiple_restoration_notification(@items, log, institution).deliver!
+      number_of_emails = number_of_emails + 1
+      inst_list.push(institution.name)
+    end
+    if number_of_emails == 0
+      respond_to do |format|
+        format.json { render json: { message: 'No new successful restorations, no emails sent.' }, status: 204 }
+      end
+    else
+      inst_pretty = inst_list.join(', ')
+      respond_to do |format|
+        format.json { render json: { message: "#{number_of_emails} sent. Institutions that received a successful restoration notification: #{inst_pretty}." }, status: 200 }
+      end
     end
   end
 
@@ -409,7 +423,7 @@ class WorkItemsController < ApplicationController
     end
     if params[:id].blank? == false
       begin
-        @work_item = WorkItem.find(params[:id])
+        @work_item = WorkItem.readable(current_user).find(params[:id])
       rescue
         # If we don't catch this, we get an internal server error
       end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe SubscriptionInstitution, :type => :model do
-  subject { FactoryGirl.build(:subscription_institution) }
+  subject { FactoryBot.build(:subscription_institution) }
 
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:identifier) }
@@ -9,8 +9,8 @@ RSpec.describe SubscriptionInstitution, :type => :model do
 
   describe '#name_is_unique' do
     it 'should validate uniqueness of the name' do
-      one = FactoryGirl.create(:subscription_institution, name: 'test')
-      two = FactoryGirl.build(:subscription_institution, name: 'test')
+      one = FactoryBot.create(:subscription_institution, name: 'test')
+      two = FactoryBot.build(:subscription_institution, name: 'test')
       two.should_not be_valid
       two.errors[:name].should include('has already been taken')
     end
@@ -18,8 +18,8 @@ RSpec.describe SubscriptionInstitution, :type => :model do
 
   describe '#identifier_is_unique' do
     it 'should validate uniqueness of the identifier' do
-      one = FactoryGirl.create(:subscription_institution, identifier: 'test.edu')
-      two = FactoryGirl.build(:subscription_institution, identifier: 'test.edu')
+      one = FactoryBot.create(:subscription_institution, identifier: 'test.edu')
+      two = FactoryBot.build(:subscription_institution, identifier: 'test.edu')
       two.should_not be_valid
       two.errors[:identifier].should include('has already been taken')
     end
@@ -27,7 +27,7 @@ RSpec.describe SubscriptionInstitution, :type => :model do
 
   describe '#has_associated_member_institution' do
     it 'should validate that it has an associated member institution' do
-      one = FactoryGirl.build(:subscription_institution, member_institution_id: nil)
+      one = FactoryBot.build(:subscription_institution, member_institution_id: nil)
       one.should_not be_valid
       one.errors[:member_institution_id].should include('cannot be nil')
     end
@@ -35,8 +35,8 @@ RSpec.describe SubscriptionInstitution, :type => :model do
 
   describe '#find_by_identifier' do
     it 'should validate uniqueness of the identifier' do
-      one = FactoryGirl.create(:subscription_institution, identifier: 'test.edu')
-      two = FactoryGirl.create(:subscription_institution, identifier: 'kollege.edu')
+      one = FactoryBot.create(:subscription_institution, identifier: 'test.edu')
+      two = FactoryBot.create(:subscription_institution, identifier: 'kollege.edu')
       SubscriptionInstitution.find_by_identifier('test.edu').should eq one
       SubscriptionInstitution.find_by_identifier('kollege.edu').should eq two
       SubscriptionInstitution.find_by_identifier('idontexist.edu').should be nil
@@ -51,9 +51,9 @@ RSpec.describe SubscriptionInstitution, :type => :model do
       before do
         subject.save!
       end
-      let(:intellectual_object) { FactoryGirl.create(:intellectual_object, institution: subject) }
-      let!(:generic_file1) { FactoryGirl.create(:generic_file, intellectual_object: intellectual_object, size: 166311750, identifier: 'test.edu/123/data/file.xml') }
-      let!(:generic_file2) { FactoryGirl.create(:generic_file, intellectual_object: intellectual_object, file_format: 'audio/wav', size: 143732461, identifier: 'test.edu/123/data/file.wav') }
+      let(:intellectual_object) { FactoryBot.create(:intellectual_object, institution: subject) }
+      let!(:generic_file1) { FactoryBot.create(:generic_file, intellectual_object: intellectual_object, size: 166311750, identifier: 'test.edu/123/data/file.xml') }
+      let!(:generic_file2) { FactoryBot.create(:generic_file, intellectual_object: intellectual_object, file_format: 'audio/wav', size: 143732461, identifier: 'test.edu/123/data/file.wav') }
       it 'should return a hash' do
         expect(subject.bytes_by_format).to eq({"all"=>310044211,
                                                'application/xml' => 166311750,
@@ -71,7 +71,7 @@ RSpec.describe SubscriptionInstitution, :type => :model do
       subject.destroy
     end
     describe 'with an associated user' do
-      let!(:user) { FactoryGirl.create(:user, name: 'Zeke', institution_id: subject.id)  }
+      let!(:user) { FactoryBot.create(:user, name: 'Zeke', institution_id: subject.id)  }
       it 'should contain the appropriate User' do
         subject.users.should eq [user]
       end
@@ -82,7 +82,7 @@ RSpec.describe SubscriptionInstitution, :type => :model do
       end
 
       describe 'or two' do
-        let!(:user2) { FactoryGirl.create(:user, name: 'Andrew', institution_id: subject.id) }
+        let!(:user2) { FactoryBot.create(:user, name: 'Andrew', institution_id: subject.id) }
         it 'should return users sorted by name' do
           subject.users.index(user).should > subject.users.index(user2)
         end
@@ -90,7 +90,7 @@ RSpec.describe SubscriptionInstitution, :type => :model do
     end
 
     describe 'with an associated intellectual object' do
-      let!(:item) { FactoryGirl.create(:intellectual_object, institution: subject) }
+      let!(:item) { FactoryBot.create(:intellectual_object, institution: subject) }
       after { item.destroy }
       it 'deleting should be blocked' do
         subject.destroy.should be false

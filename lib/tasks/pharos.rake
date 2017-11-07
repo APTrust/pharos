@@ -37,9 +37,48 @@ namespace :pharos do
       create_roles(roles)
       create_users()
     else
-      puts "Nothing to do: Institution, groups, and admin user already exist."
+      puts 'Nothing to do: Institution, groups, and admin user already exist.'
     end
     puts "You should be able to log in as ops@aptrust.org, with password 'password'"
+  end
+
+  desc 'Set up user API key'
+  task :set_user_api_key, [:user_email, :hex_length] => :environment do |_, args|
+    args.with_defaults(:hex_length => 20)
+    email = args[:user_email].to_s
+    length = args[:hex_length].to_i
+    user = User.where(email: email).first
+    if user
+      user.generate_api_key(length)
+      if user.save!
+        puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}"
+      else
+        puts 'ERROR: Unable to create API key.'
+      end
+    else
+      puts "A user with email address #{email} could not be found. Please double check your inputs and the existence of said user."
+    end
+  end
+
+  desc 'Update user API key'
+  task :update_user_api_key, [:user_email, :api_key] => :environment do |_, args|
+    email = args[:user_email].to_s
+    hex_key = args[:api_key].to_s
+    user = User.where(email: email).first
+    if user
+      if user.api_secret_key == hex_key
+        puts 'The passed in API key matches the key that is already stored in the DB, no need to update.'
+      else
+        user.api_secret_key = hex_key
+        if user.save!
+          puts "Please record this key.  If you lose it, you will have to generate a new key. Your API secret key is: #{user.api_secret_key}"
+        else
+          puts 'ERROR: Unable to create API key.'
+        end
+      end
+    else
+      puts "A user with email address #{email} could not be found. Please double check your inputs and the existence of said user."
+    end
   end
 
   # Restricted only to non-production environments
@@ -50,20 +89,6 @@ namespace :pharos do
     end
   end
 
-  # desc 'Run ci'
-  # task :travis do
-  #   puts 'Updating Solr config'
-  #   Rake::Task['jetty:config'].invoke
-  #
-  #   require 'jettywrapper'
-  #   jetty_params = Jettywrapper.load_config
-  #   puts 'Starting Jetty'
-  #   error = Jettywrapper.wrap(jetty_params) do
-  #     Rake::Task['rspec'].invoke
-  #   end
-  #   raise "test failures: #{error}" if error
-  # end
-
   desc 'Create dummy dpn work items for testing'
   task dummy_dpn: :environment do
     if Rails.env.production?
@@ -73,15 +98,14 @@ namespace :pharos do
 
     puts 'Creating queued dpn items'
     15.times.each do
-      FactoryGirl.create(:dpn_work_item)
+      FactoryBot.create(:dpn_work_item)
     end
 
     puts 'Created not queued dpn items'
     15.times.each do
-      FactoryGirl.create(:dpn_work_item, queued_at: nil, completed_at: nil)
+      FactoryBot.create(:dpn_work_item, queued_at: nil, completed_at: nil)
     end
   end
-
 
   desc 'Empty DB and add dummy information'
   task :populate_db, [:numIntObjects, :numGenFiles] => [:environment] do |_, args|
@@ -106,7 +130,7 @@ namespace :pharos do
       num_users = rand(1..5)
       num_users.times.each do |count|
         puts "== Creating user #{count+1} of #{num_users} for #{institution.name}"
-        FactoryGirl.create(:user, :institutional_user, institution_id: institution.id)
+        FactoryBot.create(:user, :institutional_user, institution_id: institution.id)
       end
 
       num_items = args[:numIntObjects].to_i
@@ -115,17 +139,17 @@ namespace :pharos do
         name = "#{SecureRandom.uuid}"
         bag_name = "#{name}.tar"
         ident = "#{institution.identifier}/#{name}"
-        item = FactoryGirl.create(:intellectual_object, institution: institution, identifier: ident, bag_name: bag_name)
+        item = FactoryBot.create(:intellectual_object, institution: institution, identifier: ident, bag_name: bag_name)
         item.save!
-        item.add_event(FactoryGirl.attributes_for(:premis_event_ingest, detail: 'Metadata recieved from bag.', outcome_detail: 'something', outcome_information: 'Parsed as part of bag submission.'))
-        item.add_event(FactoryGirl.attributes_for(:premis_event_identifier, outcome_detail: item.id, outcome_information: 'Assigned by Rake.'))
+        item.add_event(FactoryBot.attributes_for(:premis_event_ingest, detail: 'Metadata recieved from bag.', outcome_detail: 'something', outcome_information: 'Parsed as part of bag submission.'))
+        item.add_event(FactoryBot.attributes_for(:premis_event_identifier, outcome_detail: item.id, outcome_information: 'Assigned by Rake.'))
 
         #add Work item for intellectual object
-        wi = FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
-        FactoryGirl.create(:work_item_state, work_item: wi)
+        wi = FactoryBot.create(:work_item, institution: institution, intellectual_object: item, name: name, action: Pharos::Application::PHAROS_ACTIONS['ingest'], stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success'])
+        FactoryBot.create(:work_item_state, work_item: wi)
 
         # 5.times.each do |count|
-        #   FactoryGirl.create(:work_item, institution: institution, intellectual_object: item, name: name)
+        #   FactoryBot.create(:work_item, institution: institution, intellectual_object: item, name: name)
         # end
 
         num_files = args[:numGenFiles].to_i
@@ -156,12 +180,12 @@ namespace :pharos do
               uri: "file:///#{item.identifier}/data/#{name}#{file_count}.#{format[:ext]}",
               identifier: "#{item.identifier}/data/#{name}#{file_count}.#{format[:ext]}",
           }
-          f = FactoryGirl.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier], created_at: create)
+          f = FactoryBot.build(:generic_file, intellectual_object: item, file_format: attrs[:file_format], uri: attrs[:uri], identifier: attrs[:identifier], created_at: create)
           f.save!
-          f.add_event(FactoryGirl.attributes_for(:premis_event_validation, institution: institution))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: institution))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: institution))
-          f.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_validation, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: institution))
+          f.add_event(FactoryBot.attributes_for(:premis_event_fixity_check, institution: institution))
           f.save!
         end
       end

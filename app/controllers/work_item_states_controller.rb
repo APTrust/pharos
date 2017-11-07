@@ -61,7 +61,7 @@ class WorkItemStatesController < ApplicationController
   def set_item_and_state
     if params[:id]
       begin
-        @state_item = WorkItemState.find(params[:id])
+        @state_item = WorkItemState.readable(current_user).find(params[:id])
         @work_item = @state_item.work_item
       rescue
         # Don't throw RecordNotFound. Just return 404 above.

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'Searching' do
 
-  let(:user) { FactoryGirl.create(:user, :institutional_user) }
+  let(:user) { FactoryBot.create(:user, :institutional_user) }
   it 'should work' do
     login_as user
 

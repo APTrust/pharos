@@ -2,9 +2,9 @@ require 'spec_helper'
 
 RSpec.describe CatalogController, type: :controller do
 
-  let(:admin_user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
-  let(:inst_admin) { FactoryGirl.create(:user, :institutional_admin, institution_id: @another_institution.id) }
-  let(:inst_user) { FactoryGirl.create(:user, :institutional_user, institution_id: @another_institution.id)}
+  let(:admin_user) { FactoryBot.create(:user, :admin, institution_id: @institution.id) }
+  let(:inst_admin) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
+  let(:inst_user) { FactoryBot.create(:user, :institutional_user, institution_id: @another_institution.id)}
 
   before(:all) do
     Institution.delete_all
@@ -13,40 +13,41 @@ RSpec.describe CatalogController, type: :controller do
     WorkItem.delete_all
     PremisEvent.delete_all
     DpnWorkItem.delete_all
-    @institution = FactoryGirl.create(:member_institution)
-    @another_institution = FactoryGirl.create(:subscription_institution)
 
-    @object_one = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id, id: 1)
-    @object_two = FactoryGirl.create(:institutional_intellectual_object, institution_id: @institution.id, alt_identifier: ['something/1234-5678'], id: 2)
-    @object_three = FactoryGirl.create(:restricted_intellectual_object, institution_id: @institution.id, bag_name: 'fancy_bag/1234-5678', id: 3)
-    @object_four = FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id, title: 'This is an important bag', id: 4)
-    @object_five = FactoryGirl.create(:institutional_intellectual_object, institution_id: @another_institution.id, identifier: 'test.edu/1234-5678', id: 5)
-    @object_six = FactoryGirl.create(:restricted_intellectual_object, institution_id: @another_institution.id, id: 6)
+    @institution = FactoryBot.create(:member_institution)
+    @another_institution = FactoryBot.create(:subscription_institution)
 
-    @file_one = FactoryGirl.create(:generic_file, intellectual_object: @object_one, uri: 'file://something/data/old_file.xml', id: 7)
-    @file_two = FactoryGirl.create(:generic_file, intellectual_object: @object_two, uri: 'file://fancy/data/new_file.xml', id: 8)
-    @file_three = FactoryGirl.create(:generic_file, intellectual_object: @object_three, identifier: 'something/1234-5678/data/new_file.xml', id: 9)
-    @file_four = FactoryGirl.create(:generic_file, intellectual_object: @object_four, id: 10)
-    @file_five = FactoryGirl.create(:generic_file, intellectual_object: @object_five, id: 11)
-    @file_six = FactoryGirl.create(:generic_file, intellectual_object: @object_six, id: 12)
+    @object_one = FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id, id: 1)
+    @object_two = FactoryBot.create(:institutional_intellectual_object, institution_id: @institution.id, alt_identifier: ['something/1234-5678'], id: 2)
+    @object_three = FactoryBot.create(:restricted_intellectual_object, institution_id: @institution.id, bag_name: 'fancy_bag/1234-5678', id: 3)
+    @object_four = FactoryBot.create(:consortial_intellectual_object, institution_id: @another_institution.id, title: 'This is an important bag', id: 4)
+    @object_five = FactoryBot.create(:institutional_intellectual_object, institution_id: @another_institution.id, identifier: 'test.edu/1234-5678', id: 5)
+    @object_six = FactoryBot.create(:restricted_intellectual_object, institution_id: @another_institution.id, id: 6)
 
-    @item_one = FactoryGirl.create(:ingested_item, object_identifier: @object_one.identifier, generic_file_identifier: @file_one.identifier, institution_id: @another_institution.id, id: 13)
-    @item_two = FactoryGirl.create(:ingested_item, object_identifier: @object_two.identifier, generic_file_identifier: @file_two.identifier, etag: '1234-5678', id: 14)
-    @item_three = FactoryGirl.create(:ingested_item, object_identifier: @object_three.identifier, generic_file_identifier: @file_three.identifier, name: '1234-5678', id: 15)
-    @item_four = FactoryGirl.create(:ingested_item, object_identifier: @object_four.identifier, generic_file_identifier: @file_four.identifier, stage: 'Requested', institution_id: @another_institution.id, id: 16)
-    @item_five = FactoryGirl.create(:ingested_item, object_identifier: @object_five.identifier, generic_file_identifier: @file_five.identifier, name: '1234file.tar', status: 'Success', institution_id: @another_institution.id, id: 17)
-    @item_six = FactoryGirl.create(:ingested_item, object_identifier: @object_six.identifier, generic_file_identifier: @file_six.identifier, action: 'Ingest', institution_id: @another_institution.id, id: 18)
+    @file_one = FactoryBot.create(:generic_file, intellectual_object: @object_one, uri: 'file://something/data/old_file.xml', id: 7)
+    @file_two = FactoryBot.create(:generic_file, intellectual_object: @object_two, uri: 'file://fancy/data/new_file.xml', id: 8)
+    @file_three = FactoryBot.create(:generic_file, intellectual_object: @object_three, identifier: 'something/1234-5678/data/new_file.xml', id: 9)
+    @file_four = FactoryBot.create(:generic_file, intellectual_object: @object_four, id: 10)
+    @file_five = FactoryBot.create(:generic_file, intellectual_object: @object_five, id: 11)
+    @file_six = FactoryBot.create(:generic_file, intellectual_object: @object_six, id: 12)
 
-    @event_one = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_one, identifier: '1234-5678')
-    @event_two = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_two, generic_file: @file_two, identifier: 'not-my-event-9876')
-    @event_three = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_three, generic_file: @file_three)
-    @event_four = FactoryGirl.create(:premis_event_fixity_check, intellectual_object: @object_four)
-    @event_five = FactoryGirl.create(:premis_event_ingest, intellectual_object: @object_five, generic_file: @file_five)
-    @event_six = FactoryGirl.create(:premis_event_identifier_fail, intellectual_object: @object_six, generic_file: @file_six)
+    @item_one = FactoryBot.create(:ingested_item, object_identifier: @object_one.identifier, generic_file_identifier: @file_one.identifier, institution_id: @another_institution.id, id: 13)
+    @item_two = FactoryBot.create(:ingested_item, object_identifier: @object_two.identifier, generic_file_identifier: @file_two.identifier, etag: '1234-5678', id: 14)
+    @item_three = FactoryBot.create(:ingested_item, object_identifier: @object_three.identifier, generic_file_identifier: @file_three.identifier, name: '1234-5678', id: 15)
+    @item_four = FactoryBot.create(:ingested_item, object_identifier: @object_four.identifier, generic_file_identifier: @file_four.identifier, stage: 'Requested', institution_id: @another_institution.id, id: 16)
+    @item_five = FactoryBot.create(:ingested_item, object_identifier: @object_five.identifier, generic_file_identifier: @file_five.identifier, name: '1234file.tar', status: 'Success', institution_id: @another_institution.id, id: 17)
+    @item_six = FactoryBot.create(:ingested_item, object_identifier: @object_six.identifier, generic_file_identifier: @file_six.identifier, action: 'Ingest', institution_id: @another_institution.id, id: 18)
 
-    @dpn_one = FactoryGirl.create(:dpn_work_item, identifier: '1234-5678')
-    @dpn_two = FactoryGirl.create(:dpn_work_item)
-    @dpn_three = FactoryGirl.create(:dpn_work_item)
+    @event_one = FactoryBot.create(:premis_event_fixity_check, intellectual_object: @object_one, identifier: '1234-5678')
+    @event_two = FactoryBot.create(:premis_event_fixity_check, intellectual_object: @object_two, generic_file: @file_two, identifier: 'not-my-event-9876')
+    @event_three = FactoryBot.create(:premis_event_fixity_check, intellectual_object: @object_three, generic_file: @file_three)
+    @event_four = FactoryBot.create(:premis_event_fixity_check, intellectual_object: @object_four)
+    @event_five = FactoryBot.create(:premis_event_ingest, intellectual_object: @object_five, generic_file: @file_five)
+    @event_six = FactoryBot.create(:premis_event_identifier_fail, intellectual_object: @object_six, generic_file: @file_six)
+
+    @dpn_one = FactoryBot.create(:dpn_work_item, identifier: '1234-5678')
+    @dpn_two = FactoryBot.create(:dpn_work_item)
+    @dpn_three = FactoryBot.create(:dpn_work_item)
   end
 
   after(:all) do

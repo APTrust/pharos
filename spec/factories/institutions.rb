@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   sequence(:name) { |n| "#{Faker::Company.name} #{n}" }
   sequence(:brief_name) { |n|  "#{Faker::Lorem.characters rand(3..4)}#{n}"}
@@ -19,7 +19,7 @@ FactoryGirl.define do
     identifier
     dpn_uuid
     type { 'SubscriptionInstitution' }
-    member_institution_id { FactoryGirl.create(:member_institution).id }
+    member_institution_id { FactoryBot.create(:member_institution).id }
   end
 
   factory :aptrust, class: 'Institution' do

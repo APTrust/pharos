@@ -63,7 +63,7 @@ module ApplicationHelper
 
   def dpn_process_time(item)
     if item.completed_at && item.queued_at
-      process_time = ((item.completed_at - item.queued_at) / 1.hour).round(2)
+      process_time = ((item.completed_at.to_f - item.queued_at.to_f) / 1.hour).round(2)
       if process_time == 1
         process_final = '1 hour'
       else

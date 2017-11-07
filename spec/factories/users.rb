@@ -1,11 +1,11 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :user, class: 'User' do
     name { Faker::Name.name }
     email { "#{Faker::Internet.user_name}@#{Faker::Internet.domain_name}" }
     phone_number { 4345551234 }
     password { 'password' }
     roles { [Role.where(name: 'public').first_or_create] }
-    institution_id { FactoryGirl.create(:member_institution).id }
+    institution_id { FactoryBot.create(:member_institution).id }
 
     factory :aptrust_user, class: 'User' do
       roles { [Role.where(name: 'admin').first_or_create] }
@@ -16,7 +16,7 @@ FactoryGirl.define do
         elsif aptrust_institution.count > 1
           raise 'There should never be more than one institution with the name APTrust'
         else
-          FactoryGirl.create(:aptrust).id
+          FactoryBot.create(:aptrust).id
         end
       }
     end

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe User do
-  let(:user) { FactoryGirl.create(:aptrust_user) }
-  let(:inst_admin) { FactoryGirl.create(:user, :institutional_admin) }
+  let(:user) { FactoryBot.create(:aptrust_user) }
+  let(:inst_admin) { FactoryBot.create(:user, :institutional_admin) }
   let(:inst_id) { subject.institution_id }
 
   it 'should return a valid institution' do
@@ -10,17 +10,17 @@ describe User do
   end
 
   describe 'as an admin' do
-    subject { FactoryGirl.create(:user, :admin) }
+    subject { FactoryBot.create(:user, :admin) }
     its(:groups) { should match_array %w(registered admin) }
   end
 
   describe 'as an institutional admin' do
-    subject { FactoryGirl.create(:user, :institutional_admin) }
+    subject { FactoryBot.create(:user, :institutional_admin) }
     its(:groups) { should match_array ['registered', 'institutional_admin', "Admin_At_#{inst_id}"]}
   end
 
   describe 'as an institutional user' do
-    subject { FactoryGirl.create(:user, :institutional_user) }
+    subject { FactoryBot.create(:user, :institutional_user) }
     its(:groups) { should match_array ['registered', 'institutional_user', "User_At_#{inst_id}"]}
   end
 
@@ -64,23 +64,23 @@ describe User do
 
   describe '#valid_api_key?' do
     it "returns false if input key doesn't match user's key" do
-      user = FactoryGirl.create :user, api_secret_key: '123'
+      user = FactoryBot.create :user, api_secret_key: '123'
       user.valid_api_key?('456').should == false
     end
 
     it "returns true if input key matches user's key" do
-      user = FactoryGirl.create :user, api_secret_key: '123'
+      user = FactoryBot.create :user, api_secret_key: '123'
       user.valid_api_key?('123').should == true
     end
 
     it "returns false if user's API key is nil" do
-      user = FactoryGirl.create :user
+      user = FactoryBot.create :user
       user.encrypted_api_secret_key.should be_nil
       user.valid_api_key?(nil).should == false
     end
 
     it "returns false if user's API key is blank" do
-      user = FactoryGirl.create :user, encrypted_api_secret_key: ''
+      user = FactoryBot.create :user, encrypted_api_secret_key: ''
       user.encrypted_api_secret_key.should == ''
       user.valid_api_key?('').should == false
     end

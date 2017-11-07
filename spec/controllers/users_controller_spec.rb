@@ -6,14 +6,14 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe 'An APTrust Administrator' do
-    let(:admin_user) { FactoryGirl.create(:user, :admin) }
-    let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
+    let(:admin_user) { FactoryBot.create(:user, :admin) }
+    let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
 
     before { sign_in admin_user }
 
     describe 'who gets a list of users' do
-      let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
-      let!(:institutional_user) { FactoryGirl.create(:user, :institutional_user)}
+      let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
+      let!(:institutional_user) { FactoryBot.create(:user, :institutional_user)}
       it 'should see all the users' do
         get :index
         response.should be_successful
@@ -35,7 +35,7 @@ RSpec.describe UsersController, type: :controller do
 
     describe 'can create Institutional Administrators' do
       let(:institutional_admin_role_id) { Role.where(name: 'institutional_admin').first_or_create.id}
-      let(:attributes) { FactoryGirl.attributes_for(:user, role_ids: institutional_admin_role_id) }
+      let(:attributes) { FactoryBot.attributes_for(:user, role_ids: institutional_admin_role_id) }
 
       it 'unless no parameters are passed' do
         expect {
@@ -66,7 +66,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     describe 'can update Institutional Administrators' do
-      let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
 
       it 'when the parameters are valid' do
         put :update, params: { id: institutional_admin, user: {name: 'Frankie'} }
@@ -103,13 +103,13 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe 'An Institutional Administrator' do
-    let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
+    let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
 
     before { sign_in institutional_admin }
 
     describe 'who gets a list of users' do
-      let!(:user_at_institution) {  FactoryGirl.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
-      let!(:user_of_different_institution) {  FactoryGirl.create(:user, :institutional_user) }
+      let!(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
+      let!(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
       it 'can only see users in their institution' do
         get :index
         response.should be_successful
@@ -120,7 +120,7 @@ RSpec.describe UsersController, type: :controller do
 
     describe 'show an Institutinal User' do
       describe 'at my institution' do
-        let(:user_at_institution) {  FactoryGirl.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
+        let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
         it 'can show the Institutional Users for my institution' do
           get :show, params: { id: user_at_institution }
           response.should be_successful
@@ -129,7 +129,7 @@ RSpec.describe UsersController, type: :controller do
       end
 
       describe 'at a different institution' do
-        let(:user_of_different_institution) {  FactoryGirl.create(:user, :institutional_user) }
+        let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
         it "can't show" do
           get :show, params: { id: user_of_different_institution }
           response.should redirect_to root_url
@@ -147,7 +147,7 @@ RSpec.describe UsersController, type: :controller do
     describe 'creating a User' do
 
       describe 'at another institution' do
-        let(:attributes) { FactoryGirl.attributes_for(:user) }
+        let(:attributes) { FactoryBot.attributes_for(:user) }
         it "shouldn't work" do
           expect {
             post :create, params: { user: attributes }
@@ -160,7 +160,7 @@ RSpec.describe UsersController, type: :controller do
       describe 'at my institution' do
         describe 'with institutional_user role' do
           let(:institutional_user_role_id) { Role.where(name: 'institutional_user').first_or_create.id}
-          let(:attributes) { FactoryGirl.attributes_for(:user, :institution_id=>institutional_admin.institution_id, role_ids: institutional_user_role_id) }
+          let(:attributes) { FactoryBot.attributes_for(:user, :institution_id=>institutional_admin.institution_id, role_ids: institutional_user_role_id) }
           it 'should be successful' do
             expect {
               post :create, params: { user: attributes }
@@ -172,7 +172,7 @@ RSpec.describe UsersController, type: :controller do
 
         describe 'with institutional_admin role' do
           let(:institutional_admin_role_id) {Role.where(name: 'institutional_admin').first_or_create.id}
-          let(:attributes) { FactoryGirl.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_admin_role_id) }
+          let(:attributes) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_admin_role_id) }
           it 'should be successful' do
             expect {
               post :create, params: { user: attributes }
@@ -184,7 +184,7 @@ RSpec.describe UsersController, type: :controller do
 
         describe 'with admin role' do
           let(:admin_role_id) { Role.where(name: 'admin').first_or_create.id}
-          let(:attributes) { FactoryGirl.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: admin_role_id) }
+          let(:attributes) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: admin_role_id) }
           it 'should be forbidden' do
             expect {
               post :create, params: { user: attributes }
@@ -198,7 +198,7 @@ RSpec.describe UsersController, type: :controller do
 
     describe 'editing Institutional User' do
       describe 'from my institution' do
-        let(:user_at_institution) {  FactoryGirl.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
+        let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
         it 'should be successful' do
           get :edit, params: { id: user_at_institution }
           response.should be_successful
@@ -206,7 +206,7 @@ RSpec.describe UsersController, type: :controller do
         end
       end
       describe 'from another institution' do
-        let(:user_of_different_institution) {  FactoryGirl.create(:user, :institutional_user) }
+        let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
         it 'should show an error' do
           get :edit, params: { id: user_of_different_institution }
           response.should be_redirect
@@ -216,9 +216,9 @@ RSpec.describe UsersController, type: :controller do
     end
 
     describe 'can update Institutional users' do
-      let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin)}
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
       describe 'from my institution' do
-        let(:user_at_institution) {  FactoryGirl.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
+        let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
         it 'should be successful' do
           patch :update, params: { id: user_at_institution, user: {name: 'Frankie'} }
           response.should redirect_to user_url(user_at_institution)
@@ -226,7 +226,7 @@ RSpec.describe UsersController, type: :controller do
         end
       end
       describe 'from another institution' do
-        let(:user_of_different_institution) {  FactoryGirl.create(:user, :institutional_user) }
+        let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
         it 'should show an error message' do
           patch :update, params: { id: user_of_different_institution, user: {name: 'Frankie'} }
           response.should be_redirect
@@ -237,7 +237,7 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe 'An Institutional User' do
-    let!(:user) { FactoryGirl.create(:user, :institutional_user)}
+    let!(:user) { FactoryBot.create(:user, :institutional_user)}
     before { sign_in user }
 
     it 'generates a new API key' do

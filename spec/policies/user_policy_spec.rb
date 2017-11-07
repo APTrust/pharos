@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe UserPolicy do
   subject (:user_policy) { UserPolicy.new(user, other_user) }
-  let(:institution) { FactoryGirl.create(:member_institution) }
+  let(:institution) { FactoryBot.create(:member_institution) }
 
   context 'for an admin user' do
-    let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }
+    let(:user) { FactoryBot.create(:user, :admin, institution_id: institution.id) }
     describe 'when the user is any other user' do
-      let(:other_user) { FactoryGirl.create(:user) }
+      let(:other_user) { FactoryBot.create(:user) }
       it do
         should permit(:create)
         should permit(:new)
@@ -31,10 +31,10 @@ describe UserPolicy do
   end
 
   context 'for an institutional admin user' do
-    let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: institution.id ) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: institution.id ) }
     describe 'when the user is any other user ' do
       describe 'in my institution' do
-        let(:other_user) { FactoryGirl.create(:user, institution_id: institution.id) }
+        let(:other_user) { FactoryBot.create(:user, institution_id: institution.id) }
         it do
           should permit(:create)
           should permit(:new)
@@ -50,7 +50,7 @@ describe UserPolicy do
       end
 
       describe 'not in my institution' do
-        let(:other_user) { FactoryGirl.create(:user) }
+        let(:other_user) { FactoryBot.create(:user) }
         it do
           should_not permit(:show)
           should_not permit(:update)
@@ -73,10 +73,10 @@ describe UserPolicy do
   end
 
   context 'for an institutional user' do
-    let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: institution.id) }
+    let(:user) { FactoryBot.create(:user, :institutional_user, institution_id: institution.id) }
     describe 'when the user is' do
       describe 'in my institution' do
-        let(:other_user) { FactoryGirl.create(:user, institution_id: institution.id) }
+        let(:other_user) { FactoryBot.create(:user, institution_id: institution.id) }
         it do
           should_not permit(:create)
           should_not permit(:new)
@@ -92,7 +92,7 @@ describe UserPolicy do
       end
 
       describe 'not in my institution' do
-        let(:other_user) { FactoryGirl.create(:user) }
+        let(:other_user) { FactoryBot.create(:user) }
         it do
           should_not permit(:show)
           should_not permit(:update)
@@ -122,8 +122,8 @@ describe UserPolicy do
   end
 
   context 'for an authenticated user without a user group' do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:other_user) { FactoryGirl.create(:user, :institutional_user, institution_id: institution.id) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:other_user) { FactoryBot.create(:user, :institutional_user, institution_id: institution.id) }
     it do
       should_not permit(:create)
       should_not permit(:new)

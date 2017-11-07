@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :premis_event_ingest, class: 'PremisEvent' do
     identifier { SecureRandom.hex(16) }

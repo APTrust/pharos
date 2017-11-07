@@ -10,10 +10,10 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     DpnWorkItem.delete_all
   end
 
-  let!(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin) }
-  let!(:item_one) { FactoryGirl.create(:dpn_work_item, task: 'sync', remote_node: 'aptrust', identifier: '1234') }
-  let!(:item_two) { FactoryGirl.create(:dpn_work_item, task: 'ingest', remote_node: 'chronopolis', identifier: '5678', queued_at: nil) }
+  let!(:admin_user) { FactoryBot.create(:user, :admin) }
+  let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin) }
+  let!(:item_one) { FactoryBot.create(:dpn_work_item, task: 'sync', remote_node: 'aptrust', identifier: '1234') }
+  let!(:item_two) { FactoryBot.create(:dpn_work_item, task: 'ingest', remote_node: 'chronopolis', identifier: '5678', queued_at: nil) }
 
   describe '#GET index' do
     describe 'for admin users' do

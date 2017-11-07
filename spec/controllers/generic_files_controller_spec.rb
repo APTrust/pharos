@@ -1,18 +1,18 @@
 require 'spec_helper'
 
 RSpec.describe GenericFilesController, type: :controller do
-  let(:user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
-  let(:file) { FactoryGirl.create(:generic_file) }
-  let(:inst_user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id)}
-  let(:crazy_file) { FactoryGirl.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0') }
-  let(:question_file) { FactoryGirl.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161') }
-  let(:parens_file) { FactoryGirl.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf') }
+  let(:user) { FactoryBot.create(:user, :admin, institution_id: @institution.id) }
+  let(:file) { FactoryBot.create(:generic_file) }
+  let(:inst_user) { FactoryBot.create(:user, :institutional_admin, institution_id: @institution.id)}
+  let(:crazy_file) { FactoryBot.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0') }
+  let(:question_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161') }
+  let(:parens_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf') }
 
   before(:all) do
-    @institution = FactoryGirl.create(:member_institution)
-    @another_institution = FactoryGirl.create(:subscription_institution)
-    @intellectual_object = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id)
-    @another_intellectual_object = FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id)
+    @institution = FactoryBot.create(:member_institution)
+    @another_institution = FactoryBot.create(:subscription_institution)
+    @intellectual_object = FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id)
+    @another_intellectual_object = FactoryBot.create(:consortial_intellectual_object, institution_id: @another_institution.id)
     GenericFile.delete_all
   end
 
@@ -23,8 +23,8 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #index' do
     before do
       sign_in user
-      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
-      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
     end
 
@@ -35,8 +35,8 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     it 'returns only active files' do
-      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'one', state: 'A')
-      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'two', state: 'D')
+      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'one', state: 'A')
+      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'two', state: 'D')
       get :index, params: { intellectual_object_identifier: @intellectual_object.identifier }, format: :json
       expect(response).to be_successful
       response_data = JSON.parse(response.body)
@@ -49,8 +49,8 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #file_summary' do
     before do
       sign_in user
-      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
-      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
     end
 
@@ -61,8 +61,8 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     it 'returns only active files with uri, size and identifier attributes' do
-      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://one', identifier: 'file_one', state: 'A')
-      FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://two', identifier: 'file_two', state: 'D')
+      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://one', identifier: 'file_one', state: 'A')
+      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://two', identifier: 'file_two', state: 'D')
       get :index, params: { alt_action: 'file_summary', intellectual_object_identifier: CGI.escape(@intellectual_object.identifier) }, format: :json
       expect(response).to be_successful
 
@@ -89,8 +89,8 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #show' do
     before do
       sign_in user
-      file.add_event(FactoryGirl.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
-      file.add_event(FactoryGirl.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
+      file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
     end
 
@@ -143,12 +143,12 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in as inst_admin' do
-      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id) }
+      let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
       before { sign_in user }
 
       describe "should be forbidden" do
-        let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
+        let(:obj1) { FactoryBot.create(:consortial_intellectual_object) }
         it 'should be forbidden' do
           post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
           expect(response.code).to eq '403' # forbidden
@@ -158,12 +158,12 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in as inst_user' do
-      let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: @institution.id) }
+      let(:user) { FactoryBot.create(:user, :institutional_user, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
       before { sign_in user }
 
       describe "should be forbidden" do
-        let(:obj1) { FactoryGirl.create(:consortial_intellectual_object) }
+        let(:obj1) { FactoryBot.create(:consortial_intellectual_object) }
         it 'should be forbidden' do
           post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
           expect(response.code).to eq '403' # forbidden
@@ -173,7 +173,7 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in as admin' do
-      let(:user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
+      let(:user) { FactoryBot.create(:user, :admin, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
       before { sign_in user }
 
@@ -229,7 +229,7 @@ RSpec.describe GenericFilesController, type: :controller do
 
     describe 'when signed in as inst admin' do
       let(:obj1) { @intellectual_object }
-      let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @institution.id) }
+      let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @institution.id) }
 
       before { sign_in user }
       it 'should show unauthorized' do
@@ -241,7 +241,7 @@ RSpec.describe GenericFilesController, type: :controller do
 
     describe 'when signed in as inst user' do
       let(:obj1) { @intellectual_object }
-      let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: @institution.id) }
+      let(:user) { FactoryBot.create(:user, :institutional_user, institution_id: @institution.id) }
 
       before { sign_in user }
       it 'should show unauthorized' do
@@ -252,9 +252,9 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in as admin' do
-      let(:user) { FactoryGirl.create(:user, :admin, institution_id: @institution.id) }
-      let(:obj2) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id) }
-      let(:batch_obj) { FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id) }
+      let(:user) { FactoryBot.create(:user, :admin, institution_id: @institution.id) }
+      let(:obj2) { FactoryBot.create(:consortial_intellectual_object, institution_id: @another_institution.id) }
+      let(:batch_obj) { FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id) }
       let(:current_dir) { File.dirname(__FILE__) }
       let(:json_file) { File.join(current_dir, '..', 'fixtures', 'generic_file_batch.json') }
       let(:raw_json) { File.read(json_file) }
@@ -291,7 +291,7 @@ RSpec.describe GenericFilesController, type: :controller do
   end
 
   describe 'PATCH #update' do
-    before(:all) { @file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id) }
+    before(:all) { @file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id) }
     let(:file) { @file }
 
     describe 'when not signed in' do
@@ -307,7 +307,7 @@ RSpec.describe GenericFilesController, type: :controller do
       before { sign_in user }
 
       describe "and updating a file you don't have access to" do
-        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @another_institution.id) }
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
           patch :update, params: { intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file.identifier, generic_file: {size: 99}, format: 'json', trailing_slash: true }
           expect(response.code).to eq '403' # forbidden
@@ -316,8 +316,8 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       describe 'and you have access to the file' do
-        let(:new_checksum) { FactoryGirl.create(:checksum, generic_file: file) }
-        let(:new_event) { FactoryGirl.create(:premis_event_validation, generic_file: file) }
+        let(:new_checksum) { FactoryBot.create(:checksum, generic_file: file) }
+        let(:new_event) { FactoryBot.create(:premis_event_validation, generic_file: file) }
         it 'should update the file' do
           patch :update, params: { intellectual_object_identifier: file.intellectual_object.identifier, generic_file_identifier: file, generic_file: {size: 99, ingest_state: '{[D]}'}, format: 'json', trailing_slash: true }
           expect(assigns[:generic_file].size).to eq 99
@@ -343,8 +343,8 @@ RSpec.describe GenericFilesController, type: :controller do
 
   describe 'DELETE #destroy' do
     before(:all) {
-      @file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
-      @parent_work_item = FactoryGirl.create(:work_item,
+      @file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+      @parent_work_item = FactoryBot.create(:work_item,
                                                   object_identifier: @intellectual_object.identifier,
                                                   action: Pharos::Application::PHAROS_ACTIONS['ingest'],
                                                   stage: Pharos::Application::PHAROS_STAGES['record'],
@@ -369,7 +369,7 @@ RSpec.describe GenericFilesController, type: :controller do
       before { sign_in user }
 
       describe "and deleting a file you don't have access to" do
-        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: @another_institution.id) }
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
           delete :destroy, params: { generic_file_identifier: file }, format: 'json'
           expect(response.code).to eq '403' # forbidden
@@ -385,7 +385,7 @@ RSpec.describe GenericFilesController, type: :controller do
         end
 
         it 'delete the file with html response' do
-          file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+          file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
           delete :destroy, params: { generic_file_identifier: file }, format: :html
           expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
           expect(assigns[:generic_file].state).to eq 'D'
@@ -393,7 +393,7 @@ RSpec.describe GenericFilesController, type: :controller do
         end
 
         it 'should create a WorkItem with the delete request' do
-          file = FactoryGirl.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+          file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
           delete :destroy, params: { generic_file_identifier: file }, format: 'json'
           wi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(wi).not_to be_nil
@@ -423,8 +423,8 @@ RSpec.describe GenericFilesController, type: :controller do
       it 'should return only files that have not had a fixity check since the given date' do
         dates = ['2017-01-01T00:00:00Z', '2016-01-01T00:00:00Z', '2015-01-01T00:00:00Z']
         10.times do |i|
-          gf = FactoryGirl.create(:generic_file, state: 'A')
-          event = gf.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
+          gf = FactoryBot.create(:generic_file, state: 'A')
+          event = gf.add_event(FactoryBot.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
         end
         get :index, params: { not_checked_since: '2015-01-01T00:00:00Z', start: 0, rows: 10 }, format: :json
         expect(assigns[:generic_files].length).to eq 3
@@ -442,7 +442,7 @@ RSpec.describe GenericFilesController, type: :controller do
 
       it 'includes not_checked_since in next link if necessary' do
         3.times do
-          FactoryGirl.create(:generic_file, state: 'A', last_fixity_check: '1999-01-01')
+          FactoryBot.create(:generic_file, state: 'A', last_fixity_check: '1999-01-01')
         end
         get :index, params: { not_checked_since: '2099-12-31', page: 2, per_page: 1 }, format: :json
         expect(response.status).to eq(200)

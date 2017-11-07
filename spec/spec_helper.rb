@@ -42,7 +42,7 @@ RSpec.configure do |config|
     end
 
     # Create our default institution
-    # FactoryGirl.create(:aptrust)
+    # FactoryBot.create(:aptrust)
   end
 
   config.after(:all) do

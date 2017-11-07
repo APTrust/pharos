@@ -2,12 +2,12 @@ require 'spec_helper'
 require 'application_helper'
 
 describe 'work_items/show.html.erb' do
-  let(:institution) { FactoryGirl.create :member_institution }
-  let(:user) { FactoryGirl.create :user, :admin, institution: institution }
-  let(:object) { FactoryGirl.create :intellectual_object, institution: institution }
-  let(:file) { FactoryGirl.create :generic_file, intellectual_object: object }
-  let(:item) { FactoryGirl.create :work_item, object_identifier: object.identifier, generic_file_identifier: file.identifier }
-  let(:state_item) { FactoryGirl.create :work_item_state, work_item: item }
+  let(:institution) { FactoryBot.create :member_institution }
+  let(:user) { FactoryBot.create :user, :admin, institution: institution }
+  let(:object) { FactoryBot.create :intellectual_object, institution: institution }
+  let(:file) { FactoryBot.create :generic_file, intellectual_object: object }
+  let(:item) { FactoryBot.create :work_item, object_identifier: object.identifier, generic_file_identifier: file.identifier }
+  let(:state_item) { FactoryBot.create :work_item_state, work_item: item }
 
   before do
     assign(:user, user)
