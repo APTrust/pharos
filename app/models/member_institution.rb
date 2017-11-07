@@ -1,6 +1,16 @@
 class MemberInstitution < Institution
   has_many :subscription_institutions
 
+  def subscribers
+    SubscriptionInstitution.where(member_institution_id: self.id)
+  end
+
+  def subscriber_report
+    self.subscribers.each do |si|
+      si_report[si.name] = si.generic_files.sum(:size)
+    end
+  end
+
   def generate_overview
     report = {}
     report[:bytes_by_format] = self.bytes_by_format
@@ -9,9 +19,7 @@ class MemberInstitution < Institution
     report[:premis_events] = self.premis_events.count
     report[:work_items] = WorkItem.with_institution(self.id).count
     report[:average_file_size] = average_file_size
-    self.subscription_institutions.each do |si|
-      report[si.name] = si.bytes_by_format
-    end
+    report[:subscribers] = self.subscriber_report
     report
   end
 

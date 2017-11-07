@@ -2,8 +2,20 @@
 
 <dl class="dl-horizontal">
   <% @report.each do |key, value| %>
-      <dt><%= key %></dt>
-      <dd><%= number_to_human_size(value) %></dd>
+      <% value.each do |nested_key, nested_value| %>
+          <% if nested_key == :subscriber_number %>
+              <dt>Number of Subscribers</dt>
+              <dd><%= nested_value %></dd>
+          <% else %>
+              <% if nested_key == key %>
+                  <dt><%= nested_key %></dt>
+                  <dd><%= number_to_human_size(nested_value) %></dd>
+              <% else %>
+                  <dt style="font-weight: 100;"><%= nested_key %></dt>
+                  <dd style="font-weight: 100;"><%= number_to_human_size(nested_value) %></dd>
+              <% end %>
+          <% end %>
+      <% end %>
   <% end %>
 </dl>
 

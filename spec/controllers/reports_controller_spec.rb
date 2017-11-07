@@ -120,7 +120,7 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
         expect(response).to be_success
-        expect(assigns(:report).keys.size).to eq(3)
+        expect(assigns(:report).keys.size).to eq(2)
       end
     end
 
@@ -132,7 +132,7 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
         expect(response).to be_success
-        expect(assigns(:report).keys.size).to eq(3)
+        expect(assigns(:report).keys.size).to eq(2)
       end
     end
 
