@@ -8,7 +8,7 @@ RSpec.describe AlertsController, type: :controller do
     Institution.delete_all
 
     @institution_one =  FactoryBot.create(:member_institution, identifier: 'aptrust.org')
-    @institution_two = FactoryBot.create(:institution)
+    @institution_two = FactoryBot.create(:subscription_institution)
     @admin_user = FactoryBot.create(:user, :admin, institution: @institution_one)
     @institutional_admin = FactoryBot.create(:user, :institutional_admin, institution: @institution_two)
     @institutional_user = FactoryBot.create(:user, :institutional_user, institution: @institution_two)
