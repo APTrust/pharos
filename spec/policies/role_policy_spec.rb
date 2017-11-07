@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RolePolicy do
 
-  let(:institution) { FactoryGirl.create(:institution) }
+  let(:institution) { FactoryGirl.create(:member_institution) }
   subject (:role_policy) { RolePolicy.new(user, role) }
 
   context 'for an admin user' do

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe GenericFilePolicy do
   subject (:generic_file_policy) { GenericFilePolicy.new(user, generic_file) }
-  let(:institution) { FactoryGirl.create(:institution) }
+  let(:institution) { FactoryGirl.create(:member_institution) }
 
   context 'for an admin user' do
     let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }

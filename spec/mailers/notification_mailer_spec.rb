@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe NotificationMailer, type: :mailer do
   describe 'failed_fixity_notification' do
-    let(:institution) { FactoryGirl.create(:institution) }
+    let(:institution) { FactoryGirl.create(:member_institution) }
     let(:user) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
     let(:event) { FactoryGirl.create(:premis_event_fixity_check_fail, institution: institution) }
     let(:email_log) { FactoryGirl.create(:fixity_email) }
@@ -27,7 +27,7 @@ RSpec.describe NotificationMailer, type: :mailer do
   end
 
   describe 'restoration_notification' do
-    let(:institution) { FactoryGirl.create(:institution) }
+    let(:institution) { FactoryGirl.create(:member_institution) }
     let(:user) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
     let(:item) { FactoryGirl.create(:work_item, institution: institution,
                                     action: Pharos::Application::PHAROS_ACTIONS['restore'],
@@ -55,7 +55,7 @@ RSpec.describe NotificationMailer, type: :mailer do
   end
 
   describe 'multiple_failed_fixity_notification' do
-    let(:institution) { FactoryGirl.create(:institution) }
+    let(:institution) { FactoryGirl.create(:member_institution) }
     let(:user) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
     let(:event) { FactoryGirl.create(:premis_event_fixity_check_fail, institution: institution) }
     let(:event_two) { FactoryGirl.create(:premis_event_fixity_check_fail, institution: institution) }
@@ -86,7 +86,7 @@ RSpec.describe NotificationMailer, type: :mailer do
   end
 
   describe 'multiple_restoration_notification' do
-    let(:institution) { FactoryGirl.create(:institution) }
+    let(:institution) { FactoryGirl.create(:member_institution) }
     let(:user) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
     let(:item) { FactoryGirl.create(:work_item, institution: institution,
                                     action: Pharos::Application::PHAROS_ACTIONS['restore'],

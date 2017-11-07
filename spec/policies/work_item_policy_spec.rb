@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe WorkItemPolicy do
   subject (:work_item_policy) { WorkItemPolicy.new(user, work_item) }
-  let(:institution) { FactoryGirl.create(:institution) }
+  let(:institution) { FactoryGirl.create(:member_institution) }
   let(:intellectual_object) { FactoryGirl.create(:intellectual_object, institution: institution) }
-  let(:other_inst) { FactoryGirl.create(:institution) }
+  let(:other_inst) { FactoryGirl.create(:subscription_institution) }
   let(:other_int_obj) { FactoryGirl.create(:intellectual_object, institution: other_inst) }
 
   context 'for an admin user' do

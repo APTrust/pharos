@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'API Authentication: Editing an Intellectual Object via API request' do
-  let(:inst) { FactoryGirl.create :institution }
+  let(:inst) { FactoryGirl.create :member_institution }
 
   let(:old_title) { 'Old Title' }
   let(:new_title) { 'New Title' }

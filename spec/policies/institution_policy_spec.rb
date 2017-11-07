@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe InstitutionPolicy do
   subject (:institution_policy) { InstitutionPolicy.new(user, institution) }
-  let(:institution) { FactoryGirl.create(:institution) }
-  let(:other_institution) { FactoryGirl.create(:institution) }
+  let(:institution) { FactoryGirl.create(:member_institution) }
+  let(:other_institution) { FactoryGirl.create(:subscription_institution) }
 
   context 'for an admin user' do
     let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }

@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'application_helper'
 
 describe 'institutions/show.html.erb' do
-  let(:institution) { FactoryGirl.create :institution }
+  let(:institution) { FactoryGirl.create :member_institution }
   let(:user) { FactoryGirl.create(:user, :admin, institution: institution) }
 
   before do

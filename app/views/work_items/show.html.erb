@@ -1,6 +1,6 @@
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
-    <li><a href="#"><%= link_to current_user.institution.name, current_user.institution %></a></li>
+    <li><a href="#"><%= link_to current_user.institution.name, institution_path(current_user.institution) %></a></li>
   </ol>
 
   <section class="page-header">

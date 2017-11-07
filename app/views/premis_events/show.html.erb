@@ -1,6 +1,6 @@
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
-    <li><a href="#"><%= link_to @event.institution.name, @event.institution %></a></li>
+    <li><a href="#"><%= link_to @event.institution.name, institution_path(@event.institution) %></a></li>
     <li><a href="#"><%= link_to @event.intellectual_object.title, @event.intellectual_object %></a></li>
     <% if @event.generic_file_identifier != '' %>
         <li><a href="#"><%= link_to @event.generic_file.identifier, @event.generic_file %></a></li>
@@ -8,7 +8,7 @@
     <li class="active"><%= @event.identifier %></li>
   </ol>
   <ol class="breadcrumb">
-    <li><a href="#"><%= link_to current_user.institution.name, current_user.institution %></a></li>
+    <li><a href="#"><%= link_to current_user.institution.name, institution_path(current_user.institution) %></a></li>
   </ol>
 
   <section class="page-header">

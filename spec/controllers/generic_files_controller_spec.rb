@@ -9,8 +9,8 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:parens_file) { FactoryGirl.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf') }
 
   before(:all) do
-    @institution = FactoryGirl.create(:institution)
-    @another_institution = FactoryGirl.create(:institution)
+    @institution = FactoryGirl.create(:member_institution)
+    @another_institution = FactoryGirl.create(:subscription_institution)
     @intellectual_object = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id)
     @another_intellectual_object = FactoryGirl.create(:consortial_intellectual_object, institution_id: @another_institution.id)
     GenericFile.delete_all

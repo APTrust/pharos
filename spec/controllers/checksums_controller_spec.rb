@@ -14,8 +14,8 @@ RSpec.describe ChecksumsController, type: :controller do
     Checksum.delete_all
   end
 
-  let!(:institution_one) { FactoryGirl.create(:institution) }
-  let!(:institution_two) { FactoryGirl.create(:institution) }
+  let!(:institution_one) { FactoryGirl.create(:member_institution) }
+  let!(:institution_two) { FactoryGirl.create(:subscription_institution) }
   let!(:admin_user) { FactoryGirl.create(:user, :admin, institution: institution_one) }
   let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution_one) }
   let!(:admin) { FactoryGirl.create(:user, :admin) }

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe IntellectualObjectPolicy do
 
   subject (:intellectual_object_policy) { IntellectualObjectPolicy.new(user, intellectual_object) }
-  let(:institution) { FactoryGirl.create(:institution) }
+  let(:institution) { FactoryGirl.create(:member_institution) }
 
   context 'for an admin user' do
     let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }

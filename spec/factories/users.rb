@@ -5,7 +5,7 @@ FactoryGirl.define do
     phone_number { 4345551234 }
     password { 'password' }
     roles { [Role.where(name: 'public').first_or_create] }
-    institution_id { FactoryGirl.create(:institution).id }
+    institution_id { FactoryGirl.create(:member_institution).id }
 
     factory :aptrust_user, class: 'User' do
       roles { [Role.where(name: 'admin').first_or_create] }

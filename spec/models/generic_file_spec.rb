@@ -206,8 +206,8 @@ RSpec.describe GenericFile, :type => :model do
   end
 
   describe 'permission scopes and checks' do
-    let!(:inst) { FactoryGirl.create(:institution) }
-    let!(:other_inst) { FactoryGirl.create(:institution) }
+    let!(:inst) { FactoryGirl.create(:member_institution) }
+    let!(:other_inst) { FactoryGirl.create(:subscription_institution) }
 
     let!(:inst_user) { FactoryGirl.create(:user, :institutional_user,
                                           institution: inst) }
@@ -456,8 +456,8 @@ RSpec.describe GenericFile, :type => :model do
   end
 
   describe 'scopes by attribute' do
-    let!(:inst) { FactoryGirl.create(:institution) }
-    let!(:other_inst) { FactoryGirl.create(:institution) }
+    let!(:inst) { FactoryGirl.create(:member_institution) }
+    let!(:other_inst) { FactoryGirl.create(:subscription_institution) }
 
     let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
                                            institution: inst) }

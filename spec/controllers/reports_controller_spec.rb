@@ -6,8 +6,8 @@ RSpec.describe ReportsController, type: :controller do
     IntellectualObject.delete_all
     GenericFile.delete_all
 
-    @institution_one =  FactoryGirl.create(:institution)
-    @institution_two = FactoryGirl.create(:institution, identifier: 'aptrust.org')
+    @institution_one =  FactoryGirl.create(:subscription_institution)
+    @institution_two = FactoryGirl.create(:member_institution, identifier: 'aptrust.org')
     @admin_user = FactoryGirl.create(:user, :admin, institution: @institution_one)
     @institutional_user = FactoryGirl.create(:user, :institutional_user, institution: @institution_two)
     @institutional_admin = FactoryGirl.create(:user, :institutional_admin, institution: @institution_two)
@@ -120,7 +120,7 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
         expect(response).to be_success
-        expect(assigns(:report).keys.size).to eq(2)
+        expect(assigns(:report).keys.size).to eq(3)
       end
     end
 
@@ -132,7 +132,7 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
         expect(response).to be_success
-        expect(assigns(:report).keys.size).to eq(2)
+        expect(assigns(:report).keys.size).to eq(3)
       end
     end
 

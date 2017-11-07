@@ -13,8 +13,8 @@ RSpec.describe CatalogController, type: :controller do
     WorkItem.delete_all
     PremisEvent.delete_all
     DpnWorkItem.delete_all
-    @institution = FactoryGirl.create(:institution)
-    @another_institution = FactoryGirl.create(:institution)
+    @institution = FactoryGirl.create(:member_institution)
+    @another_institution = FactoryGirl.create(:subscription_institution)
 
     @object_one = FactoryGirl.create(:consortial_intellectual_object, institution_id: @institution.id, id: 1)
     @object_two = FactoryGirl.create(:institutional_intellectual_object, institution_id: @institution.id, alt_identifier: ['something/1234-5678'], id: 2)

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe UserPolicy do
   subject (:user_policy) { UserPolicy.new(user, other_user) }
-  let(:institution) { FactoryGirl.create(:institution) }
+  let(:institution) { FactoryGirl.create(:member_institution) }
 
   context 'for an admin user' do
     let(:user) { FactoryGirl.create(:user, :admin, institution_id: institution.id) }

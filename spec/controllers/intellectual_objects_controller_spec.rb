@@ -2,8 +2,8 @@ require 'spec_helper'
 
 RSpec.describe IntellectualObjectsController, type: :controller do
 
-  let(:inst1) { FactoryGirl.create(:institution) }
-  let(:inst2) { FactoryGirl.create(:institution) }
+  let(:inst1) { FactoryGirl.create(:member_institution) }
+  let(:inst2) { FactoryGirl.create(:subscription_institution) }
   let(:inst_user) { FactoryGirl.create(:user, :institutional_user,
                                        institution: inst1) }
   let(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,

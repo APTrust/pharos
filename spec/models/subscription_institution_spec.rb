@@ -1,15 +1,16 @@
 require 'spec_helper'
 
-RSpec.describe Institution, :type => :model do
-  subject { FactoryGirl.build(:institution) }
+RSpec.describe SubscriptionInstitution, :type => :model do
+  subject { FactoryGirl.build(:subscription_institution) }
 
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:identifier) }
+  it { should validate_presence_of(:type) }
 
   describe '#name_is_unique' do
     it 'should validate uniqueness of the name' do
-      one = FactoryGirl.create(:institution, name: 'test')
-      two = FactoryGirl.build(:institution, name: 'test')
+      one = FactoryGirl.create(:subscription_institution, name: 'test')
+      two = FactoryGirl.build(:subscription_institution, name: 'test')
       two.should_not be_valid
       two.errors[:name].should include('has already been taken')
     end
@@ -17,20 +18,28 @@ RSpec.describe Institution, :type => :model do
 
   describe '#identifier_is_unique' do
     it 'should validate uniqueness of the identifier' do
-      one = FactoryGirl.create(:institution, identifier: 'test.edu')
-      two = FactoryGirl.build(:institution, identifier: 'test.edu')
+      one = FactoryGirl.create(:subscription_institution, identifier: 'test.edu')
+      two = FactoryGirl.build(:subscription_institution, identifier: 'test.edu')
       two.should_not be_valid
       two.errors[:identifier].should include('has already been taken')
     end
   end
 
+  describe '#has_associated_member_institution' do
+    it 'should validate that it has an associated member institution' do
+      one = FactoryGirl.build(:subscription_institution, member_institution_id: nil)
+      one.should_not be_valid
+      one.errors[:member_institution_id].should include('cannot be nil')
+    end
+  end
+
   describe '#find_by_identifier' do
     it 'should validate uniqueness of the identifier' do
-      one = FactoryGirl.create(:institution, identifier: 'test.edu')
-      two = FactoryGirl.create(:institution, identifier: 'kollege.edu')
-      Institution.find_by_identifier('test.edu').should eq one
-      Institution.find_by_identifier('kollege.edu').should eq two
-      Institution.find_by_identifier('idontexist.edu').should be nil
+      one = FactoryGirl.create(:subscription_institution, identifier: 'test.edu')
+      two = FactoryGirl.create(:subscription_institution, identifier: 'kollege.edu')
+      SubscriptionInstitution.find_by_identifier('test.edu').should eq one
+      SubscriptionInstitution.find_by_identifier('kollege.edu').should eq two
+      SubscriptionInstitution.find_by_identifier('idontexist.edu').should be nil
     end
   end
 

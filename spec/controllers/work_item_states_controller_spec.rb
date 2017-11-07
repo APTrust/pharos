@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe WorkItemStatesController, type: :controller do
-  let!(:institution) { FactoryGirl.create(:institution) }
+  let!(:institution) { FactoryGirl.create(:member_institution) }
   let!(:admin_user) { FactoryGirl.create(:user, :admin) }
   let!(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
   let!(:item) { FactoryGirl.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'], status: Pharos::Application::PHAROS_STATUSES['success']) }

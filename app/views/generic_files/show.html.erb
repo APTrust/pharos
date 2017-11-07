@@ -1,6 +1,6 @@
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
-    <li><a href="#"><%= link_to @generic_file.intellectual_object.institution.name, @generic_file.intellectual_object.institution %></a></li>
+    <li><a href="#"><%= link_to @generic_file.intellectual_object.institution.name, institution_path(@generic_file.intellectual_object.institution) %></a></li>
     <li><a href="#"><%= link_to @generic_file.intellectual_object.title, @generic_file.intellectual_object %></a></li>
     <li class="active"><%= @generic_file.display %></li>
   </ol>
@@ -12,7 +12,7 @@
   <section class="object_info">
     <dl class="dl-horizontal dl-invert">
       <dt>Institution</dt>
-      <dd><%= link_to @generic_file.intellectual_object.institution.name, @generic_file.intellectual_object.institution %> [<%= @generic_file.intellectual_object.institution.brief_name %>]</dd>
+      <dd><%= link_to @generic_file.intellectual_object.institution.name, institution_path(@generic_file.intellectual_object.institution) %> [<%= @generic_file.intellectual_object.institution.brief_name %>]</dd>
       <dt>Intellectual Object</dt>
       <dd><%= link_to @generic_file.intellectual_object.title, @generic_file.intellectual_object %> [<%= @generic_file.intellectual_object.access %>]</dd>
       <dt>Identifier</dt>

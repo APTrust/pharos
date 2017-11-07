@@ -5,11 +5,21 @@ FactoryGirl.define do
   sequence(:identifier) { |n| "#{n}#{Faker::Internet.domain_word}.com"}
   sequence(:dpn_uuid) { |n| "#{n}#{SecureRandom.uuid}"}
 
-  factory :institution do
+  factory :member_institution do
     name
     brief_name
     identifier
     dpn_uuid
+    type { 'MemberInstitution' }
+  end
+
+  factory :subscription_institution do
+    name
+    brief_name
+    identifier
+    dpn_uuid
+    type { 'SubscriptionInstitution' }
+    member_institution_id { FactoryGirl.create(:member_institution).id }
   end
 
   factory :aptrust, class: 'Institution' do
@@ -17,5 +27,6 @@ FactoryGirl.define do
     brief_name 'apt'
     identifier 'aptrust.org'
     dpn_uuid ''
+    type { 'MemberInstitution' }
   end
 end

@@ -3,7 +3,7 @@ require 'spec_helper'
 feature 'Access Denied' do
   before do
     @user = FactoryGirl.create(:user)
-    @institution = FactoryGirl.create(:institution)
+    @institution = FactoryGirl.create(:member_institution)
   end
 
   scenario 'Unauthorized user tries to view page' do

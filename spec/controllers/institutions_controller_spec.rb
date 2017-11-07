@@ -137,7 +137,7 @@ RSpec.describe InstitutionsController, type: :controller do
     after { inst1.destroy }
 
     describe 'when not signed in' do
-      let(:inst1) { FactoryGirl.create(:institution) }
+      let(:inst1) { FactoryGirl.create(:member_institution) }
       it 'should redirect to login' do
         get :edit, params: { institution_identifier: inst1 }
         expect(response).to redirect_to root_url + 'users/sign_in'
@@ -147,7 +147,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'when signed in' do
       after { user.destroy }
       describe 'as an institutional_user' do
-        let(:inst1) { FactoryGirl.create(:institution) }
+        let(:inst1) { FactoryGirl.create(:member_institution) }
         let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: inst1.id) }
         before { sign_in user }
         it 'should be unauthorized' do
@@ -158,8 +158,8 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       describe 'as an institutional_admin' do
-        let(:inst1) { FactoryGirl.create(:institution) }
-        let(:inst2) { FactoryGirl.create(:institution) }
+        let(:inst1) { FactoryGirl.create(:member_institution) }
+        let(:inst2) { FactoryGirl.create(:subscription_institution) }
         let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: inst1.id) }
         before { sign_in user }
         describe 'editing my own institution' do
@@ -178,7 +178,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       describe 'as an admin' do
-        let(:inst1) { FactoryGirl.create(:institution) }
+        let(:inst1) { FactoryGirl.create(:member_institution) }
         let(:user) { FactoryGirl.create(:user, :admin, institution_id: inst1.id) }
         before { sign_in user }
         it 'should show the institution edit form' do
@@ -192,7 +192,7 @@ RSpec.describe InstitutionsController, type: :controller do
   describe 'PATCH update' do
 
     describe 'when not signed in' do
-      let(:inst1) { FactoryGirl.create(:institution) }
+      let(:inst1) { FactoryGirl.create(:member_institution) }
       it 'should redirect to login' do
         patch :update, params: { institution_identifier: inst1, institution: {name: 'Foo' } }
         expect(response).to redirect_to root_url + 'users/sign_in'
@@ -201,7 +201,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
     describe 'when signed in' do
       let(:user) { FactoryGirl.create(:user, :admin) }
-      let(:inst1) { FactoryGirl.create(:institution) }
+      let(:inst1) { FactoryGirl.create(:member_institution) }
       before {
         sign_in user
       }
@@ -216,7 +216,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
   describe 'POST create' do
     describe 'with admin user' do
-      let (:attributes) { FactoryGirl.attributes_for(:institution) }
+      let (:attributes) { FactoryGirl.attributes_for(:member_institution) }
 
       before do
         sign_in admin_user
@@ -237,7 +237,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
     end
     describe 'with institutional admin user' do
-      let (:attributes) { FactoryGirl.attributes_for(:institution) }
+      let (:attributes) { FactoryGirl.attributes_for(:member_institution) }
       before do
         sign_in institutional_admin
       end

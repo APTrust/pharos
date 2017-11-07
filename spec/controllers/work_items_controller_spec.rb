@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe WorkItemsController, type: :controller do
-  let!(:institution) { FactoryGirl.create(:institution) }
+  let!(:institution) { FactoryGirl.create(:member_institution) }
   let!(:admin_user) { FactoryGirl.create(:user, :admin) }
   let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution) }
   let!(:object) { FactoryGirl.create(:intellectual_object, institution: institution, access: 'institution') }
@@ -896,7 +896,7 @@ RSpec.describe WorkItemsController, type: :controller do
   #     let(:json_file) { File.join(current_dir, '..', 'fixtures', 'work_item_batch.json') }
   #     let(:raw_json) { File.read(json_file) }
   #     let(:wi_data) { JSON.parse(raw_json) }
-  #     let(:institution) { FactoryGirl.create(:institution) }
+  #     let(:institution) { FactoryGirl.create(:member_institution) }
   #     let(:object) { FactoryGirl.create(:intellectual_object, institution_id: institution.id) }
   #     let(:item_one) { FactoryGirl.create(:work_item, institution_id: institution.id, intellectual_object_id: object.id, object_identifier: object.identifier) }
   #     before do

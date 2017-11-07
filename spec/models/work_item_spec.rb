@@ -18,7 +18,7 @@ started = Pharos::Application::PHAROS_STATUSES['start']
 def setup_item(subject)
   subject.name = 'sample_bag.tar'
   subject.etag = '12345'
-  subject.institution = FactoryGirl.build(:institution, identifier: 'hardknocks.edu')
+  subject.institution = FactoryGirl.build(:member_institution, identifier: 'hardknocks.edu')
   subject.bag_date = Time.now()
   subject.bucket = 'aptrust.receiving.hardknocks.edu'
   subject.date = Time.now()

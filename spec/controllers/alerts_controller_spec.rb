@@ -7,8 +7,8 @@ RSpec.describe AlertsController, type: :controller do
     PremisEvent.delete_all
     Institution.delete_all
 
-    @institution_one =  FactoryGirl.create(:institution, identifier: 'aptrust.org')
-    @institution_two = FactoryGirl.create(:institution)
+    @institution_one =  FactoryGirl.create(:member_institution, identifier: 'aptrust.org')
+    @institution_two = FactoryGirl.create(:subscription_institution)
     @admin_user = FactoryGirl.create(:user, :admin, institution: @institution_one)
     @institutional_admin = FactoryGirl.create(:user, :institutional_admin, institution: @institution_two)
     @institutional_user = FactoryGirl.create(:user, :institutional_user, institution: @institution_two)
