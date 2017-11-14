@@ -6,9 +6,11 @@ class MemberInstitution < Institution
   end
 
   def subscriber_report
+    si_report = {}
     self.subscribers.each do |si|
       si_report[si.name] = si.generic_files.sum(:size)
     end
+    si_report
   end
 
   def generate_overview
