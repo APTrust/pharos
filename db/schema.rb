@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171106233052) do
+ActiveRecord::Schema.define(version: 20171115153649) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
