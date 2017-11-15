@@ -81,6 +81,17 @@ namespace :pharos do
     end
   end
 
+  # This should only be one run time in production, to type the institutions already in place. Future institutions should
+  # be created as one of the new types, member or subscription
+  desc 'Type institutions into member institutions'
+  task type_institutions: :environment do
+    Institution.all.each do |inst|
+      puts "Retyping #{inst.name} to be a member institution."
+      inst.type = 'MemberInstitution'
+      inst.save!
+    end
+  end
+
   # Restricted only to non-production environments
   desc 'Empty the database'
   task empty_db: :environment do
