@@ -81,6 +81,15 @@ namespace :pharos do
     end
   end
 
+  desc 'Add type to previous institutions'
+  task type_institutions: :environment do
+    Institution.all.each do |inst|
+      puts "Retyping #{inst.name} to be a member institution."
+      inst.type = 'MemberInstitution'
+      inst.save!
+    end
+  end
+
   # Restricted only to non-production environments
   desc 'Empty the database'
   task empty_db: :environment do
@@ -553,7 +562,8 @@ namespace :pharos do
         Institution.create!(name: partner[0],
                             brief_name: partner[1],
                             identifier: partner[2],
-                            dpn_uuid: partner[3])
+                            dpn_uuid: partner[3],
+                            type: 'MemberInstitution')
       else
         puts "#{partner[0]} already exists"
       end
