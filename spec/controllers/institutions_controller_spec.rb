@@ -9,9 +9,9 @@ RSpec.describe InstitutionsController, type: :controller do
     Institution.delete_all
   end
 
-  let(:admin_user) { FactoryGirl.create(:user, :admin) }
-  let(:institutional_user) { FactoryGirl.create(:user, :institutional_user) }
-  let(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin) }
+  let(:admin_user) { FactoryBot.create(:user, :admin) }
+  let(:institutional_user) { FactoryBot.create(:user, :institutional_user) }
+  let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin) }
 
   describe 'GET #index' do
     describe 'for admin users' do
@@ -137,40 +137,76 @@ RSpec.describe InstitutionsController, type: :controller do
     after { inst1.destroy }
 
     describe 'when not signed in' do
-      let(:inst1) { FactoryGirl.create(:institution) }
-      it 'should redirect to login' do
+      let(:inst1) { FactoryBot.create(:member_institution) }
+      let(:inst2) { FactoryBot.create(:subscription_institution) }
+
+      it 'should redirect to login for member institutions' do
         get :edit, params: { institution_identifier: inst1 }
+        expect(response).to redirect_to root_url + 'users/sign_in'
+      end
+
+      it 'should redirect to login for subscriber institutions' do
+        get :edit, params: { institution_identifier: inst2 }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
 
     describe 'when signed in' do
       after { user.destroy }
+
       describe 'as an institutional_user' do
-        let(:inst1) { FactoryGirl.create(:institution) }
-        let(:user) { FactoryGirl.create(:user, :institutional_user, institution_id: inst1.id) }
+        let(:inst1) { FactoryBot.create(:member_institution) }
+        let(:inst2) { FactoryBot.create(:subscription_institution) }
+        let(:user) { FactoryBot.create(:user, :institutional_user, institution_id: inst1.id) }
         before { sign_in user }
-        it 'should be unauthorized' do
+
+        it 'should be unauthorized for member institutions' do
           get :edit, params: { institution_identifier: inst1 }
+          expect(response).to redirect_to root_url
+          expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+        end
+
+        it 'should be unauthorized for subscription institutions' do
+          get :edit, params: { institution_identifier: inst2 }
           expect(response).to redirect_to root_url
           expect(flash[:alert]).to eq 'You are not authorized to access this page.'
         end
       end
 
       describe 'as an institutional_admin' do
-        let(:inst1) { FactoryGirl.create(:institution) }
-        let(:inst2) { FactoryGirl.create(:institution) }
-        let(:user) { FactoryGirl.create(:user, :institutional_admin, institution_id: inst1.id) }
-        before { sign_in user }
+        let(:inst1) { FactoryBot.create(:member_institution) }
+        let(:inst2) { FactoryBot.create(:member_institution) }
+        let(:inst3) { FactoryBot.create(:subscription_institution) }
+        let(:inst4) { FactoryBot.create(:subscription_institution) }
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: inst1.id) }
+        let(:user2) { FactoryBot.create(:user, :institutional_admin, institution_id: inst3.id) }
+        #before { sign_in user }
+
         describe 'editing my own institution' do
-          it 'should show the institution edit form' do
+          it 'should show the institution edit form for member institutions' do
+            sign_in user
             get :edit, params: { institution_identifier: inst1 }
             expect(response).to be_successful
           end
+
+          it 'should show the institution edit form for subscription institutions' do
+            sign_in user2
+            get :edit, params: { institution_identifier: inst3 }
+            expect(response).to be_successful
+          end
         end
+
         describe 'editing an institution other than my own' do
-          it 'should be unauthorized' do
+          it 'should be unauthorized for member institutions' do
+            sign_in user
             get :edit, params: { institution_identifier: inst2 }
+            expect(response).to redirect_to root_url
+            expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+          end
+
+          it 'should be unauthorized for subscription institutions' do
+            sign_in user2
+            get :edit, params: { institution_identifier: inst4 }
             expect(response).to redirect_to root_url
             expect(flash[:alert]).to eq 'You are not authorized to access this page.'
           end
@@ -178,11 +214,18 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       describe 'as an admin' do
-        let(:inst1) { FactoryGirl.create(:institution) }
-        let(:user) { FactoryGirl.create(:user, :admin, institution_id: inst1.id) }
+        let(:inst1) { FactoryBot.create(:member_institution) }
+        let(:inst2) { FactoryBot.create(:subscription_institution) }
+        let(:user) { FactoryBot.create(:user, :admin, institution_id: inst1.id) }
         before { sign_in user }
-        it 'should show the institution edit form' do
+
+        it 'should show the institution edit form for member institutions' do
           get :edit, params: { institution_identifier: inst1 }
+          expect(response).to be_successful
+        end
+
+        it 'should show the institution edit form for subscriptions institutions' do
+          get :edit, params: { institution_identifier: inst2 }
           expect(response).to be_successful
         end
       end
@@ -192,23 +235,36 @@ RSpec.describe InstitutionsController, type: :controller do
   describe 'PATCH update' do
 
     describe 'when not signed in' do
-      let(:inst1) { FactoryGirl.create(:institution) }
-      it 'should redirect to login' do
+      let(:inst1) { FactoryBot.create(:member_institution) }
+      let(:inst2) { FactoryBot.create(:subscription_institution) }
+      it 'should redirect to login for member institutions' do
         patch :update, params: { institution_identifier: inst1, institution: {name: 'Foo' } }
+        expect(response).to redirect_to root_url + 'users/sign_in'
+      end
+
+      it 'should redirect to login for subscription institutions' do
+        patch :update, params: { institution_identifier: inst2, institution: {name: 'Foo' } }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
 
     describe 'when signed in' do
-      let(:user) { FactoryGirl.create(:user, :admin) }
-      let(:inst1) { FactoryGirl.create(:institution) }
+      let(:user) { FactoryBot.create(:user, :admin) }
+      let(:inst1) { FactoryBot.create(:member_institution) }
+      let(:inst2) { FactoryBot.create(:subscription_institution) }
       before {
         sign_in user
       }
 
-      it 'should update fields' do
+      it 'should update fields for member institutions' do
         patch :update, params: { institution_identifier: inst1, institution: {name: 'Foo'} }
         expect(response).to redirect_to institution_path(inst1)
+        expect(assigns(:institution).name).to eq 'Foo'
+      end
+
+      it 'should update fields for subscription institutions' do
+        patch :update, params: { institution_identifier: inst2, institution: {name: 'Foo'} }
+        expect(response).to redirect_to institution_path(inst2)
         expect(assigns(:institution).name).to eq 'Foo'
       end
     end
@@ -216,10 +272,12 @@ RSpec.describe InstitutionsController, type: :controller do
 
   describe 'POST create' do
     describe 'with admin user' do
-      let (:attributes) { FactoryGirl.attributes_for(:institution) }
-
+      let (:current_member) { FactoryBot.create(:member_institution) }
+      let (:attributes) { FactoryBot.attributes_for(:member_institution) }
+      let (:attributes2) { FactoryBot.attributes_for(:subscription_institution, member_institution_id: current_member.id) }
       before do
         sign_in admin_user
+        current_member.save! #needs to be instantiated before the test below
       end
 
       it 'should reject when there are no parameters' do
@@ -228,23 +286,43 @@ RSpec.describe InstitutionsController, type: :controller do
         }.to raise_error ActionController::ParameterMissing
       end
 
-      it 'should accept good parameters' do
+      it 'should accept good parameters for member institutions' do
         expect {
           post :create, params: { institution: attributes }
         }.to change(Institution, :count).by(1)
         response.should redirect_to institution_url(assigns[:institution])
         assigns[:institution].should be_kind_of Institution
       end
+
+      it 'should accept good parameters for subscription institutions' do
+        expect {
+          post :create, params: { institution: attributes2 }
+        }.to change(Institution, :count).by(1)
+        response.should redirect_to institution_url(assigns[:institution])
+        assigns[:institution].should be_kind_of Institution
+      end
     end
+
     describe 'with institutional admin user' do
-      let (:attributes) { FactoryGirl.attributes_for(:institution) }
+      let (:current_member) { FactoryBot.create(:member_institution) }
+      let (:attributes) { FactoryBot.attributes_for(:member_institution) }
+      let (:attributes2) { FactoryBot.attributes_for(:subscription_institution, member_institution_id: current_member.id) }
       before do
         sign_in institutional_admin
+        current_member.save! #needs to be instantiated before the test below
       end
 
-      it 'should be unauthorized' do
+      it 'should be unauthorized for member institutions' do
         expect {
           post :create, params: { institution: attributes }
+        }.to_not change(Institution, :count)
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+      it 'should be unauthorized for subscription institutions' do
+        expect {
+          post :create, params: { institution: attributes2 }
         }.to_not change(Institution, :count)
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'

@@ -1,6 +1,6 @@
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
-    <li><a href="#"><%= link_to current_user.institution.name, current_user.institution %></a></li>
+    <li><a href="#"><%= link_to current_user.institution.name, institution_path(current_user.institution) %></a></li>
   </ol>
 
   <section class="page-header">
@@ -33,6 +33,8 @@
         <td><%= @dpn_item.queued_at %></td></tr>
       <tr><th>Completed At</th>
         <td><%= @dpn_item.completed_at %></td></tr>
+      <tr><th>Processing Time</th>
+        <td><%= dpn_process_time(@dpn_item) %></td></tr>
       <tr><th>Note</th>
         <td><%= @dpn_item.note %></td></tr>
       <tr><th>PID</th>

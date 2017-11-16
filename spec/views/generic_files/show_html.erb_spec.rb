@@ -2,10 +2,10 @@ require 'spec_helper'
 require 'application_helper'
 
 describe 'generic_files/show.html.erb' do
-  let(:institution) { FactoryGirl.create :institution }
-  let(:user) { FactoryGirl.create :user, :admin, institution: institution }
-  let(:object) { FactoryGirl.create :intellectual_object, institution: institution }
-  let(:file) { FactoryGirl.create :generic_file, intellectual_object: object }
+  let(:institution) { FactoryBot.create :member_institution }
+  let(:user) { FactoryBot.create :user, :admin, institution: institution }
+  let(:object) { FactoryBot.create :intellectual_object, institution: institution }
+  let(:file) { FactoryBot.create :generic_file, intellectual_object: object }
 
   before do
     assign(:user, user)

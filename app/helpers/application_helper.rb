@@ -8,7 +8,11 @@ module ApplicationHelper
   def edit_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-edit"></i> Edit'
     options[:class] = 'btn doc-action-btn btn-normal btn-sm' if options[:class].nil?
-    link_to(content.html_safe, [:edit, object], options) if policy(object).edit?
+    if object.is_a?(Institution)
+      link_to(content.html_safe, edit_institution_path(object), options) if policy(object).edit?
+    else
+      link_to(content.html_safe, [:edit, object], options) if policy(object).edit?
+    end
   end
 
   def destroy_link(object, content = nil, options={})
@@ -16,7 +20,11 @@ module ApplicationHelper
     options[:class] = 'btn doc-action-btn btn-danger btn-sm' if options[:class].nil?
     options[:method] = :delete if options[:method].nil?
     options[:data] = { confirm: 'Are you sure you want to delete this?' } if options[:confirm].nil?
-    link_to(content.html_safe, object, options) if policy(object).destroy?
+    if object.is_a?(Institution)
+      link_to(content.html_safe, institution_path(object), options) if policy(object).destroy?
+    else
+      link_to(content.html_safe, object, options) if policy(object).destroy?
+    end
   end
 
   def admin_password_link(object, content = nil, options={})
@@ -45,7 +53,7 @@ module ApplicationHelper
   end
 
   def get_institution_for_tabs
-    if @institution
+    if @institution && !@institution.id.nil?
       @inst = @institution
     else
       @inst = current_user.institution
@@ -55,7 +63,7 @@ module ApplicationHelper
 
   def dpn_process_time(item)
     if item.completed_at && item.queued_at
-      process_time = ((item.completed_at - item.queued_at) / 1.hour).round(2)
+      process_time = ((item.completed_at.to_f - item.queued_at.to_f) / 1.hour).round(2)
       if process_time == 1
         process_final = '1 hour'
       else

@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe GenericFile, :type => :model do
 
   it 'delegates institution to the intellectual object' do
-    file = FactoryGirl.create(:generic_file)
+    file = FactoryBot.create(:generic_file)
     institution = file.intellectual_object.institution
     file.institution.should == institution
   end
@@ -14,15 +14,15 @@ RSpec.describe GenericFile, :type => :model do
   it { should validate_presence_of(:identifier)}
 
   it 'should validate presence of intellectual object' do
-    file = FactoryGirl.create(:generic_file)
+    file = FactoryBot.create(:generic_file)
     expect(file.intellectual_object).to be_valid
     expect(file.intellectual_object.identifier).to include('/')
   end
 
   describe '#identifier_is_unique' do
     it 'should validate uniqueness of the identifier' do
-      one = FactoryGirl.create(:generic_file, identifier: 'test.edu')
-      two = FactoryGirl.build(:generic_file, identifier: 'test.edu')
+      one = FactoryBot.create(:generic_file, identifier: 'test.edu')
+      two = FactoryBot.build(:generic_file, identifier: 'test.edu')
       two.should_not be_valid
       two.errors[:identifier].should include('has already been taken')
     end
@@ -37,25 +37,25 @@ RSpec.describe GenericFile, :type => :model do
     let(:intellectual_object) { mock_model IntellectualObject, institution: institution, identifier: 'info:fedora/testing:123/1234567' }
 
     describe '#last_fixity_check' do
-      subject { FactoryGirl.create(:generic_file) }
+      subject { FactoryBot.create(:generic_file) }
       it 'should return the most recent fixity check' do
         date = '2014-08-01T16:33:39Z'
         date_two = '2014-10-01T16:33:39Z'
         date_three = '2014-11-01T16:33:39Z'
-        subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date))
+        subject.add_event(FactoryBot.attributes_for(:premis_event_fixity_check, date_time: date))
         subject.last_fixity_check.should == date
 
-        subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_two))
+        subject.add_event(FactoryBot.attributes_for(:premis_event_fixity_check, date_time: date_two))
         subject.last_fixity_check.should == date_two
 
-        subject.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: date_three))
+        subject.add_event(FactoryBot.attributes_for(:premis_event_fixity_check, date_time: date_three))
         subject.last_fixity_check.should == date_three
       end
     end
 
     describe 'that is saved' do
-      let(:intellectual_object) { FactoryGirl.create(:intellectual_object) }
-      subject { FactoryGirl.create(:generic_file, intellectual_object: intellectual_object) }
+      let(:intellectual_object) { FactoryBot.create(:intellectual_object) }
+      subject { FactoryBot.create(:generic_file, intellectual_object: intellectual_object) }
       describe 'its intellectual_object' do
         after(:all)do # Must use after(:all) to avoid 'can't modify frozen Class' bug in rspec-mocks
           subject.destroy
@@ -64,11 +64,11 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'soft_delete' do
-        let(:object) { FactoryGirl.create(:intellectual_object) }
-        let(:file) { FactoryGirl.create(:generic_file, intellectual_object: object) }
+        let(:object) { FactoryBot.create(:intellectual_object) }
+        let(:file) { FactoryBot.create(:generic_file, intellectual_object: object) }
         before do
           file.save!
-          @parent_work_item = FactoryGirl.create(:work_item,
+          @parent_work_item = FactoryBot.create(:work_item,
                                                       object_identifier: file.intellectual_object.identifier,
                                                       action: Pharos::Application::PHAROS_ACTIONS['ingest'],
                                                       stage: Pharos::Application::PHAROS_STAGES['record'],
@@ -88,13 +88,13 @@ RSpec.describe GenericFile, :type => :model do
             # A.D. 1/29/2017: Don't create the file delete event.
             # Let the Go services code do that when the actual
             # deletion occurs.
-            file.soft_delete(FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
+            file.soft_delete(FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
           }.to change { file.premis_events.count}.by(0)
           expect(file.state).to eq 'D'
         end
 
         it 'should create a WorkItem showing delete was requested' do
-          file.soft_delete(FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com'))
+          file.soft_delete(FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com'))
           pi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(pi).not_to be_nil
           expect(pi.object_identifier).to eq file.intellectual_object.identifier
@@ -107,7 +107,7 @@ RSpec.describe GenericFile, :type => :model do
       end
 
       describe 'serializable_hash' do
-        let(:subject) { FactoryGirl.create(:generic_file) }
+        let(:subject) { FactoryBot.create(:generic_file) }
         before do
         end
         after do
@@ -143,7 +143,7 @@ RSpec.describe GenericFile, :type => :model do
 
       describe 'find_checksum_by_digest' do
         it 'should find the checksum' do
-          subject.checksums.push(FactoryGirl.create(:checksum))
+          subject.checksums.push(FactoryBot.create(:checksum))
           digest = subject.checksums.first.digest
           expect(subject.find_checksum_by_digest(digest)).not_to be_nil
         end
@@ -154,7 +154,7 @@ RSpec.describe GenericFile, :type => :model do
 
       describe 'has_checksum?' do
         it 'should return true if checksum is present' do
-          subject.checksums.push(FactoryGirl.create(:checksum))
+          subject.checksums.push(FactoryBot.create(:checksum))
           digest = subject.checksums.first.digest
           expect(subject.has_checksum?(digest)).to be true
         end
@@ -174,8 +174,8 @@ RSpec.describe GenericFile, :type => :model do
     it 'should return only files that have not had a fixity check since the given date' do
       dates = ['2017-01-01T00:00:00Z', '2016-01-01T00:00:00Z', '2015-01-01T00:00:00Z']
       10.times do |i|
-        gf = FactoryGirl.create(:generic_file, state: 'A')
-        event = gf.add_event(FactoryGirl.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
+        gf = FactoryBot.create(:generic_file, state: 'A')
+        event = gf.add_event(FactoryBot.attributes_for(:premis_event_fixity_check, date_time: dates[i % 3]))
       end
       files = GenericFile.not_checked_since('2015-01-01T00:00:00Z')
       files.count.should == 3
@@ -187,8 +187,8 @@ RSpec.describe GenericFile, :type => :model do
   end
 
   describe '#find_by_identifier' do
-    let(:subject) { FactoryGirl.create(:generic_file, identifier: 'abc/123') }
-    let(:subject_two) { FactoryGirl.create(:generic_file, identifier: 'xyz/789') }
+    let(:subject) { FactoryBot.create(:generic_file, identifier: 'abc/123') }
+    let(:subject_two) { FactoryBot.create(:generic_file, identifier: 'xyz/789') }
     it 'should find by identifier' do
       subject.save!
       subject_two.save!
@@ -206,33 +206,33 @@ RSpec.describe GenericFile, :type => :model do
   end
 
   describe 'permission scopes and checks' do
-    let!(:inst) { FactoryGirl.create(:institution) }
-    let!(:other_inst) { FactoryGirl.create(:institution) }
+    let!(:inst) { FactoryBot.create(:member_institution) }
+    let!(:other_inst) { FactoryBot.create(:subscription_institution) }
 
-    let!(:inst_user) { FactoryGirl.create(:user, :institutional_user,
+    let!(:inst_user) { FactoryBot.create(:user, :institutional_user,
                                           institution: inst) }
-    let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+    let!(:inst_admin) { FactoryBot.create(:user, :institutional_admin,
                                            institution: inst) }
-    let!(:sys_admin) { FactoryGirl.create(:user, :admin) }
+    let!(:sys_admin) { FactoryBot.create(:user, :admin) }
 
-    let!(:obj_own_consortia) { FactoryGirl.create(:intellectual_object,
+    let!(:obj_own_consortia) { FactoryBot.create(:intellectual_object,
                                                   access: 'consortia', institution: inst) }
-    let!(:gf_own_consortia) { FactoryGirl.create(:generic_file, intellectual_object: obj_own_consortia) }
-    let!(:obj_own_inst) { FactoryGirl.create(:intellectual_object,
+    let!(:gf_own_consortia) { FactoryBot.create(:generic_file, intellectual_object: obj_own_consortia) }
+    let!(:obj_own_inst) { FactoryBot.create(:intellectual_object,
                                              access: 'institution', institution: inst) }
-    let!(:gf_own_inst) { FactoryGirl.create(:generic_file, intellectual_object: obj_own_inst) }
-    let!(:obj_own_restricted) { FactoryGirl.create(:intellectual_object,
+    let!(:gf_own_inst) { FactoryBot.create(:generic_file, intellectual_object: obj_own_inst) }
+    let!(:obj_own_restricted) { FactoryBot.create(:intellectual_object,
                                                    access: 'restricted', institution: inst) }
-    let!(:gf_own_restricted) { FactoryGirl.create(:generic_file, intellectual_object: obj_own_restricted) }
-    let!(:obj_other_consortia) { FactoryGirl.create(:intellectual_object,
+    let!(:gf_own_restricted) { FactoryBot.create(:generic_file, intellectual_object: obj_own_restricted) }
+    let!(:obj_other_consortia) { FactoryBot.create(:intellectual_object,
                                                     access: 'consortia', institution: other_inst) }
-    let!(:gf_other_consortia) { FactoryGirl.create(:generic_file, intellectual_object: obj_other_consortia) }
-    let!(:obj_other_inst) { FactoryGirl.create(:intellectual_object,
+    let!(:gf_other_consortia) { FactoryBot.create(:generic_file, intellectual_object: obj_other_consortia) }
+    let!(:obj_other_inst) { FactoryBot.create(:intellectual_object,
                                                access: 'institution', institution: other_inst) }
-    let!(:gf_other_inst) { FactoryGirl.create(:generic_file, intellectual_object: obj_other_inst) }
-    let!(:obj_other_restricted) { FactoryGirl.create(:intellectual_object,
+    let!(:gf_other_inst) { FactoryBot.create(:generic_file, intellectual_object: obj_other_inst) }
+    let!(:obj_other_restricted) { FactoryBot.create(:intellectual_object,
                                                      access: 'restricted', institution: other_inst) }
-    let!(:gf_other_restricted) { FactoryGirl.create(:generic_file, intellectual_object: obj_other_restricted) }
+    let!(:gf_other_restricted) { FactoryBot.create(:generic_file, intellectual_object: obj_other_restricted) }
 
     # ----------- CONSORTIA --------------
 
@@ -456,12 +456,12 @@ RSpec.describe GenericFile, :type => :model do
   end
 
   describe 'scopes by attribute' do
-    let!(:inst) { FactoryGirl.create(:institution) }
-    let!(:other_inst) { FactoryGirl.create(:institution) }
+    let!(:inst) { FactoryBot.create(:member_institution) }
+    let!(:other_inst) { FactoryBot.create(:subscription_institution) }
 
-    let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+    let!(:inst_admin) { FactoryBot.create(:user, :institutional_admin,
                                            institution: inst) }
-    let!(:obj1) { FactoryGirl.create(:intellectual_object,
+    let!(:obj1) { FactoryBot.create(:intellectual_object,
                                      institution: inst,
                                      identifier: 'test.edu/first',
                                      alt_identifier: 'first alt identifier',
@@ -471,7 +471,7 @@ RSpec.describe GenericFile, :type => :model do
                                      bag_name: 'first_item',
                                      title: 'Title of first item',
                                      state: 'A') }
-    let!(:obj2) { FactoryGirl.create(:intellectual_object,
+    let!(:obj2) { FactoryBot.create(:intellectual_object,
                                      institution: inst,
                                      identifier: 'test.edu/second',
                                      alt_identifier: 'second alt identifier',
@@ -481,7 +481,7 @@ RSpec.describe GenericFile, :type => :model do
                                      bag_name: 'second_item',
                                      title: 'Title of second item',
                                      state: 'A') }
-    let!(:obj3) { FactoryGirl.create(:intellectual_object,
+    let!(:obj3) { FactoryBot.create(:intellectual_object,
                                      institution: other_inst,
                                      identifier: 'xxx',
                                      alt_identifier: 'xxx',
@@ -491,7 +491,7 @@ RSpec.describe GenericFile, :type => :model do
                                      bag_name: 'xxx',
                                      title: 'xxx',
                                      state: 'D') }
-    let!(:gf1) { FactoryGirl.create(:generic_file,
+    let!(:gf1) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj1,
                                     uri: "https://s3.kom/uri1",
                                     identifier: 'test.edu/bag/first',
@@ -499,7 +499,7 @@ RSpec.describe GenericFile, :type => :model do
                                     created_at: '2011-01-01',
                                     updated_at: '2011-01-01',
                                     state: 'A') }
-    let!(:gf2) { FactoryGirl.create(:generic_file,
+    let!(:gf2) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj2,
                                     uri: "https://s3.kom/uri2",
                                     identifier: 'test.edu/bag/second',
@@ -507,7 +507,7 @@ RSpec.describe GenericFile, :type => :model do
                                     created_at: '2017-12-31',
                                     updated_at: '2017-12-31',
                                     state: 'A') }
-    let!(:gf3) { FactoryGirl.create(:generic_file,
+    let!(:gf3) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj3,
                                     uri: "https://s3.kom/uri2",
                                     identifier: 'test.edu/bag/third',

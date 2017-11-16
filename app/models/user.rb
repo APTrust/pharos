@@ -23,6 +23,9 @@ class User < ActiveRecord::Base
   validates_plausible_phone :phone_number
   #validate :phone_number_length
 
+  # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
+  scope :readable, ->(current_user) { where('(1=1)') }
+
   # This method assigns permission groups
   # Don't think these are necessary anymore, we use Pundit/Roles
   def groups

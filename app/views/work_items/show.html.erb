@@ -1,6 +1,6 @@
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
-    <li><a href="#"><%= link_to current_user.institution.name, current_user.institution %></a></li>
+    <li><a href="#"><%= link_to current_user.institution.name, institution_path(current_user.institution) %></a></li>
   </ol>
 
   <section class="page-header">
@@ -12,7 +12,9 @@
     <% if current_user.admin? %>
         <% unless @work_item.status == Pharos::Application::PHAROS_STATUSES['success'] %>
           <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
-              <%= requeue_link(@work_item) %>
+                <%= link_to requeue_work_item_path(@work_item.id), { class: 'btn doc-action-btn btn-normal requeue-link', data: { confirm: 'Do you really want to requeue this item for deletion?' } } do %>
+                    <i class="glyphicon glyphicon-repeat"></i> Requeue
+                <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] %>
               <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue

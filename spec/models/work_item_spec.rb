@@ -18,7 +18,7 @@ started = Pharos::Application::PHAROS_STATUSES['start']
 def setup_item(subject)
   subject.name = 'sample_bag.tar'
   subject.etag = '12345'
-  subject.institution = FactoryGirl.build(:institution, identifier: 'hardknocks.edu')
+  subject.institution = FactoryBot.build(:member_institution, identifier: 'hardknocks.edu')
   subject.bag_date = Time.now()
   subject.bucket = 'aptrust.receiving.hardknocks.edu'
   subject.date = Time.now()
@@ -87,7 +87,7 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'should set object identifier in before_save if not ingested (single part bag)' do
-    FactoryGirl.create(:intellectual_object, identifier: 'hardknocks.edu/sample_bag')
+    FactoryBot.create(:intellectual_object, identifier: 'hardknocks.edu/sample_bag')
     setup_item(subject)
     subject.action = ingest
     subject.stage = record
@@ -97,7 +97,7 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'should set object identifier in before_save if not ingested (multi part bag)' do
-    FactoryGirl.create(:intellectual_object, identifier: 'hardknocks.edu/sesame.street')
+    FactoryBot.create(:intellectual_object, identifier: 'hardknocks.edu/sesame.street')
     setup_item(subject)
     subject.name = 'sesame.street.b046.of249.tar'
     subject.action = ingest
@@ -108,7 +108,7 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'should set queue fields' do
-    subject.work_item_state = FactoryGirl.create(:work_item_state, work_item: subject, action: 'Success')
+    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
     ts = Time.now
     setup_item(subject)
     subject.action = ingest
@@ -127,21 +127,21 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'pretty_state should not choke on nil' do
-    subject.work_item_state = FactoryGirl.create(:work_item_state, work_item: subject, action: 'Success')
+    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
     setup_item(subject)
     subject.work_item_state.state = nil
     subject.pretty_state.should == nil
   end
 
   it 'pretty_state should not choke on empty string' do
-    subject.work_item_state = FactoryGirl.create(:work_item_state, work_item: subject, action: 'Success')
+    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
     setup_item(subject)
     subject.work_item_state.state = Zlib::Deflate.deflate('')
     subject.pretty_state.should == nil
   end
 
   it 'pretty_state should produce formatted JSON' do
-    subject.work_item_state = FactoryGirl.create(:work_item_state, work_item: subject, action: 'Success')
+    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
     setup_item(subject)
     subject.work_item_state.state = Zlib::Deflate.deflate('{ "here": "is", "some": ["j","s","o","n"] }')
     pretty_json = <<-eos
@@ -159,7 +159,7 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'requeue_item should reset the status, stage, and action to the appropriate fields' do
-    subject = FactoryGirl.create(:work_item)
+    subject = FactoryBot.create(:work_item)
 
     subject.status = Pharos::Application::PHAROS_STATUSES['fail']
     subject.action = Pharos::Application::PHAROS_ACTIONS['delete']
@@ -197,11 +197,11 @@ RSpec.describe WorkItem, :type => :model do
   describe 'work queue methods' do
     ingest_date = Time.parse('2014-06-01')
     before do
-      FactoryGirl.create(:intellectual_object, identifier: 'abc/123')
-      FactoryGirl.create(:generic_file, identifier: 'abc/123/doc.pdf')
+      FactoryBot.create(:intellectual_object, identifier: 'abc/123')
+      FactoryBot.create(:generic_file, identifier: 'abc/123/doc.pdf')
       3.times do
         ingest_date = ingest_date + 1.days
-        FactoryGirl.create(:work_item, object_identifier: 'abc/123',
+        FactoryBot.create(:work_item, object_identifier: 'abc/123',
                            action: Pharos::Application::PHAROS_ACTIONS['ingest'],
                            stage: Pharos::Application::PHAROS_STAGES['record'],
                            status: Pharos::Application::PHAROS_STATUSES['success'],
@@ -217,7 +217,7 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a restoration request when asked' do
       wi = WorkItem.create_restore_request('abc/123', 'mikey@example.com')
-      wi.work_item_state = FactoryGirl.build(:work_item_state, work_item: wi)
+      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
       wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
@@ -234,7 +234,7 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a dpn request when asked' do
       wi = WorkItem.create_dpn_request('abc/123', 'mikey@example.com')
-      wi.work_item_state = FactoryGirl.build(:work_item_state, work_item: wi)
+      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['dpn']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
       wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
@@ -251,7 +251,7 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a delete request when asked' do
       wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com')
-      wi.work_item_state = FactoryGirl.build(:work_item_state, work_item: wi)
+      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['delete']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
       wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
@@ -382,32 +382,32 @@ RSpec.describe WorkItem, :type => :model do
   describe 'alert methods' do
     describe 'for failed ingest' do
       it 'failed_ingest should return a list of work items that have failed a specific action' do
-        user = FactoryGirl.create(:user, :admin)
-        item = FactoryGirl.create(:work_item, action: ingest, status: failed)
+        user = FactoryBot.create(:user, :admin)
+        item = FactoryBot.create(:work_item, action: ingest, status: failed)
         items = WorkItem.failed_action(Time.now - 24.hours, ingest, user)
         expect(items.first).to eq item
       end
 
       it 'failed_ingest_count should return the number of work items that have failed a specific action' do
-        user = FactoryGirl.create(:user, :admin)
-        item = FactoryGirl.create(:work_item, action: ingest, status: failed)
+        user = FactoryBot.create(:user, :admin)
+        item = FactoryBot.create(:work_item, action: ingest, status: failed)
         count = WorkItem.failed_action_count(Time.now - 24.hours, ingest, user)
         expect(count).to eq 1
       end
 
       it 'stalled_items should return a list of work items queued 12+ hours ago that have not succeeded, failed, or cancelled' do
-        user = FactoryGirl.create(:user, :admin)
-        item1 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
-        item2 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: started)
+        user = FactoryBot.create(:user, :admin)
+        item1 = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
+        item2 = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: started)
         items = WorkItem.stalled_items(user)
         expect(items.first.id).to eq item1.id
         expect(items.last.id).to eq item2.id
       end
 
       it 'stalled_item_counts should return the number of work items queued 12+ hours ago that have not succeeded, failed, or cancelled' do
-        user = FactoryGirl.create(:user, :admin)
-        item1 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
-        item2 = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: started)
+        user = FactoryBot.create(:user, :admin)
+        item1 = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
+        item2 = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: started)
         count = WorkItem.stalled_items_count(user)
         expect(count).to eq 2
       end

@@ -6,16 +6,16 @@ RSpec.describe ReportsController, type: :controller do
     IntellectualObject.delete_all
     GenericFile.delete_all
 
-    @institution_one =  FactoryGirl.create(:institution)
-    @institution_two = FactoryGirl.create(:institution, identifier: 'aptrust.org')
-    @admin_user = FactoryGirl.create(:user, :admin, institution: @institution_one)
-    @institutional_user = FactoryGirl.create(:user, :institutional_user, institution: @institution_two)
-    @institutional_admin = FactoryGirl.create(:user, :institutional_admin, institution: @institution_two)
-    @institutional_admin_two = FactoryGirl.create(:user, :institutional_admin, institution: @institution_one)
-    @intellectual_object_one = FactoryGirl.create(:intellectual_object, institution: @institution_one)
-    @intellectual_object_two = FactoryGirl.create(:intellectual_object, institution: @institution_two)
-    @generic_file_one = FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object_one)
-    @generic_file_two = FactoryGirl.create(:generic_file, intellectual_object: @intellectual_object_two)
+    @institution_one =  FactoryBot.create(:subscription_institution)
+    @institution_two = FactoryBot.create(:member_institution, identifier: 'aptrust.org')
+    @admin_user = FactoryBot.create(:user, :admin, institution: @institution_one)
+    @institutional_user = FactoryBot.create(:user, :institutional_user, institution: @institution_two)
+    @institutional_admin = FactoryBot.create(:user, :institutional_admin, institution: @institution_two)
+    @institutional_admin_two = FactoryBot.create(:user, :institutional_admin, institution: @institution_one)
+    @intellectual_object_one = FactoryBot.create(:intellectual_object, institution: @institution_one)
+    @intellectual_object_two = FactoryBot.create(:intellectual_object, institution: @institution_two)
+    @generic_file_one = FactoryBot.create(:generic_file, intellectual_object: @intellectual_object_one)
+    @generic_file_two = FactoryBot.create(:generic_file, intellectual_object: @intellectual_object_two)
   end
 
   after :all do

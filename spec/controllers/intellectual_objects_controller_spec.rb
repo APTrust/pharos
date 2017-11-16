@@ -2,42 +2,42 @@ require 'spec_helper'
 
 RSpec.describe IntellectualObjectsController, type: :controller do
 
-  let(:inst1) { FactoryGirl.create(:institution) }
-  let(:inst2) { FactoryGirl.create(:institution) }
-  let(:inst_user) { FactoryGirl.create(:user, :institutional_user,
+  let(:inst1) { FactoryBot.create(:member_institution) }
+  let(:inst2) { FactoryBot.create(:subscription_institution) }
+  let(:inst_user) { FactoryBot.create(:user, :institutional_user,
                                        institution: inst1) }
-  let(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+  let(:inst_admin) { FactoryBot.create(:user, :institutional_admin,
                                        institution: inst1) }
-  let(:sys_admin) { FactoryGirl.create(:user, :admin) }
-  let!(:obj1) { FactoryGirl.create(:consortial_intellectual_object,
+  let(:sys_admin) { FactoryBot.create(:user, :admin) }
+  let!(:obj1) { FactoryBot.create(:consortial_intellectual_object,
                                    institution: inst2) }
-  let!(:obj2) { FactoryGirl.create(:institutional_intellectual_object,
+  let!(:obj2) { FactoryBot.create(:institutional_intellectual_object,
                                    institution: inst1,
                                    identifier: 'test.edu/baggie?c=152',
                                    title: 'Aberdeen Wanderers',
                                    description: 'Founded in Aberdeen in 1928.',
                                    etag: '4d05dc2aa07e411a55ef11bc6ade5ec1') }
-  let!(:obj3) { FactoryGirl.create(:institutional_intellectual_object,
+  let!(:obj3) { FactoryBot.create(:institutional_intellectual_object,
                                    institution: inst2) }
-  let!(:obj4) { FactoryGirl.create(:restricted_intellectual_object,
+  let!(:obj4) { FactoryBot.create(:restricted_intellectual_object,
                                    institution: inst1,
                                    title: 'Manchester City',
                                    description: 'The other Manchester team.',
                                    etag: '4d05dc2aa07e411a55ef11bc6ade5ec2') }
-  let!(:obj5) { FactoryGirl.create(:restricted_intellectual_object,
+  let!(:obj5) { FactoryBot.create(:restricted_intellectual_object,
                                    institution: inst2) }
-  let!(:obj6) { FactoryGirl.create(:institutional_intellectual_object,
+  let!(:obj6) { FactoryBot.create(:institutional_intellectual_object,
                                    institution: inst1,
                                    bag_name: '12345-abcde',
                                    alt_identifier: 'test.edu/some-bag',
                                    created_at: '2011-10-10T10:00:00Z',
                                    updated_at: '2011-10-10T10:00:00Z',
                                    etag: '4d05dc2aa07e411a55ef11bc6ade5ec3') }
-  let!(:file1) { FactoryGirl.create(:generic_file,
+  let!(:file1) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj2) }
-  let!(:event1) { FactoryGirl.create(:premis_event_ingest,
+  let!(:event1) { FactoryBot.create(:premis_event_ingest,
                                      intellectual_object: obj2) }
-  let!(:event2) { FactoryGirl.create(:premis_event_ingest,
+  let!(:event2) { FactoryBot.create(:premis_event_ingest,
                                      generic_file: file1) }
 
   before(:all) do
@@ -272,8 +272,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'GET #edit' do
-    let(:inst1_obj) { FactoryGirl.create(:consortial_intellectual_object, institution: inst1) }
-    let(:inst2_obj) { FactoryGirl.create(:consortial_intellectual_object, institution: inst2) }
+    let(:inst1_obj) { FactoryBot.create(:consortial_intellectual_object, institution: inst1) }
+    let(:inst2_obj) { FactoryBot.create(:consortial_intellectual_object, institution: inst2) }
     after do
       inst1_obj.destroy
       inst2_obj.destroy
@@ -331,7 +331,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:simple_obj) { FactoryGirl.build(:intellectual_object, institution: inst1, ingest_state: '{[]}') }
+    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}') }
 
     after do
       PremisEvent.delete_all
@@ -460,24 +460,24 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    let!(:deletable_obj) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:deletable_obj) { FactoryBot.create(:institutional_intellectual_object,
                                               institution: inst1,
                                               state: 'A') }
-    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:deleted_obj) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'D') }
-    let!(:obj_pending) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:obj_pending) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'A',
                                             identifier: 'college.edu/item') }
-    let!(:work_item) { FactoryGirl.create(:work_item,
+    let!(:work_item) { FactoryBot.create(:work_item,
                                           object_identifier: 'college.edu/item',
                                           action: 'Restore',
                                           stage: 'Requested',
                                           status: 'Pending') }
-    let!(:deletable_obj_2) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:deletable_obj_2) { FactoryBot.create(:institutional_intellectual_object,
                                                 institution: inst1, state: 'A') }
-    let!(:assc_file) { FactoryGirl.create(:generic_file, intellectual_object: deletable_obj_2) }
+    let!(:assc_file) { FactoryBot.create(:generic_file, intellectual_object: deletable_obj_2) }
 
     after(:all) do
       IntellectualObject.delete_all
@@ -560,36 +560,36 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'PUT #send_to_dpn' do
-    let!(:obj_for_dpn) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:obj_for_dpn) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'A',
                                             identifier: 'college.edu/for_dpn') }
-    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:deleted_obj) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'D',
                                             identifier: 'college.edu/deleted') }
-    let!(:obj_pending) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:obj_pending) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'A',
                                             identifier: 'college.edu/pending') }
-    let!(:obj_in_dpn) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:obj_in_dpn) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'A', dpn_uuid: '1234-5678',
                                             identifier: 'college.edu/in_dpn') }
-    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:deleted_obj) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'D') }
-    let!(:ingest) { FactoryGirl.create(:work_item,
+    let!(:ingest) { FactoryBot.create(:work_item,
                                        object_identifier: 'college.edu/for_dpn',
                                        action: 'Ingest',
                                        stage: 'Cleanup',
                                        status: 'Success') }
-    let!(:pending_restore) { FactoryGirl.create(:work_item,
+    let!(:pending_restore) { FactoryBot.create(:work_item,
                                                 object_identifier: 'college.edu/pending',
                                                 action: 'Restore',
                                                 stage: 'Requested',
                                                 status: 'Pending') }
-    let!(:dpn_item) { FactoryGirl.create(:work_item,
+    let!(:dpn_item) { FactoryBot.create(:work_item,
                                          object_identifier: 'college.edu/in_dpn',
                                          action: 'DPN',
                                          stage: 'Record',
@@ -730,24 +730,24 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'PUT #restore' do
-    let!(:obj_for_restore) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:obj_for_restore) { FactoryBot.create(:institutional_intellectual_object,
                                                 institution: inst1,
                                                 state: 'A',
                                                 identifier: 'college.edu/for_restore') }
-    let!(:deleted_obj) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:deleted_obj) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'D',
                                             identifier: 'college.edu/deleted') }
-    let!(:obj_pending) { FactoryGirl.create(:institutional_intellectual_object,
+    let!(:obj_pending) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,
                                             state: 'A',
                                             identifier: 'college.edu/pending') }
-    let!(:ingest) { FactoryGirl.create(:work_item,
+    let!(:ingest) { FactoryBot.create(:work_item,
                                        object_identifier: 'college.edu/for_restore',
                                        action: 'Ingest',
                                        stage: 'Cleanup',
                                        status: 'Success') }
-    let!(:pending_restore) { FactoryGirl.create(:work_item,
+    let!(:pending_restore) { FactoryBot.create(:work_item,
                                                 object_identifier: 'college.edu/pending',
                                                 action: 'Restore',
                                                 stage: 'Requested',

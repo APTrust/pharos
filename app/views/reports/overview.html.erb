@@ -13,6 +13,19 @@
   <dd><%= number_to_human_size(@report[:average_file_size]) %></dd>
   <dt>Total Bytes Preserved</dt>
   <dd><%= number_to_human_size(@report[:bytes_by_format]['all']) %></dd>
+  <% if @report[:subscribers].nil? || @report[:subscribers] == {} %>
+      <dt>Subscribers</dt>
+      <dd>None</dd>
+  <% else %>
+      <dt>Subscribers</dt>
+      <dd>-----------</dd>
+      <% @report[:subscribers].each do |key, value| %>
+          <dt><%= key %></dt>
+          <dd><%= number_to_human_size(value) %></dd>
+      <% end %>
+  <% end %>
+  <dt>Bytes by Type</dt>
+  <dd>-----------</dd>
   <% @report[:bytes_by_format].each do |key, value| %>
       <% unless key == 'all' %>
           <dt><%= key %></dt>

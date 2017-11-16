@@ -63,26 +63,26 @@ RSpec.describe IntellectualObject, :type => :model do
   end
 
   describe 'permission scopes and checks' do
-    let!(:inst) { FactoryGirl.create(:institution) }
-    let!(:other_inst) { FactoryGirl.create(:institution) }
+    let!(:inst) { FactoryBot.create(:member_institution) }
+    let!(:other_inst) { FactoryBot.create(:subscription_institution) }
 
-    let!(:inst_user) { FactoryGirl.create(:user, :institutional_user,
+    let!(:inst_user) { FactoryBot.create(:user, :institutional_user,
                                           institution: inst) }
-    let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+    let!(:inst_admin) { FactoryBot.create(:user, :institutional_admin,
                                            institution: inst) }
-    let!(:sys_admin) { FactoryGirl.create(:user, :admin) }
+    let!(:sys_admin) { FactoryBot.create(:user, :admin) }
 
-    let!(:obj_own_consortia) { FactoryGirl.create(:intellectual_object,
+    let!(:obj_own_consortia) { FactoryBot.create(:intellectual_object,
                                                   access: 'consortia', institution: inst) }
-    let!(:obj_own_inst) { FactoryGirl.create(:intellectual_object,
+    let!(:obj_own_inst) { FactoryBot.create(:intellectual_object,
                                              access: 'institution', institution: inst) }
-    let!(:obj_own_restricted) { FactoryGirl.create(:intellectual_object,
+    let!(:obj_own_restricted) { FactoryBot.create(:intellectual_object,
                                                    access: 'restricted', institution: inst) }
-    let!(:obj_other_consortia) { FactoryGirl.create(:intellectual_object,
+    let!(:obj_other_consortia) { FactoryBot.create(:intellectual_object,
                                                     access: 'consortia', institution: other_inst) }
-    let!(:obj_other_inst) { FactoryGirl.create(:intellectual_object,
+    let!(:obj_other_inst) { FactoryBot.create(:intellectual_object,
                                                access: 'institution', institution: other_inst) }
-    let!(:obj_other_restricted) { FactoryGirl.create(:intellectual_object,
+    let!(:obj_other_restricted) { FactoryBot.create(:intellectual_object,
                                                      access: 'restricted', institution: other_inst) }
 
     # ----------- CONSORTIA --------------
@@ -308,18 +308,18 @@ RSpec.describe IntellectualObject, :type => :model do
   end
 
   describe 'bytes_by_format' do
-    subject { FactoryGirl.create(:institutional_intellectual_object) }
+    subject { FactoryBot.create(:institutional_intellectual_object) }
     it 'should return a hash' do
       expect(subject.bytes_by_format).to eq({"all"=>0})
     end
 
     describe 'with attached files' do
       before do
-        subject.generic_files << FactoryGirl.build(:generic_file,
+        subject.generic_files << FactoryBot.build(:generic_file,
                                                    intellectual_object: subject,
                                                    size: 166311750,
                                                    identifier: 'test.edu/123/data/file.xml')
-        subject.generic_files << FactoryGirl.build(:generic_file,
+        subject.generic_files << FactoryBot.build(:generic_file,
                                                    intellectual_object: subject,
                                                    file_format: 'audio/wav',
                                                    size: 143732461,
@@ -338,10 +338,10 @@ RSpec.describe IntellectualObject, :type => :model do
   describe 'A saved instance' do
 
     describe 'with generic files' do
-      subject { FactoryGirl.create(:intellectual_object) }
+      subject { FactoryBot.create(:intellectual_object) }
 
       before do
-        @file = FactoryGirl.create(:generic_file, intellectual_object: subject)
+        @file = FactoryBot.create(:generic_file, intellectual_object: subject)
         subject.reload
       end
 
@@ -360,7 +360,7 @@ RSpec.describe IntellectualObject, :type => :model do
 
       describe 'soft_delete' do
         before {
-          @work_item = FactoryGirl.create(:work_item,
+          @work_item = FactoryBot.create(:work_item,
                                           object_identifier: subject.identifier,
                                           action: Pharos::Application::PHAROS_ACTIONS['ingest'],
                                           stage: Pharos::Application::PHAROS_STAGES['record'],
@@ -373,7 +373,7 @@ RSpec.describe IntellectualObject, :type => :model do
         let(:generic_file_delete_job) { double('file') }
 
         it 'should set the state to deleted and index the object state' do
-          attributes = FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
+          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
           subject.background_deletion(attributes)
           expect {
             subject.soft_delete(attributes)
@@ -383,7 +383,7 @@ RSpec.describe IntellectualObject, :type => :model do
         end
 
         it 'should set the state to deleted and index the object state' do
-          attributes = FactoryGirl.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com')
+          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com')
           subject.soft_delete(attributes)
           subject.background_deletion(attributes)
           subject.generic_files.all?{ |file|
@@ -405,8 +405,8 @@ RSpec.describe IntellectualObject, :type => :model do
       describe '#identifier_is_unique' do
         it 'should validate uniqueness of the identifier' do
           #puts "here"
-          one = FactoryGirl.create(:intellectual_object, identifier: 'test.edu/234')
-          two = FactoryGirl.build(:intellectual_object, identifier: 'test.edu/234')
+          one = FactoryBot.create(:intellectual_object, identifier: 'test.edu/234')
+          two = FactoryBot.build(:intellectual_object, identifier: 'test.edu/234')
           two.should_not be_valid
           two.errors[:identifier].should include('has already been taken')
         end
@@ -414,12 +414,12 @@ RSpec.describe IntellectualObject, :type => :model do
     end
 
     describe 'scopes by attribute' do
-      let!(:inst) { FactoryGirl.create(:institution) }
-      let!(:other_inst) { FactoryGirl.create(:institution) }
+      let!(:inst) { FactoryBot.create(:member_institution) }
+      let!(:other_inst) { FactoryBot.create(:subscription_institution) }
 
-      let!(:inst_admin) { FactoryGirl.create(:user, :institutional_admin,
+      let!(:inst_admin) { FactoryBot.create(:user, :institutional_admin,
                                              institution: inst) }
-      let!(:obj1) { FactoryGirl.create(:intellectual_object,
+      let!(:obj1) { FactoryBot.create(:intellectual_object,
                                        institution: inst,
                                        identifier: 'test.edu/first',
                                        alt_identifier: 'first alt identifier',
@@ -429,7 +429,7 @@ RSpec.describe IntellectualObject, :type => :model do
                                        bag_name: 'first_item',
                                        title: 'Title of first item',
                                        state: 'A') }
-      let!(:obj2) { FactoryGirl.create(:intellectual_object,
+      let!(:obj2) { FactoryBot.create(:intellectual_object,
                                        institution: inst,
                                        identifier: 'test.edu/second',
                                        alt_identifier: 'second alt identifier',
@@ -439,7 +439,7 @@ RSpec.describe IntellectualObject, :type => :model do
                                        bag_name: 'second_item',
                                        title: 'Title of second item',
                                        state: 'A') }
-      let!(:obj3) { FactoryGirl.create(:intellectual_object,
+      let!(:obj3) { FactoryBot.create(:intellectual_object,
                                        institution: other_inst,
                                        identifier: 'xxx',
                                        alt_identifier: 'xxx',
@@ -571,8 +571,8 @@ RSpec.describe IntellectualObject, :type => :model do
   end
 
   describe '#find_by_identifier' do
-    let(:subject) { FactoryGirl.create(:intellectual_object, identifier: 'abc.edu/123') }
-    let(:subject_two) { FactoryGirl.create(:intellectual_object, identifier: 'xyz.edu/789') }
+    let(:subject) { FactoryBot.create(:intellectual_object, identifier: 'abc.edu/123') }
+    let(:subject_two) { FactoryBot.create(:intellectual_object, identifier: 'xyz.edu/789') }
     it 'should find by identifier' do
       subject.save!
       subject_two.save!

@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'application_helper'
 
 describe 'users/show.html.erb' do
-  let(:user) { FactoryGirl.create :user }
+  let(:user) { FactoryBot.create :user }
 
   before do
     assign(:user, user)

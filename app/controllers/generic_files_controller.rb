@@ -73,7 +73,7 @@ class GenericFilesController < ApplicationController
   end
 
   def create
-    authorize @intellectual_object
+    authorize current_user, :object_create?
     @generic_file = @intellectual_object.generic_files.new(single_generic_file_params)
     @generic_file.state = 'A'
     respond_to do |format|
@@ -210,23 +210,23 @@ class GenericFilesController < ApplicationController
 
   def load_parent_object
     if params[:intellectual_object_identifier]
-      @intellectual_object = IntellectualObject.find_by_identifier(params[:intellectual_object_identifier])
+      @intellectual_object = IntellectualObject.readable(current_user).find_by_identifier(params[:intellectual_object_identifier])
     elsif params[:intellectual_object_id]
-      @intellectual_object = IntellectualObject.find(params[:intellectual_object_id])
+      @intellectual_object = IntellectualObject.readable(current_user).find(params[:intellectual_object_id])
     elsif params[:institution_identifier]
       @institution = Institution.where(identifier: params[:institution_identifier]).first
     else
-      @intellectual_object = GenericFile.find(params[:id]).intellectual_object
+      @intellectual_object = GenericFile.readable(current_user).find(params[:id]).intellectual_object
     end
   end
 
   def load_intellectual_object
     if params[:intellectual_object_identifier]
-      @intellectual_object = IntellectualObject.find_by_identifier(params[:intellectual_object_identifier])
+      @intellectual_object = IntellectualObject.readable(current_user).find_by_identifier(params[:intellectual_object_identifier])
     elsif params[:intellectual_object_id]
-      @intellectual_object = IntellectualObject.find(params[:intellectual_object_id])
+      @intellectual_object = IntellectualObject.readable(current_user).find(params[:intellectual_object_id])
     else
-      @intellectual_object = GenericFile.find(params[:id]).intellectual_object
+      @intellectual_object = GenericFile.readable(current_user).find(params[:id]).intellectual_object
     end
   end
 
@@ -272,7 +272,7 @@ class GenericFilesController < ApplicationController
         end
       end
     elsif params[:id]
-      @generic_file ||= GenericFile.find(params[:id])
+      @generic_file ||= GenericFile.readable(current_user).find(params[:id])
     end
     unless @generic_file.nil?
       @intellectual_object = @generic_file.intellectual_object

@@ -7,19 +7,19 @@ RSpec.describe AlertsController, type: :controller do
     PremisEvent.delete_all
     Institution.delete_all
 
-    @institution_one =  FactoryGirl.create(:institution, identifier: 'aptrust.org')
-    @institution_two = FactoryGirl.create(:institution)
-    @admin_user = FactoryGirl.create(:user, :admin, institution: @institution_one)
-    @institutional_admin = FactoryGirl.create(:user, :institutional_admin, institution: @institution_two)
-    @institutional_user = FactoryGirl.create(:user, :institutional_user, institution: @institution_two)
-    @failed_fixity = FactoryGirl.create(:premis_event_fixity_check_fail, institution: @institution_two)
-    @failed_fixity_two = FactoryGirl.create(:premis_event_fixity_check_fail, created_at: (Time.now - 36.hours))
-    @ingest_fail = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['ingest'], status: Pharos::Application::PHAROS_STATUSES['fail'])
-    @restore_fail = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['restore'], status: Pharos::Application::PHAROS_STATUSES['fail'])
-    @delete_fail = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], status: Pharos::Application::PHAROS_STATUSES['fail'])
-    @dpn_ingest_fail = FactoryGirl.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['dpn'], status: Pharos::Application::PHAROS_STATUSES['fail'])
-    @stalled = FactoryGirl.create(:work_item, queued_at: Time.now - 13.hours, status: Pharos::Application::PHAROS_STATUSES['pend'])
-    @stalled_dpn = FactoryGirl.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
+    @institution_one =  FactoryBot.create(:member_institution, identifier: 'aptrust.org')
+    @institution_two = FactoryBot.create(:subscription_institution)
+    @admin_user = FactoryBot.create(:user, :admin, institution: @institution_one)
+    @institutional_admin = FactoryBot.create(:user, :institutional_admin, institution: @institution_two)
+    @institutional_user = FactoryBot.create(:user, :institutional_user, institution: @institution_two)
+    @failed_fixity = FactoryBot.create(:premis_event_fixity_check_fail, institution: @institution_two)
+    @failed_fixity_two = FactoryBot.create(:premis_event_fixity_check_fail, created_at: (Time.now - 36.hours))
+    @ingest_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['ingest'], status: Pharos::Application::PHAROS_STATUSES['fail'])
+    @restore_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['restore'], status: Pharos::Application::PHAROS_STATUSES['fail'])
+    @delete_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], status: Pharos::Application::PHAROS_STATUSES['fail'])
+    @dpn_ingest_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['dpn'], status: Pharos::Application::PHAROS_STATUSES['fail'])
+    @stalled = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: Pharos::Application::PHAROS_STATUSES['pend'])
+    @stalled_dpn = FactoryBot.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
   end
 
   after :all do

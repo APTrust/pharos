@@ -16,8 +16,8 @@ RSpec.describe PremisEvent, :type => :model do
   end
 
   describe 'An instance' do
-    let(:object) { FactoryGirl.create(:intellectual_object) }
-    let(:file) { FactoryGirl.create(:generic_file) }
+    let(:object) { FactoryBot.create(:intellectual_object) }
+    let(:file) { FactoryBot.create(:generic_file) }
 
     it 'should properly set an identifier' do
       exp = SecureRandom.uuid
@@ -79,7 +79,7 @@ RSpec.describe PremisEvent, :type => :model do
   end
 
   describe 'serializable_hash' do
-    let(:subject) { FactoryGirl.create(:premis_event_ingest) }
+    let(:subject) { FactoryBot.create(:premis_event_ingest) }
 
     it 'should set the state to deleted and index the object state' do
       h1 = subject.serializable_hash
@@ -96,15 +96,15 @@ RSpec.describe PremisEvent, :type => :model do
   end
 
   describe 'fixity check' do
-    let(:file) { FactoryGirl.create(:generic_file, last_fixity_check: '2000-01-01') }
+    let(:file) { FactoryBot.create(:generic_file, last_fixity_check: '2000-01-01') }
 
     it 'should update last fixity date on generic file if its a fixity check' do
-      event = FactoryGirl.create(:premis_event_fixity_check, generic_file: file)
+      event = FactoryBot.create(:premis_event_fixity_check, generic_file: file)
       expect(file.last_fixity_check).to eq event.date_time
     end
 
     it 'should not update last fixity date on generic file if its not a fixity check' do
-      event = FactoryGirl.create(:premis_event_ingest, generic_file: file)
+      event = FactoryBot.create(:premis_event_ingest, generic_file: file)
       expect(file.last_fixity_check).to eq '2000-01-01'
     end
 
@@ -112,8 +112,8 @@ RSpec.describe PremisEvent, :type => :model do
 
   describe 'failed_fixity_checks' do
     it 'should return the events with a failed outcome and a fixity check type' do
-      user = FactoryGirl.create(:user, :admin)
-      event = FactoryGirl.create(:premis_event_fixity_check_fail)
+      user = FactoryBot.create(:user, :admin)
+      event = FactoryBot.create(:premis_event_fixity_check_fail)
       events = PremisEvent.failed_fixity_checks(Time.now - 24.hours, user)
       expect(events.first).to eq event
     end
@@ -121,8 +121,8 @@ RSpec.describe PremisEvent, :type => :model do
 
   describe 'failed_fixity_check_counts' do
     it 'should return a count of the number of failed fixity check events' do
-      user = FactoryGirl.create(:user, :admin)
-      event = FactoryGirl.create(:premis_event_fixity_check_fail)
+      user = FactoryBot.create(:user, :admin)
+      event = FactoryBot.create(:premis_event_fixity_check_fail)
       count = PremisEvent.failed_fixity_check_count(Time.now - 24.hours, user)
       expect(count).to eq 1
     end

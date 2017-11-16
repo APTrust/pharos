@@ -2,8 +2,8 @@ require 'spec_helper'
 require 'application_helper'
 
 describe 'users/index.html.erb' do
-  let(:institution) { FactoryGirl.create :institution }
-  let(:user) { FactoryGirl.create(:user, :admin, institution: institution) }
+  let(:institution) { FactoryBot.create :member_institution }
+  let(:user) { FactoryBot.create(:user, :admin, institution: institution) }
 
   before do
     assign(:user, user)

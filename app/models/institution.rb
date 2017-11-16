@@ -1,12 +1,11 @@
 class Institution < ActiveRecord::Base
-
   has_many :users
   has_many :intellectual_objects
   has_many :generic_files, through: :intellectual_objects
   has_many :premis_events, through: :intellectual_objects
   has_many :premis_events, through: :generic_files
 
-  validates :name, :identifier, presence: true
+  validates :name, :identifier, :type, presence: true
   validate :name_is_unique
   validate :identifier_is_unique
 
@@ -80,17 +79,6 @@ class Institution < ActiveRecord::Base
     time_fixed
   end
 
-  def generate_overview
-    report = {}
-    report[:bytes_by_format] = self.bytes_by_format
-    report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
-    report[:generic_files] = self.generic_files.where(state: 'A').count
-    report[:premis_events] = self.premis_events.count
-    report[:work_items] = WorkItem.with_institution(self.id).count
-    report[:average_file_size] = average_file_size
-    report
-  end
-
   def generate_overview_apt
     report = {}
     report[:bytes_by_format] = GenericFile.bytes_by_format
@@ -104,10 +92,19 @@ class Institution < ActiveRecord::Base
 
   def self.breakdown
     report = {}
-    Institution.all.each do |inst|
+    MemberInstitution.all.each do |inst|
       size = inst.generic_files.sum(:size)
       name = inst.name
-      report[name] = size
+      indiv_breakdown = {}
+      indiv_breakdown[name] = size
+      subscribers = SubscriptionInstitution.where(member_institution_id: inst.id)
+      indiv_breakdown[:subscriber_number] = subscribers.count
+      subscribers.each do |si|
+        si_size = si.generic_files.sum(:size)
+        si_name = si.name
+        indiv_breakdown[si_name] = si_size
+      end
+      report[name] = indiv_breakdown
     end
     report
   end

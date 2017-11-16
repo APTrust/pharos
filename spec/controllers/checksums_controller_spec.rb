@@ -14,17 +14,17 @@ RSpec.describe ChecksumsController, type: :controller do
     Checksum.delete_all
   end
 
-  let!(:institution_one) { FactoryGirl.create(:institution) }
-  let!(:institution_two) { FactoryGirl.create(:institution) }
-  let!(:admin_user) { FactoryGirl.create(:user, :admin, institution: institution_one) }
-  let!(:institutional_admin) { FactoryGirl.create(:user, :institutional_admin, institution: institution_one) }
-  let!(:admin) { FactoryGirl.create(:user, :admin) }
-  let!(:object_one) { FactoryGirl.create(:intellectual_object, institution: institution_one) }
-  let!(:object_two) { FactoryGirl.create(:intellectual_object, institution: institution_two) }
-  let!(:generic_file_one) { FactoryGirl.create(:generic_file, intellectual_object: object_one) }
-  let!(:generic_file_two) { FactoryGirl.create(:generic_file, intellectual_object: object_two) }
-  let!(:checksum_one) { FactoryGirl.create(:checksum, generic_file: generic_file_one, algorithm: 'sha256', digest: '87654321') }
-  let!(:checksum_two) { FactoryGirl.create(:checksum, generic_file: generic_file_two, algorithm: 'md5', digest: '12345678') }
+  let!(:institution_one) { FactoryBot.create(:member_institution) }
+  let!(:institution_two) { FactoryBot.create(:subscription_institution) }
+  let!(:admin_user) { FactoryBot.create(:user, :admin, institution: institution_one) }
+  let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, institution: institution_one) }
+  let!(:admin) { FactoryBot.create(:user, :admin) }
+  let!(:object_one) { FactoryBot.create(:intellectual_object, institution: institution_one) }
+  let!(:object_two) { FactoryBot.create(:intellectual_object, institution: institution_two) }
+  let!(:generic_file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
+  let!(:generic_file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+  let!(:checksum_one) { FactoryBot.create(:checksum, generic_file: generic_file_one, algorithm: 'sha256', digest: '87654321') }
+  let!(:checksum_two) { FactoryBot.create(:checksum, generic_file: generic_file_two, algorithm: 'md5', digest: '12345678') }
 
   describe '#GET index' do
     describe 'for admin users' do

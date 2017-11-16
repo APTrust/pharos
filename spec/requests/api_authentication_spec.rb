@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe 'API Authentication: Editing an Intellectual Object via API request' do
-  let(:inst) { FactoryGirl.create :institution }
+  let(:inst) { FactoryBot.create :member_institution }
 
   let(:old_title) { 'Old Title' }
   let(:new_title) { 'New Title' }
-  let(:obj) { FactoryGirl.create :intellectual_object, institution: inst, title: old_title }
+  let(:obj) { FactoryBot.create :intellectual_object, institution: inst, title: old_title }
 
   let(:update_fields) {
     { id: obj.id, intellectual_object: { title: new_title }}
@@ -14,7 +14,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
 
   let(:valid_key) { '123' }
   let(:invalid_key) { '456' }
-  let(:user) { FactoryGirl.create :user, :institutional_admin, institution_id: inst.id, api_secret_key: valid_key }
+  let(:user) { FactoryBot.create :user, :institutional_admin, institution_id: inst.id, api_secret_key: valid_key }
 
   after do
     Institution.destroy_all
@@ -57,7 +57,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
   end
 
   describe 'A user without an API key' do
-    let(:user_without_key) { FactoryGirl.create :user, :institutional_admin, institution_id: inst.id }
+    let(:user_without_key) { FactoryBot.create :user, :institutional_admin, institution_id: inst.id }
     let(:login_headers) {{ 'X-Pharos-API-User' => user_without_key.email, 'X-Pharos-API-Key' => nil }}
 
     it 'cannot log in via API request' do

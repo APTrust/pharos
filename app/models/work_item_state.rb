@@ -5,6 +5,8 @@ class WorkItemState < ActiveRecord::Base
   validates :action, presence: true
   before_save :set_action, :compress_state
 
+  scope :readable, ->(current_user) { where('(1 = 0)') unless current_user.admin? }
+
   def to_param
     id
   end

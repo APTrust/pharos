@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   # INTELLECTUAL OBJECT ROUTES
   # object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%]+/ ### This is the old pattern if we decide to stop allowing question marks
   # object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=]+/
-    object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;]+/
+    object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+/
   resources :intellectual_objects, only: [:show, :edit, :update, :destroy], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'objects'
   get 'objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_restore
   get 'objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_send_to_dpn
@@ -28,7 +28,7 @@ Rails.application.routes.draw do
   # GENERIC FILE ROUTES
   # file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.]+(\%2[fF]|\/)+[\w\-\/\.\%\@]+/ ### This is the old pattern if we decide to stop allowing question marks
   # file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)]+/
-  file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;]+/
+  file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
   get 'files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files
@@ -54,7 +54,8 @@ Rails.application.routes.draw do
   get '/api/v2/events/:id', to: 'premis_events#show', format: [:json, :html]
   get 'member-api/v2/events/:file_identifier', to: 'premis_events#index', format: :json, file_identifier: file_ptrn
   get 'member-api/v2/events/:object_identifier', to: 'premis_events#index', format: :json, object_identifier: object_ptrn
-  get 'events/failed_fixity_notification', to: 'premis_events#notify_of_failed_fixity', format: :json
+  get 'notifications/failed_fixity', to: 'premis_events#notify_of_failed_fixity', format: :json
+  get '/api/v2/notifications/failed_fixity', to: 'premis_events#notify_of_failed_fixity', format: :json
 
   # WORK ITEM ROUTES
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
@@ -70,7 +71,8 @@ Rails.application.routes.draw do
   get 'items/set_restoration_status', to: 'work_items#set_restoration_status', format: :json
   get 'api/v2/items/search', to: 'work_items#api_search', format: :json
   get 'items/:id/requeue', to: 'work_items#requeue', format: [:json, :html], as: :requeue_work_item
-  get 'items/restoration_notification', to: 'work_items#notify_of_successful_restoration', format: :json
+  get 'notifications/successful_restoration', to: 'work_items#notify_of_successful_restoration', format: :json
+  get '/api/v2/notifications/successful_restoration', to: 'work_items#notify_of_successful_restoration', format: :json
 
   # WORK ITEM STATE ROUTES
   #resources :work_item_states, path: 'item_state', only: [:show, :update, :create], format: :json, param: :work_item_id

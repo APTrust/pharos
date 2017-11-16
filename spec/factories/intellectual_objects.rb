@@ -1,7 +1,7 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :intellectual_object, class: IntellectualObject do
-    institution { FactoryGirl.create(:institution) }
+    institution { FactoryBot.create(:member_institution) }
     title { Faker::Lorem.sentence }
     description { Faker::Lorem.paragraph }
     identifier { "#{institution.identifier}/#{SecureRandom.uuid}" }
