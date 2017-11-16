@@ -3,7 +3,7 @@ class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :load_institution, only: [:index, :create]
-  before_action :load_object, only: [:show, :edit, :update, :destroy, :send_to_dpn, :restore]
+  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirmed_destroy, :send_to_dpn, :restore]
   after_action :verify_authorized
 
   def index
@@ -100,6 +100,24 @@ class IntellectualObjectsController < ApplicationController
 
   def confirmed_destroy
     authorize @intellectual_object, :soft_delete?
+    requesting_user = User.find(params[:requesting_user_id])
+    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                   date_time: "#{Time.now}",
+                   detail: 'Object deleted from S3 storage',
+                   outcome: 'Success',
+                   outcome_detail: requesting_user.email,
+                   object: 'Goamz S3 Client',
+                   agent: 'https://github.com/crowdmob/goamz',
+                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
+                   identifier: SecureRandom.uuid
+    }
+    @intellectual_object.soft_delete(attributes)
+    log = Email.log_multiple_restoration(inst_items) ### update Email model/schema to account for deletion requests
+    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
+  end
+
+  def destroy
+    authorize @intellectual_object, :soft_delete?
     pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
       respond_to do |format|
@@ -110,24 +128,8 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     elsif pending.nil?
-      attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                     date_time: "#{Time.now}",
-                     detail: 'Object deleted from S3 storage',
-                     outcome: 'Success',
-                     outcome_detail: current_user.email,
-                     object: 'Goamz S3 Client',
-                     agent: 'https://github.com/crowdmob/goamz',
-                     outcome_information: "Action requested by user from #{current_user.institution_id}",
-                     identifier: SecureRandom.uuid
-      }
-      @intellectual_object.soft_delete(attributes)
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
-          redirect_to root_path
-        }
-      end
+      log = Email.log_multiple_restoration(inst_items) ### update Email model/schema to account for deletion requests
+      NotificationMailer.deletion_request(@intellectual_object, current_user, log).deliver!
     else
       respond_to do |format|
         message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +
@@ -141,10 +143,6 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     end
-  end
-
-  def destroy
-
   end
 
   def send_to_dpn

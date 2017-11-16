@@ -1,0 +1,10 @@
+Admin Users at <%= @object_institution.name %>,
+
+This email notification is to inform you that the following intellectual object, whose deletion
+was requested by <%= @requesting_user.name %>, has been successfully queued for deletion:
+
+<a href="<%= @object_url %>" ><%= @object.identifier %></a>
+
+Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted.
+
+Please contact the APTrust team by replying to this email if you have any questions.

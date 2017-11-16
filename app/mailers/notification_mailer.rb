@@ -58,16 +58,32 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'Restoration notification on one or more of your bags')
   end
 
-  def multi_factor_delete(intellectual_object, requesting_user)
+  def deletion_request(intellectual_object, requesting_user, email_log)
     @object_institution = intellectual_object.institution
     @object = intellectual_object
+    @object_url = intellectual_object_url(@object)
     @confirmation_url
+    @requesting_user = requesting_user
     users = @object_institution.deletion_admin_user(requesting_user)
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
     email_log.save!
-    mail(to: emails, subject: "#{requesting_user.name} has requested deletion of #{@object.name}")
+    mail(to: emails, subject: "#{requesting_user.name} has requested deletion of #{@object.title}")
+  end
+
+  def deletion_confirmation(intellectual_object, requesting_user, email_log)
+    @object_institution = intellectual_object.institution
+    @object = intellectual_object
+    @object_url = intellectual_object_url(@object)
+    @requesting_user = requesting_user
+    users = @object_institution.deletion_admin_user(requesting_user)
+    users.push(requesting_user)
+    emails = []
+    users.each { |user| emails.push(user.email) }
+    email_log.user_list = emails.join('; ')
+    email_log.save!
+    mail(to: emails, subject: "#{@intellectual_object.title} queued for deletion")
   end
 
 end
