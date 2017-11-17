@@ -39,21 +39,49 @@ class Email < ApplicationRecord
     end
   end
 
+  def self.log_deletion_request(intellectual_object)
+    email_log = Email.create(email_type: 'deletion_request', intellectual_object_id: intellectual_object.id)
+    email_log.save!
+    email_log
+  end
+
+  def self.log_deletion_confirmation(intellectual_object)
+    email_log = Email.create(email_type: 'deletion_confirmation', intellectual_object_id: intellectual_object.id)
+    email_log.save!
+    email_log
+  end
+
   private
 
   def has_proper_association
     if self.email_type == 'fixity'
       errors.add(:event_identifier, 'must not be blank for a failed fixity check email') if self.event_identifier.nil?
       errors.add(:item_id, 'must be left blank for a failed fixity check email') unless self.item_id.nil?
+      errors.add(:intellectual_object_id, 'must be left blank for a failed fixity check email') unless self.intellectual_object_id.nil?
     elsif self.email_type == 'restoration'
       errors.add(:item_id, 'must not be blank for a restoration notification email') if self.item_id.nil?
       errors.add(:event_identifier, 'must be left blank for a restoration notification email') unless self.event_identifier.nil?
+      errors.add(:intellectual_object_id, 'must be left blank for a restoration notification email') unless self.intellectual_object_id.nil?
     elsif self.email_type == 'multiple_fixity'
-      #errors.add(:premis_events, 'There must be at least one event associated with this type') if self.premis_events.count == 0
-      errors.add(:work_items, 'There must be no items associated with this type') if self.work_items.count != 0
+      #errors.add(:premis_events, 'must not be empty for a failed fixity check email') if self.premis_events.count == 0
+      errors.add(:work_items, 'must be empty for a failed fixity check email') if self.work_items.count != 0
+      errors.add(:intellectual_object_id, 'must be left blank for a failed fixity check email') unless self.intellectual_object_id.nil?
     elsif self.email_type == 'multiple_restoration'
-      #errors.add(:work_items, 'There must be at least one item associated with this type') if self.work_items.count == 0
-      errors.add(:premis_events, 'There must be no events associated with this type') if self.premis_events.count != 0
+      #errors.add(:work_items, 'must not be empty for a restoration notification email') if self.work_items.count == 0
+      errors.add(:premis_events, 'must be empty for a restoration notification email') if self.premis_events.count != 0
+      errors.add(:intellectual_object_id, 'must be left blank for a restoration notification email') unless self.intellectual_object_id.nil?
+    elsif self.email_type == 'deletion_request'
+      errors.add(:intellectual_object_id, 'must not be left blank for a deletion request email') if self.intellectual_object_id.nil?
+      errors.add(:event_identifier, 'must be left blank for a deletion request email') unless self.event_identifier.nil?
+      errors.add(:item_id, 'must be left blank for a deletion request email') unless self.item_id.nil?
+      errors.add(:work_items, 'must be empty for a deletion request email') if self.work_items.count != 0
+      errors.add(:premis_events, 'must be empty for a deletion request email') if self.premis_events.count != 0
+    elsif self.email_type == 'deletion_confirmation'
+      errors.add(:intellectual_object_id, 'must not be left blank for a deletion confirmation email') if self.intellectual_object_id.nil?
+      errors.add(:event_identifier, 'must be left blank for a deletion confirmation email') unless self.event_identifier.nil?
+      errors.add(:item_id, 'must be left blank for a deletion confirmation email') unless self.item_id.nil?
+      errors.add(:work_items, 'must be empty for a deletion confirmation email') if self.work_items.count != 0
+      errors.add(:premis_events, 'must be empty for a deletion confirmation email') if self.premis_events.count != 0
     end
   end
 end

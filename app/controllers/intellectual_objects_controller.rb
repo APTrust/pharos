@@ -112,7 +112,7 @@ class IntellectualObjectsController < ApplicationController
                    identifier: SecureRandom.uuid
     }
     @intellectual_object.soft_delete(attributes)
-    log = Email.log_multiple_restoration(inst_items) ### update Email model/schema to account for deletion requests
+    log = Email.log_deletion_confirmation(@intellectual_object)
     NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
   end
 
@@ -128,7 +128,7 @@ class IntellectualObjectsController < ApplicationController
         }
       end
     elsif pending.nil?
-      log = Email.log_multiple_restoration(inst_items) ### update Email model/schema to account for deletion requests
+      log = Email.log_deletion_request(@intellectual_object)
       NotificationMailer.deletion_request(@intellectual_object, current_user, log).deliver!
     else
       respond_to do |format|
