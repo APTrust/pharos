@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171117185824) do
+ActiveRecord::Schema.define(version: 20171120211652) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -20,6 +20,11 @@ ActiveRecord::Schema.define(version: 20171117185824) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["generic_file_id"], name: "index_checksums_on_generic_file_id"
+  end
+
+  create_table "confirmation_tokens", force: :cascade do |t|
+    t.string "token"
+    t.integer "intellectual_object_id"
   end
 
   create_table "dpn_work_items", force: :cascade do |t|
@@ -127,8 +132,8 @@ ActiveRecord::Schema.define(version: 20171117185824) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "outcome"
     t.integer "institution_id"
+    t.string "outcome"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"

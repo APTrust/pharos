@@ -3,7 +3,7 @@ class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :load_institution, only: [:index, :create]
-  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirmed_destroy, :send_to_dpn, :restore]
+  before_action :load_object, only: [:show, :edit, :update, :destroy, :send_to_dpn, :restore]
   after_action :verify_authorized
 
   def index
@@ -98,26 +98,25 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def confirmed_destroy
-    authorize @intellectual_object, :soft_delete?
-    requesting_user = User.find(params[:requesting_user_id])
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: "#{Time.now}",
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
-                   identifier: SecureRandom.uuid
-    }
-    @intellectual_object.soft_delete(attributes)
-    log = Email.log_deletion_confirmation(@intellectual_object)
-    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
-  end
-
   def destroy
     authorize @intellectual_object, :soft_delete?
+    if params[:confirmation_token]
+      if params[:confirmation_token] == @intellectual_object.confirmation_token.token
+        confirmed_destroy
+      else
+        respond_to do |format|
+          message = 'Your object cannot be deleted at this time due to an invalid confirmation token. ' +
+              'Please contact your APTrust administrator for more information.'
+          format.json {
+            render :json => { status: 'error', message: message }, :status => :conflict
+          }
+          format.html {
+            redirect_to @intellectual_object
+            flash[:alert] = message
+          }
+        end
+      end
+    end
     pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
       respond_to do |format|
@@ -129,7 +128,9 @@ class IntellectualObjectsController < ApplicationController
       end
     elsif pending.nil?
       log = Email.log_deletion_request(@intellectual_object)
-      NotificationMailer.deletion_request(@intellectual_object, current_user, log).deliver!
+      token = ConfirmationToken.create(intellectual_object: @intellectual_object)
+      token.save!
+      NotificationMailer.deletion_request(@intellectual_object, current_user, log, token).deliver!
     else
       respond_to do |format|
         message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +
@@ -292,6 +293,23 @@ class IntellectualObjectsController < ApplicationController
     else
       @institution = current_user.institution
     end
+  end
+
+  def confirmed_destroy
+    requesting_user = User.find(params[:requesting_user_id])
+    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                   date_time: "#{Time.now}",
+                   detail: 'Object deleted from S3 storage',
+                   outcome: 'Success',
+                   outcome_detail: requesting_user.email,
+                   object: 'Goamz S3 Client',
+                   agent: 'https://github.com/crowdmob/goamz',
+                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
+                   identifier: SecureRandom.uuid
+    }
+    @intellectual_object.soft_delete(attributes)
+    log = Email.log_deletion_confirmation(@intellectual_object)
+    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
   end
 
   def filter

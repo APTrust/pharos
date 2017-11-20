@@ -3,6 +3,7 @@ class IntellectualObject < ActiveRecord::Base
   has_many :generic_files
   has_many :premis_events
   has_many :checksums, through: :generic_files
+  has_one :confirmation_token
   accepts_nested_attributes_for :generic_files, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
   accepts_nested_attributes_for :checksums, allow_destroy: true

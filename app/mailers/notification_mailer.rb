@@ -58,11 +58,11 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'Restoration notification on one or more of your bags')
   end
 
-  def deletion_request(intellectual_object, requesting_user, email_log)
+  def deletion_request(intellectual_object, requesting_user, email_log, confirmation_token)
     @object_institution = intellectual_object.institution
     @object = intellectual_object
     @object_url = intellectual_object_url(@object)
-    @confirmation_url
+    @confirmation_url = 'delete path for object plus params containing token and requesting user id'
     @requesting_user = requesting_user
     users = @object_institution.deletion_admin_user(requesting_user)
     emails = []
