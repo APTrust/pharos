@@ -72,7 +72,7 @@ group :development, :test, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.7.1'
+  gem 'rspec-rails', '~> 3.7.2'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
