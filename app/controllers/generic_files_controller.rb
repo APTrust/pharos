@@ -264,12 +264,16 @@ class GenericFilesController < ApplicationController
       identifier = params[:generic_file_identifier]
       @generic_file = GenericFile.where(identifier: identifier).first
       # PivotalTracker https://www.pivotaltracker.com/story/show/140235557
-      if @generic_file.nil? && looks_like_fedora_file(identifier)
-        fixed_identifier = fix_fedora_filename(identifier)
-        if fixed_identifier != identifier
-          logger.info("Rewrote #{identifier} -> #{fixed_identifier}")
-          @generic_file = GenericFile.where(identifier: fixed_identifier).first
-        end
+      if @generic_file.nil?
+          if looks_like_fedora_file(identifier)
+            fixed_identifier = fix_fedora_filename(identifier)
+            if fixed_identifier != identifier
+              logger.info("Rewrote #{identifier} -> #{fixed_identifier}")
+              @generic_file = GenericFile.where(identifier: fixed_identifier).first
+            end
+          else
+            @generic_file.find_by_identifier(identifier)
+          end
       end
     elsif params[:id]
       @generic_file ||= GenericFile.readable(current_user).find(params[:id])

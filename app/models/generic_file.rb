@@ -54,7 +54,13 @@ class GenericFile < ActiveRecord::Base
   def self.find_by_identifier(identifier)
     return nil if identifier.blank?
     unescaped_identifier = identifier.gsub(/%2F/i, '/')
-    GenericFile.where(identifier: unescaped_identifier).first
+    file = GenericFile.where(identifier: unescaped_identifier).first
+    # if file.nil?
+    #   #check to see if there's a %3A that got turned into a colon by overeager rails
+    #   no_colon_identifier = unescaped_identifier.gsub(/:/, '%3A')
+    #   file = GenericFile.where(identifier: no_colon_identifier).first
+    # end
+    file
   end
 
   def to_param
