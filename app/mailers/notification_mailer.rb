@@ -78,12 +78,12 @@ class NotificationMailer < ApplicationMailer
     @object_url = intellectual_object_url(@object)
     @requesting_user = requesting_user
     users = @object_institution.deletion_admin_user(requesting_user)
-    users.push(requesting_user)
+    users.push(requesting_user) unless users.include?(requesting_user)
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
     email_log.save!
-    mail(to: emails, subject: "#{@intellectual_object.title} queued for deletion")
+    mail(to: emails, subject: "#{@object.title} queued for deletion")
   end
 
 end

@@ -100,9 +100,17 @@ class IntellectualObjectsController < ApplicationController
 
   def destroy
     authorize @intellectual_object, :soft_delete?
+    pending = WorkItem.pending_action(@intellectual_object.identifier)
     if params[:confirmation_token]
       if params[:confirmation_token] == @intellectual_object.confirmation_token.token
         confirmed_destroy
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
+            redirect_to root_path
+          }
+        end
       else
         respond_to do |format|
           message = 'Your object cannot be deleted at this time due to an invalid confirmation token. ' +
@@ -116,32 +124,32 @@ class IntellectualObjectsController < ApplicationController
           }
         end
       end
-    end
-    pending = WorkItem.pending_action(@intellectual_object.identifier)
-    if @intellectual_object.state == 'D'
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          redirect_to @intellectual_object
-          flash[:alert] = 'This item has already been deleted.'
-        }
-      end
-    elsif pending.nil?
-      log = Email.log_deletion_request(@intellectual_object)
-      token = ConfirmationToken.create(intellectual_object: @intellectual_object)
-      token.save!
-      NotificationMailer.deletion_request(@intellectual_object, current_user, log, token).deliver!
     else
-      respond_to do |format|
-        message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +
-            "You may delete this object after the #{pending.action} request has completed."
-        format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
-        }
-        format.html {
-          redirect_to @intellectual_object
-          flash[:alert] = message
-        }
+      if @intellectual_object.state == 'D'
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            redirect_to @intellectual_object
+            flash[:alert] = 'This item has already been deleted.'
+          }
+        end
+      elsif pending.nil?
+        log = Email.log_deletion_request(@intellectual_object)
+        token = ConfirmationToken.create(intellectual_object: @intellectual_object, token: SecureRandom.hex)
+        token.save!
+        NotificationMailer.deletion_request(@intellectual_object, current_user, log, token).deliver!
+      else
+        respond_to do |format|
+          message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +
+              "You may delete this object after the #{pending.action} request has completed."
+          format.json {
+            render :json => { status: 'error', message: message }, :status => :conflict
+          }
+          format.html {
+            redirect_to @intellectual_object
+            flash[:alert] = message
+          }
+        end
       end
     end
   end

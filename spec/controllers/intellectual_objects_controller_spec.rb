@@ -505,14 +505,32 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-      it 'should create delete event and redirect (html)' do
+      it 'should create an deletion request email and token if no confirmation token is provided' do
+        count_before = Email.all.count
         delete :destroy, params: { intellectual_object_identifier: deletable_obj.identifier }
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
+        expect(email.body.encoded).to include('has requested the deletion')
+        expect(deletable_obj.confirmation_token.token).not_to be_nil
+      end
+
+      it 'should create delete event and redirect (html) if a correct confirmation token is provided' do
+        token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
+        count_before = Email.all.count
+        delete :destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: token.token, requesting_user_id: inst_admin.id }
         expect(response).to redirect_to root_url
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'D'
         expect(reloaded_object.premis_events.count).to eq 1
         expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
+        expect(email.body.encoded).to include('has been successfully queued for deletion')
       end
 
       it 'should not delete already deleted item' do
