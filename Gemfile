@@ -58,7 +58,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '2.16.0'
+  gem 'capybara', '2.16.1'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.21', require: false
 end
@@ -72,7 +72,7 @@ group :development, :test, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.7.1'
+  gem 'rspec-rails', '~> 3.7.2'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
