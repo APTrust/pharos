@@ -505,7 +505,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     describe 'when signed in as institutional admin' do
       before { sign_in inst_admin }
-      it 'should create an deletion request email and token if no confirmation token is provided' do
+
+      it 'should create an deletion request email and token' do
         count_before = Email.all.count
         delete :destroy, params: { intellectual_object_identifier: deletable_obj.identifier }
         count_after = Email.all.count
@@ -514,23 +515,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
         expect(email.body.encoded).to include('has requested the deletion')
         expect(deletable_obj.confirmation_token.token).not_to be_nil
-      end
-
-      it 'should create delete event and redirect (html) if a correct confirmation token is provided' do
-        token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
-        count_before = Email.all.count
-        delete :destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: token.token, requesting_user_id: inst_admin.id }
-        expect(response).to redirect_to root_url
-        expect(flash[:notice]).to include 'Delete job has been queued'
-        reloaded_object = IntellectualObject.find(deletable_obj.id)
-        expect(reloaded_object.state).to eq 'D'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
-        count_after = Email.all.count
-        expect(count_after).to eq count_before + 1
-        email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
-        expect(email.body.encoded).to include('has been successfully queued for deletion')
       end
 
       it 'should not delete already deleted item' do
@@ -549,14 +533,15 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
 
-      it 'should create delete event and return no content' do
-        delete :destroy, params: { intellectual_object_identifier: deletable_obj }, format: :json
-        expect(response.status).to eq(204)
-        expect(response.body).to be_empty
-        reloaded_object = IntellectualObject.find(deletable_obj.id)
-        expect(reloaded_object.state).to eq 'D'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+      it 'should create an deletion request email and token' do
+        count_before = Email.all.count
+        delete :destroy, params: { intellectual_object_identifier: deletable_obj.identifier }
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
+        expect(email.body.encoded).to include('has requested the deletion')
+        expect(deletable_obj.confirmation_token.token).not_to be_nil
       end
 
       it 'should say OK and return no content if the item was previously deleted' do
@@ -573,6 +558,107 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data['message']).to include 'Your object cannot be deleted'
       end
 
+    end
+
+  end
+
+  describe 'DELETE #confirm_destroy' do
+    let!(:deletable_obj) { FactoryBot.create(:institutional_intellectual_object,
+                                             institution: inst1,
+                                             state: 'A') }
+    let!(:deleted_obj) { FactoryBot.create(:institutional_intellectual_object,
+                                           institution: inst1,
+                                           state: 'D') }
+    let!(:obj_pending) { FactoryBot.create(:institutional_intellectual_object,
+                                           institution: inst1,
+                                           state: 'A',
+                                           identifier: 'college.edu/item') }
+    let!(:work_item) { FactoryBot.create(:work_item,
+                                         object_identifier: 'college.edu/item',
+                                         action: 'Restore',
+                                         stage: 'Requested',
+                                         status: 'Pending') }
+    let!(:deletable_obj_2) { FactoryBot.create(:institutional_intellectual_object,
+                                               institution: inst1, state: 'A') }
+    let!(:assc_file) { FactoryBot.create(:generic_file, intellectual_object: deletable_obj_2) }
+
+    after(:all) do
+      IntellectualObject.delete_all
+    end
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        delete :confirm_destroy, params: { intellectual_object_identifier: obj1 }
+        expect(response).to redirect_to root_url + 'users/sign_in'
+      end
+    end
+
+    describe 'when signed in as institutional user' do
+      before { sign_in inst_user }
+      it 'should respond with redirect (html)' do
+        delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj }
+        expect(response).to redirect_to root_url
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+      it 'should respond forbidden (json)' do
+        delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj }, format: :json
+        expect(response.code).to eq '403'
+      end
+    end
+
+    describe 'when signed in as institutional admin' do
+      before { sign_in inst_admin }
+
+      it 'should create delete event and redirect (html) if a correct confirmation token is provided' do
+        token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
+        count_before = Email.all.count
+        delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: token.token, requesting_user_id: inst_admin.id }
+        expect(response).to redirect_to root_url
+        expect(flash[:notice]).to include 'Delete job has been queued'
+        reloaded_object = IntellectualObject.find(deletable_obj.id)
+        expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
+        expect(email.body.encoded).to include('has been successfully queued for deletion')
+      end
+
+      it 'should not delete the object if an incorrect confirmation token is provided' do
+        token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
+        count_before = Email.all.count
+        delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: inst_admin.id }
+        expect(response).to redirect_to intellectual_object_path(deletable_obj.identifier)
+        expect(flash[:alert]).to include 'Your object cannot be deleted at this time due to an invalid confirmation token.'
+        reloaded_object = IntellectualObject.find(deletable_obj.id)
+        expect(reloaded_object.state).to eq 'A'
+        expect(reloaded_object.premis_events.count).to eq 0
+        count_after = Email.all.count
+        expect(count_after).to eq count_before
+      end
+    end
+
+    describe 'when signed in as system admin' do
+      before { sign_in sys_admin }
+
+      it 'should create delete event' do
+        token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
+        count_before = Email.all.count
+        delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj, confirmation_token: token.token, requesting_user_id: inst_admin.id }, format: :json
+        expect(response.status).to eq(204)
+        expect(response.body).to be_empty
+        reloaded_object = IntellectualObject.find(deletable_obj.id)
+        expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
+        expect(email.body.encoded).to include('has been successfully queued for deletion')
+      end
     end
 
   end

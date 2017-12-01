@@ -22,6 +22,9 @@ Rails.application.routes.draw do
   put 'api/v2/objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: :json, intellectual_object_identifier: object_ptrn
   put 'api/v2/objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: :json, intellectual_object_identifier: object_ptrn
   delete 'api/v2/objects/:intellectual_object_identifier/delete', to: 'intellectual_objects#destroy', format: :json, intellectual_object_identifier: object_ptrn
+  delete 'objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :object_confirm_destroy
+  delete 'api/v2/objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :api_object_confirm_destroy
+
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+/

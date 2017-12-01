@@ -62,9 +62,10 @@ class NotificationMailer < ApplicationMailer
     @object_institution = intellectual_object.institution
     @object = intellectual_object
     @object_url = intellectual_object_url(@object)
-    @confirmation_url = 'delete path for object plus params containing token and requesting user id'
     @requesting_user = requesting_user
+    @confirmation_url = object_confirm_destroy_url(@object, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
     users = @object_institution.deletion_admin_user(requesting_user)
+    users.push(@requesting_user) if users.count == 0
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
