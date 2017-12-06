@@ -9,7 +9,7 @@ gem 'sqlite3', '1.3.13'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 3.0.0'
+gem 'uglifier', '>= 4.0.1'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -35,7 +35,7 @@ gem 'wkhtmltopdf-binary'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 3.5.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.7.2'
+gem 'inherited_resources', '1.8.0'
 gem 'uuidtools'
 
 gem 'kaminari'
