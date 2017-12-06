@@ -98,7 +98,8 @@ module Pharos
                     :item_action, :stage, :status, :sort, :institution_identifier, :name_contains, :name_exact, :method,
                     :updated_since, :node, :needs_admin_review, :not_checked_since, :identifier_like, :per_page, :utf8,
                     :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
-                    :object_identifier, :format, :institution_id, :type, :member_institution_id]
+                    :object_identifier, :format, :institution_id, :type, :member_institution_id, :requesting_user_id,
+                    :confirmation_token]
 
     if Rails.env.production?
       NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'
