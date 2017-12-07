@@ -2,7 +2,7 @@ class GenericFilesController < ApplicationController
   include SearchAndIndex
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :load_generic_file, only: [:show, :update, :destroy]
+  before_action :load_generic_file, only: [:show, :update, :destroy, :confirm_destroy]
   before_action :load_intellectual_object, only: [:create, :create_batch]
   before_action :set_format
   after_action :verify_authorized
@@ -138,27 +138,46 @@ class GenericFilesController < ApplicationController
       redirect_to @generic_file
       flash[:alert] = 'This file has already been deleted.'
     elsif result == 'true'
-      attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                     date_time: Time.now.utc.iso8601,
-                     detail: 'Object deleted from S3 storage',
-                     outcome: 'Success',
-                     outcome_detail: current_user.email,
-                     object: 'Goamz S3 Client',
-                     agent: 'https://github.com/crowdmob/goamz',
-                     outcome_information: "Action requested by user from #{current_user.institution_id}",
-                     identifier: SecureRandom.uuid
-      }
-      @generic_file.soft_delete(attributes)
+      log = Email.log_deletion_request(@generic_file)
+      token = ConfirmationToken.create(generic_file: @generic_file, token: SecureRandom.hex)
+      token.save!
+      NotificationMailer.deletion_request(@generic_file, current_user, log, token).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
-          flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}"
-          redirect_to @generic_file.intellectual_object
+          redirect_to @generic_file
+          flash[:notice] = 'An email has been sent to the administrators of this institution to confirm deletion of this file.'
         }
       end
     else
       redirect_to @generic_file
       flash[:alert] = "Your file cannot be deleted at this time due to a pending #{result} request."
+    end
+  end
+
+  def confirm_destroy
+    authorize @generic_file, :soft_delete?
+    if params[:confirmation_token] == @generic_file.confirmation_token.token
+      confirmed_destroy
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}."
+          redirect_to @generic_file.intellectual_object
+        }
+      end
+    else
+      respond_to do |format|
+        message = 'Your file cannot be deleted at this time due to an invalid confirmation token. ' +
+            'Please contact your APTrust administrator for more information.'
+        format.json {
+          render :json => { status: 'error', message: message }, :status => :conflict
+        }
+        format.html {
+          redirect_to @generic_file
+          flash[:alert] = message
+        }
+      end
     end
   end
 
@@ -336,5 +355,22 @@ class GenericFilesController < ApplicationController
 
   def set_format
     request.format = 'html' unless request.format == 'json' || request.format == 'html'
+  end
+
+  def confirmed_destroy
+    requesting_user = User.find(params[:requesting_user_id])
+    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                   date_time: Time.now.utc.iso8601,
+                   detail: 'Object deleted from S3 storage',
+                   outcome: 'Success',
+                   outcome_detail: requesting_user.email,
+                   object: 'Goamz S3 Client',
+                   agent: 'https://github.com/crowdmob/goamz',
+                   outcome_information: "Action requested by user from #{current_user.institution_id}",
+                   identifier: SecureRandom.uuid
+    }
+    @generic_file.soft_delete(attributes)
+    log = Email.log_deletion_confirmation(@generic_file)
+    NotificationMailer.deletion_confirmation(@generic_file, requesting_user, log).deliver!
   end
 end

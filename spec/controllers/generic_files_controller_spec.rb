@@ -7,6 +7,7 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:crazy_file) { FactoryBot.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0') }
   let(:question_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161') }
   let(:parens_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf') }
+  let(:deleted_file) { FactoryBot.create(:generic_file, state: 'D') }
 
   before(:all) do
     @institution = FactoryBot.create(:member_institution)
@@ -378,23 +379,89 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       describe 'and you have access to the file' do
+        it 'should create an deletion request email and token' do
+          count_before = Email.all.count
+          delete :destroy, params: { generic_file_identifier: file.identifier }
+          count_after = Email.all.count
+          expect(count_after).to eq count_before + 1
+          email = ActionMailer::Base.deliveries.last
+          expect(email.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}")
+          expect(email.body.encoded).to include('has requested the deletion')
+          expect(file.confirmation_token.token).not_to be_nil
+        end
+
+        it 'should not delete already deleted item' do
+          delete :destroy, params: { generic_file_identifier: deleted_file.identifier }
+          expect(response).to redirect_to generic_file_path(deleted_file)
+          expect(flash[:alert]).to include 'This file has already been deleted'
+        end
+      end
+    end
+  end
+
+  describe 'DELETE #confirm_destroy' do
+    before(:all) {
+      @file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+      @parent_work_item = FactoryBot.create(:work_item,
+                                            object_identifier: @intellectual_object.identifier,
+                                            action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                            stage: Pharos::Application::PHAROS_STAGES['record'],
+                                            status: Pharos::Application::PHAROS_STATUSES['success'])
+    }
+    let(:file) { @file }
+
+    after(:all) {
+      @parent_work_item.delete
+    }
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        delete :confirm_destroy, params: { generic_file_identifier: file }
+        #expect(response.code).to eq '401'
+        expect(response).to redirect_to root_url + 'users/sign_in'
+        #expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
+      end
+    end
+
+    describe 'when signed in' do
+      before { sign_in user }
+
+      describe "and deleting a file you don't have access to" do
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
+        it 'should be forbidden' do
+          delete :confirm_destroy, params: { generic_file_identifier: file }, format: 'json'
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
+        end
+      end
+
+      describe 'and you have access to the file' do
         it 'should delete the file' do
-          delete :destroy, params: { generic_file_identifier: file }, format: 'json'
+          token = FactoryBot.create(:confirmation_token, generic_file: file)
+          count_before = Email.all.count
+          delete :confirm_destroy, params: { generic_file_identifier: file, confirmation_token: token.token, requesting_user_id: user.id }, format: 'json'
           expect(assigns[:generic_file].state).to eq 'D'
           expect(response.code).to eq '204'
+          count_after = Email.all.count
+          expect(count_after).to eq count_before + 1
+          email = ActionMailer::Base.deliveries.last
+          expect(email.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}")
+          expect(email.body.encoded).to include('has been successfully queued for deletion')
         end
 
         it 'delete the file with html response' do
           file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
-          delete :destroy, params: { generic_file_identifier: file }, format: :html
+          token = FactoryBot.create(:confirmation_token, generic_file: file)
+          delete :confirm_destroy, params: { generic_file_identifier: file, confirmation_token: token.token, requesting_user_id: user.id }, format: 'html'
           expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
           expect(assigns[:generic_file].state).to eq 'D'
-          expect(flash[:notice]).to eq "Delete job has been queued for file: #{file.uri}"
+          expect(flash[:notice]).to eq "Delete job has been queued for file: #{file.uri}."
         end
 
         it 'should create a WorkItem with the delete request' do
           file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
-          delete :destroy, params: { generic_file_identifier: file }, format: 'json'
+          token = FactoryBot.create(:confirmation_token, generic_file: file)
+          delete :confirm_destroy, params: { generic_file_identifier: file, confirmation_token: token.token, requesting_user_id: user.id }, format: 'json'
           wi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(wi).not_to be_nil
           expect(wi.object_identifier).to eq @intellectual_object.identifier
