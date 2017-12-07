@@ -24,6 +24,8 @@ Rails.application.routes.draw do
   delete 'api/v2/objects/:intellectual_object_identifier/delete', to: 'intellectual_objects#destroy', format: :json, intellectual_object_identifier: object_ptrn
   delete 'objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :object_confirm_destroy
   delete 'api/v2/objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :api_object_confirm_destroy
+  get 'objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :get_object_confirm_destroy
+  get 'api/v2/objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :get_api_object_confirm_destroy
 
 
   # GENERIC FILE ROUTES

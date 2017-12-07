@@ -114,6 +114,13 @@ class IntellectualObjectsController < ApplicationController
       token = ConfirmationToken.create(intellectual_object: @intellectual_object, token: SecureRandom.hex)
       token.save!
       NotificationMailer.deletion_request(@intellectual_object, current_user, log, token).deliver!
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          redirect_to @intellectual_object
+          flash[:notice] = 'An email has been sent to the administrators of this institution to confirm deletion of this object.'
+        }
+      end
     else
       respond_to do |format|
         message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +

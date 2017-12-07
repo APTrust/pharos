@@ -14,20 +14,15 @@ Rails.application.configure do
   config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
-  config.action_mailer.delivery_method = :smtp
+  # output to tmp/mails directory
+  config.action_mailer.delivery_method = :file
+  # ... and to specify output location
+  config.action_mailer.file_settings = { :location => Rails.root.join('tmp/mail') }
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.default :charset => "utf-8"
-  config.action_mailer.smtp_settings = {
-      :address => "email-smtp.us-east-1.amazonaws.com",
-      :authentication => :login,
-      :enable_starttls_auto => true,
-      :port    => 587,
-      :user_name => ENV['AWS_SES_USER'],
-      :password => ENV['AWS_SES_PWD']
-  }
+  config.action_mailer.raise_delivery_errors = true
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
