@@ -89,11 +89,9 @@ class NotificationMailer < ApplicationMailer
     @requesting_user = requesting_user
     if @subject.is_a?(IntellectualObject)
       @subject_url = intellectual_object_url(@subject)
-      @confirmation_url = object_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
       subject_line = @subject.title
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
-      @confirmation_url = file_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
       subject_line = @subject.identifier
     end
     users = @subject_institution.deletion_admin_user(requesting_user)

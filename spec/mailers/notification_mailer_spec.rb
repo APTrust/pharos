@@ -122,7 +122,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
   end
 
-  describe 'deletion_request' do
+  describe 'deletion_request of an intellectual object' do
     let(:institution) { FactoryBot.create(:member_institution) }
     let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
@@ -156,7 +156,42 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
   end
 
-  describe 'deletion_confirmation' do
+  describe 'deletion_request of a generic file' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:file) { FactoryBot.create(:generic_file, intellectual_object: object) }
+    let(:email_log) { FactoryBot.create(:deletion_request_email, generic_file_id: file.id) }
+    let(:token) { FactoryBot.create(:confirmation_token, generic_file: file) }
+    let(:mail) { described_class.deletion_request(file, user, email_log, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("#{user.name} has requested deletion of #{file.identifier}")
+    end
+
+    it 'renders the receiver email' do
+      user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'assigns @object_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}")
+    end
+
+    it 'assigns @confirmation_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}/confirm_delete?confirmation_token=#{token.token}&requesting_user_id=#{user.id}")
+    end
+
+    it 'has an email log with proper associations' do
+      expect(email_log.generic_file_id).to eq(file.id)
+    end
+  end
+
+  describe 'deletion_confirmation of an intellectual object' do
     let(:institution) { FactoryBot.create(:member_institution) }
     let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
@@ -183,6 +218,37 @@ RSpec.describe NotificationMailer, type: :mailer do
 
     it 'has an email log with proper associations' do
       expect(email_log.intellectual_object_id).to eq(object.id)
+    end
+  end
+
+  describe 'deletion_confirmation of a generic file' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:file) { FactoryBot.create(:generic_file, intellectual_object: object) }
+    let(:email_log) { FactoryBot.create(:deletion_confirmation_email, generic_file_id: file.id) }
+    let(:token) { FactoryBot.create(:confirmation_token, generic_file: file) }
+    let(:mail) { described_class.deletion_confirmation(file, user, email_log).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("#{file.identifier} queued for deletion")
+    end
+
+    it 'renders the receiver email' do
+      user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'assigns @object_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}")
+    end
+
+    it 'has an email log with proper associations' do
+      expect(email_log.generic_file_id).to eq(file.id)
     end
   end
 end
