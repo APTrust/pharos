@@ -10,7 +10,7 @@ class NotificationMailer < ApplicationMailer
     users.each { |user| emails.push(user.email) }
     emails.push('help@aptrust.org')
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@event_institution.name}, This email notification is to inform you that one of your files failed a fixity check. The failed fixity check can be found at the following link: <a href=\"<%= premis_event_url(id: @event.id) %>\" ><%= @event.identifier %></a>. Please contact the APTrust team by replying to this email if you have any questions."
+    email_log.email_text = "Admin Users at #{@event_institution.name}, This email notification is to inform you that one of your files failed a fixity check. The failed fixity check can be found at the following link: #{premis_event_url(id: @event.id)}. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: 'Failed fixity check on one of your files')
   end
@@ -24,7 +24,7 @@ class NotificationMailer < ApplicationMailer
     users.each { |user| emails.push(user.email) }
     emails.push('help@aptrust.org')
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that one of your restoration requests has successfully completed. The finished record of the restoration can be found at the following link: <a href=\"<%= work_item_url(id: @item.id) %>\" ><%= @item.object_identifier %></a>. Please contact the APTrust team by replying to this email if you have any questions."
+    email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that one of your restoration requests has successfully completed. The finished record of the restoration can be found at the following link: #{work_item_url(id: @item.id)}. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: 'Restoration complete on one of your work items')
   end
@@ -38,6 +38,7 @@ class NotificationMailer < ApplicationMailer
     users.each { |user| emails.push(user.email) }
     emails.push('help@aptrust.org')
     email_log.user_list = emails.join('; ')
+    email_log.email_text = "Admin Users at #{@event_institution.name}, This email notification is to inform you that one ore more of your files failed a fixity check. The failed fixity checks can be found at the following link: #{@events_url} A comprehensive list of failed fixity checks can be found below. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: 'Failed fixity check on one or more of your files')
   end
@@ -54,6 +55,7 @@ class NotificationMailer < ApplicationMailer
     users.each { |user| emails.push(user.email) }
     emails.push('help@aptrust.org')
     email_log.user_list = emails.join('; ')
+    email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that one or more of your restoration requests has successfully completed. The finished restorations can be found at the following link: #{@items_url} A comprehensive list of completed restorations can be found below. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: 'Restoration notification on one or more of your bags')
   end
@@ -69,6 +71,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
+    email_log.email_text = "Admin Users at #{@object_institution.name}, This email notification is to inform you that <%= @requesting_user.name %> has requested the deletion of the following item: #{@object_url} To confirm that this object should be deleting please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: "#{requesting_user.name} has requested deletion of #{@object.title}")
   end
@@ -83,6 +86,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
+    email_log.email_text = "Admin Users at #{@object_institution.name}, This email notification is to inform you that the following intellectual object, whose deletion was requested by <%= @requesting_user.name %>, has been successfully queued for deletion: #{@object_url} Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: "#{@object.title} queued for deletion")
   end
