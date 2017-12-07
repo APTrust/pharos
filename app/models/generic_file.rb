@@ -2,6 +2,7 @@ class GenericFile < ActiveRecord::Base
   belongs_to :intellectual_object
   has_many :premis_events
   has_many :checksums
+  has_one :confirmation_token
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 

@@ -4,6 +4,7 @@ FactoryBot.define do
     event_identifier { SecureRandom.hex(16) }
     item_id { nil }
     intellectual_object_id { nil }
+    generic_file_id { nil }
     email_text { 'This is the text of the email to be sent.' }
   end
 
@@ -11,6 +12,7 @@ FactoryBot.define do
     email_type { 'restoration' }
     event_identifier { nil }
     intellectual_object_id { nil }
+    generic_file_id { nil }
     item_id { FactoryBot.create(:work_item).id }
     email_text { 'This is the text of the email to be sent.' }
   end
@@ -20,6 +22,7 @@ FactoryBot.define do
     premis_events {  }
     event_identifier { nil }
     intellectual_object_id { nil }
+    generic_file_id { nil }
     item_id { nil }
     email_text { 'This is the text of the email to be sent.' }
   end
@@ -30,12 +33,14 @@ FactoryBot.define do
     event_identifier { nil }
     item_id { nil }
     intellectual_object_id { nil }
+    generic_file_id { nil }
     email_text { 'This is the text of the email to be sent.' }
   end
 
   factory :deletion_request_email, class: 'Email' do
     email_type { 'deletion_request' }
-    object_id { FactoryBot.create(:intellectual_object).id }
+    intellectual_object_id { FactoryBot.create(:intellectual_object).id }
+    generic_file_id { FactoryBot.create(:generic_file).id }
     event_identifier { nil }
     item_id { nil }
     email_text { 'This is the text of the email to be sent.' }
@@ -43,7 +48,8 @@ FactoryBot.define do
 
   factory :deletion_confirmation_email, class: 'Email' do
     email_type { 'deletion_confirmation' }
-    object_id { FactoryBot.create(:intellectual_object).id }
+    intellectual_object_id { FactoryBot.create(:intellectual_object).id }
+    generic_file_id { FactoryBot.create(:generic_file).id }
     event_identifier { nil }
     item_id { nil }
     email_text { 'This is the text of the email to be sent.' }

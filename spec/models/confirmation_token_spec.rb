@@ -7,7 +7,13 @@ RSpec.describe ConfirmationToken, :type => :model do
   end
 
   it { should validate_presence_of(:token) }
-  it { should validate_presence_of(:intellectual_object) }
+
+  it 'should validate that the token has a parent object or file' do
+    subject = FactoryBot.build(:confirmation_token, intellectual_object_id: nil, generic_file_id: nil)
+    subject.should_not be_valid
+    subject.errors[:intellectual_object_id].should include('or generic_file_id must be present')
+    subject.errors[:generic_file_id].should include('or intellectual_object_id must be present')
+  end
 
   describe 'An instance' do
 
