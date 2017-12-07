@@ -88,6 +88,10 @@ class GenericFile < ActiveRecord::Base
     identifier
   end
 
+  def institution
+    self.intellectual_object.institution
+  end
+
   def soft_delete(attributes)
     user_email = attributes[:outcome_detail]
     attributes[:identifier] = SecureRandom.uuid

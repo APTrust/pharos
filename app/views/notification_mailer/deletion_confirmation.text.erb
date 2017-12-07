@@ -1,10 +1,11 @@
-Admin Users at <%= @object_institution.name %>,
+Admin Users at <%= @subject_institution.name %>,
 
-This email notification is to inform you that the following intellectual object, whose deletion
+This email notification is to inform you that the following intellectual object or generic file, whose deletion
 was requested by <%= @requesting_user.name %>, has been successfully queued for deletion:
 
-<a href="<%= @object_url %>" ><%= @object.identifier %></a>
+<a href="<%= @subject_url %>" ><%= @subject.identifier %></a>
 
-Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted.
+Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted - if
+only a single file has been marked for deletion, this will not be an issue.
 
 Please contact the APTrust team by replying to this email if you have any questions.
