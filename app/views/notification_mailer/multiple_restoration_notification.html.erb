@@ -1,0 +1,18 @@
+<p>Admin Users at <%= @item_institution.name %>,</p>
+<br>
+<p>This email notification is to inform you that one or more of your restoration requests has successfully completed.
+The finished restorations can be found at the following link:</p>
+<br>
+<p><a href="<%= @items_url %>" >Successful Restorations</a></p>
+<br>
+<p>A comprehensive list of completed restorations can be found below.
+Please contact the APTrust team by replying to this email if you have any questions.</p>
+<br>
+<p>
+  <% @items.each do |item| %>
+    <ul>
+      <li><a href="<%= work_item_url(item) %>" ><%= item.object_identifier %></a></li>
+    </ul>
+  <% end %>
+</p>
+

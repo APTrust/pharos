@@ -1,0 +1,11 @@
+<p>Admin Users at <%= @subject_institution.name %>,</p>
+<br>
+<p>This email notification is to inform you that <%= @requesting_user.name %> has requested the deletion of the following item:</p>
+<br>
+<p><%= @subject_url %></p>
+<br>
+<p>To confirm that this object or file should be deleting please click the following link:</p>
+<br>
+<p><a href="<%= @confirmation_url %>">Click to Confirm Deletion</a></p>
+<br>
+<p>Please contact the APTrust team if you have any questions.</p>
