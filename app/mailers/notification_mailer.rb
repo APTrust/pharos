@@ -71,7 +71,7 @@ class NotificationMailer < ApplicationMailer
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
       @confirmation_url = file_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
-      subject_line = @subject.identifier
+      subject_line = @subject.uri
     end
     users = @subject_institution.deletion_admin_user(requesting_user)
     users.push(@requesting_user) if users.count == 0
@@ -92,7 +92,7 @@ class NotificationMailer < ApplicationMailer
       subject_line = @subject.title
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
-      subject_line = @subject.identifier
+      subject_line = @subject.uri
     end
     users = @subject_institution.deletion_admin_user(requesting_user)
     users.push(requesting_user) unless users.include?(requesting_user)
