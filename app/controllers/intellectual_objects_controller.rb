@@ -312,7 +312,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.find(params[:requesting_user_id])
+    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: "#{Time.now}",
                    detail: 'Object deleted from S3 storage',
