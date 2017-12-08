@@ -166,7 +166,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_request(file, user, email_log, token).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{user.name} has requested deletion of #{file.identifier}")
+      expect(mail.subject).to eq("#{user.name} has requested deletion of #{file.uri}")
     end
 
     it 'renders the receiver email' do
@@ -183,7 +183,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'assigns @confirmation_url' do
-      expect(mail.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}/confirm_delete?confirmation_token=#{token.token}&requesting_user_id=#{user.id}")
+      expect(mail.body.encoded).to include("http://localhost:3000/files/confirm_delete/#{CGI.escape(file.identifier)}?confirmation_token=#{token.token}&requesting_user_id=#{user.id}")
     end
 
     it 'has an email log with proper associations' do
@@ -231,7 +231,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_confirmation(file, user, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{file.identifier} queued for deletion")
+      expect(mail.subject).to eq("#{file.uri} queued for deletion")
     end
 
     it 'renders the receiver email' do

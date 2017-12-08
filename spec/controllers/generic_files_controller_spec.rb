@@ -417,8 +417,8 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when not signed in' do
       it 'should redirect to login' do
         delete :confirm_destroy, params: { generic_file_identifier: file }
-        #expect(response.code).to eq '401'
-        expect(response).to redirect_to root_url + 'users/sign_in'
+        expect(response.code).to eq '401'
+        #expect(response).to redirect_to root_url + 'users/sign_in'
         #expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
     end
