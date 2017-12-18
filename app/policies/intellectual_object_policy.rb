@@ -45,6 +45,10 @@ class IntellectualObjectPolicy < ApplicationPolicy
     end
   end
 
+  def object_report?
+    show?
+  end
+
   def update?
     user.admin?
   end

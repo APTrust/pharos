@@ -128,6 +128,15 @@ class IntellectualObject < ActiveRecord::Base
     generic_files.where(state: 'I')
   end
 
+  def object_report
+    data = {
+        active_files: self.active_files.count,
+        processing_files: self.processing_files.count,
+        deleted_files: self.deleted_files.count,
+        bytes_by_format: self.bytes_by_format
+    }
+  end
+
   def all_files_deleted?
     return false if generic_files.count == 0
     (generic_files.count == generic_files.where(state: 'D').count) ? true : false

@@ -101,6 +101,7 @@ Rails.application.routes.draw do
   get 'reports/:identifier', to: 'reports#index', format: [:json, :html], as: :reports, identifier: institution_ptrn
   get 'reports/overview/:identifier', to: 'reports#overview', format: [:json, :html, :pdf], as: :institution_overview, identifier: institution_ptrn
   get 'reports/institution_breakdown', to: 'reports#institution_breakdown', format: [:json, :html, :pdf], as: :institution_breakdown
+  get 'reports/object_report/:intellectual_object_identifier', to: 'reports#object_report', format: [:json, :html], as: :object_report, intellectual_object_identifier: object_ptrn
 
   # ALERT ROUTES
   get 'alerts/', to: 'alerts#index', format: [:json, :html], as: :alerts
