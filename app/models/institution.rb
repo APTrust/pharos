@@ -31,6 +31,10 @@ class Institution < ActiveRecord::Base
     admin_users
   end
 
+  def active_files
+    self.generic_files.where(state: 'A')
+  end
+
   def deletion_admin_user(requesting_user)
     confirming_users = []
     admin_users = self.admin_users
