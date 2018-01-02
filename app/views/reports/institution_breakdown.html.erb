@@ -1,23 +1,26 @@
 <h2>Institution Data Usage</h2>
 
-<dl class="dl-horizontal">
-  <% @report.each do |key, value| %>
+<ul class="inst_breakdown_list">
+  <dl class="dl-horizontal">
+    <% @report.each do |key, value| %>
       <% value.each do |nested_key, nested_value| %>
           <% if nested_key == :subscriber_number %>
-              <dt>Number of Subscribers</dt>
-              <dd><%= nested_value %></dd>
+              <li><ul><li><dt>Number of Subscribers</dt>
+              <dd><%= nested_value %></dd></li></ul></li>
           <% else %>
               <% if nested_key == key %>
-                  <dt><%= nested_key %></dt>
-                  <dd><%= number_to_human_size(nested_value) %></dd>
+                    <li><dt><%= nested_key %></dt>
+                    <dd><%= number_to_human_size(nested_value) %></dd></li>
               <% else %>
-                  <dt style="font-weight: 100;"><%= nested_key %></dt>
-                  <dd style="font-weight: 100;"><%= number_to_human_size(nested_value) %></dd>
+                    <li><ul><li><dt><%= nested_key %></dt>
+                    <dd><%= number_to_human_size(nested_value) %></dd></li></ul></li>
               <% end %>
           <% end %>
       <% end %>
-  <% end %>
-</dl>
+
+    <% end %>
+  </dl>
+</ul>
 
 <%= link_to "?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
     <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF
