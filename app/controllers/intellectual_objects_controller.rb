@@ -69,18 +69,26 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def show
-    authorize @intellectual_object
-    @institution = @intellectual_object.institution unless @intellectual_object.nil?
-    if @intellectual_object.nil? || @intellectual_object.state == 'D'
-      respond_to do |format|
-        format.json { render :nothing => true, :status => 404 }
-        format.html
-      end
-    else
+    if @intellectual_object
+      authorize @intellectual_object
+      @institution = @intellectual_object.institution
       respond_to do |format|
         format.json { render json: object_as_json }
         format.html
       end
+    else
+      authorize current_user, :nil_object?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'This object could not be found.' }, :status => 404 }
+        format.html { redirect_to root_url, alert: 'This object could not be found.' }
+      end
+    end
+
+
+    if @intellectual_object.nil? || @intellectual_object.state == 'D'
+
+    else
+
     end
   end
 

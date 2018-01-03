@@ -45,6 +45,10 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def nil_object?
+    true
+  end
+
   def nil_event?
     true
   end
