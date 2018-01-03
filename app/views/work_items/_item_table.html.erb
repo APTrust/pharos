@@ -4,6 +4,7 @@
     <th>Name</th>
     <th>Institution</th>
     <th>Processed</th>
+    <th>Size</th>
     <th>Action</th>
     <th>Stage</th>
     <th>Status</th>
@@ -25,6 +26,7 @@
           <% end %></td>
         <td><%= item.institution.identifier %></td>
         <td><%= time_ago_in_words item.date %></td>
+        <td><%= number_to_human_size(item.size) %></td>
         <td><%= item.action %></td>
         <td><%= item.stage %></td>
         <td class="status"><%= item.status %></td>
