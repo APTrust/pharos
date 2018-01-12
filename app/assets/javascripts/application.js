@@ -16,3 +16,4 @@
 //= require_tree .
 //= require.js
 //= require jquery-ui
+//= require Chart.min

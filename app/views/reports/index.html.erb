@@ -57,11 +57,35 @@
   </div>
 
   <div class="tab-pane" id="cost">
-
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Audit Date</th>
+        <th>Data in APTrust</th>
+        <th>Data in DPN</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% unless @institution.snapshots.nil? %>
+          <% @institution.snapshots.each do |snapshot| %>
+          <tr>
+            <td><%= snapshot.audit_date %></td>
+            <td><%= number_to_human_form(snapshot.apt_bytes) %></td>
+            <td><%= number_to_human_form(snapshot.dpn_bytes) %></td>
+          </tr>
+          <% end %>
+      <% end %>
+      </tbody>
+    </table>
   </div>
 
   <div class="tab-pane" id="timeline">
-
+    <% unless @institution.name? == 'APTrust' %>
+        <canvas id="indiv_timeline_chart" width="400" height="400"></canvas>
+        <script>individual_timeline(<%= @indiv_timeline_breakdown %>)</script>
+    <% end %>
+    <canvas id="group_timeline_chart" width="400" height="400"></canvas>
+    <script>group_timeline(<%= @group_timeline_breakdown %>)</script>
   </div>
 
   <div class="tab-pane" id="mimetype">

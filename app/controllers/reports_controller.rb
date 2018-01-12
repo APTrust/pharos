@@ -7,6 +7,7 @@ class ReportsController < ApplicationController
   def index
     authorize @institution
     overview_wrapper
+    timeline_wrapper
     inst_breakdown_wrapper if policy(current_user).institution_breakdown?
     respond_to do |format|
       format.json { render json: { report_list: 'There is one report available, a general overview found at reports/overview/:identifier' } }
@@ -102,7 +103,8 @@ class ReportsController < ApplicationController
   end
 
   def timeline_wrapper
-
+    @indiv_timeline_breakdown = @institution.statistics
+    @group_timeline_breakdown = Institution.group_statistics
   end
 
   def subscriber_wrapper

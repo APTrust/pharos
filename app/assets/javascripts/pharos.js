@@ -321,6 +321,100 @@ function tabbed_nav(controller) {
     }
 }
 
+function individual_timeline(stats) {
+    var ctx = document.getElementById("indiv_timeline_chart").getContext('2d');
+    var timeline_labels = []
+    var timeline_data = []
+    Object.keys(stats).forEach(function (key) {
+        var value = hash[key]
+        timeline_labels.push(key)
+        timeline_data.push(value)
+    })
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: timeline_labels,
+            datasets: [{
+                label: '# of Votes',
+                data: timeline_data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+}
+
+function group_timeline(stats) {
+    var ctx = document.getElementById("group_timeline_chart").getContext('2d');
+    var timeline_labels = []
+    var timeline_data = []
+    Object.keys(stats).forEach(function (key) {
+        var value = hash[key]
+        timeline_labels.push(key)
+        timeline_data.push(value)
+    })
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: timeline_labels,
+            datasets: [{
+                label: '# of Votes',
+                data: timeline_data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+}
+
 $(document).ready(function(){
     fixFilters();
     activate_tabs();

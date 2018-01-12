@@ -42,6 +42,11 @@ class InstitutionPolicy < ApplicationPolicy
     false
   end
 
+  def snapshot?
+    user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.id))
+  end
+
   def reports?
     user.admin? || user.institution_id == record.id
   end

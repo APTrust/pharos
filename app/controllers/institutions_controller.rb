@@ -2,7 +2,7 @@ class InstitutionsController < ApplicationController
   include SearchAndIndex
   inherit_resources
   before_action :authenticate_user!
-  before_action :load_institution, only: [:edit, :update, :show, :destroy]
+  before_action :load_institution, only: [:edit, :update, :show, :destroy, :snapshot]
   respond_to :json, :html
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
@@ -61,6 +61,18 @@ class InstitutionsController < ApplicationController
   def destroy
     authorize current_user, :delete_institution?
     destroy!
+  end
+
+  def snapshot
+    authorize @institution
+    @snapshot = @institution.snapshot
+    respond_to do |format|
+      format.json { render json: { institution: @institution.name, date: @snapshot.audit_date, aptrust_data: @snapshot.apt_bytes, dpn_data: @snapshot.dpn_bytes } }
+      format.html {
+        redirect_to root_path
+        flash[:notice] = "A snapshot of #{@institution.name} has been taken and archived on #{@snapshot.audit_date}. This institution currently has #{@snapshot.apt_bytes} bytes stored."
+      }
+    end
   end
 
   private

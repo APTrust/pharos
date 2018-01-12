@@ -4,6 +4,7 @@ class Institution < ActiveRecord::Base
   has_many :generic_files, through: :intellectual_objects
   has_many :premis_events, through: :intellectual_objects
   has_many :premis_events, through: :generic_files
+  has_many :snapshots
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
@@ -29,6 +30,10 @@ class Institution < ActiveRecord::Base
     users = User.where(institution_id: self.id)
     users.each { |user| admin_users.push(user) if user.institutional_admin? }
     admin_users
+  end
+
+  def active_files
+    self.generic_files.where(state: 'A')
   end
 
   def deletion_admin_user(requesting_user)
@@ -79,6 +84,16 @@ class Institution < ActiveRecord::Base
     time_fixed
   end
 
+  def self.group_statistics
+    stats = GenericFile.all.order(:created_at).group(:created_at).sum(:size)
+    time_fixed = []
+    stats.each do |key, value|
+      current_point = [key.to_time.to_i*1000, value.to_i]
+      time_fixed.push(current_point)
+    end
+    time_fixed
+  end
+
   def generate_overview_apt
     report = {}
     report[:bytes_by_format] = GenericFile.bytes_by_format
@@ -107,6 +122,16 @@ class Institution < ActiveRecord::Base
       report[name] = indiv_breakdown
     end
     report
+  end
+
+  def snapshot
+    apt_bytes = self.active_files.sum(:size)
+    snapshot = Snapshot.create(institution_id: self.id, audit_date: Time.now, apt_bytes: apt_bytes)
+    unless self.dpn_uuid.empty?
+      #write a query that checks intellectual objects dpn_uuids and, if present, joins to generic files to find sizes
+    end
+    snapshot.save!
+    snapshot
   end
 
   private
