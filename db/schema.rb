@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171207215845) do
+ActiveRecord::Schema.define(version: 20180112205535) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -163,6 +163,16 @@ ActiveRecord::Schema.define(version: 20171207215845) do
     t.integer "user_id"
     t.index ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
     t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
+  end
+
+  create_table "snapshots", force: :cascade do |t|
+    t.datetime "audit_date"
+    t.integer "institution_id"
+    t.integer "apt_bytes"
+    t.integer "dpn_bytes"
+    t.integer "cost"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "usage_samples", force: :cascade do |t|

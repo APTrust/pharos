@@ -63,6 +63,7 @@
         <th>Audit Date</th>
         <th>Data in APTrust</th>
         <th>Data in DPN</th>
+        <th>Storage Cost</th>
       </tr>
       </thead>
       <tbody>
@@ -72,6 +73,7 @@
             <td><%= snapshot.audit_date %></td>
             <td><%= number_to_human_form(snapshot.apt_bytes) %></td>
             <td><%= number_to_human_form(snapshot.dpn_bytes) %></td>
+            <td><%= snapshot.cost %></td>
           </tr>
           <% end %>
       <% end %>
@@ -80,12 +82,13 @@
   </div>
 
   <div class="tab-pane" id="timeline">
-    <% unless @institution.name? == 'APTrust' %>
+    <% if @institution.name? != 'APTrust' %>
         <canvas id="indiv_timeline_chart" width="400" height="400"></canvas>
-        <script>individual_timeline(<%= @indiv_timeline_breakdown %>)</script>
+        <script>individual_timeline(<%= @group_timeline_breakdown %>);</script>
     <% end %>
+
     <canvas id="group_timeline_chart" width="400" height="400"></canvas>
-    <script>group_timeline(<%= @group_timeline_breakdown %>)</script>
+    <script>group_timeline(<%= @group_timeline_breakdown %>);</script>
   </div>
 
   <div class="tab-pane" id="mimetype">

@@ -1,10 +1,11 @@
 class CreateSnapshots < ActiveRecord::Migration[5.1]
   def change
     create_table :snapshots do |t|
-      t.audit_date :datetime
-      t.institution_id :integer
-      t.apt_bytes :integer
-      t.dpn_bytes :integer
+      t.datetime :audit_date
+      t.integer :institution_id
+      t.integer :apt_bytes
+      t.integer :dpn_bytes
+      t.integer :cost
 
       t.timestamps
     end

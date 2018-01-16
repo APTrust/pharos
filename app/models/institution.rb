@@ -84,11 +84,21 @@ class Institution < ActiveRecord::Base
     time_fixed
   end
 
-  def self.group_statistics
+  def group_statistics
     stats = GenericFile.all.order(:created_at).group(:created_at).sum(:size)
     time_fixed = []
     stats.each do |key, value|
-      current_point = [key.to_time.to_i*1000, value.to_i]
+      current_point = {x: key.to_time.to_i*1000, y: value.to_i}
+      time_fixed.push(current_point)
+    end
+    time_fixed
+  end
+
+  def chart_statistics
+    stats = self.generic_files.order(:created_at).group(:created_at).sum(:size)
+    time_fixed = []
+    stats.each do |key, value|
+      current_point = {x: key.to_time.to_i*1000, y: value.to_i}
       time_fixed.push(current_point)
     end
     time_fixed

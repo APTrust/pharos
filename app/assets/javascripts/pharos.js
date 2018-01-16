@@ -323,20 +323,13 @@ function tabbed_nav(controller) {
 
 function individual_timeline(stats) {
     var ctx = document.getElementById("indiv_timeline_chart").getContext('2d');
-    var timeline_labels = []
-    var timeline_data = []
-    Object.keys(stats).forEach(function (key) {
-        var value = hash[key]
-        timeline_labels.push(key)
-        timeline_data.push(value)
-    })
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: timeline_labels,
+            labels: '',
             datasets: [{
                 label: '# of Votes',
-                data: timeline_data,
+                data: stats,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -370,20 +363,12 @@ function individual_timeline(stats) {
 
 function group_timeline(stats) {
     var ctx = document.getElementById("group_timeline_chart").getContext('2d');
-    var timeline_labels = []
-    var timeline_data = []
-    Object.keys(stats).forEach(function (key) {
-        var value = hash[key]
-        timeline_labels.push(key)
-        timeline_data.push(value)
-    })
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: timeline_labels,
             datasets: [{
                 label: '# of Votes',
-                data: timeline_data,
+                data: stats,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',

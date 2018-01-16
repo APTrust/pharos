@@ -103,8 +103,8 @@ class ReportsController < ApplicationController
   end
 
   def timeline_wrapper
-    @indiv_timeline_breakdown = @institution.statistics
-    @group_timeline_breakdown = Institution.group_statistics
+    @indiv_timeline_breakdown = @institution.chart_statistics
+    @group_timeline_breakdown = @institution.group_statistics
   end
 
   def subscriber_wrapper
