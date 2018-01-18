@@ -1,0 +1,20 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th>Object Identifier</th>
+    <th>DPN Identifier</th>
+    <th>Created At</th>
+    <th>Updated At</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @paged_results.each do |bag| %>
+      <tr>
+        <td><a href="<%= dpn_bag_path(id: bag.id) %>" ><%= truncate(bag.object_identifier, length: 50) %></a></td>
+        <td><%= bag.dpn_identifier %></td>
+        <td><%= time_ago_in_words(bag.dpn_created_at) %></td>
+        <th><%= time_ago_in_words(bag.dpn_updated_at) %></th>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

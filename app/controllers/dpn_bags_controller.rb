@@ -1,0 +1,112 @@
+class DpnBagsController < ApplicationController
+  respond_to :html, :json
+  before_action :authenticate_user!
+  before_action :set_bag, only: [:show, :update]
+  before_action :set_institution, only: :index
+  before_action :init_from_params, only: :create
+  after_action :verify_authorized
+
+  def index
+    authorize @institution, :dpn_bag_index?
+    @dpn_bags = DpnBag.all
+    filter_and_sort
+    page_results(@dpn_bags)
+    respond_to do |format|
+      format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash } } }
+      format.html {
+        index!
+      }
+    end
+  end
+
+  def create
+    authorize @dpn_bag
+    respond_to do |format|
+      if @dpn_bag.save
+        format.json { render json: @dpn_bag, status: :created }
+      else
+        format.json { render json: @dpn_bag.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def show
+    if @dpn_bag.nil?
+      authorize current_user, :nil_dpn_bag?
+      render body: nil, status: :not_found and return
+    else
+      authorize @dpn_bag
+      respond_to do |format|
+        format.json { render json: @dpn_bag.serializable_hash }
+        format.html { }
+      end
+    end
+  end
+
+  def update
+    if @dpn_bag.nil?
+      authorize current_user, :nil_dpn_bag?
+      render body: nil, status: :not_found and return
+    else
+      @dpn_bag.update(params_for_update)
+      authorize @dpn_bag
+      respond_to do |format|
+        if @dpn_bag.save
+          format.json { render json: @dpn_bag, status: :ok }
+        else
+          format.json { render json: @dpn_bag.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+  end
+
+  private
+
+  def init_from_params
+    @dpn_item = DpnBag.new(dpn_bag_params)
+  end
+
+  def dpn_bag_params
+    if request.method != 'GET'
+      params.require(:dpn_bag).permit(:institution_id, :object_identifier, :dpn_identifier, :dpn_size, :node_1, :node_2, :node_3, :dpn_created_at, :dpn_updated_at )
+    end
+  end
+
+  def params_for_update
+    params.require(:dpn_bag).permit(:object_identifier, :dpn_identifier, :dpn_size, :node_1, :node_2, :node_3, :dpn_created_at, :dpn_updated_at)
+  end
+
+  def set_bag
+    @dpn_bag = DpnBag.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+  end
+
+  def set_institution
+    if current_user.admin? and params[:institution_id]
+      @institution = Institution.find(params[:institution_id])
+    elsif current_user.admin? and params[:institution_identifier]
+      @institution = Institution.where(identifier: params[:institution_identifier]).first
+    else
+      @institution = current_user.institution
+    end
+  end
+
+  def filter_and_sort
+    @dpn_bags = @dpn_bags
+                     .with_object_identifier(params[:object_identifier])
+                     .completed_before(params[:completed_before])
+                     .completed_after(params[:completed_after])
+                     .updated_before(params[:updated_before])
+                     .updated_after(params[:updated_after])
+    params[:sort] = 'dpn_created_at DESC' unless params[:sort]
+    @dpn_bags = @dpn_bags.order(params[:sort])
+    @selected = {}
+    count = @dpn_bags.count
+    set_filter_values
+    set_page_counts(count)
+  end
+
+  def set_filter_values
+    # Some kind of datepicker thing for completed_before / completed_after / etc
+  end
+end

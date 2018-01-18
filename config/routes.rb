@@ -111,6 +111,10 @@ Rails.application.routes.draw do
   resources :dpn_work_items, path: 'dpn_items', only: [:index, :show], format: :html
   get 'dpn_items/:id/requeue', to: 'dpn_work_items#requeue', format: [:json, :html], as: :requeue_dpn_item
 
+  # DPN BAG ROUTES
+  resources :dpn_bags, path: 'api/v2/dpn_bags', only: [:index, :create, :show, :update], format: :json
+  resources :dpn_bags, path: 'dpn_bags', only: [:index, :show], format: [:json, :html]
+
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]
 
