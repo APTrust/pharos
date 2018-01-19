@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 RSpec.describe DpnBag, type: :model do
   before(:all) do
@@ -55,33 +55,4 @@ RSpec.describe DpnBag, type: :model do
     subject.dpn_updated_at = time
     subject.dpn_updated_at.should == time
   end
-
-  describe 'filters' do
-    let(:bag1) { FactoryBot.create(:dpn_bag) }
-    let(:bag2) { FactoryBot.create(:dpn_bag) }
-    let(:bag3) { FactoryBot.create(:dpn_bag) }
-
-    it 'should filter by complete' do
-      item1.completed_at = nil
-      item2.completed_at = Time.now.utc
-      item3.completed_at = Time.now.utc
-      item1.save
-      item2.save
-      item3.save
-      items = DpnWorkItem.is_completed('true')
-      items.count.should == 2
-    end
-
-    it 'should filter by incomplete' do
-      item1.completed_at = nil
-      item2.completed_at = Time.now.utc
-      item3.completed_at = Time.now.utc
-      item1.save
-      item2.save
-      item3.save
-      items = DpnWorkItem.is_not_completed('true')
-      items.count.should == 1
-    end
-  end
-
 end

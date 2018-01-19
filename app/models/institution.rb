@@ -16,6 +16,14 @@ class Institution < ActiveRecord::Base
     identifier
   end
 
+  def is_in_dpn
+    status = false
+    if self.dpn_uuid != '' || self.dpn_uuid != nil
+      status = true
+    end
+    status
+  end
+
   def self.find_by_identifier(identifier)
     Institution.where(identifier: identifier).first
   end

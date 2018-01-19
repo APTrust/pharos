@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :dpn_bag do
-    institution { FactoryBot.create(:institution) }
+    institution { FactoryBot.create(:member_institution) }
     object_identifier { "#{institution.identifier}/#{SecureRandom.uuid}" }
     dpn_identifier { SecureRandom.uuid }
     dpn_size { rand(20000..500000000) }

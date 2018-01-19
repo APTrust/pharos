@@ -57,6 +57,10 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def dpn_bag_create?
+    user.admin?
+  end
+
   def object_create?
     user.admin?
   end

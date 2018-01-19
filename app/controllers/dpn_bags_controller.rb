@@ -1,4 +1,5 @@
 class DpnBagsController < ApplicationController
+  include SearchAndIndex
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :set_bag, only: [:show, :update]
@@ -13,9 +14,7 @@ class DpnBagsController < ApplicationController
     page_results(@dpn_bags)
     respond_to do |format|
       format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash } } }
-      format.html {
-        index!
-      }
+      format.html { }
     end
   end
 
@@ -63,7 +62,7 @@ class DpnBagsController < ApplicationController
   private
 
   def init_from_params
-    @dpn_item = DpnBag.new(dpn_bag_params)
+    @dpn_bag = DpnBag.new(dpn_bag_params)
   end
 
   def dpn_bag_params
@@ -84,25 +83,32 @@ class DpnBagsController < ApplicationController
   def set_institution
     if current_user.admin? and params[:institution_id]
       @institution = Institution.find(params[:institution_id])
+      @inst_param = @institution.id
     elsif current_user.admin? and params[:institution_identifier]
       @institution = Institution.where(identifier: params[:institution_identifier]).first
+      @inst_param = @institution.id
     else
       @institution = current_user.institution
     end
   end
 
   def filter_and_sort
+    if current_user.admin? && @inst_param
+      @dpn_bags = @dpn_bags.with_institution(@inst_param)
+    elsif !current_user.admin?
+      @dpn_bags = @dpn_bags.with_institution(current_user.institution_id)
+    end
     @dpn_bags = @dpn_bags
                      .with_object_identifier(params[:object_identifier])
-                     .completed_before(params[:completed_before])
-                     .completed_after(params[:completed_after])
+                     .created_before(params[:created_before])
+                     .created_after(params[:created_after])
                      .updated_before(params[:updated_before])
                      .updated_after(params[:updated_after])
     params[:sort] = 'dpn_created_at DESC' unless params[:sort]
     @dpn_bags = @dpn_bags.order(params[:sort])
     @selected = {}
     count = @dpn_bags.count
-    set_filter_values
+    # set_filter_values
     set_page_counts(count)
   end
 
