@@ -11,9 +11,9 @@
     <table class="table dpn_bag">
       <tbody>
       <tr><th>DPN Identifier</th>
-        <td><%= @dpn_bag.remote_node %></td></tr>
+        <td><%= @dpn_bag.dpn_identifier %></td></tr>
       <tr><th>DPN Size</th>
-        <td><%= number_to_human_form(@dpn_bag.dpn_size) %></td></tr>
+        <td><%= number_to_human_size(@dpn_bag.dpn_size) %></td></tr>
       <tr><th>Node 1</th>
         <td><%= @dpn_bag.node_1 %></td></tr>
       <tr><th>Node 2</th>
@@ -22,7 +22,7 @@
         <td><%= @dpn_bag.node_3 %></td></tr>
       <tr><th>Created At (In DPN)</th>
         <td><%= time_ago_in_words @dpn_bag.dpn_created_at %></td></tr>
-      <tr><th>Updated At (In DPN)/th>
+      <tr><th>Updated At (In DPN)</th>
         <td><%= time_ago_in_words @dpn_bag.dpn_updated_at %></td></tr>
       </tbody>
     </table>
