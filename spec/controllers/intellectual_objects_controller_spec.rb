@@ -16,7 +16,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    identifier: 'test.edu/baggie?c=152',
                                    title: 'Aberdeen Wanderers',
                                    description: 'Founded in Aberdeen in 1928.',
-                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec1') }
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec1',
+                                   bagging_group_identifier: 'This is a collection.') }
   let!(:obj3) { FactoryBot.create(:institutional_intellectual_object,
                                    institution: inst2) }
   let!(:obj4) { FactoryBot.create(:restricted_intellectual_object,
@@ -139,6 +140,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { alt_identifier_like: 'some-bag' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { bagging_group_identifier: 'This is a collection.' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { bagging_group_identifier_like: 'collection' }
           expect(assigns(:intellectual_objects).size).to eq 1
         end
       end

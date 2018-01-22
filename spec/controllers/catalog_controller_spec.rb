@@ -17,7 +17,7 @@ RSpec.describe CatalogController, type: :controller do
     @institution = FactoryBot.create(:member_institution)
     @another_institution = FactoryBot.create(:subscription_institution)
 
-    @object_one = FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id, id: 1)
+    @object_one = FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id, id: 1, bagging_group_identifier: 'This is a collection.')
     @object_two = FactoryBot.create(:institutional_intellectual_object, institution_id: @institution.id, alt_identifier: ['something/1234-5678'], id: 2)
     @object_three = FactoryBot.create(:restricted_intellectual_object, institution_id: @institution.id, bag_name: 'fancy_bag/1234-5678', id: 3)
     @object_four = FactoryBot.create(:consortial_intellectual_object, institution_id: @another_institution.id, title: 'This is an important bag', id: 4)
@@ -96,6 +96,12 @@ RSpec.describe CatalogController, type: :controller do
             get :search, params: { q: 'important', search_field: 'Title', object_type: 'Intellectual Objects' }
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @object_four.id
+          end
+
+          it 'should match a partial search on bagging group identifier' do
+            get :search, params: { q: 'collection', search_field: 'Bagging Group Identifier', object_type: 'Intellectual Objects' }
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_one.id
           end
 
           it 'should strip the leading and trailing whitespace from a search term' do

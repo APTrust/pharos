@@ -26,7 +26,7 @@ function addClickFunctions() {
 function configureDropDownLists() {
     ddl1 = document.getElementById('object_type');
     ddl2 = document.getElementById('search_field');
-    var io_options = ['Object Identifier', 'Alternate Identifier', 'Bag Name', 'Title'];
+    var io_options = ['Object Identifier', 'Alternate Identifier', 'Bagging Group Identifier', 'Bag Name', 'Title'];
     var gf_options = ['File Identifier', 'URI'];
     var event_options = ['Event Identifier', 'Object Identifier', 'File Identifier'];
     var wi_options = ['Object Identifier', 'File Identifier', 'Name', 'Etag'];

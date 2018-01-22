@@ -23,6 +23,8 @@ class IntellectualObjectsController < ApplicationController
       .with_description_like(params[:description_like])
       .with_identifier(params[:identifier])
       .with_identifier_like(params[:identifier_like])
+      .with_bagging_group_identifier(params[:bagging_group_identifier])
+      .with_bagging_group_identifier_like(params[:bagging_group_identifier_like])
       .with_alt_identifier(params[:alt_identifier])
       .with_alt_identifier_like(params[:alt_identifier_like])
       .with_bag_name(params[:bag_name])
