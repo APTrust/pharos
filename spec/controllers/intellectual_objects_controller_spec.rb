@@ -331,7 +331,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}') }
+    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bagging_group_identifier: 'collection_one') }
 
     after do
       PremisEvent.delete_all
@@ -392,6 +392,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         saved_obj = IntellectualObject.where(identifier: simple_obj.identifier).first
         expect(saved_obj).to be_truthy
         expect(saved_obj.etag).to eq '90908111'
+        expect(saved_obj.bagging_group_identifier).to eq 'collection_one'
       end
     end
 
@@ -448,12 +449,13 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(saved_obj.ingest_state).to eq '{[A]}'
       end
       it 'should update the object and respond with json (json)' do
-        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678'} }, format: :json
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678', bagging_group_identifier: 'collection_two'} }, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'
         expect(saved_obj.ingest_state).to eq '{[D]}'
         expect(saved_obj.etag).to eq '12345678'
+        expect(saved_obj.bagging_group_identifier).to eq 'collection_two'
       end
     end
 

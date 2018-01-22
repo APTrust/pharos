@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171207215845) do
+ActiveRecord::Schema.define(version: 20180122175127) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -26,6 +26,20 @@ ActiveRecord::Schema.define(version: 20171207215845) do
     t.string "token"
     t.integer "intellectual_object_id"
     t.integer "generic_file_id"
+  end
+
+  create_table "dpn_bags", force: :cascade do |t|
+    t.integer "institution_id"
+    t.string "object_identifier"
+    t.string "dpn_identifier"
+    t.integer "dpn_size"
+    t.string "node_1"
+    t.string "node_2"
+    t.string "node_3"
+    t.datetime "dpn_created_at"
+    t.datetime "dpn_updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "dpn_work_items", force: :cascade do |t|
@@ -115,6 +129,7 @@ ActiveRecord::Schema.define(version: 20171207215845) do
     t.string "etag"
     t.string "dpn_uuid"
     t.text "ingest_state"
+    t.string "bagging_group_identifier", limit: 255
     t.index ["access"], name: "index_intellectual_objects_on_access"
     t.index ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
     t.index ["institution_id"], name: "index_intellectual_objects_on_institution_id"
@@ -163,6 +178,16 @@ ActiveRecord::Schema.define(version: 20171207215845) do
     t.integer "user_id"
     t.index ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
     t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
+  end
+
+  create_table "snapshots", force: :cascade do |t|
+    t.datetime "audit_date"
+    t.integer "institution_id"
+    t.integer "apt_bytes"
+    t.integer "dpn_bytes"
+    t.integer "cost"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "usage_samples", force: :cascade do |t|

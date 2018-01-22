@@ -271,7 +271,7 @@ class IntellectualObjectsController < ApplicationController
     params.require(:intellectual_object).permit(:institution_id, :title, :etag,
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :ingest_state,
-                                                generic_files_attributes:
+                                                :bagging_group_identifier, generic_files_attributes:
                                                 [:id, :uri, :identifier,
                                                  :size, :created, :modified, :file_format,
                                                  premis_events_attributes:
@@ -293,7 +293,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update_params
     params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state,
-                                                :alt_identifier, :state, :dpn_uuid, :etag)
+                                                :alt_identifier, :state, :dpn_uuid, :etag, :bagging_group_identifier)
   end
 
   def load_object

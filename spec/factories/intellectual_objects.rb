@@ -8,6 +8,7 @@ FactoryBot.define do
     access { ['consortia', 'institution', 'restricted'].sample }
     alt_identifier { '' }
     bag_name { identifier.split('/')[1] }
+    bagging_group_identifier { nil }
     state { 'A' }
     #sequence(:id) {|n| n}
 
