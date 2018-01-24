@@ -100,6 +100,7 @@ class DpnBagsController < ApplicationController
     end
     @dpn_bags = @dpn_bags
                      .with_object_identifier(params[:object_identifier])
+                     .with_dpn_identifier(params[:dpn_identifier])
                      .created_before(params[:created_before])
                      .created_after(params[:created_after])
                      .updated_before(params[:updated_before])
