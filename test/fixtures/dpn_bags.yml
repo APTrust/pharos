@@ -1,0 +1,32 @@
+dpn_one:
+  institution: inst1
+  object_identifier: institution1.edu/photos
+  dpn_identifier: 710bd853-e4da-4fe9-bd12-82b0de3d9001
+  dpn_size: 10000
+  node_1: aptrust
+  node_2: hathi
+  node_3: tdr
+  dpn_created_at: 2015-01-01T10:00:00Z
+  dpn_updated_at: 2015-01-16T10:00:00Z
+
+dpn_two:
+  institution: inst2
+  object_identifier: institution2.edu/chocolate
+  dpn_identifier: 44c91c54-b901-4f02-89a6-dc2e6d30df71
+  dpn_size: 20000
+  node_1: aptrust
+  node_2: chron
+  node_3: hathi
+  dpn_created_at: 2015-01-02T12:00:00Z
+  dpn_updated_at: 2015-01-20T10:33:00Z
+
+dpn_three:
+  institution: inst2
+  object_identifier: institution2.edu/toads
+  dpn_identifier: 44c91c54-b901-4f02-89a6-dc2e6d30df71
+  dpn_size: 31337
+  node_1: aptrust
+  node_2: tdr
+  node_3: chron
+  dpn_created_at: 2015-01-03T12:00:00Z
+  dpn_updated_at: 2015-01-21T09:18:00Z

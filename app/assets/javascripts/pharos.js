@@ -318,6 +318,9 @@ function tabbed_nav(controller) {
         case 'alerts':
             $('#alert_tab').addClass('active');
             break;
+        case 'dpn_bags':
+            $('#dpn_bag_tab').addClass('active');
+            break;
     }
 }
 
