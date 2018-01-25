@@ -55,4 +55,10 @@ RSpec.describe DpnBag, type: :model do
     subject.dpn_updated_at = time
     subject.dpn_updated_at.should == time
   end
+
+  it 'should accept dpn_size above 4GB' do
+    subject.dpn_size = 150000000000
+    subject.dpn_size.should == 150000000000
+  end
+
 end
