@@ -107,7 +107,7 @@ class DpnWorkItemsController < ApplicationController
   end
 
   def set_item
-    @dpn_item = DpnWorkItem.find(params[:id])
+    @dpn_item = DpnWorkItem.readable(current_user).find(params[:id])
   rescue ActiveRecord::RecordNotFound
   end
 

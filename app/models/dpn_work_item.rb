@@ -20,6 +20,9 @@ class DpnWorkItem < ActiveRecord::Base
   scope :is_not_completed, ->(param) { where("completed_at is NULL") if param == 'true' }
   scope :discoverable, ->(current_user) { where('(1 = 0)') unless current_user.admin? }
 
+  # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
+  scope :readable, ->(current_user) { where('(1=1)') }
+
   def serializable_hash (options={})
     {
         id: id,

@@ -76,7 +76,7 @@ class DpnBagsController < ApplicationController
   end
 
   def set_bag
-    @dpn_bag = DpnBag.find(params[:id])
+    @dpn_bag = DpnBag.readable(current_user).find(params[:id])
   rescue ActiveRecord::RecordNotFound
   end
 

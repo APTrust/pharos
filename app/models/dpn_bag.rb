@@ -15,6 +15,9 @@ class DpnBag < ApplicationRecord
   scope :updated_before, ->(param) { where('dpn_bags.dpn_updated_at < ?', param) unless param.blank? }
   scope :updated_after, ->(param) { where('dpn_bags.dpn_updated_at > ?', param) unless param.blank? }
 
+  # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
+  scope :readable, ->(current_user) { where('(1=1)') }
+
   def serializable_hash (options={})
     {
         id: id,
