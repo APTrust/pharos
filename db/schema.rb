@@ -149,8 +149,8 @@ ActiveRecord::Schema.define(version: 20180125204519) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "institution_id"
     t.string "outcome"
+    t.integer "institution_id"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"
@@ -178,16 +178,6 @@ ActiveRecord::Schema.define(version: 20180125204519) do
     t.integer "user_id"
     t.index ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
     t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
-  end
-
-  create_table "snapshots", force: :cascade do |t|
-    t.datetime "audit_date"
-    t.integer "institution_id"
-    t.integer "apt_bytes"
-    t.integer "dpn_bytes"
-    t.integer "cost"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "usage_samples", force: :cascade do |t|
