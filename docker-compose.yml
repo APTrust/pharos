@@ -5,8 +5,11 @@
 # - use sqlite for development.
 #
 
-app:
-  build: .
+pharos:
+  build:
+    context: .
+    dockerfile: Dockerfile-alpine
+  image: pharos_test1
   volumes:
     - .:/pharos
   links:
