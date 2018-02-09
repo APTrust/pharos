@@ -43,7 +43,7 @@ RUN bundle install
 RUN RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken rake assets:precompile
 
 # - load db schema at first deploy
-RUN RAILS_ENV=development rake db:schema:load
+#RUN RAILS_ENV=development rake db:schema:load
 # - migrate db schema
 RUN RAILS_ENV=development rake db:migrate
 # - pharos setup (create institutions, roles and users)
