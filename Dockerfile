@@ -33,6 +33,10 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 RUN gem install bundler --no-ri --no-rdoc
 
 ADD . /pharos
+RUN export PHAROS_RELEASE=$(git rev-parse --short HEAD)
+
+COPY Gemfile Gemfile
+COPY Gemfile.lock Gemfile.lock
 RUN bundle install
 
 # - load db schema at first deploy
