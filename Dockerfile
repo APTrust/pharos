@@ -39,6 +39,9 @@ COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 RUN bundle install
 
+# Provide dummy data to Rails so it can pre-compile assets.
+RUN RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken rake assets:precompile
+
 # - load db schema at first deploy
 RUN RAILS_ENV=development rake db:schema:load
 # - migrate db schema
@@ -46,10 +49,6 @@ RUN RAILS_ENV=development rake db:migrate
 # - pharos setup (create institutions, roles and users)
 RUN RAILS_ENV=development rake pharos:setup
 # - populate db with fixtures if RAILS_ENV=development.
-
-
-# Provide dummy data to Rails so it can pre-compile assets.
-RUN RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken rake assets:precompile
 
 # Expose rails server port
 # TODO: Add standalone passenger later.
