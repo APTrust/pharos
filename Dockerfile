@@ -7,8 +7,8 @@ MAINTAINER Christian Dahlhausen <christian@aptrust.org>
 # - nodejs: Compile assets
 # - libpq-dev: Communicate with postgres through the postgres gem
 # - postgresql-client-9.4: In case you want to talk directly to postgres
-RUN apt-get update && apt-get install -qq -y build-essential libpq-dev nodejs \
-            bundler postgresql-client libpq5 libpqxx-dev \
+RUN apt-get update && apt-get install -qq -y git build-essential libpq-dev nodejs \
+            bundler postgresql-client libpq5 libpqxx-dev sqlite3 libsqlite3-dev\
             --fix-missing --no-install-recommends
 
 # Clean APT cache to keep image lean
