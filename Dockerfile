@@ -39,6 +39,9 @@ COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 RUN bundle install
 
+#Temp until puma makes it in the Gemfile
+RUN gem install puma
+
 # Provide dummy data to Rails so it can pre-compile assets.
 RUN RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken rake assets:precompile
 
