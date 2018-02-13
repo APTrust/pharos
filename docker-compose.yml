@@ -4,6 +4,27 @@
 # - postgresql db if non-development
 # - use sqlite for development.
 #
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-alpine
+    image: pharos-test-2
+    command: bundle exec puma -p9292 -e demo
+    volumes:
+      - .:/pharos
+    links:
+      - db
+    environment:
+      - DOCKERIZED=true
+      - RAILS_ENV=demo
+      - PHAROS_DB_HOST=localhost
+      - PHAROS_DB_USER=
+    ports:
+     - "9292:9292"
+    depends_on:
+      - db
 
 pharos:
   build:
