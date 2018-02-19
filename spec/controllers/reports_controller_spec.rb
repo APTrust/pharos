@@ -74,9 +74,9 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :overview, params: { identifier: @institution_one.identifier }
         expect(response).to be_success
-        expect(assigns(:report)[:generic_files]).to eq(1)
-        expect(assigns(:report)[:intellectual_objects]).to eq(1)
-        expect(assigns(:report)[:average_file_size]).to eq(@generic_file_one.size)
+        expect(assigns(:overview_report)[:generic_files]).to eq(1)
+        expect(assigns(:overview_report)[:intellectual_objects]).to eq(1)
+        expect(assigns(:overview_report)[:average_file_size]).to eq(@generic_file_one.size)
       end
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
@@ -93,9 +93,9 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :overview, params: { identifier: @institution_two.identifier }
         expect(response).to be_success
-        expect(assigns(:report)[:generic_files]).to eq(1)
-        expect(assigns(:report)[:intellectual_objects]).to eq(1)
-        expect(assigns(:report)[:average_file_size]).to eq(@generic_file_two.size)
+        expect(assigns(:overview_report)[:generic_files]).to eq(1)
+        expect(assigns(:overview_report)[:intellectual_objects]).to eq(1)
+        expect(assigns(:overview_report)[:average_file_size]).to eq(@generic_file_two.size)
       end
 
       it 'denies access when the institution is not their own (html)' do
@@ -120,7 +120,7 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
         expect(response).to be_success
-        expect(assigns(:report).keys.size).to eq(2)
+        expect(assigns(:inst_breakdown_report).keys.size).to eq(2)
       end
     end
 
@@ -132,7 +132,7 @@ RSpec.describe ReportsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
         expect(response).to be_success
-        expect(assigns(:report).keys.size).to eq(2)
+        expect(assigns(:inst_breakdown_report).keys.size).to eq(2)
       end
     end
 

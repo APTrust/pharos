@@ -7,8 +7,8 @@ class ReportsController < ApplicationController
   def index
     authorize @institution
     overview_wrapper
-    timeline_wrapper
-    inst_breakdown_wrapper if policy(current_user).institution_breakdown?
+    @indiv_timeline_breakdown = @institution.monthly_breakdown
+    @inst_breakdown_report = Institution.breakdown if policy(current_user).institution_breakdown?
     respond_to do |format|
       format.json { render json: { report_list: 'There is one report available, a general overview found at reports/overview/:identifier' } }
       format.html { }
@@ -37,7 +37,7 @@ class ReportsController < ApplicationController
 
   def institution_breakdown
     authorize current_user
-    inst_breakdown_wrapper
+    @inst_breakdown_report = Institution.breakdown
     respond_to do |format|
       format.json { render json: { report: @inst_breakdown_report } }
       format.html { }
@@ -88,27 +88,6 @@ class ReportsController < ApplicationController
     (@institution.name == 'APTrust') ?
         @overview_report = @institution.generate_overview_apt :
         @overview_report = @institution.generate_overview
-  end
-
-  def inst_breakdown_wrapper
-    @inst_breakdown_report = Institution.breakdown
-  end
-
-  def cost_breakdown_wrapper
-
-  end
-
-  def mimetype_wrapper
-
-  end
-
-  def timeline_wrapper
-    @indiv_timeline_breakdown = @institution.chart_statistics
-    @group_timeline_breakdown = @institution.group_statistics
-  end
-
-  def subscriber_wrapper
-
   end
 
 end

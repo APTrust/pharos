@@ -329,4 +329,47 @@ RSpec.describe InstitutionsController, type: :controller do
       end
     end
   end
+
+  describe 'GET snapshot' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and creates a snapshot' do
+        get :snapshot, params: { institution_identifier: admin_user.institution.to_param }
+        #expect(response).to be_success
+        expect(response.status).to eq(302)
+        expect(flash[:notice]).to eq "A snapshot of #{admin_user.institution.name} has been taken and archived on #{assigns(:snapshots).first.audit_date}. Please see the reports page for that analysis."
+        expect(assigns(:snapshots).first.apt_bytes).to eq 0
+        expect(assigns(:snapshots).first.cost).to eq nil
+      end
+
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :snapshot, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :snapshot, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
 end

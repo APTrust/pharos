@@ -5,23 +5,29 @@ class MemberInstitution < Institution
     SubscriptionInstitution.where(member_institution_id: self.id)
   end
 
-  def subscriber_report
+  def subscriber_report(total)
     si_report = {}
+    total_size = total
     self.subscribers.each do |si|
-      si_report[si.name] = si.generic_files.sum(:size)
+      size = si.generic_files.sum(:size)
+      si_report[si.name] = size
+      total_size = total_size + size
     end
+    si_report['total_bytes'] = total_size
     si_report
   end
 
   def generate_overview
     report = {}
-    report[:bytes_by_format] = self.bytes_by_format
+    bytes = self.bytes_by_format
+    total = bytes['all']
+    report[:bytes_by_format] = bytes
     report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
     report[:generic_files] = self.generic_files.where(state: 'A').count
     report[:premis_events] = self.premis_events.count
     report[:work_items] = WorkItem.with_institution(self.id).count
     report[:average_file_size] = average_file_size
-    report[:subscribers] = self.subscriber_report
+    report[:subscribers] = self.subscriber_report(total)
     report
   end
 

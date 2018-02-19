@@ -117,6 +117,9 @@ Rails.application.routes.draw do
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]
 
+  # SNAPSHOT ROUTES
+  resources :snapshots, path: 'snapshots', only: [:index, :show], format: [:json, :html]
+
   # USER ROUTES
   devise_for :users
 

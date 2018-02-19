@@ -28,7 +28,7 @@
       <dt>Average File Size</dt>
       <dd><%= number_to_human_size(@overview_report[:average_file_size]) %></dd>
       <dt>Total Bytes Preserved</dt>
-      <dd><%= number_to_human_size(@overview_report[:bytes_by_format]['all']) %></dd>
+      <dd><%= number_to_human_size(@overview_report[:subscribers]['total_bytes']) %></dd>
       <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} %>
           <dt>Subscribers</dt>
           <dd>None</dd>
@@ -57,6 +57,15 @@
   </div>
 
   <div class="tab-pane" id="cost">
+    <% if @institution.is_a?(MemberInstitution) %>
+       <% price = cost_analysis_member(@overview_report[:subscribers]['total_bytes']) %>
+        <br><p>If your cost is $0.00, then you have not yet used the full 10TB afforded by your membership.</p>
+    <% else %>
+        <% price = cost_analysis_subscriber(@overview_report[:bytes_by_format]['all']) %>
+        <br>
+    <% end %>
+    <p>You currently have <%= number_to_human_size(@overview_report[:bytes_by_format]['all']) %> stored, billed at <%= price %>.</p>
+    <h3>Previous Database Cost Analysis Snapshots</h3>
     <table class="table">
       <thead>
       <tr>
@@ -71,8 +80,8 @@
           <% @institution.snapshots.each do |snapshot| %>
           <tr>
             <td><%= snapshot.audit_date %></td>
-            <td><%= number_to_human_form(snapshot.apt_bytes) %></td>
-            <td><%= number_to_human_form(snapshot.dpn_bytes) %></td>
+            <td><%= number_to_human_size(snapshot.apt_bytes) %></td>
+            <td><%= number_to_human_size(snapshot.dpn_bytes) %></td>
             <td><%= snapshot.cost %></td>
           </tr>
           <% end %>
@@ -84,43 +93,63 @@
   <div class="tab-pane" id="timeline">
     <% if @institution.name? != 'APTrust' %>
         <canvas id="indiv_timeline_chart" width="400" height="400"></canvas>
-        <script>individual_timeline(<%= @group_timeline_breakdown %>);</script>
+        <script>timeline_labels = [];</script>
+        <script>timeline_data = [];</script>
+        <% @indiv_timeline_breakdown.first.each do |label| %>
+            <script>timeline_labels.push("<%= label %>");</script>
+        <% end %>
+        <% @indiv_timeline_breakdown.last.each do |data_point| %>
+            <script>timeline_data.push(<%= data_point %>);</script>
+        <% end %>
+        <script>timeline_graph(timeline_labels, timeline_data);</script>
     <% end %>
-
-    <canvas id="group_timeline_chart" width="400" height="400"></canvas>
-    <script>group_timeline(<%= @group_timeline_breakdown %>);</script>
   </div>
 
   <div class="tab-pane" id="mimetype">
-    <dl class="dl-horizontal">
-      <% @overview_report[:bytes_by_format].each do |key, value| %>
-          <% unless key == 'all' %>
-              <dt><%= key %></dt>
-              <dd><%= number_to_human_size(value) %></dd>
-          <% end %>
-      <% end %>
-    </dl>
+    <table>
+      <tr>
+        <td>
+          <dl class="dl-horizontal">
+            <script>var graph_hash = {}</script>
+            <% @overview_report[:bytes_by_format].each do |key, value| %>
+                <% unless key == 'all' %>
+                    <dt><%= key %></dt>
+                    <dd><%= number_to_human_size(value) %></dd>
+                    <script>graph_hash["<%= key %>"] = <%= value %></script>
+                <% end %>
+            <% end %>
+          </dl>
+        </td>
+        <td>
+          <canvas id="indiv_mimetype_chart"></canvas>
+          <script>individual_mimetype(graph_hash)</script>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <div class="tab-pane" id="breakdown">
-    <dl class="dl-horizontal">
-      <% @inst_breakdown_report.each do |key, value| %>
-          <% value.each do |nested_key, nested_value| %>
-              <% if nested_key == :subscriber_number %>
-                  <dt>Number of Subscribers</dt>
-                  <dd><%= nested_value %></dd>
-              <% else %>
-                  <% if nested_key == key %>
-                      <dt><%= nested_key %></dt>
-                      <dd><%= number_to_human_size(nested_value) %></dd>
-                  <% else %>
-                      <dt style="font-weight: 100;"><%= nested_key %></dt>
-                      <dd style="font-weight: 100;"><%= number_to_human_size(nested_value) %></dd>
-                  <% end %>
-              <% end %>
-          <% end %>
-      <% end %>
-    </dl>
+    <ul class="inst_breakdown_list">
+      <dl class="dl-horizontal">
+        <% @inst_breakdown_report.each do |key, value| %>
+            <% value.each do |nested_key, nested_value| %>
+                <% if nested_key == :subscriber_number %>
+                    <li><ul><li><dt>Number of Subscribers</dt>
+                      <dd><%= nested_value %></dd></li></ul></li>
+                <% else %>
+                    <% if nested_key == key %>
+                        <li><dt><%= nested_key %></dt>
+                          <dd><%= number_to_human_size(nested_value) %></dd></li>
+                    <% else %>
+                        <li><ul><li><dt><%= nested_key %></dt>
+                          <dd><%= number_to_human_size(nested_value) %></dd></li></ul></li>
+                    <% end %>
+                <% end %>
+            <% end %>
+
+        <% end %>
+      </dl>
+    </ul>
 
     <%= link_to "?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
         <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF

@@ -4,7 +4,7 @@ class SnapshotPolicy < ApplicationPolicy
     if user.admin?
       true
     else
-      user.institution_id == record.institution.id
+      user.institution_id == record.first.institution_id
     end
   end
 
@@ -12,7 +12,7 @@ class SnapshotPolicy < ApplicationPolicy
     if user.admin?
       true
     else
-      user.institution_id == record.institution.id
+      user.institution_id == record.institution_id
     end
   end
 
