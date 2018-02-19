@@ -36,7 +36,7 @@ class SnapshotsController < ApplicationController
   end
 
   def find_snapshot
-    @snapshot = Snapshot.find(params[:id])
+    @snapshot = Snapshot.readable(current_user).find(params[:id])
   end
 
 
