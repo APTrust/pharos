@@ -23,6 +23,8 @@ class IntellectualObjectsController < ApplicationController
       .with_description_like(params[:description_like])
       .with_identifier(params[:identifier])
       .with_identifier_like(params[:identifier_like])
+      .with_bagging_group_identifier(params[:bagging_group_identifier])
+      .with_bagging_group_identifier_like(params[:bagging_group_identifier_like])
       .with_alt_identifier(params[:alt_identifier])
       .with_alt_identifier_like(params[:alt_identifier_like])
       .with_bag_name(params[:bag_name])
@@ -69,18 +71,26 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def show
-    authorize @intellectual_object
-    @institution = @intellectual_object.institution unless @intellectual_object.nil?
-    if @intellectual_object.nil? || @intellectual_object.state == 'D'
-      respond_to do |format|
-        format.json { render :nothing => true, :status => 404 }
-        format.html
-      end
-    else
+    if @intellectual_object
+      authorize @intellectual_object
+      @institution = @intellectual_object.institution
       respond_to do |format|
         format.json { render json: object_as_json }
         format.html
       end
+    else
+      authorize current_user, :nil_object?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'This object could not be found.' }, :status => 404 }
+        format.html { redirect_to root_url, alert: 'This object could not be found.' }
+      end
+    end
+
+
+    if @intellectual_object.nil? || @intellectual_object.state == 'D'
+
+    else
+
     end
   end
 
@@ -263,7 +273,7 @@ class IntellectualObjectsController < ApplicationController
     params.require(:intellectual_object).permit(:institution_id, :title, :etag,
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :ingest_state,
-                                                generic_files_attributes:
+                                                :bagging_group_identifier, generic_files_attributes:
                                                 [:id, :uri, :identifier,
                                                  :size, :created, :modified, :file_format,
                                                  premis_events_attributes:
@@ -285,7 +295,7 @@ class IntellectualObjectsController < ApplicationController
 
   def update_params
     params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state,
-                                                :alt_identifier, :state, :dpn_uuid, :etag)
+                                                :alt_identifier, :state, :dpn_uuid, :etag, :bagging_group_identifier)
   end
 
   def load_object

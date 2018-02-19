@@ -203,7 +203,7 @@ class WorkItem < ActiveRecord::Base
     restore_item.node = nil
     restore_item.pid = 0
     restore_item.needs_admin_review = false
-    restore_item.size = nil
+    restore_item.size = item.size
     restore_item.stage_started_at = nil
     restore_item.queued_at = nil
     restore_item.save!
@@ -228,7 +228,7 @@ class WorkItem < ActiveRecord::Base
     dpn_item.node = nil
     dpn_item.pid = 0
     dpn_item.needs_admin_review = false
-    dpn_item.size = nil
+    dpn_item.size = item.size
     dpn_item.stage_started_at = nil
     dpn_item.queued_at = nil
     dpn_item.save!
@@ -243,6 +243,8 @@ class WorkItem < ActiveRecord::Base
     if item.nil?
       raise ActiveRecord::RecordNotFound
     end
+    file = GenericFile.with_identifier(generic_file_identifier).first
+    file ? size = file.size : size = 0
     delete_item = item.dup
     delete_item.action = Pharos::Application::PHAROS_ACTIONS['delete']
     delete_item.stage = Pharos::Application::PHAROS_STAGES['requested']
@@ -257,7 +259,7 @@ class WorkItem < ActiveRecord::Base
     delete_item.node = nil
     delete_item.pid = 0
     delete_item.needs_admin_review = false
-    delete_item.size = nil
+    delete_item.size = size
     delete_item.stage_started_at = nil
     delete_item.queued_at = nil
     delete_item.save!

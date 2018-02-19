@@ -45,8 +45,20 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def nil_object?
+    true
+  end
+
   def nil_event?
     true
+  end
+
+  def nil_dpn_bag?
+    true
+  end
+
+  def dpn_bag_create?
+    user.admin?
   end
 
   def object_create?

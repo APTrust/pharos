@@ -42,6 +42,11 @@ RSpec.describe IntellectualObject, :type => :model do
       subject.identifier.should == exp
     end
 
+    it 'should properly set a bagging_group_identifier' do
+      subject.bagging_group_identifier = 'This is a connected collection.'
+      subject.bagging_group_identifier.should == 'This is a connected collection.'
+    end
+
     it 'should properly set an alternative identifier' do
       exp = 'test.edu/123456'
       subject.alt_identifier = exp

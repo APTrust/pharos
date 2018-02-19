@@ -1,0 +1,44 @@
+# This compose file needs
+# - nginx container for forwarding
+# - passenger? maybe just puma for the rails container
+# - postgresql db if non-development
+# - use sqlite for development.
+#
+
+pharos:
+  build:
+    context: .
+    dockerfile: Dockerfile-alpine
+  image: pharos_test1
+  volumes:
+    - .:/pharos
+  links:
+    - db
+  environment:
+    - DOCKERIZED=true
+  env_file:
+    - ".env"
+  ports:
+   - "3000:3000"
+
+web:
+  image: nginx:alpine
+  container_name: nginx
+  volumes:
+    - /var/log/nginx:/var/log/nginx
+  volumes_from:
+    - pharos
+  links:
+    - app
+  ports:
+    - '80:443'
+		- '443:443'
+
+db:
+  image: postgres:9.6.6-alpine
+  container_name: postgres
+  volumes:
+    - ~/.docker-volumes/rails-app/postgresql/data:/var/lib/postgresql/data
+  ports:
+    - '5432:5432'
+

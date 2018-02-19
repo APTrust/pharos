@@ -110,9 +110,13 @@ Rails.application.routes.draw do
   get 'alerts/summary', to: 'alerts#summary', format: [:json, :html], as: :alerts_summary
 
   # DPN WORK ITEM ROUTES
-  resources :dpn_work_items, path: 'api/v2/dpn_items', only: [:index, :create, :show, :update], format: :json
   resources :dpn_work_items, path: 'dpn_items', only: [:index, :show], format: :html
+  resources :dpn_work_items, path: 'api/v2/dpn_items', only: [:index, :create, :show, :update], format: :json
   get 'dpn_items/:id/requeue', to: 'dpn_work_items#requeue', format: [:json, :html], as: :requeue_dpn_item
+
+  # DPN BAG ROUTES
+  resources :dpn_bags, path: 'dpn_bags', only: [:index, :show], format: [:json, :html]
+  resources :dpn_bags, path: 'api/v2/dpn_bags', only: [:index, :create, :show, :update], format: :json
 
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]

@@ -26,6 +26,8 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_identifier_like, ->(param) { where('intellectual_objects.identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_alt_identifier, ->(param) { where(alt_identifier: param) unless param.blank? }
   scope :with_alt_identifier_like, ->(param) { where('intellectual_objects.alt_identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
+  scope :with_bagging_group_identifier, ->(param) { where(bagging_group_identifier: param) unless param.blank? }
+  scope :with_bagging_group_identifier_like, ->(param) { where('intellectual_objects.bagging_group_identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_institution, ->(param) { where(institution: param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
   scope :with_bag_name, ->(param) { where(bag_name: param) unless param.blank? }

@@ -1,10 +1,12 @@
 language: ruby
 rvm:
 - 2.3.1
-services:
-  -postgresql
+# services:
+#  - postgresql
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
+    #  - bundle exec rake db:setup RAILS_ENV=test
+  - bundle exec rake db:migrate RAILS_ENV=test
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
@@ -19,5 +21,3 @@ branches:
   - develop
 before_install:
 - gem install bundler
-before_script:
-- bundle exec rake db:migrate RAILS_ENV=test

@@ -5,6 +5,7 @@
       <th>Name</th>
       <th>Institution</th>
       <th>Processed</th>
+      <th>Size</th>
       <th>Action</th>
       <th>Stage</th>
       <th>Status</th>
@@ -19,6 +20,7 @@
               <td><%= link_to item.name, work_item_path(id: item.id) %></td>
               <td><%= item.institution.identifier %></td>
               <td><%= time_ago_in_words item.date %></td>
+              <td><%= number_to_human_size(item.size) %></td>
               <td><%= item.action %></td>
               <td><%= item.stage %></td>
               <td><%= item.status %></td>

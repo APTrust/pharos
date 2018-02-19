@@ -6,15 +6,15 @@
   <% @report.each do |key, value| %>
       <% value.each do |nested_key, nested_value| %>
           <% if nested_key == :subscriber_number %>
-              <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap;">Number of Subscribers</th>
-              <th width="400px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= nested_value %></th>
+              <th width="300px" align="left" style="font-weight: 100; float: left; overflow: hidden; white-space: nowrap;">Number of Subscribers</th>
+              <th width="370px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= nested_value %></th>
           <% else %>
               <% if nested_key == key %>
-                  <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap;"><%= nested_key %></th>
-                  <th width="400px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= number_to_human_size(nested_value) %></th>
+                  <th width="300px" align="left" style="float: left; overflow: hidden; white-space: nowrap;"><%= nested_key %></th>
+                  <th width="370px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= number_to_human_size(nested_value) %></th>
               <% else %>
-                  <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap; font-weight: 100;"><%= key %></th>
-                  <th width="400px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= number_to_human_size(nested_value) %></th>
+                  <th width="300px" align="left" style="float: left; overflow: hidden; white-space: nowrap; font-weight: 100;"><%= nested_key %></th>
+                  <th width="370px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= number_to_human_size(nested_value) %></th>
               <% end %>
           <% end %>
       <% end %>

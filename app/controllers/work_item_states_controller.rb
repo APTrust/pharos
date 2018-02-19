@@ -50,7 +50,7 @@ class WorkItemStatesController < ApplicationController
     if request.method == 'GET'
       params.require(:id)
     else
-      params.require(:work_item_state).permit(:work_item_id, :action, :state)
+      params[:work_item_state] &&= params.require(:work_item_state).permit(:work_item_id, :action, :state)
     end
   end
 

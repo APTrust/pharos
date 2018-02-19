@@ -9,7 +9,7 @@ gem 'sqlite3', '1.3.13'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.0.2'
+gem 'uglifier', '>= 4.1.5'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -26,7 +26,7 @@ gem 'sdoc', '~> 0.4.2', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.3'
+gem 'devise', '4.4.1'
 gem 'rake'
 gem 'email_validator'
 gem 'therubyracer'
@@ -59,13 +59,13 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '2.16.1'
+  gem 'capybara', '2.17.0'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.21', require: false
 end
 
 group :production, :integration do
-  gem 'pg' # Necessary for talking to our RDS instance
+  gem 'pg', '0.21.0' # Necessary for talking to our RDS instance
 end
 
 group :development, :test, :demo, :production, :integration do

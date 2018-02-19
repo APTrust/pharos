@@ -1,0 +1,54 @@
+<div id="sidebar" class="col-md-3 col-sm-4">
+  <div class="facets sidenav">
+    <h3> Limit your search </h3>
+    <p> Coming Soon.</p>
+  </div>
+</div>
+
+<div id="content" class="col-md-9 col-sm-8">
+  <h2 class="top-content-title">DPN Bags</h2>
+  <%= render 'shared/search_breadcrumb' %>
+  <div id="sortAndPerPage" class="clearfix">
+
+    <span class="page_links">
+      <% if @previous.nil? %>
+        « Previous |
+      <% else %>
+        « <a href="<%= @previous %>" rel="previous"> Previous</a> |
+      <% end %>
+      <span class="page_entries">
+       <strong><%= @first_number %></strong> - <strong><%= @second_number %></strong> of <strong><%= @count %></strong>
+      </span>
+      <% if @next.nil? %>
+        | Next »
+      <% else %>
+        | <a href="<%= @next %>" rel="next">Next</a> »
+      <% end %>
+    </span>
+
+    <span class="search-widgets pull-right">
+      <span class="sr-only"><%= 'Per Page' %></span>
+        <div id="per_page-dropdown" class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          <%= link_to(t(:'Per page', :count => @page), "#") %>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="<%= current_path('per_page', '10') %>">10</a></li>
+          <li><a href="<%= current_path('per_page', '20') %>">20</a></li>
+          <li><a href="<%= current_path('per_page', '50') %>">50</a></li>
+          <li><a href="<%= current_path('per_page', '100') %>">100</a></li>
+        </ul>
+      </div>
+    </span>
+  </div>
+  <hr>
+
+  <%- if @paged_results.empty? %>
+      <%= render 'shared/zero_results' %>
+  <%- else %>
+      <h2 class="sr-only">Search Results</h2>
+      <%= render 'bag_table' %>
+  <%- end %>
+  <%= render 'shared/compact_pagination' %>
+</div>
