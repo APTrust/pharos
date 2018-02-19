@@ -4,7 +4,9 @@
 
 <ul class="nav nav-tabs" id="inst_show_tabs">
   <li><a href="#overview" data-toggle="tab">General Overview</a></li>
-  <li><a href="#subscribers" data-toggle="tab">Subscriber Overview</a></li>
+  <% if @institution.is_a?(MemberInstitution) %>
+      <li><a href="#subscribers" data-toggle="tab">Subscriber Overview</a></li>
+  <% end %>
   <li><a href="#cost" data-toggle="tab">Cost Breakdown</a></li>
   <li><a href="#timeline" data-toggle="tab">Deposits Over Time</a></li>
   <li><a href="#mimetype" data-toggle="tab">Mimetype Breakdown</a></li>
@@ -28,13 +30,16 @@
       <dt>Average File Size</dt>
       <dd><%= number_to_human_size(@overview_report[:average_file_size]) %></dd>
       <dt>Total Bytes Preserved</dt>
-      <dd><%= number_to_human_size(@overview_report[:subscribers]['total_bytes']) %></dd>
-      <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} %>
-          <dt>Subscribers</dt>
-          <dd>None</dd>
+      <% if @institution.is_a?(MemberInstitution) %>
+          <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} || @overview_report[:subscribers].count == 1 %>
+              <dt>Subscribers</dt>
+              <dd>None</dd>
+          <% else %>
+              <dt>Subscribers</dt>
+              <dd><%= @overview_report[:subscribers].count - 1 %></dd>
+          <% end %>
       <% else %>
-          <dt>Subscribers</dt>
-          <dd><%= @overview_report[:subscribers].count %></dd>
+          <dd><%= number_to_human_size(@overview_report[:bytes_by_format]['all']) %></dd>
       <% end %>
     </dl>
 
@@ -44,7 +49,7 @@
   </div>
 
   <div class="tab-pane" id="subscribers">
-      <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} %>
+      <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} || @overview_report[:subscribers].count == 1 %>
          <br><p>You currently have no subscribers</p>
       <% else %>
         <dl class="dl-horizontal">
