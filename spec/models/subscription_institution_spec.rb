@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe SubscriptionInstitution, :type => :model do
+  before(:all) do
+    User.delete_all
+  end
+
   subject { FactoryBot.build(:subscription_institution) }
 
   it { should validate_presence_of(:name) }
