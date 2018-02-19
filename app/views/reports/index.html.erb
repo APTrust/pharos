@@ -30,7 +30,8 @@
       <dt>Average File Size</dt>
       <dd><%= number_to_human_size(@overview_report[:average_file_size]) %></dd>
       <dt>Total Bytes Preserved</dt>
-      <% if @institution.is_a?(MemberInstitution) %>
+      <% if @institution.is_a?(MemberInstitution) && @institution.name != 'APTrust' %>
+          <dd><%= number_to_human_size(@overview_report[:bytes_by_format]['all']) %></dd>
           <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} || @overview_report[:subscribers].count == 1 %>
               <dt>Subscribers</dt>
               <dd>None</dd>
@@ -62,7 +63,7 @@
   </div>
 
   <div class="tab-pane" id="cost">
-    <% if @institution.is_a?(MemberInstitution) %>
+    <% if @institution.is_a?(MemberInstitution) && @institution.name != 'APTrust' %>
        <% price = cost_analysis_member(@overview_report[:subscribers]['total_bytes']) %>
         <br><p>If your cost is $0.00, then you have not yet used the full 10TB afforded by your membership.</p>
     <% else %>
