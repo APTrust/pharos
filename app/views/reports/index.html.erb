@@ -18,7 +18,7 @@
 <div class="tab-content" id="inst_show_content">
 
   <div class="tab-pane" id="overview">
-    <dl class="dl-horizontal">
+    <br><dl class="dl-horizontal">
       <dt>Intellectual Objects</dt>
       <dd><%= @overview_report[:intellectual_objects] %></dd>
       <dt>Generic Files</dt>
@@ -50,13 +50,16 @@
   </div>
 
   <div class="tab-pane" id="subscribers">
+    <br>
       <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} || @overview_report[:subscribers].count == 1 %>
-         <br><p>You currently have no subscribers</p>
+         <p>You currently have no subscribers</p>
       <% else %>
         <dl class="dl-horizontal">
           <% @overview_report[:subscribers].each do |key, value| %>
-              <dt><%= key %></dt>
-              <dd><%= number_to_human_size(value) %></dd>
+              <% unless key == 'total_bytes' %>
+                  <dt><%= key %></dt>
+                  <dd><%= number_to_human_size(value) %></dd>
+              <% end %>
           <% end %>
         </dl>
       <% end %>
@@ -135,7 +138,7 @@
   </div>
 
   <div class="tab-pane" id="breakdown">
-    <ul class="inst_breakdown_list">
+    <br><ul class="inst_breakdown_list">
       <dl class="dl-horizontal">
         <% @inst_breakdown_report.each do |key, value| %>
             <% value.each do |nested_key, nested_value| %>
