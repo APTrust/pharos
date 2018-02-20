@@ -1,7 +1,7 @@
 module PunditViewPolicy
   extend ActiveSupport::Concern
 
-  include do
+  included do
     before do
       controller.singleton_class.class_eval do
         def policy(instance)
