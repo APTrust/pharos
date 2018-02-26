@@ -44,7 +44,7 @@ class DpnWorkItem < ActiveRecord::Base
   end
 
   def self.stalled_dpn_replications
-    DpnWorkItem.queued_before(Time.now - 24.hours).is_not_completed('true')
+    DpnWorkItem.queued_before(Time.now - 24.hours).is_not_completed('true').order('queued_at DESC')
   end
 
   def self.stalled_dpn_replication_count
