@@ -2,7 +2,7 @@ class MemberInstitution < Institution
   has_many :subscription_institutions
 
   def subscribers
-    SubscriptionInstitution.where(member_institution_id: self.id)
+    SubscriptionInstitution.where(member_institution_id: self.id).order('name')
   end
 
   def subscriber_report(total)

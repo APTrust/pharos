@@ -73,7 +73,7 @@ class Institution < ActiveRecord::Base
 
   def average_file_size
     files = self.generic_files.where(state: 'A')
-    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
+    (files.count == 0) ? avg = 0 : avg = files.average(:size) / files.count
     avg
   end
 
@@ -115,40 +115,27 @@ class Institution < ActiveRecord::Base
 
   def monthly_breakdown
     monthly_hash = []
-    monthly_labels = ['February 2018', 'January 2018', 'December 2017', 'November 2017',  'October 2017', 'September 2017', 'August 2017',
-                      'July 2017', 'June 2017', 'May 2017', 'April 2017', 'March 2017', 'February 2017', 'January 2017', 'December 2016',
-                      'November 2016', 'October 2016','September 2016', 'August 2016', 'July 2016', 'June 2016', 'May 2016', 'April 2016',
-                      'March 2016', 'February 2016', 'January 2016']
+    monthly_labels = []
+    monthly_data = []
+    earliest_date = '2014-12-1T00:00:00+00:00'
+    iterative_date = (DateTime.current+1.month).beginning_of_month
+    while iterative_date.to_s > earliest_date do
+      before_date = iterative_date - 1.month
+      monthly_labels.push(convert_datetime_to_label(before_date))
+      if self.name == 'APTrust'
+        monthly_data.push(GenericFile.created_before(iterative_date.to_s).created_after(before_date.to_s).sum(:size))
+      else
+        monthly_data.push(self.generic_files.created_before(iterative_date.to_s).created_after(before_date.to_s).sum(:size))
+      end
+      iterative_date = before_date
+    end
     monthly_hash.push(monthly_labels)
-    monthly_data = [ ]
-    monthly_data.push(self.generic_files.created_before('2018-03-1 00:00:00 -0000').created_after('2018-02-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2018-02-1 00:00:00 -0000').created_after('2018-01-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2018-01-1 00:00:00 -0000').created_after('2017-12-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-12-1 00:00:00 -0000').created_after('2017-11-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-11-1 00:00:00 -0000').created_after('2017-10-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-10-1 00:00:00 -0000').created_after('2017-09-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-09-1 00:00:00 -0000').created_after('2017-08-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-08-1 00:00:00 -0000').created_after('2017-07-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-07-1 00:00:00 -0000').created_after('2017-06-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-06-1 00:00:00 -0000').created_after('2017-05-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-05-1 00:00:00 -0000').created_after('2017-04-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-04-1 00:00:00 -0000').created_after('2017-03-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-03-1 00:00:00 -0000').created_after('2017-02-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-02-1 00:00:00 -0000').created_after('2017-01-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2017-01-1 00:00:00 -0000').created_after('2016-12-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-12-1 00:00:00 -0000').created_after('2016-11-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-11-1 00:00:00 -0000').created_after('2016-10-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-10-1 00:00:00 -0000').created_after('2016-09-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-09-1 00:00:00 -0000').created_after('2016-08-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-08-1 00:00:00 -0000').created_after('2016-07-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-07-1 00:00:00 -0000').created_after('2016-06-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-06-1 00:00:00 -0000').created_after('2016-05-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-05-1 00:00:00 -0000').created_after('2016-04-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-04-1 00:00:00 -0000').created_after('2016-03-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-03-1 00:00:00 -0000').created_after('2016-02-1 00:00:00 -0000').sum(:size) )
-    monthly_data.push(self.generic_files.created_before('2016-02-1 00:00:00 -0000').created_after('2016-01-1 00:00:00 -0000').sum(:size) )
     monthly_hash.push(monthly_data)
     monthly_hash
+  end
+
+  def convert_datetime_to_label(date)
+    date.strftime('%B %Y')
   end
 
   def generate_overview_apt
@@ -164,7 +151,7 @@ class Institution < ActiveRecord::Base
 
   def self.breakdown
     report = {}
-    MemberInstitution.all.each do |inst|
+    MemberInstitution.all.order('name').each do |inst|
       size = inst.generic_files.sum(:size)
       name = inst.name
       indiv_breakdown = {}

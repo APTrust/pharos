@@ -12,7 +12,7 @@ module UsersHelper
   end
 
   def institutions_for_select
-    Institution.all.select {|institution| policy(institution).add_user? }
+    Institution.all.order('name').select {|institution| policy(institution).add_user? }
   end
 
   def generate_key_confirmation_msg(user)

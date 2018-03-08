@@ -62,12 +62,12 @@
   </div>
 
   <div class="tab-pane" id="cost">
-    <% if @institution.is_a?(MemberInstitution) %>
-       <% price = cost_analysis_member(@overview_report[:subscribers]['total_bytes']) %>
-        <br><p>If your cost is $0.00, then you have not yet used the full 10TB afforded by your membership.</p>
-    <% else %>
+    <% if @institution.is_a?(SubscriptionInstitution) || @overview_report[:subscribers].nil? %>
         <% price = cost_analysis_subscriber(@overview_report[:bytes_by_format]['all']) %>
         <br>
+    <% else %>
+        <% price = cost_analysis_member(@overview_report[:subscribers]['total_bytes']) %>
+        <br><p>If your cost is $0.00, then you have not yet used the full 10TB afforded by your membership.</p>
     <% end %>
     <p>You currently have <%= number_to_human_size(@overview_report[:bytes_by_format]['all']) %> stored, billed at <%= price %>.</p>
     <h3>Previous Database Cost Analysis Snapshots</h3>
@@ -116,7 +116,8 @@
         <td>
           <dl class="dl-horizontal">
             <script>var graph_hash = {}</script>
-            <% @overview_report[:bytes_by_format].each do |key, value| %>
+            <% sorted_hash = Hash[ @overview_report[:bytes_by_format].sort_by { |key, value| key } ] %>
+            <% sorted_hash.each do |key, value| %>
                 <% unless key == 'all' %>
                     <dt><%= key %></dt>
                     <dd><%= number_to_human_size(value) %></dd>
