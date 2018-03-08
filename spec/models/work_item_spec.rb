@@ -400,8 +400,8 @@ RSpec.describe WorkItem, :type => :model do
         item1 = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: pending)
         item2 = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: started)
         items = WorkItem.stalled_items(user)
-        expect(items.first.id).to eq item1.id
-        expect(items.last.id).to eq item2.id
+        expect(items.last.id).to eq item1.id
+        expect(items.first.id).to eq item2.id
       end
 
       it 'stalled_item_counts should return the number of work items queued 12+ hours ago that have not succeeded, failed, or cancelled' do

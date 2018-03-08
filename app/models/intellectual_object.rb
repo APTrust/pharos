@@ -110,6 +110,11 @@ class IntellectualObject < ActiveRecord::Base
     object_in_dpn
   end
 
+  def dpn_bag
+    bag = DpnBag.where(object_identifier: self.identifier).first
+    bag
+  end
+
   def gf_count
     generic_files.where(state: 'A').count
   end

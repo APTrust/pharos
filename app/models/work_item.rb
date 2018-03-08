@@ -286,11 +286,11 @@ class WorkItem < ActiveRecord::Base
   def self.stalled_items(user)
     if user.admin?
       WorkItem.where('queued_at < ? AND (status = ? OR status = ?)', (Time.now - 12.hours),
-                     Pharos::Application::PHAROS_STATUSES['pend'], Pharos::Application::PHAROS_STATUSES['start'])
+                     Pharos::Application::PHAROS_STATUSES['pend'], Pharos::Application::PHAROS_STATUSES['start']).order('date DESC')
     else
       WorkItem.where('queued_at < ? AND (status = ? OR status = ?)', (Time.now - 12.hours),
                      Pharos::Application::PHAROS_STATUSES['pend'], Pharos::Application::PHAROS_STATUSES['start'])
-                     .with_institution(user.institution_id)
+                     .with_institution(user.institution_id).order('date DESC')
     end
   end
 
