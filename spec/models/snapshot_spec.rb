@@ -27,11 +27,6 @@ RSpec.describe Snapshot, type: :model do
       subject.apt_bytes.should == 200000000
     end
 
-    it 'should properly set dpn_bytes' do
-      subject.dpn_bytes = 400000
-      subject.dpn_bytes.should == 400000
-    end
-
     it 'should properly set a cost' do
       subject.cost = 1238.56
       subject.cost.should == 1238.56

@@ -80,7 +80,6 @@
       <tr>
         <th>Audit Date</th>
         <th>Data in APTrust</th>
-        <th>Data in DPN</th>
         <th>Storage Cost</th>
       </tr>
       </thead>
@@ -90,7 +89,6 @@
           <tr>
             <td><%= snapshot.audit_date %></td>
             <td><%= number_to_human_size(snapshot.apt_bytes) %></td>
-            <td><%= number_to_human_size(snapshot.dpn_bytes) %></td>
             <td><%= snapshot.cost %></td>
           </tr>
           <% end %>
@@ -100,6 +98,7 @@
   </div>
 
   <div class="tab-pane" id="timeline">
+    <br>
     <% if @institution.name? != 'APTrust' %>
         <canvas id="indiv_timeline_chart" width="400" height="400"></canvas>
         <script>timeline_labels = [];</script>
@@ -115,7 +114,7 @@
   </div>
 
   <div class="tab-pane" id="mimetype">
-    <table>
+    <br><table>
       <tr>
         <td>
           <dl class="dl-horizontal">
@@ -130,7 +129,7 @@
             <% end %>
           </dl>
         </td>
-        <td>
+        <td id="mimetype_cell">
           <canvas id="indiv_mimetype_chart"></canvas>
           <script>individual_mimetype(graph_hash)</script>
         </td>

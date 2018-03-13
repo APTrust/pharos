@@ -11,7 +11,6 @@ class Snapshot < ApplicationRecord
         institution_id: institution_id,
         audit_date: audit_date,
         aptrust_bytes: apt_bytes,
-        dpn_bytes: dpn_bytes,
         cost: cost
     }
   end

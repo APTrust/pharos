@@ -73,13 +73,13 @@ class Institution < ActiveRecord::Base
 
   def average_file_size
     files = self.generic_files.where(state: 'A')
-    (files.count == 0) ? avg = 0 : avg = files.average(:size) / files.count
+    (files.count == 0) ? avg = 0 : avg = files.average(:size)
     avg
   end
 
   def average_file_size_across_repo
     files = GenericFile.where(state: 'A')
-    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
+    (files.count == 0) ? avg = 0 : avg = files.average(:size)
     avg
   end
 
@@ -113,7 +113,7 @@ class Institution < ActiveRecord::Base
     time_fixed
   end
 
-  def monthly_breakdown
+  def generate_timeline_report
     monthly_hash = []
     monthly_labels = []
     monthly_data = []
@@ -181,16 +181,14 @@ class Institution < ActiveRecord::Base
 
   def self.snapshot(institution, rate)
     apt_bytes = institution.active_files.sum(:size)
-    snapshot = Snapshot.create(institution_id: institution.id, audit_date: Time.now, apt_bytes: apt_bytes)
     if apt_bytes < 10995116277760 #10 TB
-      cost = 0
+      rounded_cost = 0.00
     else
       excess = apt_bytes - 10995116277760
       cost = apt_bytes * rate
+      rounded_cost = cost.round(2)
     end
-    unless institution.dpn_uuid.empty?
-      #write a query that checks intellectual objects dpn_uuids and, if present, joins to generic files to find sizes
-    end
+    snapshot = Snapshot.create(institution_id: institution.id, audit_date: Time.now, apt_bytes: apt_bytes, cost: rounded_cost)
     snapshot.save!
     snapshot
   end

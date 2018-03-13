@@ -1,0 +1,18 @@
+<div class="page-header">
+  <h1>Reports for <%= @institution.name %></h1>
+</div>
+
+<ul class="nav nav-tabs" id="report_tabs">
+  <li id="general_tab"><%= link_to 'General Overview', institution_general_report_path(@institution.identifier) %></li>
+  <% if @institution.is_a?(MemberInstitution) %>
+      <li id="subscribers_tab"><%= link_to 'Subscriber Overview', institution_subscribers_report_path(@institution.identifier) %></li>
+  <% end %>
+  <li id="cost_tab"><%= link_to 'Cost Breakdown', institution_cost_report_path(@institution.identifier) %></li>
+  <li id="timeline_tab"><%= link_to 'Deposits Over Time', institution_timeline_report_path(@institution.identifier) %></li>
+  <li id="mimetype_tab"><%= link_to 'Mimetype Breakdown', institution_mimetype_report_path(@institution.identifier) %></li>
+  <% if policy(current_user).institution_breakdown? %>
+      <li id="breakdown_tab"><%= link_to 'Institution Breakdown', institution_breakdown_path %></li>
+  <% end %>
+</ul>
+
+<script>report_nav('<%= @nav_type %>');</script>

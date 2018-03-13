@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180308211703) do
+ActiveRecord::Schema.define(version: 20180313201437) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -185,7 +185,6 @@ ActiveRecord::Schema.define(version: 20180308211703) do
     t.datetime "audit_date"
     t.integer "institution_id"
     t.integer "apt_bytes"
-    t.integer "dpn_bytes"
     t.decimal "cost"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

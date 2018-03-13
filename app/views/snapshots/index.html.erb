@@ -3,7 +3,6 @@
   <tr>
     <th>Audit Date</th>
     <th>Data in APTrust</th>
-    <th>Data in DPN</th>
     <th>Storage Cost</th>
   </tr>
   </thead>
@@ -13,7 +12,6 @@
           <tr>
             <td><%= snapshot.audit_date %></td>
             <td><%= number_to_human_size(snapshot.apt_bytes) %></td>
-            <td><%= number_to_human_size(snapshot.dpn_bytes) %></td>
             <td><%= snapshot.cost %></td>
           </tr>
       <% end %>

@@ -14,6 +14,23 @@ class SubscriptionInstitution  < Institution
     report
   end
 
+  def generate_basic_report
+    report = {}
+    report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
+    report[:generic_files] = self.generic_files.where(state: 'A').count
+    report[:premis_events] = self.premis_events.count
+    report[:work_items] = WorkItem.with_institution(self.id).count
+    report[:average_file_size] = self.generic_files.average_file_size
+    report[:total_file_size] = self.generic_files.where(state: 'A').sum(:size)
+    report
+  end
+
+  def generate_cost_report
+    report = {}
+    report[:total_file_size] = self.generic_files.where(state: 'A').sum(:size)
+    report
+  end
+
   private
 
   def has_associated_member_institution

@@ -31,6 +31,39 @@ class MemberInstitution < Institution
     report
   end
 
+  def generate_basic_report
+    report = {}
+    if self.name == 'APTrust'
+      report[:intellectual_objects] = IntellectualObject.where(state: 'A').count
+      report[:generic_files] = GenericFile.where(state: 'A').count
+      report[:premis_events] = PremisEvent.count
+      report[:work_items] = WorkItem.count
+      report[:average_file_size] = average_file_size_across_repo
+      report[:total_file_size] = GenericFile.where(state: 'A').sum(:size)
+    else
+      report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
+      report[:generic_files] = self.generic_files.where(state: 'A').count
+      report[:premis_events] = self.premis_events.count
+      report[:work_items] = WorkItem.with_institution(self.id).count
+      report[:average_file_size] = average_file_size
+      report[:total_file_size] = self.generic_files.where(state: 'A').sum(:size)
+      report[:subscribers] = self.subscriber_report(report[:total_file_size])
+    end
+    report
+  end
+
+  def generate_subscriber_report
+    total_size = self.generic_files.where(state: 'A').sum(:size)
+    self.subscriber_report(total_size)
+  end
+
+  def generate_cost_report
+    report = {}
+    report[:total_file_size] = self.generic_files.where(state: 'A').sum(:size)
+    report[:subscribers] = self.subscriber_report(report[:total_file_size])
+    report
+  end
+
   private
 
   def check_for_associations

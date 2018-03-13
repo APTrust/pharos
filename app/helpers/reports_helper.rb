@@ -15,6 +15,7 @@ module ReportsHelper
     cost = size * 0.000000000381988
     rounded_cost = cost.round(2)
     price = "$#{rounded_cost}"
+    price = '$0.00' if price == '$0.0'
     price
   end
 end

@@ -1,12 +1,14 @@
 class ReportsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_institution, only: [:index, :overview, :download]
+  before_action :set_institution, only: [:index, :overview, :download, :general, :subscribers, :cost, :timeline, :mimetype]
   before_action :set_intellectual_object, only: :object_report
   after_action :verify_authorized
 
   def index
     authorize @institution
-    overview_wrapper
+    (@institution.name == 'APTrust') ?
+        @overview_report = @institution.generate_overview_apt :
+        @overview_report = @institution.generate_overview
     @indiv_timeline_breakdown = @institution.monthly_breakdown
     @inst_breakdown_report = Institution.breakdown if policy(current_user).institution_breakdown?
     respond_to do |format|
@@ -17,7 +19,9 @@ class ReportsController < ApplicationController
 
   def overview
     authorize @institution
-    overview_wrapper
+    (@institution.name == 'APTrust') ?
+        @overview_report = @institution.generate_overview_apt :
+        @overview_report = @institution.generate_overview
     respond_to do |format|
       format.json { render json: { report: @overview_report } }
       format.html { }
@@ -35,9 +39,86 @@ class ReportsController < ApplicationController
     end
   end
 
+  def general
+    authorize @institution, :overview?
+    @basic_report = @institution.generate_basic_report
+    @nav_type = 'general'
+    respond_to do |format|
+      format.json { render json: { report: @basic_report } }
+      format.html { }
+      # format.pdf do
+      #   html = render_to_string(action: :general, layout: false)
+      #   pdf = WickedPdf.new.pdf_from_string(html)
+      #   send_data(pdf, filename: "Basic Overview for #{@institution.name}.pdf", disposition: 'attachment')
+      # end
+    end
+  end
+
+  def subscribers
+    authorize @institution, :overview?
+    @subscriber_report = @institution.generate_subscriber_report
+    @nav_type = 'subscriber'
+    respond_to do |format|
+      format.json { render json: { report: @subscriber_report } }
+      format.html { }
+      # format.pdf do
+      #   html = render_to_string(action: :subscribers, layout: false)
+      #   pdf = WickedPdf.new.pdf_from_string(html)
+      #   send_data(pdf, filename: "Subscriber Breakdown for #{@institution.name}.pdf", disposition: 'attachment')
+      # end
+    end
+  end
+
+  def cost
+    authorize @institution, :overview?
+    @cost_report = @institution.generate_cost_report
+    @nav_type = 'cost'
+    respond_to do |format|
+      format.json { render json: { report: @cost_report } }
+      format.html { }
+      # format.pdf do
+      #   html = render_to_string(action: :cost, layout: false)
+      #   pdf = WickedPdf.new.pdf_from_string(html)
+      #   send_data(pdf, filename: "Cost Breakdown for #{@institution.name}.pdf", disposition: 'attachment')
+      # end
+    end
+  end
+
+  def timeline
+    authorize @institution, :overview?
+    @timeline_report = @institution.generate_timeline_report
+    @nav_type = 'timeline'
+    respond_to do |format|
+      format.json { render json: { report: @timeline_report } }
+      format.html { }
+      # format.pdf do
+      #   html = render_to_string(action: :timeline, layout: false)
+      #   pdf = WickedPdf.new.pdf_from_string(html)
+      #   send_data(pdf, filename: "Timeline for #{@institution.name}.pdf", disposition: 'attachment')
+      # end
+    end
+  end
+
+  def mimetype
+    authorize @institution, :overview?
+    @mimetype_report = @institution.bytes_by_format
+    @nav_type = 'mimetype'
+    respond_to do |format|
+      format.json { render json: { report: @mimetype_report } }
+      format.html { }
+      # format.pdf do
+      #   html = render_to_string(action: :mimetype, layout: false)
+      #   pdf = WickedPdf.new.pdf_from_string(html)
+      #   send_data(pdf, filename: "Mimetype Breakdown for #{@institution.name}.pdf", disposition: 'attachment')
+      # end
+    end
+  end
+
   def institution_breakdown
     authorize current_user
+    @institution = current_user.institution
     @inst_breakdown_report = Institution.breakdown
+    @nav_type = 'breakdown'
     respond_to do |format|
       format.json { render json: { report: @inst_breakdown_report } }
       format.html { }
@@ -82,12 +163,6 @@ class ReportsController < ApplicationController
     else
       @intellectual_object ||= IntellectualObject.readable(current_user).find(params[:id])
     end
-  end
-
-  def overview_wrapper
-    (@institution.name == 'APTrust') ?
-        @overview_report = @institution.generate_overview_apt :
-        @overview_report = @institution.generate_overview
   end
 
 end

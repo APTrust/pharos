@@ -102,6 +102,11 @@ Rails.application.routes.draw do
   # REPORT ROUTES
   get 'reports/:identifier', to: 'reports#index', format: [:json, :html], as: :reports, identifier: institution_ptrn
   get 'reports/overview/:identifier', to: 'reports#overview', format: [:json, :html, :pdf], as: :institution_overview, identifier: institution_ptrn
+  get 'reports/general/:identifier', to: 'reports#general', format: [:json, :html, :pdf], as: :institution_general_report, identifier: institution_ptrn
+  get 'reports/cost/:identifier', to: 'reports#cost', format: [:json, :html, :pdf], as: :institution_cost_report, identifier: institution_ptrn
+  get 'reports/subscribers/:identifier', to: 'reports#subscribers', format: [:json, :html, :pdf], as: :institution_subscribers_report, identifier: institution_ptrn
+  get 'reports/timeline/:identifier', to: 'reports#timeline', format: [:json, :html, :pdf], as: :institution_timeline_report, identifier: institution_ptrn
+  get 'reports/mimetype/:identifier', to: 'reports#mimetype', format: [:json, :html, :pdf], as: :institution_mimetype_report, identifier: institution_ptrn
   get 'reports/institution_breakdown', to: 'reports#institution_breakdown', format: [:json, :html, :pdf], as: :institution_breakdown
   get 'reports/object_report/:intellectual_object_identifier', to: 'reports#object_report', format: [:json, :html], as: :object_report, intellectual_object_identifier: object_ptrn
 
