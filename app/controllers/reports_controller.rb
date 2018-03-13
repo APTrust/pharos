@@ -101,7 +101,9 @@ class ReportsController < ApplicationController
 
   def mimetype
     authorize @institution, :overview?
-    @mimetype_report = @institution.bytes_by_format
+    (@institution.name == 'APTrust') ?
+        @mimetype_report = GenericFile.bytes_by_format :
+        @mimetype_report = @institution.bytes_by_format
     @nav_type = 'mimetype'
     respond_to do |format|
       format.json { render json: { report: @mimetype_report } }
