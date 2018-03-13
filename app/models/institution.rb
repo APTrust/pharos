@@ -168,30 +168,31 @@ class Institution < ActiveRecord::Base
     report
   end
 
-  def self.snapshot_wrapper(institution)
-    storage_rate = 0.000000000381988
-    snapshot_array = []
-    snapshot_array.push(Institution.snapshot(institution, storage_rate))
-    subscribers = SubscriptionInstitution.where(member_institution_id: institution.id)
-    subscribers.each do |si|
-      snapshot_array.push(Institution.snapshot(si, storage_rate))
-    end
-    snapshot_array
-  end
-
-  def self.snapshot(institution, rate)
-    apt_bytes = institution.active_files.sum(:size)
-    if apt_bytes < 10995116277760 #10 TB
-      rounded_cost = 0.00
-    else
-      excess = apt_bytes - 10995116277760
-      cost = apt_bytes * rate
-      rounded_cost = cost.round(2)
-    end
-    snapshot = Snapshot.create(institution_id: institution.id, audit_date: Time.now, apt_bytes: apt_bytes, cost: rounded_cost)
-    snapshot.save!
-    snapshot
-  end
+  # def self.snapshot_wrapper(institution)
+  #   storage_rate = 0.000000000381988
+  #   snapshot_array = []
+  #   snapshot_array.push(Institution.snapshot(institution, storage_rate))
+  #   subscribers = SubscriptionInstitution.where(member_institution_id: institution.id)
+  #   subscribers.each do |si|
+  #     snapshot_array.push(Institution.snapshot(si, storage_rate))
+  #   end
+  #   snapshot_array
+  # end
+  #
+  # def self.snapshot(institution, rate)
+  #   apt_bytes = institution.active_files.sum(:size)
+  #   if apt_bytes < 10995116277760 #10 TB
+  #     rounded_cost = 0.00
+  #   else
+  #     excess = apt_bytes - 10995116277760
+  #     cost = apt_bytes * rate
+  #     rounded_cost = cost.round(2)
+  #     rounded_cost = 0.00 if rounded_cost == 0.0
+  #   end
+  #   snapshot = Snapshot.create(institution_id: institution.id, audit_date: Time.now, apt_bytes: apt_bytes, cost: rounded_cost)
+  #   snapshot.save!
+  #   snapshot
+  # end
 
   private
 

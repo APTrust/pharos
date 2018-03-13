@@ -9,7 +9,7 @@ class ReportsController < ApplicationController
     (@institution.name == 'APTrust') ?
         @overview_report = @institution.generate_overview_apt :
         @overview_report = @institution.generate_overview
-    @indiv_timeline_breakdown = @institution.monthly_breakdown
+    @indiv_timeline_breakdown = @institution.generate_timeline_report
     @inst_breakdown_report = Institution.breakdown if policy(current_user).institution_breakdown?
     respond_to do |format|
       format.json { render json: { report_list: 'There is one report available, a general overview found at reports/overview/:identifier' } }

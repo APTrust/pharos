@@ -66,14 +66,26 @@ class InstitutionsController < ApplicationController
 
   def snapshot
     authorize @institution
-    @snapshots = Institution.snapshot_wrapper(@institution)
-    respond_to do |format|
-      format.json { render json: { institution: @institution.name, snapshots: @snapshots.map{ |item| item.serializable_hash } } }
-      format.html {
-        redirect_to root_path
-        flash[:notice] = "A snapshot of #{@institution.name} has been taken and archived on #{@snapshots.first.audit_date}. Please see the reports page for that analysis."
-      }
+    if @institution.is_a?(MemberInstitution)
+      @snapshots = @institution.snapshot
+      respond_to do |format|
+        format.json { render json: { institution: @institution.name, snapshots: @snapshots.map{ |item| item.serializable_hash } } }
+        format.html {
+          redirect_to root_path
+          flash[:notice] = "A snapshot of #{@institution.name} has been taken and archived on #{@snapshots.first.audit_date}. Please see the reports page for that analysis."
+        }
+      end
+    else
+      @snapshot = @institution.snapshot
+      respond_to do |format|
+        format.json { render json: { institution: @institution.name, snapshot: @snapshot.serializable_hash }  }
+        format.html {
+          redirect_to root_path
+          flash[:notice] = "A snapshot of #{@institution.name} has been taken and archived on #{@snapshot.audit_date}. Please see the reports page for that analysis."
+        }
+      end
     end
+
   end
 
   private

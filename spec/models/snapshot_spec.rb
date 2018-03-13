@@ -31,5 +31,10 @@ RSpec.describe Snapshot, type: :model do
       subject.cost = 1238.56
       subject.cost.should == 1238.56
     end
+
+    it 'should properly set a snaptshot type' do
+      subject.snapshot_type = 'Individual'
+      subject.snapshot_type.should == 'Individual'
+    end
   end
 end

@@ -342,7 +342,7 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(response.status).to eq(302)
         expect(flash[:notice]).to eq "A snapshot of #{admin_user.institution.name} has been taken and archived on #{assigns(:snapshots).first.audit_date}. Please see the reports page for that analysis."
         expect(assigns(:snapshots).first.apt_bytes).to eq 0
-        expect(assigns(:snapshots).first.cost).to eq nil
+        expect(assigns(:snapshots).first.cost).to eq 0.00
       end
 
     end
