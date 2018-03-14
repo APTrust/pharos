@@ -76,7 +76,7 @@ class MemberInstitution < Institution
       rounded_cost = 0.00
     else
       excess = total_bytes - 10995116277760
-      cost = total_bytes * 0.000000000381988
+      cost = excess * 0.000000000381988
       rounded_cost = cost.round(2)
     end
     rounded_cost = 0.00 if rounded_cost == 0.0

@@ -94,11 +94,46 @@ RSpec.describe SubscriptionInstitution, :type => :model do
     end
 
     describe 'with an associated intellectual object' do
-      let!(:item) { FactoryBot.create(:intellectual_object, institution: subject) }
-      after { item.destroy }
+      let!(:object) { FactoryBot.create(:intellectual_object, institution_id: subject.id) }
+      let!(:file) { FactoryBot.create(:generic_file, intellectual_object_id: object.id) }
+      after { object.destroy }
       it 'deleting should be blocked' do
         subject.destroy.should be false
         expect(Institution.exists?(subject.id)).to be true
+      end
+
+      it 'should be able to generate a cost report' do
+        report = subject.generate_cost_report
+        report[:total_file_size].should == file.size
+      end
+
+      it 'should be able to generate an overview report' do
+        report = subject.generate_overview
+        report[:bytes_by_format].keys.should include file.file_format
+        report[:bytes_by_format]['all'].should == file.size
+        report[:intellectual_objects].should == 1
+        report[:generic_files].should == 1
+        report[:premis_events].should == 0
+        report[:work_items].should == 0
+        report[:average_file_size].should == file.size
+      end
+
+      it 'should be able to generate a basic report' do
+        report = subject.generate_basic_report
+        report[:intellectual_objects].should == 1
+        report[:generic_files].should == 1
+        report[:premis_events].should == 0
+        report[:work_items].should == 0
+        report[:average_file_size].should == file.size
+        report[:total_file_size].should == file.size
+      end
+
+      it 'should be able to generate a snapshot' do
+        snapshot = subject.snapshot
+        snapshot.cost.should == (file.size * 0.000000000381988).round(2)
+        snapshot.snapshot_type.should == 'Individual'
+        snapshot.apt_bytes.should == file.size
+        snapshot.institution_id.should == subject.id
       end
     end
   end
