@@ -38,7 +38,7 @@ class MemberInstitution < Institution
       report[:generic_files] = GenericFile.where(state: 'A').count
       report[:premis_events] = PremisEvent.count
       report[:work_items] = WorkItem.count
-      report[:average_file_size] = average_file_size_across_repo
+      report[:average_file_size] = Institution.average_file_size_across_repo
       report[:total_file_size] = GenericFile.where(state: 'A').sum(:size)
     else
       report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count

@@ -77,7 +77,7 @@ class Institution < ActiveRecord::Base
     avg
   end
 
-  def average_file_size_across_repo
+  def self.average_file_size_across_repo
     files = GenericFile.where(state: 'A')
     (files.count == 0) ? avg = 0 : avg = files.average(:size)
     avg
@@ -88,26 +88,6 @@ class Institution < ActiveRecord::Base
     time_fixed = []
     stats.each do |key, value|
       current_point = [key.to_time.to_i*1000, value.to_i]
-      time_fixed.push(current_point)
-    end
-    time_fixed
-  end
-
-  def group_statistics
-    stats = GenericFile.all.order(:created_at).group(:created_at).sum(:size)
-    time_fixed = []
-    stats.each do |key, value|
-      current_point = {x: key.to_time.to_i*1000, y: value.to_i}
-      time_fixed.push(current_point)
-    end
-    time_fixed
-  end
-
-  def chart_statistics
-    stats = self.generic_files.order(:created_at).group(:created_at).sum(:size)
-    time_fixed = []
-    stats.each do |key, value|
-      current_point = {x: key.to_time.to_i*1000, y: value.to_i}
       time_fixed.push(current_point)
     end
     time_fixed
@@ -138,14 +118,14 @@ class Institution < ActiveRecord::Base
     date.strftime('%B %Y')
   end
 
-  def generate_overview_apt
+  def self.generate_overview_apt
     report = {}
     report[:bytes_by_format] = GenericFile.bytes_by_format
     report[:intellectual_objects] = IntellectualObject.where(state: 'A').count
     report[:generic_files] = GenericFile.where(state: 'A').count
     report[:premis_events] = PremisEvent.count
     report[:work_items] = WorkItem.count
-    report[:average_file_size] = self.average_file_size_across_repo
+    report[:average_file_size] = Institution.average_file_size_across_repo
     report
   end
 
@@ -167,32 +147,6 @@ class Institution < ActiveRecord::Base
     end
     report
   end
-
-  # def self.snapshot_wrapper(institution)
-  #   storage_rate = 0.000000000381988
-  #   snapshot_array = []
-  #   snapshot_array.push(Institution.snapshot(institution, storage_rate))
-  #   subscribers = SubscriptionInstitution.where(member_institution_id: institution.id)
-  #   subscribers.each do |si|
-  #     snapshot_array.push(Institution.snapshot(si, storage_rate))
-  #   end
-  #   snapshot_array
-  # end
-  #
-  # def self.snapshot(institution, rate)
-  #   apt_bytes = institution.active_files.sum(:size)
-  #   if apt_bytes < 10995116277760 #10 TB
-  #     rounded_cost = 0.00
-  #   else
-  #     excess = apt_bytes - 10995116277760
-  #     cost = apt_bytes * rate
-  #     rounded_cost = cost.round(2)
-  #     rounded_cost = 0.00 if rounded_cost == 0.0
-  #   end
-  #   snapshot = Snapshot.create(institution_id: institution.id, audit_date: Time.now, apt_bytes: apt_bytes, cost: rounded_cost)
-  #   snapshot.save!
-  #   snapshot
-  # end
 
   private
 

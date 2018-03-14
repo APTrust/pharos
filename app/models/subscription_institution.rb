@@ -20,9 +20,13 @@ class SubscriptionInstitution  < Institution
     report[:generic_files] = self.generic_files.where(state: 'A').count
     report[:premis_events] = self.premis_events.count
     report[:work_items] = WorkItem.with_institution(self.id).count
-    report[:average_file_size] = self.generic_files.average_file_size
+    report[:average_file_size] = self.average_file_size
     report[:total_file_size] = self.generic_files.where(state: 'A').sum(:size)
     report
+  end
+
+  def generate_subscriber_report
+    report = {}
   end
 
   def generate_cost_report

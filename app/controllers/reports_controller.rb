@@ -7,7 +7,7 @@ class ReportsController < ApplicationController
   def index
     authorize @institution
     (@institution.name == 'APTrust') ?
-        @overview_report = @institution.generate_overview_apt :
+        @overview_report = Institution.generate_overview_apt :
         @overview_report = @institution.generate_overview
     @indiv_timeline_breakdown = @institution.generate_timeline_report
     @inst_breakdown_report = Institution.breakdown if policy(current_user).institution_breakdown?
@@ -20,7 +20,7 @@ class ReportsController < ApplicationController
   def overview
     authorize @institution
     (@institution.name == 'APTrust') ?
-        @overview_report = @institution.generate_overview_apt :
+        @overview_report = Institution.generate_overview_apt :
         @overview_report = @institution.generate_overview
     respond_to do |format|
       format.json { render json: { report: @overview_report } }
