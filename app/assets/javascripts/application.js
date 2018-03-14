@@ -17,3 +17,4 @@
 //= require.js
 //= require jquery-ui
 //= require Chart.min
+//= require palette.js
