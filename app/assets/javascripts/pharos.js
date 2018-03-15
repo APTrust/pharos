@@ -415,9 +415,12 @@ function individual_mimetype(stats) {
             circumference: 2 * Math.PI,
             animation: {
                 animateRotate: true
-            }
+            },
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
+
 }
 
 function shuffleArray(array_one, array_two) {

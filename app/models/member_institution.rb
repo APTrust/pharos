@@ -34,19 +34,21 @@ class MemberInstitution < Institution
   def generate_basic_report
     report = {}
     if self.name == 'APTrust'
+      files = GenericFile.where(state: 'A')
       report[:intellectual_objects] = IntellectualObject.where(state: 'A').count
-      report[:generic_files] = GenericFile.where(state: 'A').count
+      report[:generic_files] = files.count
       report[:premis_events] = PremisEvent.count
       report[:work_items] = WorkItem.count
-      report[:average_file_size] = Institution.average_file_size_across_repo
-      report[:total_file_size] = GenericFile.where(state: 'A').sum(:size)
+      report[:total_file_size] = files.sum(:size)
+      report[:average_file_size] = files.average(:size)
     else
+      files = self.generic_files.where(state: 'A')
       report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
-      report[:generic_files] = self.generic_files.where(state: 'A').count
-      report[:premis_events] = self.premis_events.count
+      report[:generic_files] = files.count
+      report[:premis_events] = PremisEvent.where(institution_id: self.id).count
       report[:work_items] = WorkItem.with_institution(self.id).count
-      report[:average_file_size] = average_file_size
-      report[:total_file_size] = self.generic_files.where(state: 'A').sum(:size)
+      report[:total_file_size] = files.sum(:size)
+      report[:average_file_size] = files.average(:size)
       report[:subscribers] = self.subscriber_report(report[:total_file_size])
     end
     report

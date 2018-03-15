@@ -5,7 +5,7 @@
   <div class="tab-pane" id="mimetype">
     <br><table>
     <tr>
-      <td>
+      <td id="mimetype_list">
         <dl class="dl-horizontal">
           <script>var graph_hash = {}</script>
           <% sorted_hash = Hash[ @mimetype_report.sort_by { |key, value| key } ] %>
@@ -19,8 +19,10 @@
         </dl>
       </td>
       <td id="mimetype_cell">
-        <canvas id="indiv_mimetype_chart"></canvas>
-        <script>individual_mimetype(graph_hash)</script>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="indiv_mimetype_chart"></canvas>
+          <script>individual_mimetype(graph_hash)</script>
+        </div>
       </td>
     </tr>
   </table>
