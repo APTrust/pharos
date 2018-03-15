@@ -121,6 +121,7 @@ class IntellectualObjectsController < ApplicationController
       end
     elsif pending.nil?
       log = Email.log_deletion_request(@intellectual_object)
+      ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all #delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(intellectual_object: @intellectual_object, token: SecureRandom.hex)
       token.save!
       NotificationMailer.deletion_request(@intellectual_object, current_user, log, token).deliver!
