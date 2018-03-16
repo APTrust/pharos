@@ -86,13 +86,6 @@ class IntellectualObjectsController < ApplicationController
         format.html { redirect_to root_url, alert: 'This object could not be found.' }
       end
     end
-
-
-    if @intellectual_object.nil? || @intellectual_object.state == 'D'
-
-    else
-
-    end
   end
 
   def edit
