@@ -335,7 +335,8 @@ class IntellectualObjectsController < ApplicationController
 
   def filter_count_and_sort
     @selected = {}
-    filter_by_state if params[:state]
+    params[:state] = 'A' if params[:state].nil?
+    @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless params[:state] == 'all'
     get_format_counts
     get_institution_counts
     get_access_counts

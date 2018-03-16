@@ -120,7 +120,7 @@ function plotGraph (statistics_array) {
             minTickSize: [1, "day"]
         }
     };
-    $.plot("#chart", [statistics_array], options);
+    $.plot("#stats_chart", [statistics_array], options);
 }
 
 function fixFilters() {
