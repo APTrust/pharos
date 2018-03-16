@@ -35,8 +35,9 @@ class IntellectualObjectsController < ApplicationController
       .created_after(params[:created_after])
       .updated_before(params[:updated_before])
       .updated_after(params[:updated_after])
-    filter
-    sort
+      .with_access(params[:access])
+      .with_file_format(params[:file_format])
+    filter_count_and_sort
     page_results(@intellectual_objects)
     (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
     respond_to do |format|
@@ -339,33 +340,37 @@ class IntellectualObjectsController < ApplicationController
     NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
   end
 
-  def filter
-    set_filter_values
-    initialize_filter_counters
-    filter_by_institution unless params[:institution].nil?
-    filter_by_access unless params[:access].nil?
-    filter_by_state unless params[:state].nil?
-    filter_by_format unless params[:file_format].nil?
-    set_inst_count(@intellectual_objects, :objects)
-    #set_format_count(@intellectual_objects, :object)
+  def filter_count_and_sort
+    @selected = {}
+    filter_by_state if params[:state]
     get_format_counts
+    get_institution_counts
+    get_access_counts
     count = @intellectual_objects.count
     set_page_counts(count)
-  end
-
-  def set_filter_values
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.distinct.pluck(:id)
-    params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
-    #params[:file_format] ? @formats = [params[:file_format]] : @formats = @intellectual_objects.joins(:generic_files).distinct.pluck(:file_format)
+    case params[:sort]
+      when 'date'
+        @intellectual_objects = @intellectual_objects.order('created_at DESC')
+      when 'name'
+        @intellectual_objects = @intellectual_objects.order('bag_name').reverse_order
+      when 'institution'
+        @intellectual_objects = @intellectual_objects.joins(:institution).order('institutions.name')
+    end
   end
 
   def get_format_counts
+    @selected[:file_format] = params[:file_format] if params[:file_format]
     @format_counts = @intellectual_objects.joins(:generic_files).group(:file_format).count
-    formats = []
-    @format_counts.each do |key, value|
-      formats.push(key)
-    end
-    params[:file_format] ? @formats = params[:file_format] : @formats = formats
+  end
+
+  def get_institution_counts
+    @selected[:institution] = params[:institution] if params[:institution]
+    @inst_counts = @intellectual_objects.group(:institution_id).count
+  end
+
+  def get_access_counts
+    @selected[:access] = params[:access] if params[:access]
+    @access_counts = @intellectual_objects.group(:access).count
   end
 
 end

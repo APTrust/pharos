@@ -304,7 +304,6 @@ module SearchAndIndex
   def page_results(results)
     @page = params[:page].to_i
     @per_page = params[:per_page].to_i
-    #@paged_results = Kaminari.paginate_array(results).page(@page).per(@per_page)
     @paged_results = results.page(@page).per(@per_page)
     @next = format_next
     @current = format_current
@@ -321,9 +320,6 @@ module SearchAndIndex
   end
 
   def format_current
-    #path = request.fullpath.split('?').first
-    #new_url = "#{request.base_url}#{path}?page=#{@page}&per_page=#{@per_page}"
-    #new_url = add_params(new_url)
     params[:page] = @page
     params[:per_page] = @per_page
     new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
@@ -334,13 +330,10 @@ module SearchAndIndex
     if @count.to_f / @per_page <= @page
       nil
     else
-      #path = request.fullpath.split('?').first
       new_page = @page + 1
       params[:page] = new_page
       params[:per_page] = @per_page
       new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
-      #new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{@per_page}"
-      #new_url = add_params(new_url)
       new_url
     end
   end
@@ -349,13 +342,10 @@ module SearchAndIndex
     if @page == 1
       nil
     else
-      #path = request.fullpath.split('?').first
       new_page = @page - 1
       params[:page] = new_page
       params[:per_page] = @per_page
       new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
-      #new_url = "#{request.base_url}#{path}/?page=#{new_page}&per_page=#{@per_page}"
-      #new_url = add_params(new_url)
       new_url
     end
   end

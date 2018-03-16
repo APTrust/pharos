@@ -12,14 +12,12 @@
             <% current_inst = Institution.find(@selected[:institution]) %>
             <script>selected("institution", "<%= current_inst.name %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :institution)%>")</script>
         <% else %>
-            <% @institutions.each do |institution| %>
+            <% @inst_counts.each do |institution, count| %>
                 <% current_inst = Institution.find(institution) %>
-                <% unless @inst_counts[institution] == 0 || @inst_counts[institution].nil? || institution.nil? %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('institution', institution) %>"><%= current_inst.name %></a></span>
-                      <span class="facet-count">(<%= @inst_counts[institution] %>)</span>
+                      <span class="facet-count">(<%= count %>)</span>
                     </li>
-                <% end %>
             <% end %>
         <% end %>
       </ul>

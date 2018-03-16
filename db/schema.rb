@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180313210348) do
+ActiveRecord::Schema.define(version: 20180316154132) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(version: 20180313210348) do
     t.index ["created_at"], name: "index_generic_files_on_created_at"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
     t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
+    t.index ["intellectual_object_id", "file_format"], name: "index_generic_files_on_intellectual_object_id_and_file_format"
     t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
     t.index ["size"], name: "index_generic_files_on_size"
     t.index ["updated_at"], name: "index_generic_files_on_updated_at"
@@ -132,8 +133,11 @@ ActiveRecord::Schema.define(version: 20180313210348) do
     t.text "ingest_state"
     t.string "bagging_group_identifier", limit: 255
     t.index ["access"], name: "index_intellectual_objects_on_access"
+    t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
+    t.index ["created_at"], name: "index_intellectual_objects_on_created_at"
     t.index ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
     t.index ["institution_id"], name: "index_intellectual_objects_on_institution_id"
+    t.index ["state"], name: "index_intellectual_objects_on_state"
     t.index ["updated_at"], name: "index_intellectual_objects_on_updated_at"
   end
 
@@ -150,8 +154,8 @@ ActiveRecord::Schema.define(version: 20180313210348) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "institution_id"
     t.string "outcome"
+    t.integer "institution_id"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"

@@ -12,13 +12,11 @@
             <% if @selected[:access] %>
                 <script>selected("access", "<%= @selected[:access].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :access)%>")</script>
             <% else %>
-                <% @accesses.each do |acc| %>
-                    <% unless @access_counts[acc] == 0 || @access_counts[acc].nil? || acc.nil? %>
+                <% @access_counts.each do |acc, count| %>
                         <li>
                           <span class="facet-label"><a href="<%= current_path('access', acc) %>"><%= acc.capitalize %></a></span>
-                          <span class="facet-count">(<%= @access_counts[acc] %>)</span>
+                          <span class="facet-count">(<%= count %>)</span>
                         </li>
-                    <% end %>
                 <% end %>
             <% end %>
           </ul>
