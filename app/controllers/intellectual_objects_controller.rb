@@ -347,15 +347,25 @@ class IntellectualObjectsController < ApplicationController
     filter_by_state unless params[:state].nil?
     filter_by_format unless params[:file_format].nil?
     set_inst_count(@intellectual_objects, :objects)
-    set_format_count(@intellectual_objects, :object)
+    #set_format_count(@intellectual_objects, :object)
+    get_format_counts
     count = @intellectual_objects.count
     set_page_counts(count)
   end
 
   def set_filter_values
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = @intellectual_objects.distinct.pluck(:institution_id)
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.distinct.pluck(:id)
     params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted)
-    params[:file_format] ? @formats = [params[:file_format]] : @formats = @intellectual_objects.joins(:generic_files).distinct.pluck(:file_format)
+    #params[:file_format] ? @formats = [params[:file_format]] : @formats = @intellectual_objects.joins(:generic_files).distinct.pluck(:file_format)
+  end
+
+  def get_format_counts
+    @format_counts = @intellectual_objects.joins(:generic_files).group(:file_format).count
+    formats = []
+    @format_counts.each do |key, value|
+      formats.push(key)
+    end
+    params[:file_format] ? @formats = params[:file_format] : @formats = formats
   end
 
 end
