@@ -85,7 +85,7 @@ class WorkItemsController < ApplicationController
           format.json { render json: { status: response.code, body: response.body } }
           format.html {
             render 'show'
-            flash[:notice] = response.body
+            flash[:notice] = "The response from NSQ to the requeue request is as follows: Status: #{response.code}, Body: #{response.body}"
           }
         end
       end
