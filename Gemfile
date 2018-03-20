@@ -26,7 +26,7 @@ gem 'sdoc', '~> 1.0.0', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.4.3'
+gem 'devise', '4.4.1'
 gem 'rake'
 gem 'email_validator'
 gem 'therubyracer'
