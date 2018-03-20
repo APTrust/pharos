@@ -275,7 +275,7 @@ GEM
     turbolinks-source (5.1.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    uglifier (4.1.6)
+    uglifier (4.1.8)
       execjs (>= 0.3.0, < 3)
     uuidtools (2.1.5)
     warden (1.2.7)
@@ -333,11 +333,11 @@ DEPENDENCIES
   sqlite3 (= 1.3.13)
   therubyracer
   turbolinks
-  uglifier (>= 4.1.6)
+  uglifier (>= 4.1.8)
   uuidtools
   web-console (~> 3.5.1)
   wicked_pdf
   wkhtmltopdf-binary
 
 BUNDLED WITH
-   1.14.5
+   1.16.1
