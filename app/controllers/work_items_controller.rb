@@ -471,8 +471,6 @@ class WorkItemsController < ApplicationController
       end
     end
 
-    # Post WorkItem.id as the request body.
-    # It's just a number, like 15771, not a key-value http form pair.
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri)
     request.body = @work_item.id.to_s
