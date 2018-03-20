@@ -26,10 +26,9 @@ gem 'sdoc', '~> 1.0.0', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.4.1'
+gem 'devise', '4.4.3'
 gem 'rake'
 gem 'email_validator'
-gem 'therubyracer'
 gem 'therubyracer'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
