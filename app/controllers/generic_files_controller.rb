@@ -76,6 +76,7 @@ class GenericFilesController < ApplicationController
     authorize current_user, :object_create?
     @generic_file = @intellectual_object.generic_files.new(single_generic_file_params)
     @generic_file.state = 'A'
+    @generic_file.institution_id = @intellectual_object.institution_id
     respond_to do |format|
       if @generic_file.save
         format.json { render json: object_as_json, status: :created }
@@ -101,6 +102,7 @@ class GenericFilesController < ApplicationController
       files.each do |gf|
         file = @intellectual_object.generic_files.new(gf)
         file.state = 'A'
+        file.institution_id = @intellectual_object.institution_id
         @generic_files.push(file)
       end
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180316154132) do
+ActiveRecord::Schema.define(version: 20180322135215) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(version: 20180316154132) do
     t.string "state"
     t.text "ingest_state"
     t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
+    t.integer "institution_id", null: false
     t.index ["created_at"], name: "index_generic_files_on_created_at"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
     t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
@@ -154,8 +155,8 @@ ActiveRecord::Schema.define(version: 20180316154132) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "institution_id"
     t.string "outcome"
+    t.integer "institution_id"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"

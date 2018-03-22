@@ -11,12 +11,20 @@ RSpec.describe GenericFile, :type => :model do
   it { should validate_presence_of(:uri) }
   it { should validate_presence_of(:size) }
   it { should validate_presence_of(:file_format) }
-  it { should validate_presence_of(:identifier)}
+  it { should validate_presence_of(:identifier) }
+  it { should validate_presence_of(:institution_id) }
 
   it 'should validate presence of intellectual object' do
     file = FactoryBot.create(:generic_file)
     expect(file.intellectual_object).to be_valid
     expect(file.intellectual_object.identifier).to include('/')
+  end
+
+  it 'should not allow the institution_id to be changed once set' do
+    file = FactoryBot.create(:generic_file)
+    file.institution_id = 15
+    file.save!
+    file.errors[:institution_id].should include('cannot be changed')
   end
 
   it 'should accept an identifier that is longer than 256 characters' do

@@ -6,8 +6,10 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :file_format, :identifier, :last_fixity_check, presence: true
+  validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, presence: true
   validates_uniqueness_of :identifier
+  validate :init_institution_id, on: :create
+  before_save :freeze_institution_id
 
   delegate :institution, to: :intellectual_object
 
@@ -164,6 +166,18 @@ class GenericFile < ActiveRecord::Base
   # Returns true if the GenericFile has a checksum with the specified digest.
   def has_checksum?(digest)
     find_checksum_by_digest(digest).nil? == false
+  end
+
+  private
+
+  def init_institution_id
+    unless self.intellectual_object.nil?
+      self.institution_id = self.intellectual_object.institution_id if self.institution_id.nil?
+    end
+  end
+
+  def freeze_institution_id
+    errors.add(:institution_id, 'cannot be changed') if self.saved_change_to_institution_id? unless self.institution_id.nil?
   end
 
 end

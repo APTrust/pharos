@@ -42,7 +42,7 @@ class Institution < ActiveRecord::Base
   end
 
   def active_files
-    self.generic_files.where(state: 'A')
+    GenericFile.where(institution_id: self.id, state: 'A')
   end
 
   def deletion_admin_user(requesting_user)
@@ -61,9 +61,9 @@ class Institution < ActiveRecord::Base
   end
 
   def bytes_by_format
-    stats = self.generic_files.where(state: 'A').sum(:size)
+    stats = self.active_files.sum(:size)
     if stats
-      cross_tab = self.generic_files.group(:file_format).sum(:size)
+      cross_tab = self.active_files.group(:file_format).sum(:size)
       cross_tab['all'] = stats
       cross_tab
     else
@@ -72,7 +72,7 @@ class Institution < ActiveRecord::Base
   end
 
   def average_file_size
-    files = self.generic_files.where(state: 'A')
+    files = self.active_files
     (files.count == 0) ? avg = 0 : avg = files.average(:size)
     avg
   end
@@ -81,16 +81,6 @@ class Institution < ActiveRecord::Base
     files = GenericFile.where(state: 'A')
     (files.count == 0) ? avg = 0 : avg = files.average(:size)
     avg
-  end
-
-  def statistics
-    stats = self.generic_files.order(:created_at).group(:created_at).sum(:size)
-    time_fixed = []
-    stats.each do |key, value|
-      current_point = [key.to_time.to_i*1000, value.to_i]
-      time_fixed.push(current_point)
-    end
-    time_fixed
   end
 
   def generate_timeline_report
@@ -132,14 +122,14 @@ class Institution < ActiveRecord::Base
   def self.breakdown
     report = {}
     MemberInstitution.all.order('name').each do |inst|
-      size = inst.generic_files.sum(:size)
+      size = inst.active_files.sum(:size)
       name = inst.name
       indiv_breakdown = {}
       indiv_breakdown[name] = size
       subscribers = SubscriptionInstitution.where(member_institution_id: inst.id)
       indiv_breakdown[:subscriber_number] = subscribers.count
       subscribers.each do |si|
-        si_size = si.generic_files.sum(:size)
+        si_size = si.active_files.sum(:size)
         si_name = si.name
         indiv_breakdown[si_name] = si_size
       end

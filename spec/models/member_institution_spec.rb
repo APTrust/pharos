@@ -97,7 +97,7 @@ RSpec.describe MemberInstitution, :type => :model do
     describe 'with an associated subscription institution' do
       let!(:sub_inst) { FactoryBot.create(:subscription_institution, member_institution_id: subject.id) }
       let!(:object) { FactoryBot.create(:intellectual_object, institution_id: subject.id) }
-      let!(:file) { FactoryBot.create(:generic_file, intellectual_object_id: object.id) }
+      let!(:file) { FactoryBot.create(:generic_file, intellectual_object_id: object.id, institution_id: subject.id) }
       after { sub_inst.destroy }
       it 'deleting should be blocked' do
         subject.destroy.should be false
