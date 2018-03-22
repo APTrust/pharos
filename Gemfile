@@ -9,7 +9,7 @@ gem 'sqlite3', '1.3.13'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.6'
+gem 'uglifier', '>= 4.1.8'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -26,7 +26,7 @@ gem 'sdoc', '~> 1.0.0', group: :doc
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.4.1'
+gem 'devise', '4.4.3'
 gem 'rake'
 gem 'email_validator'
 gem 'therubyracer'
