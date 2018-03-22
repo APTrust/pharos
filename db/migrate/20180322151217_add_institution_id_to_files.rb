@@ -5,7 +5,7 @@ class AddInstitutionIdToFiles < ActiveRecord::Migration[5.1]
 
     batch_size = 5000
     count = 0
-    GenericFile.where(last_fixity_check: '2000-01-01').find_in_batches(batch_size: batch_size) do |batch|
+    GenericFile.find_in_batches(batch_size: batch_size) do |batch|
       GenericFile.transaction do
         batch.each do |gf|
           gf.institution_id = gf.intellectual_object.institution_id

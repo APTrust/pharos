@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180322135215) do
+ActiveRecord::Schema.define(version: 20180322163317) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -97,11 +97,17 @@ ActiveRecord::Schema.define(version: 20180322135215) do
     t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
     t.integer "institution_id", null: false
     t.index ["created_at"], name: "index_generic_files_on_created_at"
+    t.index ["file_format", "state"], name: "index_generic_files_on_file_format_and_state"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
     t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
+    t.index ["institution_id", "size", "state"], name: "index_generic_files_on_institution_id_and_size_and_state"
+    t.index ["institution_id", "state"], name: "index_generic_files_on_institution_id_and_state"
+    t.index ["institution_id"], name: "index_generic_files_on_institution_id"
     t.index ["intellectual_object_id", "file_format"], name: "index_generic_files_on_intellectual_object_id_and_file_format"
     t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
+    t.index ["size", "state"], name: "index_generic_files_on_size_and_state"
     t.index ["size"], name: "index_generic_files_on_size"
+    t.index ["state"], name: "index_generic_files_on_state"
     t.index ["updated_at"], name: "index_generic_files_on_updated_at"
   end
 
@@ -137,6 +143,7 @@ ActiveRecord::Schema.define(version: 20180322135215) do
     t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
     t.index ["created_at"], name: "index_intellectual_objects_on_created_at"
     t.index ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
+    t.index ["institution_id", "state"], name: "index_intellectual_objects_on_institution_id_and_state"
     t.index ["institution_id"], name: "index_intellectual_objects_on_institution_id"
     t.index ["state"], name: "index_intellectual_objects_on_state"
     t.index ["updated_at"], name: "index_intellectual_objects_on_updated_at"
@@ -155,8 +162,8 @@ ActiveRecord::Schema.define(version: 20180322135215) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "outcome"
     t.integer "institution_id"
+    t.string "outcome"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"
@@ -263,6 +270,7 @@ ActiveRecord::Schema.define(version: 20180322135215) do
     t.index ["date"], name: "index_work_items_on_date"
     t.index ["etag", "name"], name: "index_work_items_on_etag_and_name"
     t.index ["generic_file_id"], name: "index_work_items_on_generic_file_id"
+    t.index ["institution_id", "date"], name: "index_work_items_on_institution_id_and_date"
     t.index ["institution_id"], name: "index_work_items_on_institution_id"
     t.index ["intellectual_object_id"], name: "index_work_items_on_intellectual_object_id"
     t.index ["stage"], name: "index_work_items_on_stage"
