@@ -4,7 +4,6 @@
 
 <ul class="nav nav-tabs" id="inst_show_tabs">
   <li><a href="#summary" data-toggle="tab">Summary</a></li>
-  <li><a href="#stats" data-toggle="tab">Statistics</a></li>
   <li><a href="#users" data-toggle="tab">Users</a></li>
 </ul>
 
@@ -27,45 +26,6 @@
     <%= render 'shared/work_items' %>
 
     <%= link_to 'View All Jobs', work_items_path %>
-  </div>
-
-  <div class="tab-pane" id="stats">
-    <table class="table table-condensed">
-      <thead>
-      <tr>
-        <th>Type of Content</th>
-        <th>Amount Uploaded</th>
-        <th></th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @institution.bytes_by_format.each do |format, bytes| %>
-          <tr>
-            <td class="<%=format_class(format) %>"><%= format_display(format) %></td>
-            <td class="bytes"><%=number_to_human_size bytes %></td>
-          </tr>
-      <% end %>
-      </tbody>
-    </table>
-    <div id="chart-frame"><table>
-      <tr>
-        <td></td>
-        <td style="text-align: center;">Bytes Ingested Over Time</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-          <div id="stats_chart" width="800px" height="800px" style="padding: 20px; position: relative;"></div>
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-      </tr>
-    </table></div>
-    <script>
-        plotGraph(<%= @statistics %>);
-    </script>
   </div>
 
   <div class="tab-pane" id="users">

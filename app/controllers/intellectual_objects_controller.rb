@@ -359,7 +359,13 @@ class IntellectualObjectsController < ApplicationController
 
   def get_institution_counts
     @selected[:institution] = params[:institution] if params[:institution]
-    @inst_counts = @intellectual_objects.group(:institution_id).count
+    counts = @intellectual_objects.group(:institution_id).count
+    @inst_counts = {}
+    counts.each do |key, value|
+      name = Institution.find(key).name
+      @inst_counts[name] = [key, value]
+    end
+    @inst_counts = Hash[@inst_counts.sort]
   end
 
   def get_access_counts

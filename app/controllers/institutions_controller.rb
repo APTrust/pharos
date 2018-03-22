@@ -103,16 +103,15 @@ class InstitutionsController < ApplicationController
         (current_user.institutional_admin? && current_user.institution.name == 'APTrust' && current_user.institution.identifier == @institution.identifier)
       @items = WorkItem.limit(10).order('date').reverse_order
       @size = GenericFile.where(state: 'A').sum(:size)
-      @item_count = WorkItem.all.count
-      @object_count = IntellectualObject.all.count
+      @item_count = WorkItem.count
+      @object_count = IntellectualObject.where(state: 'A').count
     else
-      @items = WorkItem.with_institution(@institution.id).limit(10).order('date').reverse_order
+      items = WorkItem.with_institution(@institution.id)
+      @items = items.limit(10).order('date').reverse_order
       @size = @institution.active_files.sum(:size)
-      @item_count = WorkItem.with_institution(@institution.id).count
-      @object_count = @institution.intellectual_objects.count
+      @item_count = items.count
+      @object_count = @institution.intellectual_objects.where(state: 'A').count
     end
-    @failed = @items.where(status: Pharos::Application::PHAROS_STATUSES['fail'])
-    @statistics = @institution.statistics
   end
 
   def find_all_sizes
