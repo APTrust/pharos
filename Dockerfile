@@ -21,6 +21,7 @@ WORKDIR /pharos
 # Set Timezone & Locale
 ENV TZ=UTC
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+ENV ENVIRONMENT ${ENVIRONMENT:-development}
 
 # Set Environment
 # Environment to be set in .env file and populated by Ansible with correct
@@ -48,7 +49,7 @@ RUN RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname S
 # - load db schema at first deploy
 #RUN RAILS_ENV=development rake db:schema:load
 # - migrate db schema
-RUN RAILS_ENV=development rake db:migrate
+RUN RAILS_ENV=${ENVIRONMENT} rake db:migrate
 # - pharos setup (create institutions, roles and users)
 RUN RAILS_ENV=development rake pharos:setup
 # - populate db with fixtures if RAILS_ENV=development.
