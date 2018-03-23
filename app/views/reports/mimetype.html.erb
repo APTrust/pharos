@@ -1,0 +1,31 @@
+<%= render partial: 'report_navigation' %>
+
+<div class="tab-content" id="inst_show_content">
+
+  <div class="tab-pane" id="mimetype">
+    <br><table>
+    <tr>
+      <td id="mimetype_list">
+        <dl class="dl-horizontal">
+          <script>var graph_hash = {}</script>
+          <% sorted_hash = Hash[ @mimetype_report.sort_by { |key, value| key } ] %>
+          <% sorted_hash.each do |key, value| %>
+              <% unless key == 'all' %>
+                  <dt><%= key %></dt>
+                  <dd><%= number_to_human_size(value) %></dd>
+                  <script>graph_hash["<%= key %>"] = <%= value %></script>
+              <% end %>
+          <% end %>
+        </dl>
+      </td>
+      <td id="mimetype_cell">
+        <div class="chart-container" style="position: relative;">
+          <canvas id="indiv_mimetype_chart"></canvas>
+          <script>individual_mimetype(graph_hash)</script>
+        </div>
+      </td>
+    </tr>
+  </table>
+  </div>
+
+</div>

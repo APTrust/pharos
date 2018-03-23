@@ -110,6 +110,11 @@ class IntellectualObject < ActiveRecord::Base
     object_in_dpn
   end
 
+  def dpn_bag
+    bag = DpnBag.where(object_identifier: self.identifier).first
+    bag
+  end
+
   def gf_count
     generic_files.where(state: 'A').count
   end
@@ -128,6 +133,15 @@ class IntellectualObject < ActiveRecord::Base
 
   def processing_files
     generic_files.where(state: 'I')
+  end
+
+  def object_report
+    data = {
+        active_files: self.active_files.count,
+        processing_files: self.processing_files.count,
+        deleted_files: self.deleted_files.count,
+        bytes_by_format: self.bytes_by_format
+    }
   end
 
   def all_files_deleted?

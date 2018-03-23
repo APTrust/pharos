@@ -139,6 +139,7 @@ class GenericFilesController < ApplicationController
       flash[:alert] = 'This file has already been deleted.'
     elsif result == 'true'
       log = Email.log_deletion_request(@generic_file)
+      ConfirmationToken.where(generic_file_id: @generic_file.id).delete_all #delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(generic_file: @generic_file, token: SecureRandom.hex)
       token.save!
       NotificationMailer.deletion_request(@generic_file, current_user, log, token).deliver!

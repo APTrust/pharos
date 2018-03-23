@@ -4,6 +4,7 @@ class Institution < ActiveRecord::Base
   has_many :generic_files, through: :intellectual_objects
   has_many :premis_events, through: :intellectual_objects
   has_many :premis_events, through: :generic_files
+  has_many :snapshots
   has_many :dpn_bags
 
   validates :name, :identifier, :type, presence: true
@@ -60,7 +61,7 @@ class Institution < ActiveRecord::Base
   end
 
   def bytes_by_format
-    stats = self.generic_files.sum(:size)
+    stats = self.generic_files.where(state: 'A').sum(:size)
     if stats
       cross_tab = self.generic_files.group(:file_format).sum(:size)
       cross_tab['all'] = stats
@@ -72,13 +73,13 @@ class Institution < ActiveRecord::Base
 
   def average_file_size
     files = self.generic_files.where(state: 'A')
-    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
+    (files.count == 0) ? avg = 0 : avg = files.average(:size)
     avg
   end
 
-  def average_file_size_across_repo
+  def self.average_file_size_across_repo
     files = GenericFile.where(state: 'A')
-    (files.count == 0) ? avg = 0 : avg = files.sum(:size) / files.count
+    (files.count == 0) ? avg = 0 : avg = files.average(:size)
     avg
   end
 
@@ -92,20 +93,45 @@ class Institution < ActiveRecord::Base
     time_fixed
   end
 
-  def generate_overview_apt
+  def generate_timeline_report
+    monthly_hash = []
+    monthly_labels = []
+    monthly_data = []
+    earliest_date = '2014-12-1T00:00:00+00:00'
+    iterative_date = (DateTime.current+1.month).beginning_of_month
+    while iterative_date.to_s > earliest_date do
+      before_date = iterative_date - 1.month
+      monthly_labels.push(convert_datetime_to_label(before_date))
+      if self.name == 'APTrust'
+        monthly_data.push(GenericFile.created_before(iterative_date.to_s).created_after(before_date.to_s).sum(:size))
+      else
+        monthly_data.push(self.generic_files.created_before(iterative_date.to_s).created_after(before_date.to_s).sum(:size))
+      end
+      iterative_date = before_date
+    end
+    monthly_hash.push(monthly_labels)
+    monthly_hash.push(monthly_data)
+    monthly_hash
+  end
+
+  def convert_datetime_to_label(date)
+    date.strftime('%B %Y')
+  end
+
+  def self.generate_overview_apt
     report = {}
     report[:bytes_by_format] = GenericFile.bytes_by_format
     report[:intellectual_objects] = IntellectualObject.where(state: 'A').count
     report[:generic_files] = GenericFile.where(state: 'A').count
     report[:premis_events] = PremisEvent.count
     report[:work_items] = WorkItem.count
-    report[:average_file_size] = self.average_file_size_across_repo
+    report[:average_file_size] = Institution.average_file_size_across_repo
     report
   end
 
   def self.breakdown
     report = {}
-    MemberInstitution.all.each do |inst|
+    MemberInstitution.all.order('name').each do |inst|
       size = inst.generic_files.sum(:size)
       name = inst.name
       indiv_breakdown = {}

@@ -2,7 +2,7 @@ class InstitutionsController < ApplicationController
   include SearchAndIndex
   inherit_resources
   before_action :authenticate_user!
-  before_action :load_institution, only: [:edit, :update, :show, :destroy]
+  before_action :load_institution, only: [:edit, :update, :show, :destroy, :snapshot]
   respond_to :json, :html
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
@@ -10,6 +10,7 @@ class InstitutionsController < ApplicationController
   def index
     respond_to do |format|
       @institutions = policy_scope(Institution)
+      @institutions = @institutions.order('name')
       @sizes = find_all_sizes unless request.url.include?("/api/")
       @count = @institutions.count
       page_results(@institutions)
@@ -61,6 +62,30 @@ class InstitutionsController < ApplicationController
   def destroy
     authorize current_user, :delete_institution?
     destroy!
+  end
+
+  def snapshot
+    authorize @institution
+    if @institution.is_a?(MemberInstitution)
+      @snapshots = @institution.snapshot
+      respond_to do |format|
+        format.json { render json: { institution: @institution.name, snapshots: @snapshots.map{ |item| item.serializable_hash } } }
+        format.html {
+          redirect_to root_path
+          flash[:notice] = "A snapshot of #{@institution.name} has been taken and archived on #{@snapshots.first.audit_date}. Please see the reports page for that analysis."
+        }
+      end
+    else
+      @snapshot = @institution.snapshot
+      respond_to do |format|
+        format.json { render json: { institution: @institution.name, snapshot: @snapshot.serializable_hash }  }
+        format.html {
+          redirect_to root_path
+          flash[:notice] = "A snapshot of #{@institution.name} has been taken and archived on #{@snapshot.audit_date}. Please see the reports page for that analysis."
+        }
+      end
+    end
+
   end
 
   private

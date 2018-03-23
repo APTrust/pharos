@@ -14,7 +14,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
 
   let(:valid_key) { '123' }
   let(:invalid_key) { '456' }
-  let(:user) { FactoryBot.create :user, :institutional_admin, institution_id: inst.id, api_secret_key: valid_key }
+  let(:user) { FactoryBot.create :user, :admin, institution_id: inst.id, api_secret_key: valid_key }
 
   after do
     Institution.destroy_all
@@ -23,12 +23,12 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
   describe 'Valid login' do
     let(:login_headers) {{ 'X-Pharos-API-User' => user.email, 'X-Pharos-API-Key' => valid_key }}
 
-    it 'should not update the object' do
+    it 'should update the object' do
       params = update_fields.to_json
       headers = initial_headers.merge(login_headers)
       response = patch(intellectual_object_path(obj), headers: headers, params: params)
-      response.should == 403
-      #obj.reload.title.should == new_title
+      response.should == 200
+      obj.reload.title.should == new_title
     end
   end
 

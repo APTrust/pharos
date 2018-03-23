@@ -1,0 +1,22 @@
+<div><table class="table">
+  <thead>
+  <tr>
+    <th>Snapshot Type</th>
+    <th>Audit Date</th>
+    <th>Data in APTrust</th>
+    <th>Storage Cost</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% unless @institution.snapshots.nil? %>
+      <% @institution.snapshots.each do |snapshot| %>
+          <tr>
+            <td><%= snapshot.snapshot_type %></td>
+            <td><%= snapshot.audit_date %></td>
+            <td><%= number_to_human_size(snapshot.apt_bytes) %></td>
+            <td><%= snapshot.cost %></td>
+          </tr>
+      <% end %>
+  <% end %>
+  </tbody>
+</table></div>

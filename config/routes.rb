@@ -4,9 +4,11 @@ Rails.application.routes.draw do
   institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)/
   resources :institutions, format: [:json, :html], param: :institution_identifier, institution_identifier: institution_ptrn
   resources :institutions, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'api/v2/institutions'
+  get ':institution_identifier/snapshot', to: 'institutions#snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :institution_snapshot
+  get 'api/v2/:institution_identifier/snapshot', to: 'institutions#snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :api_institution_snapshot
 
   # INTELLECTUAL OBJECT ROUTES
-  object_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+/
+  object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+/
   resources :intellectual_objects, only: [:show, :edit, :update, :destroy], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'objects'
   get 'objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_restore
   get 'objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_send_to_dpn
@@ -29,7 +31,7 @@ Rails.application.routes.draw do
 
 
   # GENERIC FILE ROUTES
-  file_ptrn = /(\w+)*(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+/
+  file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ ]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
   get 'files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files
@@ -100,7 +102,13 @@ Rails.application.routes.draw do
   # REPORT ROUTES
   get 'reports/:identifier', to: 'reports#index', format: [:json, :html], as: :reports, identifier: institution_ptrn
   get 'reports/overview/:identifier', to: 'reports#overview', format: [:json, :html, :pdf], as: :institution_overview, identifier: institution_ptrn
+  get 'reports/general/:identifier', to: 'reports#general', format: [:json, :html, :pdf], as: :institution_general_report, identifier: institution_ptrn
+  get 'reports/cost/:identifier', to: 'reports#cost', format: [:json, :html, :pdf], as: :institution_cost_report, identifier: institution_ptrn
+  get 'reports/subscribers/:identifier', to: 'reports#subscribers', format: [:json, :html, :pdf], as: :institution_subscribers_report, identifier: institution_ptrn
+  get 'reports/timeline/:identifier', to: 'reports#timeline', format: [:json, :html, :pdf], as: :institution_timeline_report, identifier: institution_ptrn
+  get 'reports/mimetype/:identifier', to: 'reports#mimetype', format: [:json, :html, :pdf], as: :institution_mimetype_report, identifier: institution_ptrn
   get 'reports/institution_breakdown', to: 'reports#institution_breakdown', format: [:json, :html, :pdf], as: :institution_breakdown
+  get 'reports/object_report/:intellectual_object_identifier', to: 'reports#object_report', format: [:json, :html], as: :object_report, intellectual_object_identifier: object_ptrn
 
   # ALERT ROUTES
   get 'alerts/', to: 'alerts#index', format: [:json, :html], as: :alerts
@@ -117,6 +125,9 @@ Rails.application.routes.draw do
 
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]
+
+  # SNAPSHOT ROUTES
+  resources :snapshots, path: 'snapshots', only: [:index, :show], format: [:json, :html]
 
   # USER ROUTES
   devise_for :users

@@ -1,0 +1,37 @@
+<div id="content" class="col-md-9 show-document">
+  <ol class="breadcrumb">
+    <li><%= link_to @institution.name, institution_path(@institution) %></li>
+    <li class="active"><%= @intellectual_object.title %></li>
+  </ol>
+
+  <div class="page-header">
+    <h1 class="long_names"><%= @intellectual_object.title %></h1>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        Aggregate Data About Preserved Files
+      </h3>
+    </div>
+
+    <div class="panel-body">
+      <dl class="dl-horizontal dl-invert">
+        <dt>Active Files </dt>
+        <dd><%= @object_report[:active_files] %></dd>
+        <dt>Files In Progress </dt>
+        <dd><%= @object_report[:processing_files] %></dd>
+        <dt>Deleted Files </dt>
+        <dd><%= @object_report[:deleted_files] %></dd>
+        <dt>Total Content Upload</dt>
+        <dd><%= number_to_human_size(@object_report[:bytes_by_format]['all']) %></dd>
+        <% @object_report[:bytes_by_format].each do |format, bytes| %>
+            <% unless format == 'all' %>
+                <dt class="<%=format_class(format) %>"><%= format_display(format) %></dt>
+                <dd class="bytes"><%=number_to_human_size bytes %></dd>
+            <% end %>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+</div>

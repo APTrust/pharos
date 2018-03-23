@@ -1,27 +1,33 @@
-<h2>Institution Data Usage</h2>
+<%= render partial: 'report_navigation' %>
 
-<ul class="inst_breakdown_list">
-  <dl class="dl-horizontal">
-    <% @report.each do |key, value| %>
-      <% value.each do |nested_key, nested_value| %>
-          <% if nested_key == :subscriber_number %>
-              <li><ul><li><dt>Number of Subscribers</dt>
-              <dd><%= nested_value %></dd></li></ul></li>
-          <% else %>
-              <% if nested_key == key %>
-                    <li><dt><%= nested_key %></dt>
-                    <dd><%= number_to_human_size(nested_value) %></dd></li>
+<div class="tab-content" id="inst_show_content">
+
+  <div class="tab-pane" id="breakdown">
+    <br><ul class="inst_breakdown_list">
+    <dl class="dl-horizontal">
+      <% @inst_breakdown_report.each do |key, value| %>
+          <% value.each do |nested_key, nested_value| %>
+              <% if nested_key == :subscriber_number %>
+                  <li><ul><li><dt>Number of Subscribers</dt>
+                    <dd><%= nested_value %></dd></li></ul></li>
               <% else %>
-                    <li><ul><li><dt><%= nested_key %></dt>
-                    <dd><%= number_to_human_size(nested_value) %></dd></li></ul></li>
+                  <% if nested_key == key %>
+                      <li><dt><%= nested_key %></dt>
+                        <dd><%= number_to_human_size(nested_value) %></dd></li>
+                  <% else %>
+                      <li><ul><li><dt><%= nested_key %></dt>
+                        <dd><%= number_to_human_size(nested_value) %></dd></li></ul></li>
+                  <% end %>
               <% end %>
           <% end %>
+
       <% end %>
+    </dl>
+  </ul>
 
+    <%= link_to "?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
+        <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF
     <% end %>
-  </dl>
-</ul>
+  </div>
 
-<%= link_to "?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
-    <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF
-<% end %>
+</div>

@@ -19,6 +19,11 @@ RSpec.describe GenericFile, :type => :model do
     expect(file.intellectual_object.identifier).to include('/')
   end
 
+  it 'should accept an identifier that is longer than 256 characters' do
+    file = FactoryBot.create(:generic_file, identifier: 'somethingoutrageous.edu/a_very_very_crazy_long_bag_name_full_of_photos-3453443509-139862-3459u350984/data/this_file_needs_to_be_super_long/something_extra/way_down_deep/defying_gravity/out_of_ideas/13948098712349-34982309857923-239872989298745-2093809609864320940-2349869432098459082.txt')
+    expect(file.identifier).to eq 'somethingoutrageous.edu/a_very_very_crazy_long_bag_name_full_of_photos-3453443509-139862-3459u350984/data/this_file_needs_to_be_super_long/something_extra/way_down_deep/defying_gravity/out_of_ideas/13948098712349-34982309857923-239872989298745-2093809609864320940-2349869432098459082.txt'
+  end
+
   describe '#identifier_is_unique' do
     it 'should validate uniqueness of the identifier' do
       one = FactoryBot.create(:generic_file, identifier: 'test.edu')

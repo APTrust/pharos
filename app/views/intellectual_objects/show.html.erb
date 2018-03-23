@@ -26,7 +26,7 @@
       <dd><%= @intellectual_object.alt_identifier %></dd>
       <dt>DPN Status</dt>
       <% if @intellectual_object.in_dpn? %>
-          <dd>Item has been uploaded to DPN.</dd>
+          <dd>Item is in DPN with id <%= link_to @intellectual_object.dpn_uuid, dpn_bag_path(id: @intellectual_object.dpn_bag.id) %></dd>
       <% else %>
           <dd>Item does not reside in DPN.</dd>
       <% end %>
@@ -34,8 +34,6 @@
           <dt><i><b>State</b></i></dt>
           <dd><i>This object has been deleted.</i></dd>
       <% end %>
-
-
     </dl>
   </div>
 
@@ -45,6 +43,9 @@
     <% end %>
     <%= link_to intellectual_object_events_path(@intellectual_object), {class: 'btn doc-action-btn btn-normal'} do %>
         <i class="glyphicon glyphicon-eye-open"></i> View Events
+    <% end %>
+    <%= link_to object_report_path(@intellectual_object), {class: 'btn doc-action-btn, btn-normal'} do %>
+        <i class="glyphicon glyphicon-list"></i> View Object Report
     <% end %>
     <% unless @intellectual_object.state == 'D' || @intellectual_object.all_files_deleted?  %>
         <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_id == @intellectual_object.institution_id) %>
@@ -59,33 +60,6 @@
             <%= destroy_link(@intellectual_object) %>
         <% end %>
     <% end %>
-
   </div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">
-        Aggregate Data About Preserved Files
-      </h3>
-    </div>
-
-    <div class="panel-body">
-      <dl class="dl-horizontal dl-invert">
-        <dt>Active Files </dt>
-        <dd><%= @intellectual_object.active_files.count %></dd>
-        <dt>Files In Progress </dt>
-        <dd><%= @intellectual_object.processing_files.count %></dd>
-        <dt>Deleted Files </dt>
-        <dd><%= @intellectual_object.deleted_files.count %></dd>
-        <dt>Total Content Upload</dt>
-        <dd><%= number_to_human_size(@intellectual_object.bytes_by_format()['all']) %></dd>
-        <% @intellectual_object.bytes_by_format.each do |format, bytes| %>
-            <% unless format == 'all' %>
-                <dt class="<%=format_class(format) %>"><%= format_display(format) %></dt>
-                <dd class="bytes"><%=number_to_human_size bytes %></dd>
-            <% end %>
-        <% end %>
-      </dl>
-    </div>
-  </div>
 </div>

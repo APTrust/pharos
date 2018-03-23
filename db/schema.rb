@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180125204519) do
+ActiveRecord::Schema.define(version: 20180313210348) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(version: 20180125204519) do
     t.string "state"
     t.text "ingest_state"
     t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
+    t.index ["created_at"], name: "index_generic_files_on_created_at"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
     t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
     t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
@@ -149,8 +150,8 @@ ActiveRecord::Schema.define(version: 20180125204519) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "outcome"
     t.integer "institution_id"
+    t.string "outcome"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"
@@ -178,6 +179,16 @@ ActiveRecord::Schema.define(version: 20180125204519) do
     t.integer "user_id"
     t.index ["role_id", "user_id"], name: "index_roles_users_on_role_id_and_user_id"
     t.index ["user_id", "role_id"], name: "index_roles_users_on_user_id_and_role_id"
+  end
+
+  create_table "snapshots", force: :cascade do |t|
+    t.datetime "audit_date"
+    t.integer "institution_id"
+    t.integer "apt_bytes"
+    t.decimal "cost"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "snapshot_type"
   end
 
   create_table "usage_samples", force: :cascade do |t|

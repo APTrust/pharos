@@ -1,0 +1,21 @@
+<%= render partial: 'report_navigation' %>
+
+<div class="tab-content" id="inst_show_content">
+
+  <div class="tab-pane" id="subscribers">
+    <br>
+    <% if @subscriber_report.nil? || @subscriber_report == {} || @subscriber_report.count == 1 %>
+        <p>You currently have no subscribers</p>
+    <% else %>
+        <dl class="dl-horizontal">
+          <% @subscriber_report.each do |key, value| %>
+              <% unless key == 'total_bytes' %>
+                  <dt><%= key %></dt>
+                  <dd><%= number_to_human_size(value) %></dd>
+              <% end %>
+          <% end %>
+        </dl>
+    <% end %>
+  </div>
+
+</div>
