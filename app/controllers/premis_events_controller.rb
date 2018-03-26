@@ -178,7 +178,7 @@ class PremisEventsController < ApplicationController
     get_institution_counts
     get_event_type_counts
     get_outcome_counts
-    count = @premis_events.size
+    count = @premis_events.where.not(id: nil).pluck(:id).size
     set_page_counts(count)
     case params[:sort]
       when 'date'
