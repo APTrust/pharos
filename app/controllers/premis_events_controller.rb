@@ -25,6 +25,9 @@ class PremisEventsController < ApplicationController
     authorize @parent
     @institution = current_user.institution
     @premis_events = @premis_events
+      .with_institution(params[:institution])
+      .with_type(params[:event_type])
+      .with_outcome(params[:outcome])
       .with_create_date(params[:created_at])
       .created_before(params[:created_before])
       .created_after(params[:created_after])
@@ -33,8 +36,7 @@ class PremisEventsController < ApplicationController
       .with_object_identifier_like(params[:object_identifier_like])
       .with_file_identifier(params[:file_identifier])
       .with_file_identifier_like(params[:file_identifier_like])
-    filter
-    sort
+    filter_count_and_sort
     page_results(@premis_events)
     respond_to do |format|
       format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |event| event.serializable_hash } } }
@@ -171,23 +173,36 @@ class PremisEventsController < ApplicationController
     @premis_events = @premis_events.where(generic_file_id: @parent.id) unless @parent.nil?
   end
 
-  def filter
-    set_filter_values
+  def filter_count_and_sort
     @selected = {}
-    filter_by_institution unless params[:institution].nil?
-    filter_by_event_type unless params[:event_type].nil?
-    filter_by_outcome unless params[:outcome].nil?
-    #set_inst_count(@premis_events, :events)
-    #set_event_type_count(@premis_events)
-    #set_outcome_count(@premis_events)
-    count = @premis_events.count
+    get_institution_counts
+    get_event_type_counts
+    get_outcome_counts
+    count = @premis_events.size
     set_page_counts(count)
+    case params[:sort]
+      when 'date'
+        @premis_events = @premis_events.order('date_time DESC')
+      when 'name'
+        @premis_events = @premis_events.order('identifier').reverse_order
+      when 'institution'
+        @premis_events = @premis_events.joins(:institution).order('institutions.name')
+    end
   end
 
-  def set_filter_values
+  def get_institution_counts
+    @selected[:institution] = params[:institution] if params[:institution]
     params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values
-    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
+  end
+
+  def get_event_type_counts
+    @selected[:event_type] = params[:event_type] if params[:event_type]
+    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values.sort
+  end
+
+  def get_outcome_counts
+    @selected[:outcome] = params[:outcome] if params[:outcome]
+    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Failure Success)
   end
 
   private
