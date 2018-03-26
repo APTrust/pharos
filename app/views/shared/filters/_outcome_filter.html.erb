@@ -12,13 +12,11 @@
             <script>selected("outcome", "<%= @selected[:outcome].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :outcome)%>")</script>
         <% else %>
             <%= %>
-            <% @outcomes.each do |outcome| %>
-                <% unless @outcome_counts[outcome] == 0 || @outcome_counts[outcome].nil? || outcome.nil? %>
+            <% @outcome_counts.each do |outcome, count| %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('outcome', outcome) %>"><%= outcome.capitalize %></a></span>
-                      <span class="facet-count">(<%= @outcome_counts[outcome] %>)</span>
+                      <span class="facet-count">(<%= count %>)</span>
                     </li>
-                <% end %>
             <% end %>
         <% end %>
       </ul>

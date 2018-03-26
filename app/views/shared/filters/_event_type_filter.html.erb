@@ -11,13 +11,11 @@
         <% if @selected[:event_type] %>
             <script>selected("event_type", "<%= @selected[:event_type].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :event_type)%>")</script>
         <% else %>
-            <% @event_types.each do |type| %>
-                <% unless @event_type_counts[type] == 0 || @event_type_counts[type].nil? || type.nil? %>
+            <% @event_type_counts.each do |type, count| %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('event_type', type) %>"><%= type.capitalize %></a></span>
-                      <span class="facet-count">(<%= @event_type_counts[type] %>)</span>
+                      <span class="facet-count">(<%= count %>)</span>
                     </li>
-                <% end %>
             <% end %>
         <% end %>
       </ul>
