@@ -3,27 +3,48 @@
 <div class="tab-content" id="inst_show_content">
 
   <div class="tab-pane" id="breakdown">
-    <br><ul class="inst_breakdown_list">
-    <dl class="dl-horizontal">
-      <% @inst_breakdown_report.each do |key, value| %>
-          <% value.each do |nested_key, nested_value| %>
-              <% if nested_key == :subscriber_number %>
-                  <li><ul><li><dt>Number of Subscribers</dt>
-                    <dd><%= nested_value %></dd></li></ul></li>
-              <% else %>
-                  <% if nested_key == key %>
-                      <li><dt><%= nested_key %></dt>
-                        <dd><%= number_to_human_size(nested_value) %></dd></li>
-                  <% else %>
-                      <li><ul><li><dt><%= nested_key %></dt>
-                        <dd><%= number_to_human_size(nested_value) %></dd></li></ul></li>
-                  <% end %>
-              <% end %>
-          <% end %>
+    <br>
 
-      <% end %>
+    <ul class="inst_breakdown_list">
+    <dl class="dl-horizontal">
+
     </dl>
   </ul>
+
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Institution</th>
+        <th>Total Bytes Stored</th>
+        <th>Number of Subscribers</th>
+      </tr>
+      </thead>
+      <tbody>
+
+      <% @inst_breakdown_report.each do |key, value| %>
+          <% sub_num = value[:subscriber_number] %>
+          <% bytes_num = value[:size] %>
+          <% inst_name = key %>
+          <tr>
+            <td><%= inst_name %></td>
+            <td><%= number_to_human_size(bytes_num) %></td>
+            <td><%= number_with_delimiter(sub_num, delimiter: ',') %></td>
+          </tr>
+          <% value.each do |nested_key, nested_value| %>
+              <% if nested_key != :subscriber_number && nested_key != :size %>
+                      <% inst_name = "- #{nested_key}" %>
+                      <% bytes_num = nested_value %>
+                      <% sub_num = "Subscriber of #{key}" %>
+                  <tr>
+                    <td>    <%= inst_name %></td>
+                    <td><%= number_to_human_size(bytes_num) %></td>
+                    <td><%= number_with_delimiter(sub_num, delimiter: ',') %></td>
+                  </tr>
+              <% end %>
+          <% end %>
+      <% end %>
+      </tbody>
+    </table>
 
     <%= link_to "?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
         <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF

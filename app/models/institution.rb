@@ -135,7 +135,7 @@ class Institution < ActiveRecord::Base
       size = inst.generic_files.sum(:size)
       name = inst.name
       indiv_breakdown = {}
-      indiv_breakdown[name] = size
+      indiv_breakdown[:size] = size
       subscribers = SubscriptionInstitution.where(member_institution_id: inst.id)
       indiv_breakdown[:subscriber_number] = subscribers.count
       subscribers.each do |si|
