@@ -930,9 +930,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         put :restore, params: { intellectual_object_identifier: obj_for_restore, format: :json }
         expect(response.code).to eq '200'
         data = JSON.parse(response.body)
-        expect(data['status']).to eq 'Pending'
-        expect(data['action']).to eq 'Restore'
-        expect(data['id']).to be > 0
+        expect(data['status']).to eq 'ok'
+        expect(data['message']).to eq 'Your item has been queued for restoration.'
+        expect(data['work_item_id']).to be > 0
       end
       it 'should create a restore work item' do
         count_before = WorkItem.where(action: Pharos::Application::PHAROS_ACTIONS['restore'],
@@ -945,14 +945,20 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(count_after).to eq(count_before + 1)
       end
       it 'should reject deleted items (json)' do
-        # JSON response has no body for 409
         put :restore, params: { intellectual_object_identifier: deleted_obj }, format: :json
         expect(response.code).to eq '409'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'error'
+        expect(data['message']).to eq 'This item has been deleted and cannot be queued for restoration.'
+        expect(data['work_item_id']).to eq 0
       end
       it 'should reject items with pending work requests (json)' do
-        # JSON response has no body for 409
         put :restore, params: { intellectual_object_identifier: obj_pending }, format: :json
         expect(response.code).to eq '409'
+        data = JSON.parse(response.body)
+        expect(data['status']).to eq 'error'
+        expect(data['message']).to include 'cannot be queued for restoration at this time due to a pending'
+        expect(data['work_item_id']).to eq 0
       end
     end
 
