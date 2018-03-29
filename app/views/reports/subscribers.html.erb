@@ -5,7 +5,7 @@
   <div class="tab-pane" id="subscribers">
     <br>
     <% if @subscriber_report.nil? || @subscriber_report == {} || @subscriber_report.count == 1 %>
-        <p>You currently have no subscribers</p>
+        <p>You currently have no sub accounts.</p>
     <% else %>
         <dl class="dl-horizontal">
           <% @subscriber_report.each do |key, value| %>

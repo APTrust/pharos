@@ -5,7 +5,7 @@
 <ul class="nav nav-tabs" id="report_tabs">
   <li id="general_tab"><%= link_to "General Overview \n\n(Caution: Long Load Time)", institution_general_report_path(@institution.identifier) %></li>
   <% if @institution.is_a?(MemberInstitution) %>
-      <li id="subscribers_tab"><%= link_to 'Subscriber Overview', institution_subscribers_report_path(@institution.identifier) %></li>
+      <li id="subscribers_tab"><%= link_to 'Sub Account Overview', institution_subscribers_report_path(@institution.identifier) %></li>
   <% end %>
   <li id="cost_tab"><%= link_to 'Cost Breakdown', institution_cost_report_path(@institution.identifier) %></li>
   <li id="timeline_tab"><%= link_to 'Deposits Over Time', institution_timeline_report_path(@institution.identifier) %></li>

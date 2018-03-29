@@ -18,12 +18,12 @@
         <dt>Total Bytes (Self Only)</dt>
         <dd><%= number_to_human_size(@basic_report[:total_file_size]) %></dd>
         <% if @basic_report[:subscribers].nil? || @basic_report[:subscribers] == {} || @basic_report[:subscribers].count == 1 %>
-            <dt>Subscribers</dt>
+            <dt>Sub Accounts</dt>
             <dd>None</dd>
         <% else %>
-            <dt>Total Bytes (Including Subscribers) </dt>
+            <dt>Total Bytes (Including Sub Accounts) </dt>
             <dd><%= number_to_human_size(@basic_report[:subscribers]['total_bytes']) %></dd>
-            <dt>Subscribers</dt>
+            <dt>Sub Accounts</dt>
             <dd><%= number_with_delimiter(@basic_report[:subscribers].count - 1, delimiter: ',') %></dd>
         <% end %>
     <% else %>

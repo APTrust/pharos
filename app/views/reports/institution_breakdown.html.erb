@@ -15,8 +15,9 @@
       <thead>
       <tr>
         <th>Institution</th>
-        <th>Total Bytes Stored</th>
-        <th>Number of Subscribers</th>
+        <th class="bytes_num">Total Number of Bytes</th>
+        <th>(Readable)</th>
+        <th>Number of Sub Accounts</th>
       </tr>
       </thead>
       <tbody>
@@ -27,17 +28,19 @@
           <% inst_name = key %>
           <tr>
             <td><%= inst_name %></td>
-            <td value="<%= bytes_num %>"><%= number_to_human_size(bytes_num) %></td>
+            <td class="bytes_num"><%= bytes_num %></td>
+            <td class="bytes_num_readable">(<%= number_to_human_size(bytes_num) %>)</td>
             <td><%= number_with_delimiter(sub_num, delimiter: ',') %></td>
           </tr>
           <% value.each do |nested_key, nested_value| %>
               <% if nested_key != :subscriber_number && nested_key != :size %>
-                      <% inst_name = "- #{nested_key}" %>
+                      <% inst_name = nested_key %>
                       <% bytes_num = nested_value %>
-                      <% sub_num = "Subscriber of #{key}" %>
+                      <% sub_num = "Sub Account of #{key}" %>
                   <tr>
                     <td>    <%= inst_name %></td>
-                    <td value="<%= bytes_num %>"><%= number_to_human_size(bytes_num) %></td>
+                    <td align="right"><%= bytes_num %></td>
+                    <td padding-right="50px">(<%= number_to_human_size(bytes_num) %>)</td>
                     <td><%= number_with_delimiter(sub_num, delimiter: ',') %></td>
                   </tr>
               <% end %>

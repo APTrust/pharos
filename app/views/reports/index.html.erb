@@ -33,10 +33,10 @@
       <% if @institution.is_a?(MemberInstitution) && @institution.name != 'APTrust' %>
           <dd><%= number_to_human_size(@overview_report[:bytes_by_format]['all']) %></dd>
           <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} || @overview_report[:subscribers].count == 1 %>
-              <dt>Subscribers</dt>
+              <dt>Sub Accounts</dt>
               <dd>None</dd>
           <% else %>
-              <dt>Subscribers</dt>
+              <dt>Sub Accounts</dt>
               <dd><%= @overview_report[:subscribers].count - 1 %></dd>
           <% end %>
       <% else %>
@@ -52,7 +52,7 @@
   <div class="tab-pane" id="subscribers">
     <br>
       <% if @overview_report[:subscribers].nil? || @overview_report[:subscribers] == {} || @overview_report[:subscribers].count == 1 %>
-         <p>You currently have no subscribers</p>
+         <p>You currently have no sub accounts</p>
       <% else %>
         <dl class="dl-horizontal">
           <% @overview_report[:subscribers].each do |key, value| %>
@@ -145,7 +145,7 @@
         <% @inst_breakdown_report.each do |key, value| %>
             <% value.each do |nested_key, nested_value| %>
                 <% if nested_key == :subscriber_number %>
-                    <li><ul><li><dt>Number of Subscribers</dt>
+                    <li><ul><li><dt>Number of Sub Accounts</dt>
                       <dd><%= nested_value %></dd></li></ul></li>
                 <% else %>
                     <% if nested_key == key %>
