@@ -113,7 +113,7 @@ class IntellectualObjectsController < ApplicationController
     pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
       respond_to do |format|
-        format.json { head :no_content }
+        format.json { head :conflict }
         format.html {
           redirect_to @intellectual_object
           flash[:alert] = 'This item has already been deleted.'
