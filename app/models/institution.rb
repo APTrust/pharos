@@ -72,15 +72,104 @@ class Institution < ActiveRecord::Base
   end
 
   def average_file_size
-    files = self.generic_files.where(state: 'A')
-    (files.count == 0) ? avg = 0 : avg = files.average(:size)
-    avg
+    GenericFile.with_institution(self.id).with_state('A').average(:size)
   end
 
   def self.average_file_size_across_repo
-    files = GenericFile.where(state: 'A')
-    (files.count == 0) ? avg = 0 : avg = files.average(:size)
-    avg
+    GenericFile.with_state('A').average(:size)
+  end
+
+  def total_file_size
+    GenericFile.with_institution(self.id).with_state('A').sum(:size)
+  end
+
+  def self.total_file_size_across_repo
+    GenericFile.with_state('A').sum(:size)
+  end
+
+
+  def object_count
+    if self.name == 'APTrust'
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'intellectual_objects' and state = 'A'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = IntellectualObject.with_state('A').count
+      end
+    else
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'intellectual_objects' and institution_id = '#{self.id}' and state = 'A'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = self.intellectual_objects.with_state('A').size
+      end
+    end
+    count
+  end
+
+  def file_count
+    if self.name == 'APTrust'
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'generic_files' and state = 'A'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = GenericFile.with_state('A').count
+      end
+    else
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'generic_files' and institution_id = '#{self.id}' and state = 'A'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = GenericFile.with_institution(self.id).with_state('A').size
+      end
+    end
+    count
+  end
+
+  def event_count
+    if self.name == 'APTrust'
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'premis_events'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = PremisEvent.count
+      end
+    else
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'premis_events' and institution_id = '#{self.id}'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = PremisEvent.with_institution(self.id).size
+      end
+    end
+    count
+  end
+
+  def item_count
+    if self.name == 'APTrust'
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'work_items'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = WorkItem.count
+      end
+    else
+      if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+        query = "select reltuples from pg_class where relname = 'work_items' and institution_id = '#{self.id}'"
+        result = ActiveRecord::Base.connection.exec_query(query)
+        count = result.rows[0][0]
+      else
+        count = WorkItem.with_institution(self.id).size
+      end
+    end
+    count
   end
 
   def statistics

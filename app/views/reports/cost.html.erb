@@ -13,18 +13,28 @@
         <% if @cost_report[:subscribers].nil? || @cost_report[:subscribers] == {} || @cost_report[:subscribers].count == 1 %>
             <p>You currently have no sub accounts</p>
         <% else %>
-            <dl class="dl-horizontal">
+            <table class="table table-striped sortable">
+              <thead>
+              <tr>
+                <th>Sub Account</th>
+                <th>Cost</th>
+              </tr>
+              </thead>
+              <tbody>
               <% @cost_report[:subscribers].each do |key, value| %>
                   <% unless key == 'total_bytes' %>
-                      <dt><%= key %></dt>
-                      <dd><%= cost_analysis_subscriber(@cost_report[:subscribers][key]) %></dd>
+                      <tr>
+                        <td><%= key %></td>
+                        <td><%= cost_analysis_subscriber(@cost_report[:subscribers][key]) %></td>
+                      </tr>
                   <% end %>
               <% end %>
-            </dl>
+              </tbody>
+            </table>
         <% end %>
     <% end %>
     <h3>Previous Database Cost Analysis Snapshots</h3>
-    <table class="table">
+    <table class="table table-striped sortable">
       <thead>
       <tr>
         <th>Snapshot Type</th>

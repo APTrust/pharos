@@ -6,22 +6,22 @@ class SubscriptionInstitution  < Institution
   def generate_overview
     report = {}
     report[:bytes_by_format] = self.bytes_by_format
-    report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
-    report[:generic_files] = self.generic_files.where(state: 'A').count
-    report[:premis_events] = self.premis_events.count
-    report[:work_items] = WorkItem.with_institution(self.id).count
-    report[:average_file_size] = average_file_size
+    report[:intellectual_objects] = self.object_count
+    report[:generic_files] = self.file_count
+    report[:premis_events] = self.event_count
+    report[:work_items] = self.item_count
+    report[:average_file_size] = self.average_file_size
     report
   end
 
   def generate_basic_report
     report = {}
-    report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').count
-    report[:generic_files] = self.generic_files.where(state: 'A').count
-    report[:premis_events] = self.premis_events.count
-    report[:work_items] = WorkItem.with_institution(self.id).count
+    report[:intellectual_objects] = self.object_count
+    report[:generic_files] = self.file_count
+    report[:premis_events] = self.event_count
+    report[:work_items] = self.item_count
     report[:average_file_size] = self.average_file_size
-    report[:total_file_size] = self.generic_files.where(state: 'A').sum(:size)
+    report[:total_file_size] = self.total_file_size
     report
   end
 
