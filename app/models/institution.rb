@@ -72,38 +72,61 @@ class Institution < ActiveRecord::Base
   end
 
   def average_file_size
-    GenericFile.with_institution(self.id).with_state('A').average(:size)
+    if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+      query = "SELECT AVG(size) FROM (SELECT size FROM 'generic_files' WHERE state = 'A' AND institution_id = #{self.id})"
+      result = ActiveRecord::Base.connection.exec_query(query)
+      result[0]['AVG(size)']
+    else
+      GenericFile.with_institution(self.id).with_state('A').average(:size)
+    end
   end
 
   def self.average_file_size_across_repo
-    GenericFile.with_state('A').average(:size)
+    if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+      query = "SELECT AVG(size) FROM (SELECT size FROM 'generic_files' WHERE state = 'A')"
+      result = ActiveRecord::Base.connection.exec_query(query)
+      result[0]['AVG(size)']
+    else
+      GenericFile.with_state('A').average(:size)
+    end
   end
 
   def total_file_size
-    GenericFile.with_institution(self.id).with_state('A').sum(:size)
+    if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+      query = "SELECT SUM(size) FROM (SELECT size FROM 'generic_files' WHERE state = 'A' AND institution_id = #{self.id})"
+      result = ActiveRecord::Base.connection.exec_query(query)
+      result[0]['SUM(size)']
+    else
+      GenericFile.with_institution(self.id).with_state('A').sum(:size)
+    end
   end
 
   def self.total_file_size_across_repo
-    GenericFile.with_state('A').sum(:size)
+    if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+      query = "SELECT SUM(size) FROM (SELECT size FROM 'generic_files' WHERE state = 'A')"
+      result = ActiveRecord::Base.connection.exec_query(query)
+      result[0]['SUM(size)']
+    else
+      GenericFile.with_state('A').sum(:size)
+    end
   end
-
 
   def object_count
     if self.name == 'APTrust'
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "select reltuples from pg_class where relname = 'intellectual_objects' and state = 'A'"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'intellectual_objects' WHERE state = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result.rows[0][0]
+        count = result.rows[0]['COUNT(*)']
       else
         count = IntellectualObject.with_state('A').count
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "select reltuples from pg_class where relname = 'intellectual_objects' and institution_id = '#{self.id}' and state = 'A'"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'intellectual_objects' WHERE institution_id = #{self.id} AND state = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result.rows[0][0]
+        count = result.rows[0]['COUNT(*)']
       else
-        count = self.intellectual_objects.with_state('A').size
+        count = IntellectualObject.with_institution(self.id).with_state('A').size
       end
     end
     count
@@ -112,17 +135,18 @@ class Institution < ActiveRecord::Base
   def file_count
     if self.name == 'APTrust'
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "select reltuples from pg_class where relname = 'generic_files' and state = 'A'"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'generic_files' WHERE state = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result.rows[0][0]
+        count = result.rows[0]['COUNT(*)']
       else
         count = GenericFile.with_state('A').count
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "select reltuples from pg_class where relname = 'generic_files' and institution_id = '#{self.id}' and state = 'A'"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'generic_files' WHERE institution_id = #{self.id} AND state = 'A')"
+        #query = "SELECT COUNT(*) FROM (SELECT 'generic_files'.'identifier' FROM 'generic_files' INNER JOIN 'intellectual_objects' ON 'intellectual_objects'.'id' = 'generic_files'.'intellectual_object_id' WHERE (intellectual_objects.institution_id = #{self.id}) AND 'generic_files'.'state' = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result.rows[0][0]
+        count = result.rows[0]['COUNT(*)']
       else
         count = GenericFile.with_institution(self.id).with_state('A').size
       end
@@ -141,9 +165,9 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "select reltuples from pg_class where relname = 'premis_events' and institution_id = '#{self.id}'"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'premis_events' WHERE institution_id = #{self.id})"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result.rows[0][0]
+        count = result.rows[0]['COUNT(*)']
       else
         count = PremisEvent.with_institution(self.id).size
       end
@@ -162,9 +186,9 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "select reltuples from pg_class where relname = 'work_items' and institution_id = '#{self.id}'"
+        query = "SELECT COUNT(*) FROM (SELECT id FROM 'work_items' WHERE institution_id = #{self.id})"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result.rows[0][0]
+        count = result.rows[0]['COUNT(*)']
       else
         count = WorkItem.with_institution(self.id).size
       end
