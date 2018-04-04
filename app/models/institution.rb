@@ -116,7 +116,8 @@ class Institution < ActiveRecord::Base
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
         query = "SELECT COUNT(*) FROM (SELECT identifier FROM intellectual_objects WHERE state = 'A') AS aptrust_objects"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result[0]['COUNT(*)']
+        #count = result[0]['COUNT(*)']
+        count = result
       else
         count = IntellectualObject.with_state('A').count
       end
@@ -124,7 +125,8 @@ class Institution < ActiveRecord::Base
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
         query = "SELECT COUNT(*) FROM (SELECT identifier FROM intellectual_objects WHERE institution_id = #{self.id} AND state = 'A') AS institution_objects"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result[0]['COUNT(*)']
+        #count = result[0]['COUNT(*)']
+        count = result
       else
         count = IntellectualObject.with_institution(self.id).with_state('A').size
       end

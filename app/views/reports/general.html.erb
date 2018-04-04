@@ -15,7 +15,7 @@
 
         <tr>
           <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Intellectual Objects</span><span class="pharos_tooltiptext">Bags sent to APTrust</span></div></td>
-          <td><%= number_with_delimiter(@basic_report[:intellectual_objects], delimiter: ',') %></td>
+          <td><%= @basic_report[:intellectual_objects] %></td>
         </tr>
         <tr>
           <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Generic Files</span><span class="pharos_tooltiptext">Files sent to APTrust in bags</span></div></td>
