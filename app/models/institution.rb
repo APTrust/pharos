@@ -114,7 +114,7 @@ class Institution < ActiveRecord::Base
   def object_count
     if self.name == 'APTrust'
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'intellectual_objects' WHERE state = 'A')"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM intellectual_objects WHERE state = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result.rows[0]['COUNT(*)']
       else
@@ -122,7 +122,7 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'intellectual_objects' WHERE institution_id = #{self.id} AND state = 'A')"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM intellectual_objects WHERE institution_id = #{self.id} AND state = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result.rows[0]['COUNT(*)']
       else
@@ -135,7 +135,7 @@ class Institution < ActiveRecord::Base
   def file_count
     if self.name == 'APTrust'
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'generic_files' WHERE state = 'A')"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM generic_files WHERE state = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result.rows[0]['COUNT(*)']
       else
@@ -143,7 +143,7 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'generic_files' WHERE institution_id = #{self.id} AND state = 'A')"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM generic_files WHERE institution_id = #{self.id} AND state = 'A')"
         #query = "SELECT COUNT(*) FROM (SELECT 'generic_files'.'identifier' FROM 'generic_files' INNER JOIN 'intellectual_objects' ON 'intellectual_objects'.'id' = 'generic_files'.'intellectual_object_id' WHERE (intellectual_objects.institution_id = #{self.id}) AND 'generic_files'.'state' = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result.rows[0]['COUNT(*)']
@@ -165,7 +165,7 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT identifier FROM 'premis_events' WHERE institution_id = #{self.id})"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM premis_events WHERE institution_id = #{self.id})"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result.rows[0]['COUNT(*)']
       else
@@ -186,7 +186,7 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT id FROM 'work_items' WHERE institution_id = #{self.id})"
+        query = "SELECT COUNT(*) FROM (SELECT id FROM work_items WHERE institution_id = #{self.id})"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result.rows[0]['COUNT(*)']
       else
