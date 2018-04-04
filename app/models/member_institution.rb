@@ -7,9 +7,9 @@ class MemberInstitution < Institution
 
   def subscriber_report(total)
     si_report = {}
-    total_size = total
+    total_size = total.to_f
     self.subscribers.each do |si|
-      size = si.active_files.sum(:size)
+      size = si.total_file_size.to_f
       si_report[si.name] = size
       total_size = total_size + size
     end

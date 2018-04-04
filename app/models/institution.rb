@@ -73,7 +73,7 @@ class Institution < ActiveRecord::Base
 
   def average_file_size
     if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-      query = "SELECT AVG(size) FROM (SELECT size FROM generic_files WHERE state = 'A' AND institution_id = #{self.id}) AS institution_file_size"
+      query = "SELECT AVG(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_file_size"
       result = ActiveRecord::Base.connection.exec_query(query)
       result[0]['avg']
     else
@@ -93,7 +93,7 @@ class Institution < ActiveRecord::Base
 
   def total_file_size
     if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-      query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE state = 'A' AND institution_id = #{self.id}) AS institution_total_size"
+      query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_total_size"
       result = ActiveRecord::Base.connection.exec_query(query)
       result[0]['sum']
     else
@@ -144,7 +144,6 @@ class Institution < ActiveRecord::Base
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
         query = "SELECT COUNT(*) FROM (SELECT identifier FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_files"
-        #query = "SELECT COUNT(*) FROM (SELECT 'generic_files'.'identifier' FROM 'generic_files' INNER JOIN 'intellectual_objects' ON 'intellectual_objects'.'id' = 'generic_files'.'intellectual_object_id' WHERE (intellectual_objects.institution_id = #{self.id}) AND 'generic_files'.'state' = 'A')"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result[0]['count']
       else
@@ -157,7 +156,7 @@ class Institution < ActiveRecord::Base
   def event_count
     if self.name == 'APTrust'
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = 'SELECT COUNT(*) FROM (SELECT identifier FROM premis_events) AS aptrust_events'
+        query = 'SELECT COUNT(*) FROM (SELECT id FROM premis_events) AS aptrust_events'
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result[0]['count']
       else
@@ -165,7 +164,7 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT identifier FROM premis_events WHERE institution_id = #{self.id}) AS institution_events"
+        query = "SELECT COUNT(*) FROM (SELECT id FROM premis_events WHERE institution_id = #{self.id}) AS institution_events"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result[0]['count']
       else
