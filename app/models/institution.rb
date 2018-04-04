@@ -156,9 +156,13 @@ class Institution < ActiveRecord::Base
   def event_count
     if self.name == 'APTrust'
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = 'SELECT COUNT(*) FROM (SELECT id FROM premis_events) AS aptrust_events'
+        # query = 'SELECT COUNT(*) FROM (SELECT id FROM premis_events) AS aptrust_events'
+        # result = ActiveRecord::Base.connection.exec_query(query)
+        # count = result[0]['count']
+
+        query = "select reltuples from pg_class where relname = 'premis_events'"
         result = ActiveRecord::Base.connection.exec_query(query)
-        count = result[0]['count']
+        count = result[0]['reltuples']
       else
         count = PremisEvent.count
       end
