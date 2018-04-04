@@ -22,33 +22,27 @@ class MemberInstitution < Institution
     bytes = self.bytes_by_format
     total = bytes['all']
     report[:bytes_by_format] = bytes
-    report[:intellectual_objects] = self.intellectual_objects.with_state('A').size
-    report[:generic_files] = self.active_files.size
-    report[:premis_events] = self.premis_events.size
-    report[:work_items] = WorkItem.with_institution(self.id).size
-    report[:average_file_size] = average_file_size
+    report[:intellectual_objects] = self.object_count
+    report[:generic_files] = self.file_count
+    report[:premis_events] = self.event_count
+    report[:work_items] = self.item_count
+    report[:average_file_size] = self.average_file_size
     report[:subscribers] = self.subscriber_report(total)
     report
   end
 
   def generate_basic_report
     report = {}
+    report[:intellectual_objects] = self.object_count
+    report[:generic_files] = self.file_count
+    report[:premis_events] = self.event_count
+    report[:work_items] = self.item_count
     if self.name == 'APTrust'
-      files = GenericFile.with_state('A')
-      report[:intellectual_objects] = IntellectualObject.with_state('A').size
-      report[:generic_files] = files.size
-      report[:premis_events] = PremisEvent.all.count
-      report[:work_items] = WorkItem.all.count
-      report[:total_file_size] = files.sum(:size)
-      report[:average_file_size] = files.average(:size)
+      report[:total_file_size] = Institution.total_file_size_across_repo
+      report[:average_file_size] = Institution.average_file_size_across_repo
     else
-      files = self.active_files
-      report[:intellectual_objects] = self.intellectual_objects.where(state: 'A').size
-      report[:generic_files] = files.size
-      report[:premis_events] = PremisEvent.where(institution_id: self.id).size
-      report[:work_items] = WorkItem.with_institution(self.id).size
-      report[:total_file_size] = files.sum(:size)
-      report[:average_file_size] = files.average(:size)
+      report[:total_file_size] = self.total_file_size
+      report[:average_file_size] = self.average_file_size
       report[:subscribers] = self.subscriber_report(report[:total_file_size])
     end
     report

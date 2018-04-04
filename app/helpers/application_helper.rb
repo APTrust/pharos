@@ -132,4 +132,12 @@ module ApplicationHelper
     end
     url
   end
+
+  def paginate(scope, count, paginator_class: Kaminari::Helpers::Paginator, template: nil, **options)
+    options[:total_pages] ||= count
+    options.reverse_merge! current_page: scope.current_page, per_page: scope.limit_value, remote: false
+
+    paginator = paginator_class.new (template || self), options
+    paginator.to_s
+  end
 end

@@ -35,6 +35,8 @@ COPY Gemfile .
 COPY Gemfile.lock .
 RUN bundle install
 
+RUN gem install puma
+
 COPY . $WORKDIR
 # - load db schema at first deploy
 # - migrate db schema

@@ -5,16 +5,28 @@
   <div class="tab-pane" id="subscribers">
     <br>
     <% if @subscriber_report.nil? || @subscriber_report == {} || @subscriber_report.count == 1 %>
-        <p>You currently have no subscribers</p>
+        <p>You currently have no sub accounts.</p>
     <% else %>
-        <dl class="dl-horizontal">
+        <table class="table table-striped sortable">
+          <thead>
+          <tr>
+            <th>Sub Account</th>
+            <th class="bytes_num">Total Number of Bytes</th>
+            <th>(Readable)</th>
+          </tr>
+          </thead>
+          <tbody>
           <% @subscriber_report.each do |key, value| %>
               <% unless key == 'total_bytes' %>
-                  <dt><%= key %></dt>
-                  <dd><%= number_to_human_size(value) %></dd>
+                  <tr>
+                    <td><%= key %></td>
+                    <td align="right"><%= value %></td>
+                    <td><%= number_to_human_size(value) %></td>
+                  </tr>
               <% end %>
           <% end %>
-        </dl>
+          </tbody>
+        </table>
     <% end %>
   </div>
 

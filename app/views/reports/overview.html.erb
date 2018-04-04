@@ -14,10 +14,10 @@
   <dt>Total Bytes Preserved</dt>
   <dd><%= number_to_human_size(@report[:bytes_by_format]['all']) %></dd>
   <% if @report[:subscribers].nil? || @report[:subscribers] == {} %>
-      <dt>Subscribers</dt>
+      <dt>Sub Accounts</dt>
       <dd>None</dd>
   <% else %>
-      <dt>Subscribers</dt>
+      <dt>Sub Accounts</dt>
       <dd>-----------</dd>
       <% @report[:subscribers].each do |key, value| %>
           <dt><%= key %></dt>

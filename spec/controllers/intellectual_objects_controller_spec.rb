@@ -553,9 +553,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(deletable_obj.confirmation_token.token).not_to be_nil
       end
 
-      it 'should say OK and return no content if the item was previously deleted' do
+      # integration tests want to know this request is not honored
+      it 'should say conflict and return no content if the item was previously deleted' do
         delete :destroy, params: { intellectual_object_identifier: deleted_obj }, format: :json
-        expect(response.status).to eq(204)
+        expect(response.status).to eq(409)
         expect(response.body).to be_empty
       end
 
@@ -925,6 +926,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should respond with meaningful json (json)' do
+        # This returns a WorkItem object for format JSON
         put :restore, params: { intellectual_object_identifier: obj_for_restore, format: :json }
         expect(response.code).to eq '200'
         data = JSON.parse(response.body)
