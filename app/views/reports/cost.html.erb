@@ -5,9 +5,9 @@
   <div class="tab-pane" id="cost">
     <h3>Cost Analysis</h3>
     <% if @institution.is_a?(SubscriptionInstitution) || @cost_report[:subscribers].nil? %>
-        <p>You currently have <%= number_to_human_size(@cost_report[:total_file_size]) %> stored, billed at <%= cost_analysis_subscriber(@cost_report[:total_file_size]) %>.</p>
+        <p>You currently have <%= number_to_human_size(@cost_report[:total_file_size]) %> stored, billed at <%= number_to_currency(cost_analysis_subscriber(@cost_report[:total_file_size])) %>.</p>
     <% else %>
-        <p>You currently have <%= number_to_human_size(@cost_report[:subscribers]['total_bytes']) %> stored, billed at <%= cost_analysis_member(@cost_report[:subscribers]['total_bytes']) %>.</p>
+        <p>You currently have <%= number_to_human_size(@cost_report[:subscribers]['total_bytes']) %> stored, billed at <%= number_to_currency(cost_analysis_member(@cost_report[:subscribers]['total_bytes'])) %>.</p>
         <p>If your cost is $0.00, then you have not yet used the full 10TB afforded by your membership.</p>
         <h3>Sub Account Cost Breakdown</h3>
         <% if @cost_report[:subscribers].nil? || @cost_report[:subscribers] == {} || @cost_report[:subscribers].count == 1 %>
@@ -25,7 +25,7 @@
                   <% unless key == 'total_bytes' %>
                       <tr>
                         <td><%= key %></td>
-                        <td><%= cost_analysis_subscriber(@cost_report[:subscribers][key]) %></td>
+                        <td><%= number_to_currency(cost_analysis_subscriber(@cost_report[:subscribers][key])) %></td>
                       </tr>
                   <% end %>
               <% end %>

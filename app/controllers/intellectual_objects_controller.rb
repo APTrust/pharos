@@ -18,7 +18,7 @@ class IntellectualObjectsController < ApplicationController
     @intellectual_objects = IntellectualObject
       .discoverable(current_user)
       .with_institution(user_institution)
-      .with_institution(params[:institution_id])
+      .with_institution(params[:institution])
       .with_description(params[:description])
       .with_description_like(params[:description_like])
       .with_identifier(params[:identifier])
