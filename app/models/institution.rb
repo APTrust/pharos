@@ -168,7 +168,7 @@ class Institution < ActiveRecord::Base
       end
     else
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        query = "SELECT COUNT(*) FROM (SELECT identifier FROM premis_events WHERE identifier IS NOT NULL AND institution_id = #{self.id}) AS institution_events"
+        query = "SELECT COUNT(*) FROM (SELECT identifier FROM premis_events WHERE institution_id = #{self.id}) AS institution_events"
         result = ActiveRecord::Base.connection.exec_query(query)
         count = result[0]['count']
       else
