@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180322163317) do
+ActiveRecord::Schema.define(version: 20180405133922) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -173,6 +173,7 @@ ActiveRecord::Schema.define(version: 20180322163317) do
     t.index ["generic_file_id", "event_type"], name: "index_premis_events_on_generic_file_id_and_event_type"
     t.index ["generic_file_id"], name: "index_premis_events_on_generic_file_id"
     t.index ["generic_file_identifier"], name: "index_premis_events_on_generic_file_identifier"
+    t.index ["identifier", "institution_id"], name: "index_premis_events_on_identifier_and_institution_id"
     t.index ["identifier"], name: "index_premis_events_on_identifier", unique: true
     t.index ["institution_id"], name: "index_premis_events_on_institution_id"
     t.index ["intellectual_object_id"], name: "index_premis_events_on_intellectual_object_id"
