@@ -38,7 +38,7 @@
                 <% if current_user.admin? || current_user.institutional_admin? %>
                     <li id="alert_tab"><%= link_to 'Alerts', alerts_path %></li>
                 <% end %>
-                <li id="rep_tab"><%= link_to 'Reports', institution_general_report_path(@inst.identifier) %></li>
+                <li id="rep_tab"><%= link_to 'Reports', institution_timeline_report_path(@inst.identifier) %></li>
               </ul>
           <% end %>
           <script>tabbed_nav('<%= params[:controller]%>');</script>

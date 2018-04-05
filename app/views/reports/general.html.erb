@@ -3,34 +3,69 @@
 <div class="tab-content" id="inst_show_content">
 
   <div class="tab-pane" id="overview">
-    <br><dl class="dl-horizontal">
-    <dt>Intellectual Objects</dt>
-    <dd><%= @basic_report[:intellectual_objects] %></dd>
-    <dt>Generic Files</dt>
-    <dd><%= @basic_report[:generic_files] %></dd>
-    <dt>Premis Events</dt>
-    <dd><%= @basic_report[:premis_events] %></dd>
-    <dt>Work Items</dt>
-    <dd><%= @basic_report[:work_items] %></dd>
-    <dt>Average File Size</dt>
-    <dd><%= number_to_human_size(@basic_report[:average_file_size]) %></dd>
-    <% if @institution.is_a?(MemberInstitution) && @institution.name != 'APTrust' %>
-        <dt>Total Bytes (Self Only)</dt>
-        <dd><%= number_to_human_size(@basic_report[:total_file_size]) %></dd>
-        <% if @basic_report[:subscribers].nil? || @basic_report[:subscribers] == {} || @basic_report[:subscribers].count == 1 %>
-            <dt>Subscribers</dt>
-            <dd>None</dd>
-        <% else %>
-            <dt>Total Bytes (Including Subscribers) </dt>
-            <dd><%= number_to_human_size(@basic_report[:subscribers]['total_bytes']) %></dd>
-            <dt>Subscribers</dt>
-            <dd><%= @basic_report[:subscribers].count - 1 %></dd>
-        <% end %>
-    <% else %>
-        <dt>Total Bytes </dt>
-        <dd><%= number_to_human_size(@basic_report[:total_file_size]) %></dd>
-    <% end %>
-  </dl>
+    <br>
+    <table class="table table-striped sortable">
+      <thead>
+      <tr>
+        <th>Type</th>
+        <th>Amount</th>
+      </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Intellectual Objects</span><span class="pharos_tooltiptext">Bags sent to APTrust</span></div></td>
+          <td><%= number_with_delimiter(@basic_report[:intellectual_objects], delimiter: ',') %></td>
+        </tr>
+        <tr>
+          <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Generic Files</span><span class="pharos_tooltiptext">Files sent to APTrust in bags</span></div></td>
+          <td><%= number_with_delimiter(@basic_report[:generic_files], delimiter: ',') %></td>
+        </tr>
+        <tr>
+          <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Premis Events</span><span class="pharos_tooltiptext">Record of actions performed on bags (Identifier Assignment, Fixity Checking, etc)</span></div></td>
+          <td><%= number_with_delimiter(@basic_report[:premis_events], delimiter: ',') %></td>
+        </tr>
+        <tr>
+          <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Work Items</span><span class="pharos_tooltiptext">Requests made to APTrust for Ingest, Restoration, Deletion, etc</span></div></td>
+          <td><%= number_with_delimiter(@basic_report[:work_items], delimiter: ',') %></td>
+        </tr>
+        <tr>
+          <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Average File Size</span><span class="pharos_tooltiptext">Average size of a stored generic file</span></div></td>
+          <td>
+            <% if @basic_report[:average_file_size].nil? %>
+              0 Bytes
+            <% else %>
+              <%= number_to_human_size(@basic_report[:average_file_size]) %></td>
+            <% end %>
+        </tr>
+          <% if @institution.is_a?(MemberInstitution) && @institution.name != 'APTrust' %>
+            <tr>
+              <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Total Bytes (Self Only)</span><span class="pharos_tooltiptext">Bytes stored with APTrust not including subscribers</span></div></td>
+              <td><%= number_to_human_size(@basic_report[:total_file_size]) %></td>
+            </tr>
+              <% if @basic_report[:subscribers].nil? || @basic_report[:subscribers] == {} || @basic_report[:subscribers].count == 1 %>
+                <tr>
+                <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Sub Accounts</span><span class="pharos_tooltiptext">Subscribers you have</span></div></td>
+                  <td>0</td>
+                </tr>
+              <% else %>
+                <tr>
+                  <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Total Bytes (Including Sub Accounts)</span><span class="pharos_tooltiptext">Bytes stored with APTrust including those of subscribers</span></div></td>
+                  <td><%= number_to_human_size(@basic_report[:subscribers]['total_bytes']) %></td>
+                </tr>
+                <tr>
+                  <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Sub Accounts</span><span class="pharos_tooltiptext">Subscribers you have</span></div></td>
+                  <td><%= number_with_delimiter(@basic_report[:subscribers].count - 1, delimiter: ',') %></td>
+                </tr>
+              <% end %>
+          <% else %>
+            <tr>
+              <td><div class="pharos_tooltip"><span class="pharos_tooltip_p">Total Bytes</span><span class="pharos_tooltiptext">Bytes stored with APTrust</span></div></td>
+              <td><%= number_to_human_size(@basic_report[:total_file_size]) %></td>
+            </tr>
+          <% end %>
+      </tbody>
+    </table>
 
     <%= link_to "#{institution_overview_path(@institution.identifier)}?format=pdf", {class: 'btn doc-action-btn btn-normal'} do %>
         <i class="glyphicon glyphicon-download-alt"></i> Save Report as PDF

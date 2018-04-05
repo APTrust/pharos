@@ -639,10 +639,42 @@ ul.inst_breakdown_list li {
 }
 
 #overview dt {
-  width: 260px !important;
+  width: 800px !important;
   text-align: left !important;
 }
 
 #overview dd {
   margin-left: 280px !important;
+}
+
+td.bytes_num, th.bytes_num {
+  text-align: right;
+}
+
+td.bytes_num_readable {
+  padding-right: 200px !important;
+}
+
+.pharos_tooltip {
+  border-bottom: 1px dotted black;
+}
+
+.pharos_tooltiptext {
+  visibility: hidden;
+  background-color: gray;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0px;
+  border-radius: 6px;
+  top: -5px;
+  left: 110%;
+  font-weight: normal;
+}
+
+.pharos_tooltip:hover span.pharos_tooltiptext {
+  visibility: visible;
+}
+
+.pharos_tooltip_p {
+  padding-right: 10px;
 }

@@ -28,11 +28,11 @@
     <th width="400px" align="right" style="font-weight: 100; float: left; overflow: hidden;"><%= number_to_human_size(@report[:bytes_by_format]['all']) %></th>
   </tr>
   <% if @report[:subscribers].nil? || @report[:subscribers] == {} %>
-      <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap;">Subscribers</th>
+      <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap;">Sub Accounts</th>
       <th width="400px" align="right" style="font-weight: 100; float: left; overflow: hidden;">None</th>
   <% else %>
       <tr width="600px">
-        <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap;">Subscribers</th>
+        <th width="200px" align="left" style="float: left; overflow: hidden; white-space: nowrap;">Sub Accounts</th>
         <th width="400px" align="right" style="font-weight: 100; float: left; overflow: hidden;">-----------</th>
       </tr>
       <% @report[:subscribers].each do |key, value| %>

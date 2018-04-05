@@ -5,26 +5,36 @@
   <div class="tab-pane" id="cost">
     <h3>Cost Analysis</h3>
     <% if @institution.is_a?(SubscriptionInstitution) || @cost_report[:subscribers].nil? %>
-        <p>You currently have <%= number_to_human_size(@cost_report[:total_file_size]) %> stored, billed at <%= cost_analysis_subscriber(@cost_report[:total_file_size]) %>.</p>
+        <p>You currently have <%= number_to_human_size(@cost_report[:total_file_size]) %> stored, billed at <%= number_to_currency(cost_analysis_subscriber(@cost_report[:total_file_size])) %>.</p>
     <% else %>
-        <p>You currently have <%= number_to_human_size(@cost_report[:subscribers]['total_bytes']) %> stored, billed at <%= cost_analysis_member(@cost_report[:subscribers]['total_bytes']) %>.</p>
+        <p>You currently have <%= number_to_human_size(@cost_report[:subscribers]['total_bytes']) %> stored, billed at <%= number_to_currency(cost_analysis_member(@cost_report[:subscribers]['total_bytes'])) %>.</p>
         <p>If your cost is $0.00, then you have not yet used the full 10TB afforded by your membership.</p>
-        <h3>Subscriber Cost Breakdown</h3>
+        <h3>Sub Account Cost Breakdown</h3>
         <% if @cost_report[:subscribers].nil? || @cost_report[:subscribers] == {} || @cost_report[:subscribers].count == 1 %>
-            <p>You currently have no subscribers</p>
+            <p>You currently have no sub accounts</p>
         <% else %>
-            <dl class="dl-horizontal">
+            <table class="table table-striped sortable">
+              <thead>
+              <tr>
+                <th>Sub Account</th>
+                <th>Cost</th>
+              </tr>
+              </thead>
+              <tbody>
               <% @cost_report[:subscribers].each do |key, value| %>
                   <% unless key == 'total_bytes' %>
-                      <dt><%= key %></dt>
-                      <dd><%= cost_analysis_subscriber(@cost_report[:subscribers][key]) %></dd>
+                      <tr>
+                        <td><%= key %></td>
+                        <td><%= number_to_currency(cost_analysis_subscriber(@cost_report[:subscribers][key])) %></td>
+                      </tr>
                   <% end %>
               <% end %>
-            </dl>
+              </tbody>
+            </table>
         <% end %>
     <% end %>
     <h3>Previous Database Cost Analysis Snapshots</h3>
-    <table class="table">
+    <table class="table table-striped sortable">
       <thead>
       <tr>
         <th>Snapshot Type</th>

@@ -18,7 +18,7 @@ class IntellectualObjectsController < ApplicationController
     @intellectual_objects = IntellectualObject
       .discoverable(current_user)
       .with_institution(user_institution)
-      .with_institution(params[:institution_id])
+      .with_institution(params[:institution])
       .with_description(params[:description])
       .with_description_like(params[:description_like])
       .with_identifier(params[:identifier])
@@ -107,7 +107,7 @@ class IntellectualObjectsController < ApplicationController
     pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
       respond_to do |format|
-        format.json { head :no_content }
+        format.json { head :conflict }
         format.html {
           redirect_to @intellectual_object
           flash[:alert] = 'This item has already been deleted.'
