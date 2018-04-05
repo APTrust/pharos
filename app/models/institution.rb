@@ -156,7 +156,7 @@ class Institution < ActiveRecord::Base
   def event_count
     if self.name == 'APTrust'
       if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
-        # query = 'SELECT COUNT(*) FROM (SELECT id FROM premis_events) AS aptrust_events'
+        # query = 'SELECT COUNT(*) FROM (SELECT identifier FROM premis_events WHERE identifier IS NOT NULL) AS aptrust_events'
         # result = ActiveRecord::Base.connection.exec_query(query)
         # count = result[0]['count']
 
