@@ -158,18 +158,18 @@ class CatalogController < ApplicationController
   def set_filter_values
     case @result_type
       when 'object'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id) # This will definitely lead to institutions with no results listed in the filters w/o counts
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id) # This will definitely lead to institutions with no results listed in the filters w/o counts
         params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted) # As will this
       when 'file'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
         params[:file_format] ? @formats = [params[:file_format]] : @formats = @results.distinct.pluck(:file_format)
       when 'item'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
         params[:status] ? @statuses = [params[:status]] : @statuses = Pharos::Application::PHAROS_STATUSES.values
         params[:stage] ? @stages = [params[:stage]] : @stages = Pharos::Application::PHAROS_STAGES.values
         params[:item_action] ? @actions = [params[:item_action]] : @actions = Pharos::Application::PHAROS_ACTIONS.values
       when 'event'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
+        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
         params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values
         params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
       when 'dpn_item'
@@ -183,23 +183,43 @@ class CatalogController < ApplicationController
       when 'object'
         set_inst_count(@results, :objects)
         set_access_count(@results)
+        sort_institutions_for_filter
       when 'file'
         set_format_count(@results, :files)
         set_inst_count(@results, :files)
+        sort_institutions_for_filter
       when 'item'
         set_status_count(@results)
         set_stage_count(@results)
         set_action_count(@results)
         set_inst_count(@results, :items)
+        sort_institutions_for_filter
       when 'event'
         ######## These are all turned off because they make event searching too time consuming ############
         #set_inst_count(@results, :events)
         #set_event_type_count(@results)
         #set_outcome_count(@results)
+        sort_institutions_for_filter
       when 'dpn_item'
         set_node_count(@results)
         set_queued_count(@results)
     end
+  end
+
+  def sort_institutions_for_filter
+    @sorted_institutions = {}
+    @institutions.each do |id|
+      name = Institution.find(id).name
+      @sorted_institutions[name] = id
+    end
+    @sorted_institutions = Hash[@sorted_institutions.sort]
+
+    @new_inst_counts = {}
+    @inst_counts.each do |key, value|
+      name = Institution.find(key).name
+      @new_inst_counts[name] = [key, value]
+    end
+    @inst_counts = Hash[@new_inst_counts.sort]
   end
 
 end

@@ -1,4 +1,4 @@
-<% if @institutions %>
+<% unless @sorted_institutions == {} %>
     <div id="institution-parent" class="panel panel-default">
       <div id="filter-title-institution" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-institution">
         <h5 class="panel-title">
@@ -12,9 +12,11 @@
                 <% current_inst = Institution.find(@selected[:institution]) %>
                 <script>selected("institution", "<%= current_inst.name %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :institution)%>")</script>
             <% else %>
-                <% @institutions.each do |inst| %>
-                    <% current_inst = Institution.find(inst) %>
-                    <li><span class="facet-label"><a href="<%= current_path('institution', inst) %>"><%= current_inst.name %></a></span></li>
+                <% @sorted_institutions.each do |key, value| %>
+                    <li>
+                      <span class="facet-label"><a href="<%= current_path('institution', value) %>">
+                        <%= key %></a></span>
+                    </li>
                 <% end %>
             <% end %>
           </ul>
