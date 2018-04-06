@@ -11,8 +11,6 @@ class GenericFile < ActiveRecord::Base
   validate :init_institution_id, on: :create
   before_save :freeze_institution_id
 
-  delegate :institution, to: :intellectual_object
-
   ### Scopes
   scope :created_before, ->(param) { where('generic_files.created_at < ?', param) unless param.blank? }
   scope :created_after, ->(param) { where('generic_files.created_at > ?', param) unless param.blank? }
@@ -21,10 +19,7 @@ class GenericFile < ActiveRecord::Base
   scope :with_file_format, ->(param) { where(file_format: param) unless param.blank? }
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
   scope :with_identifier_like, ->(param) { where('generic_files.identifier like ?', "%#{param}%") unless GenericFile.empty_param(param) }
-  scope :with_institution, ->(param) {
-    joins(:intellectual_object)
-    .where('intellectual_objects.institution_id = ?', param) unless param.blank?
-  }
+  scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
   scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
   scope :not_checked_since, ->(param) { where("last_fixity_check < ? and generic_files.state='A'", param) unless param.blank? }
