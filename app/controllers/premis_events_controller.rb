@@ -178,8 +178,7 @@ class PremisEventsController < ApplicationController
     get_institution_counts
     get_event_type_counts
     get_outcome_counts
-    #count = @premis_events.size
-    count = @premis_events.where.not(identifier: nil).pluck(:identifier).size
+    count = @premis_events.where.not(identifier: nil).count
     set_page_counts(count)
     case params[:sort]
       when 'date'
@@ -193,6 +192,8 @@ class PremisEventsController < ApplicationController
 
   def get_institution_counts
     @selected[:institution] = params[:institution] if params[:institution]
+    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
+    # Can be turned on if efficiency improves to the point where filter counts are plausible
     # counts = @premis_events.group(:institution_id).size
     # @inst_counts = {}
     # counts.each do |key, value|
@@ -200,19 +201,18 @@ class PremisEventsController < ApplicationController
     #   @inst_counts[name] = [key, value]
     # end
     # @inst_counts = Hash[@inst_counts.sort]
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
   end
 
   def get_event_type_counts
     @selected[:event_type] = params[:event_type] if params[:event_type]
-    # @event_type_counts = @premis_events.group(:event_type).size
     params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values.sort
+    # @event_type_counts = @premis_events.group(:event_type).size # Can be turned on if efficiency improves to the point where filter counts are plausible
   end
 
   def get_outcome_counts
     @selected[:outcome] = params[:outcome] if params[:outcome]
-    # @outcome_counts = @premis_events.group(:outcome).size
     params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Failure Success)
+    # @outcome_counts = @premis_events.group(:outcome).size # Can be turned on if efficiency improves to the point where filter counts are plausible
   end
 
   private
