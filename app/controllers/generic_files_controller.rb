@@ -29,7 +29,7 @@ class GenericFilesController < ApplicationController
           if current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID
             @generic_files = GenericFile.all
           else
-            @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
+            @generic_files = GenericFile.with_institution(@institution.id)
           end
         end
       end
@@ -43,8 +43,9 @@ class GenericFilesController < ApplicationController
         .created_after(params[:created_after])
         .updated_before(params[:updated_before])
         .updated_after(params[:updated_after])
-      filter
-      sort
+        .with_institution(params[:institution])
+        .with_file_format(params[:file_format])
+      filter_count_and_sort
       page_results(@generic_files)
       (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
       respond_to do |format|
@@ -337,21 +338,38 @@ class GenericFilesController < ApplicationController
     return "#{start_of_name}#{dirname}#{encoded_end}"
   end
 
-  def filter
-    set_filter_values
-    initialize_filter_counters
-    filter_by_institution unless params[:institution].nil?
-    filter_by_state unless params[:state].nil?
-    filter_by_format unless params[:file_format].nil?
-    set_format_count(@generic_files, :files)
-    set_inst_count(@generic_files, :files)
+  def filter_count_and_sort
+    @selected = {}
+    params[:state] = 'A' if params[:state].nil?
+    @generic_files = @generic_files.with_state(params[:state]) unless params[:state] == 'all'
+    get_format_counts
+    get_institution_counts
     count = @generic_files.count
     set_page_counts(count)
+    case params[:sort]
+      when 'date'
+        @generic_files = @generic_files.order('updated_at DESC')
+      when 'name'
+        @generic_files = @generic_files.order('identifier').reverse_order
+      when 'institution'
+        @generic_files = @generic_files.joins(:institution).order('institutions.name')
+    end
   end
 
-  def set_filter_values
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-    params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
+  def get_format_counts
+    @selected[:file_format] = params[:file_format] if params[:file_format]
+    @format_counts = @generic_files.group(:file_format).count
+  end
+
+  def get_institution_counts
+    @selected[:institution] = params[:institution] if params[:institution]
+    counts = @generic_files.group(:institution_id).count
+    @inst_counts = {}
+    counts.each do |key, value|
+      name = Institution.find(key).name
+      @inst_counts[name] = [key, value]
+    end
+    @inst_counts = Hash[@inst_counts.sort]
   end
 
   private

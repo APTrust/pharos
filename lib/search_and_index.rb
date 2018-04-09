@@ -36,39 +36,30 @@ module SearchAndIndex
 
   def filter_by_institution
     @results = @results.with_institution(params[:institution]) unless @results.nil?
-    @intellectual_objects = @intellectual_objects.with_institution(params[:institution]) unless @intellectual_objects.nil?
-    @generic_files = @generic_files.with_institution(params[:institution]) unless @generic_files.nil?
     @items = @items.with_institution(params[:institution]) unless @items.nil?
-    @premis_events = @premis_events.with_institution(params[:institution]) unless @premis_events.nil?
     @selected[:institution] = params[:institution]
   end
 
   def filter_by_access
     @results = @results.with_access(params[:access]) unless @results.nil?
-    @intellectual_objects = @intellectual_objects.with_access(params[:access]) unless @intellectual_objects.nil?
-    @generic_files = @generic_files.with_access(params[:access]) unless @generic_files.nil?
     @items = @items.with_access(params[:access]) unless @items.nil?
     @selected[:access] = params[:access]
   end
 
   def filter_by_format
     @results = @results.with_file_format(params[:file_format]) unless @results.nil?
-    @intellectual_objects = @intellectual_objects.with_file_format(params[:file_format]) unless @intellectual_objects.nil?
-    @generic_files = @generic_files.with_file_format(params[:file_format]) unless @generic_files.nil?
     @selected[:file_format] = params[:file_format]
   end
 
   def filter_by_object_association
     @results = @results.where(intellectual_object_id: params[:object_association]) unless @results.nil?
     @items = @items.where(intellectual_object_id: params[:object_association]) unless @items.nil?
-    @premis_events = @premis_events.where(intellectual_object_id: params[:object_association]) unless @premis_events.nil?
     @selected[:object_association] = params[:object_association]
   end
 
   def filter_by_file_association
     @results = @results.where(generic_file_id: params[:file_association]) unless @results.nil?
     @items = @items.where(generic_file_id: params[:file_association]) unless @items.nil?
-    @premis_events = @premis_events.where(generic_file_id: params[:file_association]) unless @premis_events.nil?
     @selected[:file_association] = params[:file_association]
   end
 
@@ -76,8 +67,6 @@ module SearchAndIndex
     params[:state] = 'A' if params[:state].nil?
     unless params[:state] == 'all'
       @results = @results.with_state(params[:state]) unless @results.nil?
-      @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless @intellectual_objects.nil?
-      @generic_files = @generic_files.with_state(params[:state]) unless @generic_files.nil?
       @items = @items.with_state(params[:state]) unless @items.nil?
       @selected[:state] = params[:state]
     end
@@ -85,13 +74,11 @@ module SearchAndIndex
 
   def filter_by_event_type
     @results = @results.with_type(params[:event_type]) unless @results.nil?
-    @premis_events = @premis_events.with_type(params[:event_type]) unless @premis_events.nil?
     @selected[:event_type] = params[:event_type]
   end
 
   def filter_by_outcome
     @results = @results.with_outcome(params[:outcome]) unless @results.nil?
-    @premis_events = @premis_events.with_outcome(params[:outcome]) unless @premis_events.nil?
     @selected[:outcome] = params[:outcome]
   end
 
@@ -139,10 +126,7 @@ module SearchAndIndex
           @results = @results.order('dpn_work_items.queued_at DESC') unless @results.nil?
       end
     end
-    @intellectual_objects = @intellectual_objects.order('created_at DESC') unless @intellectual_objects.nil?
-    @generic_files = @generic_files.order('created_at DESC') unless @generic_files.nil?
     @items = @items.order('date DESC') unless @items.nil?
-    @premis_events = @premis_events.order('date_time DESC') unless @premis_events.nil?
   end
 
   def sort_by_name
@@ -160,18 +144,12 @@ module SearchAndIndex
           @results = @results.order ('identifier') unless @results.nil?
       end
     end
-    @intellectual_objects = @intellectual_objects.order('bag_name').reverse_order unless @intellectual_objects.nil?
-    @generic_files = @generic_files.order('uri') unless @generic_files.nil?
     @items = @items.order('name') unless @items.nil?
-    @premis_events = @premis_events.order('identifier') unless @premis_events.nil?
   end
 
   def sort_by_institution
     @results = @results.joins(:institution).order('institutions.name') unless @results.nil?
-    @intellectual_objects = @intellectual_objects.joins(:institution).order('institutions.name') unless @intellectual_objects.nil?
-    @generic_files = @generic_files.joins(:institution).order('institutions.name') unless @generic_files.nil?
     @items = @items.joins(:institution).order('institutions.name') unless @items.nil?
-    @premis_events = @premis_events.joins(:institution).order('institutions.name') unless @premis_events.nil?
   end
 
   # TODO: Discuss needs, to see which code we keep.

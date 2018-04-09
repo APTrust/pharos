@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180405133922) do
+ActiveRecord::Schema.define(version: 20180409203524) do
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -101,12 +101,16 @@ ActiveRecord::Schema.define(version: 20180405133922) do
     t.index ["file_format"], name: "index_generic_files_on_file_format"
     t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
     t.index ["institution_id", "size", "state"], name: "index_generic_files_on_institution_id_and_size_and_state"
+    t.index ["institution_id", "state", "file_format"], name: "index_files_on_inst_state_and_format"
+    t.index ["institution_id", "state", "updated_at"], name: "index_files_on_inst_state_and_updated"
     t.index ["institution_id", "state"], name: "index_generic_files_on_institution_id_and_state"
+    t.index ["institution_id", "updated_at"], name: "index_generic_files_on_institution_id_and_updated_at"
     t.index ["institution_id"], name: "index_generic_files_on_institution_id"
     t.index ["intellectual_object_id", "file_format"], name: "index_generic_files_on_intellectual_object_id_and_file_format"
     t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
     t.index ["size", "state"], name: "index_generic_files_on_size_and_state"
     t.index ["size"], name: "index_generic_files_on_size"
+    t.index ["state", "updated_at"], name: "index_generic_files_on_state_and_updated_at"
     t.index ["state"], name: "index_generic_files_on_state"
     t.index ["updated_at"], name: "index_generic_files_on_updated_at"
   end
@@ -162,8 +166,8 @@ ActiveRecord::Schema.define(version: 20180405133922) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "institution_id"
     t.string "outcome"
+    t.integer "institution_id"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"

@@ -344,7 +344,7 @@ class IntellectualObjectsController < ApplicationController
     set_page_counts(count)
     case params[:sort]
       when 'date'
-        @intellectual_objects = @intellectual_objects.order('created_at DESC')
+        @intellectual_objects = @intellectual_objects.order('updated_at DESC')
       when 'name'
         @intellectual_objects = @intellectual_objects.order('bag_name').reverse_order
       when 'institution'
