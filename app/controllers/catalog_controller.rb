@@ -26,9 +26,7 @@ class CatalogController < ApplicationController
       when 'DPN Items'
         dpn_item_search
     end
-    filter
-    params[:sort] = 'date' unless params[:sort]
-    sort
+    filter_sort_and_count
     page_results(@results)
     respond_to do |format|
       format.json { render json: {results: @paged_results, next: @next, previous: @previous} }
@@ -49,60 +47,57 @@ class CatalogController < ApplicationController
   protected
 
   def object_search
-    # Limit results to those the current user is allowed to read.
     objects = IntellectualObject.discoverable(current_user)
     @result_type = 'object'
     if @empty_param
       @results = objects
-      return
-    end
-    case params[:search_field]
-      when 'Object Identifier'
-        @results = objects.with_identifier(@q)
-      when 'Alternate Identifier'
-        @results = objects.with_alt_identifier_like(@q)
-      when 'Bag Name'
-        @results = objects.with_bag_name_like(@q)
-      when 'Title'
-        @results = objects.with_title_like(@q)
-      when 'Bagging Group Identifier'
-        @results = objects.with_bagging_group_identifier_like(@q)
+    else
+      case params[:search_field]
+        when 'Object Identifier'
+          @results = objects.with_identifier(@q)
+        when 'Alternate Identifier'
+          @results = objects.with_alt_identifier_like(@q)
+        when 'Bag Name'
+          @results = objects.with_bag_name_like(@q)
+        when 'Title'
+          @results = objects.with_title_like(@q)
+        when 'Bagging Group Identifier'
+          @results = objects.with_bagging_group_identifier_like(@q)
+      end
     end
   end
 
   def file_search
-    # Limit results to those the current user is allowed to read.
     files = GenericFile.discoverable(current_user)
     @result_type = 'file'
     if @empty_param
       @results = files
-      return
-    end
-    case params[:search_field]
-      when 'File Identifier'
-        @results = files.with_identifier(@q)
-      when 'URI'
-        @results = files.with_uri_like(@q)
+    else
+      case params[:search_field]
+        when 'File Identifier'
+          @results = files.with_identifier(@q)
+        when 'URI'
+          @results = files.with_uri_like(@q)
+      end
     end
   end
 
   def item_search
-    # Limit results to those the current user is allowed to read.
     items = WorkItem.readable(current_user)
     @result_type = 'item'
     if @empty_param
       @results = items
-      return
-    end
-    case params[:search_field]
-      when 'Name'
-        @results = items.with_name_like(@q)
-      when 'Etag'
-        @results = items.with_etag_like(@q)
-      when 'Object Identifier'
-        @results = items.with_object_identifier(@q)
-      when 'File Identifier'
-        @results = items.with_file_identifier(@q)
+    else
+      case params[:search_field]
+        when 'Name'
+          @results = items.with_name_like(@q)
+        when 'Etag'
+          @results = items.with_etag_like(@q)
+        when 'Object Identifier'
+          @results = items.with_object_identifier(@q)
+        when 'File Identifier'
+          @results = items.with_file_identifier(@q)
+      end
     end
   end
 
@@ -111,15 +106,15 @@ class CatalogController < ApplicationController
     @result_type = 'event'
     if @empty_param
       @results = events
-      return
-    end
-    case params[:search_field]
-      when 'Event Identifier'
-        @results = events.with_event_identifier(@q)
-      when 'Object Identifier'
-        @results = events.with_object_identifier(@q)
-      when 'File Identifier'
-        @results = events.with_file_identifier(@q)
+    else
+      case params[:search_field]
+        when 'Event Identifier'
+          @results = events.with_event_identifier(@q)
+        when 'Object Identifier'
+          @results = events.with_object_identifier(@q)
+        when 'File Identifier'
+          @results = events.with_file_identifier(@q)
+      end
     end
   end
 
@@ -128,98 +123,111 @@ class CatalogController < ApplicationController
     @result_type = 'dpn_item'
     if @empty_param
       @results = items
-      return
-    end
-    case params[:search_field]
-      when 'Item Identifier'
-        @results = items.with_identifier(@q)
+    else
+      case params[:search_field]
+        when 'Item Identifier'
+          @results = items.with_identifier(@q)
+      end
     end
   end
 
-  def filter
-    initialize_filter_counters
-    filter_by_status unless params[:status].nil?
-    filter_by_stage unless params[:stage].nil?
-    filter_by_action unless params[:item_action].nil?
-    filter_by_institution unless params[:institution].nil?
-    filter_by_access unless params[:access].nil?
-    filter_by_state unless params[:state].nil?
-    filter_by_format unless params[:file_format].nil?
-    filter_by_event_type unless params[:event_type].nil?
-    filter_by_outcome unless params[:outcome].nil?
-    filter_by_node unless params[:remote_node].nil?
-    filter_by_queued unless params[:queued].nil?
-    set_filter_values
-    set_filter_counts
+  def filter_sort_and_count
+    @selected = {}
+    case @result_type
+      when 'object'
+        @results = @results
+                       .with_institution(params[:institution])
+                       .with_access(params[:access])
+        params[:state] = 'A' if params[:state].nil?
+        @results = @results.with_state(params[:state]) unless params[:state] == 'all'
+        get_institution_counts(@results)
+        get_object_access_counts(@results)
+      when 'file'
+        @results = @results
+                       .with_institution(params[:institution])
+                       .with_access(params[:access])
+                       .with_file_format(params[:file_format])
+        params[:state] = 'A' if params[:state].nil?
+        @results = @results.with_state(params[:state]) unless params[:state] == 'all'
+        get_institution_counts(@results)
+        get_format_counts(@results)
+        get_file_access_counts(@results)
+      when 'item'
+        @results = @results
+                       .with_institution(params[:institution])
+                       .with_status(params[:status])
+                       .with_stage(params[:stage])
+                       .with_action(params[:item_action])
+        params[:state] = 'A' if params[:state].nil?
+        @results = @results.with_state(params[:state]) unless params[:state] == 'all'
+        get_status_counts(@results)
+        get_stage_counts(@results)
+        get_action_counts(@results)
+        get_institution_counts(@results)
+      when 'event'
+        @results = @results
+                       .with_institution(params[:institution])
+                       .with_type(params[:event_type])
+                       .with_outcome(params[:outcome])
+        get_event_institution_counts(@results)
+        get_event_type_counts(@results)
+        get_outcome_counts(@results)
+      when 'dpn_item'
+        @results = @results
+                       .with_remote_node(params[:remote_node])
+                       .queued(params[:queued])
+        get_node_counts(@results)
+        get_queued_counts(@results)
+    end
+    params[:sort] = 'date' unless params[:sort]
+    case params[:sort]
+      when 'date'
+        sort_by_date
+      when 'name'
+        sort_by_name
+      when 'institution'
+        sort_by_institution
+    end
     count = @results.count
     set_page_counts(count)
   end
 
-  def set_filter_values
-    case @result_type
-      when 'object'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id) # This will definitely lead to institutions with no results listed in the filters w/o counts
-        params[:access] ? @accesses = [params[:access]] : @accesses = %w(consortia institution restricted) # As will this
-      when 'file'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-        params[:file_format] ? @formats = [params[:file_format]] : @formats = @results.distinct.pluck(:file_format)
-      when 'item'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-        params[:status] ? @statuses = [params[:status]] : @statuses = Pharos::Application::PHAROS_STATUSES.values
-        params[:stage] ? @stages = [params[:stage]] : @stages = Pharos::Application::PHAROS_STAGES.values
-        params[:item_action] ? @actions = [params[:item_action]] : @actions = Pharos::Application::PHAROS_ACTIONS.values
-      when 'event'
-        params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-        params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values
-        params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Success Failure)
-      when 'dpn_item'
-        params[:remote_node] ? @nodes = [params[:remote_node]] : @nodes = %w(chron hathi sdr tdr aptrust)
-        @queued_filter = true
+  def sort_by_date
+    if @result_type
+      case @result_type
+        when 'object'
+          @results = @results.order('intellectual_objects.updated_at DESC') unless @results.nil?
+        when 'file'
+          @results = @results.order('generic_files.updated_at DESC') unless @results.nil?
+        when 'event'
+          @results = @results.order('premis_events.date_time DESC') unless @results.nil?
+        when 'item'
+          @results = @results.order('work_items.date DESC') unless @results.nil?
+        when 'dpn_item'
+          @results = @results.order('dpn_work_items.queued_at DESC') unless @results.nil?
+      end
     end
   end
 
-  def set_filter_counts
-    case @result_type
-      when 'object'
-        set_inst_count(@results, :objects)
-        set_access_count(@results)
-        sort_institutions_for_filter
-      when 'file'
-        set_format_count(@results, :files)
-        set_inst_count(@results, :files)
-        sort_institutions_for_filter
-      when 'item'
-        set_status_count(@results)
-        set_stage_count(@results)
-        set_action_count(@results)
-        set_inst_count(@results, :items)
-        sort_institutions_for_filter
-      when 'event'
-        ######## These are all turned off because they make event searching too time consuming ############
-        #set_inst_count(@results, :events)
-        #set_event_type_count(@results)
-        #set_outcome_count(@results)
-        sort_institutions_for_filter
-      when 'dpn_item'
-        set_node_count(@results)
-        set_queued_count(@results)
+  def sort_by_name
+    if @result_type
+      case @result_type
+        when 'object'
+          @results = @results.order('title') unless @results.nil?
+        when 'file'
+          @results = @results.order('identifier') unless @results.nil?
+        when 'event'
+          @results = @results.order('identifier').reverse_order unless @results.nil?
+        when 'item'
+          @results = @results.order('name') unless @results.nil?
+        when 'dpn_item'
+          @results = @results.order ('identifier') unless @results.nil?
+      end
     end
   end
 
-  def sort_institutions_for_filter
-    @sorted_institutions = {}
-    @institutions.each do |id|
-      name = Institution.find(id).name
-      @sorted_institutions[name] = id
-    end
-    @sorted_institutions = Hash[@sorted_institutions.sort]
-
-    @new_inst_counts = {}
-    @inst_counts.each do |key, value|
-      name = Institution.find(key).name
-      @new_inst_counts[name] = [key, value]
-    end
-    @inst_counts = Hash[@new_inst_counts.sort]
+  def sort_by_institution
+    @results = @results.joins(:institution).order('institutions.name') unless @results.nil?
   end
 
 end
