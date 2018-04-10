@@ -24,18 +24,6 @@ class PremisEventsController < ApplicationController
     params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
     authorize @parent
     @institution = current_user.institution
-    @premis_events = @premis_events
-      .with_institution(params[:institution])
-      .with_type(params[:event_type])
-      .with_outcome(params[:outcome])
-      .with_create_date(params[:created_at])
-      .created_before(params[:created_before])
-      .created_after(params[:created_after])
-      .with_event_identifier(params[:event_identifier])
-      .with_object_identifier(params[:object_identifier])
-      .with_object_identifier_like(params[:object_identifier_like])
-      .with_file_identifier(params[:file_identifier])
-      .with_file_identifier_like(params[:file_identifier_like])
     filter_count_and_sort
     page_results(@premis_events)
     respond_to do |format|
@@ -174,6 +162,18 @@ class PremisEventsController < ApplicationController
   end
 
   def filter_count_and_sort
+    @premis_events = @premis_events
+                         .with_institution(params[:institution])
+                         .with_type(params[:event_type])
+                         .with_outcome(params[:outcome])
+                         .with_create_date(params[:created_at])
+                         .created_before(params[:created_before])
+                         .created_after(params[:created_after])
+                         .with_event_identifier(params[:event_identifier])
+                         .with_object_identifier(params[:object_identifier])
+                         .with_object_identifier_like(params[:object_identifier_like])
+                         .with_file_identifier(params[:file_identifier])
+                         .with_file_identifier_like(params[:file_identifier_like])
     @selected = {}
     get_institution_counts
     get_event_type_counts

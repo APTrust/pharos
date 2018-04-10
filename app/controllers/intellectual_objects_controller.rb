@@ -15,28 +15,7 @@ class IntellectualObjectsController < ApplicationController
     else
       user_institution = current_user.institution
     end
-    @intellectual_objects = IntellectualObject
-      .discoverable(current_user)
-      .with_institution(user_institution)
-      .with_institution(params[:institution])
-      .with_description(params[:description])
-      .with_description_like(params[:description_like])
-      .with_identifier(params[:identifier])
-      .with_identifier_like(params[:identifier_like])
-      .with_bagging_group_identifier(params[:bagging_group_identifier])
-      .with_bagging_group_identifier_like(params[:bagging_group_identifier_like])
-      .with_alt_identifier(params[:alt_identifier])
-      .with_alt_identifier_like(params[:alt_identifier_like])
-      .with_bag_name(params[:bag_name])
-      .with_bag_name_like(params[:bag_name_like])
-      .with_etag(params[:etag])
-      .with_etag_like(params[:etag_like])
-      .created_before(params[:created_before])
-      .created_after(params[:created_after])
-      .updated_before(params[:updated_before])
-      .updated_after(params[:updated_after])
-      .with_access(params[:access])
-      .with_file_format(params[:file_format])
+    @intellectual_objects = IntellectualObject.discoverable(current_user).with_institution(user_institution)
     filter_count_and_sort
     page_results(@intellectual_objects)
     (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
@@ -334,9 +313,29 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def filter_count_and_sort
-    @selected = {}
+    @intellectual_objects = @intellectual_objects
+                                .with_institution(params[:institution])
+                                .with_description(params[:description])
+                                .with_description_like(params[:description_like])
+                                .with_identifier(params[:identifier])
+                                .with_identifier_like(params[:identifier_like])
+                                .with_bagging_group_identifier(params[:bagging_group_identifier])
+                                .with_bagging_group_identifier_like(params[:bagging_group_identifier_like])
+                                .with_alt_identifier(params[:alt_identifier])
+                                .with_alt_identifier_like(params[:alt_identifier_like])
+                                .with_bag_name(params[:bag_name])
+                                .with_bag_name_like(params[:bag_name_like])
+                                .with_etag(params[:etag])
+                                .with_etag_like(params[:etag_like])
+                                .created_before(params[:created_before])
+                                .created_after(params[:created_after])
+                                .updated_before(params[:updated_before])
+                                .updated_after(params[:updated_after])
+                                .with_access(params[:access])
+                                .with_file_format(params[:file_format])
     params[:state] = 'A' if params[:state].nil?
     @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless params[:state] == 'all'
+    @selected = {}
     get_format_counts
     get_institution_counts
     get_access_counts
