@@ -10,9 +10,19 @@ class WorkItemsController < ApplicationController
   after_action :verify_authorized
 
   def index
-    set_items
-    filter unless request.format == :json
-    sort
+    if current_user.admin?
+      if params[:institution].present?
+        @items = WorkItem.with_institution(params[:institution])
+        @institution = Institution.find(params[:institution])
+      else
+        @items = WorkItem.all
+        @institution = current_user.institution
+      end
+    else
+      @items = WorkItem.readable(current_user)
+      @institution = current_user.institution
+    end
+    filter_count_and_sort
     page_results(@items)
     if @items.nil? || @items.empty?
       authorize current_user, :nil_index?
@@ -379,43 +389,6 @@ class WorkItemsController < ApplicationController
                   :node, :pid, :needs_admin_review)
   end
 
-  def set_items
-    if current_user.admin?
-      params[:institution].present? ? @items = WorkItem.with_institution(params[:institution]) : @items = WorkItem.all
-    else
-      @items = WorkItem.readable(current_user)
-    end
-    params[:institution].present? ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
-    params[:sort] = 'date' if params[:sort].nil?
-    params[:retry] = to_boolean(params[:retry]) if params[:retry]
-    bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
-    bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
-    @items = @items
-      .created_before(params[:created_before])
-      .created_after(params[:created_after])
-      .updated_before(params[:updated_before])
-      .updated_after(params[:updated_after])
-      .with_bag_date(bag_date1, bag_date2)
-      .with_name(params[:name])
-      .with_name_like(params[:name_contains])
-      .with_etag(params[:etag])
-      .with_etag_like(params[:etag_contains])
-      .with_object_identifier(params[:object_identifier])
-      .with_object_identifier_like(params[:object_identifier_contains])
-      .with_file_identifier(params[:file_identifier])
-      .with_file_identifier_like(params[:file_identifier_contains])
-      .with_status(params[:status])
-      .with_stage(params[:stage])
-      .with_action(params[:item_action])
-      .queued(params[:queued])
-      .with_node(params[:node])
-      .with_unempty_node(params[:node_not_empty])
-      .with_empty_node(params[:node_empty])
-    @items = @items.with_retry(params[:retry]) unless params[:retry].nil?
-    count = @items.count
-    set_page_counts(count)
-  end
-
   def set_item
     @institution = current_user.institution
     if Rails.env.test? || Rails.env.development?
@@ -477,40 +450,79 @@ class WorkItemsController < ApplicationController
     http.request(request)
   end
 
-  def filter
-    set_filter_values
-    initialize_filter_counters
-    filter_by_status unless params[:status].nil?
-    filter_by_stage unless params[:stage].nil?
-    filter_by_action unless params[:item_action].nil?
-    filter_by_institution unless params[:institution].nil?
-    #filter_by_object_association unless params[:object_association].nil?
-    #filter_by_file_association unless params[:file_association].nil?
-    filter_by_state unless params[:state].nil?
+  def filter_count_and_sort
+    bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
+    bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
     date = format_date if params[:updated_since].present?
-    pattern = '%' + params[:name_contains] + '%' if params[:name_contains].present?
-    @items = @items.with_name(params[:name_exact])
-    @items = @items.with_name_like(pattern) if pattern
-    @items = @items.updated_after(date) if date
-    set_status_count(@items)
-    set_stage_count(@items)
-    set_action_count(@items)
-    set_inst_count(@items, :items)
+    @items = @items
+                 .created_before(params[:created_before])
+                 .created_after(params[:created_after])
+                 .updated_before(params[:updated_before])
+                 .updated_after(params[:updated_after])
+                 .updated_after(date)
+                 .with_bag_date(bag_date1, bag_date2)
+                 .with_name(params[:name_exact])
+                 .with_name(params[:name])
+                 .with_name_like(params[:name_contains])
+                 .with_name_like(params[:name_contains])
+                 .with_etag(params[:etag])
+                 .with_etag_like(params[:etag_contains])
+                 .with_object_identifier(params[:object_identifier])
+                 .with_object_identifier_like(params[:object_identifier_contains])
+                 .with_file_identifier(params[:file_identifier])
+                 .with_file_identifier_like(params[:file_identifier_contains])
+                 .with_status(params[:status])
+                 .with_stage(params[:stage])
+                 .with_action(params[:item_action])
+                 .queued(params[:queued])
+                 .with_node(params[:node])
+                 .with_unempty_node(params[:node_not_empty])
+                 .with_empty_node(params[:node_empty])
+                 .with_retry(params[:retry])
+    params[:state] = 'A' if params[:state].nil?
+    @items = @items.with_state(params[:state]) unless params[:state] == 'all'
+    @selected = {}
+    get_status_counts
+    get_stage_counts
+    get_action_counts
+    get_institution_counts
     count = @items.count
     set_page_counts(count)
+    params[:sort] = 'date' if params[:sort].nil?
+    case params[:sort]
+      when 'date'
+        @items = @items.order('date DESC')
+      when 'name'
+        @items = @items.order('name')
+      when 'institution'
+        @items = @items.joins(:institution).order('institutions.name')
+    end
   end
 
-  def set_filter_values
-    params[:status] ? @statuses = [params[:status]] : @statuses = Pharos::Application::PHAROS_STATUSES.values
-    params[:stage] ? @stages = [params[:stage]] : @stages = Pharos::Application::PHAROS_STAGES.values
-    params[:item_action] ? @actions = [params[:item_action]] : @actions = Pharos::Application::PHAROS_ACTIONS.values
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.pluck(:id)
-    #params[:object_association] ? @object_associations = [params[:object_association]] : @object_associations = @items.distinct.pluck(:intellectual_object_id)
-    #params[:file_association] ? @file_associations = [params[:file_association]] : @file_associations = @items.distinct.pluck(:generic_file_id)
+  def get_status_counts
+    @selected[:status] = params[:status] if params[:status]
+    @status_counts = @items.group(:status).count
   end
 
-  def to_boolean(str)
-    str == 'true'
+  def get_stage_counts
+    @selected[:stage] = params[:stage] if params[:stage]
+    @stage_counts = @items.group(:stage).count
+  end
+
+  def get_action_counts
+    @selected[:item_action] = params[:item_action] if params[:item_action]
+    @action_counts = @items.group(:action).count
+  end
+
+  def get_institution_counts
+    @selected[:institution] = params[:institution] if params[:institution]
+    counts = @items.group(:institution_id).count
+    @inst_counts = {}
+    counts.each do |key, value|
+      name = Institution.find(key).name
+      @inst_counts[name] = [key, value]
+    end
+    @inst_counts = Hash[@inst_counts.sort]
   end
 
   def check_for_completed_restoration

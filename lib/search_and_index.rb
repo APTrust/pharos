@@ -18,31 +18,26 @@ module SearchAndIndex
 
   def filter_by_status
     @results = @results.with_status(params[:status]) unless @results.nil?
-    @items = @items.with_status(params[:status]) unless @items.nil?
     @selected[:status] = params[:status]
   end
 
   def filter_by_stage
     @results = @results.with_stage(params[:stage]) unless @results.nil?
-    @items = @items.with_stage(params[:stage]) unless @items.nil?
     @selected[:stage] = params[:stage]
   end
 
   def filter_by_action
     @results = @results.with_action(params[:item_action]) unless @results.nil?
-    @items = @items.with_action(params[:item_action]) unless @items.nil?
     @selected[:item_action] = params[:item_action]
   end
 
   def filter_by_institution
     @results = @results.with_institution(params[:institution]) unless @results.nil?
-    @items = @items.with_institution(params[:institution]) unless @items.nil?
     @selected[:institution] = params[:institution]
   end
 
   def filter_by_access
     @results = @results.with_access(params[:access]) unless @results.nil?
-    @items = @items.with_access(params[:access]) unless @items.nil?
     @selected[:access] = params[:access]
   end
 
@@ -53,13 +48,11 @@ module SearchAndIndex
 
   def filter_by_object_association
     @results = @results.where(intellectual_object_id: params[:object_association]) unless @results.nil?
-    @items = @items.where(intellectual_object_id: params[:object_association]) unless @items.nil?
     @selected[:object_association] = params[:object_association]
   end
 
   def filter_by_file_association
     @results = @results.where(generic_file_id: params[:file_association]) unless @results.nil?
-    @items = @items.where(generic_file_id: params[:file_association]) unless @items.nil?
     @selected[:file_association] = params[:file_association]
   end
 
@@ -67,7 +60,6 @@ module SearchAndIndex
     params[:state] = 'A' if params[:state].nil?
     unless params[:state] == 'all'
       @results = @results.with_state(params[:state]) unless @results.nil?
-      @items = @items.with_state(params[:state]) unless @items.nil?
       @selected[:state] = params[:state]
     end
   end
@@ -122,7 +114,6 @@ module SearchAndIndex
           @results = @results.order('dpn_work_items.queued_at DESC') unless @results.nil?
       end
     end
-    @items = @items.order('date DESC') unless @items.nil?
   end
 
   def sort_by_name
@@ -140,12 +131,10 @@ module SearchAndIndex
           @results = @results.order ('identifier') unless @results.nil?
       end
     end
-    @items = @items.order('name') unless @items.nil?
   end
 
   def sort_by_institution
     @results = @results.joins(:institution).order('institutions.name') unless @results.nil?
-    @items = @items.joins(:institution).order('institutions.name') unless @items.nil?
   end
 
   # TODO: Discuss needs, to see which code we keep.

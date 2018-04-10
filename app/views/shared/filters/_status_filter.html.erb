@@ -11,13 +11,11 @@
         <% if @selected[:status] %>
             <script>selected("status", "<%= @selected[:status] %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :status)%>")</script>
         <% else %>
-            <% @statuses.each do |status| %>
-                <% unless @status_counts[status] == 0 || @status_counts[status].nil? || status.nil? %>
+            <% @status_counts.each do |status, count| %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('status', status) %>"><%= status %></a></span>
-                      <span class="facet-count">(<%= @status_counts[status] %>)</span>
+                      <span class="facet-count">(<%= count %>)</span>
                     </li>
-                <% end %>
             <% end %>
         <% end %>
       </ul>

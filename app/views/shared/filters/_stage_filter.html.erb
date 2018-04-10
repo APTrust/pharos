@@ -11,13 +11,11 @@
         <% if @selected[:stage] %>
             <script>selected("stage", "<%= @selected[:stage] %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :stage)%>")</script>
         <% else %>
-            <% @stages.each do |stage| %>
-                <% unless @stage_counts[stage] == 0 || @stage_counts[stage].nil? || stage.nil? %>
+            <% @stage_counts.each do |stage, count| %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('stage', stage) %>"><%= stage %></a></span>
-                      <span class="facet-count">(<%= @stage_counts[stage] %>)</span>
+                      <span class="facet-count">(<%= count %>)</span>
                     </li>
-                <% end %>
             <% end %>
         <% end %>
       </ul>

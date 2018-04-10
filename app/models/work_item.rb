@@ -35,7 +35,14 @@ class WorkItem < ActiveRecord::Base
   scope :with_node, ->(param) { where(node: param) unless param.blank? }
   scope :with_unempty_node, ->(param) { where("node is NOT NULL and node != ''") if param == 'true' }
   scope :with_empty_node, ->(param) { where("node is NULL or node = ''") if param == 'true' }
-  scope :with_retry, ->(param) { where(retry: param) }
+  scope :with_retry, ->(param) {
+    unless param.blank?
+      if param == 'true'
+        where(retry: true)
+      elsif param == 'false'
+        where(retry: false)
+      end
+    end }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?
