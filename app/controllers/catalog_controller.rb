@@ -151,24 +151,27 @@ class CatalogController < ApplicationController
         @results = @results.with_state(params[:state]) unless params[:state] == 'all'
         get_institution_counts(@results)
         get_format_counts(@results)
-        get_file_access_counts(@results)
+        get_non_object_access_counts(@results)
       when 'item'
         @results = @results
                        .with_institution(params[:institution])
                        .with_status(params[:status])
                        .with_stage(params[:stage])
                        .with_action(params[:item_action])
+                       .with_access(params[:access])
         params[:state] = 'A' if params[:state].nil?
         @results = @results.with_state(params[:state]) unless params[:state] == 'all'
         get_status_counts(@results)
         get_stage_counts(@results)
         get_action_counts(@results)
         get_institution_counts(@results)
+        get_non_object_access_counts(@results)
       when 'event'
         @results = @results
                        .with_institution(params[:institution])
                        .with_type(params[:event_type])
                        .with_outcome(params[:outcome])
+                       .with_access(params[:access])
         get_event_institution_counts(@results)
         get_event_type_counts(@results)
         get_outcome_counts(@results)

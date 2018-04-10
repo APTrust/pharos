@@ -336,9 +336,9 @@ class IntellectualObjectsController < ApplicationController
     params[:state] = 'A' if params[:state].nil?
     @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless params[:state] == 'all'
     @selected = {}
-    get_format_counts
-    get_institution_counts
-    get_access_counts
+    get_object_format_counts(@intellectual_objects)
+    get_institution_counts(@intellectual_objects)
+    get_object_access_counts(@intellectual_objects)
     count = @intellectual_objects.count
     set_page_counts(count)
     case params[:sort]
@@ -349,27 +349,6 @@ class IntellectualObjectsController < ApplicationController
       when 'institution'
         @intellectual_objects = @intellectual_objects.joins(:institution).order('institutions.name')
     end
-  end
-
-  def get_format_counts
-    @selected[:file_format] = params[:file_format] if params[:file_format]
-    @format_counts = @intellectual_objects.joins(:generic_files).group(:file_format).count
-  end
-
-  def get_institution_counts
-    @selected[:institution] = params[:institution] if params[:institution]
-    counts = @intellectual_objects.group(:institution_id).count
-    @inst_counts = {}
-    counts.each do |key, value|
-      name = Institution.find(key).name
-      @inst_counts[name] = [key, value]
-    end
-    @inst_counts = Hash[@inst_counts.sort]
-  end
-
-  def get_access_counts
-    @selected[:access] = params[:access] if params[:access]
-    @access_counts = @intellectual_objects.group(:access).count
   end
 
 end

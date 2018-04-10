@@ -149,33 +149,12 @@ class DpnWorkItemsController < ApplicationController
                      .with_remote_node(params[:remote_node])
                      .queued(params[:queued])
     @selected = {}
-    get_node_counts
-    get_queued_counts
+    get_node_counts(@dpn_items)
+    get_queued_counts(@dpn_items)
     count = @dpn_items.count
     set_page_counts(count)
     params[:sort] = 'queued_at DESC' unless params[:sort]
     @dpn_items = @dpn_items.order(params[:sort])
-  end
-
-  def get_node_counts
-    @selected[:remote_node] = params[:remote_node] if params[:remote_node]
-    begin
-      @node_counts = @dpn_items.group(:remote_node).count
-    rescue Exception => ex
-      logger.error ex.backtrace
-    end
-  end
-
-  def get_queued_counts
-    if params[:queued] == 'is_queued'
-      @selected[:queued] = 'Has been queued'
-    elsif params[:queued] == 'is_not_queued'
-      @selected[:queued] = 'Has not been queued'
-    end
-    @queued_filter = true
-    @queued_counts = {}
-    @queued_counts[:is_not_queued] = @dpn_items.queued('is_not_queued').count
-    @queued_counts[:is_queued] = @dpn_items.queued('is_queued').count
   end
 
 end

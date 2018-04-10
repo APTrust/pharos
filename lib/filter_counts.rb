@@ -11,36 +11,6 @@ module FilterCounts
     @inst_counts = Hash[@inst_counts.sort]
   end
 
-  def get_format_counts(results)
-    @selected[:file_format] = params[:file_format] if params[:file_format]
-    @format_counts = results.group(:file_format).count
-  end
-
-  def get_object_access_counts(results)
-    @selected[:access] = params[:access] if params[:access]
-    @access_counts = results.group(:access).count
-  end
-
-  def get_file_access_counts(results)
-    @selected[:access] = params[:access] if params[:access]
-    @access_counts = results.joins(:intellectual_object).group(:access).count
-  end
-
-  def get_status_counts(results)
-    @selected[:status] = params[:status] if params[:status]
-    @status_counts = results.group(:status).count
-  end
-
-  def get_stage_counts(results)
-    @selected[:stage] = params[:stage] if params[:stage]
-    @stage_counts = results.group(:stage).count
-  end
-
-  def get_action_counts(results)
-    @selected[:item_action] = params[:item_action] if params[:item_action]
-    @action_counts = results.group(:action).count
-  end
-
   def get_event_institution_counts(results)
     @selected[:institution] = params[:institution] if params[:institution]
     params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
@@ -58,6 +28,41 @@ module FilterCounts
     #   @inst_counts[name] = [key, value]
     # end
     # @inst_counts = Hash[@inst_counts.sort]
+  end
+
+  def get_format_counts(results)
+    @selected[:file_format] = params[:file_format] if params[:file_format]
+    @format_counts = results.group(:file_format).count
+  end
+
+  def get_object_format_counts(results)
+    @selected[:file_format] = params[:file_format] if params[:file_format]
+    @format_counts = results.joins(:generic_files).group(:file_format).count
+  end
+
+  def get_object_access_counts(results)
+    @selected[:access] = params[:access] if params[:access]
+    @access_counts = results.group(:access).count
+  end
+
+  def get_non_object_access_counts(results)
+    @selected[:access] = params[:access] if params[:access]
+    @access_counts = results.joins(:intellectual_object).group(:access).count
+  end
+
+  def get_status_counts(results)
+    @selected[:status] = params[:status] if params[:status]
+    @status_counts = results.group(:status).count
+  end
+
+  def get_stage_counts(results)
+    @selected[:stage] = params[:stage] if params[:stage]
+    @stage_counts = results.group(:stage).count
+  end
+
+  def get_action_counts(results)
+    @selected[:item_action] = params[:item_action] if params[:item_action]
+    @action_counts = results.group(:action).count
   end
 
   def get_event_type_counts(results)

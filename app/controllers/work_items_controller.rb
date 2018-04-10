@@ -482,10 +482,10 @@ class WorkItemsController < ApplicationController
     params[:state] = 'A' if params[:state].nil?
     @items = @items.with_state(params[:state]) unless params[:state] == 'all'
     @selected = {}
-    get_status_counts
-    get_stage_counts
-    get_action_counts
-    get_institution_counts
+    get_status_counts(@items)
+    get_stage_counts(@items)
+    get_action_counts(@items)
+    get_institution_counts(@items)
     count = @items.count
     set_page_counts(count)
     params[:sort] = 'date' if params[:sort].nil?
@@ -497,32 +497,6 @@ class WorkItemsController < ApplicationController
       when 'institution'
         @items = @items.joins(:institution).order('institutions.name')
     end
-  end
-
-  def get_status_counts
-    @selected[:status] = params[:status] if params[:status]
-    @status_counts = @items.group(:status).count
-  end
-
-  def get_stage_counts
-    @selected[:stage] = params[:stage] if params[:stage]
-    @stage_counts = @items.group(:stage).count
-  end
-
-  def get_action_counts
-    @selected[:item_action] = params[:item_action] if params[:item_action]
-    @action_counts = @items.group(:action).count
-  end
-
-  def get_institution_counts
-    @selected[:institution] = params[:institution] if params[:institution]
-    counts = @items.group(:institution_id).count
-    @inst_counts = {}
-    counts.each do |key, value|
-      name = Institution.find(key).name
-      @inst_counts[name] = [key, value]
-    end
-    @inst_counts = Hash[@inst_counts.sort]
   end
 
   def check_for_completed_restoration

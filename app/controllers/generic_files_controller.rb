@@ -341,8 +341,8 @@ class GenericFilesController < ApplicationController
     params[:state] = 'A' if params[:state].nil?
     @generic_files = @generic_files.with_state(params[:state]) unless params[:state] == 'all'
     @selected = {}
-    get_format_counts
-    get_institution_counts
+    get_format_counts(@generic_files)
+    get_institution_counts(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
     case params[:sort]
@@ -353,22 +353,6 @@ class GenericFilesController < ApplicationController
       when 'institution'
         @generic_files = @generic_files.joins(:institution).order('institutions.name')
     end
-  end
-
-  def get_format_counts
-    @selected[:file_format] = params[:file_format] if params[:file_format]
-    @format_counts = @generic_files.group(:file_format).count
-  end
-
-  def get_institution_counts
-    @selected[:institution] = params[:institution] if params[:institution]
-    counts = @generic_files.group(:institution_id).count
-    @inst_counts = {}
-    counts.each do |key, value|
-      name = Institution.find(key).name
-      @inst_counts[name] = [key, value]
-    end
-    @inst_counts = Hash[@inst_counts.sort]
   end
 
   private
