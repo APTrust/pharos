@@ -7,7 +7,7 @@ class ChecksumsController < ApplicationController
   def index
     authorize current_user, :checksum_index?
     @checksums = Checksum.all
-    filter_and_sort
+    filter_sort_and_count
     page_results(@checksums)
     respond_to do |format|
       format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map{ |cs| cs.serializable_hash } } }
@@ -44,15 +44,14 @@ class ChecksumsController < ApplicationController
     end
   end
 
-  def filter_and_sort
+  def filter_sort_and_count
     @checksums = @checksums
       .with_generic_file_identifier(params[:generic_file_identifier])
       .with_algorithm(params[:algorithm])
       .with_digest(params[:digest])
-    # PT #145151935: Sort by datetime, not created_at
-    @checksums = @checksums.order('datetime DESC')
     count = @checksums.count
     set_page_counts(count)
+    @checksums = @checksums.order('datetime DESC')
   end
 
 end
