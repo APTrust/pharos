@@ -84,18 +84,14 @@ module SearchAndIndex
 
   def filter_by_node
     @results = @results.with_remote_node(params[:remote_node]) unless @results.nil?
-    @dpn_items = @dpn_items.with_remote_node(params[:remote_node]) unless @dpn_items.nil?
     @selected[:remote_node] = params[:remote_node] if params[:remote_node]
   end
 
   def filter_by_queued
+    @results = @results.queued(params[:queued]) unless @results.nil?
     if params[:queued] == 'is_queued'
-      @results = @results.is_queued('true') unless @results.nil?
-      @dpn_items = @dpn_items.is_queued('true') unless @dpn_items.nil?
       @selected[:queued] = 'Has been queued'
     elsif params[:queued] == 'is_not_queued'
-      @results = @results.is_not_queued('true') unless @results.nil?
-      @dpn_items = @dpn_items.is_not_queued('true') unless @dpn_items.nil?
       @selected[:queued] = 'Has not been queued'
     end
   end
@@ -261,8 +257,8 @@ module SearchAndIndex
   end
 
   def set_queued_count(results)
-    @queued_counts[:is_queued] = results.is_queued('true').count
-    @queued_counts[:is_not_queued] = results.is_not_queued('true').count
+    @queued_counts[:is_queued] = results.queued('is_queued').count
+    @queued_counts[:is_not_queued] = results.queued('is_not_queued').count
   end
 
   def set_page_counts(count)

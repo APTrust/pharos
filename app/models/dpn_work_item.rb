@@ -14,11 +14,18 @@ class DpnWorkItem < ActiveRecord::Base
   scope :queued_after, ->(param) { where('dpn_work_items.queued_at > ?', param) unless param.blank? }
   scope :completed_before, ->(param) { where('dpn_work_items.completed_at < ?', param) unless param.blank? }
   scope :completed_after, ->(param) { where('dpn_work_items.completed_at > ?', param) unless param.blank? }
-  scope :is_queued, ->(param) { where("queued_at is NOT NULL") if param == 'true' }
-  scope :is_not_queued, ->(param) { where("queued_at is NULL") if param == 'true' }
   scope :is_completed, ->(param) { where("completed_at is NOT NULL") if param == 'true' }
   scope :is_not_completed, ->(param) { where("completed_at is NULL") if param == 'true' }
   scope :discoverable, ->(current_user) { where('(1 = 0)') unless current_user.admin? }
+  scope :queued, ->(param) {
+    unless param.blank?
+      if param == 'is_queued'
+        where("queued_at is NOT NULL")
+      elsif param == 'is_not_queued'
+        where("queued_at is NULL")
+      end
+    end
+  }
 
   # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
   scope :readable, ->(current_user) { where('(1=1)') }

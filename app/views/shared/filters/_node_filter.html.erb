@@ -12,13 +12,11 @@
             <% if @selected[:remote_node] %>
                 <script>selected("node", "<%= @selected[:remote_node].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :remote_node)%>")</script>
             <% else %>
-                <% @nodes.each do |node| %>
-                    <% unless @node_counts[node] == 0 || @node_counts[node].nil? || node.nil? %>
+                <% @node_counts.each do |node, count| %>
                         <li>
                           <span class="facet-label"><a href="<%= current_path('remote_node', node) %>"><%= node.capitalize %></a></span>
-                          <span class="facet-count">(<%= @node_counts[node] %>)</span>
+                          <span class="facet-count">(<%= count %>)</span>
                         </li>
-                    <% end %>
                 <% end %>
             <% end %>
           </ul>
