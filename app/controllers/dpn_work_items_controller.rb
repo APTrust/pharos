@@ -1,5 +1,5 @@
 class DpnWorkItemsController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   require 'uri'
   require 'net/http'
   respond_to :html, :json

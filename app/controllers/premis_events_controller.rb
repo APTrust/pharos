@@ -1,5 +1,5 @@
 class PremisEventsController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_and_authorize_parent_object, only: [:create]

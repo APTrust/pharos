@@ -1,5 +1,4 @@
 class InstitutionsController < ApplicationController
-  include SearchAndIndex
   inherit_resources
   before_action :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy, :snapshot]

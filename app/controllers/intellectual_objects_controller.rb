@@ -1,5 +1,5 @@
 class IntellectualObjectsController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   inherit_resources
   before_action :authenticate_user!
   before_action :load_institution, only: [:index, :create]

@@ -1,5 +1,5 @@
 class GenericFilesController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_generic_file, only: [:show, :update, :destroy, :confirm_destroy]

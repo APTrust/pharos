@@ -1,5 +1,5 @@
 class CatalogController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   before_action :authenticate_user!
   after_action :verify_authorized
 
