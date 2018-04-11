@@ -327,6 +327,7 @@ class GenericFilesController < ApplicationController
   end
 
   def filter_count_and_sort
+    params[:state] = 'A' if params[:state].nil?
     @generic_files = @generic_files
                          .with_identifier(params[:identifier])
                          .with_identifier_like(params[:identifier_like])
@@ -338,8 +339,7 @@ class GenericFilesController < ApplicationController
                          .updated_after(params[:updated_after])
                          .with_institution(params[:institution])
                          .with_file_format(params[:file_format])
-    params[:state] = 'A' if params[:state].nil?
-    @generic_files = @generic_files.with_state(params[:state]) unless params[:state] == 'all'
+                         .with_state(params[:state])
     @selected = {}
     get_format_counts(@generic_files)
     get_institution_counts(@generic_files)

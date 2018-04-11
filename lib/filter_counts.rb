@@ -30,6 +30,16 @@ module FilterCounts
     # @inst_counts = Hash[@inst_counts.sort]
   end
 
+  def get_state_counts(results)
+    @selected[:state] = params[:state] if params[:state] unless (params[:state].blank? || params[:state] == 'all' || params[:state] == 'All')
+    @state_counts = results.group(:state).count
+  end
+
+  def get_item_state_counts(results)
+    @selected[:state] = params[:state] if params[:state] unless (params[:state].blank? || params[:state] == 'all' || params[:state] == 'All')
+    @state_counts = results.joins(:intellectual_object).group(:state).count
+  end
+
   def get_format_counts(results)
     @selected[:file_format] = params[:file_format] if params[:file_format]
     @format_counts = results.group(:file_format).count

@@ -454,6 +454,7 @@ class WorkItemsController < ApplicationController
     bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
     bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
     date = format_date if params[:updated_since].present?
+    params[:state] = 'A' if params[:state].nil?
     @items = @items
                  .created_before(params[:created_before])
                  .created_after(params[:created_after])
@@ -479,13 +480,13 @@ class WorkItemsController < ApplicationController
                  .with_unempty_node(params[:node_not_empty])
                  .with_empty_node(params[:node_empty])
                  .with_retry(params[:retry])
-    params[:state] = 'A' if params[:state].nil?
-    @items = @items.with_state(params[:state]) unless params[:state] == 'all'
+                 .with_state(params[:state])
     @selected = {}
     get_status_counts(@items)
     get_stage_counts(@items)
     get_action_counts(@items)
     get_institution_counts(@items)
+    get_item_state_counts(@items)
     count = @items.count
     set_page_counts(count)
     params[:sort] = 'date' if params[:sort].nil?

@@ -133,25 +133,26 @@ class CatalogController < ApplicationController
 
   def filter_sort_and_count
     @selected = {}
+    params[:state] = 'A' if params[:state].nil?
     case @result_type
       when 'object'
         @results = @results
                        .with_institution(params[:institution])
                        .with_access(params[:access])
-        params[:state] = 'A' if params[:state].nil?
-        @results = @results.with_state(params[:state]) unless params[:state] == 'all'
+                       .with_state(params[:state])
         get_institution_counts(@results)
         get_object_access_counts(@results)
+        get_state_counts(@results)
       when 'file'
         @results = @results
                        .with_institution(params[:institution])
                        .with_access(params[:access])
                        .with_file_format(params[:file_format])
-        params[:state] = 'A' if params[:state].nil?
-        @results = @results.with_state(params[:state]) unless params[:state] == 'all'
+                       .with_state(params[:state])
         get_institution_counts(@results)
         get_format_counts(@results)
         get_non_object_access_counts(@results)
+        get_state_counts(@results)
       when 'item'
         @results = @results
                        .with_institution(params[:institution])
@@ -159,13 +160,13 @@ class CatalogController < ApplicationController
                        .with_stage(params[:stage])
                        .with_action(params[:item_action])
                        .with_access(params[:access])
-        params[:state] = 'A' if params[:state].nil?
-        @results = @results.with_state(params[:state]) unless params[:state] == 'all'
+                       .with_state(params[:state])
         get_status_counts(@results)
         get_stage_counts(@results)
         get_action_counts(@results)
         get_institution_counts(@results)
         get_non_object_access_counts(@results)
+        get_item_state_counts(@results)
       when 'event'
         @results = @results
                        .with_institution(params[:institution])

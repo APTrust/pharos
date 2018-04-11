@@ -1,0 +1,36 @@
+<% if @states %>
+    <div id="state-parent" class="panel panel-default">
+      <div id="filter-title-state" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-state">
+        <h5 class="panel-title">
+          State <span class="state-carat glyphicon glyphicon-chevron-right"></span>
+        </h5>
+      </div>
+      <div id="filter-state" class="panel-collapse facet-content collapse" style="height: 0px">
+        <div class="panel-body">
+          <ul class="facet-values list-unstyled">
+            <% if @selected[:state] %>
+                <% case @selected[:state] %>
+                  <% when 'A' %>
+                    <script>selected("state", "Active", "<%= current_path('state', 'all') %>")</script>
+                  <% when 'D' %>
+                    <script>selected("state", "Deleted", "<%= current_path('state', 'all') %>")</script>
+                  <% when 'I' %>
+                    <script>selected("state", "In Processing", "<%= current_path('state', 'all') %>")</script>
+                <% end %>
+            <% else %>
+                <% @states.each do |state| %>
+                    <% case state %>
+                      <% when 'A' %>
+                        <li><span class="facet-label"><a href="<%= current_path('state', state) %>">Active</a></span></li>
+                      <% when 'D' %>
+                        <li><span class="facet-label"><a href="<%= current_path('state', state) %>">Deleted</a></span></li>
+                      <% when 'I' %>
+                        <li><span class="facet-label"><a href="<%= current_path('state', state) %>">In Processing</a></span></li>
+                    <% end %>
+                <% end %>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+<% end %>

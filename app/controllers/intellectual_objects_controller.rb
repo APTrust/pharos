@@ -313,6 +313,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def filter_count_and_sort
+    params[:state] = 'A' if params[:state].nil?
     @intellectual_objects = @intellectual_objects
                                 .with_institution(params[:institution])
                                 .with_description(params[:description])
@@ -333,8 +334,7 @@ class IntellectualObjectsController < ApplicationController
                                 .updated_after(params[:updated_after])
                                 .with_access(params[:access])
                                 .with_file_format(params[:file_format])
-    params[:state] = 'A' if params[:state].nil?
-    @intellectual_objects = @intellectual_objects.with_state(params[:state]) unless params[:state] == 'all'
+                                .with_state(params[:state])
     @selected = {}
     get_object_format_counts(@intellectual_objects)
     get_institution_counts(@intellectual_objects)
