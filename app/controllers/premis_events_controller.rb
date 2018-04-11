@@ -153,14 +153,6 @@ class PremisEventsController < ApplicationController
     end
   end
 
-  def for_selected_object
-    @premis_events = @premis_events.where(intellectual_object_id: @parent.id) unless @parent.nil?
-  end
-
-  def for_selected_file
-    @premis_events = @premis_events.where(generic_file_id: @parent.id) unless @parent.nil?
-  end
-
   def filter_count_and_sort
     @premis_events = @premis_events
                          .with_institution(params[:institution])

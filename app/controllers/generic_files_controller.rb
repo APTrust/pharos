@@ -26,11 +26,7 @@ class GenericFilesController < ApplicationController
           @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
         else
           authorize @institution, :index_through_institution?
-          if current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID
-            @generic_files = GenericFile.all
-          else
-            @generic_files = GenericFile.with_institution(@institution.id)
-          end
+          (current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID) ? @generic_files = GenericFile.all : @generic_files = GenericFile.with_institution(@institution.id)
         end
       end
       filter_count_and_sort

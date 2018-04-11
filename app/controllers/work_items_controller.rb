@@ -6,22 +6,12 @@ class WorkItemsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_item, only: [:show, :requeue]
   before_action :init_from_params, only: :create
+  before_action :load_institution, only: :index
   #after_action :check_for_completed_restoration, only: :update
   after_action :verify_authorized
 
   def index
-    if current_user.admin?
-      if params[:institution].present?
-        @items = WorkItem.with_institution(params[:institution])
-        @institution = Institution.find(params[:institution])
-      else
-        @items = WorkItem.all
-        @institution = current_user.institution
-      end
-    else
-      @items = WorkItem.readable(current_user)
-      @institution = current_user.institution
-    end
+    (current_user.admin? and params[:institution].present?) ? @items = WorkItem.with_institution(params[:institution]) : @items = WorkItem.readable(current_user)
     filter_count_and_sort
     page_results(@items)
     if @items.nil? || @items.empty?
@@ -333,6 +323,10 @@ class WorkItemsController < ApplicationController
   end
 
   private
+
+  def load_institution
+    (current_user.admin? and params[:institution].present?) ? @institution = Institution.find(params[:institution]) : @institution = current_user.institution
+  end
 
   def array_as_json(list_of_work_items)
     list_of_work_items.map { |item| item.serializable_hash }

@@ -8,14 +8,7 @@ class IntellectualObjectsController < ApplicationController
 
   def index
     authorize @institution
-    if current_user.admin? and params[:institution_identifier]
-      params[:institution_identifier] == Pharos::Application::APTRUST_ID ? user_institution = nil : user_institution = @institution
-    elsif current_user.admin?
-      user_institution = nil
-    else
-      user_institution = current_user.institution
-    end
-    @intellectual_objects = IntellectualObject.discoverable(current_user).with_institution(user_institution)
+    (current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID) ? @intellectual_objects = IntellectualObject.all : @intellectual_objects = IntellectualObject.discoverable(current_user).with_institution(@institution.id)
     filter_count_and_sort
     page_results(@intellectual_objects)
     (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
