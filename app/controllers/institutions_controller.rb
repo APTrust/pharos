@@ -2,7 +2,7 @@ class InstitutionsController < ApplicationController
   include SearchAndIndex
   inherit_resources
   before_action :authenticate_user!
-  before_action :load_institution, only: [:edit, :update, :show, :destroy, :snapshot]
+  before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot]
   respond_to :json, :html
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
@@ -64,8 +64,8 @@ class InstitutionsController < ApplicationController
     destroy!
   end
 
-  def snapshot
-    authorize @institution
+  def single_snapshot
+    authorize @institution, :snapshot?
     if @institution.is_a?(MemberInstitution)
       @snapshots = @institution.snapshot
       respond_to do |format|
@@ -85,7 +85,19 @@ class InstitutionsController < ApplicationController
         }
       end
     end
+  end
 
+  def group_snapshot
+    authorize current_user, :snapshot?
+    @snapshots = []
+    MemberInstitution.all.each { |institution| @snapshots.push(institution.snapshot) }
+    respond_to do |format|
+      format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
+      format.html {
+        redirect_to root_path
+        flash[:notice] = "A snapshot of all Member Institutions has been taken and archived on #{@snapshots.first.first.audit_date}. Please see the reports page for that analysis."
+      }
+    end
   end
 
   private

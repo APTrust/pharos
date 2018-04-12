@@ -4,8 +4,10 @@ Rails.application.routes.draw do
   institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)/
   resources :institutions, format: [:json, :html], param: :institution_identifier, institution_identifier: institution_ptrn
   resources :institutions, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'api/v2/institutions'
-  get ':institution_identifier/snapshot', to: 'institutions#snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :institution_snapshot
-  get 'api/v2/:institution_identifier/snapshot', to: 'institutions#snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :api_institution_snapshot
+  get ':institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :institution_snapshot
+  get 'api/v2/:institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :api_institution_snapshot
+  get '/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :group_snapshot
+  get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/

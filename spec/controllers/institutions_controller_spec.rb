@@ -330,14 +330,14 @@ RSpec.describe InstitutionsController, type: :controller do
     end
   end
 
-  describe 'GET snapshot' do
+  describe 'GET single_snapshot' do
     describe 'for admin user' do
       before do
         sign_in admin_user
       end
 
       it 'responds successfully and creates a snapshot' do
-        get :snapshot, params: { institution_identifier: admin_user.institution.to_param }
+        get :single_snapshot, params: { institution_identifier: admin_user.institution.to_param }
         #expect(response).to be_success
         expect(response.status).to eq(302)
         expect(flash[:notice]).to eq "A snapshot of #{admin_user.institution.name} has been taken and archived on #{assigns(:snapshots).first.audit_date}. Please see the reports page for that analysis."
@@ -353,7 +353,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :snapshot, params: { institution_identifier: institutional_admin.institution.to_param }
+        get :single_snapshot, params: { institution_identifier: institutional_admin.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -366,7 +366,60 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :snapshot, params: { institution_identifier: institutional_user.institution.to_param }
+        get :single_snapshot, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
+  describe 'GET group_snapshot' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and creates a snapshot' do
+        get :group_snapshot, params: { }
+        #expect(response).to be_success
+        expect(response.status).to eq(302)
+        expect(flash[:notice]).to eq "A snapshot of all Member Institutions has been taken and archived on #{assigns(:snapshots).first.first.audit_date}. Please see the reports page for that analysis."
+        expect(assigns(:snapshots).first.first.apt_bytes).to eq 0
+        expect(assigns(:snapshots).first.first.cost).to eq 0.00
+      end
+
+      it 'responds successfully and creates a snapshot' do
+        get :group_snapshot, params: { }, format: :json
+        expect(response).to be_success
+        expect(assigns(:snapshots).first.first.apt_bytes).to eq 0
+        expect(assigns(:snapshots).first.first.cost).to eq 0.00
+        data = JSON.parse(response.body)
+        expect(data['snapshots'][0][0].has_key?('institution_id')).to be true
+        expect(data['snapshots'][0][1].has_key?('institution_id')).to be true
+
+      end
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :group_snapshot, params: { }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :group_snapshot, params: { }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
