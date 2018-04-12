@@ -29,6 +29,8 @@
       <dd><%= @generic_file.updated_at %> (<%= time_ago_in_words @generic_file.updated_at %>)</dd>
       <dt>Latest Fixity Check</dt>
       <dd><%= @generic_file.last_fixity_check %></dd>
+      <dt>Storage Type</dt>
+      <dd><%= @generic_file.storage_type %></dd>
       <dt>Checksums</dt>
       <% @generic_file.checksums.each do |checksum| %>
           <dd><strong><%= checksum.algorithm %>:</strong><%= checksum.digest %> generated <%= time_ago_in_words(checksum.datetime) %> ago</dd>

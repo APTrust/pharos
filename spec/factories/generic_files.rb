@@ -11,6 +11,7 @@ FactoryBot.define do
     state { 'A' }
     last_fixity_check { '2000-01-01' }
     institution_id { intellectual_object.institution_id }
+    storage_type { 'standard' }
   end
 
 end

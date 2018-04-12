@@ -6,7 +6,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, presence: true
+  validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_type, presence: true
   validates_uniqueness_of :identifier
   validate :init_institution_id, on: :create
   before_save :freeze_institution_id
@@ -24,6 +24,7 @@ class GenericFile < ActiveRecord::Base
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
   scope :not_checked_since, ->(param) { where("last_fixity_check < ? and generic_files.state='A'", param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless param.blank? }
+  scope :with_storage_type, ->(param) { where(storage_type: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?
