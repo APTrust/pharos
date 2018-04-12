@@ -388,7 +388,7 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(assigns(:snapshots).first.first.cost).to eq 0.00
       end
 
-      it 'responds successfully and creates a snapshot' do
+      it 'responds successfully and creates a snapshot (JSON)' do
         get :group_snapshot, params: { }, format: :json
         expect(response).to be_success
         expect(assigns(:snapshots).first.first.apt_bytes).to eq 0
@@ -396,7 +396,6 @@ RSpec.describe InstitutionsController, type: :controller do
         data = JSON.parse(response.body)
         expect(data['snapshots'][0][0].has_key?('institution_id')).to be true
         expect(data['snapshots'][0][1].has_key?('institution_id')).to be true
-
       end
     end
 
