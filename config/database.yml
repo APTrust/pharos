@@ -45,7 +45,7 @@ integration:
 demo:
   <<: *default
   adapter: postgresql
-  database: <%= ENV['PHAROS_DB_NAME'] %> || pharos_demo
+  database: <%= ENV['PHAROS_DB_NAME'] %>
   username: <%= ENV['PHAROS_DB_USER'] %>
   host:     <%= ENV['PHAROS_DB_HOST'] %>
   password: <%= ENV['PHAROS_DB_PWD'] %>
@@ -53,7 +53,7 @@ demo:
 production:
   <<: *default
   adapter: postgresql
-  database: <%= ENV['PHAROS_DB_NAME'] %> || pharos_production
+  database: <%= ENV['PHAROS_DB_NAME'] %>
   username: <%= ENV['PHAROS_DB_USER'] %>
   host:     <%= ENV['PHAROS_DB_HOST'] %>
   password: <%= ENV['PHAROS_DB_PWD'] %>
