@@ -339,6 +339,7 @@ class GenericFilesController < ApplicationController
     @selected = {}
     get_format_counts(@generic_files)
     get_institution_counts(@generic_files)
+    get_state_counts(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
     case params[:sort]

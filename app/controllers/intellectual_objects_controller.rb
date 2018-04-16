@@ -332,6 +332,7 @@ class IntellectualObjectsController < ApplicationController
     get_object_format_counts(@intellectual_objects)
     get_institution_counts(@intellectual_objects)
     get_object_access_counts(@intellectual_objects)
+    get_state_counts(@intellectual_objects)
     count = @intellectual_objects.count
     set_page_counts(count)
     case params[:sort]
