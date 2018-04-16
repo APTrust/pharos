@@ -32,7 +32,7 @@ gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 3.5.1'
+gem 'simple_form', '~> 4.0.0'
 gem 'phony_rails'
 gem 'inherited_resources', '1.8.0'
 gem 'uuidtools'
