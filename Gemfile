@@ -2,12 +2,12 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.1.6'
+gem 'rails', '5.2.0'
 gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.8'
+gem 'uglifier', '>= 4.1.9'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -32,7 +32,7 @@ gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 3.5.1'
+gem 'simple_form', '~> 4.0.0'
 gem 'phony_rails'
 gem 'inherited_resources', '1.8.0'
 gem 'uuidtools'
@@ -51,7 +51,7 @@ group :development do
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 3.5.1'
+  gem 'web-console', '~> 3.6.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   # Use sqlite3 as the database for Active Record
@@ -62,7 +62,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.0.0'
+  gem 'capybara', '3.0.2'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.21', require: false
 end

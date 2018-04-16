@@ -170,7 +170,13 @@ class PremisEventsController < ApplicationController
     get_event_institution_counts(@premis_events)
     get_event_type_counts(@premis_events)
     get_outcome_counts(@premis_events)
-    count = @premis_events.where.not(identifier: nil).count
+    if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+      query = "SELECT COUNT(*) FROM (#{@premis_events.to_sql}) AS event_index"
+      result = ActiveRecord::Base.connection.exec_query(query)
+      count = result[0]['count']
+    else
+      count = @premis_events.where.not(identifier: nil).count
+    end
     set_page_counts(count)
     case params[:sort]
       when 'date'
