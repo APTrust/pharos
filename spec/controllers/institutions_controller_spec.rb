@@ -21,7 +21,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :index
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders the index template' do
@@ -44,7 +44,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully' do
         get :new
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end
@@ -57,7 +57,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { institution_identifier: admin_user.institution.to_param }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.status).to eq(200)
       end
 
@@ -80,7 +80,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { institution_identifier: institutional_admin.institution.to_param }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.status).to eq(200)
       end
 
@@ -101,7 +101,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { institution_identifier: institutional_user.institution.to_param }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.status).to eq(200)
       end
 
@@ -122,7 +122,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { institution_identifier: CGI.escape(admin_user.institution.to_param) }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response.status).to eq(200)
       end
 
@@ -338,7 +338,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully and creates a snapshot' do
         get :single_snapshot, params: { institution_identifier: admin_user.institution.to_param }
-        #expect(response).to be_success
+        #expect(response).to be_successful
         expect(response.status).to eq(302)
         expect(flash[:notice]).to eq "A snapshot of #{admin_user.institution.name} has been taken and archived on #{assigns(:snapshots).first.audit_date}. Please see the reports page for that analysis."
         expect(assigns(:snapshots).first.apt_bytes).to eq 0
@@ -381,7 +381,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully and creates a snapshot' do
         get :group_snapshot, params: { }
-        #expect(response).to be_success
+        #expect(response).to be_successful
         expect(response.status).to eq(302)
         expect(flash[:notice]).to eq "A snapshot of all Member Institutions has been taken and archived on #{assigns(:snapshots).first.first.audit_date}. Please see the reports page for that analysis."
         expect(assigns(:snapshots).first.first.apt_bytes).to eq 0
@@ -390,7 +390,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully and creates a snapshot (JSON)' do
         get :group_snapshot, params: { }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:snapshots).first.first.apt_bytes).to eq 0
         expect(assigns(:snapshots).first.first.cost).to eq 0.00
         data = JSON.parse(response.body)

@@ -27,41 +27,41 @@ RSpec.describe DpnBagsController, type: :controller do
 
       it 'returns successfully when no parameters are given' do
         get :index, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 4
       end
 
       it 'filters by identifier' do
         get :index, params: { object_identifier: '1234' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [bag_one.id]
       end
 
       it 'filters by created_before' do
         get :index, params: { created_before: '2018-01-18 01:00:37 -0500' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 2
         expect(assigns(:paged_results).map &:id).to match_array [bag_three.id, bag_four.id]
       end
 
       it 'filters by created_after' do
         get :index, params: { created_after: '2018-01-18 01:00:37 -0500' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 2
         expect(assigns(:paged_results).map &:id).to match_array [bag_one.id, bag_two.id]
       end
 
       it 'filters by updated_before' do
         get :index, params: { updated_before: '2018-01-18 01:00:37 -0500' }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 2
         expect(assigns(:paged_results).map &:id).to match_array [bag_three.id, bag_four.id]
       end
 
       it 'filters by updated_after' do
         get :index, params: { updated_after: '2018-01-18 01:00:37 -0500' }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 2
         expect(assigns(:paged_results).map &:id).to match_array [bag_one.id, bag_two.id]
       end
@@ -74,7 +74,7 @@ RSpec.describe DpnBagsController, type: :controller do
 
       it "allows access only to bags belonging to the user's institution" do
         get :index, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 2
       end
     end
@@ -88,7 +88,7 @@ RSpec.describe DpnBagsController, type: :controller do
 
     it 'successfully creates the dpn item' do
       post :create, params: { dpn_bag: { institution_id: institution_two.id, object_identifier: 'test.edu/1234', dpn_identifier: '1234387', dpn_size: 1249784, node_1: 'chron', node_2: 'aptrust', node_3: 'hathi', dpn_created_at: '2018-01-16 20:00:19 -0500', dpn_updated_at: '2018-01-16 20:00:19 -0500' } }, format: :json
-      expect(response).to be_success
+      expect(response).to be_successful
       assigns(:dpn_bag).institution_id.should eq(institution_two.id)
       assigns(:dpn_bag).object_identifier.should eq('test.edu/1234')
       assigns(:dpn_bag).dpn_identifier.should eq('1234387')
@@ -120,7 +120,7 @@ RSpec.describe DpnBagsController, type: :controller do
 
       it 'responds successfully' do
         put :update, params: { id: bag_one.id, dpn_bag: { node_1: 'new_node', dpn_size: 1235823945 } }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:dpn_bag).id.should eq(bag_one.id)
         assigns(:dpn_bag).node_1.should eq('new_node')
         assigns(:dpn_bag).dpn_size.should eq(1235823945)
@@ -152,7 +152,7 @@ RSpec.describe DpnBagsController, type: :controller do
 
       it 'responds successfully' do
         get :show, params: { id: bag_two.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'responds with a 404 error if the dpn item does not exist' do
@@ -173,7 +173,7 @@ RSpec.describe DpnBagsController, type: :controller do
 
       it 'allows access to a bag belonging to own institution' do
         get :show, params: { id: bag_three.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
   end
