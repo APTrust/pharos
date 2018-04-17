@@ -448,7 +448,6 @@ class WorkItemsController < ApplicationController
     bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
     bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
     date = format_date if params[:updated_since].present?
-    params[:state] = 'A' if params[:state].nil?
     @items = @items
                  .created_before(params[:created_before])
                  .created_after(params[:created_after])
