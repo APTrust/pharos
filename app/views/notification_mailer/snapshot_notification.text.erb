@@ -1,0 +1,7 @@
+Chip,
+
+Here are the latest snapshot results broken down by institution.
+
+  <% @snap_hash.each do |key, value| %>
+      <%= key %> : <%= number_to_human_size(value) %>
+  <% end %>
