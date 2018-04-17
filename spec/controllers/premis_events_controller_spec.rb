@@ -35,7 +35,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it "can view events, even if it's not my institution" do
         get :index, params: { institution_identifier: someone_elses_file.institution.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:parent).should == someone_elses_file.institution
         assigns(:premis_events).length.should == 1
         assigns(:premis_events).map(&:identifier).should == [@someone_elses_event.identifier]
@@ -43,7 +43,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it "can view events, even if it's not my intellectual object" do
         get :index, params: { object_identifier: someone_elses_object.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:parent).should == someone_elses_object
         assigns(:premis_events).length.should == 1
         assigns(:premis_events).map(&:identifier).should == [@someone_elses_event.identifier]
@@ -51,7 +51,7 @@ RSpec.describe PremisEventsController, type: :controller do
 
       it 'can view objects events by object identifier (API)' do
         get :index, params: { object_identifier: someone_elses_object.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:parent).should == someone_elses_object
         assigns(:premis_events).length.should == 1
         assigns(:premis_events).map(&:identifier).should == [@someone_elses_event.identifier]
@@ -175,7 +175,7 @@ RSpec.describe PremisEventsController, type: :controller do
       describe 'events for an intellectual object' do
         it 'shows the events for that object, sorted by time' do
           get :index, params: { object_identifier: object }
-          expect(response).to be_success
+          expect(response).to be_successful
           assigns(:parent).should == object
           assigns(:premis_events).length.should == 3
           assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
@@ -185,7 +185,7 @@ RSpec.describe PremisEventsController, type: :controller do
       describe 'events for a generic file' do
         it 'shows the events for that file, sorted by time' do
           get :index, params: { file_identifier: file }, format: :html
-          expect(response).to be_success
+          expect(response).to be_successful
           assigns(:parent).should == file
           assigns(:premis_events).length.should == 3
           assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]

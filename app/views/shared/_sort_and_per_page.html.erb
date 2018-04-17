@@ -19,20 +19,6 @@
 
   <span class="search-widgets pull-right">
     <span class="sr-only"><%= 'Per Page' %></span>
-    <% unless @premis_events %>
-    <div id="state-dropdown" class="btn-group">
-      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-        <a href="#">Object State </a>
-        <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li><a href="<%= current_path('state', 'A') %>">Active</a></li>
-        <li><a href="<%= current_path('state', 'all') %>">All</a></li>
-        <li><a href="<%= current_path('state', 'D') %>">Deleted</a></li>
-        <li><a href="<%= current_path('state', 'I') %>">In Progress</a></li>
-      </ul>
-    </div>
-    <% end %>
 
     <div id="per_page-dropdown" class="btn-group">
       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -53,7 +39,7 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu">
-        <li><a href="<%= current_path('sort', 'date') %>">Processed Date</a></li>
+        <li><a href="<%= current_path('sort', 'date') %>">Last Updated</a></li>
         <li><a href="<%= current_path('sort', 'name') %>">Name</a></li>
         <% if current_user.admin? %>
             <li><a href="<%= current_path('sort', 'institution') %>">Institution</a></li>

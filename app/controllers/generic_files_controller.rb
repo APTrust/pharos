@@ -1,5 +1,5 @@
 class GenericFilesController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_generic_file, only: [:show, :update, :destroy, :confirm_destroy]
@@ -26,25 +26,10 @@ class GenericFilesController < ApplicationController
           @generic_files = GenericFile.where(intellectual_object_id: @intellectual_object.id)
         else
           authorize @institution, :index_through_institution?
-          if current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID
-            @generic_files = GenericFile.all
-          else
-            @generic_files = GenericFile.joins(:intellectual_object).where('intellectual_objects.institution_id = ?', @institution.id)
-          end
+          (current_user.admin? && @institution.identifier == Pharos::Application::APTRUST_ID) ? @generic_files = GenericFile.all : @generic_files = GenericFile.with_institution(@institution.id)
         end
       end
-      params[:state] = 'A' if params[:state].nil?
-      @generic_files = @generic_files
-        .with_identifier(params[:identifier])
-        .with_identifier_like(params[:identifier_like])
-        .with_uri(params[:uri])
-        .with_uri_like(params[:uri_like])
-        .created_before(params[:created_before])
-        .created_after(params[:created_after])
-        .updated_before(params[:updated_before])
-        .updated_after(params[:updated_after])
-      filter
-      sort
+      filter_count_and_sort
       page_results(@generic_files)
       (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
       respond_to do |format|
@@ -337,21 +322,34 @@ class GenericFilesController < ApplicationController
     return "#{start_of_name}#{dirname}#{encoded_end}"
   end
 
-  def filter
-    set_filter_values
-    initialize_filter_counters
-    filter_by_institution unless params[:institution].nil?
-    filter_by_state unless params[:state].nil?
-    filter_by_format unless params[:file_format].nil?
-    set_format_count(@generic_files, :files)
-    set_inst_count(@generic_files, :files)
+  def filter_count_and_sort
+    params[:state] = 'A' if params[:state].nil?
+    @generic_files = @generic_files
+                         .with_identifier(params[:identifier])
+                         .with_identifier_like(params[:identifier_like])
+                         .with_uri(params[:uri])
+                         .with_uri_like(params[:uri_like])
+                         .created_before(params[:created_before])
+                         .created_after(params[:created_after])
+                         .updated_before(params[:updated_before])
+                         .updated_after(params[:updated_after])
+                         .with_institution(params[:institution])
+                         .with_file_format(params[:file_format])
+                         .with_state(params[:state])
+    @selected = {}
+    get_format_counts(@generic_files)
+    get_institution_counts(@generic_files)
+    get_state_counts(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
-  end
-
-  def set_filter_values
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-    params[:file_format] ? @formats = [params[:file_format]] : @formats = @generic_files.distinct.pluck(:file_format)
+    case params[:sort]
+      when 'date'
+        @generic_files = @generic_files.order('updated_at DESC')
+      when 'name'
+        @generic_files = @generic_files.order('identifier').reverse_order
+      when 'institution'
+        @generic_files = @generic_files.joins(:institution).order('institutions.name')
+    end
   end
 
   private

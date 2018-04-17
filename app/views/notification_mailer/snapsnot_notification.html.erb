@@ -1,0 +1,10 @@
+<p>Chip,</p>
+<br>
+<p>Here are the latest snapshot results broken down by institution.</p>
+<br>
+<div><dl class="dl-horizontal dl-invert">
+  <% @snap_hash.each do |key, value| %>
+    <dt><%= key %></dt>
+    <dd><%= number_to_human_size(value) %></dd>
+  <% end %>
+</dl></div>

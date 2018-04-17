@@ -265,4 +265,29 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(email_log.generic_file_id).to eq(file.id)
     end
   end
+
+  describe 'snapshot_notification' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:file) { FactoryBot.create(:generic_file, intellectual_object: object) }
+    let(:snap_hash) { {institution.name => file.size} }
+    let(:mail) { described_class.snapshot_notification(snap_hash).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('New Snapshots')
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to include('team@aptrust.org')
+      expect(mail.to).to include('chip.german@aptrust.org')
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'assigns @object_url' do
+      expect(mail.body.encoded).to include('Here are the latest snapshot results broken down by institution.')
+    end
+  end
 end

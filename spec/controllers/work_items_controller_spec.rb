@@ -25,7 +25,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :index
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders the index template' do
@@ -116,7 +116,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { id: item.id }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders the show template' do
@@ -175,7 +175,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :requeue, params: { id: item.id }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders the requeue template' do
@@ -321,7 +321,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :items_for_restore, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'assigns the correct @items' do
@@ -386,7 +386,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :items_for_dpn, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'assigns the correct @items' do
@@ -451,7 +451,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :items_for_delete, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'assigns the correct @items' do
@@ -525,7 +525,7 @@ RSpec.describe WorkItemsController, type: :controller do
       it 'responds successfully with an HTTP 200 status code' do
         post(:set_restoration_status, format: :json, params: { object_identifier:object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true })
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'assigns the correct @item' do
@@ -562,7 +562,7 @@ RSpec.describe WorkItemsController, type: :controller do
         post(:set_restoration_status, format: :json, params: { object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
              node: '10.11.12.13', pid: 4321, needs_admin_review: true })
-        expect(response).to be_success
+        expect(response).to be_successful
         wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq('10.11.12.13')
@@ -575,7 +575,7 @@ RSpec.describe WorkItemsController, type: :controller do
         post :set_restoration_status, params: { object_identifier: object.identifier,
              stage: 'Resolve', status: 'Success', note: 'Lightyear', retry: true,
              node: nil, pid: 0, needs_admin_review: false }, format: :json
-             expect(response).to be_success
+             expect(response).to be_successful
         wi = WorkItem.where(object_identifier: object.identifier,
                                  action: Pharos::Application::PHAROS_ACTIONS['restore']).order(created_at: :desc).first
         expect(wi.node).to eq(nil)

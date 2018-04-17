@@ -16,7 +16,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
 
     it 'successfully creates the state item' do
       post :create, params: { work_item_state: { state: '{JSON data}', work_item_id: other_item.id, action: 'Success' } }, format: :json
-      expect(response).to be_success
+      expect(response).to be_successful
       assigns(:state_item).action.should eq('Success')
       assigns(:state_item).state.bytes.should eq("x\x9C\xAB\xF6\n\xF6\xF7SHI,I\xAC\x05\x00\x16\x90\x03\xED".bytes)
       assigns(:state_item).unzipped_state.should eq('{JSON data}')
@@ -32,7 +32,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
 
       it 'responds successfully with both the action and the state updated' do
         put :update, params: { id: state_item.id, work_item_state: { action: 'NewAction', state: '{NEW JSON data}' } }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:work_item).id.should eq(item.id)
         assigns(:state_item).id.should eq(state_item.id)
         assigns(:state_item).action.should eq('NewAction')
@@ -50,7 +50,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
 
       it 'responds successfully with both the work item and the state item set' do
         get :show, params: { id: state_item.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:work_item).id.should eq(item.id)
         assigns(:state_item).id.should eq(state_item.id)
         assigns(:state_item).state.bytes.should eq("x\x9C\xAB\xF6\n\xF6\xF7SHI,I\xAC\x05\x00\x16\x90\x03\xED".bytes)

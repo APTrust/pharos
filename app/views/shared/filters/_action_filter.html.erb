@@ -1,4 +1,4 @@
-<% unless @action_counts == {} %>
+<% if @action_counts %>
 <div id="action-parent" class="panel panel-default">
   <div id="filter-title-action" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-action">
     <h5 class="panel-title">
@@ -11,13 +11,11 @@
         <% if @selected[:item_action] %>
             <script>selected("action", "<%= @selected[:item_action] %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :item_action)%>")</script>
         <% else %>
-            <% @actions.each do |action| %>
-                <% unless @action_counts[action] == 0 || @action_counts[action].nil? || action.nil? %>
+            <% @action_counts.each do |action, count| %>
                     <li>
                       <span class="facet-label"><a href="<%= current_path('item_action', action) %>"><%= action %></a></span>
-                      <span class="facet-count">(<%= @action_counts[action] %>)</span>
+                      <span class="facet-count">(<%= count %>)</span>
                     </li>
-                <% end %>
             <% end %>
         <% end %>
       </ul>

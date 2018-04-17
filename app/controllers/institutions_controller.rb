@@ -1,8 +1,7 @@
 class InstitutionsController < ApplicationController
-  include SearchAndIndex
   inherit_resources
   before_action :authenticate_user!
-  before_action :load_institution, only: [:edit, :update, :show, :destroy, :snapshot]
+  before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot]
   respond_to :json, :html
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
@@ -64,8 +63,8 @@ class InstitutionsController < ApplicationController
     destroy!
   end
 
-  def snapshot
-    authorize @institution
+  def single_snapshot
+    authorize @institution, :snapshot?
     if @institution.is_a?(MemberInstitution)
       @snapshots = @institution.snapshot
       respond_to do |format|
@@ -85,7 +84,29 @@ class InstitutionsController < ApplicationController
         }
       end
     end
+  end
 
+  def group_snapshot
+    authorize current_user, :snapshot?
+    @snapshots = []
+    email_snap_hash = {}
+    MemberInstitution.all.each do |institution|
+      current_snaps = institution.snapshot
+      @snapshots.push(current_snaps)
+      current_snaps.each do |snap|
+        email_snap_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
+      end
+    end
+    total_bytes = Institution.total_file_size_across_repo
+    email_snap_hash['APTrust'] = total_bytes
+    NotificationMailer.snapshot_notification(email_snap_hash).deliver!
+    respond_to do |format|
+      format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
+      format.html {
+        redirect_to root_path
+        flash[:notice] = "A snapshot of all Member Institutions has been taken and archived on #{@snapshots.first.first.audit_date}. Please see the reports page for that analysis."
+      }
+    end
   end
 
   private

@@ -297,12 +297,6 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).size).to eq 3
             expect(assigns(:paged_results).map &:id).to match_array [@file_four.id, @file_five.id, @file_six.id]
           end
-
-          # it 'should filter results by object association' do
-          #   get :search, params: { q: '*', search_field: 'File Identifier', object_type: 'Generic Files', object_association: @object_four.id }
-          #   expect(assigns(:paged_results).size).to eq 1
-          #   expect(assigns(:paged_results).map &:id).to match_array [@file_four.id]
-          # end
         end
 
         describe 'for work item searches' do
@@ -317,18 +311,6 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).size).to eq 2
             expect(assigns(:paged_results).map &:id).to match_array [@item_one.id, @item_four.id]
           end
-
-          # it 'should filter results by object association' do
-          #   get :search, params: { q: '*', search_field: 'Etag', object_type: 'Work Items', object_association: @object_four.id }
-          #   expect(assigns(:paged_results).size).to eq 1
-          #   expect(assigns(:paged_results).map &:id).to match_array [@item_four.id]
-          # end
-          #
-          # it 'should filter results by file association' do
-          #   get :search, params: { q: '*', search_field: 'Etag', object_type: 'Work Items', file_association: @file_four.id }
-          #   expect(assigns(:paged_results).size).to eq 1
-          #   expect(assigns(:paged_results).map &:id).to match_array [@item_four.id]
-          # end
 
           it 'should filter results by status' do
             get :search, params: { q: '*', search_field: 'Etag', object_type: 'Work Items', status: 'Success' }
@@ -357,16 +339,6 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).map &:id).to match_array [@event_four.id]
           end
 
-          it 'should filter by object association' do
-            get :search, params: { q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', object_association: @object_four.id }
-            expect(assigns(:paged_results).map &:id).to include(@event_four.id)
-          end
-
-          it 'should filter by file association' do
-            get :search, params: { q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', file_association: @file_five.id }
-            expect(assigns(:paged_results).map &:id).to include(@event_five.id)
-          end
-
           it 'should filter by event type' do
             get :search, params: { q: '*', search_field: 'Event Identifier', object_type: 'Premis Events', event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest'] }
             expect(assigns(:paged_results).map &:id).to include(@event_five.id)
@@ -389,7 +361,7 @@ RSpec.describe CatalogController, type: :controller do
 
     it 'returns an RSS feed with current work items' do
       get :feed, format: 'rss'
-      expect(response).to be_success
+      expect(response).to be_successful
       expect(response).to render_template('catalog/feed')
       expect(response.content_type).to eq('application/rss+xml')
     end
