@@ -8,8 +8,8 @@
       <td id="mimetype_list">
         <dl class="dl-horizontal">
           <script>var graph_hash = {}</script>
-          <% sorted_hash = Hash[ @mimetype_report.sort_by { |key, value| key } ] %>
-          <% sorted_hash.each do |key, value| %>
+          <% mimetype_analysis %>
+          <% @mimetype_report.each do |key, value| %>
               <% unless key == 'all' %>
                   <dt><%= key %></dt>
                   <dd><%= number_to_human_size(value) %></dd>
