@@ -61,7 +61,7 @@ class Institution < ActiveRecord::Base
   end
 
   def bytes_by_format
-    stats = self.active_files.sum(:size)
+    stats = self.total_file_size
     if stats
       cross_tab = self.active_files.group(:file_format).sum(:size)
       cross_tab['all'] = stats
@@ -238,14 +238,14 @@ class Institution < ActiveRecord::Base
   def self.breakdown
     report = {}
     MemberInstitution.all.order('name').each do |inst|
-      size = inst.active_files.sum(:size)
+      size = inst.total_file_size
       name = inst.name
       indiv_breakdown = {}
       indiv_breakdown[:size] = size
       subscribers = SubscriptionInstitution.where(member_institution_id: inst.id)
       indiv_breakdown[:subscriber_number] = subscribers.count
       subscribers.each do |si|
-        si_size = si.active_files.sum(:size)
+        si_size = si.total_file_size
         si_name = si.name
         indiv_breakdown[si_name] = si_size
       end

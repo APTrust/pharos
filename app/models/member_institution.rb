@@ -49,23 +49,23 @@ class MemberInstitution < Institution
   end
 
   def generate_subscriber_report
-    total_size = self.active_files.sum(:size)
+    total_size = self.total_file_size
     self.subscriber_report(total_size)
   end
 
   def generate_cost_report
     report = {}
-    report[:total_file_size] = self.active_files.sum(:size)
+    report[:total_file_size] = self.total_file_size
     report[:subscribers] = self.subscriber_report(report[:total_file_size])
     report
   end
 
   def snapshot
-    indiv_bytes = self.active_files.sum(:size)
+    indiv_bytes = self.total_file_size
     total_bytes = indiv_bytes
     snapshot_array = []
     self.subscribers.each do |si|
-      total_bytes = total_bytes + si.active_files.sum(:size)
+      total_bytes = total_bytes + si.total_file_size
       snapshot_array.push(si.snapshot)
     end
     if total_bytes < 10995116277760 #10 TB

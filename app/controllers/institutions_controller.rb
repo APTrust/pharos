@@ -123,13 +123,13 @@ class InstitutionsController < ApplicationController
     if (current_user.admin? && current_user.institution.identifier == @institution.identifier)  ||
         (current_user.institutional_admin? && current_user.institution.name == 'APTrust' && current_user.institution.identifier == @institution.identifier)
       @items = WorkItem.limit(10).order('date').reverse_order
-      @size = GenericFile.where(state: 'A').sum(:size)
+      @size = Institution.total_file_size_across_repo
       @item_count = WorkItem.all.count
       @object_count = IntellectualObject.with_state('A').size
     else
       items = WorkItem.with_institution(@institution.id)
       @items = items.limit(10).order('date').reverse_order
-      @size = @institution.active_files.sum(:size)
+      @size = @institution.total_file_size
       @item_count = items.size
       @object_count = @institution.intellectual_objects.with_state('A').size
     end
@@ -139,7 +139,7 @@ class InstitutionsController < ApplicationController
     size = {}
     total_size = 0
     Institution.all.each do |inst|
-      size[inst.name] = inst.active_files.sum(:size)
+      size[inst.name] = inst.total_file_size
       total_size = size[inst.name] + total_size
     end
     size['APTrust'] = total_size
