@@ -474,13 +474,11 @@ class WorkItemsController < ApplicationController
                  .with_unempty_node(params[:node_not_empty])
                  .with_empty_node(params[:node_empty])
                  .with_retry(params[:retry])
-                 .with_state(params[:state])
     @selected = {}
     get_status_counts(@items)
     get_stage_counts(@items)
     get_action_counts(@items)
     get_institution_counts(@items)
-    get_item_state_counts(@items)
     count = @items.count
     set_page_counts(count)
     params[:sort] = 'date' if params[:sort].nil?

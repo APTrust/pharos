@@ -160,13 +160,11 @@ class CatalogController < ApplicationController
                        .with_stage(params[:stage])
                        .with_action(params[:item_action])
                        .with_access(params[:access])
-                       .with_state(params[:state])
         get_status_counts(@results)
         get_stage_counts(@results)
         get_action_counts(@results)
         get_institution_counts(@results)
         get_non_object_access_counts(@results)
-        get_item_state_counts(@results)
       when 'event'
         @results = @results
                        .with_institution(params[:institution])
