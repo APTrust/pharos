@@ -33,46 +33,49 @@ module FilterCounts
   def get_state_counts(results)
     @selected[:state] = params[:state] if params[:state] unless (params[:state].blank? || params[:state] == 'all' || params[:state] == 'All')
     @state_counts = results.group(:state).count
-  end
-
-  def get_item_state_counts(results)
-    @selected[:state] = params[:state] if params[:state] unless (params[:state].blank? || params[:state] == 'all' || params[:state] == 'All')
-    @state_counts = results.joins(:intellectual_object).group(:state).count
+    @state_counts = Hash[@state_counts.sort]
   end
 
   def get_format_counts(results)
     @selected[:file_format] = params[:file_format] if params[:file_format]
     @format_counts = results.group(:file_format).count
+    @format_counts = Hash[@format_counts.sort]
   end
 
   def get_object_format_counts(results)
     @selected[:file_format] = params[:file_format] if params[:file_format]
     @format_counts = results.joins(:generic_files).group(:file_format).count
+    @format_counts = Hash[@format_counts.sort]
   end
 
   def get_object_access_counts(results)
     @selected[:access] = params[:access] if params[:access]
     @access_counts = results.group(:access).count
+    @access_counts = Hash[@access_counts.sort]
   end
 
   def get_non_object_access_counts(results)
     @selected[:access] = params[:access] if params[:access]
     @access_counts = results.joins(:intellectual_object).group(:access).count
+    @access_counts = Hash[@access_counts.sort]
   end
 
   def get_status_counts(results)
     @selected[:status] = params[:status] if params[:status]
     @status_counts = results.group(:status).count
+    @status_counts = Hash[@status_counts.sort]
   end
 
   def get_stage_counts(results)
     @selected[:stage] = params[:stage] if params[:stage]
     @stage_counts = results.group(:stage).count
+    @stage_counts = Hash[@stage_counts.sort]
   end
 
   def get_action_counts(results)
     @selected[:item_action] = params[:item_action] if params[:item_action]
     @action_counts = results.group(:action).count
+    @action_counts = Hash[@action_counts.sort]
   end
 
   def get_event_type_counts(results)
@@ -91,6 +94,7 @@ module FilterCounts
     @selected[:remote_node] = params[:remote_node] if params[:remote_node]
     begin
       @node_counts = results.group(:remote_node).count
+      @node_counts = Hash[@node_counts.sort]
     rescue Exception => ex
       logger.error ex.backtrace
     end
