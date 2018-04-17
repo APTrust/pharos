@@ -10,6 +10,7 @@ inst1_obj1_gf1:
   identifier: institution1.edu/photos/picture1
   intellectual_object: inst1_obj1
   state: A
+  institution: inst1
 
 inst1_obj1_gf2:
   file_format: image/jpeg
@@ -18,6 +19,7 @@ inst1_obj1_gf2:
   identifier: institution1.edu/photos/picture2
   intellectual_object: inst1_obj1
   state: A
+  institution: inst1
 
 inst1_obj1_gf3:
   file_format: image/jpeg
@@ -26,6 +28,7 @@ inst1_obj1_gf3:
   identifier: institution1.edu/photos/picture3
   intellectual_object: inst1_obj1
   state: A
+  institution: inst1
 
 inst1_obj2_gf1:
   file_format: application/pdf
@@ -34,6 +37,7 @@ inst1_obj2_gf1:
   identifier: institution1.edu/pdfs/doc1
   intellectual_object: inst1_obj2
   state: A
+  institution: inst1
 
 inst1_obj2_gf2:
   file_format: application/pdf
@@ -42,6 +46,7 @@ inst1_obj2_gf2:
   identifier: institution1.edu/pdfs/doc2
   intellectual_object: inst1_obj2
   state: A
+  institution: inst1
 
 inst1_obj2_gf3:
   file_format: application/pdf
@@ -50,6 +55,7 @@ inst1_obj2_gf3:
   identifier: institution1.edu/pdfs/doc3
   intellectual_object: inst1_obj2
   state: A
+  institution: inst1
 
 inst1_obj3_gf1:
   file_format: application/binary
@@ -58,6 +64,7 @@ inst1_obj3_gf1:
   identifier: institution1.edu/glass/shard1
   intellectual_object: inst1_obj3
   state: A
+  institution: inst1
 
 inst1_obj3_gf2:
   file_format: video/mp4
@@ -66,6 +73,7 @@ inst1_obj3_gf2:
   identifier: institution1.edu/glass/shard2
   intellectual_object: inst1_obj3
   state: A
+  institution: inst1
 
 inst1_obj3_gf3:
   file_format: audio/mp3
@@ -74,6 +82,7 @@ inst1_obj3_gf3:
   identifier: institution1.edu/glass/shard3
   intellectual_object: inst1_obj3
   state: A
+  institution: inst1
 
 inst1_obj3_gf3:
   file_format: text/plain
@@ -82,6 +91,7 @@ inst1_obj3_gf3:
   identifier: institution1.edu/glass/shard4_deleted
   intellectual_object: inst1_obj3
   state: D
+  institution: inst1
 
 # Inst 2 Files
 
@@ -92,6 +102,7 @@ inst2_obj1_gf1:
   identifier: institution2.edu/photos/picture1
   intellectual_object: inst2_obj1
   state: A
+  institution: inst2
 
 inst2_obj1_gf2:
   file_format: image/jpeg
@@ -100,6 +111,7 @@ inst2_obj1_gf2:
   identifier: institution2.edu/photos/picture2
   intellectual_object: inst2_obj1
   state: A
+  institution: inst2
 
 inst2_obj1_gf3:
   file_format: image/jpeg
@@ -108,6 +120,7 @@ inst2_obj1_gf3:
   identifier: institution2.edu/photos/picture3
   intellectual_object: inst2_obj1
   state: A
+  institution: inst2
 
 inst2_obj2_gf1:
   file_format: application/pdf
@@ -116,6 +129,7 @@ inst2_obj2_gf1:
   identifier: institution2.edu/pdfs/doc1
   intellectual_object: inst2_obj2
   state: A
+  institution: inst2
 
 inst2_obj2_gf2:
   file_format: application/pdf
@@ -124,6 +138,7 @@ inst2_obj2_gf2:
   identifier: institution2.edu/pdfs/doc2
   intellectual_object: inst2_obj2
   state: A
+  institution: inst2
 
 inst2_obj2_gf3:
   file_format: application/pdf
@@ -132,6 +147,7 @@ inst2_obj2_gf3:
   identifier: institution2.edu/pdfs/doc3
   intellectual_object: inst2_obj2
   state: A
+  institution: inst2
 
 inst2_obj3_gf1:
   file_format: application/binary
@@ -140,6 +156,7 @@ inst2_obj3_gf1:
   identifier: institution2.edu/glass/shard1
   intellectual_object: inst2_obj3
   state: A
+  institution: inst2
 
 inst2_obj3_gf2:
   file_format: video/mp4
@@ -148,14 +165,16 @@ inst2_obj3_gf2:
   identifier: institution2.edu/glass/shard2
   intellectual_object: inst2_obj3
   state: A
+  institution: inst2
 
 inst2_obj3_gf3:
   file_format: audio/mp3
   uri: https://s3.amazonaws.com/aptrust.test.preservation/507ba10f-eb98-409c-b95a-a03dbb323e97
   size: 214199
-  identifier: institution2.edu/glass/shard3
+  identifier: institution2.edu/glass/Prakash_ 39 Harv. J.L. & Pub. Pol’y 341 .pdf
   intellectual_object: inst2_obj3
   state: A
+  institution: inst2
 
 inst2_obj3_gf3:
   file_format: text/plain
@@ -164,3 +183,4 @@ inst2_obj3_gf3:
   identifier: institution2.edu/glass/shard4_deleted
   intellectual_object: inst2_obj3
   state: D
+  institution: inst2

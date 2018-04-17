@@ -1,5 +1,6 @@
 class GenericFile < ActiveRecord::Base
   belongs_to :intellectual_object
+  belongs_to :institution
   has_many :premis_events
   has_many :checksums
   has_one :confirmation_token
