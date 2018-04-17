@@ -80,21 +80,3 @@ To create a sample run the script like so:
 $ RAILS_ENV=production ./script/sample_uploads
 ```
 You probably want to put this in a cron job so it can be run regularly
-
-
-## Heroku Instructions
-
-Note, section dropped as previous pharos app was deleted.  Intend to rebuild this.
-
-# Notes on Queries
-
-Most quieries are best carried out through the solr index in the formate below.
-
-The format is as follows::
-
-  <Class>.where(rails cased datastream name: <value>)
-
-So as an example, if you were to query for "APTrust" in the name field of the
-Institution model you would search as follows::
-
-  ins = Institution.where(name: "APTrust")
