@@ -51,8 +51,10 @@ module ReportsHelper
           @text_report[mimetype] = count
           text_total += count
         else
-          @other_report[mimetype] = count
-          other_total += count
+          unless base_type == 'all'
+            @other_report[mimetype] = count
+            other_total += count
+          end
       end
     end
     @base_report['Applications'] = application_total

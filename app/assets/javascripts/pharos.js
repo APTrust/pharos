@@ -361,8 +361,8 @@ function timeline_graph(labels, data) {
     });
 }
 
-function individual_mimetype(stats) {
-    var ctx = document.getElementById("indiv_mimetype_chart").getContext('2d');
+function mimetype_graph(stats, id) {
+    var ctx = document.getElementById(id).getContext('2d');
     var labels_array = [];
     var data_array = [] ;
     Object.keys(stats).forEach(function (key) {
@@ -402,7 +402,6 @@ function individual_mimetype(stats) {
             maintainAspectRatio: false
         }
     });
-
 }
 
 function shuffleArray(array_one, array_two) {
