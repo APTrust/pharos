@@ -20,11 +20,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -34,8 +34,8 @@
                     <% unless key == 'all' %>
                         <script>graph_hash["<%= key %>"] = <%= value %></script>
                         <tr>
-                          <td><%= key %></td>
-                          <td><%= value %></td>
+                          <td width="200"><%= key %></td>
+                          <td width="180"><%= value %></td>
                           <td>(<%= number_to_human_size(value) %>)</td>
                         </tr>
                     <% end %>
@@ -57,11 +57,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -71,8 +71,8 @@
                     <% unless key == 'all' %>
                         <script>total_hash["<%= key %>"] = <%= value %></script>
                         <tr>
-                          <td><%= key %></td>
-                          <td><%= value %></td>
+                          <td width="200"><%= key %></td>
+                          <td width="180"><%= value %></td>
                           <td>(<%= number_to_human_size(value) %>)</td>
                         </tr>
                     <% end %>
@@ -93,11 +93,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -106,8 +106,8 @@
                 <% @application_report.each do |key, value| %>
                     <script>app_hash["<%= key %>"] = <%= value %></script>
                     <tr>
-                      <td><%= key %></td>
-                      <td><%= value %></td>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
                       <td>(<%= number_to_human_size(value) %>)</td>
                     </tr>
                 <% end %>
@@ -128,11 +128,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -141,8 +141,8 @@
                 <% @audio_report.each do |key, value| %>
                     <script>audio_hash["<%= key %>"] = <%= value %></script>
                     <tr>
-                      <td><%= key %></td>
-                      <td><%= value %></td>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
                       <td>(<%= number_to_human_size(value) %>)</td>
                     </tr>
                 <% end %>
@@ -163,11 +163,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -176,8 +176,8 @@
                 <% @image_report.each do |key, value| %>
                     <script>image_hash["<%= key %>"] = <%= value %></script>
                     <tr>
-                      <td><%= key %></td>
-                      <td><%= value %></td>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
                       <td>(<%= number_to_human_size(value) %>)</td>
                     </tr>
                 <% end %>
@@ -198,11 +198,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -211,8 +211,8 @@
                 <% @other_report.each do |key, value| %>
                     <script>other_hash["<%= key %>"] = <%= value %></script>
                     <tr>
-                      <td><%= key %></td>
-                      <td><%= value %></td>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
                       <td>(<%= number_to_human_size(value) %>)</td>
                     </tr>
                 <% end %>
@@ -233,11 +233,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -246,8 +246,8 @@
                 <% @text_report.each do |key, value| %>
                     <script>text_hash["<%= key %>"] = <%= value %></script>
                     <tr>
-                      <td><%= key %></td>
-                      <td><%= value %></td>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
                       <td>(<%= number_to_human_size(value) %>)</td>
                     </tr>
                 <% end %>
@@ -268,11 +268,11 @@
         <table>
           <tr>
             <td id="mimetype_list">
-              <table class="table table-striped sortable">
+              <table class="table table-striped sortable mime_table">
                 <thead>
                 <tr>
-                  <th>Mimetype</th>
-                  <th class="bytes_num">Total Number of Bytes</th>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
                   <th>(Readable)</th>
                 </tr>
                 </thead>
@@ -281,8 +281,8 @@
                 <% @video_report.each do |key, value| %>
                     <script>video_hash["<%= key %>"] = <%= value %></script>
                     <tr>
-                      <td><%= key %></td>
-                      <td><%= value %></td>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
                       <td>(<%= number_to_human_size(value) %>)</td>
                     </tr>
                 <% end %>
