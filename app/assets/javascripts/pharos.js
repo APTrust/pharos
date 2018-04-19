@@ -408,7 +408,11 @@ function mimetype_graph(stats, id) {
             responsive: false,
             maintainAspectRatio: false,
             legend: {
-                position: 'right'
+                position: 'right',
+                labels: {
+                    fontSize: 10,
+                    boxWidth: 25
+                }
             }
         }
     });
