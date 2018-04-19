@@ -406,7 +406,10 @@ function mimetype_graph(stats, id) {
                 animateRotate: true
             },
             responsive: false,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            legend: {
+                position: 'right'
+            }
         }
     });
 }
