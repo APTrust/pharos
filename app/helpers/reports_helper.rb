@@ -63,6 +63,7 @@ module ReportsHelper
     @base_report['Image'] = image_total
     @base_report['Text'] = text_total
     @base_report['Other'] = other_total
+    @base_report = Hash[@base_report].sort
   end
 
 end
