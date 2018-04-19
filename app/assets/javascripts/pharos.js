@@ -377,7 +377,7 @@ function timeline_graph(labels, data) {
     });
 }
 
-function mimetype_graph(stats, id) {
+function mimetype_graph(stats, id, position) {
     var ctx = document.getElementById(id).getContext('2d');
     var labels_array = [];
     var data_array = [] ;
@@ -408,7 +408,7 @@ function mimetype_graph(stats, id) {
             responsive: false,
             maintainAspectRatio: false,
             legend: {
-                position: 'right',
+                position: position,
                 labels: {
                     fontSize: 10,
                     boxWidth: 25
