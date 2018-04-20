@@ -75,7 +75,7 @@ class Institution < ActiveRecord::Base
     if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
       query = "SELECT AVG(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_file_size"
       result = ActiveRecord::Base.connection.exec_query(query)
-      result[0]['avg']
+      result[0]['avg'].to_i
     else
       GenericFile.with_institution(self.id).with_state('A').average(:size)
     end
@@ -85,27 +85,27 @@ class Institution < ActiveRecord::Base
     if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
       query = "SELECT AVG(size) FROM (SELECT size FROM generic_files WHERE state = 'A') AS aptrust_file_size"
       result = ActiveRecord::Base.connection.exec_query(query)
-      result[0]['avg']
+      result[0]['avg'].to_i
     else
       GenericFile.with_state('A').average(:size)
     end
   end
 
   def total_file_size
-    if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
+    # if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
       query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_total_size"
       result = ActiveRecord::Base.connection.exec_query(query)
-      result[0]['sum']
-    else
-      GenericFile.with_institution(self.id).with_state('A').sum(:size)
-    end
+      result[0]['sum'].to_i
+    # else
+    #   GenericFile.with_institution(self.id).with_state('A').sum(:size)
+    # end
   end
 
   def self.total_file_size_across_repo
     if ActiveRecord::Base.connection.adapter_name == "PostgreSQL"
       query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE state = 'A') AS aptrust_total_size"
       result = ActiveRecord::Base.connection.exec_query(query)
-      result[0]['sum']
+      result[0]['sum'].to_i
     else
       GenericFile.with_state('A').sum(:size)
     end

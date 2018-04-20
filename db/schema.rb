@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 2018_04_17_150517) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
     t.string "datetime"
@@ -51,7 +54,7 @@ ActiveRecord::Schema.define(version: 2018_04_17_150517) do
     t.datetime "queued_at"
     t.datetime "completed_at"
     t.string "note", limit: 400
-    t.text "state", limit: 104857600
+    t.text "state"
     t.string "processing_node", limit: 255
     t.integer "pid", default: 0
     t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
@@ -87,7 +90,7 @@ ActiveRecord::Schema.define(version: 2018_04_17_150517) do
   create_table "generic_files", force: :cascade do |t|
     t.string "file_format"
     t.string "uri"
-    t.integer "size", limit: 8
+    t.bigint "size"
     t.string "identifier"
     t.integer "intellectual_object_id"
     t.datetime "created_at", null: false
@@ -96,7 +99,6 @@ ActiveRecord::Schema.define(version: 2018_04_17_150517) do
     t.text "ingest_state"
     t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
     t.integer "institution_id", null: false
-    t.string "storage_type", default: "standard"
     t.index ["created_at"], name: "index_generic_files_on_created_at"
     t.index ["file_format", "state"], name: "index_generic_files_on_file_format_and_state"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
@@ -167,8 +169,8 @@ ActiveRecord::Schema.define(version: 2018_04_17_150517) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "institution_id"
     t.string "outcome"
+    t.integer "institution_id"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"
@@ -255,11 +257,11 @@ ActiveRecord::Schema.define(version: 2018_04_17_150517) do
     t.string "etag"
     t.string "bucket"
     t.string "user"
-    t.text "note", limit: 255
+    t.text "note"
     t.string "action"
     t.string "stage"
     t.string "status"
-    t.text "outcome", limit: 255
+    t.text "outcome"
     t.datetime "bag_date"
     t.datetime "date"
     t.boolean "retry", default: false, null: false
@@ -270,7 +272,7 @@ ActiveRecord::Schema.define(version: 2018_04_17_150517) do
     t.boolean "needs_admin_review", default: false, null: false
     t.integer "institution_id"
     t.datetime "queued_at"
-    t.integer "size", limit: 8
+    t.bigint "size"
     t.datetime "stage_started_at"
     t.index ["action"], name: "index_work_items_on_action"
     t.index ["date"], name: "index_work_items_on_date"

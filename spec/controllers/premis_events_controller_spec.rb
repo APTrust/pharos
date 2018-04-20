@@ -168,7 +168,9 @@ RSpec.describe PremisEventsController, type: :controller do
           get :index, params: { institution_identifier: file.institution.identifier }
           assigns(:parent).should == file.institution
           assigns(:premis_events).length.should == 3
-          assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
+          assigns(:premis_events).map(&:identifier).include?(@event.identifier).should be true
+          assigns(:premis_events).map(&:identifier).include?(@event2.identifier).should be true
+          assigns(:premis_events).map(&:identifier).include?(@event3.identifier).should be true
         end
       end
 
@@ -178,7 +180,9 @@ RSpec.describe PremisEventsController, type: :controller do
           expect(response).to be_successful
           assigns(:parent).should == object
           assigns(:premis_events).length.should == 3
-          assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
+          assigns(:premis_events).map(&:identifier).include?(@event.identifier).should be true
+          assigns(:premis_events).map(&:identifier).include?(@event2.identifier).should be true
+          assigns(:premis_events).map(&:identifier).include?(@event3.identifier).should be true
         end
       end
 
@@ -188,7 +192,9 @@ RSpec.describe PremisEventsController, type: :controller do
           expect(response).to be_successful
           assigns(:parent).should == file
           assigns(:premis_events).length.should == 3
-          assigns(:premis_events).map(&:identifier).should == [@event.identifier, @event2.identifier, @event3.identifier]
+          assigns(:premis_events).map(&:identifier).include?(@event.identifier).should be true
+          assigns(:premis_events).map(&:identifier).include?(@event2.identifier).should be true
+          assigns(:premis_events).map(&:identifier).include?(@event3.identifier).should be true
         end
       end
 

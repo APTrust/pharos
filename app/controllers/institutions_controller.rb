@@ -140,7 +140,8 @@ class InstitutionsController < ApplicationController
     total_size = 0
     Institution.all.each do |inst|
       size[inst.name] = inst.total_file_size
-      total_size = size[inst.name] + total_size
+      size[inst.name] = 0 if size[inst.name].nil?
+      total_size += size[inst.name]
     end
     size['APTrust'] = total_size
     size

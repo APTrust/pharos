@@ -287,9 +287,9 @@ class WorkItemsController < ApplicationController
   def api_search
     authorize WorkItem, :admin_api?
     current_user.admin? ? @items = WorkItem.all : @items = WorkItem.with_institution(current_user.institution_id)
-    if Rails.env.test? || Rails.env.development?
-      rewrite_params_for_sqlite
-    end
+    # if  Rails.env.development?
+    #   rewrite_params_for_sqlite
+    # end
     search_fields = [:name, :etag, :bag_date, :stage, :status, :institution,
                      :retry, :object_identifier, :generic_file_identifier,
                      :node, :needs_admin_review, :process_after]
@@ -297,12 +297,12 @@ class WorkItemsController < ApplicationController
     params[:needs_admin_review] = to_boolean(params[:needs_admin_review]) if params[:needs_admin_review]
     search_fields.each do |field|
       if params[field].present?
-        if field == :bag_date && (Rails.env.test? || Rails.env.development?)
-          #@items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
-          bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
-          bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
-          @items = @items.with_bag_date(bag_date1, bag_date2)
-        elsif field == :node and params[field] == 'null'
+        # if field == :bag_date && Rails.env.development?
+        #   #@items = @items.where('datetime(bag_date) = datetime(?)', params[:bag_date])
+        #   bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
+        #   bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
+        #   @items = @items.with_bag_date(bag_date1, bag_date2)
+        if field == :node and params[field] == 'null'
           @items = @items.where('node is null')
         elsif field == :assignment_pending_since and params[field] == 'null'
           @items = @items.where('assignment_pending_since is null')
@@ -385,9 +385,9 @@ class WorkItemsController < ApplicationController
 
   def set_item
     @institution = current_user.institution
-    if Rails.env.test? || Rails.env.development?
-      rewrite_params_for_sqlite
-    end
+    # if Rails.env.development?
+    #   rewrite_params_for_sqlite
+    # end
     if params[:id].blank? == false
       begin
         @work_item = WorkItem.readable(current_user).find(params[:id])
@@ -395,25 +395,25 @@ class WorkItemsController < ApplicationController
         # If we don't catch this, we get an internal server error
       end
     else
-      if Rails.env.test? || Rails.env.development?
-        # Cursing ActiveRecord + SQLite. SQLite has all the milliseconds wrong!
-        @work_item = WorkItem.where(etag: params[:etag],
-                                    name: params[:name])
-        @work_item = @work_item.where('datetime(bag_date) = datetime(?)', params[:bag_date]).first
-      else
+      # if Rails.env.development?
+      #   # Cursing ActiveRecord + SQLite. SQLite has all the milliseconds wrong!
+      #   @work_item = WorkItem.where(etag: params[:etag],
+      #                               name: params[:name])
+      #   @work_item = @work_item.where('datetime(bag_date) = datetime(?)', params[:bag_date]).first
+      # else
         @work_item = WorkItem.where(etag: params[:etag],
                                     name: params[:name],
                                     bag_date: params[:bag_date]).first
-      end
+      # end
     end
   end
 
-  def rewrite_params_for_sqlite
-    # SQLite wants t or f for booleans
-    if params[:retry].present? && params[:retry].is_a?(String)
-      params[:retry] = params[:retry][0]
-    end
-  end
+  # def rewrite_params_for_sqlite
+  #   # SQLite wants t or f for booleans
+  #   if params[:retry].present? && params[:retry].is_a?(String)
+  #     params[:retry] = params[:retry][0]
+  #   end
+  # end
 
   def issue_requeue_http_post(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']

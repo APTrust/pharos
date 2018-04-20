@@ -22,6 +22,8 @@ gem 'jbuilder', '~> 2.7.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 1.0.0', group: :doc
 
+gem 'pg', '1.0.0' # Necessary for talking to our RDS instance
+
 gem 'pundit'
 gem 'figaro'
 gem 'devise', '4.4.3'
@@ -58,7 +60,6 @@ group :development do
   gem 'sqlite3', '1.3.13'
   # We don't use this gem directly but actionpack and actionview depend on it and it needs upgrading to fix a security warning
   gem 'rails-html-sanitizer', '1.0.4'
-  gem 'pg', '0.21.0' # Necessary for talking to our RDS instance
 end
 
 group :test do

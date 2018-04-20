@@ -39,25 +39,6 @@ RSpec.describe MemberInstitution, :type => :model do
     end
   end
 
-  describe 'bytes_by_format' do
-    it 'should return a hash' do
-      expect(subject.bytes_by_format).to eq({'all'=>0})
-    end
-    describe 'with attached files' do
-      before do
-        subject.save!
-      end
-      let(:intellectual_object) { FactoryBot.create(:intellectual_object, institution: subject) }
-      let!(:generic_file1) { FactoryBot.create(:generic_file, intellectual_object: intellectual_object, size: 166311750, identifier: 'test.edu/123/data/file.xml') }
-      let!(:generic_file2) { FactoryBot.create(:generic_file, intellectual_object: intellectual_object, file_format: 'audio/wav', size: 143732461, identifier: 'test.edu/123/data/file.wav') }
-      it 'should return a hash' do
-        expect(subject.bytes_by_format).to eq({"all"=>310044211,
-                                               'application/xml' => 166311750,
-                                               'audio/wav' => 143732461})
-      end
-    end
-  end
-
   describe 'a saved instance' do
     before do
       subject.save
@@ -66,6 +47,26 @@ RSpec.describe MemberInstitution, :type => :model do
     after do
       subject.destroy
     end
+
+    describe 'bytes_by_format' do
+      it 'should return a hash' do
+        expect(subject.bytes_by_format).to eq({'all'=>0})
+      end
+      describe 'with attached files' do
+        before do
+          subject.save!
+        end
+        let(:intellectual_object) { FactoryBot.create(:intellectual_object, institution: subject) }
+        let!(:generic_file1) { FactoryBot.create(:generic_file, intellectual_object: intellectual_object, size: 166311750, identifier: 'test.edu/123/data/file.xml') }
+        let!(:generic_file2) { FactoryBot.create(:generic_file, intellectual_object: intellectual_object, file_format: 'audio/wav', size: 143732461, identifier: 'test.edu/123/data/file.wav') }
+        it 'should return a hash' do
+          expect(subject.bytes_by_format).to eq({"all"=>310044211,
+                                                 'application/xml' => 166311750,
+                                                 'audio/wav' => 143732461})
+        end
+      end
+    end
+
     describe 'with an associated user' do
       let!(:user) { FactoryBot.create(:user, name: 'Zeke', institution_id: subject.id)  }
       it 'should contain the appropriate User' do
