@@ -56,8 +56,6 @@ group :development do
   gem 'web-console', '~> 3.6.1'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
-  # Use sqlite3 as the database for Active Record
-  # gem 'sqlite3', '1.3.13'
   # We don't use this gem directly but actionpack and actionview depend on it and it needs upgrading to fix a security warning
   gem 'rails-html-sanitizer', '1.0.4'
 end
