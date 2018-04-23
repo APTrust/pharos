@@ -66,7 +66,7 @@ group :test do
   gem 'coveralls', '0.8.21', require: false
 end
 
-group :development, :test, :postgres_test, :demo, :production, :integration do
+group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_bot_rails'

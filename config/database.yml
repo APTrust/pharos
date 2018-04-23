@@ -17,13 +17,6 @@ test:
   username: postgres
   host:     localhost
 
-postgres_test:
-  <<: *default
-  adapter: postgresql
-  database: pharos_production
-  username: apt_pharos
-  host:     localhost
-
 # Database for integration tests. This will be emptied between
 # tests.
 integration:

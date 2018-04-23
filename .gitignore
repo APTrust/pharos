@@ -37,6 +37,3 @@ fedora_export.db
 
 # Ignore test DB
 travis_ci_test
-
-# Ignore new postgres_test environment file
-/config/environments/postgres_test.rb
