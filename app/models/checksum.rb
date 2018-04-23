@@ -1,4 +1,5 @@
 class Checksum < ActiveRecord::Base
+  self.primary_key = 'id'
   belongs_to :generic_file
 
   validates :digest, presence: true

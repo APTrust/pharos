@@ -1,4 +1,5 @@
 class Institution < ActiveRecord::Base
+  self.primary_key = 'id'
   has_many :users
   has_many :intellectual_objects
   has_many :generic_files, through: :intellectual_objects

@@ -1,5 +1,5 @@
 class DpnWorkItem < ActiveRecord::Base
-
+  self.primary_key = 'id'
   validates :task, :identifier, presence: true
   validate :task_is_allowed
 

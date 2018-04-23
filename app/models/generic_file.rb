@@ -1,4 +1,5 @@
 class GenericFile < ActiveRecord::Base
+  self.primary_key = 'id'
   belongs_to :intellectual_object
   belongs_to :institution
   has_many :premis_events

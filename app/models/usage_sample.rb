@@ -1,4 +1,5 @@
 class UsageSample < ActiveRecord::Base
+  self.primary_key = 'id'
   serialize :data, Hash
 
   before_save :collect_sample
