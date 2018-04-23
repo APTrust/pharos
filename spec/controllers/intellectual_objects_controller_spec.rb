@@ -44,16 +44,20 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
   before(:all) do
     WorkItem.delete_all
+    User.delete_all
+    PremisEvent.delete_all
     GenericFile.delete_all
     IntellectualObject.delete_all
+    Institution.delete_all
   end
 
   after(:all) do
-    IntellectualObject.delete_all
     WorkItem.delete_all
-    Institution.delete_all
+    User.delete_all
     PremisEvent.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
   end
 
   describe 'GET #index' do

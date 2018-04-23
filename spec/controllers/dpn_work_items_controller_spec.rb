@@ -4,10 +4,14 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
   before :all do
     DpnWorkItem.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   after do
     DpnWorkItem.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:admin_user) { FactoryBot.create(:user, :admin) }

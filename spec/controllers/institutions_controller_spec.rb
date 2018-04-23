@@ -2,10 +2,16 @@ require 'spec_helper'
 
 RSpec.describe InstitutionsController, type: :controller do
   before :all do
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
     Institution.delete_all
   end
 
   after do
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
     Institution.delete_all
   end
 

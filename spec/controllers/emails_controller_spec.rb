@@ -4,10 +4,14 @@ RSpec.describe EmailsController, type: :controller do
 
   before :all do
     Email.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   after do
     Email.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:email_one) { FactoryBot.create(:fixity_email) }

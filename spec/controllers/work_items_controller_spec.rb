@@ -11,11 +11,14 @@ RSpec.describe WorkItemsController, type: :controller do
   let!(:state_item) { FactoryBot.create(:work_item_state, work_item: item) }
   let!(:user_state_item) { FactoryBot.create(:work_item_state, work_item: user_item) }
 
-  # after do
-  #   WorkItem.delete_all
-  #   Institution.delete_all
-  #   User.delete_all
-  # end
+  after do
+    WorkItemState.delete_all
+    WorkItem.delete_all
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
+    Institution.delete_all
+  end
 
   describe 'GET #index' do
     describe 'for admin user' do

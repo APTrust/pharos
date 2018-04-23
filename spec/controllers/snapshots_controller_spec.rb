@@ -2,8 +2,15 @@ require 'spec_helper'
 
 RSpec.describe SnapshotsController, type: :controller do
   before :all do
-    Institution.delete_all
     Snapshot.delete_all
+    User.delete_all
+    Institution.delete_all
+  end
+
+  after :all do
+    Snapshot.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:institution_one) { FactoryBot.create(:member_institution) }

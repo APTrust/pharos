@@ -2,6 +2,10 @@ require 'spec_helper'
 
 RSpec.describe PremisEventsController, type: :controller do
   after do
+    PremisEvent.delete_all
+    IntellectualObject.delete_all
+    GenericFile.delete_all
+    User.delete_all
     Institution.delete_all
   end
 

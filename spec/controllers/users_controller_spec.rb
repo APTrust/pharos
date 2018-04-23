@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe UsersController, type: :controller do
   after do
+    User.delete_all
     Institution.delete_all
   end
 

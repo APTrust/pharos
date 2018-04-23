@@ -2,10 +2,11 @@ require 'spec_helper'
 
 RSpec.describe IntellectualObject, :type => :model do
   after(:all) do
-    IntellectualObject.delete_all
     WorkItem.delete_all
-    Institution.delete_all
     PremisEvent.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   it { should validate_presence_of(:title) }

@@ -7,12 +7,13 @@ RSpec.describe CatalogController, type: :controller do
   let(:inst_user) { FactoryBot.create(:user, :institutional_user, institution_id: @another_institution.id)}
 
   before(:all) do
-    Institution.delete_all
-    IntellectualObject.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
     WorkItem.delete_all
     PremisEvent.delete_all
     DpnWorkItem.delete_all
+    User.delete_all
+    Institution.delete_all
 
     @institution = FactoryBot.create(:member_institution)
     @another_institution = FactoryBot.create(:subscription_institution)
@@ -51,12 +52,13 @@ RSpec.describe CatalogController, type: :controller do
   end
 
   after(:all) do
-    Institution.delete_all
-    IntellectualObject.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
     WorkItem.delete_all
     PremisEvent.delete_all
     DpnWorkItem.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   describe 'GET #search' do
