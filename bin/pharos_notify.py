@@ -68,5 +68,5 @@ for option in args.opt:
 
     PHAROS_URL = 'https://' + args.host + '/api/v2' + OPT_ENDPOINT
     r_option = requests.get(PHAROS_URL, headers=headers)
-    logging.info('%s: %s %s', OPT_ENDPOINT + ' Notification Status: ', \
+    logging.info('%s: %s %s', OPT_ENDPOINT + ' Status: ', \
             r_option.status_code, r_option.text)
