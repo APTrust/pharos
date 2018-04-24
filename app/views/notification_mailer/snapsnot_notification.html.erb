@@ -1,6 +1,12 @@
 <p>Chip,</p>
 <br>
-<p>Here are the latest snapshot results broken down by institution.</p>
+<% if Rails.env.demo? %>
+    <p>Here are the latest snapshot results for the demo repository broken down by institution.</p>
+<% elsif Rails.env.production? %>
+    <p>Here are the latest snapshot results for the production repository broken down by institution.</p>
+<% else %>
+    <p>Here are the latest snapshot results broken down by institution.</p>
+<% end %>
 <br>
 <div><dl class="dl-horizontal dl-invert">
   <% @snap_hash.each do |key, value| %>
