@@ -39,7 +39,8 @@
       <tr>
         <th>Snapshot Type</th>
         <th>Audit Date</th>
-        <th>Data in APTrust</th>
+        <th class="bytes_num">Bytes in APTrust</th>
+        <th>(Readable)</th>
         <th>Storage Cost</th>
       </tr>
       </thead>
@@ -49,6 +50,7 @@
               <tr>
                 <td><%= snapshot.snapshot_type %></td>
                 <td><%= snapshot.audit_date %></td>
+                <td align="right"><%= snapshot.apt_bytes %></td>
                 <td><%= number_to_human_size(snapshot.apt_bytes) %></td>
                 <td><%= number_to_currency(number_with_delimiter(snapshot.cost, delimiter: ',')) %></td>
               </tr>
