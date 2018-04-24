@@ -30,8 +30,14 @@ gem 'devise', '4.4.3'
 gem 'rake'
 gem 'email_validator'
 gem 'therubyracer'
+
+# Used to generate PDFs for reports
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+
+# Used to export data to spreadsheets
+gem 'axlsx', '2.1.0.pre'
+gem 'axlsx_rails'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 4.0.0'

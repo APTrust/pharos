@@ -47,6 +47,13 @@ GEM
     arel (9.0.0)
     autoprefixer-rails (8.3.0)
       execjs
+    axlsx (2.1.0.pre)
+      htmlentities (~> 4.3.1)
+      nokogiri (>= 1.4.1)
+      rubyzip (~> 1.1.7)
+    axlsx_rails (0.5.1)
+      actionpack (>= 3.1)
+      axlsx (>= 2.0.1)
     bcrypt (3.1.11)
     better_errors (2.4.0)
       coderay (>= 1.0.0)
@@ -111,6 +118,7 @@ GEM
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
+    htmlentities (4.3.4)
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
     inherited_resources (1.8.0)
@@ -236,6 +244,7 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
+    rubyzip (1.1.7)
     sass (3.5.6)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -304,6 +313,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  axlsx (= 2.1.0.pre)
+  axlsx_rails
   better_errors
   bootstrap-sass (~> 3.3.7)
   byebug
