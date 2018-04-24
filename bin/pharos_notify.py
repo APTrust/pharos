@@ -1,6 +1,7 @@
 #!/usr/bin/python
 ## Simple helper program is designed to curl private Pharos API endpoints
-# in order to trigger email notifications about failed or stuck repository ingests.
+# in order to trigger email notifications about failed or stuck repository
+# ingests.
 # It requires a post request. It takes four inputs as params:
 # - url : API endpoint or host
 # - time: git
@@ -9,28 +10,63 @@
 # API endpoints:
 # - notify_of_failed_fixity in the premis events controller
 # - notify_of_successful_restoration in the work items controller.
-# Both of those can take a :since parameter but default to 24 hours if one hasn't been provided and that's what the cron job should default to. There is no option, at least as of now, to toggle those notifications on or off but I could do that at a later date. I don't think the admins know yet but we did tell them about the alerts page, which they also have access to, and which also aggregates information about failed fixity checks.so they do have some way to check on those things already.
+# - snapshot: generates a snapshot of institutional total deposits
+# The failed_fixity and successful_restoration endpoints can take a :since
+# parameter but default to 24 hours if one hasn't been provided and that's
+# what the cron job should default to. There is no option, at least as of now,
+# to toggle those notifications on or off.
 
-import requests
 import os
 import logging
+import argparse
+import requests
+
+class EnvDefault(argparse.Action):
+    def __init__(self, envvar, required=True, default=None, **kwargs):
+        if not default and envvar:
+            if envvar in os.environ:
+                default = os.environ[envvar]
+        if required and default:
+            required = False
+        super(EnvDefault, self).__init__(default=default, required=required,
+                                         **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values)
+
+parser = argparse.ArgumentParser(description="Helper script to call Pharos API \
+        endpoints to trigger notifications.")
+parser.add_argument('-u', '--user', \
+	action=EnvDefault, envvar='PHAROS_API_USER', \
+        help='API User for Pharos. Needs admin privileges.')
+parser.add_argument('-k', '--key', \
+	action=EnvDefault, envvar='PHAROS_API_KEY', \
+        help='Pharos API key (default from env var)')
+parser.add_argument('-H', '--host', metavar='PHAROS_HOST', \
+	action=EnvDefault, envvar='PHAROS_HOST', \
+        help='Host to connect to.')
+parser.add_argument('-o', '--opt', nargs='+', \
+        choices=['fixity', 'restore', 'snapshot'], \
+        default=['fixity', 'restore'], \
+        help='Notification options (default: fixity, restore, snapshot)')
+
+args = parser.parse_args()
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
+headers = {'X-PHAROS-API-USER': args.user, \
+        'X-PHAROS-API-KEY': args.key, \
+        'Content-Type': 'application/json', \
+        'Accept' : 'application/json'}
 
-PHAROS_API_USER = os.getenv('PHAROS_API_USER')
-PHAROS_API_KEY = os.getenv('PHAROS_API_KEY')
+for option in args.opt:
+    if option == 'fixity':
+        OPT_ENDPOINT = '/notifications/failed_fixity'
+    elif option == 'restore':
+        OPT_ENDPOINT = '/notifications/successful_restoration'
+    elif option == 'snapshot':
+        OPT_ENDPOINT = '/group_snapshot'
 
-PHAROS_HOST = os.getenv('PHAROS_HOST')
-PHAROS_URL = { 'failed_fixity' : 'https://' + PHAROS_HOST + '/api/v2/notifications/failed_fixity',
-               'successful_restore': 'https://' + PHAROS_HOST + '/api/v2/notifications/successful_restoration'}
-
-headers = { 'X-PHAROS-API-USER': PHAROS_API_USER,
-            'X-PHAROS-API-KEY': PHAROS_API_KEY,
-            'Content-Type': 'application/json',
-            'Accept' : 'application/json'}
-
-r_fixity = requests.get(PHAROS_URL['failed_fixity'], headers=headers)
-r_restore = requests.get(PHAROS_URL['successful_restore'],headers=headers)
-
-logging.info('%s: %s %s', 'Failed Fixity Notification', r_fixity.status_code, r_fixity.text)
-logging.info('%s: %s %s', 'Successful Restore Notification', r_restore.status_code, r_restore.text)
+    PHAROS_URL = 'https://' + args.host + '/api/v2' + OPT_ENDPOINT
+    r_option = requests.get(PHAROS_URL, headers=headers)
+    logging.info('%s: %s %s', OPT_ENDPOINT + ' Notification Status: ', \
+            r_option.status_code, r_option.text)
