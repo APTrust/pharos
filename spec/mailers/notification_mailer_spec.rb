@@ -2,17 +2,17 @@ require "spec_helper"
 
 RSpec.describe NotificationMailer, type: :mailer do
   before :all do
-    Institution.delete_all
     User.delete_all
     PremisEvent.delete_all
     Email.delete_all
+    Institution.delete_all
   end
 
   after :all do
-    Institution.delete_all
     User.delete_all
     PremisEvent.delete_all
     Email.delete_all
+    Institution.delete_all
   end
 
   describe 'failed_fixity_notification' do

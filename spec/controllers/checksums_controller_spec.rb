@@ -3,15 +3,19 @@ require 'spec_helper'
 RSpec.describe ChecksumsController, type: :controller do
 
   before :all do
-    Institution.delete_all
-    GenericFile.delete_all
     Checksum.delete_all
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   after do
-    Institution.delete_all
-    GenericFile.delete_all
     Checksum.delete_all
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:institution_one) { FactoryBot.create(:member_institution) }

@@ -75,9 +75,14 @@ class MemberInstitution < Institution
       cost = excess * 0.000000000381988
       rounded_cost = cost.round(2)
     end
+    if indiv_bytes < 10995116277760 #10 TB
+      rounded_indiv_cost = 0.00
+    else
+      indiv_excess = indiv_bytes - 10995116277760
+      indiv_cost = indiv_excess * 0.000000000381988
+      rounded_indiv_cost = indiv_cost.round(2)
+    end
     rounded_cost = 0.00 if rounded_cost == 0.0
-    indiv_cost = indiv_bytes * 0.000000000381988
-    rounded_indiv_cost = indiv_cost.round(2)
     rounded_indiv_cost = 0.00 if rounded_indiv_cost == 0.0
     indiv_snapshot = Snapshot.create(institution_id: self.id, audit_date: Time.now, apt_bytes: indiv_bytes, cost: rounded_indiv_cost, snapshot_type: 'Individual')
     indiv_snapshot.save!

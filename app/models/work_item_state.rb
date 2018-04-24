@@ -1,4 +1,5 @@
 class WorkItemState < ActiveRecord::Base
+  self.primary_key = 'id'
   require 'zlib'
 
   belongs_to :work_item

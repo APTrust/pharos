@@ -2,9 +2,10 @@ require 'spec_helper'
 
 RSpec.describe ReportsController, type: :controller do
   before :all do
-    Institution.delete_all
-    IntellectualObject.delete_all
+    User.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
 
     @institution_two = FactoryBot.create(:member_institution, identifier: 'aptrust.org')
     @institution_one =  FactoryBot.create(:subscription_institution, member_institution_id: @institution_two.id)
@@ -19,9 +20,10 @@ RSpec.describe ReportsController, type: :controller do
   end
 
   after :all do
-    Institution.delete_all
-    IntellectualObject.delete_all
+    User.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
   end
 
   describe 'GET #index' do

@@ -1,4 +1,5 @@
 class ConfirmationToken < ActiveRecord::Base
+  self.primary_key = 'id'
   belongs_to :intellectual_object
   belongs_to :generic_file
 

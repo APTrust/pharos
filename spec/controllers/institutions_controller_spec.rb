@@ -2,16 +2,31 @@ require 'spec_helper'
 
 RSpec.describe InstitutionsController, type: :controller do
   before :all do
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
     Institution.delete_all
   end
 
   after do
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
     Institution.delete_all
   end
 
-  let(:admin_user) { FactoryBot.create(:user, :admin) }
-  let(:institutional_user) { FactoryBot.create(:user, :institutional_user) }
-  let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin) }
+  let(:institution_one) { FactoryBot.create(:member_institution) }
+  let(:institution_two) { FactoryBot.create(:member_institution) }
+  let(:institution_three) { FactoryBot.create(:member_institution) }
+  let(:admin_user) { FactoryBot.create(:user, :admin, institution_id: institution_one.id) }
+  let(:institutional_user) { FactoryBot.create(:user, :institutional_user, institution_id: institution_two.id) }
+  let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, institution_id: institution_three.id) }
+  let(:object_one) { FactoryBot.create(:intellectual_object, institution: institution_one)}
+  let(:object_two) { FactoryBot.create(:intellectual_object, institution: institution_two)}
+  let(:object_three) { FactoryBot.create(:intellectual_object, institution: institution_three)}
+  let(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
+  let(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+  let(:file_three) { FactoryBot.create(:generic_file, intellectual_object: object_three) }
 
   describe 'GET #index' do
     describe 'for admin users' do

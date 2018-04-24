@@ -90,15 +90,15 @@ class InstitutionsController < ApplicationController
     authorize current_user, :snapshot?
     @snapshots = []
     email_snap_hash = {}
-    MemberInstitution.all.each do |institution|
+    total_bytes = Institution.total_file_size_across_repo
+    email_snap_hash['Repository Total'] = total_bytes
+    MemberInstitution.all.order('name').each do |institution|
       current_snaps = institution.snapshot
       @snapshots.push(current_snaps)
       current_snaps.each do |snap|
         email_snap_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
       end
     end
-    total_bytes = Institution.total_file_size_across_repo
-    email_snap_hash['APTrust'] = total_bytes
     NotificationMailer.snapshot_notification(email_snap_hash).deliver!
     respond_to do |format|
       format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }

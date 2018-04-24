@@ -1,4 +1,5 @@
 class IntellectualObject < ActiveRecord::Base
+  self.primary_key = 'id'
   belongs_to :institution
   has_many :generic_files
   has_many :premis_events

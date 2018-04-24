@@ -1,6 +1,7 @@
 require 'bcrypt'
 
 class User < ActiveRecord::Base
+  self.primary_key = 'id'
   belongs_to :institution, foreign_key: :institution_id
   has_and_belongs_to_many :roles
 

@@ -1,4 +1,5 @@
 class WorkItem < ActiveRecord::Base
+  self.primary_key = 'id'
   paginates_per 10
 
   belongs_to :institution

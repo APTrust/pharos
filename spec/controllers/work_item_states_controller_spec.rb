@@ -1,6 +1,15 @@
 require 'spec_helper'
 
 RSpec.describe WorkItemStatesController, type: :controller do
+
+  after do
+    User.delete_all
+    IntellectualObject.delete_all
+    WorkItemState.delete_all
+    WorkItem.delete_all
+    Institution.delete_all
+  end
+
   let!(:institution) { FactoryBot.create(:member_institution) }
   let!(:admin_user) { FactoryBot.create(:user, :admin) }
   let!(:object) { FactoryBot.create(:intellectual_object, institution: institution, access: 'institution') }

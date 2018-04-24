@@ -5,6 +5,7 @@ RSpec.describe AlertsController, type: :controller do
     WorkItem.delete_all
     DpnWorkItem.delete_all
     PremisEvent.delete_all
+    User.delete_all
     Institution.delete_all
 
     @institution_one =  FactoryBot.create(:member_institution, identifier: 'aptrust.org')
@@ -26,6 +27,7 @@ RSpec.describe AlertsController, type: :controller do
     WorkItem.delete_all
     DpnWorkItem.delete_all
     PremisEvent.delete_all
+    User.delete_all
     Institution.delete_all
   end
 

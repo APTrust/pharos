@@ -33,6 +33,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def vacuum?
+    user.admin?
+  end
+
   def search?
     true
   end

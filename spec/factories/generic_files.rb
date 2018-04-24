@@ -10,7 +10,7 @@ FactoryBot.define do
     updated_at { "#{Time.now}" }
     state { 'A' }
     last_fixity_check { '2000-01-01' }
-    institution_id { intellectual_object.institution_id }
+    institution_id { intellectual_object.institution.id }
   end
 
 end
