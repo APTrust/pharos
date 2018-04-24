@@ -187,8 +187,13 @@ class Institution < ActiveRecord::Base
   def self.breakdown
     report = {}
     MemberInstitution.all.order('name').each do |inst|
-      size = inst.total_file_size
-      name = inst.name
+      if inst.name == 'APTrust'
+        name = 'APTrust (Repository Total)'
+        size = Institution.total_file_size_across_repo
+      else
+        name = inst.name
+        size = inst.total_file_size
+      end
       indiv_breakdown = {}
       indiv_breakdown[:size] = size
       subscribers = SubscriptionInstitution.where(member_institution_id: inst.id)
@@ -197,7 +202,9 @@ class Institution < ActiveRecord::Base
         si_size = si.total_file_size
         si_name = si.name
         indiv_breakdown[si_name] = si_size
+        size += si_size
       end
+      indiv_breakdown[:total_size] = size
       report[name] = indiv_breakdown
     end
     report

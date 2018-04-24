@@ -3,19 +3,16 @@
 <div class="tab-content" id="inst_show_content">
 
   <div class="tab-pane" id="breakdown">
+    <h3>Content Preserved by Institution</h3>
+    <p>Report generated on <%= @report_time.strftime("%B %d, %Y") %> at <%= @report_time.strftime("%H:%M %Z") %></p>
     <br>
-
-    <ul class="inst_breakdown_list">
-    <dl class="dl-horizontal">
-
-    </dl>
-  </ul>
-
     <table class="table table-striped sortable">
       <thead>
       <tr>
         <th>Institution</th>
-        <th class="bytes_num">Total Number of Bytes</th>
+        <th class="bytes_num">Bytes Preserved (Self Only)</th>
+        <th>(Readable)</th>
+        <th class="bytes_num">Bytes Preserved (Including Sub Accounts)</th>
         <th>(Readable)</th>
         <th>Number of Sub Accounts</th>
       </tr>
@@ -23,25 +20,23 @@
       <tbody>
 
       <% @inst_breakdown_report.each do |key, value| %>
-          <% sub_num = value[:subscriber_number] %>
-          <% bytes_num = value[:size] %>
-          <% inst_name = key %>
           <tr>
-            <td><%= inst_name %></td>
-            <td class="bytes_num"><%= bytes_num %></td>
-            <td class="bytes_num_readable">(<%= number_to_human_size(bytes_num) %>)</td>
-            <td><%= number_with_delimiter(sub_num, delimiter: ',') %></td>
+            <td><%= key %></td>
+            <td align="right"><%= value[:size] %></td>
+            <td padding-right="50px">(<%= number_to_human_size(value[:size]) %>)</td>
+                <td align="right"><%= value[:total_size] %></td>
+                <td padding-right="50px">(<%= number_to_human_size(value[:total_size]) %>)</td>
+            <td><%= number_with_delimiter(value[:subscriber_number], delimiter: ',') %></td>
           </tr>
           <% value.each do |nested_key, nested_value| %>
-              <% if nested_key != :subscriber_number && nested_key != :size %>
-                      <% inst_name = nested_key %>
-                      <% bytes_num = nested_value %>
-                      <% sub_num = "Sub Account of #{key}" %>
+              <% if nested_key != :subscriber_number && nested_key != :size && nested_key != :total_size %>
                   <tr>
-                    <td>    <%= inst_name %></td>
-                    <td align="right"><%= bytes_num %></td>
-                    <td padding-right="50px">(<%= number_to_human_size(bytes_num) %>)</td>
-                    <td><%= number_with_delimiter(sub_num, delimiter: ',') %></td>
+                    <td><%= nested_key %></td>
+                    <td align="right"><%= nested_value %></td>
+                    <td padding-right="50px">(<%= number_to_human_size(nested_value) %>)</td>
+                    <td align="right"><%= nested_value %></td>
+                    <td padding-right="50px">(<%= number_to_human_size(nested_value) %>)</td>
+                    <td>Sub Account of <%= key %></td>
                   </tr>
               <% end %>
           <% end %>
