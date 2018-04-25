@@ -1,0 +1,6 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Snapshots") do |sheet|
+  @snapshots.each do |snap|
+    sheet.add_row [snap.institution_id, snap.audit_date, snap.apt_bytes, snap.cost, snap.snapshot_type]
+  end
+end

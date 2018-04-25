@@ -1,3 +1,14 @@
+GIT
+  remote: https://github.com/randym/axlsx.git
+  revision: c8ac844572b25fda358cc01d2104720c4c42f450
+  ref: c8ac844
+  specs:
+    axlsx (2.1.0.pre)
+      htmlentities (~> 4.3.4)
+      mimemagic (~> 0.3)
+      nokogiri (>= 1.6.6)
+      rubyzip (>= 1.2.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -47,10 +58,6 @@ GEM
     arel (9.0.0)
     autoprefixer-rails (8.3.0)
       execjs
-    axlsx (2.1.0.pre)
-      htmlentities (~> 4.3.1)
-      nokogiri (>= 1.4.1)
-      rubyzip (~> 1.1.7)
     axlsx_rails (0.5.1)
       actionpack (>= 3.1)
       axlsx (>= 2.0.1)
@@ -244,7 +251,7 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
-    rubyzip (1.1.7)
+    rubyzip (1.2.1)
     sass (3.5.6)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -313,7 +320,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  axlsx (= 2.1.0.pre)
+  axlsx!
   axlsx_rails
   better_errors
   bootstrap-sass (~> 3.3.7)
@@ -344,6 +351,7 @@ DEPENDENCIES
   rspec-activemodel-mocks
   rspec-its
   rspec-rails (~> 3.7.2)
+  rubyzip (>= 1.2.1)
   sass-rails (~> 5.0)
   sdoc (~> 1.0.0)
   shoulda-matchers (~> 3.1.2)
