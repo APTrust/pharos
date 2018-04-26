@@ -35,10 +35,13 @@ gem 'therubyracer'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
-# Used to export data to spreadsheets
+# Used to generate spreadsheets
 gem 'rubyzip', '>= 1.2.1'
 gem 'axlsx', git: 'https://github.com/randym/axlsx.git', ref: 'c8ac844'
 gem 'axlsx_rails'
+
+# Used to export above spreadsheets to existing google sheet
+gem 'google_drive'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 4.0.0'
