@@ -32,7 +32,7 @@
                 <script>var graph_hash = {}</script>
                 <% @base_report.each do |key, value| %>
                     <% unless key == 'all' %>
-                        <script>graph_hash["<%= key %>"] = <%= value %></script>
+                        <script>graph_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                         <tr>
                           <td width="200"><%= key %></td>
                           <td width="180"><%= value %></td>
@@ -45,7 +45,7 @@
             </td>
             <td id="mimetype_cell" valign="top">
               <div class="chart-container" >
-                <canvas id="basic_mimetype_chart" width="800" height="500"></canvas>
+                <canvas id="basic_mimetype_chart" width="700" height="500"></canvas>
                 <script>mimetype_graph(graph_hash, "basic_mimetype_chart", "right")</script>
               </div>
             </td>
@@ -69,7 +69,7 @@
                 <script>var total_hash = {}</script>
                 <% @mimetype_report.each do |key, value| %>
                     <% unless key == 'all' %>
-                        <script>total_hash["<%= key %>"] = <%= value %></script>
+                        <script>total_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                         <tr>
                           <td width="200"><%= key %></td>
                           <td width="180"><%= value %></td>
@@ -104,7 +104,7 @@
                 <tbody>
                 <script>var app_hash = {}</script>
                 <% @application_report.each do |key, value| %>
-                    <script>app_hash["<%= key %>"] = <%= value %></script>
+                    <script>app_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                     <tr>
                       <td width="200"><%= key %></td>
                       <td width="180"><%= value %></td>
@@ -139,7 +139,7 @@
                 <tbody>
                 <script>var audio_hash = {}</script>
                 <% @audio_report.each do |key, value| %>
-                    <script>audio_hash["<%= key %>"] = <%= value %></script>
+                    <script>audio_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                     <tr>
                       <td width="200"><%= key %></td>
                       <td width="180"><%= value %></td>
@@ -151,7 +151,7 @@
             </td>
             <td valign="top">
               <div class="chart-container" style="position: relative;">
-                <canvas id="mimetype_audio_chart" width="800" height="500"></canvas>
+                <canvas id="mimetype_audio_chart" width="700" height="500"></canvas>
                 <script>mimetype_graph(audio_hash, "mimetype_audio_chart", "right")</script>
               </div>
             </td>
@@ -174,7 +174,7 @@
                 <tbody>
                 <script>var image_hash = {}</script>
                 <% @image_report.each do |key, value| %>
-                    <script>image_hash["<%= key %>"] = <%= value %></script>
+                    <script>image_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                     <tr>
                       <td width="200"><%= key %></td>
                       <td width="180"><%= value %></td>
@@ -186,7 +186,7 @@
             </td>
             <td valign="top">
               <div class="chart-container" style="position: relative;">
-                <canvas id="mimetype_image_chart" width="800" height="500"></canvas>
+                <canvas id="mimetype_image_chart" width="700" height="500"></canvas>
                 <script>mimetype_graph(image_hash, "mimetype_image_chart", "right")</script>
               </div>
             </td>
@@ -209,7 +209,7 @@
                 <tbody>
                 <script>var other_hash = {}</script>
                 <% @other_report.each do |key, value| %>
-                    <script>other_hash["<%= key %>"] = <%= value %></script>
+                    <script>other_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                     <tr>
                       <td width="200"><%= key %></td>
                       <td width="180"><%= value %></td>
@@ -221,7 +221,7 @@
             </td>
             <td valign="top">
               <div class="chart-container" style="position: relative;">
-                <canvas id="mimetype_other_chart" width="800" height="500"></canvas>
+                <canvas id="mimetype_other_chart" width="700" height="500"></canvas>
                 <script>mimetype_graph(other_hash, "mimetype_other_chart", "right")</script>
               </div>
             </td>
@@ -244,7 +244,7 @@
                 <tbody>
                 <script>var text_hash = {}</script>
                 <% @text_report.each do |key, value| %>
-                    <script>text_hash["<%= key %>"] = <%= value %></script>
+                    <script>text_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                     <tr>
                       <td width="200"><%= key %></td>
                       <td width="180"><%= value %></td>
@@ -256,7 +256,7 @@
             </td>
             <td valign="top">
               <div class="chart-container" style="position: relative;">
-                <canvas id="mimetype_text_chart" width="800" height="500"></canvas>
+                <canvas id="mimetype_text_chart" width="700" height="500"></canvas>
                 <script>mimetype_graph(text_hash, "mimetype_text_chart", "right")</script>
               </div>
             </td>
@@ -279,7 +279,7 @@
                 <tbody>
                 <script>var video_hash = {}</script>
                 <% @video_report.each do |key, value| %>
-                    <script>video_hash["<%= key %>"] = <%= value %></script>
+                    <script>video_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
                     <tr>
                       <td width="200"><%= key %></td>
                       <td width="180"><%= value %></td>
@@ -291,7 +291,7 @@
             </td>
             <td valign="top">
               <div class="chart-container" style="position: relative;">
-                <canvas id="mimetype_video_chart" width="800" height="500"></canvas>
+                <canvas id="mimetype_video_chart" width="700" height="500"></canvas>
                 <script>mimetype_graph(video_hash, "mimetype_video_chart", "right")</script>
               </div>
             </td>
