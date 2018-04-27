@@ -88,26 +88,24 @@ class InstitutionsController < ApplicationController
 
   def group_snapshot
     authorize current_user, :snapshot?
-    @snapshots = Snapshot.all
-    # @snapshots = []
-    # email_snap_hash = {}
-    # total_bytes = Institution.total_file_size_across_repo
-    # email_snap_hash['Repository Total'] = total_bytes
-    # MemberInstitution.all.order('name').each do |institution|
-    #   current_snaps = institution.snapshot
-    #   @snapshots.push(current_snaps)
-    #   current_snaps.each do |snap|
-    #     email_snap_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
-    #   end
-    # end
-    # NotificationMailer.snapshot_notification(email_snap_hash).deliver!
+    @snapshots = []
+    @snap_hash = {}
+    @snap_hash['Repository Total'] = Institution.total_file_size_across_repo
+    MemberInstitution.all.order('name').each do |institution|
+      current_snaps = institution.snapshot
+      @snapshots.push(current_snaps)
+      current_snaps.each do |snap|
+        @snap_hash[institution.name] = snap.apt_bytes if (snap.snapshot_type == 'Subscribers Included' && institution.name != 'APTrust')
+      end
+    end
+    NotificationMailer.snapshot_notification(@snap_hash).deliver!
     respond_to do |format|
       format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
       format.html {
         redirect_to root_path
         flash[:notice] = "A snapshot of all Member Institutions has been taken and archived on #{@snapshots.first.first.audit_date}. Please see the reports page for that analysis."
       }
-      format.xlsx { set_attachment_name "sites #{Time.now.utc.strftime('%Y%M%d%H%M%S')}.xlsx" }
+      format.xlsx { set_attachment_name "Snapshots_#{Time.now.utc.strftime('%Y-%M-%d')}.xlsx" }
     end
   end
 
