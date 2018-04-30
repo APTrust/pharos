@@ -53,7 +53,7 @@ group :development do
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 3.6.1'
+  gem 'web-console', '~> 3.6.2'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   # We don't use this gem directly but actionpack and actionview depend on it and it needs upgrading to fix a security warning
