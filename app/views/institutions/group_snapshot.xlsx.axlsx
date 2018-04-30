@@ -1,12 +1,20 @@
-wb = xlsx_package.workbook
+require 'spreadsheet'
+
+#wb = xlsx_package.workbook
+wb = Spreadsheet.open('/Users/kec6en/Desktop/test_book.xls')
 styles = xlsx_package.workbook.styles
 header_style = styles.add_style bg_color: '00',
                                 fg_color: 'FF',
                                 bold: true,
                                 alignment: { horizontal: :center }
-wb.add_worksheet(name: 'Snapshots') do |sheet|
-  sheet.add_row ['Institution', 'Bytes Preserved'], style: header_style
-  @snap_hash.each do |name, bytes|
-    sheet.add_row [name, bytes]
-  end
+sheet = wb.create_worksheet(name: 'Snapshots')
+sheet[0,0] = 'Institution'
+sheet[0,1] = 'Bytes Preserved'
+i = 1
+@snap_hash.each do |name, bytes|
+  sheet[i,0] = name
+  sheet[i,1] = bytes
+  i += 1
 end
+
+wb.write('/Users/kec6en/Desktop/test_book.xls')
