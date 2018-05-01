@@ -1,5 +1,6 @@
 # Pharos
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d37b48c4c5547cca0c9c61a5887f589)](https://www.codacy.com/app/cdahlhausen/pharos?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=APTrust/pharos&amp;utm_campaign=Badge_Grade)
 [![Code Climate](https://codeclimate.com/github/APTrust/pharos.png)](https://codeclimate.com/github/APTrust/pharos.png?branch=develop)
 [![Dependency Status](https://gemnasium.com/badges/github.com/APTrust/pharos.svg)](https://gemnasium.com/github.com/APTrust/pharos)
 
