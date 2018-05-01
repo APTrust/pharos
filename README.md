@@ -2,7 +2,6 @@
 
 [![Code Climate](https://codeclimate.com/github/APTrust/pharos.png)](https://codeclimate.com/github/APTrust/pharos.png?branch=develop)
 [![Dependency Status](https://gemnasium.com/badges/github.com/APTrust/pharos.svg)](https://gemnasium.com/github.com/APTrust/pharos)
-[![bitHound Overall Score](https://www.bithound.io/github/APTrust/pharos/badges/score.svg)](https://www.bithound.io/github/APTrust/pharos)
 
 Build Status | Continuous Integration | Code Coverage
 --- | --- | ---
