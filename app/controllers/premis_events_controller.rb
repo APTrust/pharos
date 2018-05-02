@@ -22,13 +22,22 @@ class PremisEventsController < ApplicationController
     end
     params[:file_identifier] = '' if params[:file_identifier] == 'null' || params[:file_identifier] == 'blank'
     params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
-    authorize @parent
-    @institution = current_user.institution
-    filter_count_and_sort
-    page_results(@premis_events)
-    respond_to do |format|
-      format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |event| event.serializable_hash } } }
-      format.html { }
+    if @parent.nil?
+      authorize current_user, :nil_index?
+      @institution = current_user.institution
+      respond_to do |format|
+        format.json { render nothing: true, status: :not_found }
+        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      end
+    else
+      authorize @parent
+      @institution = current_user.institution
+      filter_count_and_sort
+      page_results(@premis_events)
+      respond_to do |format|
+        format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |event| event.serializable_hash } } }
+        format.html { }
+      end
     end
   end
 
@@ -108,8 +117,8 @@ class PremisEventsController < ApplicationController
       end
       @parent = IntellectualObject.where(identifier: identifier).first
     end
-    params[:intellectual_object_id] = @parent.id
-    params[:object_identifier] = identifier
+    params[:intellectual_object_id] = @parent.id if @parent
+    params[:object_identifier] = identifier if identifier
   end
 
   def load_generic_file
@@ -121,14 +130,14 @@ class PremisEventsController < ApplicationController
       end
       @parent = GenericFile.where(identifier: identifier).first
     end
-    params[:generic_file_id] = @parent.id
-    params[:file_identifier] = identifier
+    params[:generic_file_id] = @parent.id if @parent
+    params[:file_identifier] = identifier if identifier
   end
 
   def load_institution
     identifier = params[:institution_identifier].gsub(/%2F/i, '/').gsub(/%3F/i, '?')
     @parent = Institution.where(identifier: identifier).first
-    params[:institution_id] = @parent.id
+    params[:institution_id] = @parent.id if @parent
   end
 
   def load_and_authorize_parent_object
