@@ -5,6 +5,7 @@ RSpec.describe AlertsController, type: :controller do
     WorkItem.delete_all
     DpnWorkItem.delete_all
     PremisEvent.delete_all
+    User.delete_all
     Institution.delete_all
 
     @institution_one =  FactoryBot.create(:member_institution, identifier: 'aptrust.org')
@@ -26,6 +27,7 @@ RSpec.describe AlertsController, type: :controller do
     WorkItem.delete_all
     DpnWorkItem.delete_all
     PremisEvent.delete_all
+    User.delete_all
     Institution.delete_all
   end
 
@@ -37,7 +39,7 @@ RSpec.describe AlertsController, type: :controller do
 
       it 'returns a list of each possible alert type from the last 24 hours (html)' do
         get :index
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template('index')
         assigns(:alerts_list)[:failed_fixity_checks].first.should eq(@failed_fixity)
         assigns(:alerts_list)[:failed_ingests].first.should eq(@ingest_fail)
@@ -50,14 +52,14 @@ RSpec.describe AlertsController, type: :controller do
 
       it 'returns only the specified alert type if the type parameter is used (json)' do
         get :index, params: { type: 'fixity' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:alerts_list)[:failed_fixity_checks].count.should eq 1
         assigns(:alerts_list)[:failed_ingests].should be nil
       end
 
       it 'filters by the since parameter when supplied' do
         get :index, params: { since: (Time.now - 48.hours) }
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:alerts_list)[:failed_fixity_checks].count.should eq 2
       end
     end
@@ -69,7 +71,7 @@ RSpec.describe AlertsController, type: :controller do
 
       it 'allows access only to alerts on their content (html)' do
         get :index, params: { since: (Time.now - 48.hours) }
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:alerts_list)[:failed_fixity_checks].first.should eq(@failed_fixity)
         assigns(:alerts_list)[:failed_fixity_checks].count.should eq 1
       end
@@ -100,7 +102,7 @@ RSpec.describe AlertsController, type: :controller do
 
       it 'returns a list of alert counts (html)' do
         get :summary
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template('summary')
         assigns(:alerts_summary)[:failed_fixity_count].should eq 1
         assigns(:alerts_summary)[:failed_ingest_count].should eq 1
@@ -113,7 +115,7 @@ RSpec.describe AlertsController, type: :controller do
 
       it 'returns a list of alert counts (json)' do
         get :summary, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:alerts_summary)[:failed_fixity_count].should eq 1
         assigns(:alerts_summary)[:failed_ingest_count].should eq 1
         assigns(:alerts_summary)[:failed_restoration_count].should eq 1
@@ -136,7 +138,7 @@ RSpec.describe AlertsController, type: :controller do
 
       it 'allows access (html)' do
         get :summary
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 

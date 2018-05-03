@@ -2,12 +2,12 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.1.6'
+gem 'rails', '5.2.0'
 gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.8'
+gem 'uglifier', '>= 4.1.10'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -22,6 +22,8 @@ gem 'jbuilder', '~> 2.7.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 1.0.0', group: :doc
 
+gem 'pg', '1.0.0' # Necessary for talking to our RDS instance
+
 gem 'pundit'
 gem 'figaro'
 gem 'devise', '4.4.3'
@@ -32,7 +34,7 @@ gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 3.5.1'
+gem 'simple_form', '~> 4.0.0'
 gem 'phony_rails'
 gem 'inherited_resources', '1.8.0'
 gem 'uuidtools'
@@ -51,23 +53,20 @@ group :development do
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 3.5.1'
+  gem 'web-console', '~> 3.6.2'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
-  # Use sqlite3 as the database for Active Record
-  gem 'sqlite3', '1.3.13'
   # We don't use this gem directly but actionpack and actionview depend on it and it needs upgrading to fix a security warning
   gem 'rails-html-sanitizer', '1.0.4'
-  gem 'pg', '0.21.0' # Necessary for talking to our RDS instance
 end
 
 group :test do
-  gem 'capybara', '3.0.0'
+  gem 'capybara', '3.0.3'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.21', require: false
 end
 
-group :development, :test, :postgres_test, :demo, :production, :integration do
+group :development, :test, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_bot_rails'

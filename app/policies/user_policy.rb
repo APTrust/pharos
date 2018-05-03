@@ -29,6 +29,14 @@ class UserPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
+  def snapshot?
+    user.admin?
+  end
+
+  def vacuum?
+    user.admin?
+  end
+
   def search?
     true
   end

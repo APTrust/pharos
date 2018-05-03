@@ -4,10 +4,14 @@ RSpec.describe EmailsController, type: :controller do
 
   before :all do
     Email.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   after do
     Email.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:email_one) { FactoryBot.create(:fixity_email) }
@@ -23,7 +27,7 @@ RSpec.describe EmailsController, type: :controller do
 
       it 'returns successfully all emails' do
         get :index, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:emails).size).to eq 2
       end
     end
@@ -49,7 +53,7 @@ RSpec.describe EmailsController, type: :controller do
 
       it 'returns successfully the requested email' do
         get :show, params: { id: email_one.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:email).email_type).to eq 'fixity'
       end
     end

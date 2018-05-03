@@ -1,5 +1,5 @@
 class PremisEventsController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :load_and_authorize_parent_object, only: [:create]
@@ -22,25 +22,22 @@ class PremisEventsController < ApplicationController
     end
     params[:file_identifier] = '' if params[:file_identifier] == 'null' || params[:file_identifier] == 'blank'
     params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
-    authorize @parent
-    @institution = current_user.institution
-    @premis_events = @premis_events
-      .with_institution(params[:institution])
-      .with_type(params[:event_type])
-      .with_outcome(params[:outcome])
-      .with_create_date(params[:created_at])
-      .created_before(params[:created_before])
-      .created_after(params[:created_after])
-      .with_event_identifier(params[:event_identifier])
-      .with_object_identifier(params[:object_identifier])
-      .with_object_identifier_like(params[:object_identifier_like])
-      .with_file_identifier(params[:file_identifier])
-      .with_file_identifier_like(params[:file_identifier_like])
-    filter_count_and_sort
-    page_results(@premis_events)
-    respond_to do |format|
-      format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |event| event.serializable_hash } } }
-      format.html { }
+    if @parent.nil?
+      authorize current_user, :nil_index?
+      @institution = current_user.institution
+      respond_to do |format|
+        format.json { render nothing: true, status: :not_found }
+        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      end
+    else
+      authorize @parent
+      @institution = current_user.institution
+      filter_count_and_sort
+      page_results(@premis_events)
+      respond_to do |format|
+        format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |event| event.serializable_hash } } }
+        format.html { }
+      end
     end
   end
 
@@ -120,8 +117,8 @@ class PremisEventsController < ApplicationController
       end
       @parent = IntellectualObject.where(identifier: identifier).first
     end
-    params[:intellectual_object_id] = @parent.id
-    params[:object_identifier] = identifier
+    params[:intellectual_object_id] = @parent.id if @parent
+    params[:object_identifier] = identifier if identifier
   end
 
   def load_generic_file
@@ -133,14 +130,14 @@ class PremisEventsController < ApplicationController
       end
       @parent = GenericFile.where(identifier: identifier).first
     end
-    params[:generic_file_id] = @parent.id
-    params[:file_identifier] = identifier
+    params[:generic_file_id] = @parent.id if @parent
+    params[:file_identifier] = identifier if identifier
   end
 
   def load_institution
     identifier = params[:institution_identifier].gsub(/%2F/i, '/').gsub(/%3F/i, '?')
     @parent = Institution.where(identifier: identifier).first
-    params[:institution_id] = @parent.id
+    params[:institution_id] = @parent.id if @parent
   end
 
   def load_and_authorize_parent_object
@@ -165,20 +162,26 @@ class PremisEventsController < ApplicationController
     end
   end
 
-  def for_selected_object
-    @premis_events = @premis_events.where(intellectual_object_id: @parent.id) unless @parent.nil?
-  end
-
-  def for_selected_file
-    @premis_events = @premis_events.where(generic_file_id: @parent.id) unless @parent.nil?
-  end
-
   def filter_count_and_sort
+    @premis_events = @premis_events
+                         .with_institution(params[:institution])
+                         .with_type(params[:event_type])
+                         .with_outcome(params[:outcome])
+                         .with_create_date(params[:created_at])
+                         .created_before(params[:created_before])
+                         .created_after(params[:created_after])
+                         .with_event_identifier(params[:event_identifier])
+                         .with_object_identifier(params[:object_identifier])
+                         .with_object_identifier_like(params[:object_identifier_like])
+                         .with_file_identifier(params[:file_identifier])
+                         .with_file_identifier_like(params[:file_identifier_like])
     @selected = {}
-    get_institution_counts
-    get_event_type_counts
-    get_outcome_counts
-    count = @premis_events.where.not(identifier: nil).count
+    get_event_institution_counts(@premis_events)
+    get_event_type_counts(@premis_events)
+    get_outcome_counts(@premis_events)
+    query = "SELECT COUNT(*) FROM (#{@premis_events.to_sql}) AS event_index"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    count = result[0]['count']
     set_page_counts(count)
     case params[:sort]
       when 'date'
@@ -188,37 +191,6 @@ class PremisEventsController < ApplicationController
       when 'institution'
         @premis_events = @premis_events.joins(:institution).order('institutions.name')
     end
-  end
-
-  def get_institution_counts
-    @selected[:institution] = params[:institution] if params[:institution]
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
-    @sorted_institutions = {}
-    @institutions.each do |id|
-      name = Institution.find(id).name
-      @sorted_institutions[name] = id
-    end
-    @sorted_institutions = Hash[@sorted_institutions.sort]
-    # Can be turned on if efficiency improves to the point where filter counts are plausible
-    # counts = @premis_events.group(:institution_id).size
-    # @inst_counts = {}
-    # counts.each do |key, value|
-    #   name = Institution.find(key).name
-    #   @inst_counts[name] = [key, value]
-    # end
-    # @inst_counts = Hash[@inst_counts.sort]
-  end
-
-  def get_event_type_counts
-    @selected[:event_type] = params[:event_type] if params[:event_type]
-    params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values.sort
-    # @event_type_counts = @premis_events.group(:event_type).size # Can be turned on if efficiency improves to the point where filter counts are plausible
-  end
-
-  def get_outcome_counts
-    @selected[:outcome] = params[:outcome] if params[:outcome]
-    params[:outcome] ? @outcomes = [params[:outcome]] : @outcomes = %w(Failure Success)
-    # @outcome_counts = @premis_events.group(:outcome).size # Can be turned on if efficiency improves to the point where filter counts are plausible
   end
 
   private

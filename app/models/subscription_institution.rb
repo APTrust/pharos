@@ -31,12 +31,12 @@ class SubscriptionInstitution  < Institution
 
   def generate_cost_report
     report = {}
-    report[:total_file_size] = self.active_files.sum(:size)
+    report[:total_file_size] = self.total_file_size
     report
   end
 
   def snapshot
-    apt_bytes = self.active_files.sum(:size)
+    apt_bytes = self.total_file_size
     cost = apt_bytes * 0.000000000381988
     rounded_cost = cost.round(2)
     rounded_cost = 0.00 if rounded_cost == 0.0

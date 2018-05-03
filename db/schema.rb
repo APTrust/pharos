@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180412183208) do
+ActiveRecord::Schema.define(version: 2018_04_17_150517) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -51,7 +54,7 @@ ActiveRecord::Schema.define(version: 20180412183208) do
     t.datetime "queued_at"
     t.datetime "completed_at"
     t.string "note", limit: 400
-    t.text "state", limit: 104857600
+    t.text "state"
     t.string "processing_node", limit: 255
     t.integer "pid", default: 0
     t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
@@ -87,7 +90,7 @@ ActiveRecord::Schema.define(version: 20180412183208) do
   create_table "generic_files", force: :cascade do |t|
     t.string "file_format"
     t.string "uri"
-    t.integer "size", limit: 8
+    t.bigint "size"
     t.string "identifier"
     t.integer "intellectual_object_id"
     t.datetime "created_at", null: false
@@ -202,7 +205,7 @@ ActiveRecord::Schema.define(version: 20180412183208) do
   create_table "snapshots", force: :cascade do |t|
     t.datetime "audit_date"
     t.integer "institution_id"
-    t.integer "apt_bytes"
+    t.bigint "apt_bytes"
     t.decimal "cost"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -255,11 +258,11 @@ ActiveRecord::Schema.define(version: 20180412183208) do
     t.string "etag"
     t.string "bucket"
     t.string "user"
-    t.text "note", limit: 255
+    t.text "note"
     t.string "action"
     t.string "stage"
     t.string "status"
-    t.text "outcome", limit: 255
+    t.text "outcome"
     t.datetime "bag_date"
     t.datetime "date"
     t.boolean "retry", default: false, null: false
@@ -270,7 +273,7 @@ ActiveRecord::Schema.define(version: 20180412183208) do
     t.boolean "needs_admin_review", default: false, null: false
     t.integer "institution_id"
     t.datetime "queued_at"
-    t.integer "size", limit: 8
+    t.bigint "size"
     t.datetime "stage_started_at"
     t.index ["action"], name: "index_work_items_on_action"
     t.index ["date"], name: "index_work_items_on_date"

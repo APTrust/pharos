@@ -331,12 +331,28 @@ function report_nav(type) {
 
 function timeline_graph(labels, data) {
     var ctx = document.getElementById("indiv_timeline_chart").getContext('2d');
-    var colors = palette('rainbow', data.length, 0, .5, 1).map(function(hex) {
-        return '#' + hex;
-    });
-    var dark_colors = palette('rainbow', data.length, 0, 1, .5).map(function(hex) {
-        return '#' + hex;
-    });
+    var repeat = Math.ceil(data.length/100);
+    if (repeat == 1) {
+        var colors = palette('rainbow', data.length, 0, .5, 1).map(function(hex) {
+            return '#' + hex;
+        });
+        var dark_colors = dark_colors = palette('rainbow', data.length, 0, 1, .5).map(function(hex) {
+            return '#' + hex;
+        });
+    } else {
+        var colors = [];
+        var dark_colors = [];
+        for (var i = 0; i < repeat; i++) {
+            var temp_colors = palette('rainbow', 100, 0, .5, 1).map(function(hex) {
+                return '#' + hex;
+            });
+            colors.concat(temp_colors);
+            var temp_dark_colors = dark_colors = palette('rainbow', 100, 0, 1, .5).map(function(hex) {
+                return '#' + hex;
+            });
+            dark_colors.concat(temp_dark_colors);
+        }
+    }
     var myChart = new Chart(ctx, {
         type: 'horizontalBar',
         data: {
@@ -361,8 +377,8 @@ function timeline_graph(labels, data) {
     });
 }
 
-function individual_mimetype(stats) {
-    var ctx = document.getElementById("indiv_mimetype_chart").getContext('2d');
+function mimetype_graph(stats, id, position) {
+    var ctx = document.getElementById(id).getContext('2d');
     var labels_array = [];
     var data_array = [] ;
     Object.keys(stats).forEach(function (key) {
@@ -370,55 +386,114 @@ function individual_mimetype(stats) {
         labels_array.push(key);
         data_array.push(value)
     });
-    var init_colors = palette('rainbow', data_array.length, 0, .6, .7).map(function(hex) {
-        return '#' + hex;
-    });
-    var init_dark_colors = palette('rainbow', data_array.length, 0, 1, .5).map(function(hex) {
-        return '#' + hex;
-    });
-    var new_colors = shuffleArray(init_colors, init_dark_colors);
-    var colors = new_colors[0];
-    var dark_colors = new_colors[1];
+    var colors = get_colors(data_array.length);
     var myPieChart = new Chart(ctx,{
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: labels_array,
             datasets: [{
                 data: data_array,
                 label: 'Mimetype Usage',
                 backgroundColor: colors,
-                borderColor: dark_colors,
                 borderWidth: .5
             }]
         },
         options: {
-            cutoutPercentage: 0,
+            cutoutPercentage: 30,
             rotation: -0.5 * Math.PI,
             circumference: 2 * Math.PI,
             animation: {
                 animateRotate: true
             },
-            responsive: true,
-            maintainAspectRatio: false
+            responsive: false,
+            maintainAspectRatio: false,
+            legend: {
+                position: position,
+                labels: {
+                    fontSize: 10,
+                    boxWidth: 25
+                }
+            }
         }
     });
-
 }
 
-function shuffleArray(array_one, array_two) {
-    var color_array = [];
-    for (var i = array_one.length - 1; i > 0; i--) {
+function shuffleArray(color_array) {
+    for (var i = color_array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
-        var temp_one = array_one[i];
-        array_one[i] = array_one[j];
-        array_one[j] = temp_one;
-        var temp_two = array_two[i];
-        array_two[i] = array_two[j];
-        array_two[j] = temp_two;
+        var temp_one = color_array[i];
+        color_array[i] = color_array[j];
+        color_array[j] = temp_one;
     }
-    color_array.push(array_one);
-    color_array.push(array_two);
-    return color_array
+    return color_array;
+}
+
+function get_colors(length) {
+    if (length <= 12) {
+        var init_colors = palette('tol', 12).map(function (hex) {
+            return '#' + hex;
+        });
+    } else if (length >= 13 && length < 21) {
+        var init_colors = palette('mpn65', 21).map(function (hex) {
+            return '#' + hex;
+        });
+    } else if (length >= 21 && length < 40) {
+        var color_length = Math.ceil(length/2);
+        var colors_one = palette('rainbow', color_length, 0, 1, 1).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_two = palette('tol-rainbow', color_length).map(function (hex) {
+            return '#' + hex;
+        });
+        var init_colors = colors_one.concat(colors_two)
+    } else if (length >= 41 && length < 60) {
+        var color_length = Math.ceil(length/3);
+        var colors_one = palette('rainbow', color_length, 0, 1, 1).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_two = palette('tol-rainbow', color_length).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_three = palette('mpn65', color_length).map(function (hex) {
+            return '#' + hex;
+        });
+        var init_colors = colors_one.concat(colors_two.concat(colors_three))
+    } else if (length >= 61 && length < 80) {
+        var color_length = Math.ceil(length/4);
+        var colors_one = palette('rainbow', color_length, 0, 1, 1).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_two = palette('tol-rainbow', color_length).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_three = palette('mpn65', color_length).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_four = palette('rainbow', color_length, 0, .6, .7).map(function (hex) {
+            return '#' + hex;
+        });
+        var init_colors = colors_one.concat(colors_two.concat(colors_three.concat(colors_four)))
+    } else {
+        var color_length = Math.ceil((length - 46)/3);
+        var colors_one = palette('rainbow', color_length, 0, 1, 1).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_two = palette('tol-rainbow', 25).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_three = palette('mpn65', 21).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_four = palette('rainbow', color_length, 0, 1, .5).map(function (hex) {
+            return '#' + hex;
+        });
+        var colors_five = palette('rainbow', color_length, 0, .5, 1).map(function (hex) {
+            return '#' + hex;
+        });
+        var init_colors = colors_one.concat(colors_two.concat(colors_three.concat(colors_four.concat(colors_five))))
+    }
+    var colors = shuffleArray(init_colors);
+    return colors;
 }
 
 $(document).ready(function(){

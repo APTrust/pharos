@@ -1,4 +1,5 @@
 class Email < ApplicationRecord
+  self.primary_key = 'id'
   has_and_belongs_to_many :premis_events
   has_and_belongs_to_many :work_items
 

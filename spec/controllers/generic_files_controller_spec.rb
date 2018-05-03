@@ -10,6 +10,9 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:deleted_file) { FactoryBot.create(:generic_file, state: 'D') }
 
   before(:all) do
+    User.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
     @institution = FactoryBot.create(:member_institution)
     @another_institution = FactoryBot.create(:subscription_institution)
     @intellectual_object = FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id)
@@ -19,6 +22,9 @@ RSpec.describe GenericFilesController, type: :controller do
 
   after(:all) do
     GenericFile.delete_all
+    User.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
   end
 
   describe 'GET #index' do

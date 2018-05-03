@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :vacuum]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -83,6 +83,29 @@ class UsersController < ApplicationController
     flash[:notice] = "Reset password for #{@user.email}. Please notify the user that #{password} is their new password."
   end
 
+  def vacuum
+    authorize current_user
+    if params[:vacuum_target]
+      query = set_query(params[:vacuum_target])
+      ActiveRecord::Base.connection.exec_query(query)
+      vacuum_associated_tables(params[:vacuum_target]) if params[:vacuum_target] == 'emails' || params[:vacuum_target] == 'roles'
+      respond_to do |format|
+        if params[:vacuum_target] == 'entire_database'
+          msg = 'The whole database'
+        else
+          msg = "#{params[:vacuum_target].gsub('_', ' ').capitalize.chop!} table"
+        end
+        format.json { render json: { status: 'success', message: "#{msg} has been vacuumed."  } }
+        format.html { flash[:notice] = "#{msg} has been vacuumed." }
+      end
+    else
+      respond_to do |format|
+        format.json { }
+        format.html { }
+      end
+    end
+  end
+
   private
 
   # If an id is passed through params, use it.  Otherwise default to show the current user.
@@ -127,5 +150,56 @@ class UsersController < ApplicationController
 
   def user_params
     params.required(:user).permit(:password, :password_confirmation, :current_password, :name, :email, :phone_number, :institution_id, :role_ids)
+  end
+
+  def set_query(target)
+    case target
+      when 'checksums'
+        query = 'VACUUM (VERBOSE, ANALYZE) checksums'
+      when 'confirmation_tokens'
+        query = 'VACUUM (VERBOSE, ANALYZE) confirmation_tokens'
+      when 'dpn_bags'
+        query = 'VACUUM (VERBOSE, ANALYZE) dpn_bags'
+      when 'dpn_work_items'
+        query = 'VACUUM (VERBOSE, ANALYZE) dpn_work_items'
+      when 'emails'
+        query = 'VACUUM (VERBOSE, ANALYZE) emails'
+      when 'generic_files'
+        query = 'VACUUM (VERBOSE, ANALYZE) generic_files'
+      when 'institutions'
+        query = 'VACUUM (VERBOSE, ANALYZE) institutions'
+      when 'intellectual_objects'
+        query = 'VACUUM (VERBOSE, ANALYZE) intellectual_objects'
+      when 'premis_events'
+        query = 'VACUUM (VERBOSE, ANALYZE) premis_events'
+      when 'roles'
+        query = 'VACUUM (VERBOSE, ANALYZE) roles'
+      when 'snapshots'
+        query = 'VACUUM (VERBOSE, ANALYZE) snapshots'
+      when 'usage_samples'
+        query = 'VACUUM (VERBOSE, ANALYZE) usage_samples'
+      when 'users'
+        query = 'VACUUM (VERBOSE, ANALYZE) users'
+      when 'work_items'
+        query = 'VACUUM (VERBOSE, ANALYZE) work_items'
+      when 'work_item_states'
+        query = 'VACUUM (VERBOSE, ANALYZE) work_item_states'
+      when 'entire_database'
+        query = 'VACUUM (VERBOSE, ANALYZE)'
+    end
+    query
+  end
+
+  def vacuum_associated_tables(target)
+    case target
+      when 'emails'
+        query = 'VACUUM (VERBOSE, ANALYZE) emails_premis_events'
+        ActiveRecord::Base.connection.exec_query(query)
+        query = 'VACUUM (VERBOSE, ANALYZE) emails_work_items'
+        ActiveRecord::Base.connection.exec_query(query)
+      when 'roles'
+        query = 'VACUUM (VERBOSE, ANALYZE) roles_users'
+        ActiveRecord::Base.connection.exec_query(query)
+    end
   end
 end

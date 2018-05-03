@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe UsersController, type: :controller do
   after do
+    User.delete_all
     Institution.delete_all
   end
 
@@ -234,6 +235,11 @@ RSpec.describe UsersController, type: :controller do
         end
       end
     end
+
+    it 'should not be able to perform vacuum operations' do
+      get :vacuum, params: { vacuum_target: 'snapshots' }, format: :json
+      expect(response.status).to eq(403)
+    end
   end
 
   describe 'An Institutional User' do
@@ -260,6 +266,11 @@ RSpec.describe UsersController, type: :controller do
       expect(flash[:alert]).to eq 'ERROR: Unable to create API key.'
       expect(user.api_secret_key).to be_nil
       expect(user.encrypted_api_secret_key).to be_nil
+    end
+
+    it 'should not be able to perform vacuum operations' do
+      get :vacuum, params: { vacuum_target: 'snapshots' }, format: :json
+      expect(response.status).to eq(403)
     end
   end
 end

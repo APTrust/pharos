@@ -1,5 +1,5 @@
 class DpnWorkItemsController < ApplicationController
-  include SearchAndIndex
+  include FilterCounts
   require 'uri'
   require 'net/http'
   respond_to :html, :json
@@ -12,7 +12,7 @@ class DpnWorkItemsController < ApplicationController
     authorize current_user, :dpn_index?
     @institution = current_user.institution
     @dpn_items = DpnWorkItem.all
-    filter_and_sort
+    filter_sort_and_count
     page_results(@dpn_items)
     respond_to do |format|
       format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash } } }
@@ -135,7 +135,7 @@ class DpnWorkItemsController < ApplicationController
     http.request(request)
   end
 
-  def filter_and_sort
+  def filter_sort_and_count
     @dpn_items = @dpn_items
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])
@@ -146,26 +146,15 @@ class DpnWorkItemsController < ApplicationController
                      .completed_after(params[:completed_after])
                      .is_completed(params[:is_completed])
                      .is_not_completed(params[:is_not_completed])
+                     .with_remote_node(params[:remote_node])
+                     .queued(params[:queued])
+    @selected = {}
+    get_node_counts(@dpn_items)
+    get_queued_counts(@dpn_items)
+    count = @dpn_items.count
+    set_page_counts(count)
     params[:sort] = 'queued_at DESC' unless params[:sort]
     @dpn_items = @dpn_items.order(params[:sort])
-    @selected = {}
-    initialize_filter_counters
-    filter_by_node if params[:remote_node]
-    filter_by_queued if params[:queued]
-    count = @dpn_items.count
-    set_filter_values
-    set_filter_counts
-    set_page_counts(count)
-  end
-
-  def set_filter_values
-    params[:remote_node] ? @nodes = [params[:remote_node]] : @nodes = %w(chron hathi sdr tdr aptrust)
-    @queued_filter = true
-  end
-
-  def set_filter_counts
-    set_node_count(@dpn_items)
-    set_queued_count(@dpn_items)
   end
 
 end

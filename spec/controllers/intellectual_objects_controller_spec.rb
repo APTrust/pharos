@@ -4,11 +4,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
   let(:inst1) { FactoryBot.create(:member_institution) }
   let(:inst2) { FactoryBot.create(:subscription_institution) }
+  let(:apt) { FactoryBot.create(:aptrust) }
   let(:inst_user) { FactoryBot.create(:user, :institutional_user,
                                        institution: inst1) }
   let(:inst_admin) { FactoryBot.create(:user, :institutional_admin,
                                        institution: inst1) }
-  let(:sys_admin) { FactoryBot.create(:user, :admin) }
+  let(:sys_admin) { FactoryBot.create(:user, :admin, institution: apt) }
   let!(:obj1) { FactoryBot.create(:consortial_intellectual_object,
                                    institution: inst2) }
   let!(:obj2) { FactoryBot.create(:institutional_intellectual_object,
@@ -43,16 +44,20 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
   before(:all) do
     WorkItem.delete_all
+    User.delete_all
+    PremisEvent.delete_all
     GenericFile.delete_all
     IntellectualObject.delete_all
+    Institution.delete_all
   end
 
   after(:all) do
-    IntellectualObject.delete_all
     WorkItem.delete_all
-    Institution.delete_all
+    User.delete_all
     PremisEvent.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
   end
 
   describe 'GET #index' do

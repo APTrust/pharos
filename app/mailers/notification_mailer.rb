@@ -104,4 +104,10 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: "#{subject_line} queued for deletion")
   end
 
+  def snapshot_notification(snap_hash)
+    @snap_hash = snap_hash
+    emails = ['team@aptrust.org', 'chip.german@aptrust.org']
+    mail(to: emails, subject: 'New Snapshots')
+  end
+
 end

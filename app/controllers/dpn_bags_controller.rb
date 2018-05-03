@@ -1,5 +1,4 @@
 class DpnBagsController < ApplicationController
-  include SearchAndIndex
   respond_to :html, :json
   before_action :authenticate_user!
   before_action :set_bag, only: [:show, :update]
@@ -10,7 +9,7 @@ class DpnBagsController < ApplicationController
   def index
     authorize @institution, :dpn_bag_index?
     @dpn_bags = DpnBag.all
-    filter_and_sort
+    filter_sort_and_count
     page_results(@dpn_bags)
     respond_to do |format|
       format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map{ |item| item.serializable_hash } } }
@@ -92,25 +91,25 @@ class DpnBagsController < ApplicationController
     end
   end
 
-  def filter_and_sort
+  def filter_sort_and_count
     if current_user.admin? && @inst_param
       @dpn_bags = @dpn_bags.with_institution(@inst_param)
     elsif !current_user.admin?
       @dpn_bags = @dpn_bags.with_institution(current_user.institution_id)
     end
     @dpn_bags = @dpn_bags
-                     .with_object_identifier(params[:object_identifier])
-                     .with_dpn_identifier(params[:dpn_identifier])
-                     .created_before(params[:created_before])
-                     .created_after(params[:created_after])
-                     .updated_before(params[:updated_before])
-                     .updated_after(params[:updated_after])
+                    .with_object_identifier(params[:object_identifier])
+                    .with_dpn_identifier(params[:dpn_identifier])
+                    .created_before(params[:created_before])
+                    .created_after(params[:created_after])
+                    .updated_before(params[:updated_before])
+                    .updated_after(params[:updated_after])
+    @selected = {}
+    # set_filter_values
+    count = @dpn_bags.count
+    set_page_counts(count)
     params[:sort] = 'dpn_created_at DESC' unless params[:sort]
     @dpn_bags = @dpn_bags.order(params[:sort])
-    @selected = {}
-    count = @dpn_bags.count
-    # set_filter_values
-    set_page_counts(count)
   end
 
   def set_filter_values

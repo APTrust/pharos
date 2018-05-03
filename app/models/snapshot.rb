@@ -1,4 +1,5 @@
 class Snapshot < ApplicationRecord
+  self.primary_key = 'id'
   belongs_to :institution
 
   validates :institution_id, :audit_date, :apt_bytes, :snapshot_type, presence: true

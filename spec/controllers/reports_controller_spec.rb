@@ -2,9 +2,10 @@ require 'spec_helper'
 
 RSpec.describe ReportsController, type: :controller do
   before :all do
-    Institution.delete_all
-    IntellectualObject.delete_all
+    User.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
 
     @institution_two = FactoryBot.create(:member_institution, identifier: 'aptrust.org')
     @institution_one =  FactoryBot.create(:subscription_institution, member_institution_id: @institution_two.id)
@@ -19,9 +20,10 @@ RSpec.describe ReportsController, type: :controller do
   end
 
   after :all do
-    Institution.delete_all
-    IntellectualObject.delete_all
+    User.delete_all
     GenericFile.delete_all
+    IntellectualObject.delete_all
+    Institution.delete_all
   end
 
   describe 'GET #index' do
@@ -32,7 +34,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :index, params: { identifier: @institution_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:overview_report)[:generic_files]).to eq(1)
         expect(assigns(:overview_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:overview_report)[:average_file_size]).to eq(@generic_file_one.size)
@@ -41,7 +43,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :index, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:overview_report)[:generic_files]).to eq(1)
         expect(assigns(:overview_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:overview_report)[:average_file_size]).to eq(@generic_file_two.size)
@@ -56,7 +58,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :index, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:overview_report)[:generic_files]).to eq(1)
         expect(assigns(:overview_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:overview_report)[:average_file_size]).to eq(@generic_file_two.size)
@@ -84,7 +86,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :overview, params: { identifier: @institution_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:overview_report)[:generic_files]).to eq(1)
         expect(assigns(:overview_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:overview_report)[:average_file_size]).to eq(@generic_file_one.size)
@@ -92,7 +94,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :overview, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -103,7 +105,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :overview, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:overview_report)[:generic_files]).to eq(1)
         expect(assigns(:overview_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:overview_report)[:average_file_size]).to eq(@generic_file_two.size)
@@ -130,7 +132,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :general, params: { identifier: @institution_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:basic_report)[:generic_files]).to eq(1)
         expect(assigns(:basic_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:basic_report)[:average_file_size]).to eq(@generic_file_one.size)
@@ -138,7 +140,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :general, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:basic_report)[:generic_files]).to eq(1)
         expect(assigns(:basic_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:basic_report)[:average_file_size]).to eq(@generic_file_two.size)
@@ -152,7 +154,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :general, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:basic_report)[:generic_files]).to eq(1)
         expect(assigns(:basic_report)[:intellectual_objects]).to eq(1)
         expect(assigns(:basic_report)[:average_file_size]).to eq(@generic_file_two.size)
@@ -179,13 +181,13 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :subscribers, params: { identifier: @institution_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:subscriber_report)).to eq({})
       end
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :subscribers, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:subscriber_report).keys.size).to eq(2)
       end
     end
@@ -197,7 +199,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :subscribers, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:subscriber_report).keys.size).to eq(2)
       end
 
@@ -222,13 +224,13 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :cost, params: { identifier: @institution_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:cost_report)[:total_file_size]).to eq(@generic_file_one.size)
       end
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :cost, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:cost_report)[:total_file_size]).to eq(@generic_file_two.size)
         expect(assigns(:cost_report)[:subscribers]['total_bytes']).to eq(@generic_file_two.size + @generic_file_one.size)
       end
@@ -241,7 +243,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :cost, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:cost_report)[:total_file_size]).to eq(@generic_file_two.size)
         expect(assigns(:cost_report)[:subscribers]['total_bytes']).to eq(@generic_file_two.size + @generic_file_one.size)
       end
@@ -267,7 +269,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :timeline, params: { identifier: @institution_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:timeline_report).size).to eq(2)
         report = assigns(:timeline_report)
         expect(report[0][report[0].length - 1]).to eq 'December 2014'
@@ -276,7 +278,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :timeline, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:timeline_report).size).to eq(2)
         report = assigns(:timeline_report)
         expect(report[0][report[0].length - 1]).to eq 'December 2014'
@@ -291,7 +293,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :timeline, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:timeline_report).size).to eq(2)
         report = assigns(:timeline_report)
         expect(report[0][report[0].length - 1]).to eq 'December 2014'
@@ -319,14 +321,14 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :mimetype, params: { identifier: @institution_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:mimetype_report)['all']).to eq(@generic_file_one.size)
         expect(assigns(:mimetype_report).keys).to include @generic_file_one.file_format
       end
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :mimetype, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:mimetype_report)['all']).to eq(@generic_file_two.size)
         expect(assigns(:mimetype_report).keys).to include @generic_file_two.file_format
       end
@@ -339,7 +341,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :mimetype, params: { identifier: @institution_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:mimetype_report)['all']).to eq(@generic_file_two.size)
         expect(assigns(:mimetype_report).keys).to include @generic_file_two.file_format
       end
@@ -365,7 +367,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:inst_breakdown_report).keys.size).to eq(1)
       end
     end
@@ -377,7 +379,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :institution_breakdown
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:inst_breakdown_report).keys.size).to eq(1)
       end
     end
@@ -407,7 +409,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :object_report, params: { intellectual_object_identifier: @intellectual_object_one.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:object_report)[:active_files]).to eq(1)
         expect(assigns(:object_report)[:processing_files]).to eq(0)
         expect(assigns(:object_report)[:deleted_files]).to eq(0)
@@ -416,7 +418,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for another institution' do
         get :object_report, params: { intellectual_object_identifier: @intellectual_object_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:object_report)[:active_files]).to eq(1)
         expect(assigns(:object_report)[:processing_files]).to eq(0)
         expect(assigns(:object_report)[:deleted_files]).to eq(0)
@@ -431,7 +433,7 @@ RSpec.describe ReportsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
         get :object_report, params: { intellectual_object_identifier: @intellectual_object_two.identifier }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:object_report)[:active_files]).to eq(1)
         expect(assigns(:object_report)[:processing_files]).to eq(0)
         expect(assigns(:object_report)[:deleted_files]).to eq(0)

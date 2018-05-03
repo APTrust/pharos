@@ -1,4 +1,5 @@
 class DpnBag < ApplicationRecord
+  self.primary_key = 'id'
   belongs_to :institution
 
   validates :object_identifier, :dpn_identifier, presence: :true

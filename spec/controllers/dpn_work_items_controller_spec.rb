@@ -4,10 +4,14 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
   before :all do
     DpnWorkItem.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   after do
     DpnWorkItem.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:admin_user) { FactoryBot.create(:user, :admin) }
@@ -23,41 +27,41 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
       it 'returns successfully when no parameters are given' do
         get :index, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 2
       end
 
       it 'filters by identifier' do
         get :index, params: { identifier: '1234' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
       end
 
       it 'filters by remote node' do
         get :index, params: { remote_node: 'chronopolis' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_two.id]
       end
 
       it 'filters by task' do
         get :index, params: { task: 'sync' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
       end
 
       it 'filters by queued items' do
         get :index, params: { queued: 'is_queued' }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
       end
 
       it 'filters by not queued items' do
         get :index, params: { queued: 'is_not_queued' }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_two.id]
       end
@@ -83,7 +87,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
     it 'successfully creates the dpn item' do
       post :create, params: { dpn_work_item: { remote_node: 'aptrust', processing_node: 'hathi', pid: 12, task: 'sync', identifier: '12345678', state: 'Active' } }, format: :json
-      expect(response).to be_success
+      expect(response).to be_successful
       assigns(:dpn_item).remote_node.should eq('aptrust')
       assigns(:dpn_item).task.should eq('sync')
       assigns(:dpn_item).identifier.should eq('12345678')
@@ -112,7 +116,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
       it 'responds successfully with both the action and the state updated' do
         put :update, params: { id: item_one.id, dpn_work_item: { processing_node: 'chronopolis', pid: 13, note: 'Testing the update method', state: 'NEW'} }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:dpn_item).id.should eq(item_one.id)
         assigns(:dpn_item).note.should eq('Testing the update method')
         assigns(:dpn_item).state.should eq('NEW')
@@ -146,7 +150,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
       it 'responds successfully with both the work item and the state item set' do
         get :show, params: { id: item_two.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         assigns(:dpn_item).id.should eq(item_two.id)
         assigns(:dpn_item).remote_node.should eq('chronopolis')
       end
@@ -176,7 +180,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :requeue, params: { id: item_one.id, delete_state_item: 'false', task: 'store' }
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it 'renders the requeue template' do

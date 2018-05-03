@@ -2,8 +2,15 @@ require 'spec_helper'
 
 RSpec.describe SnapshotsController, type: :controller do
   before :all do
-    Institution.delete_all
     Snapshot.delete_all
+    User.delete_all
+    Institution.delete_all
+  end
+
+  after :all do
+    Snapshot.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:institution_one) { FactoryBot.create(:member_institution) }
@@ -25,7 +32,7 @@ RSpec.describe SnapshotsController, type: :controller do
 
       it 'returns successfully with all snapshots' do
         get :index, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:snapshots).size).to eq 6
       end
     end
@@ -37,7 +44,7 @@ RSpec.describe SnapshotsController, type: :controller do
 
       it 'returns only the snapshots that belong to own institution' do
         get :index, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:snapshots).size).to eq 3
         expect(assigns(:snapshots).map &:id).to match_array [snapshot_four.id, snapshot_five.id, snapshot_six.id]
       end
@@ -52,13 +59,13 @@ RSpec.describe SnapshotsController, type: :controller do
 
       it 'returns successfully a snapshot from own institution' do
         get :show, params: {id: snapshot_one.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:snapshot).id).to eq snapshot_one.id
       end
 
       it 'returns successfully a snapshot from other institution' do
         get :show, params: {id: snapshot_four.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:snapshot).id).to eq snapshot_four.id
       end
     end
@@ -70,7 +77,7 @@ RSpec.describe SnapshotsController, type: :controller do
 
       it 'returns successfully a snapshot from own institution' do
         get :show, params: {id: snapshot_four.id }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:snapshot).id).to eq snapshot_four.id
       end
 

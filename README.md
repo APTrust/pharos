@@ -1,33 +1,33 @@
 # Pharos
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d37b48c4c5547cca0c9c61a5887f589)](https://www.codacy.com/app/cdahlhausen/pharos?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=APTrust/pharos&amp;utm_campaign=Badge_Grade)
 [![Code Climate](https://codeclimate.com/github/APTrust/pharos.png)](https://codeclimate.com/github/APTrust/pharos.png?branch=develop)
 [![Dependency Status](https://gemnasium.com/badges/github.com/APTrust/pharos.svg)](https://gemnasium.com/github.com/APTrust/pharos)
 
-Build Status | Continuous Integration | Code Coverate
+Build Status | Continuous Integration | Code Coverage
 --- | --- | ---
-Production | [![Build Status (Master)](https://travis-ci.org/APTrust/pharos.png?branch=master)](https://travis-ci.org/APTrust/pharos) | [![Coverage Status](https://coveralls.io/repos/github/APTrust/pharos/badge.svg?branch=master)](https://coveralls.io/github/APTrust/pharos?branch=master)
-Development | [![Build Status (Development)](https://travis-ci.org/APTrust/pharos.png?branch=develop)](https://travis-ci.org/APTrust/pharos) | [![Coverage Status](https://coveralls.io/repos/github/APTrust/pharos/badge.svg?branch=develop)](https://coveralls.io/github/APTrust/pharos?branch=develop)
+develop | [![Build Status (Development)](https://travis-ci.org/APTrust/pharos.png?branch=develop)](https://travis-ci.org/APTrust/pharos) | [![Coverage Status](https://coveralls.io/repos/github/APTrust/pharos/badge.svg?branch=develop)](https://coveralls.io/github/APTrust/pharos?branch=develop)
 
 ## APTrust Admin Console
 
-This application uses ActiveRecord to interact with a SQL database that is backed, down the line, by Fedora.
+This application uses ActiveRecord to interact with a SQL database.
 
 ### Requirements
 
-See 'fluctus/Gemfile' for a full list of current dependencies.
+See 'Gemfile' for a full list of current dependencies.
 
-Overall Fluctus targets the following versions or later
+Overall Pharos targets the following versions or later
 
 * Ruby >= 2.2.0
 * Rails >= 4.2.7
 
 ### Additional Configuration
 
-We use the figaro gem for additional application configuration through 'fluctus/config/application.yml' which is added
-to the .gitignore file by default.  You will need to copy 'fluctus/config/application.yml.local' to
-'fluctus/config/application.yml' and setup values as appropriate.
+We use the figaro gem for additional application configuration through 'pharos/config/application.yml' which is added
+to the .gitignore file by default.  You will need to copy 'pharos/config/application.yml.local' to
+'pharos/config/application.yml' and setup values as appropriate.
 
-Use the ``` rake secret ``` command to generate secret keys for rails and devise.  Paste those keys into the 'fluctus/config/application.yml' file.
+Use the ``` rake secret ``` command to generate secret keys for rails and devise.  Paste those keys into the 'pharos/config/application.yml' file.
 
 
 * Setup APTrust Institution object and Roles
@@ -80,21 +80,3 @@ To create a sample run the script like so:
 $ RAILS_ENV=production ./script/sample_uploads
 ```
 You probably want to put this in a cron job so it can be run regularly
-
-
-## Heroku Instructions
-
-Note, section dropped as previous pharos app was deleted.  Intend to rebuild this.
-
-# Notes on Queries
-
-Most quieries are best carried out through the solr index in the formate below.
-
-The format is as follows::
-
-  <Class>.where(rails cased datastream name: <value>)
-
-So as an example, if you were to query for "APTrust" in the name field of the
-Institution model you would search as follows::
-
-  ins = Institution.where(name: "APTrust")

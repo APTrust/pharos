@@ -607,9 +607,11 @@ a.requeue-link {
   margin-left: 200px;
 }
 
-#indiv_mimetype_chart {
-  width: 800px !important;
-  height: 800px !important;
+#basic_mimetype_chart, #mimetype_video_chart, #mimetype_audio_chart, #mimetype_image_chart,
+#mimetype_text_chart, #mimetype_app_chart, #mimetype_other_chart, #indiv_mimetype_chart, #mimetype_total_chart {
+  /*width: 800px !important;*/
+  /*height: 800px !important;*/
+  vertical-align: top !important;
 }
 
 ul.inst_breakdown_list .dl-horizontal, .inst_breakdown_list ul, ul.inst_breakdown_list .dl-horizontal dt {
@@ -634,7 +636,7 @@ ul.inst_breakdown_list li {
   width: 400px !important;
 }
 
-#mimetype_cell, #mimetype_list {
+#base_mimetype_cell, #mimetype_list, #mimetype_cell div.chart-container {
   vertical-align: top !important;
 }
 
@@ -651,9 +653,9 @@ td.bytes_num, th.bytes_num {
   text-align: right;
 }
 
-td.bytes_num_readable {
-  padding-right: 200px !important;
-}
+/*td.bytes_num_readable {*/
+  /*padding-right: 200px !important;*/
+/*}*/
 
 .pharos_tooltip {
   border-bottom: 1px dotted black;
@@ -677,4 +679,28 @@ td.bytes_num_readable {
 
 .pharos_tooltip_p {
   padding-right: 10px;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+  color: #2d5f6c;
+  background-color: #eeeeee;
+}
+
+.nav-pills > li a {
+  color: #2d5f6c;
+}
+
+table.mime_table {
+  table-layout: fixed;
+  width: 470px;
+}
+
+table.mime_table td {
+  word-wrap:break-word
+}
+
+.pdf-header {
+
+
+
 }

@@ -1,31 +1,306 @@
 <%= render partial: 'report_navigation' %>
 
 <div class="tab-content" id="inst_show_content">
-
   <div class="tab-pane" id="mimetype">
-    <br><table>
-    <tr>
-      <td id="mimetype_list">
-        <dl class="dl-horizontal">
-          <script>var graph_hash = {}</script>
-          <% sorted_hash = Hash[ @mimetype_report.sort_by { |key, value| key } ] %>
-          <% sorted_hash.each do |key, value| %>
-              <% unless key == 'all' %>
-                  <dt><%= key %></dt>
-                  <dd><%= number_to_human_size(value) %></dd>
-                  <script>graph_hash["<%= key %>"] = <%= value %></script>
-              <% end %>
-          <% end %>
-        </dl>
-      </td>
-      <td id="mimetype_cell">
-        <div class="chart-container" style="position: relative;">
-          <canvas id="indiv_mimetype_chart"></canvas>
-          <script>individual_mimetype(graph_hash)</script>
-        </div>
-      </td>
-    </tr>
-  </table>
+    <br><% mimetype_analysis %>
+    <ul class="nav nav-tabs">
+      <li><a id="first_mimetype_tag" href="#mime_overview" data-toggle="tab">Overview</a></li>
+      <li><a href="#total" data-toggle="tab">All Formats</a></li>
+      <li><a href="#application" data-toggle="tab">Application Formats</a></li>
+      <li><a href="#audio" data-toggle="tab">Audio Formats</a></li>
+      <li><a href="#image" data-toggle="tab">Image Formats</a></li>
+      <li><a href="#text" data-toggle="tab">Text Formats</a></li>
+      <li><a href="#other" data-toggle="tab">Other Formats</a></li>
+      <li><a href="#video" data-toggle="tab">Video Formats</a></li>
+    </ul>
+    <br>
+    <div class="tab-content" id="mimetype_show_content">
+
+      <div class="tab-pane fade" id="mime_overview">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var graph_hash = {}</script>
+                <% @base_report.each do |key, value| %>
+                    <% unless key == 'all' %>
+                        <script>graph_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                        <tr>
+                          <td width="200"><%= key %></td>
+                          <td width="180"><%= value %></td>
+                          <td>(<%= number_to_human_size(value) %>)</td>
+                        </tr>
+                    <% end %>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td id="mimetype_cell" valign="top">
+              <div class="chart-container" >
+                <canvas id="basic_mimetype_chart" width="700" height="500"></canvas>
+                <script>mimetype_graph(graph_hash, "basic_mimetype_chart", "right")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="total">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var total_hash = {}</script>
+                <% @mimetype_report.each do |key, value| %>
+                    <% unless key == 'all' %>
+                        <script>total_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                        <tr>
+                          <td width="200"><%= key %></td>
+                          <td width="180"><%= value %></td>
+                          <td>(<%= number_to_human_size(value) %>)</td>
+                        </tr>
+                    <% end %>
+                <% end %>
+                </tbody></table>
+            </td>
+            <td valign="top">
+              <div class="chart-container" style="position: relative;">
+                <canvas id="mimetype_total_chart" width="800" height="1000"></canvas>
+                <script>mimetype_graph(total_hash, "mimetype_total_chart", "top")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="application">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var app_hash = {}</script>
+                <% @application_report.each do |key, value| %>
+                    <script>app_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                    <tr>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
+                      <td>(<%= number_to_human_size(value) %>)</td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td valign="top">
+              <div class="chart-container" style="position: relative;">
+                <canvas id="mimetype_app_chart" width="800" height="1000"></canvas>
+                <script>mimetype_graph(app_hash, "mimetype_app_chart", "top")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="audio">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var audio_hash = {}</script>
+                <% @audio_report.each do |key, value| %>
+                    <script>audio_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                    <tr>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
+                      <td>(<%= number_to_human_size(value) %>)</td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td valign="top">
+              <div class="chart-container" style="position: relative;">
+                <canvas id="mimetype_audio_chart" width="700" height="500"></canvas>
+                <script>mimetype_graph(audio_hash, "mimetype_audio_chart", "right")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="image">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var image_hash = {}</script>
+                <% @image_report.each do |key, value| %>
+                    <script>image_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                    <tr>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
+                      <td>(<%= number_to_human_size(value) %>)</td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td valign="top">
+              <div class="chart-container" style="position: relative;">
+                <canvas id="mimetype_image_chart" width="700" height="500"></canvas>
+                <script>mimetype_graph(image_hash, "mimetype_image_chart", "right")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="other">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var other_hash = {}</script>
+                <% @other_report.each do |key, value| %>
+                    <script>other_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                    <tr>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
+                      <td>(<%= number_to_human_size(value) %>)</td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td valign="top">
+              <div class="chart-container" style="position: relative;">
+                <canvas id="mimetype_other_chart" width="700" height="500"></canvas>
+                <script>mimetype_graph(other_hash, "mimetype_other_chart", "right")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="text">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var text_hash = {}</script>
+                <% @text_report.each do |key, value| %>
+                    <script>text_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                    <tr>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
+                      <td>(<%= number_to_human_size(value) %>)</td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td valign="top">
+              <div class="chart-container" style="position: relative;">
+                <canvas id="mimetype_text_chart" width="700" height="500"></canvas>
+                <script>mimetype_graph(text_hash, "mimetype_text_chart", "right")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="video">
+        <table>
+          <tr>
+            <td id="mimetype_list">
+              <table class="table table-striped sortable mime_table">
+                <thead>
+                <tr>
+                  <th width="200">Mimetype</th>
+                  <th width="180">Total Number of Bytes</th>
+                  <th>(Readable)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <script>var video_hash = {}</script>
+                <% @video_report.each do |key, value| %>
+                    <script>video_hash["<%= key %> (<%= number_to_human_size(value) %>)"] = <%= value %></script>
+                    <tr>
+                      <td width="200"><%= key %></td>
+                      <td width="180"><%= value %></td>
+                      <td>(<%= number_to_human_size(value) %>)</td>
+                    </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </td>
+            <td valign="top">
+              <div class="chart-container" style="position: relative;">
+                <canvas id="mimetype_video_chart" width="700" height="500"></canvas>
+                <script>mimetype_graph(video_hash, "mimetype_video_chart", "right")</script>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
   </div>
 
 </div>
+<script>document.getElementById('first_mimetype_tag').click()</script>

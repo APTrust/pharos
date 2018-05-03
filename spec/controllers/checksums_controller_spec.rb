@@ -3,15 +3,19 @@ require 'spec_helper'
 RSpec.describe ChecksumsController, type: :controller do
 
   before :all do
-    Institution.delete_all
-    GenericFile.delete_all
     Checksum.delete_all
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   after do
-    Institution.delete_all
-    GenericFile.delete_all
     Checksum.delete_all
+    GenericFile.delete_all
+    IntellectualObject.delete_all
+    User.delete_all
+    Institution.delete_all
   end
 
   let!(:institution_one) { FactoryBot.create(:member_institution) }
@@ -34,27 +38,27 @@ RSpec.describe ChecksumsController, type: :controller do
 
       it 'returns successfully when no parameters are given' do
         get :index, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 2
       end
 
       it 'filters by generic file identifier' do
         get :index, params: { generic_file_identifier: generic_file_one.identifier }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [checksum_one.id]
       end
 
       it 'filters by algorithm' do
         get :index, params: { algorithm: 'md5' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [checksum_two.id]
       end
 
       it 'filters by digest' do
         get :index, params: { digest: '12345678' }, format: :json
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [checksum_two.id]
       end
