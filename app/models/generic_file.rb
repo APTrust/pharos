@@ -11,6 +11,7 @@ class GenericFile < ActiveRecord::Base
   validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_type, presence: true
   validates_uniqueness_of :identifier
   validate :init_institution_id, on: :create
+  validate :matching_storage_type, on: :create
   before_save :freeze_institution_id
 
   ### Scopes
@@ -171,6 +172,12 @@ class GenericFile < ActiveRecord::Base
   def init_institution_id
     unless self.intellectual_object.nil?
       self.institution_id = self.intellectual_object.institution_id if self.institution_id.nil?
+    end
+  end
+
+  def matching_storage_type
+    unless self.intellectual_object.nil?
+      self.storage_type = self.intellectual_object.storage_type
     end
   end
 

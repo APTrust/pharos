@@ -24,6 +24,8 @@
       <dd><%= @intellectual_object.description %></dd>
       <dt>Alternate Identifier</dt>
       <dd><%= @intellectual_object.alt_identifier %></dd>
+      <dt>Storage Type</dt>
+      <dd><%= @intellectual_object.storage_type %></dd>
       <dt>DPN Status</dt>
       <% if @intellectual_object.in_dpn? %>
           <dd>Item is in DPN with id <%= link_to @intellectual_object.dpn_uuid, dpn_bag_path(id: @intellectual_object.dpn_bag.id) %></dd>

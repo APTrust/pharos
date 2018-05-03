@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_04_17_150517) do
+ActiveRecord::Schema.define(version: 2018_05_03_200856) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -147,6 +147,7 @@ ActiveRecord::Schema.define(version: 2018_04_17_150517) do
     t.string "dpn_uuid"
     t.text "ingest_state"
     t.string "bagging_group_identifier", limit: 255
+    t.string "storage_type", default: "standard"
     t.index ["access"], name: "index_intellectual_objects_on_access"
     t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
     t.index ["created_at"], name: "index_intellectual_objects_on_created_at"

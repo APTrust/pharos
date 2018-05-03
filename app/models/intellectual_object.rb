@@ -9,7 +9,7 @@ class IntellectualObject < ActiveRecord::Base
   accepts_nested_attributes_for :premis_events, allow_destroy: true
   accepts_nested_attributes_for :checksums, allow_destroy: true
 
-  validates :title, :institution, :identifier, :access, presence: true
+  validates :title, :institution, :identifier, :access, :storage_type, presence: true
   validates_inclusion_of :access, in: %w(consortia institution restricted), message: "#{:access} is not a valid access", if: :access
   validates_uniqueness_of :identifier
 
@@ -37,6 +37,7 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_etag_like, ->(param) { where('intellectual_objects.etag like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_title_like, ->(param) { where('intellectual_objects.title like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_access, ->(param) { where(access: param) unless param.blank? }
+  scope :with_storage_type, ->(param) { where(storage_type: param) unless param.blank? }
   scope :with_file_format, ->(param) {
     joins(:generic_files)
         .where('generic_files.file_format = ?', param) unless param.blank?

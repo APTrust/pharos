@@ -10,7 +10,7 @@ FactoryBot.define do
     bag_name { identifier.split('/')[1] }
     bagging_group_identifier { nil }
     state { 'A' }
-    #sequence(:id) {|n| n}
+    storage_type { 'standard' }
 
     factory :consortial_intellectual_object, class: IntellectualObject do
       access { 'consortia' }
