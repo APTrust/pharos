@@ -145,7 +145,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'returns 404, not 500, for item not found' do
-        get :show, params: { etag: 'does not exist', name: 'duznot igzist', bag_date: '1901-01-01' }
+        get :show, params: { etag: 'does not exist', name: 'duznot igzist', bag_date: '1901-01-01' }, format: 'json'
         expect(response.status).to eq(404)
       end
     end

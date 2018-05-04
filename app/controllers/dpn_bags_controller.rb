@@ -31,7 +31,10 @@ class DpnBagsController < ApplicationController
   def show
     if @dpn_bag.nil?
       authorize current_user, :nil_dpn_bag?
-      render body: nil, status: :not_found and return
+      respond_to do |format|
+        format.json { render body: nil, status: :not_found and return }
+        format.html { redirect_to root_url, alert: 'That DPN Bag could not be found.' }
+      end
     else
       authorize @dpn_bag
       respond_to do |format|
