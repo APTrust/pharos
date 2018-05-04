@@ -1,7 +1,7 @@
 class AddStorageTypeToGenericFiles < ActiveRecord::Migration[5.1]
   def up
     puts "This migration takes a long time to run!"
-    add_column :generic_files, :storage_type, :string, default: 'standard'
+    add_column :generic_files, :storage_type, :string, default: 'Standard'
 
     batch_size = 5000
     count = 0

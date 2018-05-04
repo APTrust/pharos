@@ -343,7 +343,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bagging_group_identifier: 'collection_one', storage_type: 'glacier-va') }
+    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bagging_group_identifier: 'collection_one', storage_option: 'Glacier-VA') }
+    let(:bad_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bagging_group_identifier: 'collection_two', storage_option: 'somewhere-else') }
 
     after do
       PremisEvent.delete_all
@@ -405,7 +406,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(saved_obj).to be_truthy
         expect(saved_obj.etag).to eq '90908111'
         expect(saved_obj.bagging_group_identifier).to eq 'collection_one'
-        expect(saved_obj.storage_type).to eq 'glacier-va'
+        expect(saved_obj.storage_option).to eq 'Glacier-VA'
+      end
+
+      it 'should reject a storage_option that is not allowed' do
+        post(:create, params: { institution_identifier: inst1.identifier,
+                                intellectual_object: bad_obj.attributes }, format: 'json')
+        expect(response.code).to eq '422' #Unprocessable Entity
+        expect(JSON.parse(response.body)).to eq( { 'storage_option' => ['Storage Option is not one of the allowed options']})
       end
     end
 
@@ -455,11 +463,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should update the object and respond with redirect (html)' do
-        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', storage_type: 'glacier-va', ingest_state: '{[A]}'} }
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', storage_option: 'Glacier-VA', ingest_state: '{[A]}'} }
         expect(response).to redirect_to intellectual_object_path(obj1.identifier)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Foo'
-        expect(saved_obj.storage_type).to eq 'glacier-va'
+        expect(saved_obj.storage_option).to eq 'Glacier-VA'
         expect(saved_obj.ingest_state).to eq '{[A]}'
       end
       it 'should update the object and respond with json (json)' do

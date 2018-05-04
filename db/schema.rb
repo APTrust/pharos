@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_03_200856) do
+ActiveRecord::Schema.define(version: 2018_05_04_140355) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -99,7 +99,7 @@ ActiveRecord::Schema.define(version: 2018_05_03_200856) do
     t.text "ingest_state"
     t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
     t.integer "institution_id", null: false
-    t.string "storage_type", default: "standard"
+    t.string "storage_option", default: "standard"
     t.index ["created_at"], name: "index_generic_files_on_created_at"
     t.index ["file_format", "state"], name: "index_generic_files_on_file_format_and_state"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
@@ -147,7 +147,7 @@ ActiveRecord::Schema.define(version: 2018_05_03_200856) do
     t.string "dpn_uuid"
     t.text "ingest_state"
     t.string "bagging_group_identifier", limit: 255
-    t.string "storage_type", default: "standard"
+    t.string "storage_option", default: "standard"
     t.index ["access"], name: "index_intellectual_objects_on_access"
     t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
     t.index ["created_at"], name: "index_intellectual_objects_on_created_at"

@@ -13,7 +13,7 @@ RSpec.describe IntellectualObject, :type => :model do
   it { should validate_presence_of(:identifier) }
   it { should validate_presence_of(:institution) }
   it { should validate_presence_of(:access)}
-  it { should validate_presence_of(:storage_type) }
+  it { should validate_presence_of(:storage_option) }
 
   describe 'An instance' do
 

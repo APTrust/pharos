@@ -85,6 +85,8 @@ module Pharos
         'virus_check' => 'virus check'
     }
 
+    PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR)
+
     DPN_TASKS = %w(sync ingest replication restore fixity)
 
     DPN_STATUS = false

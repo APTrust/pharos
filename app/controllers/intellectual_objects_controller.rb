@@ -237,11 +237,11 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def create_params
-    params.require(:intellectual_object).permit(:institution_id, :title, :etag, :storage_type,
+    params.require(:intellectual_object).permit(:institution_id, :title, :etag, :storage_option,
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :ingest_state,
                                                 :bagging_group_identifier, generic_files_attributes:
-                                                [:id, :uri, :identifier, :storage_type,
+                                                [:id, :uri, :identifier, :storage_option,
                                                  :size, :created, :modified, :file_format,
                                                  premis_events_attributes:
                                                  [:id, :identifier, :event_type, :date_time,
@@ -261,7 +261,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def update_params
-    params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state, :storage_type,
+    params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state, :storage_option,
                                                 :alt_identifier, :state, :dpn_uuid, :etag, :bagging_group_identifier)
   end
 

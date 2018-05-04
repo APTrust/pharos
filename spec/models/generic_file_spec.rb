@@ -13,7 +13,7 @@ RSpec.describe GenericFile, :type => :model do
   it { should validate_presence_of(:file_format) }
   it { should validate_presence_of(:identifier) }
   it { should validate_presence_of(:institution_id) }
-  it { should validate_presence_of(:storage_type) }
+  it { should validate_presence_of(:storage_option) }
 
   it 'should validate presence of intellectual object' do
     file = FactoryBot.create(:generic_file)
@@ -139,7 +139,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h1.has_key?('state')).to be true
           expect(h1.has_key?('intellectual_object_identifier')).to be true
           expect(h1.has_key?('institution_id')).to be true
-          expect(h1.has_key?('storage_type')).to be true
+          expect(h1.has_key?('storage_option')).to be true
 
           h2 = subject.serializable_hash(include: [:checksums, :premis_events, :ingest_state])
           expect(h2.has_key?('id')).to be true
@@ -155,7 +155,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h2.has_key?('intellectual_object_identifier')).to be true
           expect(h2.has_key?('ingest_state')).to be true
           expect(h1.has_key?('institution_id')).to be true
-          expect(h1.has_key?('storage_type')).to be true
+          expect(h1.has_key?('storage_option')).to be true
         end
       end
 

@@ -190,7 +190,7 @@ class GenericFilesController < ApplicationController
   def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
       .permit(:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
-              :file_format, :storage_type, premis_events_attributes:
+              :file_format, :storage_option, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
                :agent, :intellectual_object_id, :generic_file_id,
@@ -202,7 +202,7 @@ class GenericFilesController < ApplicationController
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
       .permit(files: [:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
-                      :file_format, :storage_type, premis_events_attributes:
+                      :file_format, :storage_option, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
                        :agent, :intellectual_object_id, :generic_file_id,

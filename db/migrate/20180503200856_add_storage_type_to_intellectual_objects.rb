@@ -1,7 +1,7 @@
 class AddStorageTypeToIntellectualObjects < ActiveRecord::Migration[5.2]
   def up
     puts "This migration takes a long time to run!"
-    add_column :intellectual_objects, :storage_type, :string, default: 'standard'
+    add_column :intellectual_objects, :storage_type, :string, default: 'Standard'
 
     batch_size = 5000
     count = 0

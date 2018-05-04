@@ -8,10 +8,11 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_type, presence: true
+  validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_option, presence: true
   validates_uniqueness_of :identifier
   validate :init_institution_id, on: :create
-  validate :matching_storage_type, on: :create
+  validate :matching_storage_option, on: :create
+  validate :storage_option_is_allowed
   before_save :freeze_institution_id
 
   ### Scopes
@@ -27,7 +28,7 @@ class GenericFile < ActiveRecord::Base
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
   scope :not_checked_since, ->(param) { where("last_fixity_check <= ? and generic_files.state='A'", param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless (param.blank? || param == 'all' || param == 'All') }
-  scope :with_storage_type, ->(param) { where(storage_type: param) unless param.blank? }
+  scope :with_storage_option, ->(param) { where(storage_option: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?
@@ -175,14 +176,20 @@ class GenericFile < ActiveRecord::Base
     end
   end
 
-  def matching_storage_type
+  def matching_storage_option
     unless self.intellectual_object.nil?
-      self.storage_type = self.intellectual_object.storage_type
+      self.storage_option = self.intellectual_object.storage_option
     end
   end
 
   def freeze_institution_id
     errors.add(:institution_id, 'cannot be changed') if self.saved_change_to_institution_id? unless self.institution_id.nil?
+  end
+
+  def storage_option_is_allowed
+    if !Pharos::Application::PHAROS_STORAGE_OPTIONS.include?(self.storage_option)
+      errors.add(:storage_option, 'Storage Option is not one of the allowed options')
+    end
   end
 
 end
