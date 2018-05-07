@@ -3,9 +3,9 @@ sheet = wb[0]
 
 i = 1
 
-@wb_hash.each do |inst_array|
-  sheet.add_cell(i, 0, name)
-  sheet.add_cell(i, 1, bytes)
+@wb_hash.each do |key, value|
+  sheet.add_cell(i, 0, key)
+  sheet.add_cell(i, 1, value[0])
   i += 1
 end
 wb.write('/Users/kec6en/Desktop/test_book.xlsx')
