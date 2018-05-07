@@ -3,5 +3,5 @@ Chip,
 Here are the latest snapshot results broken down by institution.
 
   <% @snap_hash.each do |key, value| %>
-      <%= key %> : <%= value %>
+      <%= key %> : <%= value[0] %>
   <% end %>

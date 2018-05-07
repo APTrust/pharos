@@ -39,7 +39,7 @@ gem 'wkhtmltopdf-binary'
 gem 'rubyzip', '>= 1.2.1'
 gem 'axlsx', git: 'https://github.com/randym/axlsx.git', ref: 'c8ac844'
 gem 'axlsx_rails'
-gem 'spreadsheet'
+gem 'rubyXL'
 
 # Used to export above spreadsheets to existing google sheet
 gem 'google_drive'
