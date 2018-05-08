@@ -72,7 +72,6 @@ $(document).ready(function(){
                     for (var j=0; j<sortbottomrows.length; j++) {
                         tfo.appendChild(sortbottomrows[j]);
                     }
-                    // delete sortbottomrows;
                     sortbottomrows = undefined;
                 }
 
@@ -158,8 +157,6 @@ $(document).ready(function(){
                             for (var m=0; m<row_array.length; m++) {
                                 tb.appendChild(row_array[m][1]);
                             }
-
-                            //delete row_array;
                             row_array = undefined;
                         });
                     }
@@ -257,7 +254,6 @@ $(document).ready(function(){
                 for (var j=newrows.length-1; j>=0; j--) {
                     tbody.appendChild(newrows[j]);
                 }
-                //delete newrows;
                 newrows = undefined;
             },
 
