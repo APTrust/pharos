@@ -128,7 +128,7 @@ var palette = (function() {
      */
     var palette = function(scheme, number, opt_index, varargs) {
         number |= 0;
-        if (number == 0) {
+        if (number === 0) {
             return [];
         }
 
@@ -225,9 +225,6 @@ var palette = (function() {
             number = Math.abs(number);
 
             if (number <= palettes_max) {
-                for (var i = Math.max(number, palettes_min); !(i in palettes); ++i) {
-                    /* nop */
-                }
                 var colors = palettes[i];
                 if (i > number) {
                     var take_head =
@@ -775,13 +772,13 @@ var palette = (function() {
 
 
 /** @typedef {function(number): string} */
-palette.ColorFunction;
+var cf = palette.ColorFunction;
 
 /** @typedef {!Array<string>} */
-palette.Palette;
+var pt = palette.Palette;
 
 /** @typedef {!Object<number, palette.Palette>|!Array<palette.Palette>} */
-palette.PalettesList;
+var pl = palette.PalettesList;
 
 /**
  * @typedef {
@@ -797,7 +794,7 @@ palette.PalettesList;
  *     setColorFunction: function(palette.ColorFunction, boolean=, boolean=),
  *     color: function(number, ...?): ?string}}
  */
-palette.SchemeType;
+var st = palette.SchemeType;
 
 
 /* mpn65 palette start here. ************************************************/
@@ -1498,5 +1495,5 @@ palette.SchemeType;
 })();
 
 if(typeof module === "object" && module.exports) {
-    module.exports = palette
+    module.exports = palette;
 }
