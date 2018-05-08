@@ -225,6 +225,7 @@ var palette = (function() {
             number = Math.abs(number);
 
             if (number <= palettes_max) {
+                var i = Math.max(number, palettes_min);
                 var colors = palettes[i];
                 if (i > number) {
                     var take_head =
