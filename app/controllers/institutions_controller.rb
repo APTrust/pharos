@@ -90,24 +90,25 @@ class InstitutionsController < ApplicationController
     authorize current_user, :snapshot?
     @snapshots = []
     @wb_hash = {}
-    date_str = Time.now.strftime('%M/%d/%Y')
+    @date_str = Time.now.utc.strftime('%Y-%m-%d')
+    @date_str = @date_str << 'T00:00:00+00:00'
     total_size = Institution.total_file_size_across_repo
-    @wb_hash['Repository Total'] = [total_size, date_str]
-    # MemberInstitution.all.order('name').each do |institution|
-    #   current_snaps = institution.snapshot
-    #   @snapshots.push(current_snaps)
-    #   current_snaps.each do |snap|
-    #     @wb_hash[institution.name] = [snap.apt_bytes, date_str]
-    # end
-    # end
-    # NotificationMailer.snapshot_notification(@wb_hash).deliver!
+    @wb_hash['Repository Total'] = total_size
+    MemberInstitution.all.order('name').each do |institution|
+      current_snaps = institution.snapshot
+      @snapshots.push(current_snaps)
+      current_snaps.each do |snap|
+        @wb_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
+      end
+    end
+    NotificationMailer.snapshot_notification(@wb_hash).deliver!
+    write_snapshots_to_spreadsheet
     respond_to do |format|
       format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
       format.html {
         redirect_to root_path
         flash[:notice] = "A snapshot of all Member Institutions has been taken and archived on #{@snapshots.first.first.audit_date}. Please see the reports page for that analysis."
       }
-      format.xlsx { set_attachment_name "Snapshots_#{Time.now.utc.strftime('%Y-%M-%d')}.xlsx" }
     end
   end
 
@@ -152,6 +153,32 @@ class InstitutionsController < ApplicationController
   def set_attachment_name(name)
     escaped = URI.encode(name)
     response.headers['Content-Disposition'] = "attachment; filename*=UTF-8''#{escaped}"
+  end
+
+  def write_snapshots_to_spreadsheet
+    wb = RubyXL::Parser.parse('/Users/kec6en/Desktop/test_book.xlsx')
+    sheet = wb[0]
+    date_column = 0
+    counter = 0
+    while date_column == 0 && counter < 10
+      cell = sheet[2][counter]
+      date_column = counter if cell.value == @date_str unless cell.nil?
+      counter += 1
+    end
+    i = 1
+    unless date_column == 0
+      while i < 200
+        cell = sheet[i][0] unless sheet[i].nil?
+        unless cell.nil?
+          if @wb_hash.has_key?(cell.value)
+            gb = (@wb_hash[cell.value].to_f / 1073741824).round(2)
+            sheet.add_cell((i+1), date_column, gb)
+          end
+        end
+        i += 1
+      end
+    end
+    wb.write('/Users/kec6en/Desktop/test_book.xlsx')
   end
 
 end

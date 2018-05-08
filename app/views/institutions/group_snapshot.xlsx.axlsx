@@ -1,11 +1,23 @@
 wb = RubyXL::Parser.parse('/Users/kec6en/Desktop/test_book.xlsx')
 sheet = wb[0]
-
+date_column = 0
+counter = 0
+while date_column == 0 && counter < 10
+  cell = sheet[2][counter]
+  date_column = counter if cell.value == @date_str unless cell.nil?
+  counter += 1
+end
 i = 1
-
-@wb_hash.each do |key, value|
-  sheet.add_cell(i, 0, key)
-  sheet.add_cell(i, 1, value[0])
-  i += 1
+unless date_column == 0
+  while i < 200
+    cell = sheet[i][0] unless sheet[i].nil?
+    unless cell.nil?
+      if @wb_hash.has_key?(cell.value)
+        gb = (@wb_hash[cell.value].to_f / 1073741824).round(2)
+        sheet.add_cell((i+1), date_column, gb)
+      end
+    end
+    i += 1
+  end
 end
 wb.write('/Users/kec6en/Desktop/test_book.xlsx')
