@@ -31,7 +31,10 @@ class WorkItemStatesController < ApplicationController
   def show
     if @state_item.nil?
       authorize current_user, :state_show?
-      render body: nil, status: :not_found and return
+      respond_to do |format|
+        format.json { render body: nil, status: :not_found and return }
+        format.html { redirect_to root_url, alert: 'That Work Item State could not be found.' }
+      end
     else
       authorize @state_item
       respond_to do |format|

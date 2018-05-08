@@ -62,7 +62,7 @@ class WorkItemsController < ApplicationController
       authorize current_user, :nil_index?
       respond_to do |format|
         format.json { render body: nil, status: :not_found }
-        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+        format.html { redirect_to root_url, alert: 'That Work Item could not be found.' }
       end
     end
   end
@@ -93,7 +93,7 @@ class WorkItemsController < ApplicationController
       authorize current_user, :nil_index?
       respond_to do |format|
         format.json { render nothing: true, status: :not_found }
-        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+        format.html { redirect_to root_url, alert: 'That Work Item could not be found.' }
       end
     end
   end
@@ -385,9 +385,6 @@ class WorkItemsController < ApplicationController
 
   def set_item
     @institution = current_user.institution
-    # if Rails.env.development?
-    #   rewrite_params_for_sqlite
-    # end
     if params[:id].blank? == false
       begin
         @work_item = WorkItem.readable(current_user).find(params[:id])
@@ -395,16 +392,9 @@ class WorkItemsController < ApplicationController
         # If we don't catch this, we get an internal server error
       end
     else
-      # if Rails.env.development?
-      #   # Cursing ActiveRecord + SQLite. SQLite has all the milliseconds wrong!
-      #   @work_item = WorkItem.where(etag: params[:etag],
-      #                               name: params[:name])
-      #   @work_item = @work_item.where('datetime(bag_date) = datetime(?)', params[:bag_date]).first
-      # else
         @work_item = WorkItem.where(etag: params[:etag],
                                     name: params[:name],
                                     bag_date: params[:bag_date]).first
-      # end
     end
   end
 
