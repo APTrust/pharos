@@ -91,21 +91,20 @@ class InstitutionsController < ApplicationController
     authorize current_user, :snapshot?
     @snapshots = []
     @wb_hash = {}
-    @date_str = Time.now.utc.strftime('%Y-%m-%d')
-    @date_str = @date_str << 'T00:00:00+00:00'
+    @date_str = Time.now.utc.strftime('%m/%d/%Y')
     total_size = Institution.total_file_size_across_repo
     @wb_hash['Repository Total'] = total_size
-    # MemberInstitution.all.order('name').each do |institution|
-    #   current_snaps = institution.snapshot
-    #   @snapshots.push(current_snaps)
-    #   current_snaps.each do |snap|
-    #     @wb_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
-    #   end
-    # end
-    Snapshot.where("created_at > '2018-05-07 16:38:41.402948' AND snapshot_type = 'Subscribers Included'").each do |snap|
-      inst = Institution.find(snap.institution_id)
-      @wb_hash[inst.name] = snap.apt_bytes
+    MemberInstitution.all.order('name').each do |institution|
+      current_snaps = institution.snapshot
+      @snapshots.push(current_snaps)
+      current_snaps.each do |snap|
+        @wb_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
+      end
     end
+    # Snapshot.where("created_at > '2018-05-07 16:38:41.402948' AND snapshot_type = 'Subscribers Included'").each do |snap|
+    #   inst = Institution.find(snap.institution_id)
+    #   @wb_hash[inst.name] = snap.apt_bytes
+    # end
     NotificationMailer.snapshot_notification(@wb_hash).deliver!
     write_snapshots_to_spreadsheet
     respond_to do |format|
@@ -191,16 +190,17 @@ class InstitutionsController < ApplicationController
     # sheet = session.spreadsheet_by_key('1E29ttbnuRDyvWfYAh6_-Zn9s0ChOspUKCOOoeez1fZE').worksheets[0] # Chip Sheet
     sheet = session.spreadsheet_by_key('1T_zlgluaGdEU_3Fm06h0ws_U4mONpDL4JLNP_z-CU20').worksheets[0] # Kelly Test Sheet
     date_column = 0
-    counter = 0
-    while date_column == 0 && counter < 10
-      cell = sheet[2, counter]
-      date_column = counter if cell == @date_str unless cell.nil?
+    counter = 2
+    while date_column == 0 && counter < 100
+      cell = sheet[3, counter]
+      converted_date = Date.strptime(cell, '%m/%d/%Y').strftime('%m/%d/%Y')
+      date_column = counter if converted_date == @date_str unless cell.nil?
       counter += 1
     end
     i = 1
     unless date_column == 0
       while i < 200
-        cell = sheet[i, 0]
+        cell = sheet[i, 1]
         unless cell.nil?
           if @wb_hash.has_key?(cell)
             gb = (@wb_hash[cell].to_f / 1073741824).round(2)
