@@ -358,7 +358,7 @@ function timeline_graph(labels, data) {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Data Stored in Bytes',
+                label: 'Gigabytes Preserved',
                 data: data,
                 backgroundColor: colors,
                 borderColor: dark_colors,
@@ -370,6 +370,12 @@ function timeline_graph(labels, data) {
                 yAxes: [{
                     ticks: {
                         beginAtZero:true
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: "Amount of Data Preserved in Gigabytes"
                     }
                 }]
             }

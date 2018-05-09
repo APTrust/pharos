@@ -85,7 +85,7 @@ class DpnWorkItemsController < ApplicationController
       authorize current_user, :nil_index?
       respond_to do |format|
         format.json { render nothing: true, status: :not_found }
-        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+        format.html { redirect_to root_url, alert: 'That DPN Work Item could not be found.' }
       end
     end
   end

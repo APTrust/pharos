@@ -12,7 +12,7 @@ class ReportsController < ApplicationController
     @indiv_timeline_breakdown = @institution.generate_timeline_report
     @inst_breakdown_report = Institution.breakdown if policy(current_user).institution_breakdown?
     respond_to do |format|
-      format.json { render json: { report_list: 'There is one report available, a general overview found at reports/overview/:identifier' } }
+      format.json { render json: { overview_report: @overview_report, timeline_report: @indiv_timeline_breakdown, institution_breakdown: @inst_breakdown_report } }
       format.html { }
     end
   end

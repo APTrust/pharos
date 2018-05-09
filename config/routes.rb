@@ -62,6 +62,7 @@ Rails.application.routes.draw do
   get '/api/v2/events/:id', to: 'premis_events#show', format: [:json, :html]
   get 'member-api/v2/events/:file_identifier', to: 'premis_events#index', format: :json, file_identifier: file_ptrn
   get 'member-api/v2/events/:object_identifier', to: 'premis_events#index', format: :json, object_identifier: object_ptrn
+  get 'member-api/v2/events/:institution_identifier', to: 'premis_events#index', format: :json, institution_identifier: institution_ptrn
   get 'notifications/failed_fixity', to: 'premis_events#notify_of_failed_fixity', format: :json
   get '/api/v2/notifications/failed_fixity', to: 'premis_events#notify_of_failed_fixity', format: :json
 

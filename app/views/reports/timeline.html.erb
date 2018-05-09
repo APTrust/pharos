@@ -12,7 +12,7 @@
             <script>timeline_labels.push("<%= label %>");</script>
         <% end %>
         <% @timeline_report.last.each do |data_point| %>
-            <script>timeline_data.push(<%= data_point %>);</script>
+            <script>timeline_data.push(<%= readable_bytes(data_point) %>);</script>
         <% end %>
         <script>timeline_graph(timeline_labels, timeline_data);</script>
     <% end %>

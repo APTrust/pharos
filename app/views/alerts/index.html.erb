@@ -11,7 +11,9 @@
   <li><a href="#restore" data-toggle="tab">Failed Restorations</a></li>
   <li><a href="#delete" data-toggle="tab">Failed Deletions</a></li>
   <li><a href="#dpn_ingest" data-toggle="tab">Failed DPN Ingests</a></li>
-  <li><a href="#dpn_rep" data-toggle="tab">Stalled DPN Replications</a></li>
+  <% if current_user.admin? %>
+      <li><a href="#dpn_rep" data-toggle="tab">Stalled DPN Replications</a></li>
+  <% end %>
   <li><a href="#stalled" data-toggle="tab">Stalled Work Items</a></li>
 </ul>
 
@@ -41,10 +43,12 @@
     <%= render 'work_item_results', work_items: @alerts_list[:failed_dpn_ingests] %>
   </div>
 
-  <div class="tab-pane" id="dpn_rep">
-    <br><p>Total Stalled DPN Replications: <%= @alerts_list[:stalled_dpn_replications].count %></p>
-    <%= render 'dpn_item_results', dpn_items: @alerts_list[:stalled_dpn_replications] %>
-  </div>
+  <% if current_user.admin? %>
+      <div class="tab-pane" id="dpn_rep">
+        <br><p>Total Stalled DPN Replications: <%= @alerts_list[:stalled_dpn_replications].count %></p>
+        <%= render 'dpn_item_results', dpn_items: @alerts_list[:stalled_dpn_replications] %>
+      </div>
+  <% end %>
 
   <div class="tab-pane" id="stalled">
     <br><p>Total Stalled Work Items: <%= @alerts_list[:stalled_work_items].count %></p>

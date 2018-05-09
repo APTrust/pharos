@@ -41,7 +41,7 @@ $(document).ready(function(){
             },
 
             makeSortable: function(table) {
-                if (table.getElementsByTagName('thead').length == 0) {
+                if (table.getElementsByTagName('thead').length === 0) {
                     // table doesn't have a tHead. Since it should have, create one and
                     // put the first table row in it.
                     the = document.createElement('thead');
@@ -49,7 +49,7 @@ $(document).ready(function(){
                     table.insertBefore(the,table.firstChild);
                 }
                 // Safari doesn't support table.tHead, sigh
-                if (table.tHead == null) table.tHead = table.getElementsByTagName('thead')[0];
+                if (table.tHead === null) table.tHead = table.getElementsByTagName('thead')[0];
 
                 if (table.tHead.rows.length != 1) return; // can't cope with two header rows
 
@@ -64,33 +64,33 @@ $(document).ready(function(){
                     }
                 }
                 if (sortbottomrows) {
-                    if (table.tFoot == null) {
+                    if (table.tFoot === null) {
                         // table doesn't have a tfoot. Create one.
                         tfo = document.createElement('tfoot');
                         table.appendChild(tfo);
                     }
-                    for (var i=0; i<sortbottomrows.length; i++) {
-                        tfo.appendChild(sortbottomrows[i]);
+                    for (var j=0; j<sortbottomrows.length; j++) {
+                        tfo.appendChild(sortbottomrows[j]);
                     }
-                    delete sortbottomrows;
+                    sortbottomrows = undefined;
                 }
 
                 // work through each column and calculate its type
                 headrow = table.tHead.rows[0].cells;
-                for (var i=0; i<headrow.length; i++) {
+                for (var k=0; k<headrow.length; k++) {
                     // manually override the type with a sorttable_type attribute
-                    if (!headrow[i].className.match(/\bsorttable_nosort\b/)) { // skip this col
-                        mtch = headrow[i].className.match(/\bsorttable_([a-z0-9]+)\b/);
+                    if (!headrow[k].className.match(/\bsorttable_nosort\b/)) { // skip this col
+                        mtch = headrow[k].className.match(/\bsorttable_([a-z0-9]+)\b/);
                         if (mtch) { override = mtch[1]; }
                         if (mtch && typeof sorttable["sort_"+override] == 'function') {
-                            headrow[i].sorttable_sortfunction = sorttable["sort_"+override];
+                            headrow[k].sorttable_sortfunction = sorttable["sort_"+override];
                         } else {
-                            headrow[i].sorttable_sortfunction = sorttable.guessType(table,i);
+                            headrow[k].sorttable_sortfunction = sorttable.guessType(table,k);
                         }
                         // make it clickable to sort
-                        headrow[i].sorttable_columnindex = i;
-                        headrow[i].sorttable_tbody = table.tBodies[0];
-                        dean_addEvent(headrow[i],"click", sorttable.innerSortFunction = function(e) {
+                        headrow[k].sorttable_columnindex = k;
+                        headrow[k].sorttable_tbody = table.tBodies[0];
+                        dean_addEvent(headrow[k],"click", sorttable.innerSortFunction = function(e) {
 
                             if (this.className.search(/\bsorttable_sorted\b/) != -1) {
                                 // if we're already sorted by this column, just
@@ -145,8 +145,8 @@ $(document).ready(function(){
                             row_array = [];
                             col = this.sorttable_columnindex;
                             rows = this.sorttable_tbody.rows;
-                            for (var j=0; j<rows.length; j++) {
-                                row_array[row_array.length] = [sorttable.getInnerText(rows[j].cells[col]), rows[j]];
+                            for (var l=0; l<rows.length; l++) {
+                                row_array[row_array.length] = [sorttable.getInnerText(rows[l].cells[col]), rows[l]];
                             }
                             /* If you want a stable sort, uncomment the following line */
                             //sorttable.shaker_sort(row_array, this.sorttable_sortfunction);
@@ -154,11 +154,10 @@ $(document).ready(function(){
                             row_array.sort(this.sorttable_sortfunction);
 
                             tb = this.sorttable_tbody;
-                            for (var j=0; j<row_array.length; j++) {
-                                tb.appendChild(row_array[j][1]);
+                            for (var m=0; m<row_array.length; m++) {
+                                tb.appendChild(row_array[m][1]);
                             }
-
-                            delete row_array;
+                            row_array = undefined;
                         });
                     }
                 }
@@ -169,14 +168,14 @@ $(document).ready(function(){
                 sortfn = sorttable.sort_alpha;
                 for (var i=0; i<table.tBodies[0].rows.length; i++) {
                     text = sorttable.getInnerText(table.tBodies[0].rows[i].cells[column]);
-                    if (text != '') {
+                    if (text !== '') {
                         if (text.match(/^-?[£$¤]?[\d,.]+%?$/)) {
                             return sorttable.sort_numeric;
                         }
                         // check for a date: dd/mm/yyyy or dd/mm/yy
                         // can have / or . or - as separator
                         // can be mm/dd as well
-                        possdate = text.match(sorttable.DATE_RE)
+                        possdate = text.match(sorttable.DATE_RE);
                         if (possdate) {
                             // looks like a date
                             first = parseInt(possdate[1]);
@@ -209,7 +208,7 @@ $(document).ready(function(){
                 hasInputs = (typeof node.getElementsByTagName == 'function') &&
                     node.getElementsByTagName('input').length;
 
-                if (node.getAttribute("sorttable_customkey") != null) {
+                if (node.getAttribute("sorttable_customkey") !== null) {
                     return node.getAttribute("sorttable_customkey");
                 }
                 else if (typeof node.textContent != 'undefined' && !hasInputs) {
@@ -230,9 +229,9 @@ $(document).ready(function(){
                             if (node.nodeName.toLowerCase() == 'input') {
                                 return node.value.replace(/^\s+|\s+$/g, '');
                             }
+                            break;
                         case 4:
                             return node.nodeValue.replace(/^\s+|\s+$/g, '');
-                            break;
                         case 1:
                         case 11:
                             var innerText = '';
@@ -240,7 +239,6 @@ $(document).ready(function(){
                                 innerText += sorttable.getInnerText(node.childNodes[i]);
                             }
                             return innerText.replace(/^\s+|\s+$/g, '');
-                            break;
                         default:
                             return '';
                     }
@@ -253,10 +251,10 @@ $(document).ready(function(){
                 for (var i=0; i<tbody.rows.length; i++) {
                     newrows[newrows.length] = tbody.rows[i];
                 }
-                for (var i=newrows.length-1; i>=0; i--) {
-                    tbody.appendChild(newrows[i]);
+                for (var j=newrows.length-1; j>=0; j--) {
+                    tbody.appendChild(newrows[j]);
                 }
-                delete newrows;
+                newrows = undefined;
             },
 
             /* sort functions
@@ -325,9 +323,9 @@ $(document).ready(function(){
 
                     if (!swap) break;
 
-                    for(var i = t; i > b; --i) {
-                        if ( comp_func(list[i], list[i-1]) < 0 ) {
-                            var q = list[i]; list[i] = list[i-1]; list[i-1] = q;
+                    for(var j = t; j > b; --j) {
+                        if ( comp_func(list[j], list[j-1]) < 0 ) {
+                            var r = list[j]; list[j] = list[j-1]; list[j-1] = r;
                             swap = true;
                         }
                     } // for
@@ -335,7 +333,7 @@ $(document).ready(function(){
 
                 } // while(swap)
             }
-        }
+        };
 
         /* ******************************************************************
          Supporting functions: bundled here to avoid depending on a library
@@ -399,7 +397,7 @@ $(document).ready(function(){
                 // assign a global event handler to do all the work
                 element["on" + type] = handleEvent;
             }
-        };
+        }
 // a counter used to create unique IDs
         dean_addEvent.guid = 1;
 
@@ -412,7 +410,7 @@ $(document).ready(function(){
                     delete element.events[type][handler.$$guid];
                 }
             }
-        };
+        }
 
         function handleEvent(event) {
             var returnValue = true;
@@ -428,20 +426,20 @@ $(document).ready(function(){
                 }
             }
             return returnValue;
-        };
+        }
 
         function fixEvent(event) {
             // add W3C standard event methods
             event.preventDefault = fixEvent.preventDefault;
             event.stopPropagation = fixEvent.stopPropagation;
             return event;
-        };
+        }
         fixEvent.preventDefault = function() {
             this.returnValue = false;
         };
         fixEvent.stopPropagation = function() {
             this.cancelBubble = true;
-        }
+        };
 
 // Dean's forEach: http://dean.edwards.name/base/forEach.js
         /*
