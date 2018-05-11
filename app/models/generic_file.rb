@@ -14,6 +14,7 @@ class GenericFile < ActiveRecord::Base
   validate :matching_storage_option, on: :create
   validate :storage_option_is_allowed
   before_save :freeze_institution_id
+  before_save :freeze_storage_option
 
   ### Scopes
   scope :created_before, ->(param) { where('generic_files.created_at < ?', param) unless param.blank? }
@@ -186,8 +187,12 @@ class GenericFile < ActiveRecord::Base
     errors.add(:institution_id, 'cannot be changed') if self.saved_change_to_institution_id? unless self.institution_id.nil?
   end
 
+  def freeze_storage_option
+    errors.add(:storage_option, 'cannot be changed') if self.saved_change_to_storage_option? unless self.storage_option.nil?
+  end
+
   def storage_option_is_allowed
-    if !Pharos::Application::PHAROS_STORAGE_OPTIONS.include?(self.storage_option)
+    unless Pharos::Application::PHAROS_STORAGE_OPTIONS.include?(self.storage_option)
       errors.add(:storage_option, 'Storage Option is not one of the allowed options')
     end
   end

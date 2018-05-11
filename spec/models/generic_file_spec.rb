@@ -28,6 +28,13 @@ RSpec.describe GenericFile, :type => :model do
     file.errors[:institution_id].should include('cannot be changed')
   end
 
+  it 'should not allow the storage_option to be changed once set' do
+    file = FactoryBot.create(:generic_file)
+    file.storage_option = 'Glacier-OH'
+    file.save!
+    file.errors[:storage_option].should include('cannot be changed')
+  end
+
   it 'should accept an identifier that is longer than 256 characters' do
     file = FactoryBot.create(:generic_file, identifier: 'somethingoutrageous.edu/a_very_very_crazy_long_bag_name_full_of_photos-3453443509-139862-3459u350984/data/this_file_needs_to_be_super_long/something_extra/way_down_deep/defying_gravity/out_of_ideas/13948098712349-34982309857923-239872989298745-2093809609864320940-2349869432098459082.txt')
     expect(file.identifier).to eq 'somethingoutrageous.edu/a_very_very_crazy_long_bag_name_full_of_photos-3453443509-139862-3459u350984/data/this_file_needs_to_be_super_long/something_extra/way_down_deep/defying_gravity/out_of_ideas/13948098712349-34982309857923-239872989298745-2093809609864320940-2349869432098459082.txt'

@@ -596,4 +596,11 @@ RSpec.describe IntellectualObject, :type => :model do
     end
   end
 
+  it 'should not allow the storage_option to be changed once set' do
+    object = FactoryBot.create(:intellectual_object)
+    object.storage_option = 'Glacier-OH'
+    object.save!
+    object.errors[:storage_option].should include('cannot be changed')
+  end
+
 end
