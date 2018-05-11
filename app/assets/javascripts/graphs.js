@@ -71,7 +71,7 @@ function mimetype_graph(stats, id, position) {
                 data: data_array,
                 label: 'Mimetype Usage',
                 backgroundColor: colors,
-                borderWidth: .5
+                borderWidth: 0.5
             }]
         },
         options: {
