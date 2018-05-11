@@ -55,7 +55,7 @@ class IntellectualObjectsController < ApplicationController
       authorize current_user, :nil_object?
       respond_to do |format|
         format.json { render json: { status: 'error', message: 'This object could not be found.' }, :status => 404 }
-        format.html { redirect_to root_url, alert: 'This object could not be found.' }
+        format.html { redirect_to root_url, alert: "An intellectual object with identifer: #{params[:intellectual_object_identifier]} could not be found." }
       end
     end
   end
@@ -268,14 +268,13 @@ class IntellectualObjectsController < ApplicationController
   def load_object
     if params[:intellectual_object_identifier]
       @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
-      if @intellectual_object.nil?
-        msg = "IntellectualObject '#{params[:intellectual_object_identifier]}' not found"
-        raise ActionController::RoutingError.new(msg)
-      end
+      # if @intellectual_object.nil?
+      #   msg = "IntellectualObject '#{params[:intellectual_object_identifier]}' not found"
+      #   raise ActionController::RoutingError.new(msg)
+      # end
     else
       @intellectual_object ||= IntellectualObject.readable(current_user).find(params[:id])
     end
-    @institution = @intellectual_object.institution unless @intellectual_object.nil?
   end
 
   def load_institution

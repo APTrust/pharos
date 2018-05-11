@@ -15,7 +15,7 @@ ActiveRecord::Schema.define(version: 2018_05_04_140355) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "checksums", force: :cascade do |t|
+  create_table "checksums", id: :serial, force: :cascade do |t|
     t.string "algorithm"
     t.string "datetime"
     t.string "digest"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 2018_05_04_140355) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "dpn_work_items", force: :cascade do |t|
+  create_table "dpn_work_items", id: :serial, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "remote_node", limit: 20, default: "", null: false
@@ -87,7 +87,7 @@ ActiveRecord::Schema.define(version: 2018_05_04_140355) do
     t.index ["work_item_id"], name: "index_emails_work_items_on_work_item_id"
   end
 
-  create_table "generic_files", force: :cascade do |t|
+  create_table "generic_files", id: :serial, force: :cascade do |t|
     t.string "file_format"
     t.string "uri"
     t.bigint "size"
@@ -119,7 +119,7 @@ ActiveRecord::Schema.define(version: 2018_05_04_140355) do
     t.index ["updated_at"], name: "index_generic_files_on_updated_at"
   end
 
-  create_table "institutions", force: :cascade do |t|
+  create_table "institutions", id: :serial, force: :cascade do |t|
     t.string "name"
     t.string "brief_name"
     t.string "identifier"
@@ -132,7 +132,7 @@ ActiveRecord::Schema.define(version: 2018_05_04_140355) do
     t.index ["name"], name: "index_institutions_on_name"
   end
 
-  create_table "intellectual_objects", force: :cascade do |t|
+  create_table "intellectual_objects", id: :serial, force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "identifier"
@@ -224,6 +224,7 @@ ActiveRecord::Schema.define(version: 2018_05_04_140355) do
     t.string "name"
     t.string "email"
     t.string "phone_number"
+    t.string "institution_pid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "encrypted_password", default: "", null: false
@@ -287,4 +288,6 @@ ActiveRecord::Schema.define(version: 2018_05_04_140355) do
     t.index ["status"], name: "index_work_items_on_status"
   end
 
+  add_foreign_key "checksums", "generic_files"
+  add_foreign_key "users", "institutions"
 end

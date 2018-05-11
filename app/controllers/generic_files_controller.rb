@@ -52,7 +52,7 @@ class GenericFilesController < ApplicationController
       authorize current_user, :nil_file?
       respond_to do |format|
         format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.' }, status: :not_found }
-        format.html { redirect_to root_url, alert: 'This file could not be found. Please check to make sure the identifier was properly escaped.' }
+        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]}. Please check to make sure the identifier was properly escaped." }
       end
     end
   end
@@ -279,7 +279,7 @@ class GenericFilesController < ApplicationController
               @generic_file = GenericFile.where(identifier: fixed_identifier).first
             end
           else
-            @generic_file.find_by_identifier(identifier)
+            @generic_file = GenericFile.find_by_identifier(identifier)
           end
       end
     elsif params[:id]

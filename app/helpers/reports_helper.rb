@@ -66,4 +66,10 @@ module ReportsHelper
     @base_report = Hash[@base_report].sort
   end
 
+  def readable_bytes(data_point)
+    gb = data_point / 1073741824
+    gb = gb.round(2)
+    gb
+  end
+
 end

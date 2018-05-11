@@ -12,11 +12,14 @@ class PremisEventsController < ApplicationController
     @premis_events = PremisEvent.discoverable(current_user)
     if params[:object_identifier]
       load_intellectual_object
+      identifier = params[:object_identifier]
     elsif params[:file_identifier]
       load_generic_file
+      identifier = params[:file_identifier]
     elsif params[:institution_identifier]
       load_institution
       for_selected_institution
+      identifier = params[:institution_identifier]
     else
       @parent = @premis_events.first.intellectual_object
     end
@@ -27,7 +30,7 @@ class PremisEventsController < ApplicationController
       @institution = current_user.institution
       respond_to do |format|
         format.json { render nothing: true, status: :not_found }
-        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+        format.html { redirect_to root_url, alert: "A Premis Event parent (Institution/Intellectual Object/Generic File) with identifier: #{identifier} could not be found." }
       end
     else
       authorize @parent
@@ -69,7 +72,7 @@ class PremisEventsController < ApplicationController
       authorize current_user, :nil_event?
       respond_to do |format|
         format.json { render nothing: true, status: :not_found }
-        format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+        format.html { redirect_to root_url, alert: 'That Premis Event could not be found.' }
       end
     end
   end
