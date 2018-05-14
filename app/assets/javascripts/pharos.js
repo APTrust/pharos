@@ -2,11 +2,11 @@ function activate_tabs() {
     $('#inst_show_tabs li:first').addClass('active');
     $('div.tab-content div.tab-pane:first').addClass('active');
     $('#alert_index_tabs li:first').addClass('active');
-};
+}
 
 function dropdown() {
     $('.dropdown-toggle').dropdown();
-};
+}
 
 function fix_search_breadcrumb() {
     $("a.btn-sm").removeClass("dropdown-toggle");
@@ -16,11 +16,13 @@ function fix_search_breadcrumb() {
 function addClickFunctions() {
     var buttons = $("a.btn-sm.btn-default");
     for (var i = 0; i < buttons.length; i++) {
-        buttons[i].onclick = function() {
-            var href = $(this).attr("href");
-            window.location.assign(href);
-        }
+        buttons[i].onclick = buttonClickFunction();
     }
+}
+
+function buttonClickFunction() {
+    var href = $(this).attr("href");
+    window.location.assign(href);
 }
 
 function configureDropDownLists() {
@@ -187,10 +189,11 @@ function fixFilters() {
 function restoreRequeue(){
    $('#restore_form').removeClass('hidden');
    $('#restore_form_submit').on("click", function() {
+       var checked = '';
        if ($('#state_item').is(':checked')) {
-           var checked = 'true';
+           checked = 'true';
        } else {
-           var checked = 'false';
+           checked = 'false';
        }
        var id = $('#work_item_id').text();
        $.get('/items/'+id+'/requeue', {delete_state_item: checked},
@@ -250,10 +253,11 @@ function dpnRequeue() {
 function dpnItemRequeue() {
     $('#dpn_item_form').removeClass('hidden');
     $('#dpn_item_form_submit').on("click", function () {
+        var checked = '';
         if ($('#dpn_state_item').is(':checked')) {
-            var checked = 'true';
+            checked = 'true';
         } else {
-            var checked = 'false';
+            checked = 'false';
         }
         var task = $('input[name="task"]:checked').val();
         if (task == "copy" || task == "validation" || task == "store" || task == 'package' || task == 'record') {

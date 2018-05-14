@@ -90,7 +90,7 @@ $(document).ready(function(){
                         // make it clickable to sort
                         headrow[k].sorttable_columnindex = k;
                         headrow[k].sorttable_tbody = table.tBodies[0];
-                        dean_addEvent(headrow[k],"click", sorttable.innerSortFunction = function(e) {
+                        dean_addEvent(headrow[k],"click", sorttable.innerSortFunction = function() {
 
                             if (this.className.search(/\bsorttable_sorted\b/) != -1) {
                                 // if we're already sorted by this column, just
