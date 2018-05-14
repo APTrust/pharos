@@ -7,11 +7,11 @@ function configureDropDownLists() {
     var wi_options = ['Object Identifier', 'File Identifier', 'Name', 'Etag'];
     var dpn_options = ['Item Identifier'];
     var listSwitch = {
-        "Intellectual Objects": function () { createOptionList(ddl2, io_options) },
-        "Generic Files": function () { createOptionList(ddl2, gf_options) },
-        "Work Items": function () { createOptionList(ddl2, wi_options) },
-        "Premis Events": function () { createOptionList(ddl2, event_options) },
-        "DPN Items": function () { createOptionList(ddl2, dpn_options) }
+        "Intellectual Objects": function () { createOptionList(ddl2, io_options); },
+        "Generic Files": function () { createOptionList(ddl2, gf_options); },
+        "Work Items": function () { createOptionList(ddl2, wi_options); },
+        "Premis Events": function () { createOptionList(ddl2, event_options); },
+        "DPN Items": function () { createOptionList(ddl2, dpn_options); }
     };
     listSwitch[ddl1.value]();
 }
@@ -70,13 +70,21 @@ function fixFilters() {
     var filterIds = ['access', 'action', 'event_type', 'format', 'institution', 'node', 'outcome', 'queued', 'stage', 'state', 'status'];
     for (var i = 0; i < filterIds.length; i++) {
         var filter = $("#filter-"+filterIds[i]);
-        filter.on('shown.bs.collapse', function () {
-            var filter_type = this.id.split('-')[1];
-            $("."+filter_type+"-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
-        });
-        filter.on('hidden.bs.collapse', function () {
-            var filter_type = this.id.split('-')[1];
-            $("."+filter_type+"-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
-        });
+        filter.on('shown.bs.collapse', shownClickHandler());
+        filter.on('hidden.bs.collapse', hiddenClickHandler());
     }
+}
+
+function shownClickHandler() {
+    return function () {
+        var filter_type = this.id.split('-')[1];
+        $("."+filter_type+"-carat").removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
+    };
+}
+
+function hiddenClickHandler() {
+    return function () {
+        var filter_type = this.id.split('-')[1];
+        $("."+filter_type+"-carat").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
+    };
 }
