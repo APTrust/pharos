@@ -325,18 +325,9 @@ $(document).ready(function(){
                    return;
                }
 
-               // remove sorttable_sorted classes
                theadrow = this.parentNode;
-               forEach(theadrow.childNodes, function(cell) {
-                   if (cell.nodeType == 1) { // an element
-                       cell.className = cell.className.replace('sorttable_sorted_reverse','');
-                       cell.className = cell.className.replace('sorttable_sorted','');
-                   }
-               });
-               sortfwdind = document.getElementById('sorttable_sortfwdind');
-               if (sortfwdind) { sortfwdind.parentNode.removeChild(sortfwdind); }
-               sortrevind = document.getElementById('sorttable_sortrevind');
-               if (sortrevind) { sortrevind.parentNode.removeChild(sortrevind); }
+               removeSorttableClasses();
+               removeSorttableChildren();
 
                this.className += ' sorttable_sorted';
                sortfwdind = document.createElement('span');
@@ -444,6 +435,23 @@ $(document).ready(function(){
                 }
                 sortbottomrows = undefined;
             }
+        }
+
+        function removeSorttableClasses () {
+            // remove sorttable_sorted classes
+            forEach(theadrow.childNodes, function(cell) {
+                if (cell.nodeType == 1) { // an element
+                    cell.className = cell.className.replace('sorttable_sorted_reverse','');
+                    cell.className = cell.className.replace('sorttable_sorted','');
+                }
+            });
+        }
+
+        function removeSorttableChildren () {
+            sortfwdind = document.getElementById('sorttable_sortfwdind');
+            if (sortfwdind) { sortfwdind.parentNode.removeChild(sortfwdind); }
+            sortrevind = document.getElementById('sorttable_sortrevind');
+            if (sortrevind) { sortrevind.parentNode.removeChild(sortrevind); }
         }
 
 // Dean's forEach: http://dean.edwards.name/base/forEach.js
