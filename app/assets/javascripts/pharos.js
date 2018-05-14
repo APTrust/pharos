@@ -16,58 +16,40 @@ function fix_search_breadcrumb() {
 function addClickFunctions() {
     var buttons = $("a.btn-sm.btn-default");
     for (var i = 0; i < buttons.length; i++) {
-        buttons[i].onclick = buttonClickFunction();
+        buttons[i].onclick = makeButtonClickFunction(buttons[i])
     }
 }
 
-function buttonClickFunction() {
-    var href = $(this).attr("href");
-    window.location.assign(href);
+function makeButtonClickFunction(button) {
+    return function () {
+        var href = $(button).attr("href");
+        window.location.assign(href);
+    };
 }
 
 function configureDropDownLists() {
-    ddl1 = document.getElementById('object_type');
-    ddl2 = document.getElementById('search_field');
+    var ddl1 = document.getElementById('object_type');
+    var ddl2 = document.getElementById('search_field');
     var io_options = ['Object Identifier', 'Alternate Identifier', 'Bagging Group Identifier', 'Bag Name', 'Title'];
     var gf_options = ['File Identifier', 'URI'];
     var event_options = ['Event Identifier', 'Object Identifier', 'File Identifier'];
     var wi_options = ['Object Identifier', 'File Identifier', 'Name', 'Etag'];
     var dpn_options = ['Item Identifier'];
+    var listSwitch = {
+        "Intellectual Objects": function () { createOptionList(ddl2, io_options) },
+        "Generic Files": function () { createOptionList(ddl2, gf_options) },
+        "Work Items": function () { createOptionList(ddl2, wi_options) },
+        "Premis Events": function () { createOptionList(ddl2, event_options) },
+        "DPN Items": function () { createOptionList(ddl2, dpn_options) }
+    };
+    listSwitch[ddl1.value]();
+}
 
-    switch (ddl1.value) {
-        case 'Intellectual Objects':
-            ddl2.options.length = 0;
-            for (i = 0; i < io_options.length; i++) {
-                createOption(ddl2, io_options[i]);
-            }
-            break;
-        case 'Generic Files':
-            ddl2.options.length = 0;
-            for (i = 0; i < gf_options.length; i++) {
-                createOption(ddl2, gf_options[i]);
-            }
-            break;
-        case 'Work Items':
-            ddl2.options.length = 0;
-            for (i = 0; i < wi_options.length; i++) {
-                createOption(ddl2, wi_options[i]);
-            }
-            break;
-        case 'Premis Events':
-            ddl2.options.length = 0;
-            for (i = 0; i < event_options.length; i++) {
-                createOption(ddl2, event_options[i]);
-            }
-            break;
-        case 'DPN Items':
-            ddl2.options.length = 0;
-            for (i = 0; i < dpn_options.length; i++) {
-                createOption(ddl2, dpn_options[i]);
-            }
-            break;
-
+function createOptionList(ddl, option_list) {
+    ddl.options.length = 0;
+    for (var i = 0; i < option_list.length; i++) {
+        createOption(ddl, option_list[i]);
     }
-
 }
 
 function createOption(ddl, value) {
@@ -78,7 +60,7 @@ function createOption(ddl, value) {
 }
 
 function adjustSearchField(param) {
-    ddl2 = document.getElementById('search_field');
+    var ddl2 = document.getElementById('search_field');
     ddl2.value = param;
 }
 
@@ -187,58 +169,34 @@ function fixFilters() {
 }
 
 function tabbed_nav(controller) {
-    switch (controller) {
-        case 'institutions':
-            $('#inst_tab').addClass('active');
-            break;
-        case 'intellectual_objects':
-            $('#io_tab').addClass('active');
-            break;
-        case 'generic_files':
-            $('#gf_tab').addClass('active');
-            break;
-        case 'work_items':
-            $('#wi_tab').addClass('active');
-            break;
-        case 'premis_events':
-            $('#pe_tab').addClass('active');
-            break;
-        case 'dpn_work_items':
-            $('#dpn_tab').addClass('active');
-            break;
-        case 'reports':
-            $('#rep_tab').addClass('active');
-            break;
-        case 'alerts':
-            $('#alert_tab').addClass('active');
-            break;
-        case 'dpn_bags':
-            $('#dpn_bag_tab').addClass('active');
-            break;
-    }
+    var controllerSwitch = {
+        "institutions": function () { activateNavTab('inst_tab') },
+        "intellectual_objects": function () { activateNavTab('io_tab') },
+        "generic_files": function () { activateNavTab('gf_tab') },
+        "work_items": function () { activateNavTab('wi_tab') },
+        "premis_events": function () { activateNavTab('pe_tab') },
+        "dpn_work_items": function () { activateNavTab('dpn_tab') },
+        "reports": function () { activateNavTab('rep_tab') },
+        "alerts": function () { activateNavTab('alert_tab') },
+        "dpn_bags": function () { activateNavTab('dpn_bag_tab') }
+    };
+    controllerSwitch[controller]();
 }
 
 function report_nav(type) {
-    switch (type) {
-        case 'general':
-            $('#general_tab').addClass('active');
-            break;
-        case 'subscriber':
-            $('#subscribers_tab').addClass('active');
-            break;
-        case 'cost':
-            $('#cost_tab').addClass('active');
-            break;
-        case 'timeline':
-            $('#timeline_tab').addClass('active');
-            break;
-        case 'mimetype':
-            $('#mimetype_tab').addClass('active');
-            break;
-        case 'breakdown':
-            $('#breakdown_tab').addClass('active');
-            break;
-    }
+    var reportTypeSwitch = {
+        "general": function () { activateNavTab('general_tab') },
+        "subscriber": function () { activateNavTab('subscribers_tab') },
+        "cost": function () { activateNavTab('cost_tab') },
+        "timeline": function () { activateNavTab('timeline_tab') },
+        "mimetype": function () { activateNavTab('mimetype_tab') },
+        "breakdown": function () { activateNavTab('breakdown_tab') }
+    };
+    reportTypeSwitch[type]();
+}
+
+function activateNavTab(id) {
+    $('#'+id).addClass('active');
 }
 
 $(document).ready(function(){
