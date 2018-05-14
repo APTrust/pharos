@@ -79,6 +79,8 @@
  *     WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/*global mpnPalette, tolPalette, solPalette, cbPalette */
+
 'use strict';
 
 var palette = (function() {
