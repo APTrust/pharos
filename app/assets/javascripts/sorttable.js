@@ -41,39 +41,10 @@ $(document).ready(function(){
             },
 
             makeSortable: function(table) {
-                if (table.getElementsByTagName('thead').length === 0) {
-                    // table doesn't have a tHead. Since it should have, create one and
-                    // put the first table row in it.
-                    the = document.createElement('thead');
-                    the.appendChild(table.rows[0]);
-                    table.insertBefore(the,table.firstChild);
-                }
-                // Safari doesn't support table.tHead, sigh
-                if (table.tHead === null) table.tHead = table.getElementsByTagName('thead')[0];
-
+                findOrCreateTableHeader(table);
                 if (table.tHead.rows.length != 1) return; // can't cope with two header rows
 
-                // Sorttable v1 put rows with a class of "sortbottom" at the bottom (as
-                // "total" rows, for example). This is B&R, since what you're supposed
-                // to do is put them in a tfoot. So, if there are sortbottom rows,
-                // for backwards compatibility, move them to tfoot (creating it if needed).
-                sortbottomrows = [];
-                for (var i=0; i<table.rows.length; i++) {
-                    if (table.rows[i].className.search(/\bsortbottom\b/) != -1) {
-                        sortbottomrows[sortbottomrows.length] = table.rows[i];
-                    }
-                }
-                if (sortbottomrows) {
-                    if (table.tFoot === null) {
-                        // table doesn't have a tfoot. Create one.
-                        tfo = document.createElement('tfoot');
-                        table.appendChild(tfo);
-                    }
-                    for (var j=0; j<sortbottomrows.length; j++) {
-                        tfo.appendChild(sortbottomrows[j]);
-                    }
-                    sortbottomrows = undefined;
-                }
+                maintainBottomRows(table);
 
                 // work through each column and calculate its type
                 headrow = table.tHead.rows[0].cells;
@@ -142,38 +113,32 @@ $(document).ready(function(){
 
                 if (node.getAttribute("sorttable_customkey") !== null) {
                     return node.getAttribute("sorttable_customkey");
-                }
-                else if (typeof node.textContent != 'undefined' && !hasInputs) {
+                } else if (typeof node.textContent != 'undefined' && !hasInputs) {
                     return node.textContent.replace(/^\s+|\s+$/g, '');
-                }
-                else if (typeof node.innerText != 'undefined' && !hasInputs) {
+                } else if (typeof node.innerText != 'undefined' && !hasInputs) {
                     return node.innerText.replace(/^\s+|\s+$/g, '');
-                }
-                else if (typeof node.text != 'undefined' && !hasInputs) {
+                } else if (typeof node.text != 'undefined' && !hasInputs) {
                     return node.text.replace(/^\s+|\s+$/g, '');
-                }
-                else if (node.nodeName.toLocaleLowerCase() ==  'td') {
+                } else if (node.nodeName.toLocaleLowerCase() ==  'td') {
                     return node.value.replace(/^\s+|\s+$/g, '');
-                }
-                else {
-                    switch (node.nodeType) {
-                        case 3:
+                } else {
+                    var nodeTypeSwitch = {
+                        3: function () {
                             if (node.nodeName.toLowerCase() == 'input') {
                                 return node.value.replace(/^\s+|\s+$/g, '');
                             }
-                            break;
-                        case 4:
-                            return node.nodeValue.replace(/^\s+|\s+$/g, '');
-                        case 1:
-                        case 11:
+                        },
+                        4: function () { return node.nodeValue.replace(/^\s+|\s+$/g, ''); },
+                        1: function () {  },
+                        11: function () {
                             var innerText = '';
                             for (var i = 0; i < node.childNodes.length; i++) {
                                 innerText += sorttable.getInnerText(node.childNodes[i]);
                             }
                             return innerText.replace(/^\s+|\s+$/g, '');
-                        default:
-                            return '';
-                    }
+                        }
+                    };
+                    nodeTypeSwitch[node.nodeType]();
                 }
             },
 
@@ -444,6 +409,42 @@ $(document).ready(function(){
         fixEvent.stopPropagation = function() {
             this.cancelBubble = true;
         };
+
+        function findOrCreateTableHeader(table) {
+            if (table.getElementsByTagName('thead').length === 0) {
+                // table doesn't have a tHead. Since it should have, create one and
+                // put the first table row in it.
+                the = document.createElement('thead');
+                the.appendChild(table.rows[0]);
+                table.insertBefore(the,table.firstChild);
+            }
+            // Safari doesn't support table.tHead, sigh
+            if (table.tHead === null) table.tHead = table.getElementsByTagName('thead')[0];
+        }
+
+        function maintainBottomRows(table) {
+            // Sorttable v1 put rows with a class of "sortbottom" at the bottom (as
+            // "total" rows, for example). This is B&R, since what you're supposed
+            // to do is put them in a tfoot. So, if there are sortbottom rows,
+            // for backwards compatibility, move them to tfoot (creating it if needed).
+            sortbottomrows = [];
+            for (var i=0; i<table.rows.length; i++) {
+                if (table.rows[i].className.search(/\bsortbottom\b/) != -1) {
+                    sortbottomrows[sortbottomrows.length] = table.rows[i];
+                }
+            }
+            if (sortbottomrows) {
+                if (table.tFoot === null) {
+                    // table doesn't have a tfoot. Create one.
+                    tfo = document.createElement('tfoot');
+                    table.appendChild(tfo);
+                }
+                for (var j=0; j<sortbottomrows.length; j++) {
+                    tfo.appendChild(sortbottomrows[j]);
+                }
+                sortbottomrows = undefined;
+            }
+        }
 
 // Dean's forEach: http://dean.edwards.name/base/forEach.js
         /*
