@@ -276,10 +276,6 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
-    rubyXL (3.3.29)
-      nokogiri (>= 1.4.4)
-      rubyzip (>= 1.1.6)
-    rubyzip (1.2.1)
     sass (3.5.6)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -384,7 +380,6 @@ DEPENDENCIES
   rspec-activemodel-mocks
   rspec-its
   rspec-rails (~> 3.7.2)
-  rubyXL
   sass-rails (~> 5.0)
   sdoc (~> 1.0.0)
   shoulda-matchers (~> 3.1.2)

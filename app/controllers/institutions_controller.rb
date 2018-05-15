@@ -159,32 +159,6 @@ class InstitutionsController < ApplicationController
     response.headers['Content-Disposition'] = "attachment; filename*=UTF-8''#{escaped}"
   end
 
-  # def write_snapshots_to_spreadsheet
-  #   wb = RubyXL::Parser.parse('/Users/kec6en/Desktop/test_book.xlsx')
-  #   sheet = wb[0]
-  #   date_column = 0
-  #   counter = 0
-  #   while date_column == 0
-  #     cell = sheet[2][counter]
-  #     date_column = counter if cell.value == @date_str unless cell.nil?
-  #     counter += 1
-  #   end
-  #   i = 1
-  #   unless date_column == 0
-  #     while i < 200
-  #       cell = sheet[i][0] unless sheet[i].nil?
-  #       unless cell.nil?
-  #         if @wb_hash.has_key?(cell.value)
-  #           gb = (@wb_hash[cell.value].to_f / 1073741824).round(2)
-  #           sheet.add_cell((i+1), date_column, gb)
-  #         end
-  #       end
-  #       i += 1
-  #     end
-  #   end
-  #   wb.write('/Users/kec6en/Desktop/test_book.xlsx')
-  # end
-
   def write_snapshots_to_spreadsheet
     session = GoogleDrive::Session.from_config('config.json')
     # sheet = session.spreadsheet_by_key('1E29ttbnuRDyvWfYAh6_-Zn9s0ChOspUKCOOoeez1fZE').worksheets[0] # Chip Sheet

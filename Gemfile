@@ -35,10 +35,7 @@ gem 'therubyracer'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
-# Used to generate spreadsheets
-gem 'rubyXL'
-
-# Used to export above spreadsheets to existing google sheet
+# Used to create or edit google sheets
 gem 'google_drive'
 
 #gem 'omniauth-google-oauth2'
