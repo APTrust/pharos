@@ -4,8 +4,8 @@ class InstitutionsController < ApplicationController
   before_action :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot]
   respond_to :json, :html
-  after_action :verify_authorized, :except => :index
-  after_action :verify_policy_scoped, :only => :index
+  after_action :verify_authorized, except: :index
+  after_action :verify_policy_scoped, only: :index
 
   def index
     respond_to do |format|
@@ -171,6 +171,7 @@ class InstitutionsController < ApplicationController
       date_column = counter if converted_date == @date_str unless cell.nil?
       counter += 1
     end
+    #TODO: instead of finding the right column, create the right column. Ask Chip about formatting first.
     i = 1
     unless date_column == 0
       while i < 200
