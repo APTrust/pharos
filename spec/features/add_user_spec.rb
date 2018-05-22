@@ -18,8 +18,8 @@ describe 'Adding a new user' do
     fill_in 'Phone number', with: '7128582392'
     select 'APTrust', from: 'Institution'
     choose 'Institutional Admin'
-    fill_in 'Password', with: 'password'
-    fill_in 'Password confirmation', with: 'password'
+    fill_in 'Password', with: 'Password123'
+    fill_in 'Password confirmation', with: 'Password123'
     click_button 'Submit'
     expect(page).to have_content 'User was successfully created.'
   end

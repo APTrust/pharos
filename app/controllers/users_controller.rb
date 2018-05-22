@@ -75,7 +75,7 @@ class UsersController < ApplicationController
 
   def admin_password_reset
     authorize current_user
-    password = SecureRandom.hex(4)
+    password = "ABCabc-#{SecureRandom.hex(4)}"
     @user.password = password
     @user.password_confirmation = password
     @user.save!
