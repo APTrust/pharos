@@ -3,7 +3,7 @@ FactoryBot.define do
     name { Faker::Name.name }
     email { "#{Faker::Internet.user_name}@#{Faker::Internet.domain_name}" }
     phone_number { 4345551234 }
-    password { 'password' }
+    password { 'Password514' }
     roles { [Role.where(name: 'public').first_or_create] }
     institution_id { FactoryBot.create(:member_institution).id }
 
