@@ -100,6 +100,12 @@ RSpec.describe UsersController, type: :controller do
         expect(institutional_admin.api_secret_key).to be_nil
         response.should redirect_to user_url(institutional_admin)
       end
+
+      it 'lets a user know when their password has expired and needs changing' do
+        old_user = FactoryBot.create(:user, :institutional_admin)
+        old_user.update(password_changed_at: Time.now.ago(4.month))
+        assert old_user.need_change_password?
+      end
     end
   end
 
@@ -161,7 +167,14 @@ RSpec.describe UsersController, type: :controller do
       describe 'at my institution' do
         describe 'with institutional_user role' do
           let(:institutional_user_role_id) { Role.where(name: 'institutional_user').first_or_create.id}
-          let(:attributes) { FactoryBot.attributes_for(:user, :institution_id=>institutional_admin.institution_id, role_ids: institutional_user_role_id) }
+          let(:attributes) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_user_role_id) }
+          let(:no_capital) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_user_role_id, password: 'password15') }
+          let(:no_lowercase) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_user_role_id, password: 'PASSWORD15') }
+          let(:no_digits) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_user_role_id, password: 'Password') }
+          let(:too_short) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_user_role_id, password: 'password') }
+          let(:complicated) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_user_role_id, password: 'GoodPassword14') }
+          let(:long_enough) { FactoryBot.attributes_for(:user, institution_id: institutional_admin.institution_id, role_ids: institutional_user_role_id, password: 'afunnythinghappenedonthewaytotheforum') }
+
           it 'should be successful' do
             expect {
               post :create, params: { user: attributes }
@@ -169,6 +182,43 @@ RSpec.describe UsersController, type: :controller do
             response.should redirect_to user_url(assigns[:user])
             expect(assigns[:user]).to be_institutional_user
           end
+
+          it 'should reject a password with no capital letters' do
+            expect {
+              post :create, params: { user: no_capital }
+            }.to_not change(User, :count)
+          end
+
+          it 'should reject a password with no lowercase letters' do
+            expect {
+              post :create, params: { user: no_lowercase }
+            }.to_not change(User, :count)
+          end
+
+          it 'should reject a password with no numbers' do
+            expect {
+              post :create, params: { user: no_digits }
+            }.to_not change(User, :count)
+          end
+
+          it 'should reject a password that is too short' do
+            expect {
+              post :create, params: { user: too_short }
+            }.to_not change(User, :count)
+          end
+
+          it 'should accept a password that is short but has capitals, lowercase, and digits' do
+            expect {
+              post :create, params: { user: complicated }
+            }.to change(User, :count).by(1)
+          end
+
+          it 'should accept a password that has no capitals, lowercase, or digits but is long' do
+            expect {
+              post :create, params: { user: long_enough }
+            }.to change(User, :count).by(1)
+          end
+
         end
 
         describe 'with institutional_admin role' do

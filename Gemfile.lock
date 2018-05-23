@@ -240,8 +240,6 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
-    rails_email_validator (0.1.4)
-      activemodel (>= 3.0.0)
     railties (5.2.0)
       actionpack (= 5.2.0)
       activesupport (= 5.2.0)
@@ -387,7 +385,6 @@ DEPENDENCIES
   rails (= 5.2.0)
   rails-controller-testing
   rails-html-sanitizer (= 1.0.4)
-  rails_email_validator
   rake
   rspec-activemodel-mocks
   rspec-its

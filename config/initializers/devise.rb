@@ -268,14 +268,14 @@ Devise.setup do |config|
   # Should the password expire (e.g 3.months)
   config.expire_password_after = 3.months
 
-  # Need 1 char of A-Z, a-z and 0-9
-  config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/
+  # Need 1 char of A-Z, a-z and 0-9 OR a password that is at least 20 characters long
+  config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])|.{20,}/
 
   # How many passwords to keep in archive
   config.password_archiving_count = 3
 
   # Deny old password (true, false, count)
-  config.deny_old_passwords = true
+  config.deny_old_passwords = 3
 
   # enable email validation for :secure_validatable. (true, false, validation_options)
   # dependency: need an email validator like rails_email_validator
