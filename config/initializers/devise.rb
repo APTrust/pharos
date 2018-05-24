@@ -299,6 +299,3 @@ Devise.setup do |config|
   # Time period for account expiry from last_activity_at
   # config.expire_after = 90.days
 end
-
-Devise::Models::PasswordExpirable.const_set('Fixnum', Integer)
-Devise::Models::PasswordArchivable.const_set('Fixnum', Integer)

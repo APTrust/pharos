@@ -131,7 +131,8 @@ Rails.application.routes.draw do
   resources :snapshots, path: 'snapshots', only: [:index, :show], format: [:json, :html]
 
   # USER ROUTES
-  devise_for :users
+  devise_for :users,
+  controllers: { passwords: 'passwords' }
 
   resources :users do
     patch 'update_password', on: :collection

@@ -33,7 +33,9 @@ function tabbed_nav(controller) {
         "reports": function () { activateNavTab('rep_tab'); },
         "alerts": function () { activateNavTab('alert_tab'); },
         "dpn_bags": function () { activateNavTab('dpn_bag_tab'); },
-        "catalog": function () {}
+        "catalog": function () {},
+        "devise/password_expired": function () {},
+        "users": function () {}
     };
     controllerSwitch[controller]();
 }
