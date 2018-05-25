@@ -8,6 +8,10 @@ function dropdown() {
     $('.dropdown-toggle').dropdown();
 }
 
+function pass_popover() {
+    $('[data-toggle="password_popover"]').popover({html:true});
+}
+
 function addClickFunctions() {
     var buttons = $("a.btn-sm.btn-default");
     for (var i = 0; i < buttons.length; i++) {
@@ -62,4 +66,5 @@ $(document).ready(function(){
     dropdown();
     fixSearchBreadcrumb();
     addClickFunctions();
+    pass_popover();
 });

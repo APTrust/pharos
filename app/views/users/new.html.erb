@@ -4,6 +4,7 @@
 
 <%= simple_form_for(@user, html: {class: 'form-horizontal'}) do |f| %>
     <%= devise_error_messages! %>
+    <%= render 'shared/password_popup' %>
 
     <div class="form-inputs">
       <%= f.input :name, autofocus: true %>
