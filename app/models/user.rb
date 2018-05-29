@@ -1,6 +1,9 @@
 require 'bcrypt'
 
 class User < ActiveRecord::Base
+  devise :two_factor_authenticatable,
+         :otp_secret_encryption_key => ENV['TWO_FACTOR_KEY']
+
   self.primary_key = 'id'
   belongs_to :institution, foreign_key: :institution_id
   has_and_belongs_to_many :roles
@@ -10,8 +13,9 @@ class User < ActiveRecord::Base
   # :recoverable, :rememberable, :trackable, :validatable,
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :recoverable, :rememberable, :trackable,
-         :timeoutable, :secure_validatable, :password_expirable, :password_archivable
+  devise :recoverable, :rememberable, :trackable,
+         :timeoutable, :secure_validatable, :password_expirable, :password_archivable,
+         :two_factor_authenticatable, :otp_secret_encryption_key => ENV['TWO_FACTOR_KEY']
 
   validates :email, presence: true, uniqueness: true
   validate :email_is_valid
