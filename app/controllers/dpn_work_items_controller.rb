@@ -140,6 +140,7 @@ class DpnWorkItemsController < ApplicationController
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])
                      .with_state(params[:state])
+                     .with_pid(params[:pid])
                      .queued_before(params[:queued_before])
                      .queued_after(params[:queued_after])
                      .completed_before(params[:completed_before])
