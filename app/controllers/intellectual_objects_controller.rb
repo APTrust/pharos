@@ -198,7 +198,12 @@ class IntellectualObjectsController < ApplicationController
       api_status_code = :conflict
       message = 'This item has been deleted and cannot be queued for restoration.'
     elsif pending.nil?
-      restore_item = WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
+      if @intellectual_object.storage_option == 'Standard'
+        restore_item = WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
+      else
+        restore_item = WorkItem.create_glacier_restore_request(@intellectual_object.identifier, current_user.email)
+      end
+
       message = 'Your item has been queued for restoration.'
     else
       api_status_code = :conflict

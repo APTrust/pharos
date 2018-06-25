@@ -232,6 +232,23 @@ RSpec.describe WorkItem, :type => :model do
       wi.id.should_not be_nil
     end
 
+    it 'should create a glacier restoration request when asked' do
+      wi = WorkItem.create_glacier_restore_request('abc/123', 'mikey@example.com')
+      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
+      wi.action.should == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
+      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+      wi.note.should == 'Restore requested'
+      wi.outcome.should == 'Not started'
+      wi.user.should == 'mikey@example.com'
+      wi.retry.should == true
+      wi.work_item_state.state.should be_nil
+      wi.node.should be_nil
+      wi.pid.should == 0
+      wi.needs_admin_review.should == false
+      wi.id.should_not be_nil
+    end
+
     it 'should create a dpn request when asked' do
       wi = WorkItem.create_dpn_request('abc/123', 'mikey@example.com')
       wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
