@@ -7,7 +7,7 @@ gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.10'
+gem 'uglifier', '>= 4.1.11'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -34,7 +34,7 @@ gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 4.0.0'
+gem 'simple_form', '~> 4.0.1'
 gem 'phony_rails'
 gem 'inherited_resources', '1.8.0'
 gem 'uuidtools'
@@ -61,7 +61,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.0.3'
+  gem 'capybara', '3.2.1'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.21', require: false
 end

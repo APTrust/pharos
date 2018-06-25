@@ -16,7 +16,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
   let!(:admin_user) { FactoryBot.create(:user, :admin) }
   let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin) }
-  let!(:item_one) { FactoryBot.create(:dpn_work_item, task: 'sync', remote_node: 'aptrust', identifier: '1234') }
+  let!(:item_one) { FactoryBot.create(:dpn_work_item, task: 'sync', remote_node: 'aptrust', identifier: '1234', pid: '2') }
   let!(:item_two) { FactoryBot.create(:dpn_work_item, task: 'ingest', remote_node: 'chronopolis', identifier: '5678', queued_at: nil) }
 
   describe '#GET index' do
@@ -64,6 +64,13 @@ RSpec.describe DpnWorkItemsController, type: :controller do
         expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_two.id]
+      end
+
+      it 'filters by pid' do
+        get :index, params: { pid: 2 }
+        expect(response).to be_successful
+        expect(assigns(:paged_results).size).to eq 1
+        expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
       end
     end
 
