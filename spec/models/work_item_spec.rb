@@ -197,8 +197,8 @@ RSpec.describe WorkItem, :type => :model do
   describe 'work queue methods' do
     ingest_date = Time.parse('2014-06-01')
     before do
-      FactoryBot.create(:intellectual_object, identifier: 'abc/123')
-      FactoryBot.create(:generic_file, identifier: 'abc/123/doc.pdf')
+      test_obj = FactoryBot.create(:intellectual_object, identifier: 'abc/123')
+      FactoryBot.create(:generic_file, identifier: 'abc/123/doc.pdf', intellectual_object_id: test_obj.id)
       3.times do
         ingest_date = ingest_date + 1.days
         FactoryBot.create(:work_item, object_identifier: 'abc/123',
@@ -230,6 +230,25 @@ RSpec.describe WorkItem, :type => :model do
       wi.pid.should == 0
       wi.needs_admin_review.should == false
       wi.id.should_not be_nil
+    end
+
+    it 'should create a file restoration request when asked' do
+      test_file = GenericFile.where(identifier: 'abc/123/doc.pdf').first
+      wi = WorkItem.create_restore_request_for_file(test_file, 'mikey@example.com')
+      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
+      wi.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
+      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
+      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+      wi.note.should == 'Restore requested'
+      wi.outcome.should == 'Not started'
+      wi.user.should == 'mikey@example.com'
+      wi.retry.should == true
+      wi.work_item_state.state.should be_nil
+      wi.node.should be_nil
+      wi.pid.should == 0
+      wi.needs_admin_review.should == false
+      wi.id.should_not be_nil
+      wi.generic_file_identifier.should == test_file.identifier
     end
 
     it 'should create a dpn request when asked' do
@@ -289,6 +308,20 @@ RSpec.describe WorkItem, :type => :model do
       subject.save!
 
       pending_action = WorkItem.pending_action(subject.object_identifier)
+      pending_action.should_not be_nil
+      pending_action.action.should == restore
+    end
+
+    it 'should find pending restore for a file' do
+      setup_item(subject)
+      subject.action = restore
+      subject.stage = record
+      subject.status = pending
+      subject.object_identifier = 'abc/123'
+      subject.generic_file_identifier = 'abc/123/data/test.pdf'
+      subject.save!
+
+      pending_action = WorkItem.pending_action_for_file(subject.generic_file_identifier)
       pending_action.should_not be_nil
       pending_action.action.should == restore
     end

@@ -46,6 +46,10 @@ Rails.application.routes.draw do
   delete 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :api_file_confirm_destroy
   get 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_confirm_destroy
   get 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_api_file_confirm_destroy
+  get 'files/:generic_file_identifier/restore', to: 'generic_files#restore', format: [:json, :html], generic_file_identifier: file_ptrn, as: :generic_file_restore
+  get 'member-api/v2/files/:generic_file_identifier/restore', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
+  put 'api/v2/files/:generic_file_identifier/restore', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
+
 
   # INSTITUTIONS (API)
   # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'

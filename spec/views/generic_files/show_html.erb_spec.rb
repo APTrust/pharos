@@ -17,7 +17,7 @@ describe 'generic_files/show.html.erb' do
 
   describe 'A user with access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, destroy?: true)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, destroy?: true, restore?: true)
       render
     end
 
@@ -25,14 +25,15 @@ describe 'generic_files/show.html.erb' do
       rendered.should have_css('h2', text: file.identifier)
     end
 
-    it 'has a link to delete the file' do
+    it 'has a links to manipulate the file' do
       rendered.should have_link('Delete', href: generic_file_path(file))
+      rendered.should have_link('Restore File', href: generic_file_restore_path(file))
     end
   end
 
   describe 'A user without access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: false, destroy?: false)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: false, destroy?: false, restore?: false)
       render
     end
 
