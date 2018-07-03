@@ -112,7 +112,11 @@ class IntellectualObject < ActiveRecord::Base
   def in_dpn?
 	(self.dpn_uuid.nil? || self.dpn_uuid.blank? || self.dpn_uuid.empty?) ? object_in_dpn = false : object_in_dpn = true
 	object_in_dpn
-  end
+	end
+
+	def glacier_only?
+		(self.storage_option == 'Standard') ? return false : return true
+	end
 
   def dpn_bag
 	bag = DpnBag.where(object_identifier: self.identifier).first
