@@ -67,6 +67,14 @@ RSpec.describe IntellectualObject, :type => :model do
       subject.ingest_state.should == json
     end
 
+    it 'should return whether or not an object is glacier-only' do
+      subject.storage_option = 'Standard'
+      subject.glacier_only?.should == false
+
+      subject.storage_option = 'Glacier-OH'
+      subject.glacier_only?.should == true
+    end
+
   end
 
   describe 'permission scopes and checks' do

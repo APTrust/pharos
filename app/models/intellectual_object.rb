@@ -115,7 +115,8 @@ class IntellectualObject < ActiveRecord::Base
 	end
 
 	def glacier_only?
-		(self.storage_option == 'Standard') ? return false : return true
+		(self.storage_option == 'Standard') ? glacier_only = false : glacier_only = true
+		glacier_only
 	end
 
   def dpn_bag

@@ -18,6 +18,26 @@ function restoreRequeue(){
     });
 }
 
+function glacierRestoreRequeue(){
+    $('#glacier_restore_form').removeClass('hidden');
+    $('#glacier_restore_form_submit').on("click", function() {
+        var checked = '';
+        if ($('#state_item').is(':checked')) {
+            checked = 'true';
+        } else {
+            checked = 'false';
+        }
+        var id = $('#work_item_id').text();
+        $.get('/items/'+id+'/requeue', {delete_state_item: checked},
+            function(data) {
+                alert('Item has been requeued.');
+            });
+    });
+    $('#glacier_restore_form_cancel').on("click", function() {
+        $('#glacier_restore_form').addClass('hidden');
+    });
+}
+
 function ingestRequeue(){
     $('#ingest_form').removeClass('hidden');
     $('#ingest_form_submit').on("click", function() {

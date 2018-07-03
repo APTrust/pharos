@@ -426,6 +426,8 @@ class WorkItemsController < ApplicationController
       elsif stage == Pharos::Application::PHAROS_STAGES['record']
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
       end
+    elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_glacier_restore_init_topic")
     end
 
     http = Net::HTTP.new(uri.host, uri.port)
