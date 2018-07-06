@@ -547,7 +547,7 @@ RSpec.describe GenericFilesController, type: :controller do
 
     describe 'when not signed in' do
       it 'should redirect to login' do
-        put :restore, params: { generic_file_identifier: file_for_restore }
+        put :restore, params: { generic_file_identifier: file_for_restore, format: :html }
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
     end
