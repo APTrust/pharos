@@ -62,8 +62,8 @@ class CatalogController < ApplicationController
           @results = objects.with_bag_name_like(@q)
         when 'Title'
           @results = objects.with_title_like(@q)
-        when 'Bagging Group Identifier'
-          @results = objects.with_bagging_group_identifier_like(@q)
+        when 'Bag Group Identifier'
+          @results = objects.with_bag_group_identifier_like(@q)
       end
     end
   end
