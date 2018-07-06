@@ -17,7 +17,11 @@
       <dt>Identifier</dt>
       <dd><%= @intellectual_object.identifier %></dd>
       <dt>Bag Group Identifier</dt>
-      <dd><%= @intellectual_object.bag_group_identifier %></dd>
+      <% if @intellectual_object.bag_group_identifier == '' %>
+          <dd>-------</dd>
+      <% else %>
+          <dd><%= link_to @intellectual_object.bag_group_identifier, search_path(object_type: 'Intellectual Objects', search_field: 'Bag Group Identifier', q: @intellectual_object.bag_group_identifier) %></dd>
+      <% end %>
       <dt>Bag Name</dt>
       <dd><%= @intellectual_object.bag_name %></dd>
       <dt> Last Modified </dt>
