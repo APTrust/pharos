@@ -8,7 +8,7 @@ FactoryBot.define do
     access { ['consortia', 'institution', 'restricted'].sample }
     alt_identifier { '' }
     bag_name { identifier.split('/')[1] }
-    bagging_group_identifier { nil }
+    bag_group_identifier { '' }
     state { 'A' }
     storage_option { 'Standard' }
 
