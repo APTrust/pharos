@@ -63,7 +63,7 @@ end
 group :test do
   gem 'capybara', '3.3.1'
   gem 'shoulda-matchers', '~> 3.1.2'
-  gem 'coveralls', '0.8.21', require: false
+  gem 'coveralls', '0.8.22', require: false
 end
 
 group :development, :test, :demo, :production, :integration do
