@@ -60,6 +60,7 @@ module Pharos
         'ingest' => 'Ingest',
         'fixity' => 'Fixity Check',
         'restore' => 'Restore',
+				'glacier_restore' => 'Glacier Restore',
         'delete' => 'Delete',
         'dpn' => 'DPN'
     }
@@ -85,6 +86,8 @@ module Pharos
         'virus_check' => 'virus check'
     }
 
+    PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR)
+
     DPN_TASKS = %w(sync ingest replication restore fixity)
 
     DPN_STATUS = false
@@ -100,7 +103,7 @@ module Pharos
                     :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
                     :object_identifier, :format, :institution_id, :type, :member_institution_id, :requesting_user_id,
                     :confirmation_token, :dpn_identifier, :dpn_size, :node_1, :node_2, :node_3, :dpn_created_at, :dpn_updated_at,
-                    :bagging_group_identifier]
+                    :bag_group_identifier, :storage_option]
 
     if Rails.env.production?
       NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'

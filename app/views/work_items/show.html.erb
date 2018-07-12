@@ -19,6 +19,10 @@
               <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
+          <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore'] %>
+              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'glacierRestoreRequeue();' do %>
+                  <i class="glyphicon glyphicon-repeat"></i> Requeue
+              <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
               <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
@@ -33,6 +37,7 @@
     <br><br>
     <%= render 'ingest_requeue_form' %>
     <%= render 'restore_requeue_form' %>
+    <%= render 'glacier_restore_requeue_form' %>
     <%= render 'dpn_requeue_form' %>
   </section>
 

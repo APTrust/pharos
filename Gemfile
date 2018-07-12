@@ -7,7 +7,7 @@ gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.11'
+gem 'uglifier', '>= 4.1.14'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -61,9 +61,9 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.2.1'
+  gem 'capybara', '3.3.1'
   gem 'shoulda-matchers', '~> 3.1.2'
-  gem 'coveralls', '0.8.21', require: false
+  gem 'coveralls', '0.8.22', require: false
 end
 
 group :development, :test, :demo, :production, :integration do
