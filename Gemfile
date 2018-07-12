@@ -42,8 +42,9 @@ gem 'uuidtools'
 gem 'kaminari'
 gem 'bootstrap-sass', '~> 3.3.7'
 
-# This gem isn't required directly but is required in dependencies and needs specific updating due to a security warning
+# These gems aren't required directly but is required in dependencies and needs specific updating due to a security warning
 gem 'mail', '>= 2.7.0'
+gem 'sprockets', '>= 3.7.2'
 
 # S3 connector
 #gem 'aws-sdk-core'
