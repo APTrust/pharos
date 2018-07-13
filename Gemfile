@@ -49,6 +49,10 @@ gem 'sprockets', '>= 3.7.2'
 # S3 connector
 #gem 'aws-sdk-core'
 
+# Graylog logging gems
+gem 'gelf'
+gem 'lograge'
+
 group :development do
   gem 'meta_request', '=0.6.0'
   gem 'better_errors'
