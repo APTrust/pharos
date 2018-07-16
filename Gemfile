@@ -52,6 +52,7 @@ gem 'sprockets', '>= 3.7.2'
 # Graylog logging gems
 gem 'gelf'
 gem 'lograge'
+gem 'activerecord-nulldb-adapter'
 
 group :development do
   gem 'meta_request', '=0.6.0'
