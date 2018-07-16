@@ -409,7 +409,20 @@ class WorkItemsController < ApplicationController
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
-      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
+      if @work_item.generic_file_identifier.blank?
+        # Restore full bag
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
+      else
+        # Restore individual file. If it's in Glacier, we'll have to run
+        # GlacierRestore first.
+        gf = GenericFile.find_by_identifier(@work_item.generic_file_identifier)
+        if gf && gf.storage_option == 'Standard'
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_file_restore_topic")
+        else
+          @work_item.action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_glacier_restore_init_topic")
+        end
+      end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if stage == Pharos::Application::PHAROS_STAGES['fetch']
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic")
