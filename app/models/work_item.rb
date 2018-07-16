@@ -264,9 +264,13 @@ class WorkItem < ActiveRecord::Base
     if item.nil?
       raise ActiveRecord::RecordNotFound
     end
+    action = Pharos::Application::PHAROS_ACTIONS['restore']
+    if generic_file.storage_option != 'Standard'
+      action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+    end
     restore_item = item.dup
     restore_item.generic_file_identifier = generic_file.identifier
-    restore_item.action = Pharos::Application::PHAROS_ACTIONS['restore']
+    restore_item.action = action
     restore_item.stage = Pharos::Application::PHAROS_STAGES['requested']
     restore_item.status = Pharos::Application::PHAROS_STATUSES['pend']
     restore_item.note = 'Restore requested'
