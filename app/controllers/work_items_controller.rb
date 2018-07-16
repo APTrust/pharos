@@ -420,6 +420,7 @@ class WorkItemsController < ApplicationController
           uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_file_restore_topic")
         else
           @work_item.action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+          @work_item.save
           uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_glacier_restore_init_topic")
         end
       end
