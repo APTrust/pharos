@@ -57,7 +57,9 @@ RUN bundle install
 RUN gem install puma
 
 # Provide dummy data to Rails so it can pre-compile assets.
-RUN RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken rake assets:precompile
+#RUN RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken rake assets:precompile
+# TODO: Need to test using nulldb. https://medium.com/@igor.petrov/lessons-learned-from-first-attempt-of-dockerizing-ruby-on-rails-app-7e5eb9004265
+RUN DB_ADAPTER=nulldb SECRET_TOKEN=pickasecuretoken rake assets:precompile
 
 # - load db schema at first deploy
 #RUN RAILS_ENV=development rake db:schema:load
