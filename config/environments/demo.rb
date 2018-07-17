@@ -53,6 +53,9 @@ Rails.application.configure do
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  if env["PHAROS_LOGSERVER"].present?
+    config.logger = GELF::Logger.new("<%= ENV['PHAROS_LOGSERVER'] %>", "<%= ENV['PHAROS_LOGSERVER_PORT'] %>", "WAN", { :facility => "PHAROS_<%= ENV['RAILS_ENV'] %>" })
+  end
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
