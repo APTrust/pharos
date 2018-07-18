@@ -105,6 +105,24 @@ class WorkItem < ActiveRecord::Base
       .first
   end
 
+  def self.pending_action_for_file(generic_file_identifier)
+    item = WorkItem
+               .where('generic_file_identifier = ? ' +
+                          'and status not in (?, ?, ?) ' +
+                          'and action in (?, ?, ?, ?)',
+                      generic_file_identifier,
+                      Pharos::Application::PHAROS_STATUSES['success'],
+                      Pharos::Application::PHAROS_STATUSES['fail'],
+                      Pharos::Application::PHAROS_STATUSES['cancel'],
+                      Pharos::Application::PHAROS_ACTIONS['ingest'],
+                      Pharos::Application::PHAROS_ACTIONS['restore'],
+                      Pharos::Application::PHAROS_ACTIONS['delete'],
+                      Pharos::Application::PHAROS_ACTIONS['dpn'])
+               .order('date DESC')
+               .limit(1)
+               .first
+  end
+
   def requeue_item(options={})
     self.status = Pharos::Application::PHAROS_STATUSES['pend']
     self.retry = true
@@ -232,6 +250,39 @@ class WorkItem < ActiveRecord::Base
     restore_item.pid = 0
     restore_item.needs_admin_review = false
     restore_item.size = orig_item.size
+    restore_item.stage_started_at = nil
+    restore_item.queued_at = nil
+    restore_item.save!
+    restore_item
+  end
+
+  # Creates a WorkItem record showing that someone has requested
+  # restoration of a Generic File. This will eventually go into
+  # a queue for the restoration worker process.
+  def self.create_restore_request_for_file(generic_file, requested_by)
+    item = WorkItem.last_ingested_version(generic_file.intellectual_object.identifier)
+    if item.nil?
+      raise ActiveRecord::RecordNotFound
+    end
+    action = Pharos::Application::PHAROS_ACTIONS['restore']
+    if generic_file.storage_option != 'Standard'
+      action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+    end
+    restore_item = item.dup
+    restore_item.generic_file_identifier = generic_file.identifier
+    restore_item.action = action
+    restore_item.stage = Pharos::Application::PHAROS_STAGES['requested']
+    restore_item.status = Pharos::Application::PHAROS_STATUSES['pend']
+    restore_item.note = 'Restore requested'
+    restore_item.outcome = 'Not started'
+    restore_item.user = requested_by
+    restore_item.retry = true
+    restore_item.date = Time.now
+    restore_item.work_item_state.state = nil unless restore_item.work_item_state.nil?
+    restore_item.node = nil
+    restore_item.pid = 0
+    restore_item.needs_admin_review = false
+    restore_item.size = item.size
     restore_item.stage_started_at = nil
     restore_item.queued_at = nil
     restore_item.save!

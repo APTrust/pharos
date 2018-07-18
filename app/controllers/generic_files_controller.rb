@@ -2,7 +2,7 @@ class GenericFilesController < ApplicationController
   include FilterCounts
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :load_generic_file, only: [:show, :update, :destroy, :confirm_destroy]
+  before_action :load_generic_file, only: [:show, :update, :destroy, :confirm_destroy, :restore]
   before_action :load_intellectual_object, only: [:create, :create_batch]
   before_action :set_format
   after_action :verify_authorized
@@ -52,7 +52,7 @@ class GenericFilesController < ApplicationController
       authorize current_user, :nil_file?
       respond_to do |format|
         format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.' }, status: :not_found }
-        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]}. Please check to make sure the identifier was properly escaped." }
+        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]} was not found. Please check to make sure the identifier was properly escaped." }
       end
     end
   end
@@ -166,6 +166,40 @@ class GenericFilesController < ApplicationController
           flash[:alert] = message
         }
       end
+    end
+  end
+
+
+  def restore
+    authorize @generic_file, :restore?
+    message = ""
+    api_status_code = :ok
+    restore_item = nil
+    pending = WorkItem.pending_action_for_file(@generic_file.identifier)
+    if @generic_file.state == 'D'
+      api_status_code = :conflict
+      message = 'This file has been deleted and cannot be queued for restoration.'
+    elsif pending.nil?
+      restore_item = WorkItem.create_restore_request_for_file(@generic_file, current_user.email)
+      message = 'Your file has been queued for restoration.'
+    else
+      api_status_code = :conflict
+      message = "Your file cannot be queued for restoration at this time due to a pending #{pending.action} request."
+    end
+    respond_to do |format|
+      status = restore_item.nil? ? 'error' : 'ok'
+      item_id = restore_item.nil? ? 0 : restore_item.id
+      format.json {
+        render :json => { status: status, message: message, work_item_id: item_id }, :status => api_status_code
+      }
+      format.html {
+        if restore_item.nil?
+          flash[:alert] = message
+        else
+          flash[:notice] = message
+        end
+        redirect_to @generic_file
+      }
     end
   end
 

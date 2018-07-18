@@ -46,6 +46,12 @@
         <i class="glyphicon glyphicon-eye-open"></i> View Events
     <% end %>
     <% unless @generic_file.state == 'D' %>
+        <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_id == @generic_file.institution_id) %>
+            <%= link_to generic_file_restore_path(@generic_file.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
+                <i class="glyphicon glyphicon-download"></i> Restore File
+            <% end %>
+        <% end %>
+
         <%= destroy_link @generic_file %>
     <% end %>
 
