@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
     params[resource] &&= send(method) if respond_to?(method, true)
   end
 
+  before_action :configure_permitted_parameters, if: :devise_controller?
+
   # Adds a few additional behaviors into the application controller
   include ApiAuth
   # Authorization mechanism
@@ -30,6 +32,12 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     session['user_return_to'] || root_path
+  end
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_in, keys: [:otp_attempt])
   end
 
   private

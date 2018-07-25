@@ -1,8 +1,6 @@
 require 'bcrypt'
 
 class User < ActiveRecord::Base
-  devise :two_factor_authenticatable,
-         :otp_secret_encryption_key => ENV['TWO_FACTOR_KEY']
 
   self.primary_key = 'id'
   belongs_to :institution, foreign_key: :institution_id
