@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_06_172819) do
+ActiveRecord::Schema.define(version: 2018_07_26_183505) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -153,8 +153,8 @@ ActiveRecord::Schema.define(version: 2018_07_06_172819) do
     t.string "etag"
     t.string "dpn_uuid"
     t.text "ingest_state"
-    t.string "storage_option", default: "Standard", null: false
     t.string "bag_group_identifier", default: "", null: false
+    t.string "storage_option", default: "Standard", null: false
     t.index ["access"], name: "index_intellectual_objects_on_access"
     t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
     t.index ["created_at"], name: "index_intellectual_objects_on_created_at"
@@ -253,6 +253,7 @@ ActiveRecord::Schema.define(version: 2018_07_06_172819) do
     t.integer "institution_id"
     t.text "encrypted_api_secret_key"
     t.datetime "password_changed_at"
+    t.datetime "deactivated_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"
     t.index ["password_changed_at"], name: "index_users_on_password_changed_at"

@@ -133,6 +133,11 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def deactivate?
+    return false if (user.institutional_admin? && record.admin?)
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
   def work_item_batch_update?
     user.admin?
   end
