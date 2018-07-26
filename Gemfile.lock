@@ -177,7 +177,7 @@ GEM
       activesupport (>= 3.0)
       phony (> 2.15)
     public_suffix (3.0.2)
-    pundit (1.1.0)
+    pundit (2.0.0)
       activesupport (>= 3.0.0)
     rack (2.0.5)
     rack-contrib (2.0.1)
