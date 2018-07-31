@@ -98,7 +98,7 @@ class InstitutionsController < ApplicationController
       current_snaps = institution.snapshot
       @snapshots.push(current_snaps)
       current_snaps.each do |snap|
-        @wb_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
+        @wb_hash[institution.name] = [snap.cs_bytes, snap.go_bytes] if snap.snapshot_type == 'Individual'
       end
     end
     # Snapshot.where("created_at > '2018-05-07 16:38:41.402948' AND snapshot_type = 'Subscribers Included'").each do |snap|
@@ -171,7 +171,6 @@ class InstitutionsController < ApplicationController
       date_column = counter if converted_date == @date_str unless cell.nil?
       counter += 1
     end
-    #TODO: instead of finding the right column, create the right column. Ask Chip about formatting first.
     i = 1
     unless date_column == 0
       while i < 200

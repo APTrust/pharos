@@ -90,6 +90,25 @@ class Institution < ActiveRecord::Base
     result[0]['sum'].to_i
   end
 
+  def core_service_size
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option == 'Standard') AS institution_core_service_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    result[0]['sum'].to_i
+  end
+
+  def glacier_only_size
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option == 'Glacier-OH') AS institution_glacier_oh_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    glacier_oh = result[0]['sum'].to_i
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option == 'Glacier-VA') AS institution_glacier_va_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    glacier_va = result[0]['sum'].to_i
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option == 'Glacier-OR') AS institution_glacier_or_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    glacier_or = result[0]['sum'].to_i
+    glacier_oh + glacier_va + glacier_or
+  end
+
   def self.total_file_size_across_repo
     query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE state = 'A') AS aptrust_total_size"
     result = ActiveRecord::Base.connection.exec_query(query)
