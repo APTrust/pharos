@@ -92,8 +92,7 @@ class InstitutionsController < ApplicationController
     @snapshots = []
     @wb_hash = {}
     @date_str = Time.now.utc.strftime('%m/%d/%Y')
-    total_size = Institution.total_file_size_across_repo
-    @wb_hash['Repository Total'] = total_size
+    @wb_hash['Repository Total'] = Institution.total_file_size_across_repo
     MemberInstitution.all.order('name').each do |institution|
       current_snaps = institution.snapshot
       @snapshots.push(current_snaps)
@@ -101,9 +100,9 @@ class InstitutionsController < ApplicationController
         @wb_hash[institution.name] = [snap.cs_bytes, snap.go_bytes] if snap.snapshot_type == 'Individual'
       end
     end
-    # Snapshot.where("created_at > '2018-05-07 16:38:41.402948' AND snapshot_type = 'Subscribers Included'").each do |snap|
+    # Snapshot.where("created_at > '2018-05-07 16:38:41.402948' AND snapshot_type = 'Individual'").each do |snap|
     #   inst = Institution.find(snap.institution_id)
-    #   @wb_hash[inst.name] = snap.apt_bytes
+    #   @wb_hash[institution.name] = [snap.cs_bytes, snap.go_bytes]
     # end
     NotificationMailer.snapshot_notification(@wb_hash).deliver!
     write_snapshots_to_spreadsheet if Rails.env.production?
@@ -165,20 +164,22 @@ class InstitutionsController < ApplicationController
     sheet = session.spreadsheet_by_key('1T_zlgluaGdEU_3Fm06h0ws_U4mONpDL4JLNP_z-CU20').worksheets[0] # Kelly Test Sheet
     date_column = 0
     counter = 2
-    while date_column == 0 && counter < 100
+    while date_column == 0
       cell = sheet[3, counter]
-      converted_date = Date.strptime(cell, '%m/%d/%Y').strftime('%m/%d/%Y')
-      date_column = counter if converted_date == @date_str unless cell.nil?
+      date_column = counter if cell.nil?
       counter += 1
     end
     i = 1
     unless date_column == 0
+      sheet[3, date_column] = @date_str
       while i < 200
         cell = sheet[i, 1]
         unless cell.nil?
           if @wb_hash.has_key?(cell)
-            gb = (@wb_hash[cell].to_f / 1073741824).round(2)
-            sheet[(i+1), date_column] = gb
+            cs_gb = (@wb_hash[cell[0]].to_f / 1073741824).round(2)
+            go_gb = (@wb_hash[cell[1]].to_f / 1073741824).round(2)
+            sheet[(i+1), date_column] = cs_gb
+            sheet[(i+5), date_column] = go_gb
           end
         end
         i += 1
