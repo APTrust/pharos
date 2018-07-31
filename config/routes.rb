@@ -127,6 +127,7 @@ Rails.application.routes.draw do
   # DPN BAG ROUTES
   resources :dpn_bags, path: 'dpn_bags', only: [:index, :show], format: [:json, :html]
   resources :dpn_bags, path: 'api/v2/dpn_bags', only: [:index, :create, :show, :update], format: :json
+  resources :dpn_bags, path: 'member-api/v2/dpn_bags', only: [:index, :show], format: :json
 
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]
