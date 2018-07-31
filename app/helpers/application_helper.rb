@@ -16,7 +16,7 @@ module ApplicationHelper
   end
 
   def deactivate_link(object, content = nil, options={})
-    content ||= '<i class="glyphicon glyphicon-lock"></i> Deactivate'
+    content ||= '<i class="glyphicon glyphicon-minus-sign"></i> Deactivate User'
     options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
     options[:method] = :get if options[:method].nil?
     options[:data] = { confirm: 'Are you sure you want to deactivate this user?' } if options[:confirm].nil?
@@ -24,6 +24,18 @@ module ApplicationHelper
     #   link_to(content.html_safe, institution_path(object), options) if policy(object).destroy?
     # else
       link_to(content.html_safe, [:deactivate, object], options) if policy(object).deactivate?
+    # end
+  end
+
+  def reactivate_link(object, content = nil, options={})
+    content ||= '<i class="glyphicon glyphicon-plus-sign"></i> Reactivate User'
+    options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
+    options[:method] = :get if options[:method].nil?
+    options[:data] = { confirm: 'Are you sure you want to reactivate this user?' } if options[:confirm].nil?
+    # if object.is_a?(Institution)
+    #   link_to(content.html_safe, institution_path(object), options) if policy(object).destroy?
+    # else
+    link_to(content.html_safe, [:reactivate, object], options) if policy(object).reactivate?
     # end
   end
 

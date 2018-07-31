@@ -144,6 +144,7 @@ Rails.application.routes.draw do
   end
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
   get 'users/:id/deactivate', to: 'users#deactivate', as: :deactivate_user
+  get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
 

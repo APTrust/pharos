@@ -563,6 +563,15 @@ namespace :pharos do
     puts "User with email #{user_email} has been deactivated at #{user.deactivated_at}."
   end
 
+  desc 'Reactivate user'
+  task :reactivate_user, [:email] => [:environment] do |t, args|
+    user_email = args[:email]
+    user = User.where(email: user_email).first
+    user.reactivate
+    user.save!
+    puts "User with email #{user_email} has been reactivated at #{Time.now}."
+  end
+
   desc 'Deactivate all users at an institution'
   task :deactivate_institutions_users, [:identifier] => [:environment] do |t, args|
     inst_identifier = args[:identifier]
