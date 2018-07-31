@@ -5,9 +5,10 @@ source 'https://rubygems.org'
 gem 'rails', '5.2.0'
 gem 'rails-controller-testing'
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
+#gem 'sass-rails', '~> 5.0'
+gem 'sassc'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.10'
+gem 'uglifier', '>= 4.1.17'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -39,7 +40,7 @@ gem 'wkhtmltopdf-binary'
 gem 'google_drive'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 4.0.0'
+gem 'simple_form', '~> 4.0.1'
 gem 'phony_rails'
 gem 'inherited_resources', '1.8.0'
 gem 'uuidtools'
@@ -47,11 +48,17 @@ gem 'uuidtools'
 gem 'kaminari'
 gem 'bootstrap-sass', '~> 3.3.7'
 
-# This gem isn't required directly but is required in dependencies and needs specific updating due to a security warning
+# These gems aren't required directly but is required in dependencies and needs specific updating due to a security warning
 gem 'mail', '>= 2.7.0'
+gem 'sprockets', '>= 3.7.2'
 
 # S3 connector
 #gem 'aws-sdk-core'
+
+# Graylog logging gems
+gem 'gelf'
+gem 'lograge'
+gem 'activerecord-nulldb-adapter'
 
 group :development do
   gem 'meta_request', '=0.6.0'
@@ -66,9 +73,9 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.1.0'
+  gem 'capybara', '3.4.2'
   gem 'shoulda-matchers', '~> 3.1.2'
-  gem 'coveralls', '0.8.21', require: false
+  gem 'coveralls', '0.8.22', require: false
 end
 
 group :development, :test, :demo, :production, :integration do

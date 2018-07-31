@@ -198,7 +198,12 @@ class IntellectualObjectsController < ApplicationController
       api_status_code = :conflict
       message = 'This item has been deleted and cannot be queued for restoration.'
     elsif pending.nil?
-      restore_item = WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
+      if @intellectual_object.storage_option == 'Standard'
+        restore_item = WorkItem.create_restore_request(@intellectual_object.identifier, current_user.email)
+      else
+        restore_item = WorkItem.create_glacier_restore_request(@intellectual_object.identifier, current_user.email)
+      end
+
       message = 'Your item has been queued for restoration.'
     else
       api_status_code = :conflict
@@ -237,10 +242,10 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def create_params
-    params.require(:intellectual_object).permit(:institution_id, :title, :etag,
+    params.require(:intellectual_object).permit(:institution_id, :title, :etag, :storage_option,
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :ingest_state,
-                                                :bagging_group_identifier, generic_files_attributes:
+                                                :bag_group_identifier, generic_files_attributes:
                                                 [:id, :uri, :identifier,
                                                  :size, :created, :modified, :file_format,
                                                  premis_events_attributes:
@@ -261,8 +266,8 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def update_params
-    params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state,
-                                                :alt_identifier, :state, :dpn_uuid, :etag, :bagging_group_identifier)
+    params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state, :storage_option,
+                                                :alt_identifier, :state, :dpn_uuid, :etag, :bag_group_identifier)
   end
 
   def load_object
@@ -312,8 +317,8 @@ class IntellectualObjectsController < ApplicationController
                                 .with_description_like(params[:description_like])
                                 .with_identifier(params[:identifier])
                                 .with_identifier_like(params[:identifier_like])
-                                .with_bagging_group_identifier(params[:bagging_group_identifier])
-                                .with_bagging_group_identifier_like(params[:bagging_group_identifier_like])
+                                .with_bag_group_identifier(params[:bag_group_identifier])
+                                .with_bag_group_identifier_like(params[:bag_group_identifier_like])
                                 .with_alt_identifier(params[:alt_identifier])
                                 .with_alt_identifier_like(params[:alt_identifier_like])
                                 .with_bag_name(params[:bag_name])

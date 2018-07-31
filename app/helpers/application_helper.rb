@@ -15,6 +15,18 @@ module ApplicationHelper
     end
   end
 
+  def deactivate_link(object, content = nil, options={})
+    content ||= '<i class="glyphicon glyphicon-lock"></i> Deactivate'
+    options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
+    options[:method] = :get if options[:method].nil?
+    options[:data] = { confirm: 'Are you sure you want to deactivate this user?' } if options[:confirm].nil?
+    # if object.is_a?(Institution)
+    #   link_to(content.html_safe, institution_path(object), options) if policy(object).destroy?
+    # else
+      link_to(content.html_safe, [:deactivate, object], options) if policy(object).deactivate?
+    # end
+  end
+
   def destroy_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-trash"></i> Delete'
     options[:class] = 'btn doc-action-btn btn-danger btn-sm' if options[:class].nil?

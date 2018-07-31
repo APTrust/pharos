@@ -554,6 +554,27 @@ namespace :pharos do
     end
   end
 
+  desc 'Deactivate user'
+  task :deactivate_user, [:email] => [:environment] do |t, args|
+    user_email = args[:email]
+    user = User.where(email: user_email).first
+    user.soft_delete
+    user.save!
+    puts "User with email #{user_email} has been deactivated at #{user.deactivated_at}."
+  end
+
+  desc 'Deactivate all users at an institution'
+  task :deactivate_institutions_users, [:identifier] => [:environment] do |t, args|
+    inst_identifier = args[:identifier]
+    institution = Institution.where(identifier: inst_identifier).first
+    institution.users.each do |user|
+      user.soft_delete
+      user.save!
+      puts "#{user.name}'s account has been deactivated at #{user.deactivated_at}."
+    end
+    puts "All users for #{institution.name} have been deactivated."
+  end
+
   def create_institutions(partner_list)
     partner_list.each do |partner|
       existing_inst = Institution.where(identifier: partner[2]).first

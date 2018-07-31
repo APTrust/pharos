@@ -57,6 +57,10 @@ class GenericFilePolicy < ApplicationPolicy
         (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)
   end
 
+  def restore?
+    user.admin? || (user.institutional_admin? && user.institution_id == record.institution.id)
+  end
+
   class Scope
     attr_reader :user, :scope
 

@@ -88,6 +88,22 @@ class User < ActiveRecord::Base
     false
   end
 
+  # instead of deleting, indicate the user requested a delete & timestamp it
+  def soft_delete
+    update_attribute(:deactivated_at, Time.current)
+    update_attribute(:encrypted_api_secret_key, '')
+  end
+
+  # ensure user account is active
+  def active_for_authentication?
+    super && !deactivated_at
+  end
+
+  # provide a custom message for a deleted account
+  def inactive_message
+    !deactivated_at ? super : :deactivated_account
+  end
+
   attr_reader :api_secret_key
 
   def api_secret_key=(key)
