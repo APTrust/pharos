@@ -586,6 +586,45 @@ namespace :pharos do
     puts "All users at #{institution.name} have been reactivated."
   end
 
+  # For "APTrust Deposits By Month" spreadsheet on Google Docs
+  #
+  # Usage:
+  #
+  # rake pharos:print_storage_summary['2018-07-31']
+  desc 'Print storage summary'
+  task :print_storage_summary, [:end_date] => [:environment] do |t, args|
+    print_storage_report(args[:end_date])
+  end
+
+
+  # To get total GB deposited by each institution through the end of July, 2018:
+  #
+  # inst_storage_summary('2018-07-31')
+  #
+  def inst_storage_summary(end_date)
+    gb = 1073741824.0
+    # tb = 1099511627776.0
+    report = {
+      'end_date' => end_date,
+      'institutions' => {}
+    }
+    Institution.all.each do |inst|
+      byte_count = inst.active_files.where("created_at <= ?", end_date).sum(:size)
+      gigabytes = (byte_count / gb).round(2)
+      report['institutions'][inst.name] = gigabytes.to_f
+    end
+    return report
+  end
+
+  def print_storage_report(end_date)
+    report = inst_storage_summary(end_date)
+    puts "Total gigabytes of data deposited as of #{end_date}"
+    report['institutions'].each do |name, gb|
+      printf("%-50s %16.2f\n", name, gb)
+    end
+    return ''
+  end
+
   def create_institutions(partner_list)
     partner_list.each do |partner|
       existing_inst = Institution.where(identifier: partner[2]).first
