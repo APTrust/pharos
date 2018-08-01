@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   get 'api/v2/:institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :api_institution_snapshot
   get '/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :group_snapshot
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
+  get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
+  get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/

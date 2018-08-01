@@ -86,7 +86,6 @@ class UsersController < ApplicationController
   def deactivate
     authorize current_user
     @user.soft_delete
-    @user.save!
     (@user == current_user) ? sign_out(@user) : redirect_to(@user)
     flash[:notice] = "#{@user.name}'s account has been deactivated."
   end
@@ -94,7 +93,6 @@ class UsersController < ApplicationController
   def reactivate
     authorize current_user
     @user.reactivate
-    @user.save!
     redirect_to @user
     flash[:notice] = "#{@user.name}'s account has been reactivated."
   end

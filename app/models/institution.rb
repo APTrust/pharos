@@ -72,6 +72,24 @@ class Institution < ActiveRecord::Base
     end
   end
 
+  def deactivate
+    update_attribute(:deactivated_at, Time.current)
+    self.users.each do |user|
+      user.soft_delete
+    end
+  end
+
+  def reactivate
+    update_attribute(:deactivated_at, nil)
+    self.users.each do |user|
+      user.reactivate
+    end
+  end
+
+  def deactivated?
+    return !self.deactivated_at.nil?
+  end
+
   def average_file_size
     query = "SELECT AVG(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_file_size"
     result = ActiveRecord::Base.connection.exec_query(query)

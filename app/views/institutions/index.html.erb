@@ -16,6 +16,11 @@
         <td><%= link_to_if policy(institution).show?, institution.name, institution_path(institution), class: "block-link" %></td>
         <td><%= number_to_human_size(@sizes[institution.name]) %></td>
         <td><%= edit_link institution %></td>
+        <% if institution.deactivated? %>
+            <td><%= reactivate_link institution %></td>
+        <% else %>
+            <td><%= deactivate_link institution %></td>
+        <% end %>
         <td><%= destroy_link institution %></td>
       </tr>
   <% end %>

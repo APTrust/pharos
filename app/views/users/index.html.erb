@@ -22,9 +22,15 @@
         <td><% user.roles.each do |role| %>
           <%= role.name.capitalize %>
         <% end %></td>
-        <td>
-          <%= show_link user %> <%= edit_link user %> <%= destroy_link user %>
-        </td>
+        <% if user.deactivated? %>
+            <td>
+              <%= show_link user %> <%= edit_link user %> <%= reactivate_link user %> <%= destroy_link user %>
+            </td>
+        <% else %>
+            <td>
+              <%= show_link user %> <%= edit_link user %> <%= deactivate_link user %> <%= destroy_link user %>
+            </td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>

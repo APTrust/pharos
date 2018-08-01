@@ -559,7 +559,6 @@ namespace :pharos do
     user_email = args[:email]
     user = User.where(email: user_email).first
     user.soft_delete
-    user.save!
     puts "User with email #{user_email} has been deactivated at #{user.deactivated_at}."
   end
 
@@ -568,7 +567,6 @@ namespace :pharos do
     user_email = args[:email]
     user = User.where(email: user_email).first
     user.reactivate
-    user.save!
     puts "User with email #{user_email} has been reactivated at #{Time.now}."
   end
 
@@ -576,12 +574,16 @@ namespace :pharos do
   task :deactivate_institutions_users, [:identifier] => [:environment] do |t, args|
     inst_identifier = args[:identifier]
     institution = Institution.where(identifier: inst_identifier).first
-    institution.users.each do |user|
-      user.soft_delete
-      user.save!
-      puts "#{user.name}'s account has been deactivated at #{user.deactivated_at}."
-    end
-    puts "All users for #{institution.name} have been deactivated."
+    institution.deactivate
+    puts "All users at #{institution.name} have been deactivated."
+  end
+
+  desc 'Reactivate all users at an institution'
+  task :reactivate_institutions_users, [:identifier] => [:environment] do |t, args|
+    inst_identifier = args[:identifier]
+    institution = Institution.where(identifier: inst_identifier).first
+    institution.reactivate
+    puts "All users at #{institution.name} have been reactivated."
   end
 
   def create_institutions(partner_list)
