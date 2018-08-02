@@ -76,7 +76,7 @@ Rails.application.routes.draw do
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
   put 'items/', to: 'work_items#update', format: :json
   resources :work_items, path: '/api/v2/items'
-  resources :work_items, format: :json, only: [:index], path: 'member-api/v2/items'
+  resources :work_items, only: [:index], path: 'member-api/v2/items', format: [:json, :html]
   get '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   put '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   get 'items/items_for_dpn', to: 'work_items#items_for_dpn', format: :json
