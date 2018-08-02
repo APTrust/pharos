@@ -15,6 +15,8 @@ describe InstitutionPolicy do
         should permit(:update)
         should permit(:edit)
         should permit(:add_user)
+        should permit(:deactivate)
+        should permit(:reactivate)
         should_not permit(:destroy)
         #should permit(:destroy) #only turn this line on and above line off when deleting an institution. Otherwise, deletion should be OFF.
       end
@@ -39,6 +41,8 @@ describe InstitutionPolicy do
           should permit(:edit)
           should permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
 
@@ -52,6 +56,8 @@ describe InstitutionPolicy do
           should_not permit(:edit)
           should_not permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
     end
@@ -70,6 +76,8 @@ describe InstitutionPolicy do
           should_not permit(:edit)
           should_not permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
 
@@ -84,6 +92,8 @@ describe InstitutionPolicy do
           should_not permit(:edit)
           should_not permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
     end
@@ -99,6 +109,8 @@ describe InstitutionPolicy do
       should_not permit(:edit)
       should_not permit(:add_user)
       should_not permit(:destroy)
+      should_not permit(:deactivate)
+      should_not permit(:reactivate)
     end
   end
 end

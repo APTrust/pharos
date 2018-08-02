@@ -18,7 +18,7 @@ RSpec.describe InstitutionsController, type: :controller do
   let(:institution_one) { FactoryBot.create(:member_institution) }
   let(:institution_two) { FactoryBot.create(:member_institution) }
   let(:institution_three) { FactoryBot.create(:member_institution) }
-  let(:admin_user) { FactoryBot.create(:user, :admin, institution_id: institution_one.id) }
+  let(:admin_user) { FactoryBot.create(:user, :admin, institution_id: institution_one.id, encrypted_api_secret_key: '1234-5678') }
   let(:institutional_user) { FactoryBot.create(:user, :institutional_user, institution_id: institution_two.id) }
   let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, institution_id: institution_three.id) }
   let(:object_one) { FactoryBot.create(:intellectual_object, institution: institution_one)}
@@ -396,7 +396,6 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully and creates a snapshot' do
         get :group_snapshot, params: { }
-        #expect(response).to be_successful
         expect(response.status).to eq(302)
         expect(flash[:notice]).to eq "A snapshot of all Member Institutions has been taken and archived on #{assigns(:snapshots).first.first.audit_date}. Please see the reports page for that analysis."
         expect(assigns(:snapshots).first.first.apt_bytes).to eq 0
@@ -438,6 +437,107 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds unauthorized' do
         get :group_snapshot, params: { }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
+  describe 'GET deactivate' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and deactivates the institution and associated users' do
+        institution_two.name
+        institutional_user.name
+        get :deactivate, params: { institution_identifier: institution_two.identifier }
+        expect(response).to be_successful
+        expect(flash[:notice]).to eq "All users at #{institution_two.name} have been deactivated."
+        expect(assigns[:institution]).to eq institution_two
+        expect(assigns[:institution].deactivated_at).not_to be_nil
+        expect(assigns[:institution].deactivated?).to eq true
+        expect(assigns[:institution].users.first.deactivated?).to eq true
+        expect(assigns[:institution].users.first.deactivated_at).not_to be_nil
+        expect(assigns[:institution].users.first.encrypted_api_secret_key).to eq ''
+      end
+
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :deactivate, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :deactivate, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
+  describe 'GET reactivate' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and reactivates the institution and associated users' do
+        get :deactivate, params: { institution_identifier: institution_one.identifier }
+        expect(assigns[:institution]).to eq institution_one
+        expect(assigns[:institution].deactivated_at).not_to be_nil
+        expect(assigns[:institution].deactivated?).to eq true
+        expect(assigns[:institution].users.first.deactivated?).to eq true
+        expect(assigns[:institution].users.first.deactivated_at).not_to be_nil
+        expect(assigns[:institution].users.first.encrypted_api_secret_key).to eq ''
+        get :reactivate, params: { institution_identifier: institution_one.to_param }
+        expect(response).to be_successful
+        expect(flash[:notice]).to eq "All users at #{admin_user.institution.name} have been reactivated."
+        expect(assigns[:institution]).to eq institution_one
+        expect(assigns[:institution].deactivated_at).to be_nil
+        expect(assigns[:institution].deactivated?).to eq false
+        expect(assigns[:institution].users.first.deactivated?).to eq false
+        expect(assigns[:institution].users.first.deactivated_at).to be_nil
+        expect(assigns[:institution].users.first.encrypted_api_secret_key).to eq ''
+      end
+
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :reactivate, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :reactivate, params: { institution_identifier: institutional_user.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end

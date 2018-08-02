@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :vacuum]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate, :vacuum]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -86,9 +86,15 @@ class UsersController < ApplicationController
   def deactivate
     authorize current_user
     @user.soft_delete
-    @user.save!
     (@user == current_user) ? sign_out(@user) : redirect_to(@user)
     flash[:notice] = "#{@user.name}'s account has been deactivated."
+  end
+
+  def reactivate
+    authorize current_user
+    @user.reactivate
+    redirect_to @user
+    flash[:notice] = "#{@user.name}'s account has been reactivated."
   end
 
   def vacuum

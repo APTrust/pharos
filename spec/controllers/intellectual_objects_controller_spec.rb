@@ -355,7 +355,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when not signed in' do
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes })
+             intellectual_object: simple_obj.attributes }, format: 'html')
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
       it 'should respond unauthorized (json)' do
@@ -369,7 +369,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in inst_user }
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes })
+             intellectual_object: simple_obj.attributes }, format: 'html')
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -384,7 +384,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in inst_admin }
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes })
+             intellectual_object: simple_obj.attributes }, format: 'html')
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end

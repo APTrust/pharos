@@ -20,6 +20,7 @@ describe UserPolicy do
         should permit(:destroy)
         should permit(:admin_password_reset)
         should permit(:deactivate)
+        should permit(:reactivate)
       end
     end
     describe 'when the user is him/herself' do
@@ -28,6 +29,7 @@ describe UserPolicy do
         should permit(:generate_api_key)
         should permit(:admin_password_reset)
         should permit(:deactivate)
+        should permit(:reactivate)
       end
     end
   end
@@ -49,6 +51,7 @@ describe UserPolicy do
           should permit(:destroy)
           should_not permit(:admin_password_reset)
           should permit(:deactivate)
+          should permit(:reactivate)
         end
       end
 
@@ -64,6 +67,7 @@ describe UserPolicy do
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
           should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
     end
@@ -73,6 +77,7 @@ describe UserPolicy do
         should permit(:generate_api_key)
         should_not permit(:admin_password_reset)
         should permit(:deactivate)
+        should permit(:reactivate)
       end
     end
   end
@@ -94,6 +99,7 @@ describe UserPolicy do
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
           should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
 
@@ -109,6 +115,7 @@ describe UserPolicy do
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
           should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
 
@@ -124,6 +131,7 @@ describe UserPolicy do
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
           should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
     end
@@ -142,6 +150,7 @@ describe UserPolicy do
       should_not permit(:destroy)
       should_not permit(:admin_password_reset)
       should_not permit(:deactivate)
+      should_not permit(:reactivate)
     end
   end
 end

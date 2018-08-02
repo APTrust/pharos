@@ -144,7 +144,7 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when not signed in' do
       let(:obj1) { @intellectual_object }
       it 'should redirect to login' do
-        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'Foo' } }
+        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'Foo' }, format: :html }
         expect(response).to redirect_to root_url + 'users/sign_in'
         expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end

@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   get 'api/v2/:institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :api_institution_snapshot
   get '/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :group_snapshot
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
+  get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
+  get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
@@ -74,7 +76,7 @@ Rails.application.routes.draw do
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
   put 'items/', to: 'work_items#update', format: :json
   resources :work_items, path: '/api/v2/items'
-  resources :work_items, format: :json, only: [:index], path: 'member-api/v2/items'
+  resources :work_items, only: [:index], path: 'member-api/v2/items', format: [:json, :html]
   get '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   put '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   get 'items/items_for_dpn', to: 'work_items#items_for_dpn', format: :json
@@ -127,6 +129,7 @@ Rails.application.routes.draw do
   # DPN BAG ROUTES
   resources :dpn_bags, path: 'dpn_bags', only: [:index, :show], format: [:json, :html]
   resources :dpn_bags, path: 'api/v2/dpn_bags', only: [:index, :create, :show, :update], format: :json
+  resources :dpn_bags, path: 'member-api/v2/dpn_bags', only: [:index, :show], format: :json
 
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]
@@ -144,6 +147,7 @@ Rails.application.routes.draw do
   end
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
   get 'users/:id/deactivate', to: 'users#deactivate', as: :deactivate_user
+  get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
 

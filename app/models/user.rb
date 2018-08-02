@@ -94,6 +94,14 @@ class User < ActiveRecord::Base
     update_attribute(:encrypted_api_secret_key, '')
   end
 
+  def reactivate
+    update_attribute(:deactivated_at, nil)
+  end
+
+  def deactivated?
+    return !self.deactivated_at.nil?
+  end
+
   # ensure user account is active
   def active_for_authentication?
     super && !deactivated_at
