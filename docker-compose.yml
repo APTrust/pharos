@@ -1,47 +1,82 @@
-# This compose file needs
-# - nginx container for forwarding
-# - passenger? maybe just puma for the rails container
-# - postgresql db if non-development
-# - use sqlite for development.
-#
 version: '3'
 services:
-  app:
+  db:
+    image: postgres:9.6.6-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pharos
+      POSTGRES_DB: pharos
+    volumes:
+      - ./pharos-postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    labels:
+      - NETWORK_ACCESS=internal
+  pharos:
     build:
       context: .
-      dockerfile: Dockerfile-alpine
-    image: pharos-test-2
+      dockerfile: Dockerfile
+    image: aptrust/pharos
+    environment:
+      - DOCKERIZED='true'
+      - RAILS_ENV=demo
+      - ENVIRONMENT=demo
+      - PHAROS_DB_HOST=db
+      - PHAROS_DB_USER='pharos'
+#      PHAROS_DB_PASSWORD: 'password'
+      - SECRET_KEY_BASE= '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
     command: bundle exec puma -p9292 -e demo
     volumes:
       - .:/pharos
     links:
       - db
-    environment:
-      - DOCKERIZED=true
-      - RAILS_ENV=demo
-      - PHAROS_DB_HOST=localhost
-      - PHAROS_DB_USER=
-    ports:
-     - "9292:9292"
     depends_on:
       - db
-
-  web:
-    image: nginx:alpine
-    container_name: nginx
+      - migration
+    labels:
+     - VIRTUAL_HOST=pharos.docker.local
+     - VIRTUAL_PORT=9292
+    ports:
+     - "9292:9292"
+  migration:
+    image: aptrust/pharos
+    # Note: Sleep 5 seconds before init db, so psql has time to start up.
+    command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+    environment:
+      DOCKERIZED: 'true'
+      RAILS_ENV: 'demo'
+      PHAROS_DB_HOST: 'db'
+      PHAROS_DB_USER: 'pharos'
+    #    PHAROS_DB_PASSWORD: 'password'
+      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
     volumes:
-      - ./docker/nginx:/var/log/nginx
+      - .:/pharos
     links:
-      - app
+      - db
+    depends_on:
+      - db
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
     ports:
-      - '80:443'
-      - '443:443'
-
-  db:
-    image: postgres:9.6.6-alpine
-    container_name: postgres
+      - "80:80"
+      - "443:443"
     volumes:
-      - ~/.docker-volumes/rails-app/postgresql/data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
+      -  /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx-proxy/certs:/etc/nginx/certs:ro
+      - ./nginx-proxy/vhost:/etc/nginx/vhost.d
+      - ./nginx-proxy/public:/etc/share/nginx/html
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+  letsencrypt-nginx-proxy-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./nginx-proxy/certs:/etc/nginx/certs:rw
+      - ./nginx-proxy/vhost:/etc/nginx/vhost.d:rw
+      - ./nginx-proxy/public:/usr/share/nginx/html:rw
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy_nginx-proxy_1
+    depends_on:
+      - nginx-proxy
 
