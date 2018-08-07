@@ -1,0 +1,68 @@
+version: '3'
+services:
+  db:
+    image: postgres:9.6.6-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pharos
+      POSTGRES_DB: pharos
+    volumes:
+      - ./pharos-postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  pharos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aptrust/pharos
+    command: bundle exec puma -p9292
+    volumes:
+      - .:/pharos
+    links:
+      - db
+    depends_on:
+      - db
+      - migration
+    environment:
+      DOCKERIZED: 'true'
+      RAILS_ENV: 'demo'
+      PHAROS_DB_HOST: db
+      PHAROS_DB_USER: 'pharos'
+#      PHAROS_DB_PASSWORD: 'password'
+      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
+    labels:
+     - "traefik.frontend.rule=Host:pharos.docker.localhost"
+     - "traefik.port=9292"
+    ports:
+     - "9292:9292"
+  migration:
+    image: aptrust/pharos
+    # Note: Sleep 5 seconds before init db, so psql has time to start up.
+    command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+    environment:
+      DOCKERIZED: 'true'
+      RAILS_ENV: 'demo'
+      PHAROS_DB_HOST: 'db'
+      PHAROS_DB_USER: 'pharos'
+    #    PHAROS_DB_PASSWORD: 'password'
+      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
+    volumes:
+      - .:/pharos
+    links:
+      - db
+    depends_on:
+      - db
+  reverse-proxy:
+    image: traefik # The official Traefik docker image
+    command: --api --docker # Enables the web UI and tells Træfik to listen to docker
+    ports:
+      - "80:80"     # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+
+#  nginx:
+#    image: nginx-alpine
+#		restart: always
+
+
