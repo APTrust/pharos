@@ -59,7 +59,6 @@ COPY . $WORKDIR
 RUN bundle exec rake RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken assets:precompile
 
 # Expose rails server port
-EXPOSE 3000
 EXPOSE 9292
 
 # Cleanup packages we don't need after compilation
