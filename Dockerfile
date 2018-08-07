@@ -7,15 +7,10 @@ MAINTAINER Christian Dahlhausen <christian@aptrust.org>
 # - nodejs: Compile assets
 # - libpq-dev: Communicate with postgres through the postgres gem
 # - postgresql-client-9.4: In case you want to talk directly to postgres
-# RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs \
-            # libssl-dev bundler postgresql-client libpq5 libpqxx-dev \
-#RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
-#    nodejs postgresql-client postgresql-dev sqlite-dev ruby-bundler \
-#    git ruby ruby-io-console bash curl-dev ruby-dev tzdata
 
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
-    nodejs postgresql-client postgresql-dev sqlite-dev ruby-bundler \
-    tzdata
+    nodejs postgresql-client postgresql-dev ruby-bundler \
+    tzdata bash
 
 RUN mkdir /pharos
 WORKDIR /pharos
