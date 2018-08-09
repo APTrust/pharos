@@ -100,12 +100,12 @@ class InstitutionsController < ApplicationController
         @wb_hash[institution.name] = [snap.cs_bytes, snap.go_bytes] if snap.snapshot_type == 'Individual'
       end
     end
-    # Snapshot.where("created_at > '2018-05-07 16:38:41.402948' AND snapshot_type = 'Individual'").each do |snap|
+    # Snapshot.where("created_at > '2018-08-09 21:13:15.284611' AND snapshot_type = 'Individual'").each do |snap|
     #   inst = Institution.find(snap.institution_id)
-    #   @wb_hash[institution.name] = [snap.cs_bytes, snap.go_bytes]
+    #   @wb_hash[inst.name] = [snap.cs_bytes, snap.go_bytes]
     # end
     NotificationMailer.snapshot_notification(@wb_hash).deliver!
-    write_snapshots_to_spreadsheet if Rails.env.production?
+    write_snapshots_to_spreadsheet #if Rails.env.production?
     respond_to do |format|
       format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
       format.html {
@@ -166,26 +166,47 @@ class InstitutionsController < ApplicationController
     counter = 2
     while date_column == 0
       cell = sheet[3, counter]
-      date_column = counter if cell.nil?
+      date_column = counter if cell.nil? || cell.empty? || cell == ''
       counter += 1
     end
     i = 1
     unless date_column == 0
       sheet[3, date_column] = @date_str
-      while i < 200
+      while i < 2000
         cell = sheet[i, 1]
         unless cell.nil?
           if @wb_hash.has_key?(cell)
-            cs_gb = (@wb_hash[cell[0]].to_f / 1073741824).round(2)
-            go_gb = (@wb_hash[cell[1]].to_f / 1073741824).round(2)
+            cs_gb = (@wb_hash[cell][0].to_f / 1073741824).round(2)
+            go_gb = (@wb_hash[cell][1].to_f / 1073741824).round(2)
+            column = to_s26(date_column)
+            previous_column = to_s26(date_column - 1)
             sheet[(i+1), date_column] = cs_gb
+            sheet[(i+2), date_column] = "=#{column}#{i+1}/1024"
+            sheet[(i+3), date_column] = "=#{column}#{i+2}-#{previous_column}#{i+2}"
+            sheet[(i+4), date_column] = "=#{column}#{i+2}-10"
             sheet[(i+5), date_column] = go_gb
+            sheet[(i+6), date_column] = "=#{column}#{i+5}/1024"
+            sheet[(i+7), date_column] = "=#{column}#{i+6}-#{previous_column}#{i+6}"
+            sheet[(i+8), date_column] = "=((#{column}#{i+4}*#{column}$195)+((#{column}#{i+4}*#{column}$195)<0)*abs((#{column}#{i+4}*#{column}$195)))+(#{column}#{i+6}*#{column}$196)"
           end
         end
         i += 1
       end
     end
     sheet.save
+  end
+
+  Alpha26 = ("a".."z").to_a
+
+  def to_s26(number)
+    return "" if number < 1
+    s, q = "", number
+    loop do
+      q, r = (q - 1).divmod(26)
+      s.prepend(Alpha26[r])
+      break if q.zero?
+    end
+    s
   end
 
 end
