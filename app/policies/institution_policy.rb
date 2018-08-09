@@ -42,6 +42,14 @@ class InstitutionPolicy < ApplicationPolicy
     false
   end
 
+  def deactivate?
+    user.admin?
+  end
+
+  def reactivate?
+    user.admin?
+  end
+
   def snapshot?
     user.admin?
   end

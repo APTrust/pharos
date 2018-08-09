@@ -16,27 +16,29 @@ module ApplicationHelper
   end
 
   def deactivate_link(object, content = nil, options={})
-    content ||= '<i class="glyphicon glyphicon-minus-sign"></i> Deactivate User'
+    content ||= '<i class="glyphicon glyphicon-minus-sign"></i> Deactivate'
     options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
     options[:method] = :get if options[:method].nil?
-    options[:data] = { confirm: 'Are you sure you want to deactivate this user?' } if options[:confirm].nil?
-    # if object.is_a?(Institution)
-    #   link_to(content.html_safe, institution_path(object), options) if policy(object).destroy?
-    # else
+    if object.is_a?(Institution)
+      options[:data] = { confirm: 'Are you sure you want to deactivate these users?' } if options[:confirm].nil?
+      link_to(content.html_safe, deactivate_institution_path(object), options) if policy(object).deactivate?
+    else
+      options[:data] = { confirm: 'Are you sure you want to deactivate this user?' } if options[:confirm].nil?
       link_to(content.html_safe, [:deactivate, object], options) if policy(object).deactivate?
-    # end
+    end
   end
 
   def reactivate_link(object, content = nil, options={})
-    content ||= '<i class="glyphicon glyphicon-plus-sign"></i> Reactivate User'
-    options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
+    content ||= '<i class="glyphicon glyphicon-plus-sign"></i> Reactivate'
+    options[:class] = 'btn doc-action-btn btn-success btn-sm' if options[:class].nil?
     options[:method] = :get if options[:method].nil?
-    options[:data] = { confirm: 'Are you sure you want to reactivate this user?' } if options[:confirm].nil?
-    # if object.is_a?(Institution)
-    #   link_to(content.html_safe, institution_path(object), options) if policy(object).destroy?
-    # else
-    link_to(content.html_safe, [:reactivate, object], options) if policy(object).reactivate?
-    # end
+    if object.is_a?(Institution)
+      options[:data] = { confirm: 'Are you sure you want to reactivate these users?' } if options[:confirm].nil?
+      link_to(content.html_safe, reactivate_institution_path(object), options) if policy(object).reactivate?
+    else
+      options[:data] = { confirm: 'Are you sure you want to reactivate this user?' } if options[:confirm].nil?
+      link_to(content.html_safe, [:reactivate, object], options) if policy(object).reactivate?
+    end
   end
 
   def destroy_link(object, content = nil, options={})

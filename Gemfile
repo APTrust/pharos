@@ -59,6 +59,7 @@ gem 'sprockets', '>= 3.7.2'
 gem 'gelf'
 gem 'lograge'
 gem 'activerecord-nulldb-adapter'
+gem 'puma'
 
 group :development do
   gem 'meta_request', '=0.6.0'

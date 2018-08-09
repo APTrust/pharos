@@ -559,7 +559,6 @@ namespace :pharos do
     user_email = args[:email]
     user = User.where(email: user_email).first
     user.soft_delete
-    user.save!
     puts "User with email #{user_email} has been deactivated at #{user.deactivated_at}."
   end
 
@@ -568,7 +567,6 @@ namespace :pharos do
     user_email = args[:email]
     user = User.where(email: user_email).first
     user.reactivate
-    user.save!
     puts "User with email #{user_email} has been reactivated at #{Time.now}."
   end
 
@@ -576,12 +574,55 @@ namespace :pharos do
   task :deactivate_institutions_users, [:identifier] => [:environment] do |t, args|
     inst_identifier = args[:identifier]
     institution = Institution.where(identifier: inst_identifier).first
-    institution.users.each do |user|
-      user.soft_delete
-      user.save!
-      puts "#{user.name}'s account has been deactivated at #{user.deactivated_at}."
+    institution.deactivate
+    puts "All users at #{institution.name} have been deactivated."
+  end
+
+  desc 'Reactivate all users at an institution'
+  task :reactivate_institutions_users, [:identifier] => [:environment] do |t, args|
+    inst_identifier = args[:identifier]
+    institution = Institution.where(identifier: inst_identifier).first
+    institution.reactivate
+    puts "All users at #{institution.name} have been reactivated."
+  end
+
+  # For "APTrust Deposits By Month" spreadsheet on Google Docs
+  #
+  # Usage:
+  #
+  # rake pharos:print_storage_summary['2018-07-31']
+  desc 'Print storage summary'
+  task :print_storage_summary, [:end_date] => [:environment] do |t, args|
+    print_storage_report(args[:end_date])
+  end
+
+
+  # To get total GB deposited by each institution through the end of July, 2018:
+  #
+  # inst_storage_summary('2018-07-31')
+  #
+  def inst_storage_summary(end_date)
+    gb = 1073741824.0
+    # tb = 1099511627776.0
+    report = {
+      'end_date' => end_date,
+      'institutions' => {}
+    }
+    Institution.all.each do |inst|
+      byte_count = inst.active_files.where("created_at <= ?", end_date).sum(:size)
+      gigabytes = (byte_count / gb).round(2)
+      report['institutions'][inst.name] = gigabytes.to_f
     end
-    puts "All users for #{institution.name} have been deactivated."
+    return report
+  end
+
+  def print_storage_report(end_date)
+    report = inst_storage_summary(end_date)
+    puts "Total gigabytes of data deposited as of #{end_date}"
+    report['institutions'].each do |name, gb|
+      printf("%-50s %16.2f\n", name, gb)
+    end
+    return ''
   end
 
   def create_institutions(partner_list)
@@ -646,4 +687,17 @@ namespace :pharos do
     match
   end
 
+end
+namespace :db do
+  desc "Checks to see if the database exists"
+  task :exists do
+    begin
+      Rake::Task['environment'].invoke
+      ActiveRecord::Base.connection
+    rescue
+      exit 1
+    else
+      exit 0
+    end
+  end
 end

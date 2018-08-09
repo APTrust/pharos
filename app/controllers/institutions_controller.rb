@@ -2,7 +2,7 @@ class InstitutionsController < ApplicationController
   require 'google_drive'
   inherit_resources
   before_action :authenticate_user!
-  before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot]
+  before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot, :deactivate, :reactivate]
   respond_to :json, :html
   after_action :verify_authorized, except: :index
   after_action :verify_policy_scoped, only: :index
@@ -62,6 +62,24 @@ class InstitutionsController < ApplicationController
   def destroy
     authorize current_user, :delete_institution?
     destroy!
+  end
+
+  def deactivate
+    authorize @institution
+    @institution.deactivate
+    flash[:notice] = "All users at #{@institution.name} have been deactivated."
+    respond_to do |format|
+      format.html { render 'show' }
+    end
+  end
+
+  def reactivate
+    authorize @institution
+    @institution.reactivate
+    flash[:notice] = "All users at #{@institution.name} have been reactivated."
+    respond_to do |format|
+      format.html { render 'show' }
+    end
   end
 
   def single_snapshot

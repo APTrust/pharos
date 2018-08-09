@@ -212,6 +212,7 @@ GEM
       activesupport (>= 3.0)
       phony (> 2.15)
     public_suffix (3.0.2)
+    puma (3.12.0)
     pundit (2.0.0)
       activesupport (>= 3.0.0)
     rack (2.0.5)
@@ -382,6 +383,7 @@ DEPENDENCIES
   meta_request (= 0.6.0)
   pg (= 1.0.0)
   phony_rails
+  puma
   pundit
   rails (= 5.2.0)
   rails-controller-testing

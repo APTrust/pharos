@@ -3,6 +3,9 @@ class ApplicationController < ActionController::Base
     resource = controller_path.singularize.gsub('/', '_').to_sym 
     method = "#{resource}_params"
     params[resource] &&= send(method) if respond_to?(method, true)
+
+    api_check = request.fullpath.split('/')[1]
+    request.format = 'json' if (!api_check.nil? && api_check.include?('api') && params[:format].nil?)
   end
 
   # Adds a few additional behaviors into the application controller
