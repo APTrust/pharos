@@ -115,7 +115,10 @@ class InstitutionsController < ApplicationController
       current_snaps = institution.snapshot
       @snapshots.push(current_snaps)
       current_snaps.each do |snap|
-        @wb_hash[institution.name] = [snap.cs_bytes, snap.go_bytes] if snap.snapshot_type == 'Individual'
+        if snap.snapshot_type == 'Individual'
+          current_inst = Institution.find(snap.institution_id)
+          @wb_hash[current_inst.name] = [snap.cs_bytes, snap.go_bytes]
+        end
       end
     end
     # Snapshot.where("created_at > '2018-08-09 21:13:15.284611' AND snapshot_type = 'Individual'").each do |snap|
