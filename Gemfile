@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.0'
+gem 'rails', '5.2.1'
 gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
@@ -36,7 +36,7 @@ gem 'wkhtmltopdf-binary'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 4.0.1'
 gem 'phony_rails'
-gem 'inherited_resources', '1.8.0'
+gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
 
 gem 'kaminari'
