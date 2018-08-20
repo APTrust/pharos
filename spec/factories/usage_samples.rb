@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :usage_sample do
-    institution nil
-    data 'MyText'
+    institution { nil }
+    data { 'MyText' }
   end
 end
