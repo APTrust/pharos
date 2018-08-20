@@ -26,7 +26,7 @@ gem 'pg', '1.0.0' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.4.3'
+gem 'devise', '4.5.0'
 gem 'rake'
 gem 'email_validator'
 gem 'therubyracer'
