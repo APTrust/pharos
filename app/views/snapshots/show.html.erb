@@ -10,7 +10,7 @@
   <div class="object_info">
     <dl class="dl-horizontal dl-invert">
       <dt>Date of Snapshot</dt>
-      <dd><%= @snapshot.audit_date %>]</dd>
+      <dd><%= pretty_date(@snapshot.audit_date) %>]</dd>
       <dt>Bytes Stored in APTrust</dt>
       <dd><%= number_to_human_form(@snapshot.apt_bytes) %></dd>
       <dt>Storage Cost</dt>

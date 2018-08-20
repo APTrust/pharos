@@ -30,9 +30,9 @@
       <tr><th>Task</th>
         <td><%= @dpn_item.task %></td></tr>
       <tr><th>Queued At</th>
-        <td><%= @dpn_item.queued_at %></td></tr>
+        <td><%= pretty_date(@dpn_item.queued_at) %></td></tr>
       <tr><th>Completed At</th>
-        <td><%= @dpn_item.completed_at %></td></tr>
+        <td><%= pretty_date(@dpn_item.completed_at) %></td></tr>
       <tr><th>Processing Time</th>
         <td><%= dpn_process_time(@dpn_item) %></td></tr>
       <tr><th>Note</th>
