@@ -24,8 +24,10 @@
       <% end %>
       <dt>Bag Name</dt>
       <dd><%= @intellectual_object.bag_name %></dd>
+      <dt> Created </dt>
+      <dd> <%= pretty_date(@intellectual_object.created_at) %> </dd>
       <dt> Last Modified </dt>
-      <dd> <%= @intellectual_object.updated_at %> </dd>
+      <dd> <%= pretty_date(@intellectual_object.updated_at) %> </dd>
       <dt>Description</dt>
       <dd><%= @intellectual_object.description %></dd>
       <dt>Alternate Identifier</dt>

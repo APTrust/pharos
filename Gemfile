@@ -2,12 +2,12 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.0'
+gem 'rails', '5.2.1'
 gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.17'
+gem 'uglifier', '>= 4.1.18'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -26,7 +26,7 @@ gem 'pg', '1.0.0' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.4.3'
+gem 'devise', '4.5.0'
 gem 'rake'
 gem 'email_validator'
 gem 'therubyracer'
@@ -36,7 +36,7 @@ gem 'wkhtmltopdf-binary'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 4.0.1'
 gem 'phony_rails'
-gem 'inherited_resources', '1.8.0'
+gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
 
 gem 'kaminari'
@@ -68,7 +68,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.4.2'
+  gem 'capybara', '3.6.0'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.22', require: false
 end
@@ -78,7 +78,7 @@ group :development, :test, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.7.2'
+  gem 'rspec-rails', '~> 3.8.0'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
