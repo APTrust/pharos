@@ -18,6 +18,9 @@ describe InstitutionPolicy do
         should permit(:deactivate)
         should permit(:reactivate)
         should_not permit(:destroy)
+        should permit(:bulk_delete)
+        should permit(:confirm_bulk_delete_aptrust_admin)
+        should_not permit(:confirm_bulk_delete_inst_admin)
         #should permit(:destroy) #only turn this line on and above line off when deleting an institution. Otherwise, deletion should be OFF.
       end
     end
@@ -43,6 +46,9 @@ describe InstitutionPolicy do
           should_not permit(:destroy)
           should_not permit(:deactivate)
           should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should_not permit(:confirm_bulk_delete_aptrust_admin)
+          should permit(:confirm_bulk_delete_inst_admin)
         end
       end
 
@@ -58,6 +64,9 @@ describe InstitutionPolicy do
           should_not permit(:destroy)
           should_not permit(:deactivate)
           should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should_not permit(:confirm_bulk_delete_aptrust_admin)
+          should_not permit(:confirm_bulk_delete_inst_admin)
         end
       end
     end
@@ -78,6 +87,9 @@ describe InstitutionPolicy do
           should_not permit(:destroy)
           should_not permit(:deactivate)
           should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should_not permit(:confirm_bulk_delete_aptrust_admin)
+          should_not permit(:confirm_bulk_delete_inst_admin)
         end
       end
 
@@ -94,6 +106,9 @@ describe InstitutionPolicy do
           should_not permit(:destroy)
           should_not permit(:deactivate)
           should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should_not permit(:confirm_bulk_delete_aptrust_admin)
+          should_not permit(:confirm_bulk_delete_inst_admin)
         end
       end
     end
@@ -111,6 +126,9 @@ describe InstitutionPolicy do
       should_not permit(:destroy)
       should_not permit(:deactivate)
       should_not permit(:reactivate)
+      should_not permit(:bulk_delete)
+      should_not permit(:confirm_bulk_delete_aptrust_admin)
+      should_not permit(:confirm_bulk_delete_inst_admin)
     end
   end
 end

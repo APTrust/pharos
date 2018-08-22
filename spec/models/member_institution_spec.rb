@@ -85,6 +85,35 @@ RSpec.describe MemberInstitution, :type => :model do
         end
       end
 
+      describe 'or several' do
+        let!(:user2) { FactoryBot.create(:user, :institutional_admin, name: 'Andrew', institution_id: subject.id) }
+        let!(:user3) { FactoryBot.create(:user, :institutional_admin, name: 'Kelly', institution_id: subject.id) }
+        let!(:apt) { FactoryBot.create(:aptrust)}
+        let!(:user4) { FactoryBot.create(:user, :admin, name: 'Christian', institution_id: apt.id) }
+        let!(:user5) { FactoryBot.create(:user, :admin, name: 'Bradley', institution_id: apt.id) }
+
+        it 'should provide a list of institutional admins' do
+          subject.admin_users.count.should eq 2
+          expect(subject.admin_users.map &:id).to match_array [user2.id, user3.id]
+        end
+
+        it 'should provide a list of aptrust admins' do
+          subject.apt_users.count.should eq 2
+          expect(subject.apt_users.map &:id).to match_array [user4.id, user5.id]
+        end
+
+        it 'should provide a list of inst admins that are not the requesting user for a deletion request' do
+          subject.deletion_admin_user(user2).count.should eq 1
+          expect(subject.deletion_admin_user(user2).map &:id).to match_array [user3.id]
+        end
+
+        it 'should provide a list of apt admins that are not the requesting user for a bulk deletion' do
+          subject.bulk_deletion_users(user4).count.should eq 1
+          expect(subject.bulk_deletion_users(user4).map &:id).to match_array [user5.id]
+        end
+
+      end
+      
       describe '#deactivate' do
         it 'should deactivate the institution and all users belonging to it' do
           subject.deactivate

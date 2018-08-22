@@ -266,6 +266,101 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
   end
 
+  describe 'bulk_deletion_request' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:apt) { FactoryBot.create(:aptrust) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:admin_user) { FactoryBot.create(:user, :admin, institution: apt) }
+    let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:file) { FactoryBot.create(:generic_file, institution: institution) }
+    let(:email_log) { FactoryBot.create(:bulk_deletion_request_email, ident_list: [object.identifier, file.identifier], institution_id: institution.id) }
+    let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
+    let(:mail) { described_class.bulk_deletion_request(institution, [object.identifier, file.identifier], admin_user, email_log, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("#{admin_user.name} has made a bulk deletion request on behalf of #{institution.name}.")
+    end
+
+    it 'renders the receiver email' do
+      admin_user.admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      expect(mail.to).to include(admin_user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'assigns @confirmation_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/bulk_delete?confirmation_token=#{token.token}&requesting_user_id=#{user.id}&identifiers=[#{CGI.escape(object.identifier)}, #{CGI.escape(file.identifier)}]")
+    end
+
+    it 'has an email log with proper associations' do
+      expect(email_log.institution_id).to eq(institution.id)
+    end
+  end
+
+  describe 'bulk_deletion_inst_confirmation' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:apt) { FactoryBot.create(:aptrust) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:admin_user) { FactoryBot.create(:user, :admin, institution: apt) }
+    let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:file) { FactoryBot.create(:generic_file, institution: institution) }
+    let(:email_log) { FactoryBot.create(:bulk_deletion_inst_confirmation_email, ident_list: [object.identifier, file.identifier], institution_id: institution.id) }
+    let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
+    let(:mail) { described_class.bulk_deletion_inst_confirmation(institution, [object.identifier, file.identifier], admin_user, email_log, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("#{admin_user.name} and #{user.name} have made a bulk deletion request on behalf of #{institution.name}.")
+
+    it 'renders the receiver email' do
+      user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'assigns @confirmation_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_institution?confirmation_token=#{token.token}&requesting_user_ids=[#{admin_user.id}, #{user.id}]&identifiers=[#{CGI.escape(object.identifier)}, #{CGI.escape(file.identifier)}]")
+    end
+
+    it 'has an email log with proper associations' do
+      expect(email_log.institution_id).to eq(institution.id)
+    end
+  end
+
+  describe 'bulk_deletion_final_confirmation' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:apt) { FactoryBot.create(:aptrust) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:admin_user) { FactoryBot.create(:user, :admin, institution: apt) }
+    let(:other_admin) { FactoryBot.create(:user, :admin, institution: apt) }
+    let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:file) { FactoryBot.create(:generic_file, institution: institution) }
+    let(:email_log) { FactoryBot.create(:bulk_deletion_admin_confirmation_email, ident_list: [object.identifier, file.identifier], institution_id: institution.id) }
+    let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
+    let(:mail) { described_class.bulk_deletion_final_confirmation(institution, [object.identifier, file.identifier], admin_user, email_log, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("A bulk deletion request has been successfully queued for #{institution.name}.")
+    end
+
+    it 'renders the receiver email' do
+      other_admin.admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      expect(mail.to).to include(other_admin.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'has an email log with proper associations' do
+      expect(email_log.institution_id).to eq(institution.id)
+    end
+  end
+
   describe 'snapshot_notification' do
     let(:institution) { FactoryBot.create(:member_institution) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }

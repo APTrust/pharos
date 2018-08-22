@@ -62,7 +62,7 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def confirm_bulk_delete_inst_admin
+  def confirm_bulk_delete_inst_admin?
     user.institutional_admin? && (user.institution_id == record.id)
   end
 
