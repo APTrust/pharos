@@ -42,6 +42,14 @@ class Institution < ActiveRecord::Base
     admin_users
   end
 
+  def apt_users
+    apt_users = []
+    apt = Institution.where(identifier: "aptrust.org").first
+    users = User.where(institution_id: apt.id)
+    users.each { |user| apt_users.push(user) if user.admin? }
+    apt_users
+  end
+
   def active_files
     GenericFile.where(institution_id: self.id, state: 'A')
   end
@@ -53,6 +61,17 @@ class Institution < ActiveRecord::Base
       confirming_users.push(admin_users.first)
     else
       admin_users.each { |user| confirming_users.push(user) if user.name != requesting_user.name }
+    end
+    confirming_users
+  end
+
+  def bulk_deletion_users(requesting_user)
+    confirming_users = []
+    apt_users = self.apt_users
+    if apt_users.count == 1
+      confirming_users.push(apt_users.first)
+    else
+      apt_users.each { |user| confirming_users.push(user) if user.name != requesting_user.name }
     end
     confirming_users
   end

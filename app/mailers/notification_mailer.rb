@@ -104,6 +104,56 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: "#{subject_line} queued for deletion")
   end
 
+  def bulk_deletion_request(subject, ident_list, requesting_user, email_log, confirmation_token)
+    @subject = subject
+    @ident_list = ident_list
+    @requesting_user = requesting_user
+    @confirmation_url = bulk_deletion_institutional_confirmation_url(@subject, identifiers: @ident_list, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
+    users = @subject.admin_users
+    emails = []
+    users.each { |user| emails.push(user.email) }
+    email_log.user_list = emails.join('; ')
+    email_log.email_text = ""
+    email_log.save!
+    mail(to: emails, subject: "#{requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
+  end
+
+  def bulk_deletion_inst_confirmation(subject, ident_list, requesting_users, email_log, confirmation_token)
+    @subject = subject
+    @ident_list = ident_list
+    @requesting_users = []
+    requsting_users.each { |user| @requesting_users.push(user.id) }
+    requesting_users.each { |user| apt_admin_requestor = user if user.institution.identifier == 'aptrust.org' }
+    @confirmation_url = bulk_deletion_admin_confirmation_url(@subject, identifiers: @ident_list, requesting_user_ids: @requesting_users, confirmation_token: confirmation_token.token)
+    users = @subject.bulk_deletion_users(apt_admin_requestor)
+    users.push(apt_admin_requestor) if users.count == 0
+    emails = []
+    users.each { |user| emails.push(user.email) }
+    email_log.user_list = emails.join('; ')
+    email_log.email_text = ""
+    email_log.save!
+    mail(to: emails, subject: "#{requesting_users[0].name} and #{requesting_users[1].name} have made a bulk deletion request on behalf of #{@subject.name}.")
+  end
+
+  def bulk_deletion_final_confirmation(subject, ident_list, requesting_users, email_log, confirmation_token)
+    @subject = subject
+    @ident_list = ident_list
+    @requesting_users = []
+    requsting_users.each { |user| @requesting_users.push(user.id) }
+    user_string = ''
+    requesting_users.each { |user| user_string += ' #{user.name}, '}
+    @confirmation_url = bulk_deletion_final_confirmation_url(@subject, identifiers: @ident_list, requesting_user_ids: @requesting_users, confirmation_token: confirmation_token.token)
+    users = []
+    users.push(@subject.apt_users)
+    users.push(@subject.admin_users)
+    emails = []
+    users.each { |user| emails.push(user.email) }
+    email_log.user_list = emails.join('; ')
+    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that several items, whose bulk deletion was requested by<%= name_string %>have been successfully queued for deletion. <br> #{ident_list.inspect}"
+    email_log.save!
+    mail(to: emails, subject: "A bulk deletion request has been successfully queued for #{@subject.name}.")
+  end
+
   def snapshot_notification(snap_hash)
     @snap_hash = snap_hash
     emails = ['team@aptrust.org', 'chip.german@aptrust.org']
