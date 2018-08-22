@@ -1,0 +1,94 @@
+# docker-compose-ci.yml
+# Compose file to be used for CI deployments. ENV vars should be overwritten by
+# using command line params or updated variables in this compose file.
+# The compose comes with Letsencrypt SSL support and requires the host to be
+# publicly accessible by port 80 and 443
+# https://wiki.ssdt-ohio.org/display/rtd/Using+nginx-proxy
+version: '3'
+services:
+  db:
+    image: postgres:9.6.6-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pharos
+      POSTGRES_DB: pharos
+    volumes:
+      - ./pharos-postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  pharos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aptrust/pharos
+    environment:
+      - DOCKERIZED='true'
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - ENVIRONMENT=development
+      - PHAROS_DB_HOST=db
+      - PHAROS_DB_USER='pharos'
+#      PHAROS_DB_PASSWORD: 'password'
+      - SECRET_KEY_BASE= '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
+      - LETSENCRYPT_HOST=${PHAROS_DNS:-pharos.aptrust.local}
+      - LETSENCRYPT_EMAIL=ops@aptrust.local
+      - VIRTUAL_HOST=pharos.docker.local
+      - VIRTUAL_PORT=9292
+# TODO: -e demo needs fixing. doesn't read env vars in command line here. maybe dockfile cmd needs env var as entrypoint?
+    command: bundle exec puma -p9292
+    volumes:
+      - .:/pharos
+    links:
+      - db
+    depends_on:
+      - db
+      - migration
+      - nginx-proxy
+    labels:
+     - VIRTUAL_HOST=pharos.docker.local
+     - VIRTUAL_PORT=9292
+    ports:
+     - "9292:9292"
+  migration:
+    image: aptrust/pharos
+    # Note: Sleep 5 seconds before init db, so psql has time to start up.
+    command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+    environment:
+      DOCKERIZED: 'true'
+      RAILS_ENV: 'demo'
+      PHAROS_DB_HOST: 'db'
+      PHAROS_DB_USER: 'pharos'
+    #    PHAROS_DB_PASSWORD: 'password'
+      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
+    volumes:
+      - .:/pharos
+    links:
+      - db
+    depends_on:
+      - db
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      -  /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./docker/nginx-proxy/certs:/etc/nginx/certs:ro
+      - ./docker/nginx-proxy/vhost:/etc/nginx/vhost.d
+      - ./docker/nginx-proxy/public:/etc/share/nginx/html
+      - ./public:/etc/share/nginx/html/pharos
+      - ./docker/pharos.docker.localhost:/etc/nginx/vhost.d/pharos.docker.localhost
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+  letsencrypt-nginx-proxy-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/nginx-proxy/certs:/etc/nginx/certs:rw
+      - ./docker/nginx-proxy/vhost:/etc/nginx/vhost.d:rw
+      - ./docker/nginx-proxy/public:/usr/share/nginx/html:rw
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy_nginx-proxy_1
+    depends_on:
+      - nginx-proxy
+
