@@ -51,6 +51,10 @@ class GenericFilePolicy < ApplicationPolicy
     soft_delete?
   end
 
+  def finished_delete?
+    user.admin?
+  end
+
   # creates deletion events as part of the process of deletion
   def soft_delete?
     user.admin? ||

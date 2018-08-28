@@ -3,7 +3,7 @@ class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :load_institution, only: [:index, :create]
-  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirm_destroy, :send_to_dpn, :restore]
+  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirm_destroy, :finished_destroy, :send_to_dpn, :restore]
   after_action :verify_authorized
 
   def index
@@ -134,6 +134,21 @@ class IntellectualObjectsController < ApplicationController
         format.html {
           redirect_to @intellectual_object
           flash[:alert] = message
+        }
+      end
+    end
+  end
+
+  def finished_destroy
+    authorize @intellectual_object
+    @intellectual_object.mark_deleted
+    log = Email.log_deletion_finished(@intellectual_object)
+    NotificationMailer.deletion_finished(@intellectual_object, params[:requesting_user], params[:inst_approver], log).deliver!
+    respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          flash[:notice] = "Delete job has been finished for object: #{@intellectual_object.title}. Object has been marked as deleted."
+          redirect_to root_path
         }
       end
     end
