@@ -19,8 +19,9 @@ describe InstitutionPolicy do
         should permit(:reactivate)
         should_not permit(:destroy)
         should permit(:bulk_delete)
-        should permit(:confirm_bulk_delete_aptrust_admin)
-        should_not permit(:confirm_bulk_delete_inst_admin)
+        should_not permit(:partial_confirmation_bulk_delete)
+        should permit(:final_confirmation_bulk_delete)
+        should permit(:finished_bulk_delete)
         #should permit(:destroy) #only turn this line on and above line off when deleting an institution. Otherwise, deletion should be OFF.
       end
     end
@@ -47,8 +48,9 @@ describe InstitutionPolicy do
           should_not permit(:deactivate)
           should_not permit(:reactivate)
           should_not permit(:bulk_delete)
-          should_not permit(:confirm_bulk_delete_aptrust_admin)
-          should permit(:confirm_bulk_delete_inst_admin)
+          should permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
 
@@ -65,8 +67,9 @@ describe InstitutionPolicy do
           should_not permit(:deactivate)
           should_not permit(:reactivate)
           should_not permit(:bulk_delete)
-          should_not permit(:confirm_bulk_delete_aptrust_admin)
-          should_not permit(:confirm_bulk_delete_inst_admin)
+          should_not permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
     end
@@ -88,8 +91,9 @@ describe InstitutionPolicy do
           should_not permit(:deactivate)
           should_not permit(:reactivate)
           should_not permit(:bulk_delete)
-          should_not permit(:confirm_bulk_delete_aptrust_admin)
-          should_not permit(:confirm_bulk_delete_inst_admin)
+          should_not permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
 
@@ -107,8 +111,9 @@ describe InstitutionPolicy do
           should_not permit(:deactivate)
           should_not permit(:reactivate)
           should_not permit(:bulk_delete)
-          should_not permit(:confirm_bulk_delete_aptrust_admin)
-          should_not permit(:confirm_bulk_delete_inst_admin)
+          should_not permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
     end
@@ -127,8 +132,9 @@ describe InstitutionPolicy do
       should_not permit(:deactivate)
       should_not permit(:reactivate)
       should_not permit(:bulk_delete)
-      should_not permit(:confirm_bulk_delete_aptrust_admin)
-      should_not permit(:confirm_bulk_delete_inst_admin)
+      should_not permit(:partial_confirmation_bulk_delete)
+      should_not permit(:final_confirmation_bulk_delete)
+      should_not permit(:finished_bulk_delete)
     end
   end
 end

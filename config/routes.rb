@@ -10,12 +10,14 @@ Rails.application.routes.draw do
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
   get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
   get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
-  get '/:institution_identifier/bulk_delete', to: 'institutions#bulk_delete', as: :bulk_deletion, format: [:html, :json], institution_identifier: institution_ptrn
-  get 'api/v2/:institution_identifier/bulk_delete', to: 'institutions#bulk_delete', as: :api_bulk_deletion, format: :json, institution_identifier: institution_ptrn
-  get '/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#confirm_bulk_delete_inst_admin', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
-  get 'api/v2/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#confirm_bulk_delete_inst_admin', as: :api_bulk_deletion_institutional_confirmation, format: :json, institution_identifier: institution_ptrn
-  get '/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#confirm_bulk_delete_aptrust_admin', as: :bulk_deletion_admin_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
-  get 'api/v2/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#confirm_bulk_delete_aptrust_admin', as: :api_bulk_deletion_admin_confirmation, format: :json, institution_identifier: institution_ptrn
+  get '/:institution_identifier/trigger_bulk_delete', to: 'institutions#trigger_bulk_delete', as: :bulk_deletion, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/trigger_bulk_delete', to: 'institutions#trigger_bulk_delete', as: :api_bulk_deletion, format: :json, institution_identifier: institution_ptrn
+  get '/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :api_bulk_deletion_institutional_confirmation, format: :json, institution_identifier: institution_ptrn
+  get '/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :bulk_deletion_admin_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :api_bulk_deletion_admin_confirmation, format: :json, institution_identifier: institution_ptrn
+  get '/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :bulk_deletion_finished, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/

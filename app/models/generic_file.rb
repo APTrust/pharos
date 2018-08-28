@@ -95,13 +95,14 @@ class GenericFile < ActiveRecord::Base
 	self.intellectual_object.institution
   end
 
-  def soft_delete(attributes)
+  def soft_delete(attributes, options={})
 	user_email = attributes[:outcome_detail]
 	attributes[:identifier] = SecureRandom.uuid
 	io = IntellectualObject.find(self.intellectual_object_id)
 	WorkItem.create_delete_request(io.identifier,
 								   self.identifier,
-								   user_email)
+								   user_email, options)
+		
 	self.state = 'D'
 	# Let exchange services create the file delete
 	# event when it actually deletes the file.

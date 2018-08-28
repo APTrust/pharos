@@ -127,8 +127,8 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def bulk_delete
-    authorize @institution
+  def trigger_bulk_delete
+    authorize @institution, :bulk_delete?
     pending = WorkItem.pending_action(@intellectual_object.identifier)
     if @intellectual_object.state == 'D'
       respond_to do |format|
@@ -139,16 +139,16 @@ class InstitutionsController < ApplicationController
         }
       end
     elsif pending.nil?
-      log = Email.log_deletion_request(@intellectual_object)
-      ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all #delete any old tokens. Only the new one should be valid
-      token = ConfirmationToken.create(intellectual_object: @intellectual_object, token: SecureRandom.hex)
+      log = Email.log_deletion_request(@institution)
+      ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
+      token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
-      NotificationMailer.deletion_request(@intellectual_object, current_user, log, token).deliver!
+      NotificationMailer.bulk_deletion_inst_admin_approval(@institution, params[:ident_list], current_user, log, token).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
           redirect_to @intellectual_object
-          flash[:notice] = 'An email has been sent to the administrators of this institution to confirm deletion of this object.'
+          flash[:notice] = 'An email has been sent to the administrators of this institution to confirm this bulk deletion request.'
         }
       end
     else
@@ -166,18 +166,46 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def confirm_bulk_delete_aptrust_admin
+  def partial_confirmation_bulk_delete
     authorize @institution
     if params[:confirmation_token] == @institution.confirmation_token.token
-      log = Email.log_deletion_request(@institution)
-      ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all #delete any old tokens. Only the new one should be valid
-      token = ConfirmationToken.create(intellectual_object: @intellectual_object, token: SecureRandom.hex)
+      # log = Email.log_deletion_request(@institution)
+      ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
+      token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
-      NotificationMailer.deletion_request(@intellectual_object, current_user, log, token).deliver!
+      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user, params[:requesting_user] log, token).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
-          flash[:notice] = "Deletion request has been forwarded to an institutional administrator at #{@institution.name} for final confirmation."
+          flash[:notice] = "Bulk delete job for: #{@institution.name} has been sent forward for final approval by an APTrust administrator."
+          redirect_to root_path
+        }
+      end
+    else
+      respond_to do |format|
+        message = 'Your bulk deletion event cannot be queued at this time due to an invalid confirmation token. ' +
+            'Please contact your APTrust administrator for more information.'
+        format.json {
+          render :json => { status: 'error', message: message }, :status => :conflict
+        }
+        format.html {
+          redirect_to @institution
+          flash[:alert] = message
+        }
+      end
+    end
+  end
+
+  def final_confirmation_bulk_delete
+    authorize @institution
+    if params[:confirmation_token] == @institution.confirmation_token.token
+      confirmed_destroy
+      # log = Email.log_deletion_request(@institution)
+      NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user, params[:inst_approver], params[:requesting_user], log).deliver!
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          flash[:notice] = "Bulk deletion request for #{@institution.name} has been queued."
           redirect_to root_path
         }
       end
@@ -196,29 +224,17 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def confirm_bulk_delete_inst_admin
+  def finished_bulk_delete
     authorize @institution
-    if params[:confirmation_token] == @intellectual_object.confirmation_token.token
-      confirmed_destroy
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
-          redirect_to root_path
-        }
-      end
-    else
-      respond_to do |format|
-        message = 'Your object cannot be deleted at this time due to an invalid confirmation token. ' +
-            'Please contact your APTrust administrator for more information.'
-        format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
-        }
-        format.html {
-          redirect_to @intellectual_object
-          flash[:alert] = message
-        }
-      end
+    bulk_state_update
+    # log = Email.log_deletion_request(@institution)
+    NotificationMailer.bulk_deletion_finished(@institution, params[:ident_list], params[:apt_approver], params[:inst_approver], params[:requesting_user], log).deliver!
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { 
+        flash[:notice] = "Bulk deletion job for #{@institution.name} has been completed."
+        redirect_to root_path
+      }
     end
   end
 
@@ -261,8 +277,10 @@ class InstitutionsController < ApplicationController
     size
   end
 
-    def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
+  def confirmed_destroy
+    requesting_user = User.readable(current_user).find(params[:requesting_user])
+    inst_approver = User.readable(current_user).find(params[:inst_approver])
+    apt_apptrover = User.readable(current_user).find(params[:apt_approver])
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: "#{Time.now}",
                    detail: 'Object deleted from S3 storage',
@@ -273,9 +291,27 @@ class InstitutionsController < ApplicationController
                    outcome_information: "Action requested by user from #{requesting_user.institution_id}",
                    identifier: SecureRandom.uuid
     }
-    @intellectual_object.soft_delete(attributes)
-    log = Email.log_deletion_confirmation(@intellectual_object)
-    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
+    params[:ident_list].each do |identifier|
+      io = IntellectualObject.with_identifier(identifier).first
+      gf = GenericFile.with_identifier(identifier).first
+      io.soft_delete(attributes, options{inst_app: inst_approver, apt_app: apt_approver}) unless io.nil?
+      gf.soft_delete(attributes, options{inst_app: inst_approver, apt_app: apt_approver}) unless gf.nil?
+    end
+  end
+
+  def bulk_state_update
+    params[:ident_list].each do |identifier|
+      io = IntellectualObject.with_identifier(identifier).first
+      gf = GenericFile.with_identifier(identifier).first
+      unless io.nil?
+        io.state == 'D'
+        io.save!
+      end
+      unless gf.nil?
+        gf.state = 'D'
+        gf.save!
+      end
+    end
   end
 
 end

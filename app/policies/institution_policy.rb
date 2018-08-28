@@ -58,12 +58,16 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def confirm_bulk_delete_aptrust_admin?
+  def final_confirmation_bulk_delete?
     user.admin?
   end
 
-  def confirm_bulk_delete_inst_admin?
+  def partial_confirmation_bulk_delete?
     user.institutional_admin? && (user.institution_id == record.id)
+  end
+
+  def finished_bulk_delete?
+    user.admin?
   end
 
   def reports?

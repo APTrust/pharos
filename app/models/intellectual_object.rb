@@ -89,22 +89,21 @@ class IntellectualObject < ActiveRecord::Base
 	end
   end
 
-  def soft_delete(attributes)
+  def soft_delete(attributes, options={})
 	attributes[:identifier] = SecureRandom.uuid
-	self.state = 'D'
 	self.add_event(attributes)
 	self.save!
 	unless Rails.env.test?
 	  Thread.new() do
-		background_deletion(attributes)
+		background_deletion(attributes, options)
 		ActiveRecord::Base.connection.close
 	  end
 	end
   end
 
-  def background_deletion(attributes)
+  def background_deletion(attributes, options={})
 	generic_files.each do |gf|
-	  gf.soft_delete(attributes)
+	  gf.soft_delete(attributes, options)
 	end
 	save!
   end
