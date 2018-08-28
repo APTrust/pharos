@@ -169,7 +169,7 @@ class InstitutionsController < ApplicationController
   def partial_confirmation_bulk_delete
     authorize @institution
     if params[:confirmation_token] == @institution.confirmation_token.token
-      # log = Email.log_deletion_request(@institution)
+      log = Email.log_bulk_deletion_confirmation(@institution, 'partial')
       ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
@@ -200,7 +200,7 @@ class InstitutionsController < ApplicationController
     authorize @institution
     if params[:confirmation_token] == @institution.confirmation_token.token
       confirmed_destroy
-      # log = Email.log_deletion_request(@institution)
+      log = Email.log_bulk_deletion_confirmation(@institution, 'final')
       NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user, params[:inst_approver], params[:requesting_user], log).deliver!
       respond_to do |format|
         format.json { head :no_content }
@@ -226,8 +226,8 @@ class InstitutionsController < ApplicationController
 
   def finished_bulk_delete
     authorize @institution
-    bulk_state_update
-    # log = Email.log_deletion_request(@institution)
+    bulk_mark_deleted
+    log = Email.log_deletion_finished(@institution)
     NotificationMailer.bulk_deletion_finished(@institution, params[:ident_list], params[:apt_approver], params[:inst_approver], params[:requesting_user], log).deliver!
     respond_to do |format|
       format.json { head :no_content }
@@ -299,7 +299,7 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def bulk_state_update
+  def bulk_mark_deleted
     params[:ident_list].each do |identifier|
       io = IntellectualObject.with_identifier(identifier).first
       gf = GenericFile.with_identifier(identifier).first

@@ -108,6 +108,25 @@ class IntellectualObject < ActiveRecord::Base
 	save!
   end
 
+  def mark_deleted
+    self.state = 'D'
+    self.save!
+    unless Rails.env.test?
+	  Thread.new() do
+		background_mark_deleted
+		ActiveRecord::Base.connection.close
+	  end
+	end
+  end
+
+  def background_mark_deleted
+	generic_files.each do |gf|
+	  gf.state = 'D'
+	  gf.save!
+	end
+	save!
+  end
+
   def in_dpn?
 	(self.dpn_uuid.nil? || self.dpn_uuid.blank? || self.dpn_uuid.empty?) ? object_in_dpn = false : object_in_dpn = true
 	object_in_dpn

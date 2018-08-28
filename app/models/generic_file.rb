@@ -102,12 +102,12 @@ class GenericFile < ActiveRecord::Base
 	WorkItem.create_delete_request(io.identifier,
 								   self.identifier,
 								   user_email, options)
-		
-	self.state = 'D'
-	# Let exchange services create the file delete
-	# event when it actually deletes the file.
-	# self.add_event(attributes)
 	self.save!
+  end
+
+  def mark_deleted
+  	self.state = 'D'
+  	self.save!
   end
 
   # This is for serializing JSON in the API.
