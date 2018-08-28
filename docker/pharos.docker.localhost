@@ -1,0 +1,37 @@
+    client_max_body_size 0;
+    location = /analytics.js {
+        # Proxy to google-analytics.com
+        proxy_pass https://www.google-analytics.com;
+
+        # Custom expires time
+        expires 1y;
+    }
+
+    root /etc/share/nginx/html/pharos;
+    index index.html index.htm;
+
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
+        }
+    error_page 503 /503.html;
+    location = /503.html {
+        internal;
+        }
+
+#    access_log /var/log/nginx/demo.aptrust.org_access.log;
+#    error_log /var/log/nginx/demo.aptrust.org_error.log error;
+
+ location ^~ /assets/ {
+     gzip_static on;
+     expires max;
+     add_header Cache-Control public;
+  }
+
+location /server_status {
+        stub_status on;
+
+        access_log off;
+        allow 127.0.0.1;
+        deny all;
+    }
