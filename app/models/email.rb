@@ -2,6 +2,8 @@ class Email < ApplicationRecord
   self.primary_key = 'id'
   has_and_belongs_to_many :premis_events
   has_and_belongs_to_many :work_items
+  has_and_belongs_to_many :intellectual_objects
+  has_and_belongs_to_many :generic_files
 
   validates :email_type, presence: true
   validate :has_proper_association

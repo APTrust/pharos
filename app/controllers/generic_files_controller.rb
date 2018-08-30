@@ -180,7 +180,6 @@ class GenericFilesController < ApplicationController
           flash[:notice] = "Delete job has been finished for object: #{@generic_file.uri}. File has been marked as deleted."
           redirect_to root_path
         }
-      end
     end
   end
 

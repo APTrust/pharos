@@ -86,7 +86,7 @@ class NotificationMailer < ApplicationMailer
   def deletion_confirmation(subject, requesting_user, inst_approver, email_log)
     @subject = subject
     @subject_institution = subject.institution
-    @requesting_user = requesting_user
+    @requesting_user = User.find(requesting_user)
     @inst_approver = User.find(inst_approver)
     if @subject.is_a?(IntellectualObject)
       @subject_url = intellectual_object_url(@subject)
@@ -95,8 +95,8 @@ class NotificationMailer < ApplicationMailer
       @subject_url = generic_file_url(@subject)
       subject_line = @subject.uri
     end
-    users = @subject_institution.deletion_admin_user(requesting_user)
-    users.push(requesting_user) unless users.include?(requesting_user)
+    users = @subject_institution.deletion_admin_user(@requesting_user)
+    users.push(@requesting_user) unless users.include?(@requesting_user)
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
@@ -108,7 +108,7 @@ class NotificationMailer < ApplicationMailer
   def deletion_finished(subject, requesting_user, inst_approver, email_log)
     @subject = subject
     @subject_institution = subject.institution
-    @requesting_user = requesting_user
+    @requesting_user = User.find(requesting_user)
     @inst_approver = User.find(inst_approver)
     if @subject.is_a?(IntellectualObject)
       @subject_url = intellectual_object_url(@subject)
@@ -132,14 +132,15 @@ class NotificationMailer < ApplicationMailer
     @subject = subject
     @ident_list = ident_list
     @requesting_user = User.find(requesting_user)
-    @confirmation_url = bulk_deletion_institutional_confirmation_url(@subject, 'ident_list[]': @ident_list, requesting_user: @requesting_user.id, confirmation_token: confirmation_token.token)
+    @confirmation_url = bulk_deletion_institutional_confirmation_url(@subject, ident_list: @ident_list, requesting_user: @requesting_user.id, confirmation_token: confirmation_token.token)
     users = @subject.admin_users
+    users.push(@requesting_user) if users.count == 0
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
     email_log.email_text = ""
     email_log.save!
-    mail(to: emails, subject: "#{requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
+    mail(to: emails, subject: "#{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
   end
 
   def bulk_deletion_apt_admin_approval(subject, ident_list, inst_approver, requesting_user, email_log, confirmation_token)
@@ -147,7 +148,7 @@ class NotificationMailer < ApplicationMailer
     @ident_list = ident_list
     @inst_approver = User.find(inst_approver)
     @requesting_user = User.find(requesting_user)
-    @confirmation_url = bulk_deletion_admin_confirmation_url(@subject, 'ident_list[]': @ident_list, requesting_user: @requesting_user.id, inst_approver: @inst_approver.id, confirmation_token: confirmation_token.token)
+    @confirmation_url = bulk_deletion_admin_confirmation_url(@subject, ident_list: @ident_list, requesting_user: @requesting_user.id, inst_approver: @inst_approver.id, confirmation_token: confirmation_token.token)
     users = @subject.bulk_deletion_users(@requesting_user)
     users.push(@requesting_user) if users.count == 0
     emails = []
@@ -165,8 +166,10 @@ class NotificationMailer < ApplicationMailer
     @inst_approver = User.find(inst_approver)
     @requesting_user = User.find(requesting_user)
     users = []
-    users.push(@subject.apt_users)
-    users.push(@subject.admin_users)
+    @subject.apt_users.each { |user| users.push(user) }
+    @subject.admin_users.each { |user| users.push(user) }
+    #users.push(@subject.apt_users)
+    #users.push(@subject.admin_users)
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')

@@ -150,7 +150,6 @@ class IntellectualObjectsController < ApplicationController
           flash[:notice] = "Delete job has been finished for object: #{@intellectual_object.title}. Object has been marked as deleted."
           redirect_to root_path
         }
-      end
     end
   end
 

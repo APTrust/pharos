@@ -175,7 +175,7 @@ class InstitutionsController < ApplicationController
       ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
-      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user, params[:requesting_user] log, token).deliver!
+      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user, params[:requesting_user], log, token).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -296,8 +296,9 @@ class InstitutionsController < ApplicationController
     params[:ident_list].each do |identifier|
       io = IntellectualObject.with_identifier(identifier).first
       gf = GenericFile.with_identifier(identifier).first
-      io.soft_delete(attributes, options{inst_app: inst_approver, apt_app: apt_approver}) unless io.nil?
-      gf.soft_delete(attributes, options{inst_app: inst_approver, apt_app: apt_approver}) unless gf.nil?
+      options = {inst_app: inst_approver, apt_app: apt_apptrover}
+      io.soft_delete(attributes, options) unless io.nil?
+      gf.soft_delete(attributes, options) unless gf.nil?
     end
   end
 

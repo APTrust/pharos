@@ -211,7 +211,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
     let(:email_log) { FactoryBot.create(:deletion_confirmation_email, intellectual_object_id: object.id) }
     let(:token) { FactoryBot.create(:confirmation_token, intellectual_object: object) }
-    let(:mail) { described_class.deletion_confirmation(object, user, email_log).deliver_now }
+    let(:mail) { described_class.deletion_confirmation(object, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
       expect(mail.subject).to eq("#{object.title} queued for deletion")
@@ -242,7 +242,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:file) { FactoryBot.create(:generic_file, intellectual_object: object) }
     let(:email_log) { FactoryBot.create(:deletion_confirmation_email, generic_file_id: file.id) }
     let(:token) { FactoryBot.create(:confirmation_token, generic_file: file) }
-    let(:mail) { described_class.deletion_confirmation(file, user, email_log).deliver_now }
+    let(:mail) { described_class.deletion_confirmation(file, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
       expect(mail.subject).to eq("#{file.uri} queued for deletion")
@@ -273,9 +273,10 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:admin_user) { FactoryBot.create(:user, :admin, institution: apt) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
     let(:file) { FactoryBot.create(:generic_file, institution: institution) }
-    let(:email_log) { FactoryBot.create(:bulk_deletion_request_email, ident_list: [object.identifier, file.identifier], institution_id: institution.id) }
+    let(:email_log) { FactoryBot.create(:bulk_deletion_request_email, institution_id: institution.id) }
     let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
-    let(:mail) { described_class.bulk_deletion_request(institution, [object.identifier, file.identifier], admin_user, email_log, token).deliver_now }
+    let(:ident_list) { [object.identifier, file.identifier] }
+    let(:mail) { described_class.bulk_deletion_inst_admin_approval(institution, ident_list, admin_user.id, email_log, token).deliver_now }
 
     it 'renders the subject' do
       expect(mail.subject).to eq("#{admin_user.name} has made a bulk deletion request on behalf of #{institution.name}.")
@@ -306,16 +307,17 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:admin_user) { FactoryBot.create(:user, :admin, institution: apt) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
     let(:file) { FactoryBot.create(:generic_file, institution: institution) }
-    let(:email_log) { FactoryBot.create(:bulk_deletion_inst_confirmation_email, ident_list: [object.identifier, file.identifier], institution_id: institution.id) }
+    let(:email_log) { FactoryBot.create(:final_bulk_deletion_confirmation_email, institution_id: institution.id) }
     let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
-    let(:mail) { described_class.bulk_deletion_inst_confirmation(institution, [object.identifier, file.identifier], admin_user, email_log, token).deliver_now }
+    let(:mail) { described_class.bulk_deletion_apt_admin_approval(institution, [object.identifier, file.identifier], admin_user.id, user.id,  email_log, token).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{admin_user.name} and #{user.name} have made a bulk deletion request on behalf of #{institution.name}.")
+      expect(mail.subject).to eq("#{user.name} and #{admin_user.name} have made a bulk deletion request on behalf of #{institution.name}.")
+    end
 
     it 'renders the receiver email' do
       user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
-      expect(mail.to).to include(user.email)
+      expect(mail.to).to include(admin_user.email)
     end
 
     it 'renders the sender email' do
@@ -339,9 +341,9 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:other_admin) { FactoryBot.create(:user, :admin, institution: apt) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
     let(:file) { FactoryBot.create(:generic_file, institution: institution) }
-    let(:email_log) { FactoryBot.create(:bulk_deletion_admin_confirmation_email, ident_list: [object.identifier, file.identifier], institution_id: institution.id) }
+    let(:email_log) { FactoryBot.create(:final_bulk_deletion_confirmation_email, institution_id: institution.id) }
     let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
-    let(:mail) { described_class.bulk_deletion_final_confirmation(institution, [object.identifier, file.identifier], admin_user, email_log, token).deliver_now }
+    let(:mail) { described_class.bulk_deletion_queued(institution, [object.identifier, file.identifier], admin_user.id, user.id, other_admin.id, email_log).deliver_now }
 
     it 'renders the subject' do
       expect(mail.subject).to eq("A bulk deletion request has been successfully queued for #{institution.name}.")
