@@ -642,7 +642,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response).to redirect_to root_url
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)
-        expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 1
         expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
         count_after = Email.all.count
@@ -676,7 +676,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response.status).to eq(204)
         expect(response.body).to be_empty
         reloaded_object = IntellectualObject.find(deletable_obj.id)
-        expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 1
         expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
         count_after = Email.all.count

@@ -460,7 +460,7 @@ RSpec.describe GenericFilesController, type: :controller do
           token = FactoryBot.create(:confirmation_token, generic_file: file)
           count_before = Email.all.count
           delete :confirm_destroy, params: { generic_file_identifier: file, confirmation_token: token.token, requesting_user_id: user.id }, format: 'json'
-          expect(assigns[:generic_file].state).to eq 'D'
+          expect(assigns[:generic_file].state).to eq 'A'
           expect(response.code).to eq '204'
           count_after = Email.all.count
           expect(count_after).to eq count_before + 1
@@ -474,7 +474,7 @@ RSpec.describe GenericFilesController, type: :controller do
           token = FactoryBot.create(:confirmation_token, generic_file: file)
           delete :confirm_destroy, params: { generic_file_identifier: file, confirmation_token: token.token, requesting_user_id: user.id }, format: 'html'
           expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
-          expect(assigns[:generic_file].state).to eq 'D'
+          expect(assigns[:generic_file].state).to eq 'A'
           expect(flash[:notice]).to eq "Delete job has been queued for file: #{file.uri}."
         end
 

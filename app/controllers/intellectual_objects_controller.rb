@@ -320,7 +320,7 @@ class IntellectualObjectsController < ApplicationController
     }
     @intellectual_object.soft_delete(attributes)
     log = Email.log_deletion_confirmation(@intellectual_object)
-    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
+    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
   end
 
   def filter_count_and_sort

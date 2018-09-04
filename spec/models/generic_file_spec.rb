@@ -111,7 +111,7 @@ RSpec.describe GenericFile, :type => :model do
             # deletion occurs.
             file.soft_delete(FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
           }.to change { file.premis_events.count}.by(0)
-          expect(file.state).to eq 'D'
+          expect(file.state).to eq 'A' # no longer marked as deleted until final step
         end
 
         it 'should create a WorkItem showing delete was requested' do

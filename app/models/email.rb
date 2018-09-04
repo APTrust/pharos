@@ -157,7 +157,7 @@ class Email < ApplicationRecord
       errors.add(:generic_file_id, 'must be left blank for finished a bulk deletion email') unless self.generic_file_id.nil?
       errors.add(:work_items, 'must be empty for a finished bulk deletion email') if self.work_items.count != 0
       errors.add(:premis_events, 'must be empty for a finished bulk deletion email') if self.premis_events.count != 0
-    elsif self.email_type.include?('bulk_deletion_confirmation')
+    elsif self.email_type == 'bulk_deletion_confirmation_partial' || self.email_type == 'bulk_deletion_confirmation_final'
       errors.add(:institution_id, 'must not be left blank for a bulk deletion confirmation email') if self.institution_id.nil?
       errors.add(:event_identifier, 'must be left blank for a bulk deletion confirmation email') unless self.event_identifier.nil?
       errors.add(:item_id, 'must be left blank for a bulk deletion confirmation email') unless self.item_id.nil?

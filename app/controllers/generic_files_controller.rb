@@ -420,6 +420,6 @@ class GenericFilesController < ApplicationController
     }
     @generic_file.soft_delete(attributes)
     log = Email.log_deletion_confirmation(@generic_file)
-    NotificationMailer.deletion_confirmation(@generic_file, requesting_user, log).deliver!
+    NotificationMailer.deletion_confirmation(@generic_file, requesting_user.id, current_user.id, log).deliver!
   end
 end

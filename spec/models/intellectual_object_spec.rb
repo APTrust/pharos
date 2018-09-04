@@ -393,8 +393,8 @@ RSpec.describe IntellectualObject, :type => :model do
           expect {
             subject.soft_delete(attributes)
           }.to change { subject.premis_events.count}.by(1)
-          expect(subject.state).to eq 'D'
-          subject.generic_files.all?{ |file| expect(file.state).to eq 'D' }
+          expect(subject.state).to eq 'A' # no longer marked as deleted until final step
+          subject.generic_files.all?{ |file| expect(file.state).to eq 'A' } # no longer marked as deleted until final step
         end
 
         it 'should set the state to deleted and index the object state' do
