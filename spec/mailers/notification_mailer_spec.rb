@@ -208,6 +208,8 @@ RSpec.describe NotificationMailer, type: :mailer do
   describe 'deletion_confirmation of an intellectual object' do
     let(:institution) { FactoryBot.create(:member_institution) }
     let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:user_two) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:user_three) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
     let(:email_log) { FactoryBot.create(:deletion_confirmation_email, intellectual_object_id: object.id) }
     let(:token) { FactoryBot.create(:confirmation_token, intellectual_object: object) }
@@ -218,8 +220,15 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the receiver email' do
-      user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      user.admin?
+      user_two.admin?
+      user_three.admin? #including this because the user needs to be used somehow for spec to realize it exists.
       expect(mail.to).to include(user.email)
+      expect(mail.to).to include(user_two.email)
+      expect(mail.to).to include(user_three.email)
+      expect(email_log.user_list).to include(user.email)
+      expect(email_log.user_list).to include(user_two.email)
+      expect(email_log.user_list).to include(user_three.email)
     end
 
     it 'renders the sender email' do

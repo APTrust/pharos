@@ -407,5 +407,6 @@ class GenericFilesController < ApplicationController
     @generic_file.soft_delete(attributes)
     log = Email.log_deletion_confirmation(@generic_file)
     NotificationMailer.deletion_confirmation(@generic_file, requesting_user, log).deliver!
+    ConfirmationToken.where(generic_file_id: @generic_file.id).delete_all
   end
 end
