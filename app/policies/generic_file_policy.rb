@@ -51,7 +51,7 @@ class GenericFilePolicy < ApplicationPolicy
     soft_delete?
   end
 
-  def finished_delete?
+  def finished_destroy?
     user.admin?
   end
 

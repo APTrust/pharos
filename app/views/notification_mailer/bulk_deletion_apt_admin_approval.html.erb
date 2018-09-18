@@ -1,0 +1,12 @@
+<p>Admin Users at APTrust,</p>
+<br>
+<p>This email notification is to inform you that <%= @requesting_user.name %> has made a bulk deletion request on
+  behalf of <%= @subject.name %> that was approved by <%= @inst_approver.name %>. The identifiers of the objects
+  and/or files included in this request are listed below. To confirm this bulk deletion request a final time,
+  please click the link below:</p>
+<br>
+<p><a href="<%= @confirmation_url %>">Click to Confirm Bulk Deletion</a></p>
+<br>
+<% @ident_list.each do |identifier| %>
+    <p><%= identifier %></p><br>
+<% end %>

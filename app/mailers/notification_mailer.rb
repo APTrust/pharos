@@ -78,7 +78,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@subject_institution.name}, This email notification is to inform you that <%= @requesting_user.name %> has requested the deletion of the following item: #{@subject_url} To confirm that this object should be deleting please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions."
+    email_log.email_text = "Admin Users at #{@subject_institution.name}, This email notification is to inform you that #{@requesting_user.name} has requested the deletion of the following item: #{@subject_url} To confirm that this object should be deleting please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: "#{requesting_user.name} has requested deletion of #{subject_line}")
   end
@@ -125,7 +125,7 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@subject_institution.name}, This email notification is to inform you that #{@subject_url}, whose deletion was requested by #{@requesting_user.name}, and approved by #{@inst_approver.name}, has been successfully deleted."
     email_log.save!
-    mail(to: emails, subject: "#{subject_line} queued for deletion")
+    mail(to: emails, subject: "#{subject_line} deleted.")
   end
 
   def bulk_deletion_inst_admin_approval(subject, ident_list, requesting_user, email_log, confirmation_token)
@@ -138,7 +138,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = ""
+    email_log.email_text = "Admin Users at #{@subject.name}, This email notification is to inform you that #{@requesting_user.name} has made a bulk deletion request on behalf of your institution. The identifiers of the objects and/or files included in this request are listed below.To confirm this bulk deletion request please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions. <br> #{ident_list.inspect}"
     email_log.save!
     mail(to: emails, subject: "#{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
   end
@@ -154,7 +154,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = ""
+    email_log.email_text = "Admin Users at APTrust, This email notification is to inform you that #{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name} that was approved by #{@inst_approver.name}. The identifiers of the objects and/or files included in this request are listed below. To confirm this bulk deletion request a final time, please click the link below: #{@confirmation_url} <br> #{ident_list.inspect}"
     email_log.save!
     mail(to: emails, subject: "#{@requesting_user.name} and #{@inst_approver.name} have made a bulk deletion request on behalf of #{@subject.name}.")
   end
@@ -168,12 +168,10 @@ class NotificationMailer < ApplicationMailer
     users = []
     @subject.apt_users.each { |user| users.push(user) }
     @subject.admin_users.each { |user| users.push(user) }
-    #users.push(@subject.apt_users)
-    #users.push(@subject.admin_users)
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by <%= @requesting_user.name %> and approved by <%= @inst_approver.name %> and <%= @apt_approver.name %> has been successfully queued for deletion. <br> #{ident_list.inspect}"
+    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has been successfully queued for deletion. <br> #{ident_list.inspect}"
     email_log.save!
     mail(to: emails, subject: "A bulk deletion request has been successfully queued for #{@subject.name}.")
   end
@@ -185,14 +183,14 @@ class NotificationMailer < ApplicationMailer
     @inst_approver = User.find(inst_approver)
     @requesting_user = User.find(requesting_user)
     users = []
-    users.push(@subject.apt_users)
-    users.push(@subject.admin_users)
+    @subject.apt_users.each { |user| users.push(user) }
+    @subject.admin_users.each { |user| users.push(user) }
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by <%= @requesting_user.name %> and approved by <%= @inst_approver.name %> and <%= @apt_approver.name %> has successfully finished and all objects and / or files have been deleted. <br> #{ident_list.inspect}"
+    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has successfully finished and all objects and / or files have been deleted. <br> #{ident_list.inspect}"
     email_log.save!
-    mail(to: emails, subject: "A bulk deletion request has been successfully queued for #{@subject.name}.")
+    mail(to: emails, subject: "A bulk deletion request has been successfully completed for #{@subject.name}.")
   end
 
   def snapshot_notification(snap_hash)

@@ -1,0 +1,11 @@
+<p>Admin Users at <%= @subject.name %> and APTrust,</p>
+<br>
+<p>This email notification is to inform you that a bulk deletion job requested by <%= @requesting_user.name %>
+and approved by <%= @inst_approver.name %> and <%= @apt_approver.name %> has been successfully queued for deletion.
+The objects and files included in this bulk deletion are listed below. </p>
+<br>
+<p>Please contact the APTrust team if you have any questions.</p>
+<br>
+<% @ident_list.each do |identifier| %>
+  <p><%= identifier %></p><br>
+<% end %>

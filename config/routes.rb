@@ -40,6 +40,8 @@ Rails.application.routes.draw do
   delete 'api/v2/objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :api_object_confirm_destroy
   get 'objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :get_object_confirm_destroy
   get 'api/v2/objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :get_api_object_confirm_destroy
+  get 'objects/:intellectual_object_identifier/finish_delete', to: 'intellectual_objects#finished_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :get_object_finish_destroy
+  get 'api/v2/objects/:intellectual_object_identifier/finish_delete', to: 'intellectual_objects#finished_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :get_api_object_finish_destroy
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
@@ -56,6 +58,8 @@ Rails.application.routes.draw do
   delete 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :api_file_confirm_destroy
   get 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_confirm_destroy
   get 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_api_file_confirm_destroy
+  get 'files/finish_delete/:generic_file_identifier', to: 'generic_files#finished_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_finish_destroy
+  get 'api/v2/files/finish_delete/:generic_file_identifier', to: 'generic_files#finished_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_api_file_finish_destroy
   get 'files/restore/:generic_file_identifier', to: 'generic_files#restore', format: [:json, :html], generic_file_identifier: file_ptrn, as: :generic_file_restore
   get 'member-api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
   put 'api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
