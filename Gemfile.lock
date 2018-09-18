@@ -299,7 +299,7 @@ GEM
     uuidtools (2.1.5)
     warden (1.2.7)
       rack (>= 1.0)
-    web-console (3.6.2)
+    web-console (3.7.0)
       actionview (>= 5.0)
       activemodel (>= 5.0)
       bindex (>= 0.4.0)
@@ -359,7 +359,7 @@ DEPENDENCIES
   turbolinks
   uglifier (>= 4.1.19)
   uuidtools
-  web-console (~> 3.6.2)
+  web-console (~> 3.7.0)
   wicked_pdf
   wkhtmltopdf-binary
 
