@@ -76,8 +76,11 @@ class NotificationMailer < ApplicationMailer
     users = @subject_institution.deletion_admin_user(requesting_user)
     users.push(@requesting_user) if users.count == 0
     emails = []
-    users.each { |user| emails.push(user.email) }
-    email_log.user_list = emails.join('; ')
+    email_log.user_list = '' if email_log.user_list.nil?
+    users.each do |user|
+      emails.push(user.email)
+      email_log.user_list += "#{user.email}; "
+    end
     email_log.email_text = "Admin Users at #{@subject_institution.name}, This email notification is to inform you that #{@requesting_user.name} has requested the deletion of the following item: #{@subject_url} To confirm that this object should be deleting please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
     mail(to: emails, subject: "#{requesting_user.name} has requested deletion of #{subject_line}")

@@ -21,6 +21,10 @@ Overall Pharos targets the following versions or later
 * Ruby >= 2.2.0
 * Rails >= 4.2.7
 
+Installing the Postgres gem on Mac with Postgres.app:
+
+`gem install pg -v 1.1.1 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/9.5/bin/pg_config`
+
 ### Additional Configuration
 
 We use the figaro gem for additional application configuration through 'pharos/config/application.yml' which is added
