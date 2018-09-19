@@ -7,7 +7,7 @@ gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.18'
+gem 'uglifier', '>= 4.1.19'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -60,7 +60,7 @@ group :development do
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 3.6.2'
+  gem 'web-console', '~> 3.7.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   # We don't use this gem directly but actionpack and actionview depend on it and it needs upgrading to fix a security warning
@@ -68,7 +68,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.6.0'
+  gem 'capybara', '3.7.2'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.22', require: false
 end
