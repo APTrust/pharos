@@ -23,7 +23,9 @@ Overall Pharos targets the following versions or later
 
 Installing the Postgres gem on Mac with Postgres.app:
 
-`gem install pg -v 1.1.1 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/9.5/bin/pg_config`
+`gem install pg -v 1.1.3 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin/pg_config`
+
+If you have only one version of Postgres installed, substitute version number (e.g. 9.5 or 10.0) for 'latest' in the path above.
 
 ### Additional Configuration
 
