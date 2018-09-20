@@ -543,4 +543,62 @@ RSpec.describe InstitutionsController, type: :controller do
       end
     end
   end
+
+  describe 'GET trigger_bulk_delete' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and triggers a bulk delete of appropriate objects / files' do
+        obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_one)
+        obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_one)
+        obj3 = FactoryBot.create(:intellectual_object, state: 'D', institution: institution_one)
+        obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_one)
+        obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_one)
+        file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
+        file2 = FactoryBot.create(:generic_file, intellectual_object: obj5, state: 'A')
+        file3 = FactoryBot.create(:generic_file, intellectual_object: obj3, state: 'D')
+        count_before = Email.all.count
+        get :trigger_bulk_delete, params: { institution_identifier: institution_one.identifier, ident_list: [obj1.identifier, obj2.identifier, obj3.identifier, file1.identifier, file2.identifier, file3.identifier] }
+        expect(assigns[:institution]).to eq institution_one
+        expect(assigns[:final_ident_list].count).to eq 4
+        expect(assigns[:final_ident_list]).to eq [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
+        expect(assigns[:forbidden_idents].count).to eq 2
+        expect(assigns[:forbidden_idents][obj3.identifier]).to eq 'This item has already been deleted.'
+        expect(assigns[:forbidden_idents][file3.identifier]).to eq 'This item has already been deleted.'
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        token = ConfirmationToken.where(institution_id: institution_one.id).first
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_one.identifier)}/confirm_bulk_delete_institution?confirmation_token=#{token.token}&ident_list%5B%5D=#{CGI.escape(obj1.identifier)}&ident_list%5B%5D=#{CGI.escape(obj2.identifier)}&ident_list%5B%5D=#{CGI.escape(file1.identifier)}&ident_list%5B%5D=#{CGI.escape(file2.identifier)}&requesting_user_id=#{admin_user.id}")
+      end
+
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :trigger_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :trigger_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
 end

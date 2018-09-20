@@ -689,6 +689,73 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
   end
 
+  describe 'GET #finished_destroy' do
+    let!(:deletable_obj) { FactoryBot.create(:institutional_intellectual_object,
+                                             institution: inst1,
+                                             state: 'A') }
+    let!(:deleted_obj) { FactoryBot.create(:institutional_intellectual_object,
+                                           institution: inst1,
+                                           state: 'D') }
+    let!(:obj_pending) { FactoryBot.create(:institutional_intellectual_object,
+                                           institution: inst1,
+                                           state: 'A',
+                                           identifier: 'college.edu/item') }
+    let!(:work_item) { FactoryBot.create(:work_item,
+                                         object_identifier: 'college.edu/item',
+                                         action: 'Restore',
+                                         stage: 'Requested',
+                                         status: 'Pending') }
+    let!(:deletable_obj_2) { FactoryBot.create(:institutional_intellectual_object,
+                                               institution: inst1, state: 'A') }
+    let!(:assc_file) { FactoryBot.create(:generic_file, intellectual_object: deletable_obj_2) }
+
+    after(:all) do
+      IntellectualObject.delete_all
+    end
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        get :finished_destroy, params: { intellectual_object_identifier: obj1 }
+        expect(response).to redirect_to root_url + 'users/sign_in'
+      end
+    end
+
+    describe 'when signed in' do
+      before { sign_in user }
+
+      describe "and deleting a file you don't have access to" do
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: inst2.id) }
+        it 'should be forbidden' do
+          get :finished_destroy, params: { intellectual_object_identifier: obj1 }, format: 'json'
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
+        end
+      end
+
+      describe 'and you have access to the object' do
+        let(:user) { FactoryBot.create(:user, :admin) }
+        it 'should delete the object' do
+          count_before = Email.all.count
+          get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
+          expect(assigns[:intellectual_object].state).to eq 'D'
+          expect(response.code).to eq '204'
+          count_after = Email.all.count
+          expect(count_after).to eq count_before + 1
+          email = ActionMailer::Base.deliveries.last
+          expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
+          expect(email.body.encoded).to include('has been successfully deleted')
+        end
+
+        it 'delete the object with html response' do
+          dobj = FactoryBot.create(:intellectual_object)
+          get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
+          expect(assigns[:intellectual_object].state).to eq 'D'
+          expect(flash[:notice]).to eq "Delete job has been finished for object: #{dobj.title}. Object has been marked as deleted."
+        end
+      end
+    end
+  end
+
   describe 'PUT #send_to_dpn' do
     let!(:obj_for_dpn) { FactoryBot.create(:institutional_intellectual_object,
                                             institution: inst1,

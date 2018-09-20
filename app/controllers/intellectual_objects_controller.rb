@@ -143,7 +143,7 @@ class IntellectualObjectsController < ApplicationController
     authorize @intellectual_object
     @intellectual_object.mark_deleted
     log = Email.log_deletion_finished(@intellectual_object)
-    NotificationMailer.deletion_finished(@intellectual_object, params[:requesting_user], params[:inst_approver], log).deliver!
+    NotificationMailer.deletion_finished(@intellectual_object, params[:requesting_user_id], params[:inst_approver_id], log).deliver!
     respond_to do |format|
         format.json { head :no_content }
         format.html {

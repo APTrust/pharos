@@ -346,7 +346,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:email_log) { FactoryBot.create(:bulk_deletion_request_email, institution_id: institution.id) }
     let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
     let(:ident_list) { [object.identifier, file.identifier] }
-    let(:mail) { described_class.bulk_deletion_inst_admin_approval(institution, ident_list, admin_user.id, email_log, token).deliver_now }
+    let(:mail) { described_class.bulk_deletion_inst_admin_approval(institution, ident_list, {}, admin_user, email_log, token).deliver_now }
 
     it 'renders the subject' do
       expect(mail.subject).to eq("#{admin_user.name} has made a bulk deletion request on behalf of #{institution.name}.")
@@ -362,7 +362,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'assigns @confirmation_url' do
-      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_institution?confirmation_token=#{token.token}&ident_list%5B%5D=#{CGI.escape(object.identifier)}&ident_list%5B%5D=#{CGI.escape(file.identifier)}&requesting_user=#{admin_user.id}")
+      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_institution?confirmation_token=#{token.token}&ident_list%5B%5D=#{CGI.escape(object.identifier)}&ident_list%5B%5D=#{CGI.escape(file.identifier)}&requesting_user_id=#{admin_user.id}")
     end
 
     it 'has an email log with proper associations' do
@@ -394,7 +394,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'assigns @confirmation_url' do
-      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_admin?confirmation_token=#{token.token}&ident_list%5B%5D=#{CGI.escape(object.identifier)}&ident_list%5B%5D=#{CGI.escape(file.identifier)}&inst_approver=#{user.id}&requesting_user=#{admin_user.id}")
+      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_admin?confirmation_token=#{token.token}&ident_list%5B%5D=#{CGI.escape(object.identifier)}&ident_list%5B%5D=#{CGI.escape(file.identifier)}&inst_approver_id=#{user.id}&requesting_user_id=#{admin_user.id}")
     end
 
     it 'has an email log with proper associations' do

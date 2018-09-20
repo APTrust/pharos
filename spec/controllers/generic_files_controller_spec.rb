@@ -494,6 +494,65 @@ RSpec.describe GenericFilesController, type: :controller do
     end
   end
 
+  describe 'GET #finished_destroy' do
+    before(:all) {
+      @file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+      @parent_work_item = FactoryBot.create(:work_item,
+                                            object_identifier: @intellectual_object.identifier,
+                                            action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                            stage: Pharos::Application::PHAROS_STAGES['record'],
+                                            status: Pharos::Application::PHAROS_STATUSES['success'])
+    }
+    let(:file) { @file }
+
+    after(:all) {
+      @parent_work_item.delete
+    }
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        get :finished_destroy, params: { generic_file_identifier: file }
+        expect(response.code).to eq '401'
+      end
+    end
+
+    describe 'when signed in' do
+      before { sign_in user }
+
+      describe "and deleting a file you don't have access to" do
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
+        it 'should be forbidden' do
+          get :finished_destroy, params: { generic_file_identifier: file }, format: 'json'
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
+        end
+      end
+
+      describe 'and you have access to the file' do
+        let(:user) { FactoryBot.create(:user, :admin) }
+        it 'should delete the file' do
+          count_before = Email.all.count
+          get :finished_destroy, params: { generic_file_identifier: file, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
+          expect(assigns[:generic_file].state).to eq 'D'
+          expect(response.code).to eq '204'
+          count_after = Email.all.count
+          expect(count_after).to eq count_before + 1
+          email = ActionMailer::Base.deliveries.last
+          expect(email.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}")
+          expect(email.body.encoded).to include('has been successfully deleted')
+        end
+
+        it 'delete the file with html response' do
+          file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+          get :finished_destroy, params: { generic_file_identifier: file, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
+          expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
+          expect(assigns[:generic_file].state).to eq 'D'
+          expect(flash[:notice]).to eq "Delete job has been finished for file: #{file.uri}. File has been marked as deleted."
+        end
+      end
+    end
+  end
+
   describe 'GET #not_checked_since' do
     describe 'when signed in as an admin user' do
       before do

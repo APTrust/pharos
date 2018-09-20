@@ -131,40 +131,18 @@ class InstitutionsController < ApplicationController
 
   def trigger_bulk_delete
     authorize @institution, :bulk_delete?
-    pending = WorkItem.pending_action(@intellectual_object.identifier)
-    if @intellectual_object.state == 'D'
-      respond_to do |format|
-        format.json { head :conflict }
-        format.html {
-          redirect_to @intellectual_object
-          flash[:alert] = 'This item has already been deleted.'
-        }
-      end
-    elsif pending.nil?
-      log = Email.log_deletion_request(@institution)
-      ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
-      token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
-      token.save!
-      NotificationMailer.bulk_deletion_inst_admin_approval(@institution, params[:ident_list], current_user, log, token).deliver!
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          redirect_to @intellectual_object
-          flash[:notice] = 'An email has been sent to the administrators of this institution to confirm this bulk deletion request.'
-        }
-      end
-    else
-      respond_to do |format|
-        message = "Your object cannot be deleted at this time due to a pending #{pending.action} request. " +
-            "You may delete this object after the #{pending.action} request has completed."
-        format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
-        }
-        format.html {
-          redirect_to @intellectual_object
-          flash[:alert] = message
-        }
-      end
+    build_bulk_deletion_list
+    log = Email.log_deletion_request(@institution)
+    ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
+    token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
+    token.save!
+    NotificationMailer.bulk_deletion_inst_admin_approval(@institution, @final_ident_list, @forbidden_idents, current_user, log, token).deliver!
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html {
+        redirect_to root_path
+        flash[:notice] = 'An email has been sent to the administrators of this institution to confirm this bulk deletion request.'
+      }
     end
   end
 
@@ -175,7 +153,7 @@ class InstitutionsController < ApplicationController
       ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
-      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user, params[:requesting_user], log, token).deliver!
+      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user, params[:requesting_user_id], log, token).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -203,7 +181,7 @@ class InstitutionsController < ApplicationController
     if params[:confirmation_token] == @institution.confirmation_token.token
       confirmed_destroy
       log = Email.log_bulk_deletion_confirmation(@institution, 'final')
-      NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user, params[:inst_approver], params[:requesting_user], log).deliver!
+      NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user, params[:inst_approver_id], params[:requesting_user_id], log).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -230,7 +208,7 @@ class InstitutionsController < ApplicationController
     authorize @institution
     bulk_mark_deleted
     log = Email.log_deletion_finished(@institution)
-    NotificationMailer.bulk_deletion_finished(@institution, params[:ident_list], params[:apt_approver], params[:inst_approver], params[:requesting_user], log).deliver!
+    NotificationMailer.bulk_deletion_finished(@institution, params[:ident_list], params[:apt_approver_id], params[:inst_approver_id], params[:requesting_user_id], log).deliver!
     respond_to do |format|
       format.json { head :no_content }
       format.html { 
@@ -280,7 +258,7 @@ class InstitutionsController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user])
+    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
     inst_approver = User.readable(current_user).find(params[:inst_approver])
     apt_apptrover = User.readable(current_user).find(params[:apt_approver])
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
@@ -313,6 +291,24 @@ class InstitutionsController < ApplicationController
       unless gf.nil?
         gf.state = 'D'
         gf.save!
+      end
+    end
+  end
+
+  def build_bulk_deletion_list
+    @forbidden_idents = { }
+    @final_ident_list = []
+    initial_identifiers = params[:ident_list]
+    initial_identifiers.each do |identifier|
+      current = IntellectualObject.find_by_identifier(identifier)
+      current = GenericFile.find_by_identifier(identifier) if current.nil?
+      pending = WorkItem.pending_action(identifier)
+      if current.state == 'D'
+        @forbidden_idents[identifier] = 'This item has already been deleted.'
+      elsif !pending.nil?
+        @forbidden_idents[identifier] = "Your item cannot be deleted at this time due to a pending #{pending.action} request. You may delete this object after the #{pending.action} request has completed."
+      else
+        @final_ident_list.push(identifier)
       end
     end
   end

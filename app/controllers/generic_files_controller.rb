@@ -173,12 +173,12 @@ class GenericFilesController < ApplicationController
     authorize @generic_file
     @generic_file.mark_deleted
     log = Email.log_deletion_finished(@generic_file)
-    NotificationMailer.deletion_finished(@generic_file, params[:requesting_user], params[:inst_approver], log).deliver!
+    NotificationMailer.deletion_finished(@generic_file, params[:requesting_user_id], params[:inst_approver_id], log).deliver!
     respond_to do |format|
         format.json { head :no_content }
         format.html {
-          flash[:notice] = "Delete job has been finished for object: #{@generic_file.uri}. File has been marked as deleted."
-          redirect_to root_path
+          flash[:notice] = "Delete job has been finished for file: #{@generic_file.uri}. File has been marked as deleted."
+          redirect_to @generic_file.intellectual_object
         }
     end
   end
