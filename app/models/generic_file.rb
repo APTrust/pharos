@@ -106,8 +106,10 @@ class GenericFile < ActiveRecord::Base
   end
 
   def mark_deleted
-  	self.state = 'D'
-  	self.save!
+		if WorkItem.deletion_finished_for_file?(self.identifier)
+			self.state = 'D'
+			self.save!
+		end
   end
 
   # This is for serializing JSON in the API.

@@ -109,20 +109,24 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def mark_deleted
-    self.state = 'D'
-    self.save!
-    unless Rails.env.test?
-	  Thread.new() do
-		background_mark_deleted
-		ActiveRecord::Base.connection.close
-	  end
-	end
+		if WorkItem.deletion_finished?(self.identifier)
+			self.state = 'D'
+			self.save!
+			unless Rails.env.test?
+				Thread.new() do
+					background_mark_deleted
+					ActiveRecord::Base.connection.close
+				end
+			end
+		end
   end
 
   def background_mark_deleted
 	generic_files.each do |gf|
-	  gf.state = 'D'
-	  gf.save!
+		if WorkItem.deletion_finished_for_file?(gf.identifier)
+	  	gf.state = 'D'
+	  	gf.save!
+		end
 	end
 	save!
   end

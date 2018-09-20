@@ -550,7 +550,7 @@ RSpec.describe InstitutionsController, type: :controller do
         sign_in admin_user
       end
 
-      it 'responds successfully and triggers a bulk delete of appropriate objects / files' do
+      it 'responds successfully and sends an email to an institutional admin asking for confirmation of a bulk delete' do
         obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_one)
         obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_one)
         obj3 = FactoryBot.create(:intellectual_object, state: 'D', institution: institution_one)
@@ -600,5 +600,240 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
     end
+  end
+
+  describe 'GET partial_confirmation_bulk_delete' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds unauthorized' do
+        get :partial_confirmation_bulk_delete, params: { institution_identifier: admin_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds successfully and sends an email to aptrust admins requesting additional confirmation' do
+        obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
+        file2 = FactoryBot.create(:generic_file, intellectual_object: obj5, state: 'A')
+        token = FactoryBot.create(:confirmation_token, institution: institution_three)
+        apt = FactoryBot.create(:aptrust)
+        extra_admin = FactoryBot.create(:user, :admin, institution: apt)
+        count_before = Email.all.count
+        get :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        expect(assigns[:institution]).to eq institution_three
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        new_token = ConfirmationToken.where(institution_id: institution_three.id).first
+        expect(assigns[:institution].confirmation_token).to eq new_token
+        expect(new_token.token).not_to eq token.token
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_three.identifier)}/confirm_bulk_delete_admin?confirmation_token=#{new_token.token}&ident_list%5B%5D=#{CGI.escape(obj1.identifier)}&ident_list%5B%5D=#{CGI.escape(obj2.identifier)}&ident_list%5B%5D=#{CGI.escape(file1.identifier)}&ident_list%5B%5D=#{CGI.escape(file2.identifier)}&inst_approver_id=#{institutional_admin.id}&requesting_user_id=#{admin_user.id}")
+      end
+
+      it 'responds unsuccessfully if the confirmation token is invalid' do
+        obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
+        file2 = FactoryBot.create(:generic_file, intellectual_object: obj5, state: 'A')
+        token = FactoryBot.create(:confirmation_token, institution: institution_three)
+        apt = FactoryBot.create(:aptrust)
+        extra_admin = FactoryBot.create(:user, :admin, institution: apt)
+        get :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        expect(assigns[:institution]).to eq institution_three
+        expect(response).to redirect_to institution_url(institution_three)
+        expect(flash[:alert]).to eq 'Your bulk deletion event cannot be queued at this time due to an invalid confirmation token. ' +
+                                          'Please contact your APTrust administrator for more information.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :partial_confirmation_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
+  describe 'GET final_confirmation_bulk_delete' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and queues items for deletion' do
+        obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
+        file2 = FactoryBot.create(:generic_file, intellectual_object: obj5, state: 'A')
+        item1 = FactoryBot.create(:ingested_item, object_identifier: obj1.identifier, intellectual_object: obj1)
+        item2 = FactoryBot.create(:ingested_item, object_identifier: obj2.identifier, intellectual_object: obj2)
+        item3 = FactoryBot.create(:ingested_item, object_identifier: obj4.identifier, intellectual_object: obj4)
+        item4 = FactoryBot.create(:ingested_item, object_identifier: obj5.identifier, intellectual_object: obj5)
+        token = FactoryBot.create(:confirmation_token, institution: institution_three)
+        apt = FactoryBot.create(:aptrust)
+        extra_admin = FactoryBot.create(:user, :admin, institution: apt)
+        count_before = Email.all.count
+        get :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        expect(assigns[:institution]).to eq institution_three
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("This email notification is to inform you that a bulk deletion job requested by #{extra_admin.name}")
+        expect(email.body.encoded).to include("and approved by #{institutional_admin.name} and #{admin_user.name}")
+
+        reloaded_object = IntellectualObject.find(obj1.id)
+        expect(reloaded_object.state).to eq 'A'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+
+        reloaded_object = IntellectualObject.find(obj2.id)
+        expect(reloaded_object.state).to eq 'A'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+
+        reloaded_object = GenericFile.find(file1.id)
+        expect(reloaded_object.state).to eq 'A'
+
+        reloaded_object = GenericFile.find(file2.id)
+        expect(reloaded_object.state).to eq 'A'
+      end
+
+      it 'responds unsuccessfully if the confirmation token is invalid' do
+        obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
+        file2 = FactoryBot.create(:generic_file, intellectual_object: obj5, state: 'A')
+        token = FactoryBot.create(:confirmation_token, institution: institution_three)
+        apt = FactoryBot.create(:aptrust)
+        extra_admin = FactoryBot.create(:user, :admin, institution: apt)
+        get :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        expect(assigns[:institution]).to eq institution_three
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'This bulk deletion request cannot be completed at this time due to an invalid confirmation token. ' +
+                                        'Please contact your APTrust administrator for more information.'
+      end
+
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :final_confirmation_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :final_confirmation_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
+  describe 'GET finished_bulk_delete' do
+
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and marks the items as deleted' do
+        obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
+        file2 = FactoryBot.create(:generic_file, intellectual_object: obj5, state: 'A')
+        item1 = FactoryBot.create(:work_item, object_identifier: obj1.identifier, intellectual_object: obj1, action: 'Delete', status: 'Success', stage: 'Resolve')
+        item2 = FactoryBot.create(:work_item, object_identifier: obj2.identifier, intellectual_object: obj2, action: 'Delete', status: 'Success', stage: 'Resolve')
+        item3 = FactoryBot.create(:work_item, object_identifier: obj4.identifier, intellectual_object: obj4, generic_file_identifier: file1.identifier, generic_file: file1, action: 'Delete', status: 'Success', stage: 'Resolve')
+        item4 = FactoryBot.create(:work_item, object_identifier: obj5.identifier, intellectual_object: obj5, generic_file_identifier: file2.identifier, generic_file: file2, action: 'Delete', status: 'Success', stage: 'Resolve')
+        apt = FactoryBot.create(:aptrust)
+        extra_admin = FactoryBot.create(:user, :admin, institution: apt)
+        count_before = Email.all.count
+        get :finished_bulk_delete, params: { institution_identifier: institution_three.identifier, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, apt_approver_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        expect(assigns[:institution]).to eq institution_three
+        expect(flash[:notice]).to eq "Bulk deletion job for #{institution_three.name} has been completed."
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include("a bulk deletion job requested by #{extra_admin.name}")
+        expect(email.body.encoded).to include("and approved by #{institutional_admin.name} and #{admin_user.name} has successfully finished")
+
+        reloaded_object = IntellectualObject.find(obj1.id)
+        expect(reloaded_object.state).to eq 'D'
+
+        reloaded_object = IntellectualObject.find(obj2.id)
+        expect(reloaded_object.state).to eq 'D'
+
+        reloaded_object = GenericFile.find(file1.id)
+        expect(reloaded_object.state).to eq 'D'
+
+        reloaded_object = GenericFile.find(file2.id)
+        expect(reloaded_object.state).to eq 'D'
+      end
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :finished_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :finished_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+
   end
 end

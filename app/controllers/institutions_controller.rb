@@ -153,7 +153,7 @@ class InstitutionsController < ApplicationController
       ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
-      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user, params[:requesting_user_id], log, token).deliver!
+      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user.id, params[:requesting_user_id], log, token).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -169,7 +169,7 @@ class InstitutionsController < ApplicationController
           render :json => { status: 'error', message: message }, :status => :conflict
         }
         format.html {
-          redirect_to @institution
+          redirect_to institution_url(@institution)
           flash[:alert] = message
         }
       end
@@ -181,7 +181,7 @@ class InstitutionsController < ApplicationController
     if params[:confirmation_token] == @institution.confirmation_token.token
       confirmed_destroy
       log = Email.log_bulk_deletion_confirmation(@institution, 'final')
-      NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user, params[:inst_approver_id], params[:requesting_user_id], log).deliver!
+      NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user.id, params[:inst_approver_id], params[:requesting_user_id], log).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -197,7 +197,7 @@ class InstitutionsController < ApplicationController
           render :json => { status: 'error', message: message }, :status => :conflict
         }
         format.html {
-          redirect_to @institution
+          redirect_to root_path
           flash[:alert] = message
         }
       end
@@ -257,44 +257,6 @@ class InstitutionsController < ApplicationController
     size
   end
 
-  def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
-    inst_approver = User.readable(current_user).find(params[:inst_approver])
-    apt_apptrover = User.readable(current_user).find(params[:apt_approver])
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: "#{Time.now}",
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
-                   identifier: SecureRandom.uuid
-    }
-    params[:ident_list].each do |identifier|
-      io = IntellectualObject.with_identifier(identifier).first
-      gf = GenericFile.with_identifier(identifier).first
-      options = {inst_app: inst_approver, apt_app: apt_apptrover}
-      io.soft_delete(attributes, options) unless io.nil?
-      gf.soft_delete(attributes, options) unless gf.nil?
-    end
-  end
-
-  def bulk_mark_deleted
-    params[:ident_list].each do |identifier|
-      io = IntellectualObject.with_identifier(identifier).first
-      gf = GenericFile.with_identifier(identifier).first
-      unless io.nil?
-        io.state == 'D'
-        io.save!
-      end
-      unless gf.nil?
-        gf.state = 'D'
-        gf.save!
-      end
-    end
-  end
-
   def build_bulk_deletion_list
     @forbidden_idents = { }
     @final_ident_list = []
@@ -309,6 +271,43 @@ class InstitutionsController < ApplicationController
         @forbidden_idents[identifier] = "Your item cannot be deleted at this time due to a pending #{pending.action} request. You may delete this object after the #{pending.action} request has completed."
       else
         @final_ident_list.push(identifier)
+      end
+    end
+  end
+
+  def confirmed_destroy
+    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
+    inst_approver = User.readable(current_user).find(params[:inst_approver_id])
+    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                   date_time: "#{Time.now}",
+                   detail: 'Object deleted from S3 storage',
+                   outcome: 'Success',
+                   outcome_detail: requesting_user.email,
+                   object: 'Goamz S3 Client',
+                   agent: 'https://github.com/crowdmob/goamz',
+                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
+                   identifier: SecureRandom.uuid
+    }
+    params[:ident_list].each do |identifier|
+      io = IntellectualObject.with_identifier(identifier).first
+      gf = GenericFile.with_identifier(identifier).first
+      options = {inst_app: inst_approver, apt_app: current_user}
+      io.soft_delete(attributes, options) unless io.nil?
+      gf.soft_delete(attributes, options) unless gf.nil?
+    end
+  end
+
+  def bulk_mark_deleted
+    params[:ident_list].each do |identifier|
+      io = IntellectualObject.with_identifier(identifier).first
+      gf = GenericFile.with_identifier(identifier).first
+      if io && WorkItem.deletion_finished?(io.identifier)
+        io.state = 'D'
+        io.save!
+      end
+      if gf && WorkItem.deletion_finished_for_file?(gf.identifier)
+        gf.state = 'D'
+        gf.save!
       end
     end
   end

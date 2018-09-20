@@ -7,6 +7,7 @@ class Institution < ActiveRecord::Base
   has_many :premis_events, through: :generic_files
   has_many :snapshots
   has_many :dpn_bags
+  has_one :confirmation_token
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique

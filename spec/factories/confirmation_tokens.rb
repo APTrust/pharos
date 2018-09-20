@@ -12,4 +12,9 @@ FactoryBot.define do
     token { SecureRandom.hex }
     generic_file { FactoryBot.create(:generic_file) }
   end
+
+  factory :bulk_confirmation_token do
+    token { SecureRandom.hex }
+    institution { FactoryBot.create(:institution) }
+  end
 end

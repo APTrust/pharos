@@ -347,6 +347,24 @@ class WorkItem < ActiveRecord::Base
     delete_item
   end
 
+  def self.deletion_finished?(intellectual_object_identifier)
+    item = WorkItem.with_object_identifier(intellectual_object_identifier)
+               .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+               .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+               .with_status(Pharos::Application::PHAROS_STATUSES['success']).first
+    item.nil? ? result = false : result = true
+    result
+  end
+
+  def self.deletion_finished_for_file?(generic_file_identifier)
+    item = WorkItem.with_file_identifier(generic_file_identifier)
+               .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+               .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+               .with_status(Pharos::Application::PHAROS_STATUSES['success']).first
+    item.nil? ? result = false : result = true
+    result
+  end
+
   def self.failed_action(datetime, action, user)
     if user.admin?
       WorkItem.with_action(action)
