@@ -50,6 +50,21 @@ RSpec.describe DpnWorkItem, type: :model do
     subject.state.should == 'This is a new state.'
   end
 
+  it 'should properly set a retry' do
+    subject.retry = true
+    subject.retry.should == true
+  end
+
+  it 'should properly set a stage' do
+    subject.stage = 'Package'
+    subject.stage.should == 'Package'
+  end
+
+  it 'should properly set a status' do
+    subject.status = 'Success'
+    subject.status.should == 'Success'
+  end
+
   it 'should properly set a pid' do
     subject.pid = 14
     subject.pid.should == 14
@@ -61,6 +76,17 @@ RSpec.describe DpnWorkItem, type: :model do
     subject.errors[:task].should include('Task is not one of the allowed options')
   end
 
+  it 'should validate that stage is one of the allowed options' do
+    subject = FactoryBot.build(:dpn_work_item, stage: 'not_allowed')
+    subject.should_not be_valid
+    subject.errors[:stage].should include('Stage is not one of the allowed options')
+  end
+
+  it 'should validate that status is one of the allowed options' do
+    subject = FactoryBot.build(:dpn_work_item, status: 'not_allowed')
+    subject.should_not be_valid
+    subject.errors[:status].should include('Status is not one of the allowed options')
+  end
 
   describe 'filters' do
     let(:item1) { FactoryBot.create(:dpn_work_item) }

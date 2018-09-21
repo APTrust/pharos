@@ -93,7 +93,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     end
 
     it 'successfully creates the dpn item' do
-      post :create, params: { dpn_work_item: { remote_node: 'aptrust', processing_node: 'hathi', pid: 12, task: 'sync', identifier: '12345678', state: 'Active' } }, format: :json
+      post :create, params: { dpn_work_item: { remote_node: 'aptrust', processing_node: 'hathi', pid: 12, task: 'sync', stage: 'Package', status: 'Success', identifier: '12345678', state: 'Active' } }, format: :json
       expect(response).to be_successful
       assigns(:dpn_item).remote_node.should eq('aptrust')
       assigns(:dpn_item).task.should eq('sync')
@@ -101,6 +101,8 @@ RSpec.describe DpnWorkItemsController, type: :controller do
       assigns(:dpn_item).state.should eq('Active')
       assigns(:dpn_item).processing_node.should eq('hathi')
       assigns(:dpn_item).pid.should eq(12)
+      assigns(:dpn_item).stage.should eq('Package')
+      assigns(:dpn_item).status.should eq('Success')
     end
 
     describe 'for institutional admin users' do
@@ -121,14 +123,16 @@ RSpec.describe DpnWorkItemsController, type: :controller do
         sign_in admin_user
       end
 
-      it 'responds successfully with both the action and the state updated' do
-        put :update, params: { id: item_one.id, dpn_work_item: { processing_node: 'chronopolis', pid: 13, note: 'Testing the update method', state: 'NEW'} }, format: :json
+      it 'responds successfully with both the action, stage, status and the state updated' do
+        put :update, params: { id: item_one.id, dpn_work_item: { processing_node: 'chronopolis', pid: 13, note: 'Testing the update method', stage: 'Package', status: 'Success', state: 'NEW'} }, format: :json
         expect(response).to be_successful
         assigns(:dpn_item).id.should eq(item_one.id)
         assigns(:dpn_item).note.should eq('Testing the update method')
         assigns(:dpn_item).state.should eq('NEW')
         assigns(:dpn_item).processing_node.should eq('chronopolis')
         assigns(:dpn_item).pid.should eq(13)
+        assigns(:dpn_item).stage.should eq('Package')
+        assigns(:dpn_item).status.should eq('Success')
       end
 
       it 'responds with a 404 error if the dpn item does not exist' do

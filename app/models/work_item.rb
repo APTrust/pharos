@@ -378,21 +378,15 @@ class WorkItem < ActiveRecord::Base
   end
 
   def status_is_allowed
-    if !Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
-      errors.add(:status, 'Status is not one of the allowed options')
-    end
+    errors.add(:status, 'Status is not one of the allowed options') unless Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
   end
 
   def stage_is_allowed
-    if !Pharos::Application::PHAROS_STAGES.values.include?(self.stage)
-      errors.add(:stage, 'Stage is not one of the allowed options')
-    end
+    errors.add(:stage, 'Stage is not one of the allowed options') unless Pharos::Application::PHAROS_STAGES.values.include?(self.stage)
   end
 
   def action_is_allowed
-    if !Pharos::Application::PHAROS_ACTIONS.values.include?(self.action)
-      errors.add(:action, 'Action is not one of the allowed options')
-    end
+    errors.add(:action, 'Action is not one of the allowed options') unless Pharos::Application::PHAROS_ACTIONS.values.include?(self.action)
   end
 
   # :state may contain a blob of JSON text from our micorservices.
