@@ -16,8 +16,8 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
   let!(:admin_user) { FactoryBot.create(:user, :admin) }
   let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin) }
-  let!(:item_one) { FactoryBot.create(:dpn_work_item, task: 'sync', remote_node: 'aptrust', identifier: '1234', pid: '2') }
-  let!(:item_two) { FactoryBot.create(:dpn_work_item, task: 'ingest', remote_node: 'chronopolis', identifier: '5678', queued_at: nil) }
+  let!(:item_one) { FactoryBot.create(:dpn_work_item, task: 'sync', remote_node: 'aptrust', identifier: '1234', pid: '2', stage: 'Package', status: 'Success', retry: false) }
+  let!(:item_two) { FactoryBot.create(:dpn_work_item, task: 'ingest', remote_node: 'chronopolis', identifier: '5678', queued_at: nil, stage: 'Store', status: 'Cancelled', retry: true) }
 
   describe '#GET index' do
     describe 'for admin users' do
@@ -68,6 +68,27 @@ RSpec.describe DpnWorkItemsController, type: :controller do
 
       it 'filters by pid' do
         get :index, params: { pid: 2 }
+        expect(response).to be_successful
+        expect(assigns(:paged_results).size).to eq 1
+        expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
+      end
+
+      it 'filters by retry' do
+        get :index, params: { retry: true }
+        expect(response).to be_successful
+        expect(assigns(:paged_results).size).to eq 1
+        expect(assigns(:paged_results).map &:id).to match_array [item_two.id]
+      end
+
+      it 'filters by stage' do
+        get :index, params: { stage: 'Package' }
+        expect(response).to be_successful
+        expect(assigns(:paged_results).size).to eq 1
+        expect(assigns(:paged_results).map &:id).to match_array [item_one.id]
+      end
+
+      it 'filters by status' do
+        get :index, params: { status: 'Success' }
         expect(response).to be_successful
         expect(assigns(:paged_results).size).to eq 1
         expect(assigns(:paged_results).map &:id).to match_array [item_one.id]

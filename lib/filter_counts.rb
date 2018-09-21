@@ -78,6 +78,13 @@ module FilterCounts
     @action_counts = Hash[@action_counts.sort]
   end
 
+  def get_retry_counts(results)
+    @selected[:retry] = params[:retry] if params[:retry]
+    @retry_counts = {}
+    @retry_counts['t'] = results.with_retry('true').count
+    @retry_counts['f'] = results.with_retry('false').count
+  end
+
   def get_event_type_counts(results)
     @selected[:event_type] = params[:event_type] if params[:event_type]
     params[:event_type] ? @event_types = [params[:event_type]] : @event_types = Pharos::Application::PHAROS_EVENT_TYPES.values.sort

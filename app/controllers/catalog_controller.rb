@@ -180,8 +180,14 @@ class CatalogController < ApplicationController
         @results = @results
                        .with_remote_node(params[:remote_node])
                        .queued(params[:queued])
+                       .with_stage(params[:stage])
+                       .with_status(params[:status])
+                       .with_retry(params[:retry])
         get_node_counts(@results)
         get_queued_counts(@results)
+        get_status_counts(@results)
+        get_stage_counts(@results)
+        get_retry_counts(@results)
     end
     params[:sort] = 'date' unless params[:sort]
     case params[:sort]

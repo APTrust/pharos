@@ -140,6 +140,9 @@ class DpnWorkItemsController < ApplicationController
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])
                      .with_state(params[:state])
+                     .with_stage(params[:stage])
+                     .with_status(params[:status])
+                     .with_retry(params[:retry])
                      .with_pid(params[:pid])
                      .queued_before(params[:queued_before])
                      .queued_after(params[:queued_after])
@@ -152,6 +155,9 @@ class DpnWorkItemsController < ApplicationController
     @selected = {}
     get_node_counts(@dpn_items)
     get_queued_counts(@dpn_items)
+    get_status_counts(@dpn_items)
+    get_stage_counts(@dpn_items)
+    get_retry_counts(@dpn_items)
     count = @dpn_items.count
     set_page_counts(count)
     params[:sort] = 'queued_at DESC' unless params[:sort]

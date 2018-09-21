@@ -1,0 +1,28 @@
+<% if @retry_counts %>
+    <div id="retry-parent" class="panel panel-default">
+      <div id="filter-title-retry" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-retry">
+        <h5 class="panel-title">
+          Retry Option <span class="retry-carat glyphicon glyphicon-chevron-right"></span>
+        </h5>
+
+      </div>
+      <div id="filter-retry" class="panel-collapse facet-content collapse" style="height: 0px">
+        <div class="panel-body">
+          <ul class="facet-values list-unstyled">
+            <% if @selected[:retry] %>
+                <script>selected("retry", "<%= @selected[:retry].capitalize %>", "<%=url_for(params.permit(Pharos::Application::PARAMS_HASH).except :retry)%>")</script>
+            <% else %>
+                <li>
+                  <span class="facet-label"><a href="<%= current_path('retry', 'true') %>">True</a></span>
+                  <span class="facet-count">(<%= @retry_counts['t'] %>)</span>
+                </li>
+                <li>
+                  <span class="facet-label"><a href="<%= current_path('retry', 'false') %>">False</a></span>
+                  <span class="facet-count">(<%= @retry_counts['f'] %>)</span>
+                </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+<% end %>
