@@ -318,7 +318,13 @@ class IntellectualObjectsController < ApplicationController
                    outcome_information: "Action requested by user from #{requesting_user.institution_id}",
                    identifier: SecureRandom.uuid
     }
-    @intellectual_object.soft_delete(attributes)
+    if params[:inst_approver_id]
+      inst_approver = User.readable(current_user).find(params[:inst_approver_id])
+      options = { inst_app: inst_approver.email }
+      @intellectual_object.soft_delete(attributes, options)
+    else
+      @intellectual_object.soft_delete(attributes)
+    end
     log = Email.log_deletion_confirmation(@intellectual_object)
     NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
     ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all

@@ -291,7 +291,7 @@ class InstitutionsController < ApplicationController
     params[:ident_list].each do |identifier|
       io = IntellectualObject.with_identifier(identifier).first
       gf = GenericFile.with_identifier(identifier).first
-      options = {inst_app: inst_approver, apt_app: current_user}
+      options = {inst_app: inst_approver.email, apt_app: current_user.email}
       io.soft_delete(attributes, options) unless io.nil?
       gf.soft_delete(attributes, options) unless gf.nil?
     end
