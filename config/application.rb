@@ -66,7 +66,7 @@ module Pharos
     }
 
     PHAROS_EVENT_TYPES = {
-	      'access_assignment' => 'access assignment',
+        'access_assignment' => 'access assignment',
         'capture' => 'capture',
         'compress' => 'compression',
         'create' => 'creation',
