@@ -86,6 +86,12 @@ class Email < ApplicationRecord
     email_log
   end
 
+  def self.log_daily_deletion_notification(deletion_subject)
+    email_log = Email.create(email_type: 'deletion_notifications', institution_id: deletion_subject.id)
+    email_log.save!
+    email_log
+  end
+
   private
 
   def has_proper_association
@@ -157,14 +163,14 @@ class Email < ApplicationRecord
       errors.add(:generic_file_id, 'must be left blank for finished a bulk deletion email') unless self.generic_file_id.nil?
       errors.add(:work_items, 'must be empty for a finished bulk deletion email') if self.work_items.count != 0
       errors.add(:premis_events, 'must be empty for a finished bulk deletion email') if self.premis_events.count != 0
-    elsif self.email_type == 'bulk_deletion_confirmation_partial' || self.email_type == 'bulk_deletion_confirmation_final'
-      errors.add(:institution_id, 'must not be left blank for a bulk deletion confirmation email') if self.institution_id.nil?
-      errors.add(:event_identifier, 'must be left blank for a bulk deletion confirmation email') unless self.event_identifier.nil?
-      errors.add(:item_id, 'must be left blank for a bulk deletion confirmation email') unless self.item_id.nil?
-      errors.add(:intellectual_object_id, 'must be left blank for a bulk deletion confirmation email') unless self.intellectual_object_id.nil?
-      errors.add(:generic_file_id, 'must be left blank for a bulk deletion confirmation email') unless self.generic_file_id.nil?
-      errors.add(:work_items, 'must be empty for a bulk deletion confirmation email') if self.work_items.count != 0
-      errors.add(:premis_events, 'must be empty for a bulk deletion confirmation email') if self.premis_events.count != 0
+    elsif self.email_type == 'bulk_deletion_confirmation_partial' || self.email_type == 'bulk_deletion_confirmation_final' || self.email_type == 'deletion_notification'
+      errors.add(:institution_id, 'must not be left blank for a bulk deletion confirmation or deletion notification email') if self.institution_id.nil?
+      errors.add(:event_identifier, 'must be left blank for bulk deletion confirmation and deletion notification emails') unless self.event_identifier.nil?
+      errors.add(:item_id, 'must be left blank for bulk deletion confirmation and deletion notification emails') unless self.item_id.nil?
+      errors.add(:intellectual_object_id, 'must be left blank for bulk deletion confirmation and deletion notification emails') unless self.intellectual_object_id.nil?
+      errors.add(:generic_file_id, 'must be left blank for bulk deletion confirmation and deletion notification emails') unless self.generic_file_id.nil?
+      errors.add(:work_items, 'must be left blank for bulk deletion confirmation and deletion notification emails') if self.work_items.count != 0
+      errors.add(:premis_events, 'must be left blank for bulk deletion confirmation and deletion notification emails') if self.premis_events.count != 0
     end
   end
 end

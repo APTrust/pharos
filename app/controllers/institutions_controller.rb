@@ -218,6 +218,27 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  def deletion_notifications
+    authorize current_user, :deletion_notifications?
+    Institution.each do |current_inst|
+      items = current_inst.new_deletion_items
+      unless items.nil? || items.count == 0
+        csv = current_inst.generate_deletion_csv(items)
+        email = NotificationMailer.deletion_notification(current_inst, csv).deliver_now
+        if email.processed?
+          email_log = Email.log_daily_deletion_notification(current_inst)
+          email_log.user_list = email.to
+          email_log.email_text = email.body.encoded
+          email_log.save!
+        end
+      end
+    end
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to root_path }
+    end
+  end
+
   private
 
   def load_institution
