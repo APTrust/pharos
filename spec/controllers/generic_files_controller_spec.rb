@@ -550,6 +550,12 @@ RSpec.describe GenericFilesController, type: :controller do
 
         end
 
+        it 'should raise an exception if there is no PREMIS deletion event' do
+          expect {
+            get :finished_destroy, params: { generic_file_identifier: file, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
+          }.to raise_error("File cannot be marked deleted without first creating a deletion PREMIS event.")
+        end
+
         it 'delete the file with html response' do
           file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
           # Record PREMIS ingest and deletion events

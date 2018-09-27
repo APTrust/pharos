@@ -109,6 +109,8 @@ class GenericFile < ActiveRecord::Base
     if self.deleted_since_last_ingest?
       self.state = 'D'
       self.save!
+    else
+      raise "File cannot be marked deleted without first creating a deletion PREMIS event."
     end
   end
 
