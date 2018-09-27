@@ -531,7 +531,9 @@ RSpec.describe GenericFilesController, type: :controller do
       describe 'and you have access to the file' do
         let(:user) { FactoryBot.create(:user, :admin) }
         it 'should delete the file' do
-          item = FactoryBot.create(:work_item, object_identifier: file.intellectual_object.identifier, intellectual_object: file.intellectual_object, generic_file_identifier: file.identifier, generic_file: file, action: 'Delete', status: 'Success', stage: 'Resolve')
+          # Record PREMIS ingest and deletion events
+          file.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T10:00:00Z'))
+          file.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: '2018-01-01T10:00:00Z'))
           count_before = Email.all.count
           get :finished_destroy, params: { generic_file_identifier: file, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
           expect(assigns[:generic_file].state).to eq 'D'
@@ -550,7 +552,9 @@ RSpec.describe GenericFilesController, type: :controller do
 
         it 'delete the file with html response' do
           file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
-          item = FactoryBot.create(:work_item, object_identifier: file.intellectual_object.identifier, intellectual_object: file.intellectual_object, generic_file_identifier: file.identifier, generic_file: file, action: 'Delete', status: 'Success', stage: 'Resolve')
+          # Record PREMIS ingest and deletion events
+          file.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T10:00:00Z'))
+          file.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: '2018-01-01T10:00:00Z'))
           get :finished_destroy, params: { generic_file_identifier: file, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
           expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
           expect(assigns[:generic_file].state).to eq 'D'

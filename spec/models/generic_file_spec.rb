@@ -230,6 +230,41 @@ RSpec.describe GenericFile, :type => :model do
     end
   end
 
+  describe '#deleted_since_last_ingest?' do
+    subject { FactoryBot.create(:generic_file) }
+    it 'should not say item is deleted if no deletion event since last ingest event' do
+      early_date = '2014-06-01T16:33:39Z'
+      middle_date = '2014-08-01T16:33:39Z'
+      late_date = '2014-10-01T16:33:39Z'
+      subject.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: middle_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).first.date_time.should == middle_date
+      # False because there is no delete event.
+      expect(subject.deleted_since_last_ingest?).to eq false
+
+      subject.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: early_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).first.date_time.should == early_date
+      # False because deletion came BEFORE most recent ingest.
+      expect(subject.deleted_since_last_ingest?).to eq false
+    end
+  end
+
+  describe '#deleted_since_last_ingest?' do
+    subject { FactoryBot.create(:generic_file) }
+    it 'should say item is deleted if this is a deletion event since last ingest event' do
+      early_date = '2014-06-01T16:33:39Z'
+      middle_date = '2014-08-01T16:33:39Z'
+      late_date = '2014-10-01T16:33:39Z'
+      # Add ingest event with middle date
+      subject.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: middle_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).first.date_time.should == middle_date
+      # Add deletion event with late date
+      subject.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: late_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).first.date_time.should == late_date
+      # True because deletion came AFTER most recent ingest.
+      expect(subject.deleted_since_last_ingest?).to eq true
+    end
+  end
+
   describe 'permission scopes and checks' do
     let!(:inst) { FactoryBot.create(:member_institution) }
     let!(:other_inst) { FactoryBot.create(:subscription_institution) }
