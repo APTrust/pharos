@@ -55,6 +55,37 @@ class Institution < ActiveRecord::Base
     GenericFile.where(institution_id: self.id, state: 'A')
   end
 
+  def new_deletion_items
+    latest_email = Email.where(institution_id: self.id).order(id: :asc).limit(1)
+    deletion_items = WorkItem.with_institution(self.id)
+                         .created_after(latest_email.created_at)
+                         .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+                         .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+                         .with_status(Pharos::Application::PHAROS_STATUSES['success'])
+    deletion_items
+  end
+
+  def generate_deletion_csv(deletion_items)
+    attributes = ['Generic File Identifier', 'Date Deleted', 'Requested By', 'Approved By', 'APTrust Approver']
+    CSV.generate(headers: true) do |csv|
+      csv << attributes
+      deletion_items.each do |item|
+        unless item.generic_file_identifier.nil?
+          row = item.generic_file_identifier
+          row << item.date
+          row << item.user
+          row << item.inst_approver
+          if item.apt_approver.nil?
+            row << 'NA'
+          else
+            row << item.apt_approver
+          end
+          csv << row
+        end
+      end
+    end
+  end
+
   def deletion_admin_user(requesting_user)
     confirming_users = []
     admin_users = self.admin_users

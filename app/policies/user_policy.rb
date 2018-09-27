@@ -37,6 +37,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def deletion_notifications?
+    user.admin?
+  end
+
   def search?
     true
   end
