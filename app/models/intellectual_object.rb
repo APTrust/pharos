@@ -109,10 +109,21 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def mark_deleted
-    if WorkItem.deletion_finished?(self.identifier)
+    if self.deleted_since_last_ingest?
       self.state = 'D'
       self.save!
+    else
+      raise "Object cannot be marked deleted without first creating a deletion PREMIS event."
     end
+  end
+
+  def deleted_since_last_ingest?
+    last_ingest = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).order(date_time: :desc).limit(1).first
+    last_deletion = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).limit(1).first
+    if !last_ingest.nil? && !last_deletion.nil? && last_deletion.date_time > last_ingest.date_time
+      return true
+    end
+    return false
   end
 
   def in_dpn?

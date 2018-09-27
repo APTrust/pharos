@@ -737,6 +737,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         it 'should delete the object' do
           count_before = Email.all.count
           item = FactoryBot.create(:work_item, object_identifier: deletable_obj.identifier, intellectual_object: deletable_obj, action: 'Delete', status: 'Success', stage: 'Resolve')
+          # Create the ingest and delete events...
+          deletable_obj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          deletable_obj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
           get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
           expect(assigns[:intellectual_object].state).to eq 'D'
           expect(response.code).to eq '204'
@@ -753,6 +756,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
         it 'delete the object with html response' do
           dobj = FactoryBot.create(:intellectual_object)
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
           item = FactoryBot.create(:work_item, object_identifier: dobj.identifier, intellectual_object: dobj, action: 'Delete', status: 'Success', stage: 'Resolve')
           get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
           expect(assigns[:intellectual_object].state).to eq 'D'
