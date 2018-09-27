@@ -736,7 +736,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         let(:user) { FactoryBot.create(:user, :admin) }
         it 'should delete the object' do
           count_before = Email.all.count
-          item = FactoryBot.create(:work_item, object_identifier: deletable_obj.identifier, intellectual_object: deletable_obj, action: 'Delete', status: 'Success', stage: 'Resolve')
           # Create the ingest and delete events...
           deletable_obj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
           deletable_obj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
@@ -754,11 +753,24 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           # expect(email.body.encoded).to include('has been successfully deleted')
         end
 
+        it 'should raise exception if there is no delete event' do
+          expect{ get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'}.to raise_error("Object cannot be marked deleted without first creating a deletion PREMIS event.")
+        end
+
+        it 'should raise exception if object has undeleted files' do
+          # Create the ingest and delete events...
+          dobj = FactoryBot.create(:intellectual_object)
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
+          active_file = FactoryBot.create(:generic_file, intellectual_object_id: dobj.id, state: 'A')
+          expect{get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'}.to raise_error("Object cannot be marked deleted without first creating a deletion PREMIS event.")
+        end
+
+
         it 'delete the object with html response' do
           dobj = FactoryBot.create(:intellectual_object)
           dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
           dobj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
-          item = FactoryBot.create(:work_item, object_identifier: dobj.identifier, intellectual_object: dobj, action: 'Delete', status: 'Success', stage: 'Resolve')
           get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
           expect(assigns[:intellectual_object].state).to eq 'D'
           expect(flash[:notice]).to eq "Delete job has been finished for object: #{dobj.title}. Object has been marked as deleted."

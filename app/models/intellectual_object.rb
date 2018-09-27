@@ -109,6 +109,9 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def mark_deleted
+    if self.generic_files.where(state: 'A').count > 0
+      raise "Object cannot be marked deleted until all of its files have been marked deleted."
+    end
     if self.deleted_since_last_ingest?
       self.state = 'D'
       self.save!
