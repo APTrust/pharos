@@ -177,6 +177,8 @@ class CatalogController < ApplicationController
         get_event_type_counts(@results)
         get_outcome_counts(@results)
       when 'dpn_item'
+        params[:status] = nil if params[:status] == 'Null Status'
+        params[:stage] = nil if params[:stage] == 'Null Stage'
         @results = @results
                        .with_remote_node(params[:remote_node])
                        .queued(params[:queued])

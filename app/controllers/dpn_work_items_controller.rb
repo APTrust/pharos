@@ -136,6 +136,8 @@ class DpnWorkItemsController < ApplicationController
   end
 
   def filter_sort_and_count
+    params[:status] = nil if params[:status] == 'Null Status'
+    params[:stage] = nil if params[:stage] == 'Null Stage'
     @dpn_items = @dpn_items
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])

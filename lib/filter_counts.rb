@@ -63,12 +63,14 @@ module FilterCounts
   def get_status_counts(results)
     @selected[:status] = params[:status] if params[:status]
     @status_counts = results.group(:status).count
+    @status_counts['Null Status'] = @status_counts.delete(nil) if @status_counts[nil]
     @status_counts = Hash[@status_counts.sort]
   end
 
   def get_stage_counts(results)
     @selected[:stage] = params[:stage] if params[:stage]
     @stage_counts = results.group(:stage).count
+    @stage_counts['Null Stage'] = @stage_counts.delete(nil) if @stage_counts[nil]
     @stage_counts = Hash[@stage_counts.sort]
   end
 
