@@ -17,8 +17,8 @@ Rails.application.routes.draw do
   post 'api/v2/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :api_bulk_deletion_admin_confirmation, format: :json, institution_identifier: institution_ptrn
   get '/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :bulk_deletion_finished, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
-  get '/deletion_notifications', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
-  get 'api/v2/deletion_notifications', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
+  get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
+  get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
 
 
   # INTELLECTUAL OBJECT ROUTES
