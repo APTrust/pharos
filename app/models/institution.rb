@@ -1,4 +1,6 @@
 class Institution < ActiveRecord::Base
+  require 'csv'
+
   self.primary_key = 'id'
   has_many :users
   has_many :intellectual_objects
@@ -56,12 +58,19 @@ class Institution < ActiveRecord::Base
   end
 
   def new_deletion_items
-    latest_email = Email.where(institution_id: self.id).order(id: :asc).limit(1)
-    deletion_items = WorkItem.with_institution(self.id)
-                         .created_after(latest_email.created_at)
-                         .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
-                         .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
-                         .with_status(Pharos::Application::PHAROS_STATUSES['success'])
+    latest_email = Email.where(institution_id: self.id, email_type: 'deletion_notifications').order(id: :asc).limit(1).first
+    if latest_email.nil?
+      deletion_items = WorkItem.with_institution(self.id)
+                           .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+                           .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+                           .with_status(Pharos::Application::PHAROS_STATUSES['success'])
+    else
+      deletion_items = WorkItem.with_institution(self.id)
+                           .created_after(latest_email.created_at)
+                           .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+                           .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+                           .with_status(Pharos::Application::PHAROS_STATUSES['success'])
+    end
     deletion_items
   end
 
@@ -71,15 +80,9 @@ class Institution < ActiveRecord::Base
       csv << attributes
       deletion_items.each do |item|
         unless item.generic_file_identifier.nil?
-          row = item.generic_file_identifier
-          row << item.date
-          row << item.user
-          row << item.inst_approver
-          if item.apt_approver.nil?
-            row << 'NA'
-          else
-            row << item.apt_approver
-          end
+          item.inst_approver.nil? ? inst_app = 'NA' : inst_app = item.inst_approver
+          item.aptrust_approver.nil? ? apt_app = 'NA' : apt_app = item.aptrust_approver
+          row = [item.generic_file_identifier, item.date.to_s, item.user, inst_app, apt_app]
           csv << row
         end
       end

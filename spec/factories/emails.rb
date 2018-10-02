@@ -111,5 +111,15 @@ FactoryBot.define do
     email_text { 'This is the text of the email to be sent.' }
   end
 
+  factory :deletion_notification_email, class: 'Email' do
+    email_type { 'deletion_notifications' }
+    intellectual_object_id { nil }
+    generic_file_id { nil }
+    institution_id { FactoryBot.create(:institution).id }
+    event_identifier { nil }
+    item_id { nil }
+    email_text { 'This is the text of the email to be sent.' }
+  end
+
 
 end

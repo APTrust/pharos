@@ -470,6 +470,43 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
   end
 
+  describe 'deletion_notification' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:apt) { FactoryBot.create(:aptrust) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:admin_user) { FactoryBot.create(:user, :admin, institution: apt) }
+    let(:object_one) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:object_two) { FactoryBot.create(:intellectual_object, institution: institution) }
+    let(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
+    let(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+    let(:latest_email) { FactoryBot.create(:deletion_notification_email) }
+    let(:item_one) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one) }
+    let(:item_two) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two) }
+    let(:csv) { institution.generate_deletion_csv([item_one, item_two]) }
+    let(:mail) { described_class.deletion_notification(institution, csv) }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('New Completed Deletions')
+    end
+
+    it 'renders the receiver email' do
+      user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'has a csv attachment' do
+      expect(mail.attachments.count).to eq(1)
+      attachment = mail.attachments[0]
+      attachment.should be_a_kind_of(Mail::Part)
+      attachment.content_type.should eq('text/csv')
+      attachment.filename.should == 'deletions.csv'
+    end
+  end
+
   describe 'snapshot_notification' do
     let(:institution) { FactoryBot.create(:member_institution) }
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }

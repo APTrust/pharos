@@ -210,7 +210,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     attachments['deletions.csv'] = { mime_type: 'text/csv', content: csv,  }
-    mail(to: emails, subject: 'New Finished Deletion Requests')
+    mail(to: emails, subject: 'New Completed Deletions')
   end
 
 end

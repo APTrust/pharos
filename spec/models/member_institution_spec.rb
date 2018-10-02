@@ -3,6 +3,7 @@ require 'spec_helper'
 RSpec.describe MemberInstitution, :type => :model do
   before(:all) do
     User.delete_all
+    Institution.delete_all
   end
 
   subject { FactoryBot.build(:member_institution) }
@@ -149,6 +150,33 @@ RSpec.describe MemberInstitution, :type => :model do
       it 'deleting should be blocked' do
         subject.destroy.should be false
         expect(Institution.exists?(subject.id)).to be true
+      end
+    end
+
+    describe 'with associated work items' do
+      let!(:object_one) { FactoryBot.create(:intellectual_object, institution: subject) }
+      let!(:object_two) { FactoryBot.create(:intellectual_object, institution: subject) }
+      let!(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
+      let!(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+
+      it 'should return a list of new deletion items' do
+        latest_email = FactoryBot.create(:deletion_notification_email, institution_id: subject.id)
+        sleep 1
+        item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, institution_id: subject.id)
+        item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, institution_id: subject.id)
+        items = subject.new_deletion_items
+        items.count.should eq(2)
+        expect(items).to include(item_one)
+        expect(items).to include(item_two)
+      end
+
+      it 'should generate a csv file for new deletion work items' do
+        item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, generic_file_identifier: file_one.identifier, institution_id: subject.id)
+        item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
+        csv = subject.generate_deletion_csv([item_one, item_two])
+        expect(csv).to include('Generic File Identifier,Date Deleted,Requested By,Approved By,APTrust Approver')
+        expect(csv).to include("#{item_one.generic_file_identifier},#{item_one.date.to_s},#{item_one.user},NA,NA")
+        expect(csv).to include("#{item_two.generic_file_identifier},#{item_two.date.to_s},#{item_two.user},NA,NA")
       end
     end
 

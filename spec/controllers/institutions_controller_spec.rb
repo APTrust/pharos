@@ -6,6 +6,7 @@ RSpec.describe InstitutionsController, type: :controller do
     IntellectualObject.delete_all
     User.delete_all
     Institution.delete_all
+    WorkItem.delete_all
   end
 
   after do
@@ -13,6 +14,7 @@ RSpec.describe InstitutionsController, type: :controller do
     IntellectualObject.delete_all
     User.delete_all
     Institution.delete_all
+    WorkItem.delete_all
   end
 
   let(:institution_one) { FactoryBot.create(:member_institution) }
@@ -544,7 +546,7 @@ RSpec.describe InstitutionsController, type: :controller do
     end
   end
 
-  describe 'GET trigger_bulk_delete' do
+  describe 'POST trigger_bulk_delete' do
     describe 'for admin user' do
       before do
         sign_in admin_user
@@ -560,7 +562,7 @@ RSpec.describe InstitutionsController, type: :controller do
         file2 = FactoryBot.create(:generic_file, intellectual_object: obj5, state: 'A')
         file3 = FactoryBot.create(:generic_file, intellectual_object: obj3, state: 'D')
         count_before = Email.all.count
-        get :trigger_bulk_delete, params: { institution_identifier: institution_one.identifier, ident_list: [obj1.identifier, obj2.identifier, obj3.identifier, file1.identifier, file2.identifier, file3.identifier] }
+        post :trigger_bulk_delete, params: { institution_identifier: institution_one.identifier, ident_list: [obj1.identifier, obj2.identifier, obj3.identifier, file1.identifier, file2.identifier, file3.identifier] }
         expect(assigns[:institution]).to eq institution_one
         expect(assigns[:final_ident_list].count).to eq 4
         expect(assigns[:final_ident_list]).to eq [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
@@ -582,7 +584,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :trigger_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
+        post :trigger_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }, format: :html
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -595,21 +597,21 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :trigger_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        post :trigger_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }, format: :html
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
     end
   end
 
-  describe 'GET partial_confirmation_bulk_delete' do
+  describe 'POST partial_confirmation_bulk_delete' do
     describe 'for admin user' do
       before do
         sign_in admin_user
       end
 
       it 'responds unauthorized' do
-        get :partial_confirmation_bulk_delete, params: { institution_identifier: admin_user.institution.to_param }
+        post :partial_confirmation_bulk_delete, params: { institution_identifier: admin_user.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -632,7 +634,7 @@ RSpec.describe InstitutionsController, type: :controller do
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
         count_before = Email.all.count
-        get :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
         expect(assigns[:institution]).to eq institution_three
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
@@ -653,7 +655,7 @@ RSpec.describe InstitutionsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, institution: institution_three)
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
-        get :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
         expect(assigns[:institution]).to eq institution_three
         expect(response).to redirect_to institution_url(institution_three)
         expect(flash[:alert]).to eq 'Your bulk deletion event cannot be queued at this time due to an invalid confirmation token. ' +
@@ -668,14 +670,14 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :partial_confirmation_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        post :partial_confirmation_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
     end
   end
 
-  describe 'GET final_confirmation_bulk_delete' do
+  describe 'POST final_confirmation_bulk_delete' do
     describe 'for admin user' do
       before do
         sign_in admin_user
@@ -696,7 +698,7 @@ RSpec.describe InstitutionsController, type: :controller do
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
         count_before = Email.all.count
-        get :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
         expect(assigns[:institution]).to eq institution_three
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
@@ -731,7 +733,7 @@ RSpec.describe InstitutionsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, institution: institution_three)
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
-        get :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
         expect(assigns[:institution]).to eq institution_three
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'This bulk deletion request cannot be completed at this time due to an invalid confirmation token. ' +
@@ -746,7 +748,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :final_confirmation_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
+        post :final_confirmation_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -759,14 +761,14 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :final_confirmation_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        post :final_confirmation_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
     end
   end
 
-  describe 'GET finished_bulk_delete' do
+  describe 'POST finished_bulk_delete' do
 
     describe 'for admin user' do
       before do
@@ -787,7 +789,7 @@ RSpec.describe InstitutionsController, type: :controller do
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
         count_before = Email.all.count
-        get :finished_bulk_delete, params: { institution_identifier: institution_three.identifier, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, apt_approver_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        post :finished_bulk_delete, params: { institution_identifier: institution_three.identifier, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, apt_approver_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
         expect(assigns[:institution]).to eq institution_three
         expect(flash[:notice]).to eq "Bulk deletion job for #{institution_three.name} has been completed."
         count_after = Email.all.count
@@ -816,7 +818,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :finished_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
+        post :finished_bulk_delete, params: { institution_identifier: institutional_admin.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -829,11 +831,63 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'responds unauthorized' do
-        get :finished_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
+        post :finished_bulk_delete, params: { institution_identifier: institutional_user.institution.to_param }
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
     end
 
+  end
+
+  describe 'GET deletion_notifications' do
+    describe 'for admin user' do
+      before do
+        sign_in admin_user
+      end
+
+      it 'responds successfully and sends out an deletion notification email with a CSV attachment' do
+        extra_user = FactoryBot.create(:user, :institutional_admin, institution_id: institution_three.id)
+        obj1 = FactoryBot.create(:intellectual_object, state: 'D', institution: institution_three)
+        obj2 = FactoryBot.create(:intellectual_object, state: 'D', institution: institution_three)
+        file1 = FactoryBot.create(:generic_file, intellectual_object: obj1, state: 'D')
+        file2 = FactoryBot.create(:generic_file, intellectual_object: obj2, state: 'D')
+        latest_email = FactoryBot.create(:deletion_notification_email, institution_id: institution_three.id)
+        sleep 1
+        item1 = FactoryBot.create(:work_item, object_identifier: obj1.identifier, intellectual_object: obj1, generic_file_identifier: file1.identifier, generic_file: file1, action: 'Delete', status: 'Success', stage: 'Resolve', institution_id: institution_three.id)
+        item2 = FactoryBot.create(:work_item, object_identifier: obj2.identifier, intellectual_object: obj2, generic_file_identifier: file2.identifier, generic_file: file2, action: 'Delete', status: 'Success', stage: 'Resolve', institution_id: institution_three.id)
+        count_before = Email.all.count
+        get :deletion_notifications
+        count_after = Email.all.count
+        expect(count_after).to eq count_before + 1
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include('new deletion requests that have completed')
+        expect(email.attachments.count).to eq(1)
+      end
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'responds unauthorized' do
+        get :deletion_notifications
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :deletion_notifications
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
   end
 end
