@@ -67,11 +67,11 @@ class NotificationMailer < ApplicationMailer
     if @subject.is_a?(IntellectualObject)
       @subject_url = intellectual_object_url(@subject)
       @confirmation_url = object_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
-      subject_line = @subject.title
+      subject_line = @subject.identifier
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
       @confirmation_url = file_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
-      subject_line = @subject.uri
+      subject_line = @subject.identifier
     end
     users = @subject_institution.deletion_admin_user(requesting_user)
     users.push(@requesting_user) if users.count == 0
@@ -93,10 +93,10 @@ class NotificationMailer < ApplicationMailer
     @inst_approver = User.find(inst_approver)
     if @subject.is_a?(IntellectualObject)
       @subject_url = intellectual_object_url(@subject)
-      subject_line = @subject.title
+      subject_line = @subject.identifier
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
-      subject_line = @subject.uri
+      subject_line = @subject.identifier
     end
     users = @subject_institution.deletion_admin_user(@requesting_user)
     users.push(@requesting_user) unless users.include?(@requesting_user)
@@ -115,10 +115,10 @@ class NotificationMailer < ApplicationMailer
     @inst_approver = User.find(inst_approver)
     if @subject.is_a?(IntellectualObject)
       @subject_url = intellectual_object_url(@subject)
-      subject_line = @subject.title
+      subject_line = @subject.identifier
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
-      subject_line = @subject.uri
+      subject_line = @subject.identifier
     end
     users = @subject_institution.deletion_admin_user(@requesting_user)
     users.push(@requesting_user) unless users.include?(@requesting_user)

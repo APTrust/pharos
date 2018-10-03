@@ -131,6 +131,7 @@ class InstitutionsController < ApplicationController
 
   def trigger_bulk_delete
     authorize @institution, :bulk_delete?
+    parse_ident_list
     build_bulk_deletion_list
     log = Email.log_deletion_request(@institution)
     ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
@@ -153,6 +154,7 @@ class InstitutionsController < ApplicationController
       ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
+      #parse_ident_list
       NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user.id, params[:requesting_user_id], log, token).deliver!
       respond_to do |format|
         format.json { head :no_content }
@@ -179,6 +181,7 @@ class InstitutionsController < ApplicationController
   def final_confirmation_bulk_delete
     authorize @institution
     if params[:confirmation_token] == @institution.confirmation_token.token
+      #parse_ident_list
       confirmed_destroy
       log = Email.log_bulk_deletion_confirmation(@institution, 'final')
       NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user.id, params[:inst_approver_id], params[:requesting_user_id], log).deliver!
@@ -206,9 +209,10 @@ class InstitutionsController < ApplicationController
 
   def finished_bulk_delete
     authorize @institution
+    parse_ident_list
     bulk_mark_deleted
     log = Email.log_deletion_finished(@institution)
-    NotificationMailer.bulk_deletion_finished(@institution, params[:ident_list], params[:apt_approver_id], params[:inst_approver_id], params[:requesting_user_id], log).deliver!
+    NotificationMailer.bulk_deletion_finished(@institution, @ident_list, params[:apt_approver_id], params[:inst_approver_id], params[:requesting_user_id], log).deliver!
     respond_to do |format|
       format.json { head :no_content }
       format.html { 
@@ -279,7 +283,7 @@ class InstitutionsController < ApplicationController
   def build_bulk_deletion_list
     @forbidden_idents = { }
     @final_ident_list = []
-    initial_identifiers = params[:ident_list]
+    initial_identifiers = @ident_list
     initial_identifiers.each do |identifier|
       current = IntellectualObject.find_by_identifier(identifier)
       current = GenericFile.find_by_identifier(identifier) if current.nil?
@@ -317,7 +321,7 @@ class InstitutionsController < ApplicationController
   end
 
   def bulk_mark_deleted
-    params[:ident_list].each do |identifier|
+    @ident_list.each do |identifier|
       io = IntellectualObject.with_identifier(identifier).first
       gf = GenericFile.with_identifier(identifier).first
       if io && WorkItem.deletion_finished?(io.identifier)
@@ -328,6 +332,19 @@ class InstitutionsController < ApplicationController
         gf.state = 'D'
         gf.save!
       end
+    end
+  end
+
+  def parse_ident_list
+    begin
+      list = JSON.parse(request.body.read)
+    rescue JSON::ParserError, Exception => e
+      respond_to do |format|
+        format.json { render json: {error: "JSON parse error: #{e.message}"}, status: 400 } and return
+      end
+    end
+    if list
+      @ident_list = list['ident_list']
     end
   end
 

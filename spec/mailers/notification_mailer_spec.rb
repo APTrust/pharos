@@ -145,7 +145,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_request(object, user, email_log, token).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{user.name} has requested deletion of #{object.title}")
+      expect(mail.subject).to eq("#{user.name} has requested deletion of #{object.identifier}")
     end
 
     it 'renders the receiver email' do
@@ -180,7 +180,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_request(file, user, email_log, token).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{user.name} has requested deletion of #{file.uri}")
+      expect(mail.subject).to eq("#{user.name} has requested deletion of #{file.identifier}")
     end
 
     it 'renders the receiver email' do
@@ -216,7 +216,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_confirmation(object, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{object.title} queued for deletion")
+      expect(mail.subject).to eq("#{object.identifier} queued for deletion")
     end
 
     it 'renders the receiver email' do
@@ -254,7 +254,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_confirmation(file, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{file.uri} queued for deletion")
+      expect(mail.subject).to eq("#{file.identifier} queued for deletion")
     end
 
     it 'renders the receiver email' do
@@ -284,7 +284,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_finished(object, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{object.title} deleted.")
+      expect(mail.subject).to eq("#{object.identifier} deleted.")
     end
 
     it 'renders the receiver email' do
@@ -315,7 +315,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_finished(file, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{file.uri} deleted.")
+      expect(mail.subject).to eq("#{file.identifier} deleted.")
     end
 
     it 'renders the receiver email' do
