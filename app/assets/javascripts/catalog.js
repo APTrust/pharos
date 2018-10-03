@@ -67,7 +67,7 @@ function selected (category, filter, newpath) {
 }
 
 function fixFilters() {
-    var filterIds = ['access', 'action', 'event_type', 'format', 'institution', 'node', 'outcome', 'queued', 'stage', 'state', 'status'];
+    var filterIds = ['access', 'action', 'event_type', 'format', 'institution', 'node', 'outcome', 'queued', 'stage', 'state', 'status', 'retry'];
     for (var i = 0; i < filterIds.length; i++) {
         var filter = $("#filter-"+filterIds[i]);
         filter.on('shown.bs.collapse', shownClickHandler());

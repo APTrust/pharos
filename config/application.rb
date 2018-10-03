@@ -53,7 +53,9 @@ module Pharos
         'record' => 'Record',
         'clean' => 'Cleanup',
         'resolve' => 'Resolve',
-        'package' => 'Package'
+        'package' => 'Package',
+        'restoring' => 'Restoring',
+        'available_in_s3' => 'Available in S3'
     }
 
     PHAROS_ACTIONS = {
