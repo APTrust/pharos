@@ -98,12 +98,12 @@ class DpnWorkItemsController < ApplicationController
 
   def dpn_work_item_params
     if request.method != 'GET'
-      params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid)
+      params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid, :stage, :status)
     end
   end
 
   def params_for_update
-    params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid)
+    params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid, :stage, :status)
   end
 
   def set_item
@@ -136,10 +136,15 @@ class DpnWorkItemsController < ApplicationController
   end
 
   def filter_sort_and_count
+    params[:status] = nil if params[:status] == 'Null Status'
+    params[:stage] = nil if params[:stage] == 'Null Stage'
     @dpn_items = @dpn_items
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])
                      .with_state(params[:state])
+                     .with_stage(params[:stage])
+                     .with_status(params[:status])
+                     .with_retry(params[:retry])
                      .with_pid(params[:pid])
                      .queued_before(params[:queued_before])
                      .queued_after(params[:queued_after])
@@ -152,6 +157,9 @@ class DpnWorkItemsController < ApplicationController
     @selected = {}
     get_node_counts(@dpn_items)
     get_queued_counts(@dpn_items)
+    get_status_counts(@dpn_items)
+    get_stage_counts(@dpn_items)
+    get_retry_counts(@dpn_items)
     count = @dpn_items.count
     set_page_counts(count)
     params[:sort] = 'queued_at DESC' unless params[:sort]

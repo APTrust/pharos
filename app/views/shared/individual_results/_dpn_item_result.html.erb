@@ -20,5 +20,9 @@
     <dd><%= pretty_date(current.queued_at) %></dd>
     <dt>Completed At: </dt>
     <dd><%= pretty_date(current.completed_at) %></dd>
+    <dt>Stage: </dt>
+    <dd><%= current.stage %></dd>
+    <dt class="<%= current.status %>">Status: </dt>
+    <dd class="<%= current.status %>"><%= current.status %></dd>
   </dl>
 </div>

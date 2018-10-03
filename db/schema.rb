@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_31_193202) do
+ActiveRecord::Schema.define(version: 2018_09_21_145825) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,6 +61,9 @@ ActiveRecord::Schema.define(version: 2018_07_31_193202) do
     t.text "state"
     t.string "processing_node", limit: 255
     t.integer "pid", default: 0
+    t.boolean "retry", default: true, null: false
+    t.string "stage"
+    t.string "status"
     t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
     t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
   end
@@ -227,6 +230,8 @@ ActiveRecord::Schema.define(version: 2018_07_31_193202) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "snapshot_type"
+    t.bigint "cs_bytes"
+    t.bigint "go_bytes"
   end
 
   create_table "usage_samples", id: :serial, force: :cascade do |t|

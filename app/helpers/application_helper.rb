@@ -124,6 +124,7 @@ module ApplicationHelper
     old_path = @current
     old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except param) if old_path.include? param
     old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except :page) if old_path.include? 'page'
+    value = '' if value.nil?
     if value.kind_of?(Integer)
       encoded_val = value
     elsif value.include?('+')

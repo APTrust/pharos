@@ -7,6 +7,8 @@
     <th>Queued At</th>
     <th>Completed At</th>
     <th>Processing Time</th>
+    <th>Stage</th>
+    <th>Status</th>
     <th>Note</th>
   </tr>
   </thead>
@@ -19,7 +21,9 @@
         <td><%= truncate(item.queued_at.to_s, length: 13) %></td>
         <td><%= truncate(item.completed_at.to_s, length: 13) %></td>
         <td><%= dpn_process_time(item) %></td>
-        <th><%= truncate(item.note, length: 50) %></th>
+        <td><%= item.stage %></td>
+        <td class="status"><%= item.status %></td>
+        <td><%= truncate(item.note, length: 50) %></td>
       </tr>
   <% end %>
   </tbody>
