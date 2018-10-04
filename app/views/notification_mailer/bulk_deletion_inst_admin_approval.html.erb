@@ -1,13 +1,9 @@
 <p>Admin Users at <%= @subject.name %>,</p>
 <br>
 <p>This email notification is to inform you that <%= @requesting_user.name %> has made a bulk deletion request on
-behalf of your institution. The identifiers of the objects and/or files included in this request are listed below.
+behalf of your institution. The identifiers of the objects and/or files included in this request are listed in an attached CSV file.
 To confirm this bulk deletion request please click the following link:</p>
 <br>
 <p><a href="<%= @confirmation_url %>">Click to Confirm Bulk Deletion</a></p>
 <br>
 <p>Please contact the APTrust team if you have any questions.</p>
-<br>
-<% @ident_list.each do |identifier| %>
-    <p><%= identifier %></p><br>
-<% end %>

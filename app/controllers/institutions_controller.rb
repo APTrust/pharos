@@ -131,13 +131,16 @@ class InstitutionsController < ApplicationController
 
   def trigger_bulk_delete
     authorize @institution, :bulk_delete?
+    @bulk_job = BulkDeleteJob.create(requested_by: current_user.email, institution: @institution)
+    @bulk_job.save!
     parse_ident_list
     build_bulk_deletion_list
+    csv = Institution.generate_confirmation_csv(@bulk_job)
     log = Email.log_deletion_request(@institution)
     ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
     token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
     token.save!
-    NotificationMailer.bulk_deletion_inst_admin_approval(@institution, @final_ident_list, @forbidden_idents, current_user, log, token).deliver!
+    NotificationMailer.bulk_deletion_inst_admin_approval(@institution, @bulk_job, @forbidden_idents, log, token, csv).deliver!
     respond_to do |format|
       format.json { head :no_content }
       format.html {
@@ -282,7 +285,6 @@ class InstitutionsController < ApplicationController
 
   def build_bulk_deletion_list
     @forbidden_idents = { }
-    @final_ident_list = []
     initial_identifiers = @ident_list
     initial_identifiers.each do |identifier|
       current = IntellectualObject.find_by_identifier(identifier)
@@ -293,7 +295,7 @@ class InstitutionsController < ApplicationController
       elsif !pending.nil?
         @forbidden_idents[identifier] = "Your item cannot be deleted at this time due to a pending #{pending.action} request. You may delete this object after the #{pending.action} request has completed."
       else
-        @final_ident_list.push(identifier)
+        current.is_a?(IntellectualObject) ? @bulk_job.intellectual_objects.push(current) : @bulk_job.generic_files.push(current)
       end
     end
   end

@@ -131,19 +131,20 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: "#{subject_line} deleted.")
   end
 
-  def bulk_deletion_inst_admin_approval(subject, ident_list, bad_idents, requesting_user, email_log, confirmation_token)
+  def bulk_deletion_inst_admin_approval(subject, bulk_job, bad_idents, email_log, confirmation_token, csv)
     @subject = subject
-    @ident_list = ident_list
     @bad_idents = bad_idents
-    @requesting_user = requesting_user
-    @confirmation_url = bulk_deletion_institutional_confirmation_url(@subject, ident_list: @ident_list, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
+    @requesting_user = User.where(email: bulk_job.requested_by).first
+    @confirmation_url = bulk_deletion_institutional_confirmation_url(@subject, bulk_delete_job_id: bulk_job.id, confirmation_token: confirmation_token.token)
     users = @subject.admin_users
     users.push(@requesting_user) if users.count == 0
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@subject.name}, This email notification is to inform you that #{@requesting_user.name} has made a bulk deletion request on behalf of your institution. The identifiers of the objects and/or files included in this request are listed at the bottom of the email. To confirm this bulk deletion request please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions. The following objects and files could not be part of a deletion request. <br> #{bad_idents.inspect} <br> Items included in bulk deletion request: #{ident_list.inspect}"
+    email_log.email_text = "Admin Users at #{@subject.name}, This email notification is to inform you that #{@requesting_user.name} has made a bulk deletion request on behalf of your institution. The identifiers of the objects and/or files included in this request are listed in an attached CSV file. To confirm this bulk deletion request please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions. The following objects and files could not be part of a deletion request. <br> #{bad_idents.inspect}"
     email_log.save!
+    bulk_job.emails.push(email_log)
+    attachments['requested_deletions.csv'] = { mime_type: 'text/csv', content: csv }
     mail(to: emails, subject: "#{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
   end
 
@@ -209,7 +210,7 @@ class NotificationMailer < ApplicationMailer
     @subject.admin_users.each { |user| users.push(user) }
     emails = []
     users.each { |user| emails.push(user.email) }
-    attachments['deletions.csv'] = { mime_type: 'text/csv', content: csv,  }
+    attachments['deletions.csv'] = { mime_type: 'text/csv', content: csv }
     mail(to: emails, subject: 'New Completed Deletions')
   end
 

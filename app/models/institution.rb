@@ -9,6 +9,7 @@ class Institution < ActiveRecord::Base
   has_many :premis_events, through: :generic_files
   has_many :snapshots
   has_many :dpn_bags
+  has_many :bulk_delete_jobs
   has_one :confirmation_token
 
   validates :name, :identifier, :type, presence: true
@@ -85,6 +86,21 @@ class Institution < ActiveRecord::Base
           row = [item.generic_file_identifier, item.date.to_s, item.user, inst_app, apt_app]
           csv << row
         end
+      end
+    end
+  end
+
+  def generate_confirmation_csv(bulk_job)
+    attributes = ['Identifier']
+    CSV.generate(headers: true) do |csv|
+      csv << attributes
+      bulk_job.intellectual_objects.each do |object|
+        row = [object.identifier]
+        csv << row
+      end
+      bulk_job.generic_files.each do |file|
+        row = [file.identifier]
+        csv << row
       end
     end
   end

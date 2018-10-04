@@ -10,12 +10,53 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_21_145825) do
+ActiveRecord::Schema.define(version: 2018_10_04_203804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "checksums", force: :cascade do |t|
+  create_table "bulk_delete_jobs", force: :cascade do |t|
+    t.string "requested_by"
+    t.string "institutional_approver"
+    t.string "aptrust_approver"
+    t.datetime "institutional_approval_at"
+    t.datetime "aptrust_approval_at"
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "institution_id", null: false
+  end
+
+  create_table "bulk_delete_jobs_emails", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "email_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_emails_on_bulk_delete_job_id"
+    t.index ["email_id"], name: "index_bulk_delete_jobs_emails_on_email_id"
+  end
+
+  create_table "bulk_delete_jobs_generic_files", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "generic_file_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_generic_files_on_bulk_delete_job_id"
+    t.index ["generic_file_id"], name: "index_bulk_delete_jobs_generic_files_on_generic_file_id"
+  end
+
+  create_table "bulk_delete_jobs_institutions", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "institution_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_institutions_on_bulk_delete_job_id"
+    t.index ["institution_id"], name: "index_bulk_delete_jobs_institutions_on_institution_id"
+  end
+
+  create_table "bulk_delete_jobs_intellectual_objects", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "intellectual_object_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_intellectual_objects_on_bulk_job_id"
+    t.index ["intellectual_object_id"], name: "index_bulk_delete_jobs_intellectual_objects_on_object_id"
+  end
+
+  create_table "checksums", id: false, force: :cascade do |t|
+    t.serial "id", null: false
     t.string "algorithm"
     t.string "datetime"
     t.string "digest"
@@ -25,14 +66,16 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.index ["generic_file_id"], name: "index_checksums_on_generic_file_id"
   end
 
-  create_table "confirmation_tokens", force: :cascade do |t|
+  create_table "confirmation_tokens", id: false, force: :cascade do |t|
+    t.bigserial "id", null: false
     t.string "token"
     t.integer "intellectual_object_id"
     t.integer "generic_file_id"
     t.integer "institution_id"
   end
 
-  create_table "dpn_bags", force: :cascade do |t|
+  create_table "dpn_bags", id: false, force: :cascade do |t|
+    t.bigserial "id", null: false
     t.integer "institution_id"
     t.string "object_identifier"
     t.string "dpn_identifier"
@@ -46,7 +89,8 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "dpn_work_items", force: :cascade do |t|
+  create_table "dpn_work_items", id: false, force: :cascade do |t|
+    t.serial "id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "remote_node", limit: 20, default: "", null: false
@@ -65,7 +109,8 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
   end
 
-  create_table "emails", force: :cascade do |t|
+  create_table "emails", id: false, force: :cascade do |t|
+    t.bigserial "id", null: false
     t.string "email_type"
     t.string "event_identifier"
     t.integer "item_id"
@@ -93,20 +138,21 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
   end
 
   create_table "emails_premis_events", id: false, force: :cascade do |t|
-    t.integer "premis_event_id"
-    t.integer "email_id"
+    t.bigint "premis_event_id"
+    t.bigint "email_id"
     t.index ["email_id"], name: "index_emails_premis_events_on_email_id"
     t.index ["premis_event_id"], name: "index_emails_premis_events_on_premis_event_id"
   end
 
   create_table "emails_work_items", id: false, force: :cascade do |t|
-    t.integer "work_item_id"
-    t.integer "email_id"
+    t.bigint "work_item_id"
+    t.bigint "email_id"
     t.index ["email_id"], name: "index_emails_work_items_on_email_id"
     t.index ["work_item_id"], name: "index_emails_work_items_on_work_item_id"
   end
 
-  create_table "generic_files", force: :cascade do |t|
+  create_table "generic_files", id: false, force: :cascade do |t|
+    t.serial "id", null: false
     t.string "file_format"
     t.string "uri"
     t.bigint "size"
@@ -115,14 +161,13 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "state"
-    t.text "ingest_state"
     t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
+    t.text "ingest_state"
     t.integer "institution_id", null: false
-    t.string "storage_option", default: "standard"
+    t.string "storage_option", default: "Standard", null: false
     t.index ["created_at"], name: "index_generic_files_on_created_at"
     t.index ["file_format", "state"], name: "index_generic_files_on_file_format_and_state"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
-    t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
     t.index ["institution_id", "size", "state"], name: "index_generic_files_on_institution_id_and_size_and_state"
     t.index ["institution_id", "state", "file_format"], name: "index_files_on_inst_state_and_format"
     t.index ["institution_id", "state", "updated_at"], name: "index_files_on_inst_state_and_updated"
@@ -138,7 +183,8 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.index ["updated_at"], name: "index_generic_files_on_updated_at"
   end
 
-  create_table "institutions", force: :cascade do |t|
+  create_table "institutions", id: false, force: :cascade do |t|
+    t.serial "id", null: false
     t.string "name"
     t.string "brief_name"
     t.string "identifier"
@@ -152,7 +198,8 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.index ["name"], name: "index_institutions_on_name"
   end
 
-  create_table "intellectual_objects", force: :cascade do |t|
+  create_table "intellectual_objects", id: false, force: :cascade do |t|
+    t.serial "id", null: false
     t.string "title"
     t.text "description"
     t.string "identifier"
@@ -167,11 +214,10 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.string "dpn_uuid"
     t.text "ingest_state"
     t.string "bag_group_identifier", default: "", null: false
-    t.string "storage_option", default: "standard"
+    t.string "storage_option", default: "Standard", null: false
     t.index ["access"], name: "index_intellectual_objects_on_access"
     t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
     t.index ["created_at"], name: "index_intellectual_objects_on_created_at"
-    t.index ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
     t.index ["institution_id", "state"], name: "index_intellectual_objects_on_institution_id_and_state"
     t.index ["institution_id"], name: "index_intellectual_objects_on_institution_id"
     t.index ["state"], name: "index_intellectual_objects_on_state"
@@ -187,7 +233,7 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.index ["password_archivable_type", "password_archivable_id"], name: "index_password_archivable"
   end
 
-  create_table "premis_events", force: :cascade do |t|
+  create_table "premis_events", id: :serial, force: :cascade do |t|
     t.string "identifier"
     t.string "event_type"
     t.string "date_time"
@@ -200,8 +246,8 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "outcome"
     t.integer "institution_id"
+    t.string "outcome"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"
@@ -219,7 +265,7 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.index ["outcome"], name: "index_premis_events_on_outcome"
   end
 
-  create_table "roles", force: :cascade do |t|
+  create_table "roles", id: :serial, force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -244,14 +290,14 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.bigint "go_bytes"
   end
 
-  create_table "usage_samples", force: :cascade do |t|
+  create_table "usage_samples", id: :serial, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "institution_id"
     t.text "data"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", id: :serial, force: :cascade do |t|
     t.string "name"
     t.string "email"
     t.string "phone_number"
@@ -269,11 +315,6 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.integer "institution_id"
     t.text "encrypted_api_secret_key"
     t.datetime "password_changed_at"
-    t.string "encrypted_otp_secret"
-    t.string "encrypted_otp_secret_iv"
-    t.string "encrypted_otp_secret_salt"
-    t.integer "consumed_timestep"
-    t.boolean "otp_required_for_login"
     t.datetime "deactivated_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"
@@ -281,7 +322,7 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-  create_table "work_item_states", force: :cascade do |t|
+  create_table "work_item_states", id: :serial, force: :cascade do |t|
     t.integer "work_item_id"
     t.string "action", null: false
     t.binary "state"
@@ -289,7 +330,7 @@ ActiveRecord::Schema.define(version: 2018_09_21_145825) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "work_items", force: :cascade do |t|
+  create_table "work_items", id: :serial, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "intellectual_object_id"

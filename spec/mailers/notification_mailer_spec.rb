@@ -344,9 +344,11 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:object) { FactoryBot.create(:intellectual_object, institution: institution) }
     let(:file) { FactoryBot.create(:generic_file, institution: institution) }
     let(:email_log) { FactoryBot.create(:bulk_deletion_request_email, institution_id: institution.id) }
+    let(:job) { BulkDeleteJob.create_job(institution, admin_user, [object], [file]) }
     let(:token) { FactoryBot.create(:confirmation_token, institution: institution) }
     let(:ident_list) { [object.identifier, file.identifier] }
-    let(:mail) { described_class.bulk_deletion_inst_admin_approval(institution, ident_list, {}, admin_user, email_log, token).deliver_now }
+    let(:csv) { institution.generate_confirmation_csv(job) }
+    let(:mail) { described_class.bulk_deletion_inst_admin_approval(institution, job, {}, email_log, token, csv).deliver_now }
 
     it 'renders the subject' do
       expect(mail.subject).to eq("#{admin_user.name} has made a bulk deletion request on behalf of #{institution.name}.")
@@ -362,11 +364,19 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'assigns @confirmation_url' do
-      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_institution?confirmation_token=#{token.token}&ident_list%5B%5D=#{CGI.escape(object.identifier)}&ident_list%5B%5D=#{CGI.escape(file.identifier)}&requesting_user_id=#{admin_user.id}")
+      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_institution?bulk_delete_job_id=#{job.id}&confirmation_token=#{token.token}")
     end
 
     it 'has an email log with proper associations' do
       expect(email_log.institution_id).to eq(institution.id)
+    end
+
+    it 'has a csv attachment' do
+      expect(mail.attachments.count).to eq(1)
+      attachment = mail.attachments[0]
+      attachment.should be_a_kind_of(Mail::Part)
+      attachment.content_type.should include('text/csv')
+      attachment.filename.should == 'requested_deletions.csv'
     end
   end
 
