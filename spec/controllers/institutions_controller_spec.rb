@@ -7,6 +7,7 @@ RSpec.describe InstitutionsController, type: :controller do
     User.delete_all
     Institution.delete_all
     WorkItem.delete_all
+    BulkDeleteJob.delete_all
   end
 
   after do
@@ -15,6 +16,7 @@ RSpec.describe InstitutionsController, type: :controller do
     User.delete_all
     Institution.delete_all
     WorkItem.delete_all
+    BulkDeleteJob.delete_all
   end
 
   let(:institution_one) { FactoryBot.create(:member_institution) }
@@ -566,8 +568,10 @@ RSpec.describe InstitutionsController, type: :controller do
         post :trigger_bulk_delete, params: { institution_identifier: institution_one.identifier }, body: { ident_list: ident_hash }.to_json, format: :json
         expect(assigns[:institution]).to eq institution_one
         expect(assigns[:ident_list].count).to eq 6
-        expect(assigns[:final_ident_list].count).to eq 4
-        expect(assigns[:final_ident_list]).to eq [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
+        expect(assigns[:bulk_job].intellectual_objects.count).to eq 2
+        expect(assigns[:bulk_job].intellectual_objects.map &:identifier).to eq [obj1.identifier, obj2.identifier]
+        expect(assigns[:bulk_job].generic_files.count).to eq 2
+        expect(assigns[:bulk_job].generic_files.map &:identifier).to eq [file1.identifier, file2.identifier]
         expect(assigns[:forbidden_idents].count).to eq 2
         expect(assigns[:forbidden_idents][obj3.identifier]).to eq 'This item has already been deleted.'
         expect(assigns[:forbidden_idents][file3.identifier]).to eq 'This item has already been deleted.'
@@ -575,7 +579,7 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(count_after).to eq count_before + 1
         token = ConfirmationToken.where(institution_id: institution_one.id).first
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_one.identifier)}/confirm_bulk_delete_institution?confirmation_token=#{token.token}&ident_list%5B%5D=#{CGI.escape(obj1.identifier)}&ident_list%5B%5D=#{CGI.escape(obj2.identifier)}&ident_list%5B%5D=#{CGI.escape(file1.identifier)}&ident_list%5B%5D=#{CGI.escape(file2.identifier)}&requesting_user_id=#{admin_user.id}")
+        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_one.identifier)}/confirm_bulk_delete_institution?bulk_delete_job_id=#{assigns[:bulk_job].id}&confirmation_token=#{token.token}")
       end
 
     end
@@ -636,16 +640,22 @@ RSpec.describe InstitutionsController, type: :controller do
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
         count_before = Email.all.count
-        ident_hash = [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
-        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email)
+        bulk_job.intellectual_objects.push(obj1)
+        bulk_job.intellectual_objects.push(obj2)
+        bulk_job.generic_files.push(file1)
+        bulk_job.generic_files.push(file2)
+        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, bulk_delete_job_id: bulk_job.id }
         expect(assigns[:institution]).to eq institution_three
+        expect(assigns[:bulk_job].institutional_approver).to eq institutional_admin.email
+        expect(assigns[:bulk_job].institutional_approval_at).not_to be_nil
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
         new_token = ConfirmationToken.where(institution_id: institution_three.id).first
         expect(assigns[:institution].confirmation_token).to eq new_token
         expect(new_token.token).not_to eq token.token
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_three.identifier)}/confirm_bulk_delete_admin?confirmation_token=#{new_token.token}&ident_list%5B%5D=#{CGI.escape(obj1.identifier)}&ident_list%5B%5D=#{CGI.escape(obj2.identifier)}&ident_list%5B%5D=#{CGI.escape(file1.identifier)}&ident_list%5B%5D=#{CGI.escape(file2.identifier)}&inst_approver_id=#{institutional_admin.id}&requesting_user_id=#{admin_user.id}")
+        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_three.identifier)}/confirm_bulk_delete_admin?bulk_delete_job_id=#{bulk_job.id}&confirmation_token=#{new_token.token}")
       end
 
       it 'responds unsuccessfully if the confirmation token is invalid' do
@@ -697,13 +707,19 @@ RSpec.describe InstitutionsController, type: :controller do
         item2 = FactoryBot.create(:ingested_item, object_identifier: obj2.identifier, intellectual_object: obj2)
         item3 = FactoryBot.create(:ingested_item, object_identifier: obj4.identifier, intellectual_object: obj4)
         item4 = FactoryBot.create(:ingested_item, object_identifier: obj5.identifier, intellectual_object: obj5)
-        token = FactoryBot.create(:confirmation_token, institution: institution_three)
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email, institutional_approver: institutional_admin.email)
+        bulk_job.intellectual_objects.push(obj1)
+        bulk_job.intellectual_objects.push(obj2)
+        bulk_job.generic_files.push(file1)
+        bulk_job.generic_files.push(file2)
+        token = FactoryBot.create(:confirmation_token, institution: institution_three)
         count_before = Email.all.count
-        ident_hash = [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
-        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, bulk_delete_job_id: bulk_job.id }
         expect(assigns[:institution]).to eq institution_three
+        expect(assigns[:bulk_job].aptrust_approver).to eq admin_user.email
+        expect(assigns[:bulk_job].aptrust_approval_at).not_to be_nil
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
         email = ActionMailer::Base.deliveries.last
@@ -794,9 +810,14 @@ RSpec.describe InstitutionsController, type: :controller do
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
         count_before = Email.all.count
-        ident_hash = [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
-        post :finished_bulk_delete, params: { institution_identifier: institution_three.identifier, requesting_user_id: extra_admin.id, inst_approver_id: institutional_admin.id, apt_approver_id: admin_user.id }, body: { ident_list: ident_hash }.to_json
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email, institutional_approver: institutional_admin.email)
+        bulk_job.intellectual_objects.push(obj1)
+        bulk_job.intellectual_objects.push(obj2)
+        bulk_job.generic_files.push(file1)
+        bulk_job.generic_files.push(file2)
+        post :finished_bulk_delete, params: { institution_identifier: institution_three.identifier, bulk_delete_job_id: bulk_job.id }
         expect(assigns[:institution]).to eq institution_three
+        expect(assigns[:bulk_job]).to eq bulk_job
         expect(flash[:notice]).to eq "Bulk deletion job for #{institution_three.name} has been completed."
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1

@@ -131,11 +131,11 @@ class InstitutionsController < ApplicationController
 
   def trigger_bulk_delete
     authorize @institution, :bulk_delete?
-    @bulk_job = BulkDeleteJob.create(requested_by: current_user.email, institution: @institution)
+    @bulk_job = BulkDeleteJob.create(requested_by: current_user.email, institution_id: @institution.id)
     @bulk_job.save!
     parse_ident_list
     build_bulk_deletion_list
-    csv = Institution.generate_confirmation_csv(@bulk_job)
+    csv = @institution.generate_confirmation_csv(@bulk_job)
     log = Email.log_deletion_request(@institution)
     ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
     token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
@@ -153,12 +153,16 @@ class InstitutionsController < ApplicationController
   def partial_confirmation_bulk_delete
     authorize @institution
     if params[:confirmation_token] == @institution.confirmation_token.token
+      @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
+      @bulk_job.institutional_approver = current_user.email
+      @bulk_job.institutional_approval_at = Time.now.utc
+      @bulk_job.save!
       log = Email.log_bulk_deletion_confirmation(@institution, 'partial')
+      csv = @institution.generate_confirmation_csv(@bulk_job)
       ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
       token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
       token.save!
-      #parse_ident_list
-      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, params[:ident_list], current_user.id, params[:requesting_user_id], log, token).deliver!
+      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, @bulk_job, log, token, csv).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -184,10 +188,14 @@ class InstitutionsController < ApplicationController
   def final_confirmation_bulk_delete
     authorize @institution
     if params[:confirmation_token] == @institution.confirmation_token.token
-      #parse_ident_list
+      @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
+      @bulk_job.aptrust_approver = current_user.email
+      @bulk_job.aptrust_approval_at = Time.now.utc
+      @bulk_job.save!
       confirmed_destroy
       log = Email.log_bulk_deletion_confirmation(@institution, 'final')
-      NotificationMailer.bulk_deletion_queued(@institution, params[:ident_list], current_user.id, params[:inst_approver_id], params[:requesting_user_id], log).deliver!
+      csv = @institution.generate_confirmation_csv(@bulk_job)
+      NotificationMailer.bulk_deletion_queued(@institution, @bulk_job, log, csv).deliver!
       respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -212,10 +220,14 @@ class InstitutionsController < ApplicationController
 
   def finished_bulk_delete
     authorize @institution
-    parse_ident_list
+    @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
+    @bulk_job.aptrust_approver = current_user.email
+    @bulk_job.aptrust_approval_at = Time.now.utc
+    @bulk_job.save!
     bulk_mark_deleted
     log = Email.log_deletion_finished(@institution)
-    NotificationMailer.bulk_deletion_finished(@institution, @ident_list, params[:apt_approver_id], params[:inst_approver_id], params[:requesting_user_id], log).deliver!
+    csv = @institution.generate_confirmation_csv(@bulk_job)
+    NotificationMailer.bulk_deletion_finished(@institution, @bulk_job, log, csv).deliver!
     respond_to do |format|
       format.json { head :no_content }
       format.html { 
@@ -301,8 +313,8 @@ class InstitutionsController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
-    inst_approver = User.readable(current_user).find(params[:inst_approver_id])
+    requesting_user = User.where(email: @bulk_job.requested_by).first
+    inst_approver = User.where(email: @bulk_job.institutional_approver).first
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: "#{Time.now}",
                    detail: 'Object deleted from S3 storage',
@@ -313,26 +325,29 @@ class InstitutionsController < ApplicationController
                    outcome_information: "Action requested by user from #{requesting_user.institution_id}",
                    identifier: SecureRandom.uuid
     }
-    params[:ident_list].each do |identifier|
-      io = IntellectualObject.with_identifier(identifier).first
-      gf = GenericFile.with_identifier(identifier).first
+    @bulk_job.intellectual_objects.each do |obj|
       options = {inst_app: inst_approver.email, apt_app: current_user.email}
-      io.soft_delete(attributes, options) unless io.nil?
-      gf.soft_delete(attributes, options) unless gf.nil?
+      obj.soft_delete(attributes, options)
+    end
+
+    @bulk_job.generic_files.each do |file|
+      options = {inst_app: inst_approver.email, apt_app: current_user.email}
+      file.soft_delete(attributes, options)
     end
   end
 
   def bulk_mark_deleted
-    @ident_list.each do |identifier|
-      io = IntellectualObject.with_identifier(identifier).first
-      gf = GenericFile.with_identifier(identifier).first
-      if io && WorkItem.deletion_finished?(io.identifier)
-        io.state = 'D'
-        io.save!
+    @bulk_job.intellectual_objects.each do |obj|
+      if WorkItem.deletion_finished?(obj.identifier)
+        obj.state = 'D'
+        obj.save!
       end
-      if gf && WorkItem.deletion_finished_for_file?(gf.identifier)
-        gf.state = 'D'
-        gf.save!
+    end
+
+    @bulk_job.generic_files.each do |file|
+      if WorkItem.deletion_finished_for_file?(file.identifier)
+        file.state = 'D'
+        file.save!
       end
     end
   end

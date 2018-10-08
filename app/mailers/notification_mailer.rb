@@ -148,53 +148,53 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: "#{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
   end
 
-  def bulk_deletion_apt_admin_approval(subject, ident_list, inst_approver, requesting_user, email_log, confirmation_token)
+  def bulk_deletion_apt_admin_approval(subject, bulk_job, email_log, confirmation_token, csv)
     @subject = subject
-    @ident_list = ident_list
-    @inst_approver = User.find(inst_approver)
-    @requesting_user = User.find(requesting_user)
-    @confirmation_url = bulk_deletion_admin_confirmation_url(@subject, ident_list: @ident_list, requesting_user_id: @requesting_user.id, inst_approver_id: @inst_approver.id, confirmation_token: confirmation_token.token)
+    @inst_approver = User.where(email: bulk_job.institutional_approver).first
+    @requesting_user = User.where(email: bulk_job.requested_by).first
+    @confirmation_url = bulk_deletion_admin_confirmation_url(@subject, bulk_delete_job_id: bulk_job.id, confirmation_token: confirmation_token.token)
     users = @subject.bulk_deletion_users(@requesting_user)
     users.push(@requesting_user) if users.count == 0
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at APTrust, This email notification is to inform you that #{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name} that was approved by #{@inst_approver.name}. The identifiers of the objects and/or files included in this request are listed below. To confirm this bulk deletion request a final time, please click the link below: #{@confirmation_url} <br> #{ident_list.inspect}"
+    email_log.email_text = "Admin Users at APTrust, This email notification is to inform you that #{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name} that was approved by #{@inst_approver.name}. The identifiers of the objects and/or files included in this request are listed in an attached CSV file. To confirm this bulk deletion request a final time, please click the link below: #{@confirmation_url}"
     email_log.save!
+    attachments['requested_deletions.csv'] = { mime_type: 'text/csv', content: csv }
     mail(to: emails, subject: "#{@requesting_user.name} and #{@inst_approver.name} have made a bulk deletion request on behalf of #{@subject.name}.")
   end
 
-  def bulk_deletion_queued(subject, ident_list, apt_approver, inst_approver, requesting_user, email_log)
+  def bulk_deletion_queued(subject, bulk_job, email_log, csv)
     @subject = subject
-    @ident_list = ident_list
-    @apt_approver = User.find(apt_approver)
-    @inst_approver = User.find(inst_approver)
-    @requesting_user = User.find(requesting_user)
+    @apt_approver = User.where(email: bulk_job.aptrust_approver).first
+    @inst_approver = User.where(email: bulk_job.institutional_approver).first
+    @requesting_user = User.where(email: bulk_job.requested_by).first
     users = []
     @subject.apt_users.each { |user| users.push(user) }
     @subject.admin_users.each { |user| users.push(user) }
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has been successfully queued for deletion. <br> #{ident_list.inspect}"
+    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has been successfully queued for deletion. Please see the attached CSV file for a list of identifiers."
     email_log.save!
+    attachments['queued_deletions.csv'] = { mime_type: 'text/csv', content: csv }
     mail(to: emails, subject: "A bulk deletion request has been successfully queued for #{@subject.name}.")
   end
 
-  def bulk_deletion_finished(subject, ident_list, apt_approver, inst_approver, requesting_user, email_log)
+  def bulk_deletion_finished(subject, bulk_job, email_log, csv)
     @subject = subject
-    @ident_list = ident_list
-    @apt_approver = User.find(apt_approver)
-    @inst_approver = User.find(inst_approver)
-    @requesting_user = User.find(requesting_user)
+    @apt_approver = User.where(email: bulk_job.aptrust_approver).first
+    @inst_approver = User.where(email: bulk_job.institutional_approver).first
+    @requesting_user = User.where(email: bulk_job.requested_by).first
     users = []
     @subject.apt_users.each { |user| users.push(user) }
     @subject.admin_users.each { |user| users.push(user) }
     emails = []
     users.each { |user| emails.push(user.email) }
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has successfully finished and all objects and / or files have been deleted. <br> #{ident_list.inspect}"
+    email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has successfully finished and all objects and / or files have been deleted."
     email_log.save!
+    attachments['finished_deletions.csv'] = { mime_type: 'text/csv', content: csv }
     mail(to: emails, subject: "A bulk deletion request has been successfully completed for #{@subject.name}.")
   end
 
