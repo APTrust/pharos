@@ -742,15 +742,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
           expect(assigns[:intellectual_object].state).to eq 'D'
           expect(response.code).to eq '204'
-          count_after = Email.all.count
-          expect(count_after).to eq count_before + 1
-
-          # PT #160823207: System is no longer generating this email.
-          # Now we're doing a single daily confirmation email as described in PT #160823502
-          # -----------------------------------------
-          # email = ActionMailer::Base.deliveries.last
-          # expect(email.body.encoded).to include("http://localhost:3000/objects/#{CGI.escape(deletable_obj.identifier)}")
-          # expect(email.body.encoded).to include('has been successfully deleted')
         end
 
         it 'should raise exception if there is no delete event' do

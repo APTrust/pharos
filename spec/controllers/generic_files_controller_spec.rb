@@ -538,16 +538,6 @@ RSpec.describe GenericFilesController, type: :controller do
           get :finished_destroy, params: { generic_file_identifier: file, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
           expect(assigns[:generic_file].state).to eq 'D'
           expect(response.code).to eq '204'
-          count_after = Email.all.count
-          expect(count_after).to eq count_before + 1
-
-          # PT #160823207: System is no longer generating this email.
-          # Now we're doing a single daily confirmation email as described in PT #160823502
-          # -----------------------------------------
-          # email = ActionMailer::Base.deliveries.last
-          # expect(email.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}")
-          # expect(email.body.encoded).to include('has been successfully deleted')
-
         end
 
         it 'should raise an exception if there is no PREMIS deletion event' do

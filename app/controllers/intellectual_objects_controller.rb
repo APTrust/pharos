@@ -142,10 +142,6 @@ class IntellectualObjectsController < ApplicationController
   def finished_destroy
     authorize @intellectual_object
     @intellectual_object.mark_deleted
-    log = Email.log_deletion_finished(@intellectual_object)
-    # PT #160823207: Turn this off in favor of a single daily confirmation email
-    # as described in PT #160823502
-    # NotificationMailer.deletion_finished(@intellectual_object, params[:requesting_user_id], params[:inst_approver_id], log).deliver!
     respond_to do |format|
         format.json { head :no_content }
         format.html {
