@@ -97,5 +97,5 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
-  config.show_send_to_dpn_button = true
+  config.show_send_to_dpn_button = false
 end
