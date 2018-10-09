@@ -114,19 +114,19 @@ class DpnWorkItemsController < ApplicationController
   def issue_requeue_http_post(task)
     if @dpn_item.task == 'replication'
       if task == 'copy'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_copy_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_copy_topic")
       elsif task == 'validation'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_validation_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_validation_topic")
       elsif task == 'store'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_replication_store_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_replication_store_topic")
       end
     elsif @dpn_item.task == 'ingest'
       if task == 'package'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_package_topic")
       elsif task == 'store'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_ingest_store_topic")
       elsif task == 'record'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_record_topic")
       end
     end
     http = Net::HTTP.new(uri.host, uri.port)
