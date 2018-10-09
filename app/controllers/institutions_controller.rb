@@ -1,8 +1,9 @@
 class InstitutionsController < ApplicationController
   inherit_resources
+  skip_before_action :verify_authenticity_token, only: [:trigger_bulk_delete]
   before_action :authenticate_user!
-  before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot, :deactivate, :reactivate, 
-                                          :trigger_bulk_delete, :partial_confirmation_bulk_delete, :final_confirmation_bulk_delete, 
+  before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot, :deactivate, :reactivate,
+                                          :trigger_bulk_delete, :partial_confirmation_bulk_delete, :final_confirmation_bulk_delete,
                                           :finished_bulk_delete]
   respond_to :json, :html
   after_action :verify_authorized, :except => :index
@@ -230,7 +231,7 @@ class InstitutionsController < ApplicationController
     NotificationMailer.bulk_deletion_finished(@institution, @bulk_job, log, csv).deliver!
     respond_to do |format|
       format.json { head :no_content }
-      format.html { 
+      format.html {
         flash[:notice] = "Bulk deletion job for #{@institution.name} has been completed."
         redirect_to root_path
       }
