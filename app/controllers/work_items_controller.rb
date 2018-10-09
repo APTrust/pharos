@@ -407,7 +407,7 @@ class WorkItemsController < ApplicationController
 
   def issue_requeue_http_post(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      ri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_delete_topic")
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
       if @work_item.generic_file_identifier.blank?
         # Restore full bag
