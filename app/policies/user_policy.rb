@@ -93,6 +93,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def nil_bulk_job_show?
+    user.admin? || user.institutional_admin?
+  end
+
   def checksum_index?
     user.admin?
   end

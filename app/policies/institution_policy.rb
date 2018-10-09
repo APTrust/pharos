@@ -70,6 +70,10 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def bulk_delete_job_index?
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.id))
+  end
+
   def reports?
     user.admin? || user.institution_id == record.id
   end

@@ -1,0 +1,61 @@
+<div id="content" class="col-md-10">
+  <ol class="breadcrumb">
+    <li><a href="#"><%= link_to @institution.name, institution_path(@institution) %></a></li>
+    <li class="active"><%= @bulk_job.id %></li>
+  </ol>
+
+  <section class="page-header">
+    <h2>Bulk Delete Job for <%= @institution.name %> requested on <%= @bulk_job.created_at %></h2>
+  </section>
+
+  <section class="queue">
+    <table class="table indiv_job">
+      <tbody>
+      <tr><th>Requested By</th>
+        <td><%= @bulk_job.requested_by %></td></tr>
+      <tr><th>Institutional Approver</th>
+        <td><%= @bulk_job.institutional_approver %></td></tr>
+      <tr><th>APTrust Approver</th>
+        <td><%= @bulk_job.aptrust_approver %></td></tr>
+      <tr><th>Institutional Approval At</th>
+        <td><%= pretty_date(@bulk_job.institutional_approval_at) %></td></tr>
+      <tr><th>APTrust Approval At</th>
+        <td><%= pretty_date(@bulk_job.aptrust_approval_at) %></td></tr>
+      <tr><th>Created At</th>
+        <td><%= pretty_date(@bulk_job.created_at) %></td></tr>
+      <tr><th>Updated At</th>
+        <td><%= pretty_date(@bulk_job.updated_at) %></td></tr>
+      <tr><th>Note</th>
+        <td><%= @bulk_job.note %></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="panel">
+    <% if @bulk_job.institutional_approver.nil? && @bulk_job.aptrust_approver.nil? && !params[:confirmation_token].nil? %>
+      <%= link_to bulk_deletion_institutional_confirmation_url(@institution, bulk_delete_job_id: @bulk_job.id, confirmation_token: params[:confirmation_token]), {class: 'btn doc-action-btn btn-normal'} do %>
+          <i class="glyphicon glyphicon-list-alt"></i> Confirm Objects and Files for Deletion
+      <% end %>
+    <% elsif @bulk_job.aptrust_approver.nil? && !params[:confirmation_token].nil? %>
+        <%= link_to bulk_deletion_admin_confirmation_url(@institution, bulk_delete_job_id: @bulk_job.id, confirmation_token: params[:confirmation_token]), {class: 'btn doc-action-btn btn-normal'} do %>
+            <i class="glyphicon glyphicon-list-alt"></i> Confirm Objects and Files for Deletion
+        <% end %>
+    <% end %>
+  </div>
+
+  <div class="panel">
+    <h4>Intellectual Objects included in Bulk Delete Job</h4>
+    <ol>
+      <% @bulk_job.intellectual_objects.each do |obj| %>
+        <li><a href="#"><%= link_to obj.identifier, obj %></a></li>
+      <% end %>
+    </ol>
+    <br>
+    <h4>Generic Files included in Bulk Delete Job</h4>
+    <ol>
+      <% @bulk_job.generic_files.each do |file| %>
+          <li><a href="#"><%= link_to file.identifier, file %></a></li>
+      <% end %>
+    </ol>
+  </div>
+</div>

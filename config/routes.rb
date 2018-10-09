@@ -151,6 +151,10 @@ Rails.application.routes.draw do
   # SNAPSHOT ROUTES
   resources :snapshots, path: 'snapshots', only: [:index, :show], format: [:json, :html]
 
+  # BULK DELETE JOB ROUTES
+  resources :bulk_delete_jobs, path: 'bulk_delete_jobs', only: [:index, :show], format: [:json, :html]
+  resources :bulk_delete_jobs, path: 'api/v2/bulk_delete_jobs', only: [:index, :show], format: :json
+
   # USER ROUTES
   devise_for :users
 

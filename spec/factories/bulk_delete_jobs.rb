@@ -5,5 +5,6 @@ FactoryBot.define do
     aptrust_approver { FactoryBot.create(:user, :admin).email }
     institutional_approval_at { Time.now.to_s }
     aptrust_approval_at { Time.now.to_s }
+    institution_id { FactoryBot.create(:member_institution).id }
   end
 end

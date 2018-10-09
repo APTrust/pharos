@@ -136,6 +136,7 @@ class NotificationMailer < ApplicationMailer
     @bad_idents = bad_idents
     @requesting_user = User.where(email: bulk_job.requested_by).first
     @confirmation_url = bulk_deletion_institutional_confirmation_url(@subject, bulk_delete_job_id: bulk_job.id, confirmation_token: confirmation_token.token)
+    @bulk_job_view_url = bulk_delete_job_url(bulk_job.id, confirmation_token: confirmation_token.token)
     users = @subject.admin_users
     users.push(@requesting_user) if users.count == 0
     emails = []
@@ -153,6 +154,7 @@ class NotificationMailer < ApplicationMailer
     @inst_approver = User.where(email: bulk_job.institutional_approver).first
     @requesting_user = User.where(email: bulk_job.requested_by).first
     @confirmation_url = bulk_deletion_admin_confirmation_url(@subject, bulk_delete_job_id: bulk_job.id, confirmation_token: confirmation_token.token)
+    @bulk_job_view_url = bulk_delete_job_url(bulk_job.id, confirmation_token: confirmation_token.token)
     users = @subject.bulk_deletion_users(@requesting_user)
     users.push(@requesting_user) if users.count == 0
     emails = []
@@ -169,6 +171,7 @@ class NotificationMailer < ApplicationMailer
     @apt_approver = User.where(email: bulk_job.aptrust_approver).first
     @inst_approver = User.where(email: bulk_job.institutional_approver).first
     @requesting_user = User.where(email: bulk_job.requested_by).first
+    @bulk_job_view_url = bulk_delete_job_url(bulk_job.id)
     users = []
     @subject.apt_users.each { |user| users.push(user) }
     @subject.admin_users.each { |user| users.push(user) }

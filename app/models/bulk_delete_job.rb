@@ -19,10 +19,11 @@ class BulkDeleteJob < ActiveRecord::Base
   scope :institutional_approval_after, ->(param) { where('bulk_delete_jobs.institutional_approval_at > ?', param) unless param.blank? }
   scope :aptrust_approval_before, ->(param) { where('bulk_delete_jobs.aptrust_approval_at < ?', param) unless param.blank? }
   scope :aptrust_approval_after, ->(param) { where('bulk_delete_jobs.aptrust_approval_at > ?', param) unless param.blank? }
-  scope :with_institution, ->(param) {
+  scope :with_institution_identifier, ->(param) {
     joins(:institution)
         .where('institutions.identifier = ?', param) unless param.blank?
   }
+  scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
   scope :with_intellectual_object, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.identifier = ?', param) unless param.blank?
@@ -30,6 +31,12 @@ class BulkDeleteJob < ActiveRecord::Base
   scope :with_generic_file, ->(param) {
     joins(:generic_file)
         .where('generic_files.identifier = ?', param) unless param.blank?
+  }
+  scope :discoverable, ->(current_user) {
+    where(institution_id: current_user.institution.id) unless current_user.admin?
+  }
+  scope :readable, ->(current_user) {
+    where(institution_id: current_user.institution.id) unless current_user.admin?
   }
 
   def self.create_job(institution, user, objects=[], files=[])
