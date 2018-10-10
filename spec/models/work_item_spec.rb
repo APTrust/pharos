@@ -294,7 +294,7 @@ RSpec.describe WorkItem, :type => :model do
     end
 
     it 'should create a delete request when asked' do
-      wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com')
+      wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com', 'jeremy@example.com', 'joyce@example.com')
       wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['delete']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
@@ -302,6 +302,8 @@ RSpec.describe WorkItem, :type => :model do
       wi.note.should == 'Delete requested'
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
+      wi.inst_approver.should == 'jeremy@example.com'
+      wi.aptrust_approver.should == 'joyce@example.com'
       wi.retry.should == true
       wi.generic_file_identifier.should == 'abc/123/doc.pdf'
       wi.work_item_state.state.should be_nil

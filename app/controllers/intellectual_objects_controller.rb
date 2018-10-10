@@ -310,6 +310,7 @@ class IntellectualObjectsController < ApplicationController
 
   def confirmed_destroy
     requesting_user = User.readable(current_user).find(params[:requesting_user_id])
+    params[:inst_approver_id] ? inst_approver = User.readable(current_user).find(params[:inst_approver_id]).email : inst_approver = nil
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: "#{Time.now}",
                    detail: 'Object deleted from S3 storage',
@@ -318,15 +319,10 @@ class IntellectualObjectsController < ApplicationController
                    object: 'Goamz S3 Client',
                    agent: 'https://github.com/crowdmob/goamz',
                    outcome_information: "Action requested by user from #{requesting_user.institution_id}",
-                   identifier: SecureRandom.uuid
+                   identifier: SecureRandom.uuid,
+                   inst_app: inst_approver
     }
-    if params[:inst_approver_id]
-      inst_approver = User.readable(current_user).find(params[:inst_approver_id])
-      options = { inst_app: inst_approver.email }
-      @intellectual_object.soft_delete(attributes, options)
-    else
-      @intellectual_object.soft_delete(attributes)
-    end
+    @intellectual_object.soft_delete(attributes)
     log = Email.log_deletion_confirmation(@intellectual_object)
     NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
     ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all

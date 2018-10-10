@@ -810,7 +810,7 @@ RSpec.describe InstitutionsController, type: :controller do
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
         count_before = Email.all.count
-        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email, institutional_approver: institutional_admin.email)
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: admin_user.email, institutional_approver: institutional_admin.email, aptrust_approver: extra_admin.email)
         bulk_job.intellectual_objects.push(obj1)
         bulk_job.intellectual_objects.push(obj2)
         bulk_job.generic_files.push(file1)
@@ -822,8 +822,8 @@ RSpec.describe InstitutionsController, type: :controller do
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include("a bulk deletion job requested by #{extra_admin.name}")
-        expect(email.body.encoded).to include("and approved by #{institutional_admin.name} and #{admin_user.name} has successfully finished")
+        expect(email.body.encoded).to include("a bulk deletion job requested by #{admin_user.name}")
+        expect(email.body.encoded).to include("and approved by #{institutional_admin.name} and #{extra_admin.name} has successfully finished")
 
         reloaded_object = IntellectualObject.find(obj1.id)
         expect(reloaded_object.state).to eq 'D'

@@ -188,6 +188,7 @@ class InstitutionsController < ApplicationController
   def final_confirmation_bulk_delete
     authorize @institution
     if params[:confirmation_token] == @institution.confirmation_token.token
+      ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens
       @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
       @bulk_job.aptrust_approver = current_user.email
       @bulk_job.aptrust_approval_at = Time.now.utc
@@ -221,9 +222,6 @@ class InstitutionsController < ApplicationController
   def finished_bulk_delete
     authorize @institution
     @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
-    @bulk_job.aptrust_approver = current_user.email
-    @bulk_job.aptrust_approval_at = Time.now.utc
-    @bulk_job.save!
     bulk_mark_deleted
     log = Email.log_deletion_finished(@institution)
     csv = @institution.generate_confirmation_csv(@bulk_job)
@@ -313,8 +311,7 @@ class InstitutionsController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.where(email: @bulk_job.requested_by).first
-    inst_approver = User.where(email: @bulk_job.institutional_approver).first
+    requesting_user = User.readable(current_user).where(email: @bulk_job.requested_by).first
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: "#{Time.now}",
                    detail: 'Object deleted from S3 storage',
@@ -323,16 +320,16 @@ class InstitutionsController < ApplicationController
                    object: 'Goamz S3 Client',
                    agent: 'https://github.com/crowdmob/goamz',
                    outcome_information: "Action requested by user from #{requesting_user.institution_id}",
-                   identifier: SecureRandom.uuid
+                   identifier: SecureRandom.uuid,
+                   inst_app: @bulk_job.institutional_approver,
+                   apt_app: @bulk_job.aptrust_approver
     }
     @bulk_job.intellectual_objects.each do |obj|
-      options = {inst_app: inst_approver.email, apt_app: current_user.email}
-      obj.soft_delete(attributes, options)
+      obj.soft_delete(attributes)
     end
 
     @bulk_job.generic_files.each do |file|
-      options = {inst_app: inst_approver.email, apt_app: current_user.email}
-      file.soft_delete(attributes, options)
+      file.soft_delete(attributes)
     end
   end
 

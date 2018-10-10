@@ -318,7 +318,7 @@ class WorkItem < ActiveRecord::Base
   # Creates a WorkItem record showing that someone has requested
   # deletion of a GenericFile. This will eventually go into a queue for
   # the delete worker process.
-  def self.create_delete_request(intellectual_object_identifier, generic_file_identifier, requested_by, options={})
+  def self.create_delete_request(intellectual_object_identifier, generic_file_identifier, requested_by, inst_app, apt_app)
     item = WorkItem.last_ingested_version(intellectual_object_identifier)
     if item.nil?
       raise ActiveRecord::RecordNotFound
@@ -342,8 +342,8 @@ class WorkItem < ActiveRecord::Base
     delete_item.size = size
     delete_item.stage_started_at = nil
     delete_item.queued_at = nil
-    delete_item.inst_approver = options[:inst_app] if options && options[:inst_app]
-    delete_item.aptrust_approver = options[:apt_app] if options && options[:apt_app]  
+    delete_item.inst_approver = inst_app
+    delete_item.aptrust_approver = apt_app
     delete_item.save!
     delete_item
   end
