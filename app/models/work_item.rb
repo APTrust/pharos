@@ -133,6 +133,7 @@ class WorkItem < ActiveRecord::Base
     if self.action == Pharos::Application::PHAROS_ACTIONS['delete']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Delete requested'
+      self.outcome = 'Not started'
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
