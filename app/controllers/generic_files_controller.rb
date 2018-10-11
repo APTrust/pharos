@@ -172,10 +172,6 @@ class GenericFilesController < ApplicationController
   def finished_destroy
     authorize @generic_file
     @generic_file.mark_deleted
-    log = Email.log_deletion_finished(@generic_file)
-    # PT #160823207: Turn this off in favor of a single daily confirmation email
-    # as described in PT #160823502
-    # NotificationMailer.deletion_finished(@generic_file, params[:requesting_user_id], params[:inst_approver_id], log).deliver!
     respond_to do |format|
         format.json { head :no_content }
         format.html {
