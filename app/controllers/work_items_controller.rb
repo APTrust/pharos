@@ -407,39 +407,39 @@ class WorkItemsController < ApplicationController
 
   def issue_requeue_http_post(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
       if @work_item.generic_file_identifier.blank?
         # Restore full bag
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_restore_topic")
       else
         # Restore individual file. If it's in Glacier, we'll have to run
         # GlacierRestore first.
         gf = GenericFile.find_by_identifier(@work_item.generic_file_identifier)
         if gf && gf.storage_option == 'Standard'
-          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_file_restore_topic")
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_restore_topic")
         else
-          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_glacier_restore_init_topic")
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
         end
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if stage == Pharos::Application::PHAROS_STAGES['fetch']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_fetch_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['store']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_store_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_store_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['record']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_record_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_record_topic")
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn']
       if stage == Pharos::Application::PHAROS_STAGES['package']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_package_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['store']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_ingest_store_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['record']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_record_topic")
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
-      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_glacier_restore_init_topic")
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
     end
 
     http = Net::HTTP.new(uri.host, uri.port)
