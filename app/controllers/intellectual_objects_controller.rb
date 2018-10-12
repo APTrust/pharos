@@ -115,26 +115,39 @@ class IntellectualObjectsController < ApplicationController
 
   def confirm_destroy
     authorize @intellectual_object, :soft_delete?
-    if params[:confirmation_token] == @intellectual_object.confirmation_token.token
-      confirmed_destroy
+    if @intellectual_object.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS('delete')).with_object_identifier(@intellectual_object.identifier).count != 0)
       respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
-          redirect_to root_path
-        }
-      end
-    else
-      respond_to do |format|
-        message = 'Your object cannot be deleted at this time due to an invalid confirmation token. ' +
-            'Please contact your APTrust administrator for more information.'
+        message = 'This deletion request has already been confirmed and queued for deletion by someone else.'
         format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
+          render :json => { status: 'ok', message: message }, :status => :ok
         }
         format.html {
           redirect_to @intellectual_object
-          flash[:alert] = message
+          flash[:notice] = message
         }
+      end
+    else
+      if params[:confirmation_token] == @intellectual_object.confirmation_token.token
+        confirmed_destroy
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
+            redirect_to root_path
+          }
+        end
+      else
+        respond_to do |format|
+          message = 'Your object cannot be deleted at this time due to an invalid confirmation token. ' +
+              'Please contact your APTrust administrator for more information.'
+          format.json {
+            render :json => { status: 'error', message: message }, :status => :conflict
+          }
+          format.html {
+            redirect_to @intellectual_object
+            flash[:alert] = message
+          }
+        end
       end
     end
   end
@@ -305,8 +318,7 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
-    params[:inst_approver_id] ? inst_approver = User.readable(current_user).find(params[:inst_approver_id]).email : inst_approver = nil
+    requesting_user = User.find(params[:requesting_user_id])
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: "#{Time.now}",
                    detail: 'Object deleted from S3 storage',
@@ -316,7 +328,7 @@ class IntellectualObjectsController < ApplicationController
                    agent: 'https://github.com/crowdmob/goamz',
                    outcome_information: "Action requested by user from #{requesting_user.institution_id}",
                    identifier: SecureRandom.uuid,
-                   inst_app: inst_approver
+                   inst_app: current_user.email
     }
     @intellectual_object.soft_delete(attributes)
     log = Email.log_deletion_confirmation(@intellectual_object)

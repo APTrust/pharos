@@ -145,26 +145,39 @@ class GenericFilesController < ApplicationController
 
   def confirm_destroy
     authorize @generic_file, :soft_delete?
-    if params[:confirmation_token] == @generic_file.confirmation_token.token
-      confirmed_destroy
+    if @generic_file.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS('delete')).with_file_identifier(@generic_file.identifier).count == 1)
       respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}."
-          redirect_to @generic_file.intellectual_object
-        }
-      end
-    else
-      respond_to do |format|
-        message = 'Your file cannot be deleted at this time due to an invalid confirmation token. ' +
-            'Please contact your APTrust administrator for more information.'
+        message = 'This deletion request has already been confirmed and queued for deletion by someone else.'
         format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
+          render :json => { status: 'ok', message: message }, :status => :ok
         }
         format.html {
           redirect_to @generic_file
-          flash[:alert] = message
+          flash[:notice] = message
         }
+      end
+    else
+      if params[:confirmation_token] == @generic_file.confirmation_token.token
+        confirmed_destroy
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}."
+            redirect_to @generic_file.intellectual_object
+          }
+        end
+      else
+        respond_to do |format|
+          message = 'Your file cannot be deleted at this time due to an invalid confirmation token. ' +
+              'Please contact your APTrust administrator for more information.'
+          format.json {
+            render :json => { status: 'error', message: message }, :status => :conflict
+          }
+          format.html {
+            redirect_to @generic_file
+            flash[:alert] = message
+          }
+        end
       end
     end
   end
@@ -405,8 +418,7 @@ class GenericFilesController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
-    params[:inst_approver_id] ? inst_approver = User.readable(current_user).find(params[:inst_approver_id]).email : inst_approver = nil
+    requesting_user = User.find(params[:requesting_user_id])
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: Time.now.utc.iso8601,
                    detail: 'Object deleted from S3 storage',
@@ -416,7 +428,7 @@ class GenericFilesController < ApplicationController
                    agent: 'https://github.com/crowdmob/goamz',
                    outcome_information: "Action requested by user from #{current_user.institution_id}",
                    identifier: SecureRandom.uuid,
-                   inst_app: inst_approver
+                   inst_app: current_user.email
     }
     @generic_file.soft_delete(attributes)
     log = Email.log_deletion_confirmation(@generic_file)

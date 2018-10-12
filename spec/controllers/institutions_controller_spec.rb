@@ -668,7 +668,12 @@ RSpec.describe InstitutionsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, institution: institution_three)
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
-        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email)
+        bulk_job.intellectual_objects.push(obj1)
+        bulk_job.intellectual_objects.push(obj2)
+        bulk_job.generic_files.push(file1)
+        bulk_job.generic_files.push(file2)
+        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, bulk_delete_job_id: bulk_job.id}
         expect(assigns[:institution]).to eq institution_three
         expect(response).to redirect_to institution_url(institution_three)
         expect(flash[:alert]).to eq 'Your bulk deletion event cannot be queued at this time due to an invalid confirmation token. ' +
@@ -699,6 +704,12 @@ RSpec.describe InstitutionsController, type: :controller do
       it 'responds successfully and queues items for deletion' do
         obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
         obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        count = 0
+        5.times do
+          count += 1
+          FactoryBot.create(:generic_file, identifier: "test.edu/tester/data/file#{count}.pdf", intellectual_object: obj1, state: 'A')
+          FactoryBot.create(:generic_file, identifier: "test.edu/tester/data/photo#{count}.pdf", intellectual_object: obj2, state: 'A')
+        end
         obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
         obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
         file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
@@ -718,6 +729,7 @@ RSpec.describe InstitutionsController, type: :controller do
         count_before = Email.all.count
         post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, bulk_delete_job_id: bulk_job.id }
         expect(assigns[:institution]).to eq institution_three
+        expect(assigns[:bulk_job].institutional_approver).to eq institutional_admin.email
         expect(assigns[:bulk_job].aptrust_approver).to eq admin_user.email
         expect(assigns[:bulk_job].aptrust_approval_at).not_to be_nil
         count_after = Email.all.count
@@ -730,17 +742,49 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 1
         expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
+        expect(delete_items.count).to eq 5
+        expect(delete_items[0].inst_approver).to eq institutional_admin.email
+        expect(delete_items[0].aptrust_approver).to eq admin_user.email
+        expect(delete_items[1].inst_approver).to eq institutional_admin.email
+        expect(delete_items[1].aptrust_approver).to eq admin_user.email
+        expect(delete_items[2].inst_approver).to eq institutional_admin.email
+        expect(delete_items[2].aptrust_approver).to eq admin_user.email
+        expect(delete_items[3].inst_approver).to eq institutional_admin.email
+        expect(delete_items[3].aptrust_approver).to eq admin_user.email
+        expect(delete_items[4].inst_approver).to eq institutional_admin.email
+        expect(delete_items[4].aptrust_approver).to eq admin_user.email
 
         reloaded_object = IntellectualObject.find(obj2.id)
         expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 1
         expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
+        expect(delete_items.count).to eq 5
+        expect(delete_items[0].inst_approver).to eq institutional_admin.email
+        expect(delete_items[0].aptrust_approver).to eq admin_user.email
+        expect(delete_items[1].inst_approver).to eq institutional_admin.email
+        expect(delete_items[1].aptrust_approver).to eq admin_user.email
+        expect(delete_items[2].inst_approver).to eq institutional_admin.email
+        expect(delete_items[2].aptrust_approver).to eq admin_user.email
+        expect(delete_items[3].inst_approver).to eq institutional_admin.email
+        expect(delete_items[3].aptrust_approver).to eq admin_user.email
+        expect(delete_items[4].inst_approver).to eq institutional_admin.email
+        expect(delete_items[4].aptrust_approver).to eq admin_user.email
 
         reloaded_object = GenericFile.find(file1.id)
         expect(reloaded_object.state).to eq 'A'
+        delete_item = WorkItem.with_action('Delete').with_file_identifier(reloaded_object.identifier).first
+        expect(delete_item).not_to be_nil
+        expect(delete_item.inst_approver).to eq institutional_admin.email
+        expect(delete_item.aptrust_approver).to eq admin_user.email
 
         reloaded_object = GenericFile.find(file2.id)
         expect(reloaded_object.state).to eq 'A'
+        delete_item = WorkItem.with_action('Delete').with_file_identifier(reloaded_object.identifier).first
+        expect(delete_item).not_to be_nil
+        expect(delete_item.inst_approver).to eq institutional_admin.email
+        expect(delete_item.aptrust_approver).to eq admin_user.email
       end
 
       it 'responds unsuccessfully if the confirmation token is invalid' do
@@ -753,8 +797,12 @@ RSpec.describe InstitutionsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, institution: institution_three)
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
-        ident_hash = [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
-        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email, institutional_approver: institutional_admin.email)
+        bulk_job.intellectual_objects.push(obj1)
+        bulk_job.intellectual_objects.push(obj2)
+        bulk_job.generic_files.push(file1)
+        bulk_job.generic_files.push(file2)
+        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, bulk_delete_job_id: bulk_job.id }
         expect(assigns[:institution]).to eq institution_three
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'This bulk deletion request cannot be completed at this time due to an invalid confirmation token. ' +
