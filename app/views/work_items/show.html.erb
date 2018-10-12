@@ -77,6 +77,12 @@
         <th>Status</th>
         <td class="status"><%= @work_item.status %></td>
       </tr>
+      <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
+            <tr><th>Institutional Approver</th>
+              <td><%= @work_item.inst_approver %></td></tr>
+            <tr><th>APTrust Approver (for bulk delete)</th>
+              <td><%= @work_item.aptrust_approver %></td></tr>
+      <% end %>
       <tr><th>Size</th>
         <td><%= number_to_human_size(@work_item.size) %></td></tr>
       <tr><th>Retry</th>

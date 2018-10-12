@@ -153,7 +153,7 @@ class InstitutionsController < ApplicationController
   def partial_confirmation_bulk_delete
     authorize @institution
     @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
-    if params[:confirmation_token] == @institution.confirmation_token.token
+    if !@institution.confirmation_token.nil? && params[:confirmation_token] == @institution.confirmation_token.token
       if @bulk_job.institutional_approver.nil?
         @bulk_job.institutional_approver = current_user.email
         @bulk_job.institutional_approval_at = Time.now.utc
