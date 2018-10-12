@@ -61,7 +61,9 @@ class Institution < ActiveRecord::Base
   def new_deletion_items
     latest_email = Email.where(institution_id: self.id, email_type: 'deletion_notifications').order(id: :asc).limit(1).first
     if latest_email.nil?
+      time = Time.now - 48.hours
       deletion_items = WorkItem.with_institution(self.id)
+                           .created_after(time)
                            .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
                            .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
                            .with_status(Pharos::Application::PHAROS_STATUSES['success'])
