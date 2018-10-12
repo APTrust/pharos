@@ -324,6 +324,7 @@ class InstitutionsController < ApplicationController
                    inst_app: @bulk_job.institutional_approver,
                    apt_app: @bulk_job.aptrust_approver
     }
+
     @bulk_job.intellectual_objects.each do |obj|
       obj.soft_delete(attributes)
     end

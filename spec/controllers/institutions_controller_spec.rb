@@ -699,6 +699,12 @@ RSpec.describe InstitutionsController, type: :controller do
       it 'responds successfully and queues items for deletion' do
         obj1 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
         obj2 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
+        count = 0
+        5.times do
+          count += 1
+          FactoryBot.create(:generic_file, identifier: "test.edu/tester/data/file#{count}.pdf", intellectual_object: obj1, state: 'A')
+          FactoryBot.create(:generic_file, identifier: "test.edu/tester/data/photo#{count}.pdf", intellectual_object: obj2, state: 'A')
+        end
         obj4 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
         obj5 = FactoryBot.create(:intellectual_object, state: 'A', institution: institution_three)
         file1 = FactoryBot.create(:generic_file, intellectual_object: obj4, state: 'A')
@@ -718,6 +724,7 @@ RSpec.describe InstitutionsController, type: :controller do
         count_before = Email.all.count
         post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, bulk_delete_job_id: bulk_job.id }
         expect(assigns[:institution]).to eq institution_three
+        expect(assigns[:bulk_job].institutional_approver).to eq institutional_admin.email
         expect(assigns[:bulk_job].aptrust_approver).to eq admin_user.email
         expect(assigns[:bulk_job].aptrust_approval_at).not_to be_nil
         count_after = Email.all.count
@@ -730,17 +737,49 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 1
         expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
+        expect(delete_items.count).to eq 5
+        expect(delete_items[0].inst_approver).to eq institutional_admin.email
+        expect(delete_items[0].aptrust_approver).to eq admin_user.email
+        expect(delete_items[1].inst_approver).to eq institutional_admin.email
+        expect(delete_items[1].aptrust_approver).to eq admin_user.email
+        expect(delete_items[2].inst_approver).to eq institutional_admin.email
+        expect(delete_items[2].aptrust_approver).to eq admin_user.email
+        expect(delete_items[3].inst_approver).to eq institutional_admin.email
+        expect(delete_items[3].aptrust_approver).to eq admin_user.email
+        expect(delete_items[4].inst_approver).to eq institutional_admin.email
+        expect(delete_items[4].aptrust_approver).to eq admin_user.email
 
         reloaded_object = IntellectualObject.find(obj2.id)
         expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 1
         expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
+        expect(delete_items.count).to eq 5
+        expect(delete_items[0].inst_approver).to eq institutional_admin.email
+        expect(delete_items[0].aptrust_approver).to eq admin_user.email
+        expect(delete_items[1].inst_approver).to eq institutional_admin.email
+        expect(delete_items[1].aptrust_approver).to eq admin_user.email
+        expect(delete_items[2].inst_approver).to eq institutional_admin.email
+        expect(delete_items[2].aptrust_approver).to eq admin_user.email
+        expect(delete_items[3].inst_approver).to eq institutional_admin.email
+        expect(delete_items[3].aptrust_approver).to eq admin_user.email
+        expect(delete_items[4].inst_approver).to eq institutional_admin.email
+        expect(delete_items[4].aptrust_approver).to eq admin_user.email
 
         reloaded_object = GenericFile.find(file1.id)
         expect(reloaded_object.state).to eq 'A'
+        delete_item = WorkItem.with_action('Delete').with_file_identifier(reloaded_object.identifier).first
+        expect(delete_item).not_to be_nil
+        expect(delete_item.inst_approver).to eq institutional_admin.email
+        expect(delete_item.aptrust_approver).to eq admin_user.email
 
         reloaded_object = GenericFile.find(file2.id)
         expect(reloaded_object.state).to eq 'A'
+        delete_item = WorkItem.with_action('Delete').with_file_identifier(reloaded_object.identifier).first
+        expect(delete_item).not_to be_nil
+        expect(delete_item.inst_approver).to eq institutional_admin.email
+        expect(delete_item.aptrust_approver).to eq admin_user.email
       end
 
       it 'responds unsuccessfully if the confirmation token is invalid' do

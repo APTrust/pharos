@@ -91,9 +91,12 @@ class IntellectualObject < ActiveRecord::Base
 
   def soft_delete(attributes)
     attributes[:identifier] = SecureRandom.uuid
-    self.add_event(attributes)
+    event_attributes = attributes.except(:inst_app, :apt_app)
+    self.add_event(event_attributes)
     self.save!
-    unless Rails.env.test?
+    if Rails.env.test?
+      background_deletion(attributes)
+    else
       Thread.new() do
         background_deletion(attributes)
         ActiveRecord::Base.connection.close
@@ -209,8 +212,6 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def add_event(attributes)
-    attributes.delete(:inst_app)
-    attributes.delete(:apt_app)
     event = self.premis_events.build(attributes)
     event.intellectual_object = self
     event.institution = self.institution
