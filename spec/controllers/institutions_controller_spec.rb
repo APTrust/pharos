@@ -668,7 +668,12 @@ RSpec.describe InstitutionsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, institution: institution_three)
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
-        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email)
+        bulk_job.intellectual_objects.push(obj1)
+        bulk_job.intellectual_objects.push(obj2)
+        bulk_job.generic_files.push(file1)
+        bulk_job.generic_files.push(file2)
+        post :partial_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, bulk_delete_job_id: bulk_job.id}
         expect(assigns[:institution]).to eq institution_three
         expect(response).to redirect_to institution_url(institution_three)
         expect(flash[:alert]).to eq 'Your bulk deletion event cannot be queued at this time due to an invalid confirmation token. ' +
@@ -792,8 +797,12 @@ RSpec.describe InstitutionsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, institution: institution_three)
         apt = FactoryBot.create(:aptrust)
         extra_admin = FactoryBot.create(:user, :admin, institution: apt)
-        ident_hash = [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier]
-        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, requesting_user_id: admin_user.id, inst_approver_id: institutional_admin.id, ident_list: [obj1.identifier, obj2.identifier, file1.identifier, file2.identifier] }
+        bulk_job = FactoryBot.create(:bulk_delete_job, institution_id: institution_three.id, requested_by: extra_admin.email, institutional_approver: institutional_admin.email)
+        bulk_job.intellectual_objects.push(obj1)
+        bulk_job.intellectual_objects.push(obj2)
+        bulk_job.generic_files.push(file1)
+        bulk_job.generic_files.push(file2)
+        post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: SecureRandom.hex, bulk_delete_job_id: bulk_job.id }
         expect(assigns[:institution]).to eq institution_three
         expect(response).to redirect_to root_path
         expect(flash[:alert]).to eq 'This bulk deletion request cannot be completed at this time due to an invalid confirmation token. ' +

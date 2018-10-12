@@ -152,23 +152,36 @@ class InstitutionsController < ApplicationController
 
   def partial_confirmation_bulk_delete
     authorize @institution
+    @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
     if params[:confirmation_token] == @institution.confirmation_token.token
-      @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
-      @bulk_job.institutional_approver = current_user.email
-      @bulk_job.institutional_approval_at = Time.now.utc
-      @bulk_job.save!
-      log = Email.log_bulk_deletion_confirmation(@institution, 'partial')
-      csv = @institution.generate_confirmation_csv(@bulk_job)
-      ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
-      token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
-      token.save!
-      NotificationMailer.bulk_deletion_apt_admin_approval(@institution, @bulk_job, log, token, csv).deliver!
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Bulk delete job for: #{@institution.name} has been sent forward for final approval by an APTrust administrator."
-          redirect_to root_path
-        }
+      if @bulk_job.institutional_approver.nil?
+        @bulk_job.institutional_approver = current_user.email
+        @bulk_job.institutional_approval_at = Time.now.utc
+        @bulk_job.save!
+        log = Email.log_bulk_deletion_confirmation(@institution, 'partial')
+        csv = @institution.generate_confirmation_csv(@bulk_job)
+        ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
+        token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
+        token.save!
+        NotificationMailer.bulk_deletion_apt_admin_approval(@institution, @bulk_job, log, token, csv).deliver!
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            flash[:notice] = "Bulk delete job for: #{@institution.name} has been sent forward for final approval by an APTrust administrator."
+            redirect_to root_path
+          }
+        end
+      else
+        respond_to do |format|
+          message = 'This bulk deletion request has already been confirmed and sent forward for APTrust approval by someone else.'
+          format.json {
+            render :json => { status: 'ok', message: message }, :status => :ok
+          }
+          format.html {
+            redirect_to root_path
+            flash[:notice] = message
+          }
+        end
       end
     else
       respond_to do |format|
@@ -187,34 +200,47 @@ class InstitutionsController < ApplicationController
 
   def final_confirmation_bulk_delete
     authorize @institution
-    if params[:confirmation_token] == @institution.confirmation_token.token
-      ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens
-      @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
-      @bulk_job.aptrust_approver = current_user.email
-      @bulk_job.aptrust_approval_at = Time.now.utc
-      @bulk_job.save!
-      confirmed_destroy
-      log = Email.log_bulk_deletion_confirmation(@institution, 'final')
-      csv = @institution.generate_confirmation_csv(@bulk_job)
-      NotificationMailer.bulk_deletion_queued(@institution, @bulk_job, log, csv).deliver!
+    @bulk_job = BulkDeleteJob.find(params[:bulk_delete_job_id])
+    if @institution.confirmation_token.nil? && !@bulk_job.aptrust_approver.nil?
       respond_to do |format|
-        format.json { head :no_content }
+        message = 'This bulk deletion request has already been confirmed and queued for deletion by someone else.'
+        format.json {
+          render :json => { status: 'ok', message: message }, :status => :ok
+        }
         format.html {
-          flash[:notice] = "Bulk deletion request for #{@institution.name} has been queued."
           redirect_to root_path
+          flash[:notice] = message
         }
       end
     else
-      respond_to do |format|
-        message = 'This bulk deletion request cannot be completed at this time due to an invalid confirmation token. ' +
-            'Please contact your APTrust administrator for more information.'
-        format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
-        }
-        format.html {
-          redirect_to root_path
-          flash[:alert] = message
-        }
+      if params[:confirmation_token] == @institution.confirmation_token.token
+        ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens
+        @bulk_job.aptrust_approver = current_user.email
+        @bulk_job.aptrust_approval_at = Time.now.utc
+        @bulk_job.save!
+        confirmed_destroy
+        log = Email.log_bulk_deletion_confirmation(@institution, 'final')
+        csv = @institution.generate_confirmation_csv(@bulk_job)
+        NotificationMailer.bulk_deletion_queued(@institution, @bulk_job, log, csv).deliver!
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            flash[:notice] = "Bulk deletion request for #{@institution.name} has been queued."
+            redirect_to root_path
+          }
+        end
+      else
+        respond_to do |format|
+          message = 'This bulk deletion request cannot be completed at this time due to an invalid confirmation token. ' +
+              'Please contact your APTrust administrator for more information.'
+          format.json {
+            render :json => { status: 'error', message: message }, :status => :conflict
+          }
+          format.html {
+            redirect_to root_path
+            flash[:alert] = message
+          }
+        end
       end
     end
   end

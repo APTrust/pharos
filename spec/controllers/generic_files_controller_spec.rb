@@ -539,7 +539,7 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(assigns[:generic_file].state).to eq 'D'
           expect(response.code).to eq '204'
           count_after = Email.all.count
-          expect(count_after).to eq count_before + 1
+          # expect(count_after).to eq count_before + 1
 
           # PT #160823207: System is no longer generating this email.
           # Now we're doing a single daily confirmation email as described in PT #160823502
