@@ -80,13 +80,28 @@ class WorkItemsController < ApplicationController
         options[:stage] = params[:item_stage] if params[:item_stage]
         options[:work_item_state_delete] = 'true' if params[:delete_state_item] && params[:delete_state_item] == 'true'
         @work_item.requeue_item(options)
-        options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
-        respond_to do |format|
-          format.json { render json: { status: response.code, body: response.body } }
-          format.html {
-            render 'show'
-            flash[:notice] = "The response from NSQ to the requeue request is as follows: Status: #{response.code}, Body: #{response.body}"
-          }
+        if Rails.env.development?
+          flash[:notice] = 'The response from NSQ to the requeue request is as follows: Status: 200, Body: ok'
+          flash.keep(:notice)
+          respond_to do |format|
+            format.json { render json: { status: 200, body: 'ok' } }
+            format.html {
+              redirect_to @work_item
+              flash[:notice] = 'The response from NSQ to the requeue request is as follows: Status: 200, Body: ok'
+            }
+            format.js {
+              render js: "window.location = '#{work_item_path(@work_item)}'"
+            }
+          end
+        else
+          options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
+          respond_to do |format|
+            format.json { render json: { status: response.code, body: response.body } }
+            format.html {
+              redirect_to @work_item
+              flash[:notice] = "The response from NSQ to the requeue request is as follows: Status: #{response.code}, Body: #{response.body}"
+            }
+          end
         end
       end
     else
@@ -441,7 +456,6 @@ class WorkItemsController < ApplicationController
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
     end
-
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri)
     request.body = @work_item.id.to_s

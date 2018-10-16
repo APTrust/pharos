@@ -24,7 +24,7 @@
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
-              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', remote: true, onclick: 'ingestRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>

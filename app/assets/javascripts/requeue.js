@@ -9,10 +9,7 @@ function restoreRequeue(){
             checked = 'false';
         }
         var id = $('#work_item_id').text();
-        $.get('/items/'+id+'/requeue', {delete_state_item: checked},
-            function(data) {
-                alert('Item has been requeued.');
-            });
+        $.get('/items/'+id+'/requeue', {delete_state_item: checked});
     });
     $('#restore_form_cancel').on("click", function() {
         $('#restore_form').addClass('hidden');
@@ -31,10 +28,7 @@ function glacierRestoreRequeue(){
             checked = 'false';
         }
         var id = $('#work_item_id').text();
-        $.get('/items/'+id+'/requeue', {delete_state_item: checked},
-            function(data) {
-                alert('Item has been requeued.');
-            });
+        $.get('/items/'+id+'/requeue', {delete_state_item: checked});
     });
     $('#glacier_restore_form_cancel').on("click", function() {
         $('#glacier_restore_form').addClass('hidden');
@@ -52,9 +46,9 @@ function ingestRequeue(){
                 $('#ingest_error').addClass('hidden');
             }
             var id = $('#work_item_id').text();
-            $.get('/items/'+id+'/requeue', {item_stage: stage},
+            $.get('/items/'+id+'/requeue', { item_stage: stage },
                 function(data) {
-                    alert('Item has been requeued.');
+                    window.location.replace(id);
                 });
         } else {
             $('#ingest_error').removeClass('hidden');
@@ -76,10 +70,7 @@ function dpnRequeue() {
                 $('#ingest_error').addClass('hidden');
             }
             var id = $('#work_item_id').text();
-            $.get('/items/' + id + '/requeue', {item_stage: stage},
-                function (data) {
-                    alert('Item has been requeued.');
-                });
+            $.get('/items/' + id + '/requeue', {item_stage: stage});
         } else {
             $('#dpn_error').removeClass('hidden');
         }
@@ -106,10 +97,7 @@ function dpnItemRequeue() {
                 $('#dpn_item_error').addClass('hidden');
             }
             var id = $('#dpn_item_id').text();
-            $.get('/dpn_items/' + id + '/requeue', {task: task, delete_state_item: checked},
-                function (data) {
-                    alert('DPN Item has been requeued.');
-                });
+            $.get('/dpn_items/' + id + '/requeue', {task: task, delete_state_item: checked});
         } else {
             $('#dpn_item_error').removeClass('hidden');
         }
