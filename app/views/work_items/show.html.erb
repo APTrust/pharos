@@ -12,23 +12,23 @@
     <% if current_user.admin? %>
         <% unless @work_item.status == Pharos::Application::PHAROS_STATUSES['success'] %>
           <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
-                <%= link_to requeue_work_item_path(@work_item.id), { class: 'btn doc-action-btn btn-normal requeue-link', data: { confirm: 'Do you really want to requeue this item for deletion?' } } do %>
+                <%= link_to requeue_work_item_path(@work_item.id), { id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', data: { confirm: 'Do you really want to requeue this item for deletion?' } } do %>
                     <i class="glyphicon glyphicon-repeat"></i> Requeue
                 <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] %>
-              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore'] %>
-              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'glacierRestoreRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'glacierRestoreRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
-              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
-              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% end %>
