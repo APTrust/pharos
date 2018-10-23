@@ -137,11 +137,11 @@ class WorkItem < ActiveRecord::Base
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
-      self.work_item_state.delete if options[:work_item_state_delete]
+      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
-      self.work_item_state.delete if options[:work_item_state_delete]
+      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if options[:stage]
         if options[:stage] == Pharos::Application::PHAROS_STAGES['fetch']

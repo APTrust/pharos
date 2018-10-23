@@ -1,0 +1,25 @@
+<div id="dpn_item_fixity_form" class="hidden">
+  <div class="">
+    <span id="ui-id-1" class=""><h4>Confirm Requeue for DPN Fixity Checking</h4></span>
+  </div>
+  <div id="dialog-form-ingest" class="">
+    <form>
+      <fieldset>
+        <label for="stage">What stage would you like to requeue to?</label><br>
+        <p id="dpn_item_fixity_error" class="hidden alert alert-error">This field is required.</p>
+        <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['requested'] %>"> Request From Glacier</label><br>
+        <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['available_in_s3'] %>"> Copy From S3</label><br>
+        <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['validate'] %>"> Validate Fixity</label><br>
+      </fieldset>
+    </form>
+  </div>
+  <br>
+  <div class="">
+    <div class="">
+      <button type="submit" id="dpn_item_fixity_form_submit" class="btn doc-action-btn btn-success">
+        <i class="glyphicon glyphicon-repeat"></i>Requeue DPN Item</button>
+      <button type="button" id="dpn_item_fixity_form_cancel" class="btn doc-action-btn btn-warning">
+        <i class="glyphicon glyphicon-remove"></i>Cancel</button>
+    </div>
+  </div>
+</div>

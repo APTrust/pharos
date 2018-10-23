@@ -107,3 +107,24 @@ function dpnItemRequeue() {
         $('#requeue-btn').removeClass('hidden');
     });
 }
+
+function dpnItemFixityRequeue() {
+    $('#dpn_item_fixity_form').removeClass('hidden');
+    $('#requeue-btn').addClass('hidden');
+    $('#dpn_item_fixity_form_submit').on("click", function () {
+        var stage = $('input[name="stage"]:checked').val();
+        if (stage == "requested" || stage == "validate" || stage == "available_in_s3") {
+            if (!$('#dpn_item_fixity_error').hasClass('hidden')) {
+                $('#dpn_item_fixity_error').addClass('hidden');
+            }
+            var id = $('#dpn_item_id').text();
+            $.get('/dpn_items/' + id + '/requeue', {stage: stage});
+        } else {
+            $('#dpn_item_fixity_error').removeClass('hidden');
+        }
+    });
+    $('#dpn_item_fixity_form_cancel').on("click", function () {
+        $('#dpn_item_fixity_form').addClass('hidden');
+        $('#requeue-btn').removeClass('hidden');
+    });
+}

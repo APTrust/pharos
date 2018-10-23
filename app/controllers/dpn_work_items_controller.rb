@@ -64,10 +64,16 @@ class DpnWorkItemsController < ApplicationController
   def requeue
     if @dpn_item
       authorize @dpn_item
-      if @dpn_item.task == 'ingest' || @dpn_item.task == 'replication'
-        (params[:delete_state_item] && params[:delete_state_item] == 'true') ? delete_state = 'true' : delete_state = 'false'
-        @dpn_item.requeue_item(delete_state)
-        response = issue_requeue_http_post(params[:task])
+      if @dpn_item.task == 'ingest' || @dpn_item.task == 'replication' || @dpn_item.task == 'fixity'
+        if @dpn_item.task == 'ingest' || @dpn_item.task == 'replication'
+          (params[:delete_state_item] && params[:delete_state_item] == 'true') ? delete_state = 'true' : delete_state = 'false'
+          @dpn_item.requeue_item(delete_state)
+          response = issue_requeue_http_post(params[:task])
+        elsif @dpn_item.task == 'fixity'
+          stage = params[:stage]
+          @dpn_item.fixity_requeue(stage)
+          response = issue_requeue_http_post(stage)
+        end
         respond_to do |format|
           format.json { render json: { status: response.code, body: response.body } }
           format.html {
@@ -111,22 +117,30 @@ class DpnWorkItemsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
   end
 
-  def issue_requeue_http_post(task)
+  def issue_requeue_http_post(task_or_stage)
     if @dpn_item.task == 'replication'
-      if task == 'copy'
+      if task_or_stage == 'copy'
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_copy_topic")
-      elsif task == 'validation'
+      elsif task_or_stage == 'validation'
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_validation_topic")
-      elsif task == 'store'
+      elsif task_or_stage == 'store'
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_replication_store_topic")
       end
     elsif @dpn_item.task == 'ingest'
-      if task == 'package'
+      if task_or_stage == 'package'
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_package_topic")
-      elsif task == 'store'
+      elsif task_or_stage == 'store'
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_ingest_store_topic")
-      elsif task == 'record'
+      elsif task_or_stage == 'record'
         uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_record_topic")
+      end
+    elsif @dpn_item.task == 'fixity'
+      if task_or_stage == Pharos::Application::PHAROS_STAGES['requested']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_glacier_restore_topic")
+      elsif task_or_stage == Pharos::Application::PHAROS_STAGES['validate']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_fixity_topic")
+      elsif task_or_stage == Pharos::Application::PHAROS_STAGES['available_in_s3']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_s3_download_topic")
       end
     end
     http = Net::HTTP.new(uri.host, uri.port)
