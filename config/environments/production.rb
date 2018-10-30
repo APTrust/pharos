@@ -49,7 +49,7 @@ Rails.application.configure do
   config.log_level = :debug
  # Logged GEM stuff
   config.logged.enabled = true
-  config.logged.loggers.my.logger = Logger.new "#{Rails.root}/log/demo.log"
+  config.logged.loggers.my.logger = Logger.new "#{Rails.root}/log/production.log"
   config.logged.loggers.rails.logger = :rails
   config.logged.action_controller.enabled = true
   config.logged.level = :warn
