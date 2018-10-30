@@ -488,6 +488,7 @@ class WorkItemsController < ApplicationController
                  .with_action(params[:item_action])
                  .queued(params[:queued])
                  .with_node(params[:node])
+                 .with_pid(params[:pid])
                  .with_unempty_node(params[:node_not_empty])
                  .with_empty_node(params[:node_empty])
                  .with_retry(params[:retry])
