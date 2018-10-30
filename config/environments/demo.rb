@@ -48,6 +48,12 @@ Rails.application.configure do
   # when problems arise.
   config.log_level = :warn
 
+ # Logged GEM stuff
+  config.logged.enabled = true
+  config.logged.loggers.my.logger = Logger.new "#{Rails.root}/log/demo.log"
+  config.logged.loggers.rails.logger = :rails
+  config.logged.action_controller.enabled = true
+  config.logged.level = :warn
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
 
