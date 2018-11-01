@@ -52,6 +52,7 @@ gem 'sprockets', '>= 3.7.2'
 # Graylog logging gems
 gem 'gelf'
 gem 'lograge'
+gem 'logged'
 gem 'activerecord-nulldb-adapter'
 gem 'puma'
 

@@ -47,6 +47,12 @@ Rails.application.configure do
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.log_level = :debug
+ # Logged GEM stuff
+  config.logged.enabled = true
+  config.logged.loggers.my.logger = Logger.new "#{Rails.root}/log/demo.log"
+  config.logged.loggers.rails.logger = :rails
+  config.logged.action_controller.enabled = true
+  config.logged.level = :warn
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
