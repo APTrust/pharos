@@ -165,7 +165,10 @@ module ApplicationHelper
                                                                              :updated_after))
       when 'premis_events'
         url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :object_association,
-                                                                             :file_association, :state, :event_type, :outcome))
+                                                                             :file_association, :state, :event_type, :outcome, :created_at,
+                                                                             :created_before, :created_after, :event_identifier,
+                                                                             :object_identifier, :object_identifier_like, :file_identifier,
+                                                                             :file_identifier_like))
       when 'work_items'
         url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage,
                                                                              :status, :access, :object_association, :file_association,
