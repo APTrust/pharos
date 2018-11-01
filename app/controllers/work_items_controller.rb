@@ -27,7 +27,11 @@ class WorkItemsController < ApplicationController
       authorize @items
       respond_to do |format|
         format.json {
-          json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          if current_user.admin?
+            json_list = @paged_results.map { |item| item.serializable_hash }
+          else
+            json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          end
           render json: {count: @count, next: @next, previous: @previous, results: json_list}
         }
         format.html { render 'old_index' }
