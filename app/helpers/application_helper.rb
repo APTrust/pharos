@@ -148,7 +148,8 @@ module ApplicationHelper
       when 'catalog'
         url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage,
                                                                              :status, :access, :file_format, :object_association,
-                                                                             :file_association, :type, :state, :event_type, :outcome))
+                                                                             :file_association, :type, :state, :event_type, :outcome,
+                                                                             :queued, :retry, :remote_node))
       when 'intellectual_objects'
         url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format,
                                                                              :state))
