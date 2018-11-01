@@ -184,7 +184,8 @@ module ApplicationHelper
                                                                              :completed_after, :is_completed, :is_not_completed,
                                                                              :remote_node, :queued))
       when 'dpn_bags'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:object_identifer, :dpn_identifer, :created_before,
+                                                                             :created_after, :updated_before, :updated_after))
     end
     url
   end
