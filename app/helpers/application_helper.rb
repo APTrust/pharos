@@ -177,7 +177,7 @@ module ApplicationHelper
                                                                              :name_contains, :etag, :etag_contains, :object_identifier,
                                                                              :object_identifier_contains, :file_identifier,
                                                                              :file_identifier_contains, :queued, :node, :pid, :node_not_empty,
-                                                                             :node_empty, :retry))
+                                                                             :node_empty, :retry, :pid_empty, :pid_not_empty))
       when 'dpn_work_items'
         url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :task, :identifier, :stage,
                                                                              :status, :state, :retry, :pid, :queued_before, :queued_after,

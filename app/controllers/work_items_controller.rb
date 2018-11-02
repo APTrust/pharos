@@ -495,6 +495,8 @@ class WorkItemsController < ApplicationController
                  .with_pid(params[:pid])
                  .with_unempty_node(params[:node_not_empty])
                  .with_empty_node(params[:node_empty])
+                 .with_unempty_pid(params[:pid_not_empty])
+                 .with_empty_pid(params[:pid_empty])
                  .with_retry(params[:retry])
     @selected = {}
     get_status_counts(@items)

@@ -110,7 +110,7 @@ module Pharos
                    :completed_after, :is_completed, :is_not_completed, :object_identifier_contains, :file_identifier_contains,
                    :node_not_empty, :node_empty, :file_identifier_like, :object_identifier_like, :event_identifier, :created_at,
                    :uri, :etag_like, :bag_name, :bag_name_like, :alt_identifier, :alt_identifier_like, :bag_group_identifier,
-                   :bag_group_identifier_like, :description, :description_like]
+                   :bag_group_identifier_like, :description, :description_like, :pid_empty, :pid_not_empty]
 
     if Rails.env.production?
       NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'

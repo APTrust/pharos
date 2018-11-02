@@ -37,6 +37,8 @@ class WorkItem < ActiveRecord::Base
   scope :with_pid, ->(param) { where(pid: param) unless param.blank? }
   scope :with_unempty_node, ->(param) { where("node is NOT NULL and node != ''") if param == 'true' }
   scope :with_empty_node, ->(param) { where("node is NULL or node = ''") if param == 'true' }
+  scope :with_unempty_pid, ->(param) { where('pid is NOT NULL and pid != 0') if param == 'true' }
+  scope :with_empty_pid, ->(param) { where('pid is NULL or pid = 0') if param == 'true' }
   scope :with_retry, ->(param) {
     unless param.blank?
       if param == 'true'
