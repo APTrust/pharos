@@ -27,7 +27,11 @@ class WorkItemsController < ApplicationController
       authorize @items
       respond_to do |format|
         format.json {
-          json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          if current_user.admin?
+            json_list = @paged_results.map { |item| item.serializable_hash }
+          else
+            json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          end
           render json: {count: @count, next: @next, previous: @previous, results: json_list}
         }
         format.html { render 'old_index' }
@@ -491,6 +495,8 @@ class WorkItemsController < ApplicationController
                  .with_pid(params[:pid])
                  .with_unempty_node(params[:node_not_empty])
                  .with_empty_node(params[:node_empty])
+                 .with_unempty_pid(params[:pid_not_empty])
+                 .with_empty_pid(params[:pid_empty])
                  .with_retry(params[:retry])
     @selected = {}
     get_status_counts(@items)
