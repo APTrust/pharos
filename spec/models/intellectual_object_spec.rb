@@ -389,7 +389,6 @@ RSpec.describe IntellectualObject, :type => :model do
 
         it 'should set the state to deleted and index the object state' do
           attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
-          subject.background_deletion(attributes)
           expect {
             subject.soft_delete(attributes)
           }.to change { subject.premis_events.count}.by(1)
@@ -400,7 +399,6 @@ RSpec.describe IntellectualObject, :type => :model do
         it 'should set the state to deleted and index the object state' do
           attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com')
           subject.soft_delete(attributes)
-          subject.background_deletion(attributes)
           subject.generic_files.all?{ |file|
             wi = WorkItem.where(generic_file_identifier: file.identifier).first
             expect(wi).not_to be_nil

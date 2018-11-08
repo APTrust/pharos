@@ -215,14 +215,10 @@ class InstitutionsController < ApplicationController
       end
     else
       if params[:confirmation_token] == @institution.confirmation_token.token
-        ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens
         @bulk_job.aptrust_approver = current_user.email
         @bulk_job.aptrust_approval_at = Time.now.utc
         @bulk_job.save!
         confirmed_destroy
-        log = Email.log_bulk_deletion_confirmation(@institution, 'final')
-        csv = @institution.generate_confirmation_csv(@bulk_job)
-        NotificationMailer.bulk_deletion_queued(@institution, @bulk_job, log, csv).deliver!
         respond_to do |format|
           format.json { head :no_content }
           format.html {
@@ -344,21 +340,29 @@ class InstitutionsController < ApplicationController
                    detail: 'Object deleted from S3 storage',
                    outcome: 'Success',
                    outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
+                   object: 'AWS Go SDK S3 Library',
+                   agent: 'https://github.com/aws/aws-sdk-go',
+                   outcome_information: "Bulk deletion approved by #{@bulk_job.institutional_approver} and #{@bulk_job.aptrust_approver}.",
                    identifier: SecureRandom.uuid,
                    inst_app: @bulk_job.institutional_approver,
                    apt_app: @bulk_job.aptrust_approver
     }
-
-    @bulk_job.intellectual_objects.each do |obj|
-      obj.soft_delete(attributes)
+    t = Thread.new do
+      ActiveRecord::Base.connection_pool.with_connection do
+        ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens
+        @bulk_job.intellectual_objects.each do |obj|
+          obj.soft_delete(attributes)
+        end
+        @bulk_job.generic_files.each do |file|
+          file.soft_delete(attributes)
+        end
+        log = Email.log_bulk_deletion_confirmation(@institution, 'final')
+        csv = @institution.generate_confirmation_csv(@bulk_job)
+        NotificationMailer.bulk_deletion_queued(@institution, @bulk_job, log, csv).deliver!
+      end
+      ActiveRecord::Base.connection_pool.release_connection
     end
-
-    @bulk_job.generic_files.each do |file|
-      file.soft_delete(attributes)
-    end
+    t.join
   end
 
   def bulk_mark_deleted

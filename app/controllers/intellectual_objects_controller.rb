@@ -154,7 +154,18 @@ class IntellectualObjectsController < ApplicationController
 
   def finished_destroy
     authorize @intellectual_object
-    @intellectual_object.mark_deleted
+    deletion_item = WorkItem.with_object_identifier(@intellectual_object.identifier).with_action(Pharos::Application::PHAROS_ACTIONS['delete']).first
+    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                   date_time: "#{Time.now}",
+                   detail: 'Object deleted from S3 storage',
+                   outcome: 'Success',
+                   outcome_detail: deletion_item.user,
+                   object: 'AWS Go SDK S3 Library',
+                   agent: 'https://github.com/aws/aws-sdk-go',
+                   outcome_information: "Deletion approved by #{deletion_item.inst_approver}.",
+                   identifier: SecureRandom.uuid
+    }
+    @intellectual_object.mark_deleted(attributes)
     respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -330,10 +341,16 @@ class IntellectualObjectsController < ApplicationController
                    identifier: SecureRandom.uuid,
                    inst_app: current_user.email
     }
-    @intellectual_object.soft_delete(attributes)
-    log = Email.log_deletion_confirmation(@intellectual_object)
-    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
-    ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all
+    t = Thread.new do
+      ActiveRecord::Base.connection_pool.with_connection do
+        @intellectual_object.soft_delete(attributes)
+        log = Email.log_deletion_confirmation(@intellectual_object)
+        NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
+        ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all
+      end
+      ActiveRecord::Base.connection_pool.release_connection
+    end
+    t.join
   end
 
   def filter_count_and_sort
