@@ -335,7 +335,7 @@ class IntellectualObjectsController < ApplicationController
     attributes = { requestor: requesting_user.email,
                    inst_app: current_user.email
     }
-    t = Thread.new do
+    @t = Thread.new do
       ActiveRecord::Base.connection_pool.with_connection do
         @intellectual_object.soft_delete(attributes)
         log = Email.log_deletion_confirmation(@intellectual_object)
@@ -344,7 +344,7 @@ class IntellectualObjectsController < ApplicationController
       end
       ActiveRecord::Base.connection_pool.release_connection
     end
-    t.join
+    #t.join
   end
 
   def filter_count_and_sort

@@ -728,6 +728,7 @@ RSpec.describe InstitutionsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, institution: institution_three)
         count_before = Email.all.count
         post :final_confirmation_bulk_delete, params: { institution_identifier: institution_three.identifier, confirmation_token: token.token, bulk_delete_job_id: bulk_job.id }
+        assigns[:t].join
         expect(assigns[:institution]).to eq institution_three
         expect(assigns[:bulk_job].institutional_approver).to eq institutional_admin.email
         expect(assigns[:bulk_job].aptrust_approver).to eq admin_user.email

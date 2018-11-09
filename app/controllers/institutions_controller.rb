@@ -339,7 +339,7 @@ class InstitutionsController < ApplicationController
                    inst_app: @bulk_job.institutional_approver,
                    apt_app: @bulk_job.aptrust_approver
     }
-    t = Thread.new do
+    @t = Thread.new do
       ActiveRecord::Base.connection_pool.with_connection do
         ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens
         @bulk_job.intellectual_objects.each do |obj|
@@ -354,7 +354,7 @@ class InstitutionsController < ApplicationController
       end
       ActiveRecord::Base.connection_pool.release_connection
     end
-    t.join
+    #t.join
   end
 
   def bulk_mark_deleted
