@@ -162,9 +162,11 @@ class IntellectualObjectsController < ApplicationController
                    outcome_detail: deletion_item.user,
                    object: 'AWS Go SDK S3 Library',
                    agent: 'https://github.com/aws/aws-sdk-go',
-                   outcome_information: "Deletion approved by #{deletion_item.inst_approver}.",
                    identifier: SecureRandom.uuid
     }
+    (deletion_item.aptrust_approver.nil? || deletion_item.aptrust_approver == '') ?
+        attributes[:outcome_information] = "Deletion approved by #{deletion_item.inst_approver}." :
+        attributes[:outcome_information] = "Bulk deletion approved by #{@bulk_job.institutional_approver} and #{@bulk_job.aptrust_approver}."
     @intellectual_object.mark_deleted(attributes)
     respond_to do |format|
         format.json { head :no_content }
@@ -330,15 +332,7 @@ class IntellectualObjectsController < ApplicationController
 
   def confirmed_destroy
     requesting_user = User.find(params[:requesting_user_id])
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: "#{Time.now}",
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
-                   identifier: SecureRandom.uuid,
+    attributes = { requestor: requesting_user.email,
                    inst_app: current_user.email
     }
     t = Thread.new do

@@ -643,8 +643,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'A'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        expect(reloaded_object.premis_events.count).to eq 0
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
         email = ActionMailer::Base.deliveries.last
@@ -677,8 +676,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response.body).to be_empty
         reloaded_object = IntellectualObject.find(deletable_obj.id)
         expect(reloaded_object.state).to eq 'A'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        expect(reloaded_object.premis_events.count).to eq 0
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
         email = ActionMailer::Base.deliveries.last
@@ -739,15 +737,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: deletable_obj.identifier, user: user.email, inst_approver: inst_user.email)
           # Create the ingest and delete events...
           deletable_obj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
-          deletable_obj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
           get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
           expect(assigns[:intellectual_object].state).to eq 'D'
+          reloaded_object = IntellectualObject.find(deletable_obj.id)
+          expect(reloaded_object.premis_events.count).to eq 2
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
           expect(response.code).to eq '204'
-        end
-
-        it 'should raise exception if there is no delete event' do
-          deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: deletable_obj.identifier, user: user.email, inst_approver: inst_user.email)
-          expect{ get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'}.to raise_error("Object cannot be marked deleted without first creating a deletion PREMIS event.")
         end
 
         it 'should raise exception if object has undeleted files' do
@@ -755,7 +750,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           dobj = FactoryBot.create(:intellectual_object)
           deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: dobj.identifier, user: user.email, inst_approver: inst_user.email)
           dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
-          dobj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
           active_file = FactoryBot.create(:generic_file, intellectual_object_id: dobj.id, state: 'A')
           expect{get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'}.to raise_error("Object cannot be marked deleted until all of its files have been marked deleted.")
         end
@@ -765,9 +759,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           dobj = FactoryBot.create(:intellectual_object)
           deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: dobj.identifier, user: user.email, inst_approver: inst_user.email)
           dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
-          dobj.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: Time.now.utc))
           get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
           expect(assigns[:intellectual_object].state).to eq 'D'
+          reloaded_object = IntellectualObject.find(dobj.id)
+          expect(reloaded_object.premis_events.count).to eq 2
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
           expect(flash[:notice]).to eq "Delete job has been finished for object: #{dobj.title}. Object has been marked as deleted."
         end
       end

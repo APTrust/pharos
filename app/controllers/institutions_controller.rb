@@ -335,15 +335,7 @@ class InstitutionsController < ApplicationController
 
   def confirmed_destroy
     requesting_user = User.readable(current_user).where(email: @bulk_job.requested_by).first
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: "#{Time.now}",
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'AWS Go SDK S3 Library',
-                   agent: 'https://github.com/aws/aws-sdk-go',
-                   outcome_information: "Bulk deletion approved by #{@bulk_job.institutional_approver} and #{@bulk_job.aptrust_approver}.",
-                   identifier: SecureRandom.uuid,
+    attributes = { requestor: requesting_user.email,
                    inst_app: @bulk_job.institutional_approver,
                    apt_app: @bulk_job.aptrust_approver
     }
@@ -368,8 +360,18 @@ class InstitutionsController < ApplicationController
   def bulk_mark_deleted
     @bulk_job.intellectual_objects.each do |obj|
       if WorkItem.deletion_finished?(obj.identifier)
-        obj.state = 'D'
-        obj.save!
+        attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                       date_time: "#{Time.now}",
+                       detail: 'Object deleted from S3 storage',
+                       outcome: 'Success',
+                       outcome_detail: @bulk_job.requested_by,
+                       object: 'AWS Go SDK S3 Library',
+                       agent: 'https://github.com/aws/aws-sdk-go',
+                       identifier: SecureRandom.uuid,
+                       outcome_information: "Bulk deletion approved by #{@bulk_job.institutional_approver} and #{@bulk_job.aptrust_approver}."
+
+        }
+        obj.mark_deleted(attributes)
       end
     end
 

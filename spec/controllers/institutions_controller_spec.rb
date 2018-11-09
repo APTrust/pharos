@@ -740,8 +740,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
         reloaded_object = IntellectualObject.find(obj1.id)
         expect(reloaded_object.state).to eq 'A'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        expect(reloaded_object.premis_events.count).to eq 0
         delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
         expect(delete_items.count).to eq 5
         expect(delete_items[0].inst_approver).to eq institutional_admin.email
@@ -757,8 +756,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
         reloaded_object = IntellectualObject.find(obj2.id)
         expect(reloaded_object.state).to eq 'A'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        expect(reloaded_object.premis_events.count).to eq 0
         delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
         expect(delete_items.count).to eq 5
         expect(delete_items[0].inst_approver).to eq institutional_admin.email
@@ -875,9 +873,13 @@ RSpec.describe InstitutionsController, type: :controller do
 
         reloaded_object = IntellectualObject.find(obj1.id)
         expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
 
         reloaded_object = IntellectualObject.find(obj2.id)
         expect(reloaded_object.state).to eq 'D'
+        expect(reloaded_object.premis_events.count).to eq 1
+        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
 
         reloaded_object = GenericFile.find(file1.id)
         expect(reloaded_object.state).to eq 'D'

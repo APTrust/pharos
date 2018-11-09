@@ -90,10 +90,6 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def soft_delete(attributes)
-    attributes[:identifier] = SecureRandom.uuid
-    event_attributes = attributes.except(:inst_app, :apt_app)
-    self.add_event(event_attributes)
-    self.save!
     generic_files.each do |gf|
       gf.soft_delete(attributes)
     end
@@ -104,13 +100,11 @@ class IntellectualObject < ActiveRecord::Base
     if self.generic_files.where(state: 'A').count > 0
       raise 'Object cannot be marked deleted until all of its files have been marked deleted.'
     end
-    # self.soft_delete(attributes)
-    if self.deleted_since_last_ingest?
-      self.state = 'D'
-      self.save!
-    else
-      raise 'Object cannot be marked deleted without first creating a deletion PREMIS event.'
-    end
+    attributes[:identifier] = SecureRandom.uuid
+    self.add_event(attributes)
+    self.save!
+    self.state = 'D'
+    self.save!
   end
 
   def deleted_since_last_ingest?

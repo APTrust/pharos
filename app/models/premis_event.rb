@@ -106,7 +106,7 @@ class PremisEvent < ActiveRecord::Base
 
   def set_inst_id
     unless self.intellectual_object.nil?
-      self.institution_id = self.intellectual_object.institution.id
+      self.institution_id = self.intellectual_object.institution_id
     end
   end
 
