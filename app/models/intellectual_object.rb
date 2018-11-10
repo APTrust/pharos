@@ -136,7 +136,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def gf_size
-    generic_files.where(state: 'A').sum(:size)
+    generic_files.where(state: 'A').sum(:size).to_i
   end
 
   def active_files

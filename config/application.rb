@@ -99,13 +99,18 @@ module Pharos
     APTRUST_ID = 'aptrust.org'
 
     PARAMS_HASH = [:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
-                    :file_association, :type, :state, :event_type, :outcome, :q, :search_field, :object_type,
-                    :item_action, :stage, :status, :sort, :institution_identifier, :name_contains, :name_exact, :method,
-                    :updated_since, :node, :needs_admin_review, :not_checked_since, :identifier_like, :per_page, :utf8,
-                    :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
-                    :object_identifier, :format, :institution_id, :type, :member_institution_id, :requesting_user_id,
-                    :confirmation_token, :dpn_identifier, :dpn_size, :node_1, :node_2, :node_3, :dpn_created_at, :dpn_updated_at,
-                    :bag_group_identifier, :storage_option]
+                   :file_association, :type, :state, :event_type, :outcome, :q, :search_field, :object_type,
+                   :institution_identifier, :name_contains, :name_exact, :method, :bag_date, :name, :etag, :etag_contains,
+                   :updated_since, :node, :needs_admin_review, :not_checked_since, :identifier_like, :per_page, :utf8,
+                   :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
+                   :object_identifier, :format, :institution_id, :type, :member_institution_id, :requesting_user_id,
+                   :confirmation_token, :dpn_identifier, :dpn_size, :node_1, :node_2, :node_3, :dpn_created_at, :dpn_updated_at,
+                   :bag_group_identifier, :storage_option, :dpn_identifer, :created_before, :created_after, :updated_before,
+                   :updated_after, :task, :identifier, :retry, :pid, :queued_before, :queued_after, :completed_before,
+                   :completed_after, :is_completed, :is_not_completed, :object_identifier_contains, :file_identifier_contains,
+                   :node_not_empty, :node_empty, :file_identifier_like, :object_identifier_like, :event_identifier, :created_at,
+                   :uri, :etag_like, :bag_name, :bag_name_like, :alt_identifier, :alt_identifier_like, :bag_group_identifier,
+                   :bag_group_identifier_like, :description, :description_like, :pid_empty, :pid_not_empty]
 
     if Rails.env.production?
       NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'

@@ -1,5 +1,5 @@
 <% if @status_counts %>
-<% unless @status_counts.values.count == 1 && @status_counts[0].nil? %>
+<% unless @status_counts.values.count == 1 && @status_counts.values[0].nil? %>
 <div id="status-parent" class="panel panel-default">
   <div id="filter-title-status" class="collapse-toggle panel-heading collapsed" data-toggle="collapse" data-target="#filter-status">
     <h5 class="panel-title">

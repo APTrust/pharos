@@ -14,10 +14,16 @@
             <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnItemRequeue();' do %>
                 <i class="glyphicon glyphicon-repeat"></i> Requeue
             <% end %>
+
+        <% elsif @dpn_item.task == 'fixity' %>
+            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnItemFixityRequeue();' do %>
+                <i class="glyphicon glyphicon-repeat"></i> Requeue
+            <% end %>
         <% end %>
     <% end %>
     <br><br>
     <%= render 'requeue_form' %>
+    <%= render 'fixity_requeue_form' %>
   </section>
 
   <section class="queue">

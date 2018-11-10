@@ -34,8 +34,11 @@ class WorkItem < ActiveRecord::Base
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
   scope :with_node, ->(param) { where(node: param) unless param.blank? }
+  scope :with_pid, ->(param) { where(pid: param) unless param.blank? }
   scope :with_unempty_node, ->(param) { where("node is NOT NULL and node != ''") if param == 'true' }
   scope :with_empty_node, ->(param) { where("node is NULL or node = ''") if param == 'true' }
+  scope :with_unempty_pid, ->(param) { where('pid is NOT NULL and pid != 0') if param == 'true' }
+  scope :with_empty_pid, ->(param) { where('pid is NULL or pid = 0') if param == 'true' }
   scope :with_retry, ->(param) {
     unless param.blank?
       if param == 'true'
@@ -137,11 +140,11 @@ class WorkItem < ActiveRecord::Base
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
-      self.work_item_state.delete if options[:work_item_state_delete]
+      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
-      self.work_item_state.delete if options[:work_item_state_delete]
+      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if options[:stage]
         if options[:stage] == Pharos::Application::PHAROS_STAGES['fetch']

@@ -419,6 +419,7 @@ RSpec.describe WorkItem, :type => :model do
       WorkItem.update_all(node: 'xyz')
       items = WorkItem.with_unempty_node("true")
       items.should_not be_empty
+      items.count.should == WorkItem.all.count
       WorkItem.update_all(node: '')
       items = WorkItem.with_unempty_node("true")
       items.should be_empty
@@ -435,6 +436,31 @@ RSpec.describe WorkItem, :type => :model do
       WorkItem.update_all(node: '')
       items = WorkItem.with_empty_node("true")
       items.should_not be_empty
+      items.count.should == WorkItem.all.count
+    end
+
+    it 'should find by pid not empty' do
+      WorkItem.update_all(pid: 15)
+      items = WorkItem.with_unempty_pid("true")
+      items.should_not be_empty
+      items.count.should == WorkItem.all.count
+      WorkItem.update_all(pid: 0)
+      items = WorkItem.with_unempty_pid("true")
+      items.should be_empty
+      items = WorkItem.with_unempty_pid(nil)
+      items.should_not be_empty
+    end
+
+    it 'should find by pid empty' do
+      WorkItem.update_all(pid: 15)
+      items = WorkItem.with_empty_pid("true")
+      items.should be_empty
+      items = WorkItem.with_empty_pid(nil)
+      items.should_not be_empty
+      WorkItem.update_all(pid: 0)
+      items = WorkItem.with_empty_pid("true")
+      items.should_not be_empty
+      items.count.should == WorkItem.all.count
     end
 
   end

@@ -79,6 +79,15 @@ class DpnWorkItem < ActiveRecord::Base
     self.save!
   end
 
+  def fixity_requeue(stage)
+    self.stage = stage
+    self.status = Pharos::Application::PHAROS_STATUSES['pend']
+    self.retry = true
+    self.pid = 0
+    self.processing_node = nil
+    self.save!
+  end
+
   private
 
   def task_is_allowed
