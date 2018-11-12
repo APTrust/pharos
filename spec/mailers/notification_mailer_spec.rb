@@ -138,6 +138,40 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
   end
 
+  describe 'spot_test_restoration_notification' do
+    let(:institution) { FactoryBot.create(:member_institution) }
+    let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }
+    let(:item) { FactoryBot.create(:work_item, institution: institution,
+                                   action: Pharos::Application::PHAROS_ACTIONS['restore'],
+                                   status: Pharos::Application::PHAROS_STATUSES['success'],
+                                   stage: Pharos::Application::PHAROS_STAGES['record'],
+                                   object_identifier: 'test.edu/bag_name',
+                                   note: 'Bag test.edu/bag_name restored to https://s3.amazonaws.com/aptrust.restore.test.edu/bag_name.tar') }
+    let(:email_log) { FactoryBot.create(:restoration_email) }
+    let(:mail) { described_class.spot_test_restoration_notification(item, email_log).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('Restoration System Spot Test')
+    end
+
+    it 'renders the receiver email' do
+      user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'assigns @item_url' do
+      expect(mail.body.encoded).to match("http://localhost:3000/items/#{item.id}")
+    end
+
+    it 'assigns @download_url' do
+      expect(mail.body.encoded).to match('https://s3.amazonaws.com/aptrust.restore.test.edu/bag_name.tar')
+    end
+  end
+
   describe 'deletion_request of an intellectual object' do
     let(:institution) { FactoryBot.create(:member_institution) }
     let(:user) { FactoryBot.create(:user, :institutional_admin, institution: institution) }

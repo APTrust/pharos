@@ -4,7 +4,7 @@ class WorkItemsController < ApplicationController
   require 'net/http'
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :set_item, only: [:show, :requeue]
+  before_action :set_item, only: [:show, :requeue, :spot_test_restoration]
   before_action :init_from_params, only: :create
   before_action :load_institution, only: :index
   #after_action :check_for_completed_restoration, only: :update
@@ -300,6 +300,15 @@ class WorkItemsController < ApplicationController
       respond_to do |format|
         format.json { render json: { message: "#{number_of_emails} sent. Institutions that received a successful restoration notification: #{inst_pretty}." }, status: 200 }
       end
+    end
+  end
+
+  def spot_test_restoration
+    authorize current_user
+    log = Email.log_restoration(@work_item.id)
+    NotificationMailer.spot_test_restoration_notification(@work_item, log).deliver!
+    respond_to do |format|
+      format.json { render json: { message: "Admin users at #{@work_item.institution.name} have recieved a spot test restoration email for #{@work_item.object_identifier}" }, status: 200 }
     end
   end
 
