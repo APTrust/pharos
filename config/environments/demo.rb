@@ -48,19 +48,20 @@ Rails.application.configure do
   # when problems arise.
   config.log_level = :warn
 
- # Logged GEM stuff
-  config.logged.enabled = true
-  config.logged.loggers.my.logger = Logger.new "#{Rails.root}/log/demo.log"
-  config.logged.loggers.rails.logger = :rails
-  config.logged.action_controller.enabled = true
-  config.logged.level = :warn
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
+
+  # Semantic logger
+  #config.colorize_logging = false
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
   if ENV['PHAROS_LOGSERVER'].present?
-    config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
+    #config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
+    config.semantic_logger.add_appender(
+  	appender: :graylog,
+        url: "udp://#{ENV['PHAROS_LOGSERVER']}:#{ENV['PHAROS_LOGSERVER_PORT']}"
+    )
   end
 
   # Use a different cache store in production.

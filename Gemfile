@@ -53,8 +53,9 @@ gem 'loofah', '~> 2.2.3'
 
 # Graylog logging gems
 gem 'gelf'
-gem 'lograge'
-gem 'logged'
+gem 'awesome_print'
+gem 'rails_semantic_logger'
+
 gem 'activerecord-nulldb-adapter'
 gem 'puma'
 
