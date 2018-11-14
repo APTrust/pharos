@@ -757,7 +757,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         end
 
 
-        it 'delete the object with html response' do
+        it 'should delete the object with html response' do
           dobj = FactoryBot.create(:intellectual_object)
           deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: dobj.identifier, user: user.email, inst_approver: inst_user.email)
           dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
@@ -767,6 +767,18 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           expect(reloaded_object.premis_events.count).to eq 2
           expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
           expect(flash[:notice]).to eq "Delete job has been finished for object: #{dobj.title}. Object has been marked as deleted."
+        end
+
+        it 'should have the correct message when the object was part of a bulk deletion' do
+          dobj = FactoryBot.create(:intellectual_object)
+          deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: dobj.identifier, user: user.email, inst_approver: inst_user.email, aptrust_approver: 'test_user@test.edu')
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
+          expect(assigns[:intellectual_object].state).to eq 'D'
+          reloaded_object = IntellectualObject.find(dobj.id)
+          expect(reloaded_object.premis_events.count).to eq 2
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).first.outcome_information).to eq "Bulk deletion approved by #{inst_user.email} and test_user@test.edu."
         end
       end
     end

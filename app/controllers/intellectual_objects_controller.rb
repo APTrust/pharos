@@ -166,7 +166,7 @@ class IntellectualObjectsController < ApplicationController
     }
     (deletion_item.aptrust_approver.nil? || deletion_item.aptrust_approver == '') ?
         attributes[:outcome_information] = "Deletion approved by #{deletion_item.inst_approver}." :
-        attributes[:outcome_information] = "Bulk deletion approved by #{@bulk_job.institutional_approver} and #{@bulk_job.aptrust_approver}."
+        attributes[:outcome_information] = "Bulk deletion approved by #{deletion_item.inst_approver} and #{deletion_item.aptrust_approver}."
     @intellectual_object.mark_deleted(attributes)
     respond_to do |format|
         format.json { head :no_content }
