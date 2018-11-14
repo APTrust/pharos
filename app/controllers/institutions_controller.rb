@@ -368,7 +368,7 @@ class InstitutionsController < ApplicationController
                        object: 'AWS Go SDK S3 Library',
                        agent: 'https://github.com/aws/aws-sdk-go',
                        identifier: SecureRandom.uuid,
-                       outcome_information: "Bulk deletion approved by #{@bulk_job.institutional_approver} and #{@bulk_job.aptrust_approver}."
+                       outcome_information: "Object deleted as part of bulk deletion at the request of #{@bulk_job.requested_by}. Institutional Approver: #{@bulk_job.institutional_approver}. APTrust Approver: #{@bulk_job.aptrust_approver}"
 
         }
         obj.mark_deleted(attributes)

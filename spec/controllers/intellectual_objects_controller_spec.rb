@@ -778,7 +778,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           reloaded_object = IntellectualObject.find(dobj.id)
           expect(reloaded_object.premis_events.count).to eq 2
           expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
-          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).first.outcome_information).to eq "Bulk deletion approved by #{inst_user.email} and test_user@test.edu."
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).first.outcome_information).to eq "Object deleted as part of bulk deletion at the request of #{user.email}. Institutional Approver: #{inst_user.email}. APTrust Approver: test_user@test.edu"
         end
       end
     end

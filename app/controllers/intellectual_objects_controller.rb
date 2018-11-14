@@ -165,8 +165,8 @@ class IntellectualObjectsController < ApplicationController
                    identifier: SecureRandom.uuid
     }
     (deletion_item.aptrust_approver.nil? || deletion_item.aptrust_approver == '') ?
-        attributes[:outcome_information] = "Deletion approved by #{deletion_item.inst_approver}." :
-        attributes[:outcome_information] = "Bulk deletion approved by #{deletion_item.inst_approver} and #{deletion_item.aptrust_approver}."
+        attributes[:outcome_information] = "Object deleted at the request of #{deletion_item.user}. Institutional Approver: #{deletion_item.inst_approver}." :
+        attributes[:outcome_information] = "Object deleted as part of bulk deletion at the request of #{deletion_item.user}. Institutional Approver: #{deletion_item.inst_approver}. APTrust Approver: #{deletion_item.aptrust_approver}"
     @intellectual_object.mark_deleted(attributes)
     respond_to do |format|
         format.json { head :no_content }
