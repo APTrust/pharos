@@ -109,6 +109,8 @@ GEM
     ffi (1.9.25)
     figaro (1.1.1)
       thor (~> 0.14)
+    gelf (3.1.0)
+      json
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     has_scope (0.7.2)
@@ -327,6 +329,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   figaro
+  gelf
   inherited_resources (= 1.9.0)
   jbuilder (~> 2.7.0)
   jquery-rails
