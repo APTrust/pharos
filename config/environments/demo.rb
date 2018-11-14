@@ -60,7 +60,7 @@ Rails.application.configure do
     #config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
     config.semantic_logger.add_appender(
   	appender: :graylog,
-        url:      "udp://ENV['PHAROS_LOGSERVER']:ENV['PHAROS_LOGSERVER_PORT']"
+        url: "udp://#{ENV['PHAROS_LOGSERVER']}:#{ENV['PHAROS_LOGSERVER_PORT']}"
     )
   end
 
