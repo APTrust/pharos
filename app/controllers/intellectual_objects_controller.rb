@@ -154,7 +154,20 @@ class IntellectualObjectsController < ApplicationController
 
   def finished_destroy
     authorize @intellectual_object
-    @intellectual_object.mark_deleted
+    deletion_item = WorkItem.with_object_identifier(@intellectual_object.identifier).with_action(Pharos::Application::PHAROS_ACTIONS['delete']).first
+    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                   date_time: "#{Time.now}",
+                   detail: 'Object deleted from S3 storage',
+                   outcome: 'Success',
+                   outcome_detail: deletion_item.user,
+                   object: 'AWS Go SDK S3 Library',
+                   agent: 'https://github.com/aws/aws-sdk-go',
+                   identifier: SecureRandom.uuid
+    }
+    (deletion_item.aptrust_approver.nil? || deletion_item.aptrust_approver == '') ?
+        attributes[:outcome_information] = "Deletion approved by #{deletion_item.inst_approver}." :
+        attributes[:outcome_information] = "Bulk deletion approved by #{@bulk_job.institutional_approver} and #{@bulk_job.aptrust_approver}."
+    @intellectual_object.mark_deleted(attributes)
     respond_to do |format|
         format.json { head :no_content }
         format.html {
@@ -319,21 +332,19 @@ class IntellectualObjectsController < ApplicationController
 
   def confirmed_destroy
     requesting_user = User.find(params[:requesting_user_id])
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: "#{Time.now}",
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
-                   identifier: SecureRandom.uuid,
+    attributes = { requestor: requesting_user.email,
                    inst_app: current_user.email
     }
-    @intellectual_object.soft_delete(attributes)
-    log = Email.log_deletion_confirmation(@intellectual_object)
-    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
-    ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all
+    @t = Thread.new do
+      ActiveRecord::Base.connection_pool.with_connection do
+        @intellectual_object.soft_delete(attributes)
+        log = Email.log_deletion_confirmation(@intellectual_object)
+        NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
+        ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all
+      end
+      ActiveRecord::Base.connection_pool.release_connection
+    end
+    #t.join
   end
 
   def filter_count_and_sort

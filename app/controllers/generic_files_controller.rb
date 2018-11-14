@@ -419,15 +419,7 @@ class GenericFilesController < ApplicationController
 
   def confirmed_destroy
     requesting_user = User.find(params[:requesting_user_id])
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: Time.now.utc.iso8601,
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{current_user.institution_id}",
-                   identifier: SecureRandom.uuid,
+    attributes = { requestor: requesting_user.email,
                    inst_app: current_user.email
     }
     @generic_file.soft_delete(attributes)

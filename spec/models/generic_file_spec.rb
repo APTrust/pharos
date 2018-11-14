@@ -104,18 +104,21 @@ RSpec.describe GenericFile, :type => :model do
         let(:async_job) { double('one') }
 
         it 'should set the state to deleted and index the object state' do
-
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
           expect {
             # A.D. 1/29/2017: Don't create the file delete event.
             # Let the Go services code do that when the actual
             # deletion occurs.
-            file.soft_delete(FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
+            file.soft_delete(attributes)
           }.to change { file.premis_events.count}.by(0)
           expect(file.state).to eq 'A' # no longer marked as deleted until final step
         end
 
         it 'should create a WorkItem showing delete was requested' do
-          file.soft_delete(FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com'))
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
+          file.soft_delete(attributes)
           pi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(pi).not_to be_nil
           expect(pi.object_identifier).to eq file.intellectual_object.identifier
@@ -123,6 +126,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(pi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
           expect(pi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
           expect(pi.user).to eq 'user@example.com'
+          expect(pi.inst_approver).to eq 'other_user@example.com'
         end
 
       end

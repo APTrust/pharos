@@ -29,6 +29,21 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'Restoration complete on one of your work items')
   end
 
+  def spot_test_restoration_notification(work_item, email_log)
+    @item_institution = work_item.institution
+    @item = work_item
+    @item_url = work_item_url(id: @item.id)
+    @download_url = work_item.note.split('restored to')[1]
+    users = @item_institution.admin_users
+    emails = []
+    users.each { |user| emails.push(user.email) }
+    emails.push('help@aptrust.org')
+    email_log.user_list = emails.join('; ')
+    email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that a spot test of the restoration system has been performed on one of your bags. Please help APTrust out by downloading the restored bag and letting us know if any problems occur. Click #{@item_url} to view the Work Item record of the restored bag. Click #{@download_url} to download the restored bag from S3. Please contact the APTrust team by replying to this email if you have any questions, or if you have any problems."
+    email_log.save!
+    mail(to: emails, subject: 'Restoration System Spot Test')
+  end
+
   def multiple_failed_fixity_notification(events, email_log, event_institution)
     @event_institution = event_institution
     @events = events

@@ -33,6 +33,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def spot_test_restoration?
+    user.admin?
+  end
+
   def vacuum?
     user.admin?
   end

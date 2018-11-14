@@ -388,19 +388,19 @@ RSpec.describe IntellectualObject, :type => :model do
         let(:generic_file_delete_job) { double('file') }
 
         it 'should set the state to deleted and index the object state' do
-          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
-          subject.background_deletion(attributes)
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
           expect {
             subject.soft_delete(attributes)
-          }.to change { subject.premis_events.count}.by(1)
+          }.to change { subject.premis_events.count}.by(0) # no longer create Premis Event until final step
           expect(subject.state).to eq 'A' # no longer marked as deleted until final step
           subject.generic_files.all?{ |file| expect(file.state).to eq 'A' } # no longer marked as deleted until final step
         end
 
         it 'should set the state to deleted and index the object state' do
-          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com')
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
           subject.soft_delete(attributes)
-          subject.background_deletion(attributes)
           subject.generic_files.all?{ |file|
             wi = WorkItem.where(generic_file_identifier: file.identifier).first
             expect(wi).not_to be_nil
@@ -409,10 +409,32 @@ RSpec.describe IntellectualObject, :type => :model do
             expect(wi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
             expect(wi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
             expect(wi.user).to eq 'user@example.com'
+            expect(wi.inst_approver).to eq 'other_user@example.com'
           }
         end
 
       end
+
+      describe 'mark_deleted' do
+        before {
+          @work_item = FactoryBot.create(:work_item,
+                                         object_identifier: subject.identifier,
+                                         action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                         stage: Pharos::Application::PHAROS_STAGES['record'],
+                                         status: Pharos::Application::PHAROS_STATUSES['success'])
+        }
+
+        it 'should create a PREMIS event and set the state to deleted' do
+          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
+          @file.state = 'D'
+          @file.save!
+          expect {
+            subject.mark_deleted(attributes)
+          }.to change { subject.premis_events.count}.by(1)
+          expect(subject.state).to eq 'D'
+        end
+      end
+
     end
 
     describe 'unique identifier' do
