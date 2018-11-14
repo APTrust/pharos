@@ -47,12 +47,13 @@ Rails.application.configure do
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.log_level = :debug
- # Logged GEM stuff
-  config.logged.enabled = true
-  config.logged.loggers.my.logger = Logger.new "#{Rails.root}/log/production.log"
-  config.logged.loggers.rails.logger = :rails
-  config.logged.action_controller.enabled = true
-  config.logged.level = :warn
+
+   # Semantic logger
+  #config.colorize_logging = false
+  config.rails_semantic_logger.semantic   = false
+  config.rails_semantic_logger.started    = true
+  config.rails_semantic_logger.processing = true
+  config.rails_semantic_logger.rendered   = true
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
@@ -60,7 +61,11 @@ Rails.application.configure do
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
 	if ENV['PHAROS_LOGSERVER'].present?
-    config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
+#    config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
+    config.semantic_logger.add_appender(
+    	appender: :graylog,
+        url: "udp://#{ENV['PHAROS_LOGSERVER']}:#{ENV['PHAROS_LOGSERVER_PORT']}"
+    )
   end
 
 
