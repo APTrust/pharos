@@ -90,11 +90,8 @@ class WorkItemsController < ApplicationController
           respond_to do |format|
             format.json { render json: { status: 200, body: 'ok' } }
             format.html {
-              redirect_to @work_item
+              redirect_to work_item_path(@work_item.id)
               flash[:notice] = 'The response from NSQ to the requeue request is as follows: Status: 200, Body: ok'
-            }
-            format.js {
-              render js: "window.location = '#{work_item_path(@work_item)}'"
             }
           end
         else
@@ -102,7 +99,7 @@ class WorkItemsController < ApplicationController
           respond_to do |format|
             format.json { render json: { status: response.code, body: response.body } }
             format.html {
-              redirect_to @work_item
+              redirect_to work_item_path(@work_item.id)
               flash[:notice] = "The response from NSQ to the requeue request is as follows: Status: #{response.code}, Body: #{response.body}"
             }
           end
