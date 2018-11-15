@@ -24,11 +24,11 @@
       <dt>Filesize<dt>
       <dd><%= number_to_human_size(@generic_file.size) %></dd>
       <dt>Created</dt>
-      <dd><%= @generic_file.created_at %> (<%= time_ago_in_words @generic_file.created_at %>)</dd>
+      <dd><%= pretty_date(@generic_file.created_at) %> (<%= time_ago_in_words(@generic_file.created_at) %>)</dd>
       <dt>Modified</dt>
-      <dd><%= @generic_file.updated_at %> (<%= time_ago_in_words @generic_file.updated_at %>)</dd>
+      <dd><%= pretty_date(@generic_file.updated_at) %> (<%= time_ago_in_words(@generic_file.updated_at) %>)</dd>
       <dt>Latest Fixity Check</dt>
-      <dd><%= @generic_file.last_fixity_check %></dd>
+      <dd><%= pretty_date(@generic_file.last_fixity_check) %> (<%= time_ago_in_words(@generic_file.last_fixity_check) %>)</dd>
       <dt>Storage Type</dt>
       <dd><%= @generic_file.storage_option %></dd>
       <dt>Checksums</dt>

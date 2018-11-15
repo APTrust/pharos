@@ -23,13 +23,15 @@
     <dt>Event Type: </dt>
     <dd><%= current.event_type %></dd>
     <dt>DateTime: </dt>
-    <dd><%= time_ago_in_words current.date_time %></dd>
+    <dd><%= pretty_date(DateTime.parse(current.date_time)) %></dd>
     <dt>Detail: </dt>
     <dd><%= current.detail %></dd>
     <dt>Outcome: </dt>
     <dd><%= current.outcome %></dd>
-    <dt>Outcome Details: </dt>
+    <dt>Outcome Detail: </dt>
     <dd><%= current.outcome_detail %></dd>
+    <dt>Outcome Information: </dt>
+    <dd><%= current.outcome_information %></dd>
     <dt>Object: </dt>
     <dd><%= current.object %></dd>
     <dt>Agent: </dt>

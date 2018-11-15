@@ -17,7 +17,7 @@
     <dt>Etag: </dt>
     <dd><%= current.etag %></dd>
     <dt>Processed: </dt>
-    <dd><%= time_ago_in_words current.date %></dd>
+    <dd><%= pretty_date(current.date) %></dd>
     <dt>Action: </dt>
     <dd><%= current.action %></dd>
     <dt>Stage: </dt>

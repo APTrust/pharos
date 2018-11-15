@@ -294,7 +294,7 @@ RSpec.describe WorkItem, :type => :model do
     end
 
     it 'should create a delete request when asked' do
-      wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com')
+      wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com', 'jeremy@example.com', 'joyce@example.com')
       wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['delete']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
@@ -302,6 +302,8 @@ RSpec.describe WorkItem, :type => :model do
       wi.note.should == 'Delete requested'
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
+      wi.inst_approver.should == 'jeremy@example.com'
+      wi.aptrust_approver.should == 'joyce@example.com'
       wi.retry.should == true
       wi.generic_file_identifier.should == 'abc/123/doc.pdf'
       wi.work_item_state.state.should be_nil
@@ -417,6 +419,7 @@ RSpec.describe WorkItem, :type => :model do
       WorkItem.update_all(node: 'xyz')
       items = WorkItem.with_unempty_node("true")
       items.should_not be_empty
+      items.count.should == WorkItem.all.count
       WorkItem.update_all(node: '')
       items = WorkItem.with_unempty_node("true")
       items.should be_empty
@@ -433,6 +436,31 @@ RSpec.describe WorkItem, :type => :model do
       WorkItem.update_all(node: '')
       items = WorkItem.with_empty_node("true")
       items.should_not be_empty
+      items.count.should == WorkItem.all.count
+    end
+
+    it 'should find by pid not empty' do
+      WorkItem.update_all(pid: 15)
+      items = WorkItem.with_unempty_pid("true")
+      items.should_not be_empty
+      items.count.should == WorkItem.all.count
+      WorkItem.update_all(pid: 0)
+      items = WorkItem.with_unempty_pid("true")
+      items.should be_empty
+      items = WorkItem.with_unempty_pid(nil)
+      items.should_not be_empty
+    end
+
+    it 'should find by pid empty' do
+      WorkItem.update_all(pid: 15)
+      items = WorkItem.with_empty_pid("true")
+      items.should be_empty
+      items = WorkItem.with_empty_pid(nil)
+      items.should_not be_empty
+      WorkItem.update_all(pid: 0)
+      items = WorkItem.with_empty_pid("true")
+      items.should_not be_empty
+      items.count.should == WorkItem.all.count
     end
 
   end

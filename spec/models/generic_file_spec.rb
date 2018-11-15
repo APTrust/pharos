@@ -104,18 +104,21 @@ RSpec.describe GenericFile, :type => :model do
         let(:async_job) { double('one') }
 
         it 'should set the state to deleted and index the object state' do
-
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
           expect {
             # A.D. 1/29/2017: Don't create the file delete event.
             # Let the Go services code do that when the actual
             # deletion occurs.
-            file.soft_delete(FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com'))
+            file.soft_delete(attributes)
           }.to change { file.premis_events.count}.by(0)
-          expect(file.state).to eq 'D'
+          expect(file.state).to eq 'A' # no longer marked as deleted until final step
         end
 
         it 'should create a WorkItem showing delete was requested' do
-          file.soft_delete(FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com'))
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
+          file.soft_delete(attributes)
           pi = WorkItem.where(generic_file_identifier: file.identifier).first
           expect(pi).not_to be_nil
           expect(pi.object_identifier).to eq file.intellectual_object.identifier
@@ -123,6 +126,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(pi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
           expect(pi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
           expect(pi.user).to eq 'user@example.com'
+          expect(pi.inst_approver).to eq 'other_user@example.com'
         end
 
       end
@@ -227,6 +231,41 @@ RSpec.describe GenericFile, :type => :model do
       expect(gf2).to eq subject_two
       gf2 = GenericFile.find_by_identifier('i_dont_exist')
       expect(gf2).to be_nil
+    end
+  end
+
+  describe '#deleted_since_last_ingest?' do
+    subject { FactoryBot.create(:generic_file) }
+    it 'should not say item is deleted if no deletion event since last ingest event' do
+      early_date = '2014-06-01T16:33:39Z'
+      middle_date = '2014-08-01T16:33:39Z'
+      late_date = '2014-10-01T16:33:39Z'
+      subject.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: middle_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).first.date_time.should == middle_date
+      # False because there is no delete event.
+      expect(subject.deleted_since_last_ingest?).to eq false
+
+      subject.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: early_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).first.date_time.should == early_date
+      # False because deletion came BEFORE most recent ingest.
+      expect(subject.deleted_since_last_ingest?).to eq false
+    end
+  end
+
+  describe '#deleted_since_last_ingest?' do
+    subject { FactoryBot.create(:generic_file) }
+    it 'should say item is deleted if this is a deletion event since last ingest event' do
+      early_date = '2014-06-01T16:33:39Z'
+      middle_date = '2014-08-01T16:33:39Z'
+      late_date = '2014-10-01T16:33:39Z'
+      # Add ingest event with middle date
+      subject.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: middle_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).first.date_time.should == middle_date
+      # Add deletion event with late date
+      subject.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: late_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).first.date_time.should == late_date
+      # True because deletion came AFTER most recent ingest.
+      expect(subject.deleted_since_last_ingest?).to eq true
     end
   end
 

@@ -46,9 +46,9 @@ RSpec.describe CatalogController, type: :controller do
     @event_five = FactoryBot.create(:premis_event_ingest, intellectual_object: @object_five, generic_file: @file_five)
     @event_six = FactoryBot.create(:premis_event_identifier_fail, intellectual_object: @object_six, generic_file: @file_six)
 
-    @dpn_one = FactoryBot.create(:dpn_work_item, identifier: '1234-5678')
-    @dpn_two = FactoryBot.create(:dpn_work_item)
-    @dpn_three = FactoryBot.create(:dpn_work_item)
+    @dpn_one = FactoryBot.create(:dpn_work_item, identifier: '1234-5678', remote_node: 'hathi', status: 'Success', stage: 'Record')
+    @dpn_two = FactoryBot.create(:dpn_work_item, remote_node: 'sdr', status: 'Cancelled', stage: 'Store', retry: false)
+    @dpn_three = FactoryBot.create(:dpn_work_item, remote_node: 'sdr', queued_at: nil, status: 'Success', stage: 'Store')
   end
 
   after(:all) do
@@ -184,6 +184,38 @@ RSpec.describe CatalogController, type: :controller do
             get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items' }
             expect(assigns(:paged_results).size).to eq 3
             expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id, @dpn_two.id, @dpn_three.id]
+          end
+
+          describe 'with filtering' do
+            it 'should filter results by remote node' do
+              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', remote_node: 'hathi' }
+              expect(assigns(:paged_results).size).to eq 1
+              expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id]
+            end
+
+            it 'should filter results by queued status' do
+              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', queued: 'is_queued' }
+              expect(assigns(:paged_results).size).to eq 2
+              expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id, @dpn_two.id]
+            end
+
+            it 'should filter results by status' do
+              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', status: 'Success' }
+              expect(assigns(:paged_results).size).to eq 2
+              expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id, @dpn_three.id]
+            end
+
+            it 'should filter results by stage' do
+              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', stage: 'Store' }
+              expect(assigns(:paged_results).size).to eq 2
+              expect(assigns(:paged_results).map &:id).to match_array [@dpn_two.id, @dpn_three.id]
+            end
+
+            it 'should filter results by retry' do
+              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', retry: false }
+              expect(assigns(:paged_results).size).to eq 1
+              expect(assigns(:paged_results).map &:id).to match_array [@dpn_two.id]
+            end
           end
         end
 

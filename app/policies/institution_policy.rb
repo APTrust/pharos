@@ -54,6 +54,26 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def bulk_delete?
+    user.admin?
+  end
+
+  def final_confirmation_bulk_delete?
+    user.admin?
+  end
+
+  def partial_confirmation_bulk_delete?
+    user.institutional_admin? && (user.institution_id == record.id)
+  end
+
+  def finished_bulk_delete?
+    user.admin?
+  end
+
+  def bulk_delete_job_index?
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.id))
+  end
+
   def reports?
     user.admin? || user.institution_id == record.id
   end

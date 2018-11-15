@@ -3,7 +3,7 @@ class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :load_institution, only: [:index, :create]
-  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirm_destroy, :send_to_dpn, :restore]
+  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirm_destroy, :finished_destroy, :send_to_dpn, :restore]
   after_action :verify_authorized
 
   def index
@@ -115,27 +115,65 @@ class IntellectualObjectsController < ApplicationController
 
   def confirm_destroy
     authorize @intellectual_object, :soft_delete?
-    if params[:confirmation_token] == @intellectual_object.confirmation_token.token
-      confirmed_destroy
+    if @intellectual_object.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS('delete')).with_object_identifier(@intellectual_object.identifier).count != 0)
       respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
-          redirect_to root_path
-        }
-      end
-    else
-      respond_to do |format|
-        message = 'Your object cannot be deleted at this time due to an invalid confirmation token. ' +
-            'Please contact your APTrust administrator for more information.'
+        message = 'This deletion request has already been confirmed and queued for deletion by someone else.'
         format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
+          render :json => { status: 'ok', message: message }, :status => :ok
         }
         format.html {
           redirect_to @intellectual_object
-          flash[:alert] = message
+          flash[:notice] = message
         }
       end
+    else
+      if params[:confirmation_token] == @intellectual_object.confirmation_token.token
+        confirmed_destroy
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            flash[:notice] = "Delete job has been queued for object: #{@intellectual_object.title}. Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted."
+            redirect_to root_path
+          }
+        end
+      else
+        respond_to do |format|
+          message = 'Your object cannot be deleted at this time due to an invalid confirmation token. ' +
+              'Please contact your APTrust administrator for more information.'
+          format.json {
+            render :json => { status: 'error', message: message }, :status => :conflict
+          }
+          format.html {
+            redirect_to @intellectual_object
+            flash[:alert] = message
+          }
+        end
+      end
+    end
+  end
+
+  def finished_destroy
+    authorize @intellectual_object
+    deletion_item = WorkItem.with_object_identifier(@intellectual_object.identifier).with_action(Pharos::Application::PHAROS_ACTIONS['delete']).first
+    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
+                   date_time: "#{Time.now}",
+                   detail: 'Object deleted from S3 storage',
+                   outcome: 'Success',
+                   outcome_detail: deletion_item.user,
+                   object: 'AWS Go SDK S3 Library',
+                   agent: 'https://github.com/aws/aws-sdk-go',
+                   identifier: SecureRandom.uuid
+    }
+    (deletion_item.aptrust_approver.nil? || deletion_item.aptrust_approver == '') ?
+        attributes[:outcome_information] = "Object deleted at the request of #{deletion_item.user}. Institutional Approver: #{deletion_item.inst_approver}." :
+        attributes[:outcome_information] = "Object deleted as part of bulk deletion at the request of #{deletion_item.user}. Institutional Approver: #{deletion_item.inst_approver}. APTrust Approver: #{deletion_item.aptrust_approver}"
+    @intellectual_object.mark_deleted(attributes)
+    respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          flash[:notice] = "Delete job has been finished for object: #{@intellectual_object.title}. Object has been marked as deleted."
+          redirect_to root_path
+        }
     end
   end
 
@@ -293,20 +331,20 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: "#{Time.now}",
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{requesting_user.institution_id}",
-                   identifier: SecureRandom.uuid
+    requesting_user = User.find(params[:requesting_user_id])
+    attributes = { requestor: requesting_user.email,
+                   inst_app: current_user.email
     }
-    @intellectual_object.soft_delete(attributes)
-    log = Email.log_deletion_confirmation(@intellectual_object)
-    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user, log).deliver!
+    @t = Thread.new do
+      ActiveRecord::Base.connection_pool.with_connection do
+        @intellectual_object.soft_delete(attributes)
+        log = Email.log_deletion_confirmation(@intellectual_object)
+        NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
+        ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all
+      end
+      ActiveRecord::Base.connection_pool.release_connection
+    end
+    #t.join
   end
 
   def filter_count_and_sort

@@ -63,12 +63,14 @@ module FilterCounts
   def get_status_counts(results)
     @selected[:status] = params[:status] if params[:status]
     @status_counts = results.group(:status).count
+    @status_counts['Null Status'] = @status_counts.delete(nil) if @status_counts[nil]
     @status_counts = Hash[@status_counts.sort]
   end
 
   def get_stage_counts(results)
     @selected[:stage] = params[:stage] if params[:stage]
     @stage_counts = results.group(:stage).count
+    @stage_counts['Null Stage'] = @stage_counts.delete(nil) if @stage_counts[nil]
     @stage_counts = Hash[@stage_counts.sort]
   end
 
@@ -76,6 +78,13 @@ module FilterCounts
     @selected[:item_action] = params[:item_action] if params[:item_action]
     @action_counts = results.group(:action).count
     @action_counts = Hash[@action_counts.sort]
+  end
+
+  def get_retry_counts(results)
+    @selected[:retry] = params[:retry] if params[:retry]
+    @retry_counts = {}
+    @retry_counts['t'] = results.with_retry('true').count
+    @retry_counts['f'] = results.with_retry('false').count
   end
 
   def get_event_type_counts(results)

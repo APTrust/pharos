@@ -1,0 +1,19 @@
+<div id="sidebar" class="col-md-3 col-sm-4">
+  <div class="facets sidenav">
+    <h3> Limit your search </h3>
+    <%= render 'shared/filters/institution_filter' %>
+  </div>
+</div>
+
+<div id="content" class="col-md-9 col-sm-8">
+  <h2 class="top-content-title">Bulk Delete Jobs for <%= @institution.name %></h2>
+  <%= render 'shared/search_breadcrumb' %>
+  <%= render 'shared/sort_and_per_page' %>
+  <hr>
+  <%- if @paged_results.empty? %>
+      <%= render 'shared/zero_results' %>
+  <%- else %>
+      <%= render 'shared/search_results' %>
+  <%- end %>
+  <%= render 'shared/compact_pagination' %>
+</div>

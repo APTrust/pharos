@@ -25,7 +25,7 @@
               <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.name, length: 55) %></a>
           <% end %></td>
         <td><%= item.institution.identifier %></td>
-        <td><%= time_ago_in_words item.date %></td>
+        <td><%= truncate(item.date.to_s, length: 13) %></td>
         <td><%= number_to_human_size(item.size) %></td>
         <td><%= item.action %></td>
         <td><%= item.stage %></td>

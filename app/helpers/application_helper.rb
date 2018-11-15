@@ -124,6 +124,7 @@ module ApplicationHelper
     old_path = @current
     old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except param) if old_path.include? param
     old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except :page) if old_path.include? 'page'
+    value = '' if value.nil?
     if value.kind_of?(Integer)
       encoded_val = value
     elsif value.include?('+')
@@ -145,16 +146,47 @@ module ApplicationHelper
   def start_over_link(controller)
     case controller
       when 'catalog'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
-                                    :file_association, :type, :state, :event_type, :outcome))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage,
+                                                                             :status, :access, :file_format, :object_association,
+                                                                             :file_association, :type, :state, :event_type, :outcome,
+                                                                             :queued, :retry, :remote_node))
       when 'intellectual_objects'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format, :state))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format,
+                                                                             :state, :description, :description_like, :identifier,
+                                                                             :identifier_like, :bag_group_identifier,
+                                                                             :bag_group_identifier_like, :alt_identifier,
+                                                                             :alt_identifier_like, :bag_name, :bag_name_like, :etag,
+                                                                             :etag_like, :created_before, :created_after, :updated_before,
+                                                                             :updated_after))
       when 'generic_files'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format, :object_association, :state))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format,
+                                                                             :object_association, :state, :identifier, :identifier_like,
+                                                                             :uri, :created_before, :created_after, :updated_before,
+                                                                             :updated_after))
       when 'premis_events'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :object_association, :file_association, :state, :event_type, :outcome))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :object_association,
+                                                                             :file_association, :state, :event_type, :outcome, :created_at,
+                                                                             :created_before, :created_after, :event_identifier,
+                                                                             :object_identifier, :object_identifier_like, :file_identifier,
+                                                                             :file_identifier_like))
       when 'work_items'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage, :status, :access, :object_association, :file_association, :state))
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :item_action, :institution, :stage,
+                                                                             :status, :access, :object_association, :file_association,
+                                                                             :state, :created_before, :created_after, :updated_before,
+                                                                             :updated_after, :updated_since, :bag_date, :name, :name_exact,
+                                                                             :name_contains, :etag, :etag_contains, :object_identifier,
+                                                                             :object_identifier_contains, :file_identifier,
+                                                                             :file_identifier_contains, :queued, :node, :pid, :node_not_empty,
+                                                                             :node_empty, :retry, :pid_empty, :pid_not_empty))
+      when 'dpn_work_items'
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :task, :identifier, :stage,
+                                                                             :status, :state, :retry, :pid, :queued_before, :queued_after,
+                                                                             :completed_before, :completed_after, :is_completed,
+                                                                             :is_not_completed, :remote_node, :queued))
+      when 'dpn_bags'
+        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :object_identifer,
+                                                                             :dpn_identifer, :created_before, :created_after,
+                                                                             :updated_before, :updated_after))
     end
     url
   end
@@ -164,6 +196,16 @@ module ApplicationHelper
     options.reverse_merge! current_page: scope.current_page, per_page: scope.limit_value, remote: false
     paginator = paginator_class.new (template || self), options
     paginator.to_s
+  end
+
+  def pretty_date(date)
+    unless date.nil? || date == ''
+      # date = date.strftime('%a, %b %d, %Y %H:%M:%S')
+      # date += ' -GMT'
+      date = date.strftime('%Y-%m-%dT%H:%M:%S') #ISO Format
+      date += '+00:00'
+      
+    end
   end
 
 end

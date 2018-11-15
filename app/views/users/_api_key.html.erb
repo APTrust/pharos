@@ -3,7 +3,7 @@
 
     <% unless @user.encrypted_api_secret_key.nil? || @user.encrypted_api_secret_key == '' %>
         <% if @user == current_user %>
-            <div>Your API Secret Key is: <%= @user.encrypted_api_secret_key %>.</div>
+            <div>You already have an API key. If you've forgotten it, you'll need to generate a new one.</div>
             <br>
         <% else %>
             <div>This user already has an API Secret Key.</div>

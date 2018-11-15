@@ -14,10 +14,16 @@
             <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnItemRequeue();' do %>
                 <i class="glyphicon glyphicon-repeat"></i> Requeue
             <% end %>
+
+        <% elsif @dpn_item.task == 'fixity' %>
+            <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnItemFixityRequeue();' do %>
+                <i class="glyphicon glyphicon-repeat"></i> Requeue
+            <% end %>
         <% end %>
     <% end %>
     <br><br>
     <%= render 'requeue_form' %>
+    <%= render 'fixity_requeue_form' %>
   </section>
 
   <section class="queue">
@@ -30,11 +36,17 @@
       <tr><th>Task</th>
         <td><%= @dpn_item.task %></td></tr>
       <tr><th>Queued At</th>
-        <td><%= @dpn_item.queued_at %></td></tr>
+        <td><%= pretty_date(@dpn_item.queued_at) %></td></tr>
       <tr><th>Completed At</th>
-        <td><%= @dpn_item.completed_at %></td></tr>
+        <td><%= pretty_date(@dpn_item.completed_at) %></td></tr>
       <tr><th>Processing Time</th>
         <td><%= dpn_process_time(@dpn_item) %></td></tr>
+      <tr><th>Stage</th>
+        <td><%= @dpn_item.stage %></td></tr>
+      <tr><th>Status</th>
+        <td><%= @dpn_item.status %></td></tr>
+      <tr><th>Retry</th>
+        <td><%= @dpn_item.retry %></td></tr>
       <tr><th>Note</th>
         <td><%= @dpn_item.note %></td></tr>
       <tr><th>PID</th>

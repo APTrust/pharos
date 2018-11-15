@@ -142,7 +142,7 @@ class ReportsController < ApplicationController
   def object_report
     authorize @intellectual_object
     @institution = @intellectual_object.institution unless @intellectual_object.nil?
-    if @intellectual_object.nil? || @intellectual_object.state == 'D'
+    if @intellectual_object.nil?
       respond_to do |format|
         format.json { render :nothing => true, :status => 404 }
         format.html

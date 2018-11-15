@@ -24,8 +24,10 @@
       <% end %>
       <dt>Bag Name</dt>
       <dd><%= @intellectual_object.bag_name %></dd>
+      <dt> Created </dt>
+      <dd> <%= pretty_date(@intellectual_object.created_at) %> </dd>
       <dt> Last Modified </dt>
-      <dd> <%= @intellectual_object.updated_at %> </dd>
+      <dd> <%= pretty_date(@intellectual_object.updated_at) %> </dd>
       <dt>Description</dt>
       <dd><%= @intellectual_object.description %></dd>
       <dt>Alternate Identifier</dt>
@@ -34,7 +36,11 @@
       <dd><%= @intellectual_object.storage_option %></dd>
       <dt>DPN Status</dt>
       <% if @intellectual_object.in_dpn? %>
-          <dd>Item is in DPN with id <%= link_to @intellectual_object.dpn_uuid, dpn_bag_path(id: @intellectual_object.dpn_bag.id) %></dd>
+          <% if @intellectual_object.dpn_bag.nil? %>
+              <dd>Item is in DPN but DPN Bag information is not yet available, please check back later.</dd>
+          <% else %>
+              <dd>Item is in DPN with id <%= link_to @intellectual_object.dpn_uuid, dpn_bag_path(id: @intellectual_object.dpn_bag.id) %></dd>
+          <% end %>
       <% else %>
           <dd>Item does not reside in DPN.</dd>
       <% end %>

@@ -25,10 +25,10 @@ FactoryBot.define do
   end
 
   factory :aptrust, class: 'Institution' do
-    name 'APTrust'
-    brief_name 'apt'
-    identifier 'aptrust.org'
-    dpn_uuid ''
+    name { 'APTrust' }
+    brief_name { 'apt' }
+    identifier { 'aptrust.org' }
+    dpn_uuid { '' }
     type { 'MemberInstitution' }
     deactivated_at { nil }
   end

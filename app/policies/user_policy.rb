@@ -33,7 +33,15 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def spot_test_restoration?
+    user.admin?
+  end
+
   def vacuum?
+    user.admin?
+  end
+
+  def deletion_notifications?
     user.admin?
   end
 
@@ -87,6 +95,10 @@ class UserPolicy < ApplicationPolicy
 
   def state_show?
     user.admin?
+  end
+
+  def nil_bulk_job_show?
+    user.admin? || user.institutional_admin?
   end
 
   def checksum_index?

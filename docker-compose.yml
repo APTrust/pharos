@@ -1,47 +1,70 @@
-# This compose file needs
-# - nginx container for forwarding
-# - passenger? maybe just puma for the rails container
-# - postgresql db if non-development
-# - use sqlite for development.
-#
+# This is the development version.
+# Which docker-compose defaults to if no param is given.
+# https://wiki.ssdt-ohio.org/display/rtd/Using+nginx-proxy
 version: '3'
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile-alpine
-    image: pharos-test-2
-    command: bundle exec puma -p9292 -e demo
-    volumes:
-      - .:/pharos
-    links:
-      - db
-    environment:
-      - DOCKERIZED=true
-      - RAILS_ENV=demo
-      - PHAROS_DB_HOST=localhost
-      - PHAROS_DB_USER=
-    ports:
-     - "9292:9292"
-    depends_on:
-      - db
-
-  web:
-    image: nginx:alpine
-    container_name: nginx
-    volumes:
-      - ./docker/nginx:/var/log/nginx
-    links:
-      - app
-    ports:
-      - '80:443'
-      - '443:443'
-
   db:
     image: postgres:9.6.6-alpine
-    container_name: postgres
+    environment:
+      POSTGRES_USER: pharos
+      POSTGRES_DB: pharos
     volumes:
-      - ~/.docker-volumes/rails-app/postgresql/data:/var/lib/postgresql/data
+      - ./docker/pharos-postgres:/var/lib/postgresql/data
     ports:
       - '5432:5432'
-
+  pharos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aptrust/pharos
+    environment:
+      - DOCKERIZED='true'
+    #TODO: Change to development after updating databse settings for development
+      - RAILS_ENV=${RAILS_ENV:-demo}
+      - ENVIRONMENT=demo
+      - PHAROS_DB_HOST=db
+      - PHAROS_DB_USER='pharos'
+#      PHAROS_DB_PASSWORD: 'password'
+      - SECRET_KEY_BASE= '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
+      - VIRTUAL_HOST=pharos.docker.localhost
+      - VIRTUAL_PORT=9292
+# TODO: -e demo needs fixing. doesn't read env vars in command line here. maybe dockfile cmd needs env var as entrypoint?
+    labels:
+      - VIRTUAL_HOST=pharos.docker.localhost
+      - VIRTUAL_PORT=9292
+    command: bundle exec puma -p9292
+    volumes:
+      - .:/pharos
+    depends_on:
+      - db
+      - migration
+      - nginx-proxy
+    ports:
+     - "9292:9292"
+  migration:
+    image: aptrust/pharos
+    # Note: Sleep 5 seconds before init db, so psql has time to start up.
+    command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+    environment:
+      DOCKERIZED: 'true'
+      RAILS_ENV: 'demo'
+      PHAROS_DB_HOST: 'db'
+      PHAROS_DB_USER: 'pharos'
+    #    PHAROS_DB_PASSWORD: 'password'
+      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
+    volumes:
+      - .:/pharos
+    depends_on:
+      - db
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      -  /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./docker/nginx-proxy/certs:/etc/nginx/certs:ro
+      - ./docker/nginx-proxy/vhost:/etc/nginx/vhost.d
+      - ./docker/nginx-proxy/public:/etc/share/nginx/html
+      - ./public:/etc/share/nginx/html/pharos
+      - ./docker/pharos.docker.localhost:/etc/nginx/vhost.d/pharos.docker.localhost

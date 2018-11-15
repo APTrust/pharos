@@ -19,7 +19,7 @@
     <dt>Bag Name: </dt>
     <dd><%= current.bag_name %></dd>
     <dt>Last Modified: </dt>
-    <dd><%= time_ago_in_words current.updated_at %></dd>
+    <dd><%= pretty_date(current.updated_at) %></dd>
     <dt>Description: </dt>
     <dd><%= current.description %></dd>
     <% unless current.alt_identifier.nil? || current.alt_identifier == '' || current.alt_identifier == [] %>

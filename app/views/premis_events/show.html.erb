@@ -23,7 +23,7 @@
       <tr><th>Event Type</th>
         <td><%= @event.event_type %></td></tr>
       <tr><th>DateTime</th>
-        <td><%= time_ago_in_words @event.date_time %></td></tr>
+        <td><%= pretty_date(DateTime.parse(@event.date_time)) %></td></tr>
       <tr><th>Detail</th>
         <td><%= @event.detail %></td></tr>
       <tr><th>Outcome</th>
@@ -35,9 +35,9 @@
       <tr><th>Agent</th>
         <td><%= @event.agent %></td></tr>
       <tr><th>Created At</th>
-        <td><%= @event.created_at %></td></tr>
+        <td><%= pretty_date(@event.created_at) %></td></tr>
       <tr><th>Updated At</th>
-        <td><%= @event.updated_at %></td></tr>
+        <td><%= pretty_date(@event.updated_at) %></td></tr>
       </tbody>
     </table>
   </section>

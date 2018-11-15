@@ -16,6 +16,7 @@ describe GenericFilePolicy do
       should_not permit(:edit)
       should permit(:soft_delete)
       should permit(:destroy)
+      should permit(:finished_destroy)
     end
   end
 
@@ -33,6 +34,7 @@ describe GenericFilePolicy do
         should_not permit(:update)
         should_not permit(:edit)
         should permit(:destroy)
+        should_not permit(:finished_destroy)
       end
     end
 
@@ -47,6 +49,7 @@ describe GenericFilePolicy do
           should_not permit(:edit)
           should_not permit(:soft_delete)
           should_not permit(:destroy)
+          should_not permit(:finished_destroy)
         end
       end
 
@@ -60,6 +63,7 @@ describe GenericFilePolicy do
           should_not permit(:edit)
           should_not permit(:soft_delete)
           should_not permit(:destroy)
+          should_not permit(:finished_destroy)
         end
       end
     end
@@ -80,6 +84,7 @@ describe GenericFilePolicy do
             should_not permit(:soft_delete)
             should_not permit(:destroy)
             should permit(:show)
+            should_not permit(:finished_destroy)
           end
         end
         describe 'and it belongs to an institutional accessible object' do
@@ -109,6 +114,7 @@ describe GenericFilePolicy do
             should_not permit(:soft_delete)
             should_not permit(:destroy)
             should permit(:show)
+            should_not permit(:finished_destroy)
           end
         end
         describe 'and it belongs to an institutional accessible object' do
@@ -138,6 +144,7 @@ describe GenericFilePolicy do
       should_not permit(:add_event)
       should_not permit(:soft_delete)
       should_not permit(:destroy)
+      should_not permit(:finished_destroy)
     end
   end
 end
