@@ -29,7 +29,6 @@ gem 'figaro'
 gem 'devise', '4.5.0'
 gem 'rake'
 gem 'email_validator'
-gem 'therubyracer'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
