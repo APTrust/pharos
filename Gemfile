@@ -5,7 +5,8 @@ source 'https://rubygems.org'
 gem 'rails', '5.2.1'
 gem 'rails-controller-testing'
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
+#gem 'sass-rails', '~> 5.0'
+gem 'sassc'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.1.19'
 # Use CoffeeScript for .coffee assets and views
@@ -29,9 +30,13 @@ gem 'figaro'
 gem 'devise', '4.5.0'
 gem 'rake'
 gem 'email_validator'
-gem 'therubyracer'
+
+# Used to generate PDFs for reports
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+
+# Used to create or edit google sheets
+gem 'google_drive'
 
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 4.0.1'

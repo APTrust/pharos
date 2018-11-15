@@ -1,4 +1,5 @@
 class InstitutionsController < ApplicationController
+  require 'google_drive'
   inherit_resources
   skip_before_action :verify_authenticity_token, only: [:trigger_bulk_delete]
   before_action :authenticate_user!
@@ -6,8 +7,8 @@ class InstitutionsController < ApplicationController
                                           :trigger_bulk_delete, :partial_confirmation_bulk_delete, :final_confirmation_bulk_delete,
                                           :finished_bulk_delete]
   respond_to :json, :html
-  after_action :verify_authorized, :except => :index
-  after_action :verify_policy_scoped, :only => :index
+  after_action :verify_authorized, except: :index
+  after_action :verify_policy_scoped, only: :index
 
   def index
     respond_to do |format|
@@ -110,17 +111,21 @@ class InstitutionsController < ApplicationController
   def group_snapshot
     authorize current_user, :snapshot?
     @snapshots = []
-    email_snap_hash = {}
-    total_bytes = Institution.total_file_size_across_repo
-    email_snap_hash['Repository Total'] = total_bytes
+    @wb_hash = {}
+    @date_str = Time.now.utc.strftime('%m/%d/%Y')
+    @wb_hash['Repository Total'] = Institution.total_file_size_across_repo
     MemberInstitution.all.order('name').each do |institution|
       current_snaps = institution.snapshot
       @snapshots.push(current_snaps)
       current_snaps.each do |snap|
-        email_snap_hash[institution.name] = snap.apt_bytes if snap.snapshot_type == 'Subscribers Included'
+        if snap.snapshot_type == 'Individual'
+          current_inst = Institution.find(snap.institution_id)
+          @wb_hash[current_inst.name] = [snap.cs_bytes, snap.go_bytes]
+        end
       end
     end
-    NotificationMailer.snapshot_notification(email_snap_hash).deliver!
+    NotificationMailer.snapshot_notification(@wb_hash).deliver!
+    write_snapshots_to_spreadsheet #if Rails.env.production?
     respond_to do |format|
       format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
       format.html {
@@ -394,6 +399,62 @@ class InstitutionsController < ApplicationController
     if list
       @ident_list = list['ident_list']
     end
+  end
+
+  def set_attachment_name(name)
+    escaped = URI.encode(name)
+    response.headers['Content-Disposition'] = "attachment; filename*=UTF-8''#{escaped}"
+  end
+
+  def write_snapshots_to_spreadsheet
+    session = GoogleDrive::Session.from_config('config.json')
+    sheet = session.spreadsheet_by_key('1E29ttbnuRDyvWfYAh6_-Zn9s0ChOspUKCOOoeez1fZE').worksheets[0] # Chip Sheet
+    # sheet = session.spreadsheet_by_key('1T_zlgluaGdEU_3Fm06h0ws_U4mONpDL4JLNP_z-CU20').worksheets[0] # Kelly Test Sheet
+    date_column = 0
+    counter = 2
+    while date_column == 0
+      cell = sheet[3, counter]
+      date_column = counter if cell.nil? || cell.empty? || cell == ''
+      counter += 1
+    end
+    i = 1
+    unless date_column == 0
+      sheet[3, date_column] = @date_str
+      while i < 2000
+        cell = sheet[i, 1]
+        unless cell.nil?
+          if @wb_hash.has_key?(cell)
+            cs_gb = (@wb_hash[cell][0].to_f / 1073741824).round(2)
+            go_gb = (@wb_hash[cell][1].to_f / 1073741824).round(2)
+            column = to_s26(date_column)
+            previous_column = to_s26(date_column - 1)
+            sheet[(i+1), date_column] = cs_gb
+            sheet[(i+2), date_column] = "=#{column}#{i+1}/1024"
+            sheet[(i+3), date_column] = "=#{column}#{i+2}-#{previous_column}#{i+2}"
+            sheet[(i+4), date_column] = "=#{column}#{i+2}-10"
+            sheet[(i+5), date_column] = go_gb
+            sheet[(i+6), date_column] = "=#{column}#{i+5}/1024"
+            sheet[(i+7), date_column] = "=#{column}#{i+6}-#{previous_column}#{i+6}"
+            sheet[(i+8), date_column] = "=((#{column}#{i+4}*#{column}$195)+((#{column}#{i+4}*#{column}$195)<0)*abs((#{column}#{i+4}*#{column}$195)))+(#{column}#{i+6}*#{column}$196)"
+          end
+        end
+        i += 1
+      end
+    end
+    sheet.save
+  end
+
+  Alpha26 = ("a".."z").to_a
+
+  def to_s26(number)
+    return "" if number < 1
+    s, q = "", number
+    loop do
+      q, r = (q - 1).divmod(26)
+      s.prepend(Alpha26[r])
+      break if q.zero?
+    end
+    s
   end
 
 end
