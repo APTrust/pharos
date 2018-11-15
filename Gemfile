@@ -49,7 +49,7 @@ gem 'bootstrap-sass', '~> 3.3.7'
 
 # These gems aren't required directly but are required in various dependencies and
 # needed specific updating due to security warnings
-gem 'mail', '>= 2.7.0'
+gem 'mail', '>= 2.7.1'
 gem 'sprockets', '>= 3.7.2'
 gem 'loofah', '~> 2.2.3'
 
