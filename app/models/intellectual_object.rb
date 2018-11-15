@@ -100,6 +100,9 @@ class IntellectualObject < ActiveRecord::Base
     if self.generic_files.where(state: 'A').count > 0
       raise 'Object cannot be marked deleted until all of its files have been marked deleted.'
     end
+    if self.state == 'D'
+      return  # Object has already been marked deleted
+    end
     attributes[:identifier] = SecureRandom.uuid
     self.add_event(attributes)
     self.save!
