@@ -6,9 +6,9 @@
 # 1. ID OS - Linux or OSX
 # 2. If OSX, install homebrew
 # 3. Install Docker-CE on osx (brew cask install docker/linux: apt-get install docker)
-# 4. Run build.sh to build the latest version of Pharos
+# 4. Run make build to build the latest version of Pharos
 # 5. docker-compose up -f docker-compose-dev.yml
-# 6. Print out URL for user
+# 6. Connect to pharos.docker.localhost in your browser.
 
 # -  make restart: docker-compose up -d -f docker-compose-dev.yml
 #
