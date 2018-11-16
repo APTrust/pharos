@@ -40,7 +40,8 @@ up: ## Start containers for Pharos, Postgresql, Nginx
 	docker-compose up -d
 
 run: ## Just run Pharos in foreground
-	docker run aptrust/$(tag) .
+	docker run -p 9292:9292 $(tag)
+
 
 publish:
 	docker tag aptrust/pharos registry.gitlab.com/aptrust/container-registry/pharos && \
