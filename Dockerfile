@@ -73,10 +73,7 @@ RUN apk del ruby-bundler build-base postgresql-dev ruby-dev libxml2-dev \
 # Expose a volume so that nginx will be able to read in assets in production.
 VOLUME ["$WORKDIR/public"]
 
-# Setup requires DB to be present. setup should be part of deploy?
-#RUN rake pharos:setup
-#ENTRYPOINT ["$WORKDIR/docker-entrypoint.sh"]
-# The main command to run when the container starts. Also
-# tell the Rails dev server to bind to all interfaces by
-# default.
-CMD ["bundle", "exec", "puma", "-b tcp://127.0.0.1:9292"]
+RUN chown -R somebody:somegroup /pharos
+USER somebody
+
+CMD ["bundle", "exec", "puma", "-p 9292"]
