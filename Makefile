@@ -34,7 +34,7 @@ revision: ## Show me the git hash
 	echo "$(revision)"
 
 build: ## Build the Pharos container
-	docker build -t $(tag) -t $(name):$(revision) -t $(registry)/$(repository)/$(tag) .
+	docker build -t aptrust/$(tag) -t $(tag) -t $(name):$(revision) -t $(registry)/$(repository)/$(tag) .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
 	docker-compose up -d
@@ -49,9 +49,7 @@ publish:
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
 
-
 push: ## Push the Docker image up to the registry
 	docker push  $(registry)/$(repository)/$(tag)
 
 clean: ## Clean the generated/compiles files
-
