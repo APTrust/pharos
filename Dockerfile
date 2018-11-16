@@ -1,6 +1,5 @@
-#FROM ruby:2.4-alpine
-FROM  usualoma/ruby-with-therubyracer:2.4.1-alpine
-MAINTAINER Christian Dahlhausen <christian@aptrust.org>
+FROM ruby:2.5.1-alpine3.7
+LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 
 # Install dependencies
 # - build-base: To ensure certain gems can be compiled
