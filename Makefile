@@ -6,9 +6,9 @@
 # 1. ID OS - Linux or OSX
 # 2. If OSX, install homebrew
 # 3. Install Docker-CE on osx (brew cask install docker/linux: apt-get install docker)
-# 4. Run build.sh to build the latest version of Pharos
+# 4. Run make build to build the latest version of Pharos
 # 5. docker-compose up -f docker-compose-dev.yml
-# 6. Print out URL for user
+# 6. Connect to pharos.docker.localhost in your browser.
 
 # -  make restart: docker-compose up -d -f docker-compose-dev.yml
 #
@@ -34,13 +34,14 @@ revision: ## Show me the git hash
 	echo "$(revision)"
 
 build: ## Build the Pharos container
-	docker build -t $(tag) -t $(name):$(revision) -t $(registry)/$(repository)/$(tag) .
+	docker build -t aptrust/$(tag) -t $(tag) -t $(name):$(revision) -t $(registry)/$(repository)/$(tag) .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
 	docker-compose up -d
 
 run: ## Just run Pharos in foreground
-	docker run aptrust/$(tag) .
+	docker run -p 9292:9292 $(tag)
+
 
 publish:
 	docker tag aptrust/pharos registry.gitlab.com/aptrust/container-registry/pharos && \
@@ -49,9 +50,7 @@ publish:
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
 
-
 push: ## Push the Docker image up to the registry
 	docker push  $(registry)/$(repository)/$(tag)
 
 clean: ## Clean the generated/compiles files
-

@@ -103,9 +103,14 @@ class IntellectualObject < ActiveRecord::Base
     if self.state == 'D'
       return  # Object has already been marked deleted
     end
-    attributes[:identifier] = SecureRandom.uuid
-    self.add_event(attributes)
-    self.save!
+    # Create deletion event only if one doesn't already exist.
+    last_ingest = self.premis_events.where(event_type: 'ingestion', outcome: 'Success', generic_file_identifier: '').order(date_time: :desc).limit(1).first
+    last_deletion = self.premis_events.where(event_type: 'deletion', outcome: 'Success', generic_file_identifier: '').order(date_time: :desc).limit(1).first
+    if !last_deletion || last_deletion.date_time < last_ingest.date_time
+      attributes[:identifier] = SecureRandom.uuid
+      self.add_event(attributes)
+      self.save!
+    end
     self.state = 'D'
     self.save!
   end

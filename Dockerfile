@@ -1,6 +1,5 @@
-#FROM ruby:2.4-alpine
-FROM  usualoma/ruby-with-therubyracer:2.4.1-alpine
-MAINTAINER Christian Dahlhausen <christian@aptrust.org>
+FROM ruby:2.5.1-alpine3.7
+LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 
 # Install dependencies
 # - build-base: To ensure certain gems can be compiled
@@ -9,8 +8,10 @@ MAINTAINER Christian Dahlhausen <christian@aptrust.org>
 # - postgresql-client-9.4: In case you want to talk directly to postgres
 
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
-    nodejs postgresql-client postgresql-dev ruby-bundler \
-    tzdata bash
+    nodejs postgresql-client postgresql-dev ruby-bundler libstdc++ \
+    tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal libxml2-dev libxslt-dev
+
+RUN addgroup -S somegroup -g 1000 && adduser -S -G somegroup somebody -u 1000
 
 RUN mkdir /pharos
 WORKDIR /pharos
@@ -42,18 +43,17 @@ ENV PHAROS_SYSTEM_USER_PWD ${PHAROS_SYSTEM_USER_PWD:-ketchup}
 ENV PHAROS_SYSTEM_USER_KEY ${PHAROS_SYSTEM_USER_KEY:-Alexandria}
 ENV NSQ_BASE_URL ${NSQ_BASE_URL:-http://nsq:4151}
 
-
 COPY Gemfile .
 COPY Gemfile.lock .
 RUN bundle install
 
 COPY . $WORKDIR
-# - load db schema at first deploy
 
+# - load db schema at first deploy
 # - migrate db schema
 # - pharos setup (create institutions, roles and users)
-# - precompile assets
-# - populate db with fixtures if RAILS_ENV=development.
+# --> These should be part of a build script. The only purpose of this image is
+# to provide the rails environment and app. It assumes an external db (per env)
 
 # Provide dummy data to Rails so it can pre-compile assets.
 RUN bundle exec rake RAILS_ENV=development DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken assets:precompile
@@ -62,15 +62,18 @@ RUN bundle exec rake RAILS_ENV=development DATABASE_URL=postgresql://user:pass@1
 EXPOSE 9292
 
 # Cleanup packages we don't need after compilation
-RUN apk del ruby-bundler build-base
+RUN apk del ruby-bundler build-base postgresql-dev ruby-dev libxml2-dev \
+    libxslt-dev python2 ruby-nokogiri ruby-bigdecimal && \
+    rm -rf /usr/lib/ruby/gems/*/cache/* \
+           /usr/local/bundle/cache/* \
+           /var/cache/apk/* \
+           /tmp/* \
+           /var/tmp/*
 
 # Expose a volume so that nginx will be able to read in assets in production.
 VOLUME ["$WORKDIR/public"]
 
-# Setup requires DB to be present. setup should be part of deploy?
-#RUN rake pharos:setup
-#ENTRYPOINT ["$WORKDIR/docker-entrypoint.sh"]
-# The main command to run when the container starts. Also
-# tell the Rails dev server to bind to all interfaces by
-# default.
-CMD ["bundle", "exec", "puma", "-b tcp://127.0.0.1:9292"]
+RUN chown -R somebody:somegroup /pharos
+USER somebody
+
+CMD ["bundle", "exec", "puma", "-p 9292"]
