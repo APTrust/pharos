@@ -37,3 +37,6 @@ fedora_export.db
 
 # Ignore test DB
 travis_ci_test
+
+# Ignore Config file for Spreadsheet credentials
+config.json
