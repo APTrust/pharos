@@ -348,10 +348,22 @@ class InstitutionsController < ApplicationController
       ActiveRecord::Base.connection_pool.with_connection do
         ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens
         @bulk_job.intellectual_objects.each do |obj|
-          obj.soft_delete(attributes)
+          begin
+            obj.soft_delete(attributes)
+          rescue => e
+            logger.error "Exception in Bulk Delete. Object Identifier: #{obj.identifier}"
+            logger.error e.message
+            logger.error e.backtrace.join("\n")
+          end
         end
         @bulk_job.generic_files.each do |file|
-          file.soft_delete(attributes)
+          begin
+            file.soft_delete(attributes)
+          rescue => e
+            logger.error "Exception in Bulk Delete. Object Identifier: #{file.identifier}"
+            logger.error e.message
+            logger.error e.backtrace.join("\n")
+          end
         end
         log = Email.log_bulk_deletion_confirmation(@institution, 'final')
         csv = @institution.generate_confirmation_csv(@bulk_job)
