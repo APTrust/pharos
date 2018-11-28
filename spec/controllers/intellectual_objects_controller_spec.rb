@@ -664,6 +664,20 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         count_after = Email.all.count
         expect(count_after).to eq count_before
       end
+
+      it 'should not delete the object if the object already has a deletion work item' do
+        token = FactoryBot.create(:confirmation_token, institution_id: 15)
+        count_before = Email.all.count
+        item = FactoryBot.create(:work_item, object_identifier: deletable_obj.identifier, intellectual_object: deletable_obj, action: 'Delete', status: 'Success', stage: 'Resolve')
+        delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: token.token, requesting_user_id: inst_admin.id }
+        expect(response).to redirect_to intellectual_object_path(deletable_obj)
+        expect(flash[:notice]).to include 'This deletion request has already been confirmed and queued for deletion by someone else.'
+        reloaded_object = IntellectualObject.find(deletable_obj.id)
+        expect(reloaded_object.state).to eq 'A'
+        expect(reloaded_object.premis_events.count).to eq 0
+        count_after = Email.all.count
+        expect(count_after).to eq count_before
+      end
     end
 
     describe 'when signed in as system admin' do
