@@ -66,4 +66,4 @@ services:
       - ./docker/nginx-proxy/vhost:/etc/nginx/vhost.d
       - ./docker/nginx-proxy/public:/etc/share/nginx/html
       - ./public:/etc/share/nginx/html/pharos
-      - ./docker/pharos.docker.localhost:/etc/nginx/vhost.d/pharos.docker.localhost
+      - ./docker/pharos.localhost:/etc/nginx/vhost.d/pharos.localhost
