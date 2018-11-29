@@ -13,12 +13,9 @@ services:
     ports:
       - '5432:5432'
   pharos:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: aptrust/pharos
     environment:
-      - DOCKERIZED='true'
+      - DOCKERIZED=true
     #TODO: Change to development after updating databse settings for development
       - RAILS_ENV=${RAILS_ENV:-demo}
       - ENVIRONMENT=demo
