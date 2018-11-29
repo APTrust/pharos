@@ -42,6 +42,17 @@ up: ## Start containers for Pharos, Postgresql, Nginx
 run: ## Just run Pharos in foreground
 	docker run -p 9292:9292 $(TAG)
 
+dev: ## Run Pharos for development on localhost
+	docker network create -d bridge pharos-dev-net || true
+	docker start pharos-dev-db || docker run -d --network pharos-dev-net --hostname pharos-dev-db --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
+	docker run -e PHAROS_DB_HOST=host.docker.internal -e PHAROS_DB_USER=postgres --network pharos-dev-net --rm --name pharos-migration $(TAG) /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+	docker start pharos-dev-web || docker run -d -e PHAROS_DB_HOST=host.docker.internal -e PHAROS_DB_USER=postgres --network=pharos-dev-net -p 9292:9292 --name pharos-dev-web $(TAG)
+
+devclean:
+	docker stop pharos-dev-db && docker rm pharos-dev-db || true
+	docker stop pharos-dev-migration && docker rm pharos-dev-migration || true
+	docker stop pharos-dev-web && docker rm pharos-dev-web  || true
+	docker network rm pharos-dev-net
 
 publish:
 	docker tag aptrust/pharos registry.gitlab.com/aptrust/container-registry/pharos && \
