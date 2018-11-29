@@ -77,4 +77,4 @@ VOLUME ["$WORKDIR/public"]
 RUN chown -R somebody:somegroup /pharos
 USER somebody
 
-CMD ["bundle", "exec", "puma", "-p 9292"]
+CMD ["bundle", "exec", "puma", "-p9292"]
