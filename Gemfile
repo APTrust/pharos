@@ -38,7 +38,7 @@ gem 'wkhtmltopdf-binary'
 gem 'google_drive'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 4.0.1'
+gem 'simple_form', '~> 4.1.0'
 gem 'phony_rails'
 gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
