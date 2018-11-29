@@ -26,10 +26,12 @@ services:
       - VIRTUAL_HOST=pharos.localhost
       - VIRTUAL_PORT=9292
 # TODO: -e demo needs fixing. doesn't read env vars in command line here. maybe dockfile cmd needs env var as entrypoint?
+    command: bundle exec puma -p9292 -e $RAILS_ENV
+    #@expose:
+    #  - 9292
     labels:
       - VIRTUAL_HOST=pharos.localhost
       - VIRTUAL_PORT=9292
-    command: bundle exec puma -p9292
     volumes:
       - .:/pharos
     depends_on:
