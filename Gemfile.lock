@@ -327,7 +327,7 @@ GEM
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
     uber (0.1.0)
-    uglifier (4.1.19)
+    uglifier (4.1.20)
       execjs (>= 0.3.0, < 3)
     uuidtools (2.1.5)
     warden (1.2.7)
@@ -393,7 +393,7 @@ DEPENDENCIES
   spring
   sprockets (>= 3.7.2)
   turbolinks
-  uglifier (>= 4.1.19)
+  uglifier (>= 4.1.20)
   uuidtools
   web-console (~> 3.7.0)
   wicked_pdf
