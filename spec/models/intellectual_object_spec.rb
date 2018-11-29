@@ -13,6 +13,7 @@ RSpec.describe IntellectualObject, :type => :model do
   it { should validate_presence_of(:identifier) }
   it { should validate_presence_of(:institution) }
   it { should validate_presence_of(:access)}
+  it { should validate_presence_of(:storage_option) }
 
   describe 'An instance' do
 
@@ -43,9 +44,9 @@ RSpec.describe IntellectualObject, :type => :model do
       subject.identifier.should == exp
     end
 
-    it 'should properly set a bagging_group_identifier' do
-      subject.bagging_group_identifier = 'This is a connected collection.'
-      subject.bagging_group_identifier.should == 'This is a connected collection.'
+    it 'should properly set a bag_group_identifier' do
+      subject.bag_group_identifier = 'This is a connected collection.'
+      subject.bag_group_identifier.should == 'This is a connected collection.'
     end
 
     it 'should properly set an alternative identifier' do
@@ -64,6 +65,14 @@ RSpec.describe IntellectualObject, :type => :model do
       json = '[{ "something": "something" }]'
       subject.ingest_state = json
       subject.ingest_state.should == json
+    end
+
+    it 'should return whether or not an object is glacier-only' do
+      subject.storage_option = 'Standard'
+      subject.glacier_only?.should == false
+
+      subject.storage_option = 'Glacier-OH'
+      subject.glacier_only?.should == true
     end
 
   end
@@ -379,19 +388,19 @@ RSpec.describe IntellectualObject, :type => :model do
         let(:generic_file_delete_job) { double('file') }
 
         it 'should set the state to deleted and index the object state' do
-          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
-          subject.background_deletion(attributes)
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
           expect {
             subject.soft_delete(attributes)
-          }.to change { subject.premis_events.count}.by(1)
-          expect(subject.state).to eq 'D'
-          subject.generic_files.all?{ |file| expect(file.state).to eq 'D' }
+          }.to change { subject.premis_events.count}.by(0) # no longer create Premis Event until final step
+          expect(subject.state).to eq 'A' # no longer marked as deleted until final step
+          subject.generic_files.all?{ |file| expect(file.state).to eq 'A' } # no longer marked as deleted until final step
         end
 
         it 'should set the state to deleted and index the object state' do
-          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'user@example.com')
+          attributes = { requestor: 'user@example.com',
+                         inst_app: 'other_user@example.com' }
           subject.soft_delete(attributes)
-          subject.background_deletion(attributes)
           subject.generic_files.all?{ |file|
             wi = WorkItem.where(generic_file_identifier: file.identifier).first
             expect(wi).not_to be_nil
@@ -400,10 +409,32 @@ RSpec.describe IntellectualObject, :type => :model do
             expect(wi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
             expect(wi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
             expect(wi.user).to eq 'user@example.com'
+            expect(wi.inst_approver).to eq 'other_user@example.com'
           }
         end
 
       end
+
+      describe 'mark_deleted' do
+        before {
+          @work_item = FactoryBot.create(:work_item,
+                                         object_identifier: subject.identifier,
+                                         action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                         stage: Pharos::Application::PHAROS_STAGES['record'],
+                                         status: Pharos::Application::PHAROS_STATUSES['success'])
+        }
+
+        it 'should create a PREMIS event and set the state to deleted' do
+          attributes = FactoryBot.attributes_for(:premis_event_deletion, outcome_detail: 'joe@example.com')
+          @file.state = 'D'
+          @file.save!
+          expect {
+            subject.mark_deleted(attributes)
+          }.to change { subject.premis_events.count}.by(1)
+          expect(subject.state).to eq 'D'
+        end
+      end
+
     end
 
     describe 'unique identifier' do
@@ -592,6 +623,48 @@ RSpec.describe IntellectualObject, :type => :model do
       expect(obj2).to eq subject_two
       obj2 = IntellectualObject.find_by_identifier('i_dont_exist')
       expect(obj2).to be_nil
+    end
+  end
+
+  it 'should not allow the storage_option to be changed once set' do
+    object = FactoryBot.create(:intellectual_object)
+    object.storage_option = 'Glacier-OH'
+    object.save!
+    object.errors[:storage_option].should include('cannot be changed')
+  end
+
+  describe '#deleted_since_last_ingest?' do
+    subject { FactoryBot.create(:intellectual_object) }
+    it 'should not say item is deleted if no deletion event since last ingest event' do
+      early_date = '2014-06-01T16:33:39Z'
+      middle_date = '2014-08-01T16:33:39Z'
+      late_date = '2014-10-01T16:33:39Z'
+      subject.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: middle_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).first.date_time.should == middle_date
+      # False because there is no delete event.
+      expect(subject.deleted_since_last_ingest?).to eq false
+
+      subject.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: early_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).first.date_time.should == early_date
+      # False because deletion came BEFORE most recent ingest.
+      expect(subject.deleted_since_last_ingest?).to eq false
+    end
+  end
+
+  describe '#deleted_since_last_ingest?' do
+    subject { FactoryBot.create(:intellectual_object) }
+    it 'should say item is deleted if this is a deletion event since last ingest event' do
+      early_date = '2014-06-01T16:33:39Z'
+      middle_date = '2014-08-01T16:33:39Z'
+      late_date = '2014-10-01T16:33:39Z'
+      # Add ingest event with middle date
+      subject.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: middle_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).first.date_time.should == middle_date
+      # Add deletion event with late date
+      subject.add_event(FactoryBot.attributes_for(:premis_event_deletion, date_time: late_date))
+      subject.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).first.date_time.should == late_date
+      # True because deletion came AFTER most recent ingest.
+      expect(subject.deleted_since_last_ingest?).to eq true
     end
   end
 

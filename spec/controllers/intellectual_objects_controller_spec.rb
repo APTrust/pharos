@@ -18,7 +18,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    title: 'Aberdeen Wanderers',
                                    description: 'Founded in Aberdeen in 1928.',
                                    etag: '4d05dc2aa07e411a55ef11bc6ade5ec1',
-                                   bagging_group_identifier: 'This is a collection.') }
+                                   bag_group_identifier: 'This is a collection.') }
   let!(:obj3) { FactoryBot.create(:institutional_intellectual_object,
                                    institution: inst2) }
   let!(:obj4) { FactoryBot.create(:restricted_intellectual_object,
@@ -147,10 +147,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           get :index, params: { alt_identifier_like: 'some-bag' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { bagging_group_identifier: 'This is a collection.' }
+          get :index, params: { bag_group_identifier: 'This is a collection.' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { bagging_group_identifier_like: 'collection' }
+          get :index, params: { bag_group_identifier_like: 'collection' }
           expect(assigns(:intellectual_objects).size).to eq 1
         end
       end
@@ -343,7 +343,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bagging_group_identifier: 'collection_one') }
+    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bag_group_identifier: 'collection_one', storage_option: 'Glacier-VA') }
+    let(:bad_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bag_group_identifier: 'collection_two', storage_option: 'somewhere-else') }
 
     after do
       PremisEvent.delete_all
@@ -354,7 +355,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when not signed in' do
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes })
+             intellectual_object: simple_obj.attributes }, format: 'html')
         expect(response).to redirect_to root_url + 'users/sign_in'
       end
       it 'should respond unauthorized (json)' do
@@ -368,7 +369,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in inst_user }
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes })
+             intellectual_object: simple_obj.attributes }, format: 'html')
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -383,7 +384,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       before { sign_in inst_admin }
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
-             intellectual_object: simple_obj.attributes })
+             intellectual_object: simple_obj.attributes }, format: 'html')
         expect(response).to redirect_to root_url
         expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
@@ -404,7 +405,15 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         saved_obj = IntellectualObject.where(identifier: simple_obj.identifier).first
         expect(saved_obj).to be_truthy
         expect(saved_obj.etag).to eq '90908111'
-        expect(saved_obj.bagging_group_identifier).to eq 'collection_one'
+        expect(saved_obj.bag_group_identifier).to eq 'collection_one'
+        expect(saved_obj.storage_option).to eq 'Glacier-VA'
+      end
+
+      it 'should reject a storage_option that is not allowed' do
+        post(:create, params: { institution_identifier: inst1.identifier,
+                                intellectual_object: bad_obj.attributes }, format: 'json')
+        expect(response.code).to eq '422' #Unprocessable Entity
+        expect(JSON.parse(response.body)).to eq( { 'storage_option' => ['Storage Option is not one of the allowed options']})
       end
     end
 
@@ -454,20 +463,22 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should update the object and respond with redirect (html)' do
-        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', ingest_state: '{[A]}'} }
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', storage_option: 'Glacier-VA', ingest_state: '{[A]}'} }
         expect(response).to redirect_to intellectual_object_path(obj1.identifier)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Foo'
+        expect(saved_obj.storage_option).to eq 'Glacier-VA'
         expect(saved_obj.ingest_state).to eq '{[A]}'
       end
+
       it 'should update the object and respond with json (json)' do
-        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678', bagging_group_identifier: 'collection_two'} }, format: :json
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678', bag_group_identifier: 'collection_two'} }, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'
         expect(saved_obj.ingest_state).to eq '{[D]}'
         expect(saved_obj.etag).to eq '12345678'
-        expect(saved_obj.bagging_group_identifier).to eq 'collection_two'
+        expect(saved_obj.bag_group_identifier).to eq 'collection_two'
       end
     end
 
@@ -628,12 +639,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
         count_before = Email.all.count
         delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: token.token, requesting_user_id: inst_admin.id }
+        assigns[:t].join
         expect(response).to redirect_to root_url
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)
-        expect(reloaded_object.state).to eq 'D'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        expect(reloaded_object.state).to eq 'A'
+        expect(reloaded_object.premis_events.count).to eq 0
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
         email = ActionMailer::Base.deliveries.last
@@ -653,6 +664,20 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         count_after = Email.all.count
         expect(count_after).to eq count_before
       end
+
+      it 'should not delete the object if the object already has a deletion work item' do
+        token = FactoryBot.create(:confirmation_token, institution_id: 15)
+        count_before = Email.all.count
+        item = FactoryBot.create(:work_item, object_identifier: deletable_obj.identifier, intellectual_object: deletable_obj, action: 'Delete', status: 'Success', stage: 'Resolve')
+        delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: token.token, requesting_user_id: inst_admin.id }
+        expect(response).to redirect_to intellectual_object_path(deletable_obj)
+        expect(flash[:notice]).to include 'This deletion request has already been confirmed and queued for deletion by someone else.'
+        reloaded_object = IntellectualObject.find(deletable_obj.id)
+        expect(reloaded_object.state).to eq 'A'
+        expect(reloaded_object.premis_events.count).to eq 0
+        count_after = Email.all.count
+        expect(count_after).to eq count_before
+      end
     end
 
     describe 'when signed in as system admin' do
@@ -662,12 +687,12 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
         count_before = Email.all.count
         delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj, confirmation_token: token.token, requesting_user_id: inst_admin.id }, format: :json
+        assigns[:t].join
         expect(response.status).to eq(204)
         expect(response.body).to be_empty
         reloaded_object = IntellectualObject.find(deletable_obj.id)
-        expect(reloaded_object.state).to eq 'D'
-        expect(reloaded_object.premis_events.count).to eq 1
-        expect(reloaded_object.premis_events[0].event_type).to eq Pharos::Application::PHAROS_EVENT_TYPES['delete']
+        expect(reloaded_object.state).to eq 'A'
+        expect(reloaded_object.premis_events.count).to eq 0
         count_after = Email.all.count
         expect(count_after).to eq count_before + 1
         email = ActionMailer::Base.deliveries.last
@@ -676,6 +701,101 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       end
     end
 
+  end
+
+  describe 'GET #finished_destroy' do
+    let!(:deletable_obj) { FactoryBot.create(:institutional_intellectual_object,
+                                             institution: inst1,
+                                             state: 'A') }
+    let!(:deleted_obj) { FactoryBot.create(:institutional_intellectual_object,
+                                           institution: inst1,
+                                           state: 'D') }
+    let!(:obj_pending) { FactoryBot.create(:institutional_intellectual_object,
+                                           institution: inst1,
+                                           state: 'A',
+                                           identifier: 'college.edu/item') }
+    let!(:work_item) { FactoryBot.create(:work_item,
+                                         object_identifier: 'college.edu/item',
+                                         action: 'Restore',
+                                         stage: 'Requested',
+                                         status: 'Pending') }
+    let!(:deletable_obj_2) { FactoryBot.create(:institutional_intellectual_object,
+                                               institution: inst1, state: 'A') }
+    let!(:assc_file) { FactoryBot.create(:generic_file, intellectual_object: deletable_obj_2) }
+
+    after(:all) do
+      IntellectualObject.delete_all
+    end
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        get :finished_destroy, params: { intellectual_object_identifier: obj1 }
+        expect(response).to redirect_to root_url + 'users/sign_in'
+      end
+    end
+
+    describe 'when signed in' do
+      before { sign_in user }
+
+      describe "and deleting a file you don't have access to" do
+        let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: inst2.id) }
+        it 'should be forbidden' do
+          get :finished_destroy, params: { intellectual_object_identifier: obj1 }, format: 'json'
+          expect(response.code).to eq '403' # forbidden
+          expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
+        end
+      end
+
+      describe 'and you have access to the object' do
+        let(:user) { FactoryBot.create(:user, :admin) }
+        it 'should delete the object' do
+          count_before = Email.all.count
+          deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: deletable_obj.identifier, user: user.email, inst_approver: inst_user.email)
+          # Create the ingest and delete events...
+          deletable_obj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          get :finished_destroy, params: { intellectual_object_identifier: deletable_obj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
+          expect(assigns[:intellectual_object].state).to eq 'D'
+          reloaded_object = IntellectualObject.find(deletable_obj.id)
+          expect(reloaded_object.premis_events.count).to eq 2
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
+          expect(response.code).to eq '204'
+        end
+
+        it 'should raise exception if object has undeleted files' do
+          # Create the ingest and delete events...
+          dobj = FactoryBot.create(:intellectual_object)
+          deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: dobj.identifier, user: user.email, inst_approver: inst_user.email)
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          active_file = FactoryBot.create(:generic_file, intellectual_object_id: dobj.id, state: 'A')
+          expect{get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'}.to raise_error("Object cannot be marked deleted until all of its files have been marked deleted.")
+        end
+
+
+        it 'should delete the object with html response' do
+          dobj = FactoryBot.create(:intellectual_object)
+          deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: dobj.identifier, user: user.email, inst_approver: inst_user.email)
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
+          expect(assigns[:intellectual_object].state).to eq 'D'
+          reloaded_object = IntellectualObject.find(dobj.id)
+          expect(reloaded_object.premis_events.count).to eq 2
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
+          expect(flash[:notice]).to eq "Delete job has been finished for object: #{dobj.title}. Object has been marked as deleted."
+        end
+
+        it 'should have the correct message when the object was part of a bulk deletion' do
+          dobj = FactoryBot.create(:intellectual_object)
+          deletion_item = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], object_identifier: dobj.identifier, user: user.email, inst_approver: inst_user.email, aptrust_approver: 'test_user@test.edu')
+          dobj.add_event(FactoryBot.attributes_for(:premis_event_ingest, date_time: '2010-01-01T12:00:00Z'))
+          get :finished_destroy, params: { intellectual_object_identifier: dobj, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'json'
+          expect(assigns[:intellectual_object].state).to eq 'D'
+          reloaded_object = IntellectualObject.find(dobj.id)
+          expect(reloaded_object.premis_events.count).to eq 2
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).count).to eq 1
+          expect(reloaded_object.premis_events.with_type(Pharos::Application::PHAROS_EVENT_TYPES['delete']).first.outcome_information).to eq "Object deleted as part of bulk deletion at the request of #{user.email}. Institutional Approver: #{inst_user.email}. APTrust Approver: test_user@test.edu"
+        end
+      end
+    end
   end
 
   describe 'PUT #send_to_dpn' do

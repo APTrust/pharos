@@ -66,6 +66,19 @@ RSpec.describe UsersController, type: :controller do
       expect(assigns[:user].password).not_to eq password
     end
 
+    it 'can deactivate a user' do
+      get :deactivate, params: { id: institutional_admin }
+      expect(assigns[:user]).to eq institutional_admin
+      expect(assigns[:user].deactivated_at).not_to be_nil
+      expect(assigns[:user].encrypted_api_secret_key).to eq ''
+    end
+
+    it 'can reactivate a user' do
+      get :reactivate, params: { id: institutional_admin }
+      expect(assigns[:user]).to eq institutional_admin
+      expect(assigns[:user].deactivated_at).to be_nil
+    end
+
     describe 'can update Institutional Administrators' do
       let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
 
@@ -286,6 +299,46 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
+    describe 'can deactivate users' do
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
+      describe 'from my institution' do
+        let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
+        it 'should be successful' do
+          get :deactivate, params: { id: user_at_institution }
+          response.should redirect_to user_url(user_at_institution)
+          expect(assigns[:user]).to eq user_at_institution
+          expect(assigns[:user].deactivated_at).to_not be_nil
+        end
+      end
+      describe 'from another institution' do
+        let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
+        it 'should not succeed' do
+          get :deactivate, params: { id: user_of_different_institution }, format: :json
+          response.should be_redirect
+        end
+      end
+    end
+
+    describe 'can reactivate users' do
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
+      describe 'from my institution' do
+        let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
+        it 'should be successful' do
+          get :reactivate, params: { id: user_at_institution }
+          response.should redirect_to user_url(user_at_institution)
+          expect(assigns[:user]).to eq user_at_institution
+          expect(assigns[:user].deactivated_at).to be_nil
+        end
+      end
+      describe 'from another institution' do
+        let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
+        it 'should not succeed' do
+          get :reactivate, params: { id: user_of_different_institution }, format: :json
+          response.should be_redirect
+        end
+      end
+    end
+
     it 'should not be able to perform vacuum operations' do
       get :vacuum, params: { vacuum_target: 'snapshots' }, format: :json
       expect(response.status).to eq(403)
@@ -320,6 +373,16 @@ RSpec.describe UsersController, type: :controller do
 
     it 'should not be able to perform vacuum operations' do
       get :vacuum, params: { vacuum_target: 'snapshots' }, format: :json
+      expect(response.status).to eq(403)
+    end
+
+    it 'should not be able to deactivate users' do
+      get :deactivate, params: { id: user.id }, format: :json
+      expect(response.status).to eq(403)
+    end
+
+    it 'should not be able to reactivate users' do
+      get :reactivate, params: { id: user.id }, format: :json
       expect(response.status).to eq(403)
     end
   end

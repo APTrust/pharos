@@ -3,6 +3,7 @@ require 'spec_helper'
 RSpec.describe MemberInstitution, :type => :model do
   before(:all) do
     User.delete_all
+    Institution.delete_all
   end
 
   subject { FactoryBot.build(:member_institution) }
@@ -84,6 +85,63 @@ RSpec.describe MemberInstitution, :type => :model do
           subject.users.index(user).should > subject.users.index(user2)
         end
       end
+
+      describe 'or several' do
+        let!(:user2) { FactoryBot.create(:user, :institutional_admin, name: 'Andrew', institution_id: subject.id) }
+        let!(:user3) { FactoryBot.create(:user, :institutional_admin, name: 'Kelly', institution_id: subject.id) }
+        let!(:apt) { FactoryBot.create(:aptrust)}
+        let!(:user4) { FactoryBot.create(:user, :admin, name: 'Christian', institution_id: apt.id) }
+        let!(:user5) { FactoryBot.create(:user, :admin, name: 'Bradley', institution_id: apt.id) }
+
+        it 'should provide a list of institutional admins' do
+          subject.admin_users.count.should eq 2
+          expect(subject.admin_users.map &:id).to match_array [user2.id, user3.id]
+        end
+
+        it 'should provide a list of aptrust admins' do
+          subject.apt_users.count.should eq 2
+          expect(subject.apt_users.map &:id).to match_array [user4.id, user5.id]
+        end
+
+        it 'should provide a list of inst admins that are not the requesting user for a deletion request' do
+          subject.deletion_admin_user(user2).count.should eq 1
+          expect(subject.deletion_admin_user(user2).map &:id).to match_array [user3.id]
+        end
+
+        it 'should provide a list of apt admins that are not the requesting user for a bulk deletion' do
+          subject.bulk_deletion_users(user4).count.should eq 1
+          expect(subject.bulk_deletion_users(user4).map &:id).to match_array [user5.id]
+        end
+
+      end
+      
+      describe '#deactivate' do
+        it 'should deactivate the institution and all users belonging to it' do
+          subject.deactivate
+          subject.deactivated?.should eq true
+          subject.users.first.deactivated?.should eq true
+          subject.deactivated_at.should_not be_nil
+          subject.users.first.deactivated_at.should_not be_nil
+          subject.users.first.encrypted_api_secret_key.should eq ''
+        end
+      end
+
+      describe '#reactivate' do
+        it 'should reactivate the institution and all users belonging to it' do
+          subject.deactivate
+          subject.deactivated?.should eq true
+          subject.users.first.deactivated?.should eq true
+          subject.deactivated_at.should_not be_nil
+          subject.users.first.deactivated_at.should_not be_nil
+          subject.users.first.encrypted_api_secret_key.should eq ''
+          subject.reactivate
+          subject.deactivated?.should eq false
+          subject.users.first.deactivated?.should eq false
+          subject.deactivated_at.should be_nil
+          subject.users.first.deactivated_at.should be_nil
+          subject.users.first.encrypted_api_secret_key.should eq ''
+        end
+      end
     end
 
     describe 'with an associated intellectual object' do
@@ -92,6 +150,33 @@ RSpec.describe MemberInstitution, :type => :model do
       it 'deleting should be blocked' do
         subject.destroy.should be false
         expect(Institution.exists?(subject.id)).to be true
+      end
+    end
+
+    describe 'with associated work items' do
+      let!(:object_one) { FactoryBot.create(:intellectual_object, institution: subject) }
+      let!(:object_two) { FactoryBot.create(:intellectual_object, institution: subject) }
+      let!(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
+      let!(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+
+      it 'should return a list of new deletion items' do
+        latest_email = FactoryBot.create(:deletion_notification_email, institution_id: subject.id)
+        sleep 1
+        item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, institution_id: subject.id)
+        item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, institution_id: subject.id)
+        items = subject.new_deletion_items
+        items.count.should eq(2)
+        expect(items).to include(item_one)
+        expect(items).to include(item_two)
+      end
+
+      it 'should generate a csv file for new deletion work items' do
+        item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, generic_file_identifier: file_one.identifier, institution_id: subject.id)
+        item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
+        csv = subject.generate_deletion_csv([item_one, item_two])
+        expect(csv).to include('Generic File Identifier,Date Deleted,Requested By,Approved By,APTrust Approver')
+        expect(csv).to include("#{item_one.generic_file_identifier},#{item_one.date.to_s},#{item_one.user},NA,NA")
+        expect(csv).to include("#{item_two.generic_file_identifier},#{item_two.date.to_s},#{item_two.user},NA,NA")
       end
     end
 

@@ -1,7 +1,7 @@
 function configureDropDownLists() {
     var ddl1 = document.getElementById('object_type');
     var ddl2 = document.getElementById('search_field');
-    var io_options = ['Object Identifier', 'Alternate Identifier', 'Bagging Group Identifier', 'Bag Name', 'Title'];
+    var io_options = ['Object Identifier', 'Alternate Identifier', 'Bag Group Identifier', 'Bag Name', 'Title'];
     var gf_options = ['File Identifier', 'URI'];
     var event_options = ['Event Identifier', 'Object Identifier', 'File Identifier'];
     var wi_options = ['Object Identifier', 'File Identifier', 'Name', 'Etag'];
@@ -67,7 +67,7 @@ function selected (category, filter, newpath) {
 }
 
 function fixFilters() {
-    var filterIds = ['access', 'action', 'event_type', 'format', 'institution', 'node', 'outcome', 'queued', 'stage', 'state', 'status'];
+    var filterIds = ['access', 'action', 'event_type', 'format', 'institution', 'node', 'outcome', 'queued', 'stage', 'state', 'status', 'retry'];
     for (var i = 0; i < filterIds.length; i++) {
         var filter = $("#filter-"+filterIds[i]);
         filter.on('shown.bs.collapse', shownClickHandler());

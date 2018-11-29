@@ -46,7 +46,7 @@ Rails.application.configure do
   config.show_send_to_dpn_button = true
 
   # Log debug messages, because we're testing.
-  config.log_level = :debug
+  config.log_level = :warn
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true

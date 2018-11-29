@@ -11,6 +11,7 @@ FactoryBot.define do
     identifier
     dpn_uuid
     type { 'MemberInstitution' }
+    deactivated_at { nil }
   end
 
   factory :subscription_institution do
@@ -20,13 +21,15 @@ FactoryBot.define do
     dpn_uuid
     type { 'SubscriptionInstitution' }
     member_institution_id { FactoryBot.create(:member_institution).id }
+    deactivated_at { nil }
   end
 
   factory :aptrust, class: 'Institution' do
-    name 'APTrust'
-    brief_name 'apt'
-    identifier 'aptrust.org'
-    dpn_uuid ''
+    name { 'APTrust' }
+    brief_name { 'apt' }
+    identifier { 'aptrust.org' }
+    dpn_uuid { '' }
     type { 'MemberInstitution' }
+    deactivated_at { nil }
   end
 end

@@ -13,6 +13,8 @@
           <%= render 'shared/individual_results/event_result', counter: counter, current: current %>
         <% elsif current.is_a?(DpnWorkItem) %>
           <%= render 'shared/individual_results/dpn_item_result', counter: counter, current: current %>
+        <% elsif current.is_a?(BulkDeleteJob) %>
+          <%= render 'shared/individual_results/bulk_delete_job_result', counter: counter, current: current %>
         <% end %>
         <% counter = counter+1 %>
         <hr>

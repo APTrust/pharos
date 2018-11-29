@@ -62,11 +62,18 @@ class MemberInstitution < Institution
 
   def snapshot
     indiv_bytes = self.total_file_size
+    indiv_cs_bytes = self.core_service_size
+    indiv_go_bytes = self.glacier_only_size
     total_bytes = indiv_bytes
+    total_cs_bytes = indiv_cs_bytes
+    total_go_bytes = indiv_go_bytes
     snapshot_array = []
     self.subscribers.each do |si|
-      total_bytes = total_bytes + si.total_file_size
-      snapshot_array.push(si.snapshot)
+      snap = si.snapshot
+      total_bytes = total_bytes + snap.apt_bytes
+      total_cs_bytes = total_cs_bytes + snap.cs_bytes
+      total_go_bytes = total_go_bytes + snap.go_bytes
+      snapshot_array.push(snap)
     end
     if total_bytes < 10995116277760 #10 TB
       rounded_cost = 0.00
@@ -84,10 +91,10 @@ class MemberInstitution < Institution
     end
     rounded_cost = 0.00 if rounded_cost == 0.0
     rounded_indiv_cost = 0.00 if rounded_indiv_cost == 0.0
-    indiv_snapshot = Snapshot.create(institution_id: self.id, audit_date: Time.now, apt_bytes: indiv_bytes, cost: rounded_indiv_cost, snapshot_type: 'Individual')
+    indiv_snapshot = Snapshot.create(institution_id: self.id, audit_date: Time.now, apt_bytes: indiv_bytes, cs_bytes: indiv_cs_bytes, go_bytes: indiv_go_bytes, cost: rounded_indiv_cost, snapshot_type: 'Individual')
     indiv_snapshot.save!
     snapshot_array.push(indiv_snapshot)
-    snapshot = Snapshot.create(institution_id: self.id, audit_date: Time.now, apt_bytes: total_bytes, cost: rounded_cost, snapshot_type: 'Subscribers Included')
+    snapshot = Snapshot.create(institution_id: self.id, audit_date: Time.now, apt_bytes: total_bytes, cs_bytes: total_cs_bytes, go_bytes: total_go_bytes, cost: rounded_cost, snapshot_type: 'Subscribers Included')
     snapshot.save!
     snapshot_array.push(snapshot)
     snapshot_array

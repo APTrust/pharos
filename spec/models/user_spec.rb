@@ -102,6 +102,22 @@ describe User do
     end
   end
 
+  describe 'soft_delete' do
+    it 'deactivates the user' do
+      user.soft_delete
+      user.deactivated_at.should_not be_nil
+      user.encrypted_api_secret_key.should == ''
+    end
+  end
+
+  describe 'reactivate' do
+    it 'reactivates the user' do
+      user.soft_delete
+      user.reactivate
+      user.deactivated_at.should be_nil
+    end
+  end
+
   # describe 'session timeout' do
   #   it 'defaults to Devise.timeout_in' do
   #     user.timeout_in.should eq Devise.timeout_in

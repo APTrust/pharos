@@ -178,6 +178,14 @@ RSpec.describe WorkItem, :type => :model do
     subject.stage.should ==  Pharos::Application::PHAROS_STAGES['requested']
 
     subject.status = Pharos::Application::PHAROS_STATUSES['fail']
+    subject.action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+    subject.stage = Pharos::Application::PHAROS_STAGES['validate']
+    subject.requeue_item
+    subject.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+    subject.action.should == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+    subject.stage.should ==  Pharos::Application::PHAROS_STAGES['requested']
+
+    subject.status = Pharos::Application::PHAROS_STATUSES['fail']
     subject.action = Pharos::Application::PHAROS_ACTIONS['ingest']
     subject.stage = Pharos::Application::PHAROS_STAGES['validate']
     subject.requeue_item(stage: Pharos::Application::PHAROS_STAGES['fetch'])
@@ -197,8 +205,8 @@ RSpec.describe WorkItem, :type => :model do
   describe 'work queue methods' do
     ingest_date = Time.parse('2014-06-01')
     before do
-      FactoryBot.create(:intellectual_object, identifier: 'abc/123')
-      FactoryBot.create(:generic_file, identifier: 'abc/123/doc.pdf')
+      test_obj = FactoryBot.create(:intellectual_object, identifier: 'abc/123')
+      FactoryBot.create(:generic_file, identifier: 'abc/123/doc.pdf', intellectual_object_id: test_obj.id)
       3.times do
         ingest_date = ingest_date + 1.days
         FactoryBot.create(:work_item, object_identifier: 'abc/123',
@@ -232,6 +240,42 @@ RSpec.describe WorkItem, :type => :model do
       wi.id.should_not be_nil
     end
 
+    it 'should create a file restoration request when asked' do
+      test_file = GenericFile.where(identifier: 'abc/123/doc.pdf').first
+      wi = WorkItem.create_restore_request_for_file(test_file, 'mikey@example.com')
+      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
+      wi.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
+      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
+      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+      wi.note.should == 'Restore requested'
+      wi.outcome.should == 'Not started'
+      wi.user.should == 'mikey@example.com'
+      wi.retry.should == true
+      wi.work_item_state.state.should be_nil
+      wi.node.should be_nil
+      wi.pid.should == 0
+      wi.needs_admin_review.should == false
+      wi.id.should_not be_nil
+      wi.generic_file_identifier.should == test_file.identifier
+    end
+
+    it 'should create a glacier restoration request when asked' do
+      wi = WorkItem.create_glacier_restore_request('abc/123', 'mikey@example.com')
+      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
+      wi.action.should == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
+      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
+      wi.note.should == 'Restore requested'
+      wi.outcome.should == 'Not started'
+      wi.user.should == 'mikey@example.com'
+      wi.retry.should == true
+      wi.work_item_state.state.should be_nil
+      wi.node.should be_nil
+      wi.pid.should == 0
+      wi.needs_admin_review.should == false
+      wi.id.should_not be_nil
+    end
+
     it 'should create a dpn request when asked' do
       wi = WorkItem.create_dpn_request('abc/123', 'mikey@example.com')
       wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
@@ -250,7 +294,7 @@ RSpec.describe WorkItem, :type => :model do
     end
 
     it 'should create a delete request when asked' do
-      wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com')
+      wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com', 'jeremy@example.com', 'joyce@example.com')
       wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['delete']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
@@ -258,6 +302,8 @@ RSpec.describe WorkItem, :type => :model do
       wi.note.should == 'Delete requested'
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
+      wi.inst_approver.should == 'jeremy@example.com'
+      wi.aptrust_approver.should == 'joyce@example.com'
       wi.retry.should == true
       wi.generic_file_identifier.should == 'abc/123/doc.pdf'
       wi.work_item_state.state.should be_nil
@@ -289,6 +335,20 @@ RSpec.describe WorkItem, :type => :model do
       subject.save!
 
       pending_action = WorkItem.pending_action(subject.object_identifier)
+      pending_action.should_not be_nil
+      pending_action.action.should == restore
+    end
+
+    it 'should find pending restore for a file' do
+      setup_item(subject)
+      subject.action = restore
+      subject.stage = record
+      subject.status = pending
+      subject.object_identifier = 'abc/123'
+      subject.generic_file_identifier = 'abc/123/data/test.pdf'
+      subject.save!
+
+      pending_action = WorkItem.pending_action_for_file(subject.generic_file_identifier)
       pending_action.should_not be_nil
       pending_action.action.should == restore
     end
@@ -359,6 +419,7 @@ RSpec.describe WorkItem, :type => :model do
       WorkItem.update_all(node: 'xyz')
       items = WorkItem.with_unempty_node("true")
       items.should_not be_empty
+      items.count.should == WorkItem.all.count
       WorkItem.update_all(node: '')
       items = WorkItem.with_unempty_node("true")
       items.should be_empty
@@ -375,6 +436,31 @@ RSpec.describe WorkItem, :type => :model do
       WorkItem.update_all(node: '')
       items = WorkItem.with_empty_node("true")
       items.should_not be_empty
+      items.count.should == WorkItem.all.count
+    end
+
+    it 'should find by pid not empty' do
+      WorkItem.update_all(pid: 15)
+      items = WorkItem.with_unempty_pid("true")
+      items.should_not be_empty
+      items.count.should == WorkItem.all.count
+      WorkItem.update_all(pid: 0)
+      items = WorkItem.with_unempty_pid("true")
+      items.should be_empty
+      items = WorkItem.with_unempty_pid(nil)
+      items.should_not be_empty
+    end
+
+    it 'should find by pid empty' do
+      WorkItem.update_all(pid: 15)
+      items = WorkItem.with_empty_pid("true")
+      items.should be_empty
+      items = WorkItem.with_empty_pid(nil)
+      items.should_not be_empty
+      WorkItem.update_all(pid: 0)
+      items = WorkItem.with_empty_pid("true")
+      items.should_not be_empty
+      items.count.should == WorkItem.all.count
     end
 
   end

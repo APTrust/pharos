@@ -46,13 +46,23 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :debug
+  config.log_level = :warn
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
 
+  # Semantic logger
+  #config.colorize_logging = false
+
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  if ENV['PHAROS_LOGSERVER'].present?
+    #config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
+    config.semantic_logger.add_appender(
+  	appender: :graylog,
+        url: "udp://#{ENV['PHAROS_LOGSERVER']}:#{ENV['PHAROS_LOGSERVER_PORT']}"
+    )
+  end
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
@@ -94,5 +104,5 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
-  config.show_send_to_dpn_button = true
+  config.show_send_to_dpn_button = false
 end

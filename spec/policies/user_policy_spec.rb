@@ -19,6 +19,8 @@ describe UserPolicy do
         should permit(:update_password)
         should permit(:destroy)
         should permit(:admin_password_reset)
+        should permit(:deactivate)
+        should permit(:reactivate)
       end
     end
     describe 'when the user is him/herself' do
@@ -26,6 +28,8 @@ describe UserPolicy do
       it do
         should permit(:generate_api_key)
         should permit(:admin_password_reset)
+        should permit(:deactivate)
+        should permit(:reactivate)
       end
     end
   end
@@ -46,6 +50,8 @@ describe UserPolicy do
           should_not permit(:update_password)
           should permit(:destroy)
           should_not permit(:admin_password_reset)
+          should permit(:deactivate)
+          should permit(:reactivate)
         end
       end
 
@@ -60,6 +66,8 @@ describe UserPolicy do
           should_not permit(:update_password)
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
     end
@@ -68,6 +76,8 @@ describe UserPolicy do
       it do
         should permit(:generate_api_key)
         should_not permit(:admin_password_reset)
+        should permit(:deactivate)
+        should permit(:reactivate)
       end
     end
   end
@@ -88,6 +98,8 @@ describe UserPolicy do
           should_not permit(:update_password)
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
 
@@ -102,6 +114,8 @@ describe UserPolicy do
           should_not permit(:update_password)
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
 
@@ -116,6 +130,8 @@ describe UserPolicy do
           should permit(:update_password)
           should_not permit(:destroy)
           should_not permit(:admin_password_reset)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
         end
       end
     end
@@ -133,6 +149,8 @@ describe UserPolicy do
       should_not permit(:generate_api_key)
       should_not permit(:destroy)
       should_not permit(:admin_password_reset)
+      should_not permit(:deactivate)
+      should_not permit(:reactivate)
     end
   end
 end

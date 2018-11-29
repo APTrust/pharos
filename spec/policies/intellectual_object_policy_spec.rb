@@ -15,6 +15,7 @@ describe IntellectualObjectPolicy do
       should permit(:add_event)
       should permit(:soft_delete)
       should permit(:destroy)
+      should permit(:finished_destroy)
     end
   end
 
@@ -31,6 +32,7 @@ describe IntellectualObjectPolicy do
           should_not permit(:add_event)
           should permit(:soft_delete)
           should permit(:destroy)
+          should_not permit(:finished_destroy)
         end
       end
 
@@ -44,6 +46,7 @@ describe IntellectualObjectPolicy do
             should_not permit(:add_event)
             should_not permit(:soft_delete)
             should_not permit(:destroy)
+            should_not permit(:finished_destroy)
           end
         end
 
@@ -56,6 +59,7 @@ describe IntellectualObjectPolicy do
             should_not permit(:add_event)
             should_not permit(:soft_delete)
             should_not permit(:destroy)
+            should_not permit(:finished_destroy)
           end
         end
       end
@@ -77,6 +81,7 @@ describe IntellectualObjectPolicy do
             should_not permit(:soft_delete)
             should_not permit(:destroy)
             should permit(:show)
+            should_not permit(:finished_destroy)
           end
         end
         describe 'and is institutional accessible' do
@@ -101,6 +106,7 @@ describe IntellectualObjectPolicy do
             should_not permit(:soft_delete)
             should_not permit(:destroy)
             should permit(:show)
+            should_not permit(:finished_destroy)
           end
         end
         describe 'and it belongs to an institutional accessible object' do
@@ -125,6 +131,7 @@ describe IntellectualObjectPolicy do
       should_not permit(:add_event)
       should_not permit(:soft_delete)
       should_not permit(:destroy)
+      should_not permit(:finished_destroy)
     end
   end
 end

@@ -17,8 +17,12 @@
     <dt>Task: </dt>
     <dd><%= current.task %></dd>
     <dt>Queued At: </dt>
-    <dd><%= current.queued_at %></dd>
+    <dd><%= pretty_date(current.queued_at) %></dd>
     <dt>Completed At: </dt>
-    <dd><%= current.completed_at %></dd>
+    <dd><%= pretty_date(current.completed_at) %></dd>
+    <dt>Stage: </dt>
+    <dd><%= current.stage %></dd>
+    <dt class="<%= current.status %>">Status: </dt>
+    <dd class="<%= current.status %>"><%= current.status %></dd>
   </dl>
 </div>

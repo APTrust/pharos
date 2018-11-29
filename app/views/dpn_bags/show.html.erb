@@ -1,3 +1,5 @@
+<% @title = "DPN Bag #{@dpn_bag.dpn_identifier}" %>
+
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
     <li><a href="#"><%= link_to current_user.institution.name, institution_path(current_user.institution) %></a></li>
@@ -21,9 +23,9 @@
       <tr><th>Node 3</th>
         <td><%= @dpn_bag.node_3 %></td></tr>
       <tr><th>Created At (In DPN)</th>
-        <td><%= time_ago_in_words @dpn_bag.dpn_created_at %></td></tr>
+        <td><%= pretty_date(@dpn_bag.dpn_created_at) %></td></tr>
       <tr><th>Updated At (In DPN)</th>
-        <td><%= time_ago_in_words @dpn_bag.dpn_updated_at %></td></tr>
+        <td><%= pretty_date(@dpn_bag.dpn_updated_at) %></td></tr>
       </tbody>
     </table>
   </section>

@@ -1,3 +1,5 @@
+<% @title = 'New User' %>
+
 <div class="page-header">
   <h1>Registering New User</h1>
 </div>
@@ -15,11 +17,11 @@
 
       <%= f.association :roles, collection: roles_for_select, as: :radio_buttons %>
 
-      <%= f.label :two_factor_enabled %><br />
-      <%= f.check_box :two_factor_enabled %>
-
       <%= f.input :password %>
       <%= f.input :password_confirmation %>
+
+      <%= f.label :enabled_two_factor %><br />
+      <%= f.check_box :enabled_two_factor %>
 
     </div>
     <br>

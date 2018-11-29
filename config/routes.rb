@@ -8,6 +8,18 @@ Rails.application.routes.draw do
   get 'api/v2/:institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :api_institution_snapshot
   get '/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :group_snapshot
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
+  get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
+  get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
+  post 'api/v2/:institution_identifier/trigger_bulk_delete', to: 'institutions#trigger_bulk_delete', as: :api_bulk_deletion, format: :json, institution_identifier: institution_ptrn
+  get '/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
+  post 'api/v2/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :api_bulk_deletion_institutional_confirmation, format: :json, institution_identifier: institution_ptrn
+  get '/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :bulk_deletion_admin_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
+  post 'api/v2/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :api_bulk_deletion_admin_confirmation, format: :json, institution_identifier: institution_ptrn
+  get '/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :bulk_deletion_finished, format: [:html, :json], institution_identifier: institution_ptrn
+  post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
+  get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
+  get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
+
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
@@ -18,6 +30,7 @@ Rails.application.routes.draw do
   get 'objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :intellectual_objects
   resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/objects'
   get 'api/v2/objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
+  get 'api/v2/objects', to: 'intellectual_objects#index', format: [:json, :html]
   post 'api/v2/objects/:institution_identifier', to: 'intellectual_objects#create', format: :json, institution_identifier: institution_ptrn
   get 'member-api/v2/objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
   get 'member-api/v2/objects/', to: 'intellectual_objects#index', format: [:json, :html]
@@ -30,6 +43,8 @@ Rails.application.routes.draw do
   delete 'api/v2/objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :api_object_confirm_destroy
   get 'objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :get_object_confirm_destroy
   get 'api/v2/objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :get_api_object_confirm_destroy
+  get 'objects/:intellectual_object_identifier/finish_delete', to: 'intellectual_objects#finished_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :get_object_finish_destroy
+  get 'api/v2/objects/:intellectual_object_identifier/finish_delete', to: 'intellectual_objects#finished_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :get_api_object_finish_destroy
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
@@ -46,6 +61,12 @@ Rails.application.routes.draw do
   delete 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :api_file_confirm_destroy
   get 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_confirm_destroy
   get 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_api_file_confirm_destroy
+  get 'files/finish_delete/:generic_file_identifier', to: 'generic_files#finished_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_finish_destroy
+  get 'api/v2/files/finish_delete/:generic_file_identifier', to: 'generic_files#finished_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_api_file_finish_destroy
+  get 'files/restore/:generic_file_identifier', to: 'generic_files#restore', format: [:json, :html], generic_file_identifier: file_ptrn, as: :generic_file_restore
+  get 'member-api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
+  put 'api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
+
 
   # INSTITUTIONS (API)
   # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'
@@ -70,7 +91,7 @@ Rails.application.routes.draw do
   resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
   put 'items/', to: 'work_items#update', format: :json
   resources :work_items, path: '/api/v2/items'
-  resources :work_items, format: :json, only: [:index], path: 'member-api/v2/items'
+  resources :work_items, only: [:index], path: 'member-api/v2/items', format: [:json, :html]
   get '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   put '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   get 'items/items_for_dpn', to: 'work_items#items_for_dpn', format: :json
@@ -82,6 +103,8 @@ Rails.application.routes.draw do
   get 'items/:id/requeue', to: 'work_items#requeue', format: [:json, :html], as: :requeue_work_item
   get 'notifications/successful_restoration', to: 'work_items#notify_of_successful_restoration', format: :json
   get '/api/v2/notifications/successful_restoration', to: 'work_items#notify_of_successful_restoration', format: :json
+  get 'notifications/spot_test_restoration/:id', to: 'work_items#spot_test_restoration', format: :json
+  get '/api/v2/notifications/spot_test_restoration/:id', to: 'work_items#spot_test_restoration', format: :json
 
   # WORK ITEM STATE ROUTES
   #resources :work_item_states, path: 'item_state', only: [:show, :update, :create], format: :json, param: :work_item_id
@@ -123,12 +146,17 @@ Rails.application.routes.draw do
   # DPN BAG ROUTES
   resources :dpn_bags, path: 'dpn_bags', only: [:index, :show], format: [:json, :html]
   resources :dpn_bags, path: 'api/v2/dpn_bags', only: [:index, :create, :show, :update], format: :json
+  resources :dpn_bags, path: 'member-api/v2/dpn_bags', only: [:index, :show], format: :json
 
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]
 
   # SNAPSHOT ROUTES
   resources :snapshots, path: 'snapshots', only: [:index, :show], format: [:json, :html]
+
+  # BULK DELETE JOB ROUTES
+  resources :bulk_delete_jobs, path: 'bulk_delete_jobs', only: [:index, :show], format: [:json, :html]
+  resources :bulk_delete_jobs, path: 'api/v2/bulk_delete_jobs', only: [:index, :show], format: :json
 
   # USER ROUTES
   devise_for :users,
@@ -138,12 +166,16 @@ Rails.application.routes.draw do
     patch 'update_password', on: :collection
     get 'edit_password', on: :member
     patch 'generate_api_key', on: :member
-    get 'two_factor_confirm', to: 'users#confirm_two_factor', as: :confirm_two_factor, on: :member
-    patch 'two_factor_update', to: 'users#confirm_two_factor_update', as: :confirm_two_factor_update, on: :collection
+    # get 'two_factor_confirm', to: 'users#confirm_two_factor', as: :confirm_two_factor, on: :member
+    # patch 'two_factor_update', to: 'users#confirm_two_factor_update', as: :confirm_two_factor_update, on: :collection
   end
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
+  get 'users/:id/deactivate', to: 'users#deactivate', as: :deactivate_user
+  get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
+
+  resources :verifications, only: [:edit, :update]
 
   authenticated :user do
     root to: 'institutions#show', as: 'authenticated_root'

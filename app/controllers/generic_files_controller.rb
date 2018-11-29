@@ -2,7 +2,7 @@ class GenericFilesController < ApplicationController
   include FilterCounts
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :load_generic_file, only: [:show, :update, :destroy, :confirm_destroy]
+  before_action :load_generic_file, only: [:show, :update, :destroy, :confirm_destroy, :finished_destroy, :restore]
   before_action :load_intellectual_object, only: [:create, :create_batch]
   before_action :set_format
   after_action :verify_authorized
@@ -52,7 +52,7 @@ class GenericFilesController < ApplicationController
       authorize current_user, :nil_file?
       respond_to do |format|
         format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.' }, status: :not_found }
-        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]}. Please check to make sure the identifier was properly escaped." }
+        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]} was not found. Please check to make sure the identifier was properly escaped." }
       end
     end
   end
@@ -145,27 +145,86 @@ class GenericFilesController < ApplicationController
 
   def confirm_destroy
     authorize @generic_file, :soft_delete?
-    if params[:confirmation_token] == @generic_file.confirmation_token.token
-      confirmed_destroy
+    if @generic_file.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS['delete']).with_file_identifier(@generic_file.identifier).count == 1)
       respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}."
-          redirect_to @generic_file.intellectual_object
-        }
-      end
-    else
-      respond_to do |format|
-        message = 'Your file cannot be deleted at this time due to an invalid confirmation token. ' +
-            'Please contact your APTrust administrator for more information.'
+        message = 'This deletion request has already been confirmed and queued for deletion by someone else.'
         format.json {
-          render :json => { status: 'error', message: message }, :status => :conflict
+          render :json => { status: 'ok', message: message }, :status => :ok
         }
         format.html {
           redirect_to @generic_file
-          flash[:alert] = message
+          flash[:notice] = message
         }
       end
+    else
+      if params[:confirmation_token] == @generic_file.confirmation_token.token
+        confirmed_destroy
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}."
+            redirect_to @generic_file.intellectual_object
+          }
+        end
+      else
+        respond_to do |format|
+          message = 'Your file cannot be deleted at this time due to an invalid confirmation token. ' +
+              'Please contact your APTrust administrator for more information.'
+          format.json {
+            render :json => { status: 'error', message: message }, :status => :conflict
+          }
+          format.html {
+            redirect_to @generic_file
+            flash[:alert] = message
+          }
+        end
+      end
+    end
+  end
+
+  def finished_destroy
+    authorize @generic_file
+    @generic_file.mark_deleted
+    respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          flash[:notice] = "Delete job has been finished for file: #{@generic_file.uri}. File has been marked as deleted."
+          redirect_to @generic_file.intellectual_object
+        }
+    end
+  end
+
+
+  def restore
+    authorize @generic_file, :restore?
+    message = ""
+    api_status_code = :ok
+    restore_item = nil
+    pending = WorkItem.pending_action_for_file(@generic_file.identifier)
+    if @generic_file.state == 'D'
+      api_status_code = :conflict
+      message = 'This file has been deleted and cannot be queued for restoration.'
+    elsif pending.nil?
+      restore_item = WorkItem.create_restore_request_for_file(@generic_file, current_user.email)
+      message = 'Your file has been queued for restoration.'
+    else
+      api_status_code = :conflict
+      message = "Your file cannot be queued for restoration at this time due to a pending #{pending.action} request."
+    end
+    respond_to do |format|
+      status = restore_item.nil? ? 'error' : 'ok'
+      item_id = restore_item.nil? ? 0 : restore_item.id
+      format.json {
+        render :json => { status: status, message: message, work_item_id: item_id }, :status => api_status_code
+      }
+      format.html {
+        if restore_item.nil?
+          flash[:alert] = message
+        else
+          flash[:notice] = message
+        end
+        redirect_to @generic_file
+      }
     end
   end
 
@@ -190,7 +249,7 @@ class GenericFilesController < ApplicationController
   def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
       .permit(:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
-              :file_format, premis_events_attributes:
+              :file_format, :storage_option, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
                :agent, :intellectual_object_id, :generic_file_id,
@@ -202,7 +261,7 @@ class GenericFilesController < ApplicationController
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
       .permit(files: [:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
-                      :file_format, premis_events_attributes:
+                      :file_format, :storage_option, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
                        :agent, :intellectual_object_id, :generic_file_id,
@@ -359,19 +418,13 @@ class GenericFilesController < ApplicationController
   end
 
   def confirmed_destroy
-    requesting_user = User.readable(current_user).find(params[:requesting_user_id])
-    attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
-                   date_time: Time.now.utc.iso8601,
-                   detail: 'Object deleted from S3 storage',
-                   outcome: 'Success',
-                   outcome_detail: requesting_user.email,
-                   object: 'Goamz S3 Client',
-                   agent: 'https://github.com/crowdmob/goamz',
-                   outcome_information: "Action requested by user from #{current_user.institution_id}",
-                   identifier: SecureRandom.uuid
+    requesting_user = User.find(params[:requesting_user_id])
+    attributes = { requestor: requesting_user.email,
+                   inst_app: current_user.email
     }
     @generic_file.soft_delete(attributes)
     log = Email.log_deletion_confirmation(@generic_file)
-    NotificationMailer.deletion_confirmation(@generic_file, requesting_user, log).deliver!
+    NotificationMailer.deletion_confirmation(@generic_file, requesting_user.id, current_user.id, log).deliver!
+    ConfirmationToken.where(generic_file_id: @generic_file.id).delete_all
   end
 end

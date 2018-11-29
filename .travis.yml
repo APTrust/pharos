@@ -1,24 +1,25 @@
 language: ruby
 rvm:
-- 2.3.1
-- 2.4.2
-# services:
-#  - postgresql
+ - 2.4.2
+ - 2.5.1
+services:
+  - postgresql
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-    #  - bundle exec rake db:setup RAILS_ENV=test
+  - bundle exec rake db:setup RAILS_ENV=test
   - bundle exec rake db:migrate RAILS_ENV=test
+  - bundle exec rake test RAILS_ENV=test
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
   - secure: XHjeFTlHHhdwdZfV6HzvCfovU2fRVPO3Uc7tBAHa8MRXPGaphxfvcJU4HSrDouWKemm/9As67NNocwKkLdyQ920spQ4+DJdnDnz0ifY7oLz98DBBoniXhtpaJQ1ahCl6l7754Rt5U6XNeHT71K4t5GSm4hrjHpq7mJpgRY6BzUs=
   - secure: ZBCss4Cr2QNh0lN3JcCCZkqU3AORpnRKVZP0WEjZIJdYnxeuirkZ3IdLgYL6dUVpt1/mv5bXD19UJh6TA5JNb3fN+Kx30jXVIUVBBYqU6iHqE6yV6a3rC4QJgCob1IlZStJ9QxBNWo5nwEpEgrfJbz8s7extrYTQNq3GB2AR9a0=
-notifications:
-  slack:
-    secure: H5vU3wRKiO5VCBNThkEfT5uhpZVa710PnaRzfSM1wfX95X5JvV7NmH8AwbGtpe90O5gpub2kEji7WIFtshRwVCFwcjvA11pWUH7Q2K5fs6mcSoIFTXXptNW2jnbC8a11yiMPu41BFVOphQQk/mDMIhP95RN0+Zr7x92zzn/LwRETW1OseJN05KpOE0CLTaOv8apJecpVzcw55sNuCD2Ztrlu9tut45rKBKCEGUta4YImWey5RgxKYgP+7I7K7ImueRCZuKWMbYtmVaYSF7/hf23xwD5jESVpq/xlf89B3JOpu3NQL6ZNQHfMvGZwjHkgTAnO/D/zWD+kUVTs1ulgbVbeJqxtT/mAqiWVCagX7QHOSirwJ7Se4jjAU4LpNAvtXGFuRKZNiNDtDm1beQGbwmrMoTN22FykQwkDm1bWwUQCuFEsSNi1yHS7pN+RNAyqIYOqdn9KjZT/TMxsWRfp/+z3rReh7GBZTsDzGaNG46gUUJDcYLcgO7jpAiu7wcM2md9Q0qmmZ8LP3cZzHyde3k4MYNL+ETZXrAzJOxN6liUW+TgdfyD5mK632OVImCRyxLv6NKvTCL/YhpRRymI0gYLhENy3BgM/yZPV62qfVxyAxUrtFF9hwcXd3Nzj56hFmBCuNXRnF2jnMETv9tzQZaGARcEbGMaHw/hLSXYBtpE=
 branches:
   only:
-  - master
-  - develop
+    - gh-pages
+    - /.*/
 before_install:
 - gem install bundler
+notifications:
+    slack:
+      secure: H5vU3wRKiO5VCBNThkEfT5uhpZVa710PnaRzfSM1wfX95X5JvV7NmH8AwbGtpe90O5gpub2kEji7WIFtshRwVCFwcjvA11pWUH7Q2K5fs6mcSoIFTXXptNW2jnbC8a11yiMPu41BFVOphQQk/mDMIhP95RN0+Zr7x92zzn/LwRETW1OseJN05KpOE0CLTaOv8apJecpVzcw55sNuCD2Ztrlu9tut45rKBKCEGUta4YImWey5RgxKYgP+7I7K7ImueRCZuKWMbYtmVaYSF7/hf23xwD5jESVpq/xlf89B3JOpu3NQL6ZNQHfMvGZwjHkgTAnO/D/zWD+kUVTs1ulgbVbeJqxtT/mAqiWVCagX7QHOSirwJ7Se4jjAU4LpNAvtXGFuRKZNiNDtDm1beQGbwmrMoTN22FykQwkDm1bWwUQCuFEsSNi1yHS7pN+RNAyqIYOqdn9KjZT/TMxsWRfp/+z3rReh7GBZTsDzGaNG46gUUJDcYLcgO7jpAiu7wcM2md9Q0qmmZ8LP3cZzHyde3k4MYNL+ETZXrAzJOxN6liUW+TgdfyD5mK632OVImCRyxLv6NKvTCL/YhpRRymI0gYLhENy3BgM/yZPV62qfVxyAxUrtFF9hwcXd3Nzj56hFmBCuNXRnF2jnMETv9tzQZaGARcEbGMaHw/hLSXYBtpE=

@@ -12,8 +12,8 @@
       <tr>
         <td><a href="<%= dpn_bag_path(id: bag.id) %>" ><%= truncate(bag.object_identifier, length: 50) %></a></td>
         <td><%= bag.dpn_identifier %></td>
-        <td><%= time_ago_in_words(bag.dpn_created_at) %></td>
-        <th><%= time_ago_in_words(bag.dpn_updated_at) %></th>
+        <td><%= pretty_date(bag.dpn_created_at) %></td>
+        <th><%= pretty_date(bag.dpn_updated_at) %></th>
       </tr>
   <% end %>
   </tbody>

@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :vacuum]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate, :vacuum]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -83,15 +83,18 @@ class UsersController < ApplicationController
     flash[:notice] = "Reset password for #{@user.email}. Please notify the user that #{password} is their new password."
   end
 
-  def confirm_two_factor
+  def deactivate
     authorize current_user
-    current_user.send_two_factor_authentication_code
-    rescue Twilio::REST::RequestError
-      flash[:alert] = "Your phone number is invalid so we couldn't send your SMS code."
+    @user.soft_delete
+    (@user == current_user) ? sign_out(@user) : redirect_to(@user)
+    flash[:notice] = "#{@user.name}'s account has been deactivated."
   end
 
-  def confirm_two_factor_update
+  def reactivate
     authorize current_user
+    @user.reactivate
+    redirect_to @user
+    flash[:notice] = "#{@user.name}'s account has been reactivated."
   end
 
   def vacuum

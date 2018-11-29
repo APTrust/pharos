@@ -64,10 +64,16 @@ class DpnWorkItemsController < ApplicationController
   def requeue
     if @dpn_item
       authorize @dpn_item
-      if @dpn_item.task == 'ingest' || @dpn_item.task == 'replication'
-        (params[:delete_state_item] && params[:delete_state_item] == 'true') ? delete_state = 'true' : delete_state = 'false'
-        @dpn_item.requeue_item(delete_state)
-        response = issue_requeue_http_post(params[:task])
+      if @dpn_item.task == 'ingest' || @dpn_item.task == 'replication' || @dpn_item.task == 'fixity'
+        if @dpn_item.task == 'ingest' || @dpn_item.task == 'replication'
+          (params[:delete_state_item] && params[:delete_state_item] == 'true') ? delete_state = 'true' : delete_state = 'false'
+          @dpn_item.requeue_item(delete_state)
+          response = issue_requeue_http_post(params[:task])
+        elsif @dpn_item.task == 'fixity'
+          stage = params[:stage]
+          @dpn_item.fixity_requeue(stage)
+          response = issue_requeue_http_post(stage)
+        end
         respond_to do |format|
           format.json { render json: { status: response.code, body: response.body } }
           format.html {
@@ -98,12 +104,12 @@ class DpnWorkItemsController < ApplicationController
 
   def dpn_work_item_params
     if request.method != 'GET'
-      params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid)
+      params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid, :stage, :status)
     end
   end
 
   def params_for_update
-    params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid)
+    params.require(:dpn_work_item).permit(:remote_node, :processing_node, :task, :identifier, :queued_at, :completed_at, :note, :state, :pid, :stage, :status)
   end
 
   def set_item
@@ -111,22 +117,30 @@ class DpnWorkItemsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
   end
 
-  def issue_requeue_http_post(task)
+  def issue_requeue_http_post(task_or_stage)
     if @dpn_item.task == 'replication'
-      if task == 'copy'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_copy_topic")
-      elsif task == 'validation'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_validation_topic")
-      elsif task == 'store'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_replication_store_topic")
+      if task_or_stage == 'copy'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_copy_topic")
+      elsif task_or_stage == 'validation'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_validation_topic")
+      elsif task_or_stage == 'store'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_replication_store_topic")
       end
     elsif @dpn_item.task == 'ingest'
-      if task == 'package'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
-      elsif task == 'store'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
-      elsif task == 'record'
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
+      if task_or_stage == 'package'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_package_topic")
+      elsif task_or_stage == 'store'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_ingest_store_topic")
+      elsif task_or_stage == 'record'
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_record_topic")
+      end
+    elsif @dpn_item.task == 'fixity'
+      if task_or_stage == Pharos::Application::PHAROS_STAGES['requested']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_glacier_restore_topic")
+      elsif task_or_stage == Pharos::Application::PHAROS_STAGES['validate']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_fixity_topic")
+      elsif task_or_stage == Pharos::Application::PHAROS_STAGES['available_in_s3']
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_s3_download_topic")
       end
     end
     http = Net::HTTP.new(uri.host, uri.port)
@@ -136,10 +150,16 @@ class DpnWorkItemsController < ApplicationController
   end
 
   def filter_sort_and_count
+    params[:status] = nil if params[:status] == 'Null Status'
+    params[:stage] = nil if params[:stage] == 'Null Stage'
     @dpn_items = @dpn_items
                      .with_task(params[:task])
                      .with_identifier(params[:identifier])
                      .with_state(params[:state])
+                     .with_stage(params[:stage])
+                     .with_status(params[:status])
+                     .with_retry(params[:retry])
+                     .with_pid(params[:pid])
                      .queued_before(params[:queued_before])
                      .queued_after(params[:queued_after])
                      .completed_before(params[:completed_before])
@@ -151,6 +171,9 @@ class DpnWorkItemsController < ApplicationController
     @selected = {}
     get_node_counts(@dpn_items)
     get_queued_counts(@dpn_items)
+    get_status_counts(@dpn_items)
+    get_stage_counts(@dpn_items)
+    get_retry_counts(@dpn_items)
     count = @dpn_items.count
     set_page_counts(count)
     params[:sort] = 'queued_at DESC' unless params[:sort]

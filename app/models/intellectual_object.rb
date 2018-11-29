@@ -9,11 +9,13 @@ class IntellectualObject < ActiveRecord::Base
   accepts_nested_attributes_for :premis_events, allow_destroy: true
   accepts_nested_attributes_for :checksums, allow_destroy: true
 
-  validates :title, :institution, :identifier, :access, presence: true
+  validates :title, :institution, :identifier, :access, :storage_option, presence: true
   validates_inclusion_of :access, in: %w(consortia institution restricted), message: "#{:access} is not a valid access", if: :access
   validates_uniqueness_of :identifier
+  validate :storage_option_is_allowed
 
   before_save :set_bag_name
+  before_save :freeze_storage_option
   before_destroy :check_for_associations
 
   ### Scopes
@@ -27,8 +29,8 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_identifier_like, ->(param) { where('intellectual_objects.identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_alt_identifier, ->(param) { where(alt_identifier: param) unless param.blank? }
   scope :with_alt_identifier_like, ->(param) { where('intellectual_objects.alt_identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
-  scope :with_bagging_group_identifier, ->(param) { where(bagging_group_identifier: param) unless param.blank? }
-  scope :with_bagging_group_identifier_like, ->(param) { where('intellectual_objects.bagging_group_identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
+  scope :with_bag_group_identifier, ->(param) { where(bag_group_identifier: param) unless param.blank? }
+  scope :with_bag_group_identifier_like, ->(param) { where('intellectual_objects.bag_group_identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_institution, ->(param) { where(institution: param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless (param.blank? || param == 'all' || param == 'All') }
   scope :with_bag_name, ->(param) { where(bag_name: param) unless param.blank? }
@@ -37,6 +39,7 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_etag_like, ->(param) { where('intellectual_objects.etag like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_title_like, ->(param) { where('intellectual_objects.title like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_access, ->(param) { where(access: param) unless param.blank? }
+  scope :with_storage_option, ->(param) { where(storage_option: param) unless param.blank? }
   scope :with_file_format, ->(param) {
     joins(:generic_files)
         .where('generic_files.file_format = ?', param) unless param.blank?
@@ -87,28 +90,48 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def soft_delete(attributes)
-    attributes[:identifier] = SecureRandom.uuid
-    self.state = 'D'
-    self.add_event(attributes)
-    self.save!
-    unless Rails.env.test?
-      Thread.new() do
-        background_deletion(attributes)
-        ActiveRecord::Base.connection.close
-      end
-    end
-  end
-
-  def background_deletion(attributes)
     generic_files.each do |gf|
       gf.soft_delete(attributes)
     end
     save!
   end
 
+  def mark_deleted(attributes)
+    if self.generic_files.where(state: 'A').count > 0
+      raise 'Object cannot be marked deleted until all of its files have been marked deleted.'
+    end
+    if self.state == 'D'
+      return  # Object has already been marked deleted
+    end
+    # Create deletion event only if one doesn't already exist.
+    last_ingest = self.premis_events.where(event_type: 'ingestion', outcome: 'Success', generic_file_identifier: '').order(date_time: :desc).limit(1).first
+    last_deletion = self.premis_events.where(event_type: 'deletion', outcome: 'Success', generic_file_identifier: '').order(date_time: :desc).limit(1).first
+    if !last_deletion || last_deletion.date_time < last_ingest.date_time
+      attributes[:identifier] = SecureRandom.uuid
+      self.add_event(attributes)
+      self.save!
+    end
+    self.state = 'D'
+    self.save!
+  end
+
+  def deleted_since_last_ingest?
+    last_ingest = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).order(date_time: :desc).limit(1).first
+    last_deletion = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).limit(1).first
+    if !last_ingest.nil? && !last_deletion.nil? && last_deletion.date_time > last_ingest.date_time
+      return true
+    end
+    return false
+  end
+
   def in_dpn?
     (self.dpn_uuid.nil? || self.dpn_uuid.blank? || self.dpn_uuid.empty?) ? object_in_dpn = false : object_in_dpn = true
     object_in_dpn
+  end
+
+  def glacier_only?
+    (self.storage_option == 'Standard') ? glacier_only = false : glacier_only = true
+    glacier_only
   end
 
   def dpn_bag
@@ -121,7 +144,7 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def gf_size
-    generic_files.where(state: 'A').sum(:size)
+    generic_files.where(state: 'A').sum(:size).to_i
   end
 
   def active_files
@@ -192,11 +215,11 @@ class IntellectualObject < ActiveRecord::Base
   def can_discover?(user)
     case access
       when 'consortia'
-          true
+        true
       when 'institution'
-          user.admin? || user.institution_id == institution_id
+        user.admin? || user.institution_id == institution_id
       when 'restricted'
-          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
+        user.admin? || (user.institional_admin? && user.institution_id == institution_id)
     end
   end
 
@@ -204,11 +227,11 @@ class IntellectualObject < ActiveRecord::Base
   def can_read?(user)
     case access
       when 'consortia'
-          true
+        true
       when 'institution'
-          user.admin? || user.institution_id == institution_id
+        user.admin? || user.institution_id == institution_id
       when 'restricted'
-          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
+        user.admin? || (user.institional_admin? && user.institution_id == institution_id)
     end
   end
 
@@ -216,11 +239,11 @@ class IntellectualObject < ActiveRecord::Base
   def can_edit?(user)
     case access
       when 'consortia'
-          user.admin? || user.institution_id == institution_id
+        user.admin? || user.institution_id == institution_id
       when 'institution'
-          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
+        user.admin? || (user.institional_admin? && user.institution_id == institution_id)
       when 'restricted'
-          user.admin? || (user.institional_admin? && user.institution_id == institution_id)
+        user.admin? || (user.institional_admin? && user.institution_id == institution_id)
     end
   end
 
@@ -229,7 +252,7 @@ class IntellectualObject < ActiveRecord::Base
 
   def has_right_number_of_checksums(checksum_list)
     checksums_okay = true
-    if(checksum_list.nil? || checksum_list.length == 0)
+    if (checksum_list.nil? || checksum_list.length == 0)
       checksums_okay = false
     else
       algorithms = Array.new
@@ -258,7 +281,7 @@ class IntellectualObject < ActiveRecord::Base
 
   def set_bag_name
     return if self.identifier.nil?
-    if (self.bag_name.nil? || self.bag_name == '')
+    if self.bag_name.nil? || self.bag_name == ''
       pieces = self.identifier.split('/')
       i = 1
       while i < pieces.count do
@@ -267,6 +290,16 @@ class IntellectualObject < ActiveRecord::Base
       end
       self.bag_name = name
     end
+  end
+
+  def storage_option_is_allowed
+    unless Pharos::Application::PHAROS_STORAGE_OPTIONS.include?(self.storage_option)
+      errors.add(:storage_option, 'Storage Option is not one of the allowed options')
+    end
+  end
+
+  def freeze_storage_option
+    errors.add(:storage_option, 'cannot be changed') if self.storage_option_changed? unless self.storage_option.nil?
   end
 
 end

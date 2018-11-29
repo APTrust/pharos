@@ -1,0 +1,7 @@
+<p>Admin Users at <%= @subject_institution.name %>,</p>
+<br>
+<p>This email notification is to inform you that <a href="<%= @subject_url %>" ><%= @subject.identifier %></a>,
+  whose deletion was requested by <%= @requesting_user.name %>, and approved by <%= @inst_approver.name %>,
+  has been successfully deleted.</p>
+<br>
+<p>Please contact the APTrust team if you have any questions.</p>

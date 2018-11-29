@@ -8,10 +8,13 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
 
-  validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, presence: true
+  validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_option, presence: true
   validates_uniqueness_of :identifier
   validate :init_institution_id, on: :create
+  validate :matching_storage_option, on: :create
+  validate :storage_option_is_allowed
   before_save :freeze_institution_id
+  before_save :freeze_storage_option
 
   ### Scopes
   scope :created_before, ->(param) { where('generic_files.created_at < ?', param) unless param.blank? }
@@ -26,13 +29,14 @@ class GenericFile < ActiveRecord::Base
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
   scope :not_checked_since, ->(param) { where("last_fixity_check <= ? and generic_files.state='A'", param) unless param.blank? }
   scope :with_state, ->(param) { where(state: param) unless (param.blank? || param == 'all' || param == 'All') }
+  scope :with_storage_option, ->(param) { where(storage_option: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?
   }
   scope :discoverable, ->(current_user) {
     joins(:intellectual_object)
-    .where('intellectual_objects.institution_id = ?', current_user.institution.id) unless current_user.admin?
+        .where('intellectual_objects.institution_id = ?', current_user.institution.id) unless current_user.admin?
   }
   scope :readable, ->(current_user) {
     # Inst admin can read anything at their institution.
@@ -40,10 +44,10 @@ class GenericFile < ActiveRecord::Base
     # Admin can read anything.
     if current_user.institutional_admin?
       joins(:intellectual_object)
-      .where('intellectual_objects.institution_id = ?', current_user.institution.id)
+          .where('intellectual_objects.institution_id = ?', current_user.institution.id)
     elsif current_user.institutional_user?
       joins(:intellectual_object)
-      .where("(intellectual_objects.access != 'restricted' and intellectual_objects.institution_id = ?)", current_user.institution.id)
+          .where("(intellectual_objects.access != 'restricted' and intellectual_objects.institution_id = ?)", current_user.institution.id)
     end
   }
   scope :writable, ->(current_user) {
@@ -92,17 +96,33 @@ class GenericFile < ActiveRecord::Base
   end
 
   def soft_delete(attributes)
-    user_email = attributes[:outcome_detail]
-    attributes[:identifier] = SecureRandom.uuid
+    user_email = attributes[:requestor]
+    attributes[:inst_app] ? inst_app = attributes[:inst_app] : inst_app = nil
+    attributes[:apt_app] ? apt_app = attributes[:apt_app] : apt_app = nil
     io = IntellectualObject.find(self.intellectual_object_id)
     WorkItem.create_delete_request(io.identifier,
                                    self.identifier,
-                                   user_email)
-    self.state = 'D'
-    # Let exchange services create the file delete
-    # event when it actually deletes the file.
-    # self.add_event(attributes)
+                                   user_email, inst_app, apt_app)
     self.save!
+  end
+
+  def mark_deleted
+    if self.deleted_since_last_ingest?
+      self.state = 'D'
+      self.save!
+    else
+      raise 'File cannot be marked deleted without first creating a deletion PREMIS event.'
+    end
+  end
+
+  # Returns true if Premis events say this item has been deleted.
+  def deleted_since_last_ingest?
+    last_ingest = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['ingest']).order(date_time: :desc).limit(1).first
+    last_deletion = self.premis_events.where(event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete']).order(date_time: :desc).limit(1).first
+    if !last_ingest.nil? && !last_deletion.nil? && last_deletion.date_time > last_ingest.date_time
+      return true
+    end
+    return false
   end
 
   # This is for serializing JSON in the API.
@@ -173,8 +193,24 @@ class GenericFile < ActiveRecord::Base
     end
   end
 
+  def matching_storage_option
+    unless self.intellectual_object.nil?
+      self.storage_option = self.intellectual_object.storage_option
+    end
+  end
+
   def freeze_institution_id
-    errors.add(:institution_id, 'cannot be changed') if self.saved_change_to_institution_id? unless self.institution_id.nil?
+    errors.add(:institution_id, 'cannot be changed') if self.institution_id_changed? unless self.institution_id.nil?
+  end
+
+  def freeze_storage_option
+    errors.add(:storage_option, 'cannot be changed') if self.storage_option_changed? unless self.storage_option.nil?
+  end
+
+  def storage_option_is_allowed
+    unless Pharos::Application::PHAROS_STORAGE_OPTIONS.include?(self.storage_option)
+      errors.add(:storage_option, 'Storage Option is not one of the allowed options')
+    end
   end
 
 end

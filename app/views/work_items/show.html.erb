@@ -1,3 +1,5 @@
+<% @title = "Work Item #{@work_item.name}" %>
+
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
     <li><a href="#"><%= link_to current_user.institution.name, institution_path(current_user.institution) %></a></li>
@@ -12,19 +14,23 @@
     <% if current_user.admin? %>
         <% unless @work_item.status == Pharos::Application::PHAROS_STATUSES['success'] %>
           <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
-                <%= link_to requeue_work_item_path(@work_item.id), { class: 'btn doc-action-btn btn-normal requeue-link', data: { confirm: 'Do you really want to requeue this item for deletion?' } } do %>
+                <%= link_to requeue_work_item_path(@work_item.id), { id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', data: { confirm: 'Do you really want to requeue this item for deletion?' } } do %>
                     <i class="glyphicon glyphicon-repeat"></i> Requeue
                 <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore'] %>
-              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'restoreRequeue();' do %>
+                  <i class="glyphicon glyphicon-repeat"></i> Requeue
+              <% end %>
+          <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore'] %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'glacierRestoreRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest'] %>
-              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'ingestRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', remote: true, onclick: 'ingestRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
-              <%= link_to '#', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
+              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
           <% end %>
@@ -33,6 +39,7 @@
     <br><br>
     <%= render 'ingest_requeue_form' %>
     <%= render 'restore_requeue_form' %>
+    <%= render 'glacier_restore_requeue_form' %>
     <%= render 'dpn_requeue_form' %>
   </section>
 
@@ -56,14 +63,14 @@
       <% if (@work_item.generic_file_identifier.nil? || @work_item.generic_file_identifier == '' )%>
           <td class="identifier">No associated file</td></tr>
       <% else %>
-          <td class="identifier"><%= link_to @work_item.generic_file_identifier, generic_file_path(@work_item.generic_file) %></td></tr>
+          <td class="identifier"><%= link_to truncate(@work_item.generic_file_identifier, length: 110), generic_file_path(@work_item.generic_file) %></td></tr>
       <% end %>
       <tr><th>Bag Date</th>
-        <td><%= @work_item.bag_date %></td></tr>
+        <td><%= pretty_date(@work_item.bag_date) %></td></tr>
       <tr><th>Date Processed</th>
-        <td><%= @work_item.date %></td></tr>
+        <td><%= pretty_date(@work_item.date) %></td></tr>
       <tr><th>Queued At</th>
-        <td><%= @work_item.queued_at %></td></tr>
+        <td><%= pretty_date(@work_item.queued_at) %></td></tr>
       <tr><th>Action</th>
         <td><%= @work_item.action %></td></tr>
       <tr><th>Stage</th>
@@ -72,6 +79,12 @@
         <th>Status</th>
         <td class="status"><%= @work_item.status %></td>
       </tr>
+      <% if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
+            <tr><th>Institutional Approver</th>
+              <td><%= @work_item.inst_approver %></td></tr>
+            <tr><th>APTrust Approver (for bulk delete)</th>
+              <td><%= @work_item.aptrust_approver %></td></tr>
+      <% end %>
       <tr><th>Size</th>
         <td><%= number_to_human_size(@work_item.size) %></td></tr>
       <tr><th>Retry</th>

@@ -1,4 +1,6 @@
 class Institution < ActiveRecord::Base
+  require 'csv'
+
   self.primary_key = 'id'
   has_many :users
   has_many :intellectual_objects
@@ -7,6 +9,8 @@ class Institution < ActiveRecord::Base
   has_many :premis_events, through: :generic_files
   has_many :snapshots
   has_many :dpn_bags
+  has_many :bulk_delete_jobs
+  has_one :confirmation_token
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
@@ -42,8 +46,65 @@ class Institution < ActiveRecord::Base
     admin_users
   end
 
+  def apt_users
+    apt_users = []
+    apt = Institution.where(identifier: "aptrust.org").first
+    users = User.where(institution_id: apt.id)
+    users.each { |user| apt_users.push(user) if user.admin? }
+    apt_users
+  end
+
   def active_files
     GenericFile.where(institution_id: self.id, state: 'A')
+  end
+
+  def new_deletion_items
+    latest_email = Email.where(institution_id: self.id, email_type: 'deletion_notifications').order(id: :asc).limit(1).first
+    if latest_email.nil?
+      time = Time.now - 48.hours
+      deletion_items = WorkItem.with_institution(self.id)
+                           .created_after(time)
+                           .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+                           .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+                           .with_status(Pharos::Application::PHAROS_STATUSES['success'])
+    else
+      deletion_items = WorkItem.with_institution(self.id)
+                           .created_after(latest_email.created_at)
+                           .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+                           .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+                           .with_status(Pharos::Application::PHAROS_STATUSES['success'])
+    end
+    deletion_items
+  end
+
+  def generate_deletion_csv(deletion_items)
+    attributes = ['Generic File Identifier', 'Date Deleted', 'Requested By', 'Approved By', 'APTrust Approver']
+    CSV.generate(headers: true) do |csv|
+      csv << attributes
+      deletion_items.each do |item|
+        unless item.generic_file_identifier.nil?
+          item.inst_approver.nil? ? inst_app = 'NA' : inst_app = item.inst_approver
+          item.aptrust_approver.nil? ? apt_app = 'NA' : apt_app = item.aptrust_approver
+          row = [item.generic_file_identifier, item.date.to_s, item.user, inst_app, apt_app]
+          csv << row
+        end
+      end
+    end
+  end
+
+  def generate_confirmation_csv(bulk_job)
+    attributes = ['Identifier']
+    CSV.generate(headers: true) do |csv|
+      csv << attributes
+      bulk_job.intellectual_objects.each do |object|
+        row = [object.identifier]
+        csv << row
+      end
+      bulk_job.generic_files.each do |file|
+        row = [file.identifier]
+        csv << row
+      end
+    end
   end
 
   def deletion_admin_user(requesting_user)
@@ -53,6 +114,17 @@ class Institution < ActiveRecord::Base
       confirming_users.push(admin_users.first)
     else
       admin_users.each { |user| confirming_users.push(user) if user.name != requesting_user.name }
+    end
+    confirming_users
+  end
+
+  def bulk_deletion_users(requesting_user)
+    confirming_users = []
+    apt_users = self.apt_users
+    if apt_users.count == 1
+      confirming_users.push(apt_users.first)
+    else
+      apt_users.each { |user| confirming_users.push(user) if user.name != requesting_user.name }
     end
     confirming_users
   end
@@ -72,6 +144,24 @@ class Institution < ActiveRecord::Base
     end
   end
 
+  def deactivate
+    update_attribute(:deactivated_at, Time.current)
+    self.users.each do |user|
+      user.soft_delete
+    end
+  end
+
+  def reactivate
+    update_attribute(:deactivated_at, nil)
+    self.users.each do |user|
+      user.reactivate
+    end
+  end
+
+  def deactivated?
+    return !self.deactivated_at.nil?
+  end
+
   def average_file_size
     query = "SELECT AVG(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_file_size"
     result = ActiveRecord::Base.connection.exec_query(query)
@@ -88,6 +178,25 @@ class Institution < ActiveRecord::Base
     query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A') AS institution_total_size"
     result = ActiveRecord::Base.connection.exec_query(query)
     result[0]['sum'].to_i
+  end
+
+  def core_service_size
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option = 'Standard') AS institution_core_service_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    result[0]['sum'].to_i
+  end
+
+  def glacier_only_size
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option = 'Glacier-OH') AS institution_glacier_oh_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    glacier_oh = result[0]['sum'].to_i
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option = 'Glacier-VA') AS institution_glacier_va_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    glacier_va = result[0]['sum'].to_i
+    query = "SELECT SUM(size) FROM (SELECT size FROM generic_files WHERE institution_id = #{self.id} AND state = 'A' AND storage_option = 'Glacier-OR') AS institution_glacier_or_size"
+    result = ActiveRecord::Base.connection.exec_query(query)
+    glacier_or = result[0]['sum'].to_i
+    glacier_oh + glacier_va + glacier_or
   end
 
   def self.total_file_size_across_repo

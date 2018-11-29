@@ -2,6 +2,8 @@ class DpnWorkItem < ActiveRecord::Base
   self.primary_key = 'id'
   validates :task, :identifier, presence: true
   validate :task_is_allowed
+  validate :status_is_allowed
+  validate :stage_is_allowed
 
   ### Scopes
   scope :with_remote_node, ->(param) { where(remote_node: param) unless param.blank? }
@@ -16,6 +18,16 @@ class DpnWorkItem < ActiveRecord::Base
   scope :completed_after, ->(param) { where('dpn_work_items.completed_at > ?', param) unless param.blank? }
   scope :is_completed, ->(param) { where("completed_at is NOT NULL") if param == 'true' }
   scope :is_not_completed, ->(param) { where("completed_at is NULL") if param == 'true' }
+  scope :with_stage, ->(param) { where(stage: param) unless param.blank? }
+  scope :with_status, ->(param) { where(status: param) unless param.blank? }
+  scope :with_retry, ->(param) {
+    unless param.blank?
+      if param == 'true'
+        where(retry: true)
+      elsif param == 'false'
+        where(retry: false)
+      end
+    end }
   scope :discoverable, ->(current_user) { where('(1 = 0)') unless current_user.admin? }
   scope :queued, ->(param) {
     unless param.blank?
@@ -41,6 +53,9 @@ class DpnWorkItem < ActiveRecord::Base
         completed_at: completed_at,
         note: note,
         state: state,
+        stage: stage,
+        status: status,
+        retry: self.retry,
         pid: pid
     }
   end
@@ -64,11 +79,32 @@ class DpnWorkItem < ActiveRecord::Base
     self.save!
   end
 
+  def fixity_requeue(stage)
+    self.stage = stage
+    self.status = Pharos::Application::PHAROS_STATUSES['pend']
+    self.retry = true
+    self.pid = 0
+    self.processing_node = nil
+    self.save!
+  end
+
   private
 
   def task_is_allowed
-    if !Pharos::Application::DPN_TASKS.include?(self.task)
+    unless Pharos::Application::DPN_TASKS.include?(self.task)
       errors.add(:task, 'Task is not one of the allowed options')
+    end
+  end
+
+  def status_is_allowed
+    unless self.status.nil?
+      errors.add(:status, 'Status is not one of the allowed options') unless Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
+    end
+  end
+
+  def stage_is_allowed
+    unless self.stage.nil?
+      errors.add(:stage, 'Stage is not one of the allowed options') unless Pharos::Application::PHAROS_STAGES.values.include?(self.stage)
     end
   end
 end

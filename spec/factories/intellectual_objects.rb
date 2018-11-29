@@ -8,9 +8,9 @@ FactoryBot.define do
     access { ['consortia', 'institution', 'restricted'].sample }
     alt_identifier { '' }
     bag_name { identifier.split('/')[1] }
-    bagging_group_identifier { nil }
+    bag_group_identifier { '' }
     state { 'A' }
-    #sequence(:id) {|n| n}
+    storage_option { 'Standard' }
 
     factory :consortial_intellectual_object, class: IntellectualObject do
       access { 'consortia' }

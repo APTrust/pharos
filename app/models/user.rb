@@ -76,21 +76,8 @@ class User < ActiveRecord::Base
     is? 'institutional_user'
   end
 
-  def need_two_factor_authentication?(request)
-    self.two_factor_enabled? && self.confirmed_two_factor?
-  end
-
-  def confirm_two_factor!(code)
-    update_attributes(confirmed_two_factor: true) if authenticate_otp(code)
-  end
-
-  def send_two_factor_authentication_code
-    return unless phone_number.present?
-    Twilio::REST::Client.new.messages.create(
-        from: ENV['TWILIO_PHONE_NUMBER'],
-        to: phone_number,
-        body: "Your one time code is: #{otp_code}"
-    )
+  def need_two_factor_authentication?
+    self.enabled_two_factor == true && self.confirmed_two_factor == true
   end
 
   def role_id
@@ -105,6 +92,30 @@ class User < ActiveRecord::Base
 
   def guest?
     false
+  end
+
+  # instead of deleting, indicate the user requested a delete & timestamp it
+  def soft_delete
+    update_attribute(:deactivated_at, Time.current)
+    update_attribute(:encrypted_api_secret_key, '')
+  end
+
+  def reactivate
+    update_attribute(:deactivated_at, nil)
+  end
+
+  def deactivated?
+    return !self.deactivated_at.nil?
+  end
+
+  # ensure user account is active
+  def active_for_authentication?
+    super && !deactivated_at
+  end
+
+  # provide a custom message for a deleted account
+  def inactive_message
+    !deactivated_at ? super : :deactivated_account
   end
 
   attr_reader :api_secret_key

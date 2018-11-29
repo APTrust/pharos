@@ -1,0 +1,15 @@
+<p>Admin Users at <%= @subject.name %>,</p>
+<br>
+<p>This email notification is to inform you that <%= @requesting_user.name %> has made a bulk deletion request on
+behalf of your institution. The identifiers of the objects and/or files included in this request are listed in an attached CSV file.
+Please examine the attached list or view the objects and/or files in Pharos before confirming the deletion request.</p>
+<br>
+<br>
+<p>To VIEW the bulk deletion request and all associated objects and/or files, please click the following link:</p>
+<p><a href="<%= @bulk_job_view_url %>">Click to View Bulk Deletion</a></p>
+<br>
+<br>
+<p>To CONFIRM this bulk deletion request please click the following link:</p>
+<p><a href="<%= @confirmation_url %>">Click to Confirm Bulk Deletion</a></p>
+<br>
+<p>Please contact the APTrust team if you have any questions.</p>

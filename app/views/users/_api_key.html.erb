@@ -1,7 +1,15 @@
 <% if policy(@user).generate_api_key? %>
     <h4> API Secret Key </h4>
 
-    <% unless @user.encrypted_api_secret_key %>
+    <% unless @user.encrypted_api_secret_key.nil? || @user.encrypted_api_secret_key == '' %>
+        <% if @user == current_user %>
+            <div>You already have an API key. If you've forgotten it, you'll need to generate a new one.</div>
+            <br>
+        <% else %>
+            <div>This user already has an API Secret Key.</div>
+            <br>
+        <% end %>
+    <% else %>
         <div> You do not have an API secret key yet. </div>
         <br />
     <% end %>

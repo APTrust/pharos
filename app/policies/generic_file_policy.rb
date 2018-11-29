@@ -51,10 +51,18 @@ class GenericFilePolicy < ApplicationPolicy
     soft_delete?
   end
 
+  def finished_destroy?
+    user.admin?
+  end
+
   # creates deletion events as part of the process of deletion
   def soft_delete?
     user.admin? ||
         (user.institutional_admin? && user.institution_id == record.intellectual_object.institution.id)
+  end
+
+  def restore?
+    user.admin? || (user.institutional_admin? && user.institution_id == record.institution.id)
   end
 
   class Scope

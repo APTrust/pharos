@@ -1,0 +1,26 @@
+<% # container for a single doc -%>
+<div class="document">
+
+  <% # header bar for doc items in index view -%>
+  <section class="documentHeader clearfix">
+
+    <%- # main title container for doc partial view -%>
+    <h5 class="index_title col-sm-9 col-lg-9">
+      <%= counter %>. <%= link_to "Bulk Delete Job from #{current.created_at}", bulk_delete_job_path(current.id) %>
+    </h5>
+
+  </section>
+
+  <dl class="document-metadata dl-horizontal dl-invert">
+    <dt>Requested By: </dt>
+    <dd><%= current.requested_by %></dd>
+    <dt>Institutional Approver: </dt>
+    <dd><%= current.institutional_approver %></dd>
+    <dt>APTrust Approver: </dt>
+    <dd><%= current.aptrust_approver %></dd>
+    <dt>Institutional Approval At: </dt>
+    <dd><%= pretty_date(current.institutional_approval_at) %></dd>
+    <dt>APTrust Approval At: </dt>
+    <dd><%= pretty_date(current.aptrust_approval_at) %></dd>
+  </dl>
+</div>

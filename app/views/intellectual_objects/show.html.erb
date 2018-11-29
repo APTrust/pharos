@@ -1,3 +1,5 @@
+<% @title = "Object #{@intellectual_object.identifier}" %>
+
 <div id="content" class="col-md-9 show-document">
   <ol class="breadcrumb">
     <li><%= link_to @institution.name, institution_path(@institution) %></li>
@@ -16,17 +18,31 @@
       <dd><%= @intellectual_object.access.capitalize %></dd>
       <dt>Identifier</dt>
       <dd><%= @intellectual_object.identifier %></dd>
+      <dt>Bag Group Identifier</dt>
+      <% if @intellectual_object.bag_group_identifier == '' %>
+          <dd>-------</dd>
+      <% else %>
+          <dd><%= link_to @intellectual_object.bag_group_identifier, search_path(object_type: 'Intellectual Objects', search_field: 'Bag Group Identifier', q: @intellectual_object.bag_group_identifier) %></dd>
+      <% end %>
       <dt>Bag Name</dt>
       <dd><%= @intellectual_object.bag_name %></dd>
+      <dt> Created </dt>
+      <dd> <%= pretty_date(@intellectual_object.created_at) %> </dd>
       <dt> Last Modified </dt>
-      <dd> <%= @intellectual_object.updated_at %> </dd>
+      <dd> <%= pretty_date(@intellectual_object.updated_at) %> </dd>
       <dt>Description</dt>
       <dd><%= @intellectual_object.description %></dd>
       <dt>Alternate Identifier</dt>
       <dd><%= @intellectual_object.alt_identifier %></dd>
+      <dt>Storage Type</dt>
+      <dd><%= @intellectual_object.storage_option %></dd>
       <dt>DPN Status</dt>
       <% if @intellectual_object.in_dpn? %>
-          <dd>Item is in DPN with id <%= link_to @intellectual_object.dpn_uuid, dpn_bag_path(id: @intellectual_object.dpn_bag.id) %></dd>
+          <% if @intellectual_object.dpn_bag.nil? %>
+              <dd>Item is in DPN but DPN Bag information is not yet available, please check back later.</dd>
+          <% else %>
+              <dd>Item is in DPN with id <%= link_to @intellectual_object.dpn_uuid, dpn_bag_path(id: @intellectual_object.dpn_bag.id) %></dd>
+          <% end %>
       <% else %>
           <dd>Item does not reside in DPN.</dd>
       <% end %>
@@ -52,7 +68,7 @@
             <%= link_to intellectual_object_restore_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
                 <i class="glyphicon glyphicon-download"></i> Restore Object
             <% end %>
-            <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.in_dpn? == false && @intellectual_object.too_big? == false)%>
+            <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.in_dpn? == false && @intellectual_object.too_big? == false && @intellectual_object.glacier_only? == false)%>
                 <%= link_to intellectual_object_send_to_dpn_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
                     <i class="glyphicon glyphicon-send dpn"></i> Send Object To DPN
                 <% end %>

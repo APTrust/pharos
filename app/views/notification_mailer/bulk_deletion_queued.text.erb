@@ -1,0 +1,9 @@
+Admin Users at <%= @subject.name %> and APTrust,
+
+This email notification is to inform you that a bulk deletion job requested by <%= @requesting_user.name %>
+  and approved by <%= @inst_approver.name %> and <%= @apt_approver.name %> has been successfully queued for deletion.
+ Please see the attached CSV file for a list of identifiers, or view the objects and/or files in Pharos using the link below.
+
+<%= @bulk_job_view_url %>
+
+Please contact the APTrust team by replying to this email if you have any questions.

@@ -1,3 +1,5 @@
+<% @title = "File #{@generic_file.identifier}" %>
+
 <div id="content" class="col-md-10">
   <ol class="breadcrumb">
     <li><a href="#"><%= link_to @generic_file.intellectual_object.institution.name, institution_path(@generic_file.intellectual_object.institution) %></a></li>
@@ -24,11 +26,13 @@
       <dt>Filesize<dt>
       <dd><%= number_to_human_size(@generic_file.size) %></dd>
       <dt>Created</dt>
-      <dd><%= @generic_file.created_at %> (<%= time_ago_in_words @generic_file.created_at %>)</dd>
+      <dd><%= pretty_date(@generic_file.created_at) %> (<%= time_ago_in_words(@generic_file.created_at) %>)</dd>
       <dt>Modified</dt>
-      <dd><%= @generic_file.updated_at %> (<%= time_ago_in_words @generic_file.updated_at %>)</dd>
+      <dd><%= pretty_date(@generic_file.updated_at) %> (<%= time_ago_in_words(@generic_file.updated_at) %>)</dd>
       <dt>Latest Fixity Check</dt>
-      <dd><%= @generic_file.last_fixity_check %></dd>
+      <dd><%= pretty_date(@generic_file.last_fixity_check) %> (<%= time_ago_in_words(@generic_file.last_fixity_check) %>)</dd>
+      <dt>Storage Type</dt>
+      <dd><%= @generic_file.storage_option %></dd>
       <dt>Checksums</dt>
       <% @generic_file.checksums.each do |checksum| %>
           <dd><strong><%= checksum.algorithm %>:</strong><%= checksum.digest %> generated <%= time_ago_in_words(checksum.datetime) %> ago</dd>
@@ -44,6 +48,12 @@
         <i class="glyphicon glyphicon-eye-open"></i> View Events
     <% end %>
     <% unless @generic_file.state == 'D' %>
+        <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_id == @generic_file.institution_id) %>
+            <%= link_to generic_file_restore_path(@generic_file.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
+                <i class="glyphicon glyphicon-download"></i> Restore File
+            <% end %>
+        <% end %>
+
         <%= destroy_link @generic_file %>
     <% end %>
 

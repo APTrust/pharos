@@ -15,7 +15,13 @@ describe InstitutionPolicy do
         should permit(:update)
         should permit(:edit)
         should permit(:add_user)
+        should permit(:deactivate)
+        should permit(:reactivate)
         should_not permit(:destroy)
+        should permit(:bulk_delete)
+        should_not permit(:partial_confirmation_bulk_delete)
+        should permit(:final_confirmation_bulk_delete)
+        should permit(:finished_bulk_delete)
         #should permit(:destroy) #only turn this line on and above line off when deleting an institution. Otherwise, deletion should be OFF.
       end
     end
@@ -39,6 +45,12 @@ describe InstitutionPolicy do
           should permit(:edit)
           should permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
 
@@ -52,6 +64,12 @@ describe InstitutionPolicy do
           should_not permit(:edit)
           should_not permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should_not permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
     end
@@ -70,6 +88,12 @@ describe InstitutionPolicy do
           should_not permit(:edit)
           should_not permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should_not permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
 
@@ -84,6 +108,12 @@ describe InstitutionPolicy do
           should_not permit(:edit)
           should_not permit(:add_user)
           should_not permit(:destroy)
+          should_not permit(:deactivate)
+          should_not permit(:reactivate)
+          should_not permit(:bulk_delete)
+          should_not permit(:partial_confirmation_bulk_delete)
+          should_not permit(:final_confirmation_bulk_delete)
+          should_not permit(:finished_bulk_delete)
         end
       end
     end
@@ -99,6 +129,12 @@ describe InstitutionPolicy do
       should_not permit(:edit)
       should_not permit(:add_user)
       should_not permit(:destroy)
+      should_not permit(:deactivate)
+      should_not permit(:reactivate)
+      should_not permit(:bulk_delete)
+      should_not permit(:partial_confirmation_bulk_delete)
+      should_not permit(:final_confirmation_bulk_delete)
+      should_not permit(:finished_bulk_delete)
     end
   end
 end

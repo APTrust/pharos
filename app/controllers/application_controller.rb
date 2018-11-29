@@ -3,15 +3,46 @@ class ApplicationController < ActionController::Base
     resource = controller_path.singularize.gsub('/', '_').to_sym 
     method = "#{resource}_params"
     params[resource] &&= send(method) if respond_to?(method, true)
+
+    api_check = request.fullpath.split('/')[1]
+    request.format = 'json' if (!api_check.nil? && api_check.include?('api') && params[:format].nil?)
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  before_action :check_for_user_2fa
+  before_action :verify_user!, unless: :devise_controller?
 
-  def check_for_user_2fa
-    return unless current_user && !current_user.confirmed_two_factor?
-    flash[:alert] = "You did not confirm your two factor authentication. <a href='#{confirm_two_factor_user_url(current_user)}'>Do it here!</a>".html_safe
+  def verify_user!
+    start_verification if requires_verification?
+  end
+
+  def requires_verification?
+    unless current_user.nil?
+      session[:verified].nil? && current_user.need_two_factor_authentication?
+    end
+  end
+
+  def start_verification
+    current_user.otp_required_for_login = true
+    current_code = User.generate_otp_secret
+    current_user.otp_secret = current_code
+    current_user.save!
+
+    client = Nexmo::Client.new(api_key: ENV['NEXMO_API_KEY'], api_secret: ['NEXMO_API_SECRET'])
+    response = client.sms.send(
+        from: '14344666249',
+        to: current_user.phone_number,
+        text: "Your new one time code is: #{current_code}."
+    )
+    if response.status == '0'
+      redirect_to edit_verification_path(id: response.request_id)
+    else
+      sign_out current_user
+      redirect_to :new_user_session, flash: {
+          error: 'Could not verify your number. Please contact support.'
+      }
+      logger.error "Error: #{response.error_text}"
+    end
   end
 
   # Adds a few additional behaviors into the application controller

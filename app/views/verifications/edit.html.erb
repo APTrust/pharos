@@ -1,0 +1,7 @@
+<%= form_tag verification_path(id: params[:id]), method: :put do %>
+    <div class="form-group">
+      <%= label_tag :code %><br />
+      <%= number_field_tag :code, class: "form-control"  %>
+    </div>
+    <%= submit_tag 'Verify One Time Code', class: "btn btn-primary" %>
+<% end %>

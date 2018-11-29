@@ -62,8 +62,8 @@ class CatalogController < ApplicationController
           @results = objects.with_bag_name_like(@q)
         when 'Title'
           @results = objects.with_title_like(@q)
-        when 'Bagging Group Identifier'
-          @results = objects.with_bagging_group_identifier_like(@q)
+        when 'Bag Group Identifier'
+          @results = objects.with_bag_group_identifier_like(@q)
       end
     end
   end
@@ -177,11 +177,19 @@ class CatalogController < ApplicationController
         get_event_type_counts(@results)
         get_outcome_counts(@results)
       when 'dpn_item'
+        params[:status] = nil if params[:status] == 'Null Status'
+        params[:stage] = nil if params[:stage] == 'Null Stage'
         @results = @results
                        .with_remote_node(params[:remote_node])
                        .queued(params[:queued])
+                       .with_stage(params[:stage])
+                       .with_status(params[:status])
+                       .with_retry(params[:retry])
         get_node_counts(@results)
         get_queued_counts(@results)
+        get_status_counts(@results)
+        get_stage_counts(@results)
+        get_retry_counts(@results)
     end
     params[:sort] = 'date' unless params[:sort]
     case params[:sort]

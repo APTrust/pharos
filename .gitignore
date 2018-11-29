@@ -37,3 +37,10 @@ fedora_export.db
 
 # Ignore test DB
 travis_ci_test
+
+# Ignore Config file for Spreadsheet credentials
+config.json
+
+# Ignore .env file with Nexmo credentials
+nexmo.env
+/config/dev_env.yml

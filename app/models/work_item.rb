@@ -34,8 +34,11 @@ class WorkItem < ActiveRecord::Base
   scope :with_action, ->(param) { where(action: param) unless param.blank? }
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
   scope :with_node, ->(param) { where(node: param) unless param.blank? }
+  scope :with_pid, ->(param) { where(pid: param) unless param.blank? }
   scope :with_unempty_node, ->(param) { where("node is NOT NULL and node != ''") if param == 'true' }
   scope :with_empty_node, ->(param) { where("node is NULL or node = ''") if param == 'true' }
+  scope :with_unempty_pid, ->(param) { where('pid is NOT NULL and pid != 0') if param == 'true' }
+  scope :with_empty_pid, ->(param) { where('pid is NULL or pid = 0') if param == 'true' }
   scope :with_retry, ->(param) {
     unless param.blank?
       if param == 'true'
@@ -90,7 +93,7 @@ class WorkItem < ActiveRecord::Base
     item = WorkItem
       .where('object_identifier = ? ' +
              'and status not in (?, ?, ?) ' +
-             'and action in (?, ?, ?, ?)',
+             'and action in (?, ?, ?, ?, ?)',
              intellectual_object_identifier,
              Pharos::Application::PHAROS_STATUSES['success'],
              Pharos::Application::PHAROS_STATUSES['fail'],
@@ -98,10 +101,29 @@ class WorkItem < ActiveRecord::Base
              Pharos::Application::PHAROS_ACTIONS['ingest'],
              Pharos::Application::PHAROS_ACTIONS['restore'],
              Pharos::Application::PHAROS_ACTIONS['delete'],
-             Pharos::Application::PHAROS_ACTIONS['dpn'])
+             Pharos::Application::PHAROS_ACTIONS['dpn'],
+             Pharos::Application::PHAROS_ACTIONS['glacier_restore'])
       .order('date DESC')
       .limit(1)
       .first
+  end
+
+  def self.pending_action_for_file(generic_file_identifier)
+    item = WorkItem
+               .where('generic_file_identifier = ? ' +
+                          'and status not in (?, ?, ?) ' +
+                          'and action in (?, ?, ?, ?)',
+                      generic_file_identifier,
+                      Pharos::Application::PHAROS_STATUSES['success'],
+                      Pharos::Application::PHAROS_STATUSES['fail'],
+                      Pharos::Application::PHAROS_STATUSES['cancel'],
+                      Pharos::Application::PHAROS_ACTIONS['ingest'],
+                      Pharos::Application::PHAROS_ACTIONS['restore'],
+                      Pharos::Application::PHAROS_ACTIONS['delete'],
+                      Pharos::Application::PHAROS_ACTIONS['dpn'])
+               .order('date DESC')
+               .limit(1)
+               .first
   end
 
   def requeue_item(options={})
@@ -114,10 +136,15 @@ class WorkItem < ActiveRecord::Base
     if self.action == Pharos::Application::PHAROS_ACTIONS['delete']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Delete requested'
+      self.outcome = 'Not started'
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
-      self.work_item_state.delete if options[:work_item_state_delete]
+      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
+    elsif self.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+      self.stage = Pharos::Application::PHAROS_STAGES['requested']
+      self.note = 'Restore requested'
+      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if options[:stage]
         if options[:stage] == Pharos::Application::PHAROS_STAGES['fetch']
@@ -164,6 +191,9 @@ class WorkItem < ActiveRecord::Base
         elsif item.action == Pharos::Application::PHAROS_ACTIONS['restore']
           result = 'restore'
           break
+        elsif item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+          result = 'glacier restore'
+          break
         elsif item.action == Pharos::Application::PHAROS_ACTIONS['delete'] && item.generic_file_identifier == generic_file_identifier
           result = 'delete'
           break
@@ -196,6 +226,55 @@ class WorkItem < ActiveRecord::Base
     end
     restore_item = item.dup
     restore_item.action = Pharos::Application::PHAROS_ACTIONS['restore']
+    restore_item = WorkItem.finish_restore_request(restore_item, requested_by, item)
+    restore_item
+  end
+
+  def self.create_glacier_restore_request(intellectual_object_identifier, requested_by)
+    item = WorkItem.last_ingested_version(intellectual_object_identifier)
+    if item.nil?
+      raise ActiveRecord::RecordNotFound
+    end
+    restore_item = item.dup
+    restore_item.action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+    restore_item = WorkItem.finish_restore_request(restore_item, requested_by, item)
+    restore_item
+  end
+
+  def self.finish_restore_request(restore_item, requested_by, orig_item)
+    restore_item.stage = Pharos::Application::PHAROS_STAGES['requested']
+    restore_item.status = Pharos::Application::PHAROS_STATUSES['pend']
+    restore_item.note = 'Restore requested'
+    restore_item.outcome = 'Not started'
+    restore_item.user = requested_by
+    restore_item.retry = true
+    restore_item.date = Time.now
+    restore_item.work_item_state.state = nil unless restore_item.work_item_state.nil?
+    restore_item.node = nil
+    restore_item.pid = 0
+    restore_item.needs_admin_review = false
+    restore_item.size = orig_item.size
+    restore_item.stage_started_at = nil
+    restore_item.queued_at = nil
+    restore_item.save!
+    restore_item
+  end
+
+  # Creates a WorkItem record showing that someone has requested
+  # restoration of a Generic File. This will eventually go into
+  # a queue for the restoration worker process.
+  def self.create_restore_request_for_file(generic_file, requested_by)
+    item = WorkItem.last_ingested_version(generic_file.intellectual_object.identifier)
+    if item.nil?
+      raise ActiveRecord::RecordNotFound
+    end
+    action = Pharos::Application::PHAROS_ACTIONS['restore']
+    if generic_file.storage_option != 'Standard'
+      action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+    end
+    restore_item = item.dup
+    restore_item.generic_file_identifier = generic_file.identifier
+    restore_item.action = action
     restore_item.stage = Pharos::Application::PHAROS_STAGES['requested']
     restore_item.status = Pharos::Application::PHAROS_STATUSES['pend']
     restore_item.note = 'Restore requested'
@@ -242,7 +321,7 @@ class WorkItem < ActiveRecord::Base
   # Creates a WorkItem record showing that someone has requested
   # deletion of a GenericFile. This will eventually go into a queue for
   # the delete worker process.
-  def self.create_delete_request(intellectual_object_identifier, generic_file_identifier, requested_by)
+  def self.create_delete_request(intellectual_object_identifier, generic_file_identifier, requested_by, inst_app, apt_app)
     item = WorkItem.last_ingested_version(intellectual_object_identifier)
     if item.nil?
       raise ActiveRecord::RecordNotFound
@@ -266,8 +345,28 @@ class WorkItem < ActiveRecord::Base
     delete_item.size = size
     delete_item.stage_started_at = nil
     delete_item.queued_at = nil
+    delete_item.inst_approver = inst_app
+    delete_item.aptrust_approver = apt_app
     delete_item.save!
     delete_item
+  end
+
+  def self.deletion_finished?(intellectual_object_identifier)
+    item = WorkItem.with_object_identifier(intellectual_object_identifier)
+               .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+               .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+               .with_status(Pharos::Application::PHAROS_STATUSES['success']).first
+    item.nil? ? result = false : result = true
+    result
+  end
+
+  def self.deletion_finished_for_file?(generic_file_identifier)
+    item = WorkItem.with_file_identifier(generic_file_identifier)
+               .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+               .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+               .with_status(Pharos::Application::PHAROS_STATUSES['success']).first
+    item.nil? ? result = false : result = true
+    result
   end
 
   def self.failed_action(datetime, action, user)
@@ -303,21 +402,15 @@ class WorkItem < ActiveRecord::Base
   end
 
   def status_is_allowed
-    if !Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
-      errors.add(:status, 'Status is not one of the allowed options')
-    end
+    errors.add(:status, 'Status is not one of the allowed options') unless Pharos::Application::PHAROS_STATUSES.values.include?(self.status)
   end
 
   def stage_is_allowed
-    if !Pharos::Application::PHAROS_STAGES.values.include?(self.stage)
-      errors.add(:stage, 'Stage is not one of the allowed options')
-    end
+    errors.add(:stage, 'Stage is not one of the allowed options') unless Pharos::Application::PHAROS_STAGES.values.include?(self.stage)
   end
 
   def action_is_allowed
-    if !Pharos::Application::PHAROS_ACTIONS.values.include?(self.action)
-      errors.add(:action, 'Action is not one of the allowed options')
-    end
+    errors.add(:action, 'Action is not one of the allowed options') unless Pharos::Application::PHAROS_ACTIONS.values.include?(self.action)
   end
 
   # :state may contain a blob of JSON text from our micorservices.

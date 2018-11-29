@@ -4,7 +4,7 @@ class WorkItemsController < ApplicationController
   require 'net/http'
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :set_item, only: [:show, :requeue]
+  before_action :set_item, only: [:show, :requeue, :spot_test_restoration]
   before_action :init_from_params, only: :create
   before_action :load_institution, only: :index
   #after_action :check_for_completed_restoration, only: :update
@@ -27,7 +27,11 @@ class WorkItemsController < ApplicationController
       authorize @items
       respond_to do |format|
         format.json {
-          json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          if current_user.admin?
+            json_list = @paged_results.map { |item| item.serializable_hash }
+          else
+            json_list = @paged_results.map { |item| item.serializable_hash(except: [:node, :pid]) }
+          end
           render json: {count: @count, next: @next, previous: @previous, results: json_list}
         }
         format.html { render 'old_index' }
@@ -80,13 +84,25 @@ class WorkItemsController < ApplicationController
         options[:stage] = params[:item_stage] if params[:item_stage]
         options[:work_item_state_delete] = 'true' if params[:delete_state_item] && params[:delete_state_item] == 'true'
         @work_item.requeue_item(options)
-        options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
-        respond_to do |format|
-          format.json { render json: { status: response.code, body: response.body } }
-          format.html {
-            render 'show'
-            flash[:notice] = "The response from NSQ to the requeue request is as follows: Status: #{response.code}, Body: #{response.body}"
-          }
+        if Rails.env.development?
+          flash[:notice] = 'The response from NSQ to the requeue request is as follows: Status: 200, Body: ok'
+          flash.keep(:notice)
+          respond_to do |format|
+            format.json { render json: { status: 200, body: 'ok' } }
+            format.html {
+              redirect_to work_item_path(@work_item.id)
+              flash[:notice] = 'The response from NSQ to the requeue request is as follows: Status: 200, Body: ok'
+            }
+          end
+        else
+          options[:stage] ? response = issue_requeue_http_post(options[:stage]) : response = issue_requeue_http_post('')
+          respond_to do |format|
+            format.json { render json: { status: response.code, body: response.body } }
+            format.html {
+              redirect_to work_item_path(@work_item.id)
+              flash[:notice] = "The response from NSQ to the requeue request is as follows: Status: #{response.code}, Body: #{response.body}"
+            }
+          end
         end
       end
     else
@@ -284,6 +300,15 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  def spot_test_restoration
+    authorize current_user
+    log = Email.log_restoration(@work_item.id)
+    NotificationMailer.spot_test_restoration_notification(@work_item, log).deliver!
+    respond_to do |format|
+      format.json { render json: { message: "Admin users at #{@work_item.institution.name} have recieved a spot test restoration email for #{@work_item.object_identifier}" }, status: 200 }
+    end
+  end
+
   def api_search
     authorize WorkItem, :admin_api?
     current_user.admin? ? @items = WorkItem.all : @items = WorkItem.with_institution(current_user.institution_id)
@@ -407,27 +432,40 @@ class WorkItemsController < ApplicationController
 
   def issue_requeue_http_post(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_delete_topic")
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
-      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_restore_topic")
+      if @work_item.generic_file_identifier.blank?
+        # Restore full bag
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_restore_topic")
+      else
+        # Restore individual file. If it's in Glacier, we'll have to run
+        # GlacierRestore first.
+        gf = GenericFile.find_by_identifier(@work_item.generic_file_identifier)
+        if gf && gf.storage_option == 'Standard'
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_restore_topic")
+        else
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
+        end
+      end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if stage == Pharos::Application::PHAROS_STAGES['fetch']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_fetch_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_fetch_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['store']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_store_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_store_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['record']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=apt_record_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_record_topic")
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn']
       if stage == Pharos::Application::PHAROS_STAGES['package']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_package_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_package_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['store']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_ingest_store_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_ingest_store_topic")
       elsif stage == Pharos::Application::PHAROS_STAGES['record']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/put?topic=dpn_record_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=dpn_record_topic")
       end
+    elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
     end
-
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri)
     request.body = @work_item.id.to_s
@@ -460,8 +498,11 @@ class WorkItemsController < ApplicationController
                  .with_action(params[:item_action])
                  .queued(params[:queued])
                  .with_node(params[:node])
+                 .with_pid(params[:pid])
                  .with_unempty_node(params[:node_not_empty])
                  .with_empty_node(params[:node_empty])
+                 .with_unempty_pid(params[:pid_not_empty])
+                 .with_empty_pid(params[:pid_empty])
                  .with_retry(params[:retry])
     @selected = {}
     get_status_counts(@items)

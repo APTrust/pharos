@@ -1,3 +1,5 @@
+<% @title = "Search Results for #{@q}" %>
+
 <div id="sidebar" class="col-md-3 col-sm-4">
   <div class="facets sidenav">
     <h3> Limit your search </h3>
@@ -13,6 +15,7 @@
     <% end %>
     <%= render 'shared/filters/queued_filter' %>
     <%= render 'shared/filters/node_filter' %>
+    <%= render 'shared/filters/retry_filter' %>
     <%= render 'shared/filters/state_filter' %>
     <%= render 'shared/filters/action_filter' %>
     <%= render 'shared/filters/stage_filter' %>
