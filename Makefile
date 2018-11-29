@@ -13,12 +13,12 @@
 # -  make restart: docker-compose up -d -f docker-compose-dev.yml
 #
 
-registry = registry.gitlab.com/aptrust
-repository = container-registry
-name = pharos
-version = latest
-tag = $(name):$(version)
-revision=$(shell git rev-parse --short=2 HEAD)
+REGISTRY = registry.gitlab.com/aptrust
+REPOSITORY = container-registry
+NAME=$(shell basename $(CURDIR))
+VERSION = latest
+TAG = $(NAME):$(VERSION)
+REVISION=$(shell git rev-parse --short=2 HEAD)
 
 # HELP
 # This will output the help for each task
@@ -31,16 +31,16 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 revision: ## Show me the git hash
-	echo "$(revision)"
+	echo "$(REVISION)"
 
 build: ## Build the Pharos container
-	docker build -t aptrust/$(tag) -t $(tag) -t $(name):$(revision) -t $(registry)/$(repository)/$(tag) .
+	docker build -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
 	docker-compose up -d
 
 run: ## Just run Pharos in foreground
-	docker run -p 9292:9292 $(tag)
+	docker run -p 9292:9292 $(TAG)
 
 
 publish:
@@ -51,6 +51,6 @@ publish:
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
 
 push: ## Push the Docker image up to the registry
-	docker push  $(registry)/$(repository)/$(tag)
+	docker push  $(REGISTRY)/$(REPOSITORY)/$(TAG)
 
 clean: ## Clean the generated/compiles files
