@@ -23,11 +23,11 @@ services:
       - PHAROS_DB_USER='pharos'
 #      PHAROS_DB_PASSWORD: 'password'
       - SECRET_KEY_BASE= '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
-      - VIRTUAL_HOST=pharos.docker.localhost
+      - VIRTUAL_HOST=pharos.localhost
       - VIRTUAL_PORT=9292
 # TODO: -e demo needs fixing. doesn't read env vars in command line here. maybe dockfile cmd needs env var as entrypoint?
     labels:
-      - VIRTUAL_HOST=pharos.docker.localhost
+      - VIRTUAL_HOST=pharos.localhost
       - VIRTUAL_PORT=9292
     command: bundle exec puma -p9292
     volumes:
@@ -37,7 +37,7 @@ services:
       - migration
       - nginx-proxy
     ports:
-     - "9292:9292"
+      - "9292:9292"
   migration:
     image: aptrust/pharos
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
