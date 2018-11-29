@@ -76,6 +76,23 @@ class User < ActiveRecord::Base
     is? 'institutional_user'
   end
 
+  def need_two_factor_authentication?(request)
+    self.two_factor_enabled? && self.confirmed_two_factor?
+  end
+
+  def confirm_two_factor!(code)
+    update_attributes(confirmed_two_factor: true) if authenticate_otp(code)
+  end
+
+  def send_two_factor_authentication_code
+    return unless phone_number.present?
+    Twilio::REST::Client.new.messages.create(
+        from: ENV['TWILIO_PHONE_NUMBER'],
+        to: phone_number,
+        body: "Your one time code is: #{otp_code}"
+    )
+  end
+
   def role_id
     if(admin?)
       Role.where(name: 'admin').first_or_create.id

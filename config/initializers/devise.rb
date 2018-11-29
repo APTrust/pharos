@@ -11,6 +11,10 @@ Devise.setup do |config|
   # config.secret_key = 'c42eb9944793049777987a1f334d0eced0f2f6381840441dacdf7f5e61e834d864b972b712c649357e055848d73d28725a55087ca2184f3e0cb6a6bc6f46ef97'
   config.secret_key = ENV['DEVISE_SECRET_KEY']
 
+  # Allowing sign ins after a password reset would allow a user to
+  # bypass two factor authentication so keep it turned off.
+  config.sign_in_after_reset_password = false
+
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class

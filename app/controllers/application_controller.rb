@@ -7,6 +7,13 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
 
+  before_action :check_for_user_2fa
+
+  def check_for_user_2fa
+    return unless current_user && !current_user.confirmed_two_factor?
+    flash[:alert] = "You did not confirm your two factor authentication. <a href='#{confirm_two_factor_user_url(current_user)}'>Do it here!</a>".html_safe
+  end
+
   # Adds a few additional behaviors into the application controller
   include ApiAuth
   # Authorization mechanism

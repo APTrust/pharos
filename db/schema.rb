@@ -10,10 +10,50 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_29_184726) do
+ActiveRecord::Schema.define(version: 2018_11_29_161730) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "bulk_delete_jobs", force: :cascade do |t|
+    t.string "requested_by"
+    t.string "institutional_approver"
+    t.string "aptrust_approver"
+    t.datetime "institutional_approval_at"
+    t.datetime "aptrust_approval_at"
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "institution_id", null: false
+  end
+
+  create_table "bulk_delete_jobs_emails", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "email_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_emails_on_bulk_delete_job_id"
+    t.index ["email_id"], name: "index_bulk_delete_jobs_emails_on_email_id"
+  end
+
+  create_table "bulk_delete_jobs_generic_files", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "generic_file_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_generic_files_on_bulk_delete_job_id"
+    t.index ["generic_file_id"], name: "index_bulk_delete_jobs_generic_files_on_generic_file_id"
+  end
+
+  create_table "bulk_delete_jobs_institutions", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "institution_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_institutions_on_bulk_delete_job_id"
+    t.index ["institution_id"], name: "index_bulk_delete_jobs_institutions_on_institution_id"
+  end
+
+  create_table "bulk_delete_jobs_intellectual_objects", id: false, force: :cascade do |t|
+    t.bigint "bulk_delete_job_id"
+    t.bigint "intellectual_object_id"
+    t.index ["bulk_delete_job_id"], name: "index_bulk_delete_jobs_intellectual_objects_on_bulk_job_id"
+    t.index ["intellectual_object_id"], name: "index_bulk_delete_jobs_intellectual_objects_on_object_id"
+  end
 
   create_table "checksums", force: :cascade do |t|
     t.string "algorithm"
@@ -29,6 +69,7 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.string "token"
     t.integer "intellectual_object_id"
     t.integer "generic_file_id"
+    t.integer "institution_id"
   end
 
   create_table "dpn_bags", force: :cascade do |t|
@@ -57,6 +98,9 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.text "state"
     t.string "processing_node", limit: 255
     t.integer "pid", default: 0
+    t.boolean "retry", default: true, null: false
+    t.string "stage"
+    t.string "status"
     t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
     t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
   end
@@ -71,6 +115,21 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.datetime "updated_at", null: false
     t.integer "intellectual_object_id"
     t.integer "generic_file_id"
+    t.integer "institution_id"
+  end
+
+  create_table "emails_generic_files", id: false, force: :cascade do |t|
+    t.bigint "generic_file_id"
+    t.bigint "email_id"
+    t.index ["email_id"], name: "index_emails_generic_files_on_email_id"
+    t.index ["generic_file_id"], name: "index_emails_generic_files_on_generic_file_id"
+  end
+
+  create_table "emails_intellectual_objects", id: false, force: :cascade do |t|
+    t.bigint "intellectual_object_id"
+    t.bigint "email_id"
+    t.index ["email_id"], name: "index_emails_intellectual_objects_on_email_id"
+    t.index ["intellectual_object_id"], name: "index_emails_intellectual_objects_on_intellectual_object_id"
   end
 
   create_table "emails_premis_events", id: false, force: :cascade do |t|
@@ -111,6 +170,7 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.index ["institution_id", "updated_at"], name: "index_generic_files_on_institution_id_and_updated_at"
     t.index ["institution_id"], name: "index_generic_files_on_institution_id"
     t.index ["intellectual_object_id", "file_format"], name: "index_generic_files_on_intellectual_object_id_and_file_format"
+    t.index ["intellectual_object_id", "state"], name: "index_generic_files_on_intellectual_object_id_and_state"
     t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
     t.index ["size", "state"], name: "index_generic_files_on_size_and_state"
     t.index ["size"], name: "index_generic_files_on_size"
@@ -129,6 +189,7 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.string "state"
     t.string "type"
     t.integer "member_institution_id"
+    t.datetime "deactivated_at"
     t.index ["name"], name: "index_institutions_on_name"
   end
 
@@ -146,7 +207,7 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.string "etag"
     t.string "dpn_uuid"
     t.text "ingest_state"
-    t.string "bagging_group_identifier", limit: 255
+    t.string "bag_group_identifier", default: "", null: false
     t.string "storage_option", default: "standard"
     t.index ["access"], name: "index_intellectual_objects_on_access"
     t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
@@ -220,6 +281,8 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "snapshot_type"
+    t.bigint "cs_bytes"
+    t.bigint "go_bytes"
   end
 
   create_table "usage_samples", force: :cascade do |t|
@@ -252,6 +315,9 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.string "encrypted_otp_secret_salt"
     t.integer "consumed_timestep"
     t.boolean "otp_required_for_login"
+    t.datetime "deactivated_at"
+    t.boolean "enabled_two_factor", default: false
+    t.boolean "confirmed_two_factor", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"
     t.index ["password_changed_at"], name: "index_users_on_password_changed_at"
@@ -292,6 +358,8 @@ ActiveRecord::Schema.define(version: 2018_05_29_184726) do
     t.datetime "queued_at"
     t.bigint "size"
     t.datetime "stage_started_at"
+    t.string "aptrust_approver"
+    t.string "inst_approver"
     t.index ["action"], name: "index_work_items_on_action"
     t.index ["date"], name: "index_work_items_on_date"
     t.index ["etag", "name"], name: "index_work_items_on_etag_and_name"

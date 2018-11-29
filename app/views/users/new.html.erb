@@ -15,6 +15,9 @@
 
       <%= f.association :roles, collection: roles_for_select, as: :radio_buttons %>
 
+      <%= f.label :two_factor_enabled %><br />
+      <%= f.check_box :two_factor_enabled %>
+
       <%= f.input :password %>
       <%= f.input :password_confirmation %>
 

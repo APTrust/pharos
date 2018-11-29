@@ -18,6 +18,9 @@
           <%= f.association :roles, collection: roles_for_select, as: :radio_buttons, :checked => @user.role_id %>
       <% end %>
 
+      <%= f.label :two_factor_enabled %><br />
+      <%= f.check_box :two_factor_enabled %>
+
     </div>
     <br>
     <div class="form-actions">

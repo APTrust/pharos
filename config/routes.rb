@@ -138,6 +138,8 @@ Rails.application.routes.draw do
     patch 'update_password', on: :collection
     get 'edit_password', on: :member
     patch 'generate_api_key', on: :member
+    get 'two_factor_confirm', to: 'users#confirm_two_factor', as: :confirm_two_factor, on: :member
+    patch 'two_factor_update', to: 'users#confirm_two_factor_update', as: :confirm_two_factor_update, on: :collection
   end
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum

@@ -83,6 +83,17 @@ class UsersController < ApplicationController
     flash[:notice] = "Reset password for #{@user.email}. Please notify the user that #{password} is their new password."
   end
 
+  def confirm_two_factor
+    authorize current_user
+    current_user.send_two_factor_authentication_code
+    rescue Twilio::REST::RequestError
+      flash[:alert] = "Your phone number is invalid so we couldn't send your SMS code."
+  end
+
+  def confirm_two_factor_update
+    authorize current_user
+  end
+
   def vacuum
     authorize current_user
     if params[:vacuum_target]
@@ -114,7 +125,7 @@ class UsersController < ApplicationController
   end
 
   def build_resource_params
-    [params.fetch(:user, {}).permit(:name, :email, :phone_number, :password, :password_confirmation, :institution_id).tap do |p|
+    [params.fetch(:user, {}).permit(:name, :email, :phone_number, :password, :password_confirmation, :institution_id, :two_factor_enabled).tap do |p|
        p[:institution_id] = build_institution_id if params[:user][:institution_id] unless params[:user].nil?
        p[:role_ids] = build_role_ids if params[:user][:role_ids] unless params[:user].nil?
      end]
@@ -149,7 +160,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.required(:user).permit(:password, :password_confirmation, :current_password, :name, :email, :phone_number, :institution_id, :role_ids)
+    params.required(:user).permit(:password, :password_confirmation, :current_password, :name, :email, :phone_number, :institution_id, :role_ids, :two_factor_enabled)
   end
 
   def set_query(target)
