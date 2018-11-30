@@ -5,7 +5,7 @@ default: &default
   host: <%= ENV['PHAROS_DB_HOST'] || 'db' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos' %>
   username: <%= ENV['PHAROS_DB_USER'] || 'pharos' %>
-  password: <%= ENV['PHAROS_DB_PASSWORD'] || 'password' %>
+  password: <%= ENV['PHAROS_DB_PWD'] || 'password' %>
 
 development:
   <<: *default
