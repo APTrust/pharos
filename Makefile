@@ -60,6 +60,8 @@ devclean:
 publish:
 	docker tag aptrust/pharos registry.gitlab.com/aptrust/container-registry/pharos && \
 	docker push registry.gitlab.com/aptrust/container-registry/pharos
+	docker push aptrust/pharos
+
 
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
