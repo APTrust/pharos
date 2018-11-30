@@ -40,3 +40,6 @@ travis_ci_test
 
 # Ignore Config file for Spreadsheet credentials
 config.json
+
+# Ignore local yml file
+/config/dev_env.yml
