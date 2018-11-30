@@ -13,7 +13,7 @@ services:
     ports:
       - '5432:5432'
   pharos:
-    image: aptrust/pharos
+    image: registry.gitlab.com/aptrust/container-registry/pharos
     environment:
       - DOCKERIZED=true
     #TODO: Change to development after updating databse settings for development
