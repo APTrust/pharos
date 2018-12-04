@@ -36,6 +36,9 @@ revision: ## Show me the git hash
 build: ## Build the Pharos container
 	docker build -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
+build-nc: ## Build the Pharos container, no cached layers.
+	docker build --no-cache -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+
 up: ## Start containers for Pharos, Postgresql, Nginx
 	docker-compose up -d
 
@@ -57,6 +60,8 @@ devclean:
 publish:
 	docker tag aptrust/pharos registry.gitlab.com/aptrust/container-registry/pharos && \
 	docker push registry.gitlab.com/aptrust/container-registry/pharos
+	docker push aptrust/pharos
+
 
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
