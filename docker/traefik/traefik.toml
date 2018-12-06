@@ -1,0 +1,27 @@
+defaultEntryPoints = ["http", "https"]
+
+[web]
+address = ":8080"
+
+[entryPoints]
+
+[entryPoints.http]
+address = ":80"
+
+[entryPoints.http.redirect]
+entryPoint = "https"
+
+[entryPoints.https]
+address = ":443"
+[entryPoints.https.tls]
+
+[acme]
+email = "christian.dahlhausen@aptrust.org"
+storage = "acme.json"
+entryPoint = "https"
+onDemand = true
+OnHostRule = false
+
+[acme.httpChallenge]
+  entryPoint = "http"
+
