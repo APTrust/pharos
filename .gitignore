@@ -44,3 +44,4 @@ config.json
 # Ignore .env file with Nexmo credentials
 nexmo.env
 /config/dev_env.yml
+

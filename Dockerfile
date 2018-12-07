@@ -28,8 +28,8 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 #ENV PHAROS_DB_HOST='here'
 #ENV PHAROS_DB_NAME='pharos'
 #ENV PHAROS_DB_USER='root'
-#ENV PHAROS_DB_PASSWORD=''
-ENV RAILS_ENV ${ENVIRONMENT:-development}
+#ENV PHAROS_DB_PWD=''
+ENV RAILS_ENV ${RAILS_ENV:-development}
 ENV DEVISE_SECRET_KEY ${DEVISE_SECRET_KEY:-61becfbecdb004668f7a040c857c2d5f030f857212e1941dc89efc064a1065b516057495c6e0d860493d6dd376df154c2ee174f4ad40d14581c39a5240502b6b}
 ENV RAILS_SECRET_KEY ${RAILS_SECRET_KEY:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4c37bb506f1288f8976a187a4df1fdd820ad88b8382009c84de50f2d53a09d4c17ff2e64f8a99dc4da6a4987}
 ENV SECRET_KEY_BASE ${SECRET_KEY_BASE:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4c37bb506f1288f8976a187a4df1fdd820ad88b8382009c84de50f2d53a09d4c17ff2e64f8a99dc4da6a4987}
@@ -62,8 +62,8 @@ RUN bundle exec rake RAILS_ENV=development DATABASE_URL=postgresql://user:pass@1
 EXPOSE 9292
 
 # Cleanup packages we don't need after compilation
-RUN apk del ruby-bundler build-base postgresql-dev ruby-dev libxml2-dev \
-    libxslt-dev python2 ruby-nokogiri ruby-bigdecimal && \
+RUN apk del build-base postgresql-dev postgresql-client libxml2-dev libxslt-dev \
+            ruby-bundler ruby-dev ruby-bigdecimal && \
     rm -rf /usr/lib/ruby/gems/*/cache/* \
            /usr/local/bundle/cache/* \
            /var/cache/apk/* \
@@ -76,4 +76,4 @@ VOLUME ["$WORKDIR/public"]
 RUN chown -R somebody:somegroup /pharos
 USER somebody
 
-CMD ["bundle", "exec", "puma", "-p 9292"]
+CMD ["bundle", "exec", "puma", "-p9292"]

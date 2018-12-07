@@ -2,12 +2,12 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.1'
+gem 'rails', '5.2.1.1'
 gem 'rails-controller-testing'
 # Use SCSS for stylesheets
 gem 'sassc'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.19'
+gem 'uglifier', '>= 4.1.20'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -43,7 +43,7 @@ gem 'wkhtmltopdf-binary'
 gem 'google_drive'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 4.0.1'
+gem 'simple_form', '~> 4.1.0'
 gem 'phony_rails'
 gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
@@ -79,7 +79,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.11.0'
+  gem 'capybara', '3.12.0'
   gem 'shoulda-matchers', '~> 3.1.2'
   gem 'coveralls', '0.8.22', require: false
 end
