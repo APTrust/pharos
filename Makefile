@@ -61,8 +61,9 @@ devclean: ## Stop and remove running Docker containers
 	docker network rm pharos-dev-net
 
 publish:
-	docker tag aptrust/pharos registry.gitlab.com/aptrust/container-registry/pharos && \
-	docker push registry.gitlab.com/aptrust/container-registry/pharos
+	docker login $(REGISTRY)
+	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos && \
+	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 
 
