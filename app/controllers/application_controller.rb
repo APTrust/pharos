@@ -23,17 +23,19 @@ class ApplicationController < ActionController::Base
   end
 
   def start_verification
-    current_user.otp_required_for_login = true
-    current_code = User.generate_otp_secret
-    current_user.otp_secret = current_code
-    current_user.save!
+    # current_user.otp_required_for_login = true
+    # current_code = User.generate_otp_secret
+    # current_user.otp_secret = current_code
+    # current_user.save!
 
     client = Nexmo::Client.new(api_key: ENV['NEXMO_API_KEY'], api_secret: ['NEXMO_API_SECRET'])
-    response = client.sms.send(
-        from: '14344666249',
-        to: current_user.phone_number,
-        text: "Your new one time code is: #{current_code}."
-    )
+    # response = client.sms.send(
+    #     from: '14344666249',
+    #     to: current_user.phone_number,
+    #     text: "Your new one time code is: #{current_code}."
+    # )
+    response = client.verify.request(number: current_user.phone_number, brand: 'APTrust')
+
     if response.status == '0'
       redirect_to edit_verification_path(id: response.request_id)
     else
