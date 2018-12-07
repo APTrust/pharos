@@ -63,7 +63,7 @@ EXPOSE 9292
 
 # Cleanup packages we don't need after compilation
 RUN apk del build-base postgresql-dev postgresql-client libxml2-dev libxslt-dev \
-            ruby-bundler ruby-dev ruby-nokogiri ruby-bigdecimal && \
+            ruby-bundler ruby-dev ruby-bigdecimal && \
     rm -rf /usr/lib/ruby/gems/*/cache/* \
            /usr/local/bundle/cache/* \
            /var/cache/apk/* \
