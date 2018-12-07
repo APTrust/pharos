@@ -29,8 +29,8 @@ gem 'figaro'
 gem 'devise', '4.5.0'
 gem 'devise-security'
 gem 'devise-two-factor'
-gem 'nexmo'
 gem 'dotenv-rails'
+gem 'aws-sdk-sns'
 
 gem 'rake'
 gem 'email_validator'
@@ -57,9 +57,6 @@ gem 'mail', '>= 2.7.1'
 gem 'sprockets', '>= 3.7.2'
 gem 'loofah', '~> 2.2.3'
 gem 'rack', '~> 2.0.6'
-
-# S3 connector
-#gem 'aws-sdk-core'
 
 # Graylog logging gems
 gem 'gelf'

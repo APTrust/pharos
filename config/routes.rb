@@ -166,14 +166,14 @@ Rails.application.routes.draw do
     patch 'update_password', on: :collection
     get 'edit_password', on: :member
     patch 'generate_api_key', on: :member
-    # get 'two_factor_confirm', to: 'users#confirm_two_factor', as: :confirm_two_factor, on: :member
-    # patch 'two_factor_update', to: 'users#confirm_two_factor_update', as: :confirm_two_factor_update, on: :collection
   end
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
   get 'users/:id/deactivate', to: 'users#deactivate', as: :deactivate_user
   get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
+  post 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
+  post 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
 
   resources :verifications, only: [:edit, :update]
 

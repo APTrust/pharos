@@ -57,6 +57,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def disable_otp
+    current_user.enabled_two_factor = false
+    current_user.save!
+    redirect_to root_path
+  end
+
+  def enable_otp
+    current_user.otp_secret = User.generate_otp_secret
+    current_user.enabled_two_factor = true
+    current_user.save!
+    redirect_to root_path
+  end
+
   def generate_api_key
     authorize @user
     @user.generate_api_key

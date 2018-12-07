@@ -6,14 +6,11 @@ class VerificationsController < ApplicationController
   end
 
   def update
-    response = client.verify.check(request_id: params[:id], code: params[:code])
-
-    if response.status == 0
-    #if current_user.current_otp == params[:code]
+    if current_user.validate_and_consume_otp!(params[:code])
       session[:verified] = true
-      redirect_to :root_path
+      redirect_to session['user_return_to'] || root_path
     else
-      redirect_to edit_verification_path(id: params[:id]), flash: { error: confirmation['error_text'] }
+      redirect_to edit_verification_path(id: params[:id]), flash: { error: 'Incorrect one time password.' }
     end
   end
 end

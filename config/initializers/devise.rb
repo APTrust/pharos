@@ -306,4 +306,7 @@ Devise.setup do |config|
 
   # Time period for account expiry from last_activity_at
   # config.expire_after = 90.days
+
+  # Set drift time for one time passwords to five minutes
+  config.otp_allowed_drift = 300
 end
