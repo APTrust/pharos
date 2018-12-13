@@ -113,12 +113,6 @@ RSpec.describe UsersController, type: :controller do
         expect(institutional_admin.api_secret_key).to be_nil
         response.should redirect_to user_url(institutional_admin)
       end
-
-      it 'lets a user know when their password has expired and needs changing' do
-        old_user = FactoryBot.create(:user, :institutional_admin)
-        old_user.update(password_changed_at: Time.now.ago(4.month))
-        assert old_user.need_change_password?
-      end
     end
   end
 
@@ -194,24 +188,6 @@ RSpec.describe UsersController, type: :controller do
             }.to change(User, :count).by(1)
             response.should redirect_to user_url(assigns[:user])
             expect(assigns[:user]).to be_institutional_user
-          end
-
-          it 'should reject a password with no capital letters' do
-            expect {
-              post :create, params: { user: no_capital }
-            }.to_not change(User, :count)
-          end
-
-          it 'should reject a password with no lowercase letters' do
-            expect {
-              post :create, params: { user: no_lowercase }
-            }.to_not change(User, :count)
-          end
-
-          it 'should reject a password with no numbers' do
-            expect {
-              post :create, params: { user: no_digits }
-            }.to_not change(User, :count)
           end
 
           it 'should reject a password that is too short' do

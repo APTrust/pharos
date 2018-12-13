@@ -149,7 +149,7 @@ Devise.setup do |config|
 
   # ==> Configuration for :validatable
   # Range for password length.
-  config.password_length = 8..128
+  config.password_length = 10..128
 
   # Email regex used to validate email formats. It simply asserts that
   # one (and only one) @ exists in the given string. This is mainly
@@ -274,10 +274,10 @@ Devise.setup do |config|
   # Configure security extension for devise
 
   # Should the password expire (e.g 3.months)
-  config.expire_password_after = 3.months
+  # config.expire_password_after = 3.months
 
   # Need 1 char of A-Z, a-z and 0-9 OR a password that is at least 20 characters long
-  config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])|.{20,}/
+  # config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])|.{20,}/
 
   # How many passwords to keep in archive
   config.password_archiving_count = 3
