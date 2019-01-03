@@ -19,6 +19,8 @@ branches:
     - gh-pages
     - /.*/
 before_install:
+- gem update --system
+- gem --version
 - gem install bundler
 notifications:
     slack:
