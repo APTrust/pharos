@@ -76,6 +76,10 @@ class User < ActiveRecord::Base
     is? 'institutional_user'
   end
 
+  def sms_user?
+    false
+  end
+
   def need_two_factor_authentication?
     self.enabled_two_factor == true && self.confirmed_two_factor == true
   end

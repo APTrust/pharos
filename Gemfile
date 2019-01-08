@@ -31,6 +31,7 @@ gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
 gem 'aws-sdk-sns'
+gem 'rqrcode-rails3'
 
 gem 'rake'
 gem 'email_validator'

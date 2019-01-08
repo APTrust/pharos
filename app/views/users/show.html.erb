@@ -9,13 +9,25 @@
   <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br><br>
 </address>
 
-<% if !current_user.enabled_two_factor %>
-    <%= button_to "Enable Two Factor Authentication", users_enable_otp_path(@user.id), :method => :post, class: 'btn btn-normal doc-action-btn' %>
+<% if current_user.sms_user? %>
+    <% if !current_user.enabled_two_factor %>
+        <%= button_to "Enable Two Factor Authentication", users_enable_otp_path(@user.id), :method => :post, class: 'btn btn-normal doc-action-btn' %>
+    <% end %>
+
+    <% if current_user.enabled_two_factor %>
+        <%= button_to "Disable Two Factor Authentication", users_disable_otp_path(@user.id), :method => :post, class: 'btn btn-normal doc-action-btn' %>
+    <% end %>
+<% else %>
+    <% if !current_user.enabled_two_factor %>
+        <%= button_to "Enable Two Factor Authentication", (raw RQRCode::render_qrcode(current_user.otp_provisioning_uri(current_user.email, issuer: "Pharos"), :svg, :level => :l, :unit => 2)), :method => :post, class: 'btn btn-normal doc-action-btn' %>
+    <% end %>
+
+    <% if current_user.enabled_two_factor %>
+        <%= button_to "Disable Two Factor Authentication", (raw RQRCode::render_qrcode(current_user.otp_provisioning_uri(current_user.email, issuer: "Pharos"), :svg, :level => :l, :unit => 2)), :method => :post, class: 'btn btn-normal doc-action-btn' %>
+    <% end %>
 <% end %>
 
-<% if current_user.enabled_two_factor %>
-    <%= button_to "Disable Two Factor Authentication", users_disable_otp_path(@user.id), :method => :post, class: 'btn btn-normal doc-action-btn' %>
-<% end %>
+
 
 <h4>Roles</h4>
 <ul class="unstyled">
