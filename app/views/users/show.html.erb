@@ -27,7 +27,14 @@
     <% end %>
 <% end %>
 
-
+<% if @codes %>
+    <h4>Backup Codes</h4>
+    <ul class="unstyled">
+      <% @codes.each do |code| %>
+          <li><%= code %></li>
+      <% end %>
+    </ul>
+<% end %>
 
 <h4>Roles</h4>
 <ul class="unstyled">

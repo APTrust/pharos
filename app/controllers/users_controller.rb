@@ -66,8 +66,9 @@ class UsersController < ApplicationController
   def enable_otp
     current_user.otp_secret = User.generate_otp_secret
     current_user.enabled_two_factor = true
+    @codes = current_user.generate_otp_backup_codes!
     current_user.save!
-    redirect_to root_path
+    redirect_to current_user
   end
 
   def generate_api_key
