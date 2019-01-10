@@ -84,6 +84,13 @@ class User < ActiveRecord::Base
     self.enabled_two_factor == true && self.confirmed_two_factor == true
   end
 
+  def otp_qr_code
+    issuer = 'APTrust'
+    label = "#{issuer}:#{self.email}"
+    qrcode = RQRCode::QRCode.new(otp_provisioning_uri(label, issuer: issuer))
+    qrcode.as_svg(module_size: 4)
+  end
+
   def role_id
     if(admin?)
       Role.where(name: 'admin').first_or_create.id

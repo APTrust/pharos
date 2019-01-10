@@ -57,18 +57,27 @@ class UsersController < ApplicationController
     end
   end
 
-  def disable_otp
-    current_user.enabled_two_factor = false
-    current_user.save!
-    redirect_to root_path
-  end
-
   def enable_otp
     current_user.otp_secret = User.generate_otp_secret
     current_user.enabled_two_factor = true
     @codes = current_user.generate_otp_backup_codes!
     current_user.save!
     redirect_to current_user
+  end
+
+  def disable_otp
+    current_user.enabled_two_factor = false
+    current_user.save!
+    redirect_to root_path
+  end
+
+  def two_factor_text_link
+    sms = Aws::SNS::Client.new
+    response = sms.publish({
+                               phone_number: current_user.phone_number,
+                               message: "Your new one time password is: #{current_user.current_otp}"
+                           })
+    redirect_to edit_verification_path(id: current_user.id)
   end
 
   def generate_api_key

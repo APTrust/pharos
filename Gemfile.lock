@@ -288,8 +288,6 @@ GEM
     rotp (2.1.2)
     rqrcode (0.10.1)
       chunky_png (~> 1.0)
-    rqrcode-rails3 (0.1.7)
-      rqrcode (>= 0.4.2)
     rspec-activemodel-mocks (1.1.0)
       activemodel (>= 3.0)
       activesupport (>= 3.0)
@@ -421,7 +419,7 @@ DEPENDENCIES
   rails-html-sanitizer (= 1.0.4)
   rails_semantic_logger
   rake
-  rqrcode-rails3
+  rqrcode
   rspec-activemodel-mocks
   rspec-its
   rspec-rails (~> 3.8.1)

@@ -1,3 +1,10 @@
+<p>Use this QR code and an application such as Authy to generate your one time code.
+If you do not have a smart phone you may instead opt to have a code texted to you by clicking the link below.</p>
+
+<%= current_user.otp_qr_code.html_safe %>
+
+<%= link_to 'Text Me My Code', twofa_text_path(current_user.id) %>
+
 <%= form_tag verification_path(id: params[:id]), method: :put do %>
     <div class="form-group">
       <%= label_tag :code %><br />

@@ -174,6 +174,7 @@ Rails.application.routes.draw do
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
   post 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
   post 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
+  get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
 
   resources :verifications, only: [:edit, :update]
 

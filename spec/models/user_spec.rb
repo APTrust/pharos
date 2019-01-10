@@ -1,9 +1,13 @@
 require 'spec_helper'
+require 'devise_two_factor/spec_helpers'
 
 describe User do
   let(:user) { FactoryBot.create(:aptrust_user) }
   let(:inst_admin) { FactoryBot.create(:user, :institutional_admin) }
   let(:inst_id) { subject.institution_id }
+
+  # it_behaves_like "two_factor_authenticatable"
+  # it_behaves_like "two_factor_backupable"
 
   it 'should return a valid institution' do
     user.institution.id.should == user.institution_id
