@@ -12,6 +12,14 @@ RSpec.describe MemberInstitution, :type => :model do
   it { should validate_presence_of(:identifier) }
   it { should validate_presence_of(:type) }
 
+  describe '#read_only identifier' do
+    it 'should ensure the identifier can not be updated' do
+      one = FactoryBot.create(:member_institution, identifier: 'test.edu')
+      one.update_attributes(identifier: 'foo.edu')
+      one.reload.identifier.should eql 'test.edu'
+    end
+  end
+
   describe '#name_is_unique' do
     it 'should validate uniqueness of the name' do
       one = FactoryBot.create(:member_institution, name: 'test')

@@ -12,9 +12,13 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
+  #before_save :freeze_identifier
+
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
   validate :identifier_is_unique
+
+  attr_readonly :identifier
 
   before_destroy :check_for_associations
 
@@ -341,7 +345,11 @@ class Institution < ActiveRecord::Base
     unless self.identifier.include?('com') || self.identifier.include?('org') || self.identifier.include?('edu')
       errors.add(:identifier, "must end in '.com', '.org', or '.edu'")
     end
+  end
 
+  def freeze_identifier
+    puts "Testing: #{self.identifier}, id: #{self.id}"
+    errors.add(:identifier, 'cannot be changed') if self.identifier_changed? unless self.identifier.nil?
   end
 
   def check_for_associations
