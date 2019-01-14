@@ -27,6 +27,7 @@ test:
 integration:
   <<: *default
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
+  host:     localhost
 
 # Demo environment for APTrust Demo system
 demo:
