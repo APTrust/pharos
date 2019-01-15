@@ -12,7 +12,7 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
-  #before_save :freeze_identifier
+  before_validation :sanitize_update_params, on: :update
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
@@ -347,9 +347,8 @@ class Institution < ActiveRecord::Base
     end
   end
 
-  def freeze_identifier
-    puts "Testing: #{self.identifier}, id: #{self.id}"
-    errors.add(:identifier, 'cannot be changed') if self.identifier_changed? unless self.identifier.nil?
+  def sanitize_update_params
+    restore_attributes(['identifier', :identifier])
   end
 
   def check_for_associations

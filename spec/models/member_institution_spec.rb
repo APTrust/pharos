@@ -15,7 +15,7 @@ RSpec.describe MemberInstitution, :type => :model do
   describe '#read_only identifier' do
     it 'should ensure the identifier can not be updated' do
       one = FactoryBot.create(:member_institution, identifier: 'test.edu')
-      one.update_attributes(identifier: 'foo.edu')
+      one.update(identifier: 'foo.edu')
       one.reload.identifier.should eql 'test.edu'
     end
   end
