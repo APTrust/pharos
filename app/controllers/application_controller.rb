@@ -23,11 +23,11 @@ class ApplicationController < ActionController::Base
   end
 
   def start_verification
-    # sms = Aws::SNS::Client.new
-    # response = sms.publish({
-    #                            phone_number: current_user.phone_number,
-    #                            message: "Your new one time password is: #{current_user.current_otp}"
-    #                        })
+    sms = Aws::SNS::Client.new
+    response = sms.publish({
+                               phone_number: current_user.phone_number,
+                               message: "Your new one time password is: #{current_user.current_otp}"
+                           })
     redirect_to edit_verification_path(id: current_user.id)
   end
 

@@ -49,6 +49,8 @@ GEM
     arel (9.0.0)
     attr_encrypted (3.1.0)
       encryptor (~> 3.0.0)
+    authy (2.7.4)
+      httpclient (>= 2.5.3.3)
     autoprefixer-rails (9.1.0)
       execjs
     awesome_print (1.8.0)
@@ -110,6 +112,9 @@ GEM
       railties (>= 4.1.0, < 6.0)
       responders
       warden (~> 1.2.3)
+    devise-authy (1.10.0)
+      authy (>= 2.7.2)
+      devise (>= 3.0.0)
     devise-security (0.13.0)
       devise (>= 4.2.0, < 5.0)
       rails (>= 4.2.0, < 6.0)
@@ -392,6 +397,7 @@ DEPENDENCIES
   coffee-rails (~> 4.2.2)
   coveralls (= 0.8.22)
   devise (= 4.5.0)
+  devise-authy
   devise-security
   devise-two-factor
   dotenv-rails

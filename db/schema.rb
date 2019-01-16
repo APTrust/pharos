@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_09_220358) do
+ActiveRecord::Schema.define(version: 2019_01_16_202103) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -319,6 +319,9 @@ ActiveRecord::Schema.define(version: 2019_01_09_220358) do
     t.boolean "enabled_two_factor", default: false
     t.boolean "confirmed_two_factor", default: false
     t.string "otp_backup_codes", array: true
+    t.string "authy_id"
+    t.datetime "last_sign_in_with_authy"
+    t.index ["authy_id"], name: "index_users_on_authy_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"
     t.index ["password_changed_at"], name: "index_users_on_password_changed_at"

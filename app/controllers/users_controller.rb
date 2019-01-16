@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  require 'authy'
   inherit_resources
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate, :vacuum]
@@ -18,6 +19,16 @@ class UsersController < ApplicationController
     @user = build_resource
     authorize @user
     create!(notice: 'User was successfully created.')
+    if @user.save
+      session[:user_id] = @user.id
+
+      authy = Authy::API.register_user(
+          email: @user.email,
+          cellphone: @user.phone_number,
+          country_code: @user.phone_number[1]
+      )
+      @user.update(authy_id: authy.id)
+    end
   end
 
   def show
