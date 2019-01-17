@@ -44,7 +44,7 @@ gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
 
 gem 'kaminari'
-gem 'bootstrap-sass', '~> 3.3.7'
+gem 'bootstrap-sass', '~> 3.4.0'
 
 # These gems aren't required directly but are required in various dependencies and
 # needed specific updating due to security warnings
