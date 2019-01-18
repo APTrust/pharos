@@ -1,11 +1,8 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '5.2.1.1'
 gem 'rails-controller-testing'
-# Use SCSS for stylesheets
-gem 'sassc'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.1.20'
 # Use CoffeeScript for .coffee assets and views
@@ -44,7 +41,8 @@ gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
 
 gem 'kaminari'
-gem 'bootstrap-sass', '~> 3.3.7'
+gem 'sassc-rails'
+gem 'bootstrap-sass', '~> 3.4.0'
 
 # These gems aren't required directly but are required in various dependencies and
 # needed specific updating due to security warnings
