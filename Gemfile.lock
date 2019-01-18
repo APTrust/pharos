@@ -116,7 +116,7 @@ GEM
       thor (~> 0.14)
     gelf (3.1.0)
       json
-    globalid (0.4.1)
+    globalid (0.4.2)
       activesupport (>= 4.2.0)
     google-api-client (0.25.0)
       addressable (~> 2.5, >= 2.5.1)
@@ -187,7 +187,7 @@ GEM
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2018.0812)
-    mimemagic (0.3.2)
+    mimemagic (0.3.3)
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
@@ -205,7 +205,7 @@ GEM
       phony (> 2.15)
     public_suffix (3.0.3)
     puma (3.12.0)
-    pundit (2.0.0)
+    pundit (2.0.1)
       activesupport (>= 3.0.0)
     rack (2.0.6)
     rack-contrib (2.0.1)
@@ -234,7 +234,7 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
-    rails_semantic_logger (4.3.2)
+    rails_semantic_logger (4.3.3)
       rails (>= 3.2)
       semantic_logger (~> 4.3)
     railties (5.2.1.1)
@@ -260,7 +260,7 @@ GEM
       rspec-mocks (>= 2.99, < 4.0)
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
-    rspec-expectations (3.8.1)
+    rspec-expectations (3.8.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.8.0)
     rspec-its (1.2.0)
@@ -269,7 +269,7 @@ GEM
     rspec-mocks (3.8.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.8.0)
-    rspec-rails (3.8.1)
+    rspec-rails (3.8.2)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       railties (>= 3.0)
@@ -385,7 +385,7 @@ DEPENDENCIES
   rake
   rspec-activemodel-mocks
   rspec-its
-  rspec-rails (~> 3.8.1)
+  rspec-rails (~> 3.8.2)
   sassc-rails
   sdoc (~> 1.0.0)
   shoulda-matchers (~> 3.1.2)
