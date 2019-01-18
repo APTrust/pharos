@@ -19,7 +19,7 @@ gem 'jbuilder', '~> 2.8.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 1.0.0', group: :doc
 
-gem 'pg', '1.1.3' # Necessary for talking to our RDS instance
+gem 'pg', '1.1.4' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
