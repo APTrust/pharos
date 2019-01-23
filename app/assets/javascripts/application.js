@@ -19,3 +19,4 @@
 //= require Chart.min
 //= require palette.js
 //= require sorttable.js
+//= require authy.js

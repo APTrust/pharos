@@ -11,6 +11,8 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   before_action :verify_user!, unless: :devise_controller?
+  before_action :authenticate_authy_request, :only => [:callback]
+  protect_from_forgery except: [:callback, :send_token]
 
   def verify_user!
     start_verification if requires_verification?
@@ -23,12 +25,63 @@ class ApplicationController < ActionController::Base
   end
 
   def start_verification
-    sms = Aws::SNS::Client.new
-    response = sms.publish({
-                               phone_number: current_user.phone_number,
-                               message: "Your new one time password is: #{current_user.current_otp}"
-                           })
-    redirect_to edit_verification_path(id: current_user.id)
+    if current_user.sms_user?
+      sms = Aws::SNS::Client.new
+      response = sms.publish({
+                                 phone_number: current_user.phone_number,
+                                 message: "Your new one time password is: #{current_user.current_otp}"
+                             })
+      redirect_to edit_verification_path(id: current_user.id)
+    else
+      one_touch = Authy::OneTouch.send_approval_request(
+          id: current_user.authy_id,
+          message: 'Request to Login to APTrust Repository Website',
+          details: {
+              'Email Address' => current_user.email,
+          }
+      )
+      status = one_touch['success'] ? :onetouch : :sms
+      current_user.update(authy_status: status)
+    end
+
+  end
+
+  def callback
+    authy_id = params[:authy_id]
+    if authy_id != 1234
+      begin
+        @user = User.find_by! authy_id: authy_id
+        @user.update(authy_status: params[:status])
+      rescue => e
+        puts e.message
+      end
+    end
+    render plain: 'ok'
+  end
+
+  def one_touch_status
+    @user = User.find(session[:pre_2fa_auth_user_id])
+    session[:user_id] = @user.approved? ? @user.id : nil
+    render plain: @user.authy_status
+  end
+
+  def send_token
+    @user = User.find(session[:pre_2fa_auth_user_id])
+    Authy::API.request_sms(id: @user.authy_id)
+    render plain: 'sending token'
+  end
+
+  def verify
+    @user = User.find(session[:pre_2fa_auth_user_id])
+    token = Authy::API.verify(id: @user.authy_id, token: params[:token])
+    if token.ok?
+      session[:user_id] = @user.id
+      session[:pre_2fa_auth_user_id] = nil
+      redirect_to account_path
+    else
+      flash.now[:danger] = "Incorrect code, please try again"
+      redirect_to new_session_path
+    end
   end
 
   # Adds a few additional behaviors into the application controller
@@ -188,6 +241,28 @@ class ApplicationController < ActionController::Base
     str = str << "&not_checked_since=#{params[:not_checked_since]}" if params[:not_checked_since].present?
     str = str << "&identifier_like=#{params[:identifier_like]}" if params[:identifier_like].present?
     str
+  end
+
+  private
+
+  def authenticate_authy_request
+    url = request.url
+    raw_params = JSON.parse(request.raw_post)
+    nonce = request.headers["X-Authy-Signature-Nonce"]
+    sorted_params = (Hash[raw_params.sort]).to_query
+
+    # data format of Authy digest
+    data = nonce + "|" + request.method + "|" + url + "|" + sorted_params
+
+    digest = OpenSSL::HMAC.digest('sha256', Authy.api_key, data)
+    digest_in_base64 = Base64.encode64(digest)
+
+    theirs = (request.headers['X-Authy-Signature']).strip
+    mine = digest_in_base64.strip
+
+    unless theirs == mine
+      render plain: 'invalid request signature'
+    end
   end
 
 end

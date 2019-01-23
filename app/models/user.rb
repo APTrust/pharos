@@ -77,7 +77,7 @@ class User < ActiveRecord::Base
   end
 
   def sms_user?
-    true
+    false
   end
 
   def need_two_factor_authentication?
