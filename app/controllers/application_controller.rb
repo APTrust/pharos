@@ -12,7 +12,6 @@ class ApplicationController < ActionController::Base
 
   before_action :verify_user!, unless: :devise_controller?
   before_action :authenticate_authy_request, :only => [:callback]
-  protect_from_forgery except: [:callback, :send_token]
 
   def verify_user!
     start_verification if requires_verification?
@@ -91,7 +90,7 @@ class ApplicationController < ActionController::Base
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception
+  protect_from_forgery with: :exception, except: [:callback, :send_token]
 
   skip_before_action :verify_authenticity_token, :if => :api_request?
 
