@@ -1,11 +1,8 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.1.1'
+gem 'rails', '5.2.2'
 gem 'rails-controller-testing'
-# Use SCSS for stylesheets
-gem 'sassc'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.1.20'
 # Use CoffeeScript for .coffee assets and views
@@ -22,7 +19,7 @@ gem 'jbuilder', '~> 2.8.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 1.0.0', group: :doc
 
-gem 'pg', '1.1.3' # Necessary for talking to our RDS instance
+gem 'pg', '1.1.4' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
@@ -51,7 +48,8 @@ gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
 
 gem 'kaminari'
-gem 'bootstrap-sass', '~> 3.3.7'
+gem 'sassc-rails'
+gem 'bootstrap-sass', '~> 3.4.0'
 
 # These gems aren't required directly but are required in various dependencies and
 # needed specific updating due to security warnings
@@ -91,7 +89,7 @@ group :development, :test, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.8.1'
+  gem 'rspec-rails', '~> 3.8.2'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end

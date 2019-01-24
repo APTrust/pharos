@@ -286,6 +286,13 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(response).to redirect_to institution_path(inst2)
         expect(assigns(:institution).name).to eq 'Foo'
       end
+
+      it 'should ignore updates to read only fields' do
+        test_inst = FactoryBot.create(:member_institution, identifier: 'test.edu')
+        patch :update, params: { institution_identifier: test_inst, institution: {name: 'Foo', identifier: 'foo.edu'} }
+        expect(assigns(:institution).name).to eq 'Foo'
+        expect(assigns(:institution).identifier).not_to eq 'foo.edu'
+      end
     end
   end
 

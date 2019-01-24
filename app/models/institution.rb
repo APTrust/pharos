@@ -12,9 +12,13 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
+  before_validation :sanitize_update_params, on: :update
+
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
   validate :identifier_is_unique
+
+  attr_readonly :identifier
 
   before_destroy :check_for_associations
 
@@ -341,7 +345,10 @@ class Institution < ActiveRecord::Base
     unless self.identifier.include?('com') || self.identifier.include?('org') || self.identifier.include?('edu')
       errors.add(:identifier, "must end in '.com', '.org', or '.edu'")
     end
+  end
 
+  def sanitize_update_params
+    restore_attributes(['identifier', :identifier])
   end
 
   def check_for_associations
