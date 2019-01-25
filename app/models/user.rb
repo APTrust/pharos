@@ -77,7 +77,7 @@ class User < ActiveRecord::Base
   end
 
   def sms_user?
-    true
+    self.authy_status == 'sms' || self.authy_status.nil?
   end
 
   def need_two_factor_authentication?

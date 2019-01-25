@@ -71,6 +71,12 @@ class UsersController < ApplicationController
   def enable_otp
     current_user.otp_secret = User.generate_otp_secret
     current_user.enabled_two_factor = true
+    authy = Authy::API.register_user(
+        email: @user.email,
+        cellphone: @user.phone_number,
+        country_code: @user.phone_number[1]
+    )
+    @user.update(authy_id: authy.id)
     @codes = current_user.generate_otp_backup_codes!
     current_user.save!
     redirect_to current_user

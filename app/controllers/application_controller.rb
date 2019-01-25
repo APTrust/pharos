@@ -24,7 +24,6 @@ class ApplicationController < ActionController::Base
   end
 
   def start_verification
-    puts "Testing, got into start verification method *******************************************************************"
     if current_user.sms_user?
       sms = Aws::SNS::Client.new
       response = sms.publish({
