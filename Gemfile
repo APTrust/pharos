@@ -54,13 +54,16 @@ gem 'rack', '~> 2.0.6'
 # S3 connector
 #gem 'aws-sdk-core'
 
-# Graylog logging gems
-gem 'gelf'
-gem 'awesome_print'
-gem 'rails_semantic_logger'
-
 gem 'activerecord-nulldb-adapter'
 gem 'puma'
+
+
+group :demo, :production do
+  # Graylog logging gems
+  gem 'rails_semantic_logger'
+  gem 'gelf'
+  gem 'awesome_print'
+end
 
 group :development do
   gem 'meta_request', '=0.6.0'
