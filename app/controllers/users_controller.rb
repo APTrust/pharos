@@ -2,7 +2,8 @@ class UsersController < ApplicationController
   require 'authy'
   inherit_resources
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate, :vacuum]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
+                                  :vacuum, :enable_otp, :disable_otp, :verify_twofa]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -69,32 +70,46 @@ class UsersController < ApplicationController
   end
 
   def enable_otp
-    current_user.otp_secret = User.generate_otp_secret
-    current_user.enabled_two_factor = true
+    authorize @user
+    @user.otp_secret = User.generate_otp_secret
+    @user.enabled_two_factor = true
     authy = Authy::API.register_user(
         email: @user.email,
         cellphone: @user.phone_number,
         country_code: @user.phone_number[1]
     )
     @user.update(authy_id: authy.id)
-    @codes = current_user.generate_otp_backup_codes!
-    current_user.save!
-    redirect_to current_user
+    @codes = @user.generate_otp_backup_codes!
+    @user.save!
+    redirect_to @user
   end
 
   def disable_otp
-    current_user.enabled_two_factor = false
-    current_user.save!
+    authorize @user
+    @user.enabled_two_factor = false
+    @user.save!
     redirect_to root_path
   end
 
-  def two_factor_text_link
-    sms = Aws::SNS::Client.new
-    response = sms.publish({
-                               phone_number: current_user.phone_number,
-                               message: "Your new one time password is: #{current_user.current_otp}"
-                           })
-    redirect_to edit_verification_path(id: current_user.id)
+  def verify_twofa
+    authorize @user
+    one_touch = Authy::OneTouch.send_approval_request(
+        id: @user.authy_id,
+        message: 'Request to Login to APTrust Repository Website',
+        details: {
+            'Email Address' => @user.email,
+        }
+    )
+    status = one_touch['success'] ? :onetouch : :sms
+    @user.update(authy_status: status)
+    if @user.sms_user?
+      sms = Aws::SNS::Client.new
+      response = sms.publish({
+                                 phone_number: @user.phone_number,
+                                 message: "Your new one time password is: #{@user.current_otp}"
+                             })
+      redirect_to edit_verification_path(id: @user.id, verification_type: 'phone_number')
+    end
   end
 
   def generate_api_key

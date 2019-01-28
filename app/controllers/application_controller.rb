@@ -24,25 +24,23 @@ class ApplicationController < ActionController::Base
   end
 
   def start_verification
+    one_touch = Authy::OneTouch.send_approval_request(
+        id: current_user.authy_id,
+        message: 'Request to Login to APTrust Repository Website',
+        details: {
+            'Email Address' => current_user.email,
+        }
+    )
+    status = one_touch['success'] ? :onetouch : :sms
+    current_user.update(authy_status: status)
     if current_user.sms_user?
       sms = Aws::SNS::Client.new
       response = sms.publish({
                                  phone_number: current_user.phone_number,
                                  message: "Your new one time password is: #{current_user.current_otp}"
                              })
-      redirect_to edit_verification_path(id: current_user.id)
-    else
-      one_touch = Authy::OneTouch.send_approval_request(
-          id: current_user.authy_id,
-          message: 'Request to Login to APTrust Repository Website',
-          details: {
-              'Email Address' => current_user.email,
-          }
-      )
-      status = one_touch['success'] ? :onetouch : :sms
-      current_user.update(authy_status: status)
+      redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
     end
-
   end
 
   def callback
@@ -78,7 +76,7 @@ class ApplicationController < ActionController::Base
       session[:pre_2fa_auth_user_id] = nil
       redirect_to account_path
     else
-      flash.now[:danger] = "Incorrect code, please try again"
+      flash.now[:danger] = 'Incorrect code, please try again'
       redirect_to new_session_path
     end
   end

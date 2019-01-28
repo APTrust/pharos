@@ -182,9 +182,10 @@ Rails.application.routes.draw do
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
   post 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
   post 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
+  post 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
   get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
 
-  resources :verifications, only: [:edit, :update]
+  resources :verifications, only: [:new, :create, :edit, :update]
 
   authenticated :user do
     root to: 'institutions#show', as: 'authenticated_root'

@@ -118,6 +118,21 @@ class UserPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
+  def enable_otp?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def disable_otp?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def verify_twofa?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
   def edit?
     update?
   end
