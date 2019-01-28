@@ -162,7 +162,7 @@ Rails.application.routes.draw do
   devise_for :users,
   controllers: {
       passwords: 'passwords',
-      omniauthcallbacks: 'users/omniauth_callbacks'
+      #omniauthcallbacks: 'users/omniauth_callbacks'
   },
   pathnames: {
       verify_authy: '/verify-token',
@@ -186,6 +186,8 @@ Rails.application.routes.draw do
   get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
 
   resources :verifications, only: [:new, :create, :edit, :update]
+
+  get '/verification_callback', to: 'application#callback', as: :verification_callback
 
   authenticated :user do
     root to: 'institutions#show', as: 'authenticated_root'

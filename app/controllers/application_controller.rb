@@ -45,15 +45,30 @@ class ApplicationController < ActionController::Base
 
   def callback
     authy_id = params[:authy_id]
+    puts "HERE 1: Authy ID: #{params[:authy_id]} ***************************************************************"
     if authy_id != 1234
       begin
         @user = User.find_by! authy_id: authy_id
+        puts "HERE 2: User email: #{@user.email} ***************************************************************"
         @user.update(authy_status: params[:status])
+        token = Authy::API.verify(id: @user.authy_id, token: params[:token])
+        if token.ok?
+          puts "HERE 3: Token: #{params[:token]} ***************************************************************"
+          session[:user_id] = @user.id
+          session[:verified] = true
+          session[:pre_2fa_auth_user_id] = nil
+          redirect_to account_path
+        else
+          puts "HERE 4: Token: #{params[:token]} ***************************************************************"
+          session[:verified] = false
+          flash.now[:danger] = 'Incorrect code, please try again'
+          redirect_to new_session_path
+        end
       rescue => e
         puts e.message
       end
     end
-    render plain: 'ok'
+    #render plain: 'ok'
   end
 
   def one_touch_status
@@ -70,15 +85,7 @@ class ApplicationController < ActionController::Base
 
   def verify
     @user = User.find(session[:pre_2fa_auth_user_id])
-    token = Authy::API.verify(id: @user.authy_id, token: params[:token])
-    if token.ok?
-      session[:user_id] = @user.id
-      session[:pre_2fa_auth_user_id] = nil
-      redirect_to account_path
-    else
-      flash.now[:danger] = 'Incorrect code, please try again'
-      redirect_to new_session_path
-    end
+
   end
 
   # Adds a few additional behaviors into the application controller
