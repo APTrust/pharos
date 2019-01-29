@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   before_action :verify_user!, unless: :devise_controller?
-  before_action :authenticate_authy_request, :only => [:callback]
+  #before_action :authenticate_authy_request, :only => [:callback]
 
   def verify_user!
     start_verification if requires_verification?
@@ -49,38 +49,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def callback
-    authy_id = params[:authy_id]
-    puts "HERE 1: Authy ID: #{params[:authy_id]} ***************************************************************"
-    if authy_id != 1234
-      begin
-        @user = User.find_by! authy_id: authy_id
-        puts "HERE 2: User email: #{@user.email} ***************************************************************"
-        @user.update(authy_status: params[:status])
-        token = Authy::API.verify(id: @user.authy_id, token: params[:token])
-        if token.ok?
-          puts "HERE 3: Token: #{params[:token]} ***************************************************************"
-          session[:user_id] = @user.id
-          session[:verified] = true
-          session[:pre_2fa_auth_user_id] = nil
-          redirect_to account_path
-        else
-          puts "HERE 4: Token: #{params[:token]} ***************************************************************"
-          session[:verified] = false
-          flash.now[:danger] = 'Incorrect code, please try again'
-          redirect_to new_session_path
-        end
-      rescue => e
-        puts e.message
-      end
-    end
-    #render plain: 'ok'
-  end
-
   def one_touch_status
-    puts "Inside one touch status method *****************************************************"
     @user = current_user
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
+
     if !status.ok?
       render json: { err: 'One Touch Status Error' }, status: :internal_server_error and return
     end
@@ -91,29 +63,43 @@ class ApplicationController < ActionController::Base
       session[:verified] = true
       redirect_to session['user_return_to'] || root_path
     elsif status['approval_request']['status'] == 'denied'
-      session[:verified] = false
-      session[:authy] = false
+      session.delete(:authy)
+      session.delete(:verified)
       sign_out(@user)
       redirect_to new_user_session_path, flash: { error: 'Request denied, please try again later.' }
     else
-      puts status['approval_request']['status']
       sleep 1
       one_touch_status
     end
-
-    #render json: { body: status }, status: :ok
   end
 
-  def send_token
-    @user = User.find(session[:pre_2fa_auth_user_id])
-    Authy::API.request_sms(id: @user.authy_id)
-    render plain: 'sending token'
-  end
-
-  def verify
-    @user = User.find(session[:pre_2fa_auth_user_id])
-
-  end
+  # def callback
+  #   authy_id = params[:authy_id]
+  #   puts "HERE 1: Authy ID: #{params[:authy_id]} ***************************************************************"
+  #   if authy_id != 1234
+  #     begin
+  #       @user = User.find_by! authy_id: authy_id
+  #       puts "HERE 2: User email: #{@user.email} ***************************************************************"
+  #       @user.update(authy_status: params[:status])
+  #       token = Authy::API.verify(id: @user.authy_id, token: params[:token])
+  #       if token.ok?
+  #         puts "HERE 3: Token: #{params[:token]} ***************************************************************"
+  #         session[:user_id] = @user.id
+  #         session[:verified] = true
+  #         session[:pre_2fa_auth_user_id] = nil
+  #         redirect_to account_path
+  #       else
+  #         puts "HERE 4: Token: #{params[:token]} ***************************************************************"
+  #         session[:verified] = false
+  #         flash.now[:danger] = 'Incorrect code, please try again'
+  #         redirect_to new_session_path
+  #       end
+  #     rescue => e
+  #       puts e.message
+  #     end
+  #   end
+  #   #render plain: 'ok'
+  # end
 
   # Adds a few additional behaviors into the application controller
   include ApiAuth
@@ -276,24 +262,24 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def authenticate_authy_request
-    url = request.url
-    raw_params = JSON.parse(request.raw_post)
-    nonce = request.headers["X-Authy-Signature-Nonce"]
-    sorted_params = (Hash[raw_params.sort]).to_query
-
-    # data format of Authy digest
-    data = nonce + "|" + request.method + "|" + url + "|" + sorted_params
-
-    digest = OpenSSL::HMAC.digest('sha256', Authy.api_key, data)
-    digest_in_base64 = Base64.encode64(digest)
-
-    theirs = (request.headers['X-Authy-Signature']).strip
-    mine = digest_in_base64.strip
-
-    unless theirs == mine
-      render plain: 'invalid request signature'
-    end
-  end
+  # def authenticate_authy_request
+  #   url = request.url
+  #   raw_params = JSON.parse(request.raw_post)
+  #   nonce = request.headers["X-Authy-Signature-Nonce"]
+  #   sorted_params = (Hash[raw_params.sort]).to_query
+  #
+  #   # data format of Authy digest
+  #   data = nonce + "|" + request.method + "|" + url + "|" + sorted_params
+  #
+  #   digest = OpenSSL::HMAC.digest('sha256', Authy.api_key, data)
+  #   digest_in_base64 = Base64.encode64(digest)
+  #
+  #   theirs = (request.headers['X-Authy-Signature']).strip
+  #   mine = digest_in_base64.strip
+  #
+  #   unless theirs == mine
+  #     render plain: 'invalid request signature'
+  #   end
+  # end
 
 end
