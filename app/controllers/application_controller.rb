@@ -89,12 +89,15 @@ class ApplicationController < ActionController::Base
       session.delete(:uuid) || session.delete('uuid')
       session[:authy] = true
       session[:verified] = true
+      redirect_to session['user_return_to'] || root_path
     elsif status['approval_request']['status'] == 'denied'
       session[:verified] = false
-      sign_out(current_user)
-      flash.now[:danger] = 'Request denied, please try again later.'
+      session[:authy] = false
+      sign_out(@user)
+      redirect_to new_user_session_path, flash: { error: 'Request denied, please try again later.' }
     else
       puts status['approval_request']['status']
+      sleep 1
       one_touch_status
     end
 
