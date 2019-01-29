@@ -31,6 +31,10 @@ class ApplicationController < ActionController::Base
             'Email Address' => current_user.email,
         }
     )
+    if !one_touch.ok?
+      render json: { err: 'Create Push Error' }, status: :internal_server_error and return
+    end
+    session[:uuid] = one_touch.approval_request['uuid']
     status = one_touch['success'] ? :onetouch : :sms
     current_user.update(authy_status: status)
     if current_user.sms_user?
@@ -40,6 +44,8 @@ class ApplicationController < ActionController::Base
                                  message: "Your new one time password is: #{current_user.current_otp}"
                              })
       redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
+    else
+      one_touch_status
     end
   end
 
@@ -72,9 +78,27 @@ class ApplicationController < ActionController::Base
   end
 
   def one_touch_status
-    @user = User.find(session[:pre_2fa_auth_user_id])
-    session[:user_id] = @user.approved? ? @user.id : nil
-    render plain: @user.authy_status
+    puts "Inside one touch status method *****************************************************"
+    @user = current_user
+    status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
+    if !status.ok?
+      render json: { err: 'One Touch Status Error' }, status: :internal_server_error and return
+    end
+
+    if status['approval_request']['status'] == 'approved'
+      session.delete(:uuid) || session.delete('uuid')
+      session[:authy] = true
+      session[:verified] = true
+    elsif status['approval_request']['status'] == 'denied'
+      session[:verified] = false
+      sign_out(current_user)
+      flash.now[:danger] = 'Request denied, please try again later.'
+    else
+      puts status['approval_request']['status']
+      one_touch_status
+    end
+
+    #render json: { body: status }, status: :ok
   end
 
   def send_token
