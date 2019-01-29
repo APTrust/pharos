@@ -57,19 +57,26 @@ class ApplicationController < ActionController::Base
       render json: { err: 'One Touch Status Error' }, status: :internal_server_error and return
     end
 
-    if status['approval_request']['status'] == 'approved'
-      session.delete(:uuid) || session.delete('uuid')
-      session[:authy] = true
-      session[:verified] = true
-      redirect_to session['user_return_to'] || root_path
-    elsif status['approval_request']['status'] == 'denied'
+    if status['approval_request']['seconds_to_expire'] <= 0
       session.delete(:authy)
       session.delete(:verified)
       sign_out(@user)
-      redirect_to new_user_session_path, flash: { error: 'Request denied, please try again later.' }
+      redirect_to new_user_session_path, flash: { error: 'Push notification expired, please try again later.' }
     else
-      sleep 1
-      one_touch_status
+      if status['approval_request']['status'] == 'approved'
+        session.delete(:uuid) || session.delete('uuid')
+        session[:authy] = true
+        session[:verified] = true
+        redirect_to session['user_return_to'] || root_path
+      elsif status['approval_request']['status'] == 'denied'
+        session.delete(:authy)
+        session.delete(:verified)
+        sign_out(@user)
+        redirect_to new_user_session_path, flash: { error: 'Request denied, please try again later.' }
+      else
+        sleep 1
+        one_touch_status
+      end
     end
   end
 
