@@ -79,7 +79,7 @@ end
 
 group :test do
   gem 'capybara', '3.13.2'
-  gem 'shoulda-matchers', '~> 3.1.2'
+  gem 'shoulda-matchers', '~> 3.1.3'
   gem 'coveralls', '0.8.22', require: false
 end
 
