@@ -5,6 +5,10 @@ class VerificationsController < ApplicationController
 
   end
 
+  def pending
+
+  end
+
   def update
     if params[:verification_type] == 'login'
       if current_user.validate_and_consume_otp!(params[:code])

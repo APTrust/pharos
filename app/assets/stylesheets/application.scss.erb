@@ -706,3 +706,17 @@ table.mime_table td {
 #passPopoverDiv a {
   padding-left: 0px;
 }
+
+.loader {
+  border: 16px solid #DCE1E2;
+  border-top: 16px solid #18333a;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

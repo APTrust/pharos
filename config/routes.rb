@@ -185,9 +185,10 @@ Rails.application.routes.draw do
   post 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
   get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
 
-  resources :verifications, only: [:new, :create, :edit, :update]
+  resources :verifications, only: [:edit, :update]
+  get 'verifications/pending', to: 'verifications#pending', as: :verification_pending
 
-  get '/verification_callback', to: 'application#callback', as: :verification_callback
+  #get '/verification_callback', to: 'application#callback', as: :verification_callback
 
   authenticated :user do
     root to: 'institutions#show', as: 'authenticated_root'

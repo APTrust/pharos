@@ -79,6 +79,7 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+  helper_method :one_touch_status
 
   # def callback
   #   authy_id = params[:authy_id]
