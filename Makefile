@@ -64,8 +64,8 @@ dev: ## Run Pharos for development on localhost
 	docker start pharos-dev-web > /dev/null 2>&1 || docker run -d -e PHAROS_DB_HOST=pharos-dev-db -e PHAROS_DB_NAME=pharos_development -e PHAROS_DB_USER=postgres --network=pharos-dev-net -p 9292:9292 --name pharos-dev-web $(TAG)
 
 devclean: ## Stop and remove running Docker containers
-	docker stop pharos-dev-db && docker rm pharos-dev-db || true
-	docker stop pharos-dev-web && docker rm pharos-dev-web  || true
+	docker stop pharos-dev-db && docker rm -v pharos-dev-db || true
+	docker stop pharos-dev-web && docker rm -v pharos-dev-web || true
 	docker network rm pharos-dev-net
 
 publish:
