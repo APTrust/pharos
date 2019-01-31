@@ -68,6 +68,10 @@ devclean: ## Stop and remove running Docker containers
 	docker stop pharos-dev-web && docker rm -v pharos-dev-web || true
 	docker network rm pharos-dev-net
 
+devstop: ## Stop and remove running Docker containers
+	docker stop pharos-dev-db
+	docker stop pharos-dev-web
+
 publish:
 	docker login $(REGISTRY)
 	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos && \
