@@ -11,6 +11,7 @@ development:
   <<: *default
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_development' %>
+  username: <%= ENV['PHAROS_DB_USER'] || 'postgres' %>
 
 
 # Warning: The database defined as "test" will be erased and
