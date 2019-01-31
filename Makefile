@@ -49,6 +49,13 @@ down: ## Stop containers for Pharos, Postgresql, Nginx
 run: ## Just run Pharos in foreground
 	docker run -p 9292:9292 $(TAG)
 
+runex: ## Start Pharos container, run command and exit.
+	docker run $(TAG) $(filter-out $@, $(MAKECMDGOALS))
+#	docker exec $(TAG) $(filter-out $@, $(MAKECMDGOALS))
+
+%:
+	    @true
+
 dev: ## Run Pharos for development on localhost
 	docker network create -d bridge pharos-dev-net || true
 	docker start pharos-dev-db || docker run -d --network pharos-dev-net --hostname pharos-dev-db --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
