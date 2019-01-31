@@ -56,6 +56,14 @@ runex: ## Start Pharos container, run command and exit.
 %:
 	    @true
 
+tests: ## Run Pharos spec tests
+	docker network create -d bridge pharos-test-net > /dev/null 2>&1 || true
+	docker start pharos-test-db > /dev/null 2>&1 || docker run -d --network pharos-test-net --hostname pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
+	docker run  -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-test-db --network pharos-test-net --rm --name pharos-migration $(TAG) /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup"
+	docker run --rm -it --network pharos-test-net -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_HOST=pharos-test-db -e RAILS_ENV=test $(TAG) /bin/bash -c "bin/rake"
+	docker stop pharos-test-db && docker rm -v pharos-test-db || true
+	docker network rm pharos-test-net
+
 dev: ## Run Pharos for development on localhost
 	docker network create -d bridge pharos-dev-net > /dev/null 2>&1 || true
 	#docker start pharos-dev-db > /dev/null 2>&1 || docker run -d --network pharos-dev-net --hostname pharos-dev-db -e POSTGRES_DB=pharos_development --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
