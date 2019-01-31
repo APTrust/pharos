@@ -73,12 +73,14 @@ class UsersController < ApplicationController
     authorize @user
     @user.otp_secret = User.generate_otp_secret
     @user.enabled_two_factor = true
-    authy = Authy::API.register_user(
-        email: @user.email,
-        cellphone: @user.phone_number,
-        country_code: @user.phone_number[1]
-    )
-    @user.update(authy_id: authy.id)
+    unless Rails.env.test?
+      authy = Authy::API.register_user(
+          email: @user.email,
+          cellphone: @user.phone_number,
+          country_code: @user.phone_number[1]
+      )
+      @user.update(authy_id: authy.id)
+    end
     @codes = @user.generate_otp_backup_codes!
     @user.save!
     redirect_to @user
