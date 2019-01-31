@@ -57,10 +57,11 @@ runex: ## Start Pharos container, run command and exit.
 	    @true
 
 dev: ## Run Pharos for development on localhost
-	docker network create -d bridge pharos-dev-net || true
-	docker start pharos-dev-db || docker run -d --network pharos-dev-net --hostname pharos-dev-db --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
-	docker run -e PHAROS_DB_HOST=host.docker.internal -e PHAROS_DB_USER=postgres --network pharos-dev-net --rm --name pharos-migration $(TAG) /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
-	docker start pharos-dev-web || docker run -d -e PHAROS_DB_HOST=host.docker.internal -e PHAROS_DB_USER=postgres --network=pharos-dev-net -p 9292:9292 --name pharos-dev-web $(TAG)
+	docker network create -d bridge pharos-dev-net > /dev/null 2>&1 || true
+	#docker start pharos-dev-db > /dev/null 2>&1 || docker run -d --network pharos-dev-net --hostname pharos-dev-db -e POSTGRES_DB=pharos_development --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
+	docker start pharos-dev-db > /dev/null 2>&1 || docker run -d --network pharos-dev-net --hostname pharos-dev-db --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
+	docker run  -e PHAROS_DB_NAME=pharos_development -e PHAROS_DB_HOST=pharos-dev-db -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-dev-db --network pharos-dev-net --rm --name pharos-migration $(TAG) /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || echo 'Init DB setup'; rake db:setup RAILS_ENV=development; rake db:migrate; rake pharos:setup"
+	docker start pharos-dev-web > /dev/null 2>&1 || docker run -d -e PHAROS_DB_HOST=pharos-dev-db -e PHAROS_DB_NAME=pharos_development -e PHAROS_DB_USER=postgres --network=pharos-dev-net -p 9292:9292 --name pharos-dev-web $(TAG)
 
 devclean: ## Stop and remove running Docker containers
 	docker stop pharos-dev-db && docker rm pharos-dev-db || true
