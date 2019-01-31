@@ -61,7 +61,7 @@ class ApplicationController < ActionController::Base
       session.delete(:authy)
       session.delete(:verified)
       sign_out(@user)
-      redirect_to new_user_session_path, flash: { error: 'Push notification expired, please try again later.' }
+      redirect_to new_user_session_path, flash: { error: 'This push notification has expired' }
     else
       if status['approval_request']['status'] == 'approved'
         session.delete(:uuid) || session.delete('uuid')
@@ -72,7 +72,7 @@ class ApplicationController < ActionController::Base
         session.delete(:authy)
         session.delete(:verified)
         sign_out(@user)
-        redirect_to new_user_session_path, flash: { error: 'Request denied, please try again later.' }
+        redirect_to new_user_session_path, flash: { error: 'This request was denied.' }
       else
         sleep 1
         one_touch_status

@@ -96,21 +96,27 @@ class UsersController < ApplicationController
   def verify_twofa
     authorize @user
     one_touch = Authy::OneTouch.send_approval_request(
-        id: @user.authy_id,
+        id: current_user.authy_id,
         message: 'Request to Login to APTrust Repository Website',
         details: {
-            'Email Address' => @user.email,
+            'Email Address' => current_user.email,
         }
     )
+    if !one_touch.ok?
+      render json: { err: 'Create Push Error' }, status: :internal_server_error and return
+    end
+    session[:uuid] = one_touch.approval_request['uuid']
     status = one_touch['success'] ? :onetouch : :sms
-    @user.update(authy_status: status)
-    if @user.sms_user?
+    current_user.update(authy_status: status)
+    if current_user.sms_user?
       sms = Aws::SNS::Client.new
       response = sms.publish({
-                                 phone_number: @user.phone_number,
-                                 message: "Your new one time password is: #{@user.current_otp}"
+                                 phone_number: current_user.phone_number,
+                                 message: "Your new one time password is: #{current_user.current_otp}"
                              })
-      redirect_to edit_verification_path(id: @user.id, verification_type: 'phone_number')
+      redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
+    else
+      one_touch_status
     end
   end
 
