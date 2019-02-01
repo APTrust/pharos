@@ -20,15 +20,15 @@ development:
 test:
   <<: *default
   database: travis_ci_test
-  username: postgres
-  host:     localhost
+  username: <%= ENV['PHAROS_DB_USER'] || 'postgres' %>
+  host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
 
 # Database for integration tests. This will be emptied between
 # tests.
 integration:
   <<: *default
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
-  host:     localhost
+  host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
 
 # Demo environment for APTrust Demo system
 demo:
