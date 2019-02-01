@@ -1,0 +1,7 @@
+<%= form_tag check_backup_verification_path(id: params[:id]), method: :put do %>
+    <div class="form-group">
+      <%= label_tag :code %><br />
+      <%= text_field_tag :code %>
+    </div>
+    <%= submit_tag 'Verify Backup Code', class: "btn btn-primary" %>
+<% end %>

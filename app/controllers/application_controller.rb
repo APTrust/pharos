@@ -8,6 +8,12 @@ class ApplicationController < ActionController::Base
     request.format = 'json' if (!api_check.nil? && api_check.include?('api') && params[:format].nil?)
   end
 
+  before_action do
+    if params[:use_backup_code] && params[:use_backup_code] == '1'
+      session[:backup_code] = true
+    end
+  end
+
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   before_action :verify_user!, unless: :devise_controller?
@@ -24,28 +30,32 @@ class ApplicationController < ActionController::Base
   end
 
   def start_verification
-    one_touch = Authy::OneTouch.send_approval_request(
-        id: current_user.authy_id,
-        message: 'Request to Login to APTrust Repository Website',
-        details: {
-            'Email Address' => current_user.email,
-        }
-    )
-    if !one_touch.ok?
-      render json: { err: 'Create Push Error' }, status: :internal_server_error and return
-    end
-    session[:uuid] = one_touch.approval_request['uuid']
-    status = one_touch['success'] ? :onetouch : :sms
-    current_user.update(authy_status: status)
-    if current_user.sms_user?
-      sms = Aws::SNS::Client.new
-      response = sms.publish({
-                                 phone_number: current_user.phone_number,
-                                 message: "Your new one time password is: #{current_user.current_otp}"
-                             })
-      redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
+    if session[:backup_code]
+      redirect_to enter_backup_verification_path(id: current_user.id), flash: { alert: 'Please enter a backup code.' }
     else
-      one_touch_status
+      one_touch = Authy::OneTouch.send_approval_request(
+          id: current_user.authy_id,
+          message: 'Request to Login to APTrust Repository Website',
+          details: {
+              'Email Address' => current_user.email,
+          }
+      )
+      if !one_touch.ok?
+        render json: { err: 'Create Push Error' }, status: :internal_server_error and return
+      end
+      session[:uuid] = one_touch.approval_request['uuid']
+      status = one_touch['success'] ? :onetouch : :sms
+      current_user.update(authy_status: status)
+      if current_user.sms_user?
+        sms = Aws::SNS::Client.new
+        response = sms.publish({
+                                   phone_number: current_user.phone_number,
+                                   message: "Your new one time password is: #{current_user.current_otp}"
+                               })
+        redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
+      else
+        one_touch_status
+      end
     end
   end
 
@@ -67,7 +77,7 @@ class ApplicationController < ActionController::Base
         session.delete(:uuid) || session.delete('uuid')
         session[:authy] = true
         session[:verified] = true
-        redirect_to session['user_return_to'] || root_path
+        redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
       elsif status['approval_request']['status'] == 'denied'
         session.delete(:authy)
         session.delete(:verified)

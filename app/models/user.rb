@@ -12,8 +12,8 @@ class User < ActiveRecord::Base
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
   devise :recoverable, :rememberable, :trackable,
-         :timeoutable, :validatable, :two_factor_backupable,
-         :two_factor_authenticatable, :otp_secret_encryption_key => ENV['TWO_FACTOR_KEY']
+         :timeoutable, :validatable, :two_factor_authenticatable,
+         :two_factor_backupable, otp_backup_code_length: 10, :otp_secret_encryption_key => ENV['TWO_FACTOR_KEY']
 
   validates :email, presence: true, uniqueness: true
   validate :email_is_valid
