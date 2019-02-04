@@ -15,7 +15,5 @@ before_script:
 env:
   global:
   - CACHE_DIR=$HOME/.cache/docker
-  - PGPORT=5433
-
 
 
