@@ -3,6 +3,7 @@ default: &default
   pool: 5
   timeout: 5000
   host: <%= ENV['PHAROS_DB_HOST'] || 'db' %>
+  port: <%= ENV['PHAROS_DB_PORT'] || 5432 %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos' %>
   username: <%= ENV['PHAROS_DB_USER'] || 'pharos' %>
   password: <%= ENV['PHAROS_DB_PWD'] || 'password' %>
@@ -19,7 +20,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: travis_ci_test
+  database: <%= ENV['PHAROS_DB_NAME'] || 'travis_ci_test' %>
   username: <%= ENV['PHAROS_DB_USER'] || 'postgres' %>
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
 
