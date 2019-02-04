@@ -58,9 +58,9 @@ runex: ## Start Pharos container, run command and exit.
 test-ci: ## Run Pharos spec tests in CI
 	docker build -t pharos-ci:latest .
 	docker network create -d bridge pharos-test-net
-	docker run -d --network pharos-test-net --hostname pharos-test-db --name pharos-test-db -p 5433:5432 postgres:9.6.6-alpine
-	docker run -e RAILS_ENV=test -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_PORT=5433 -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-test-db --network pharos-test-net --rm -v ${PWD}:/pharos2 --name pharos-migration pharos-ci:latest /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup"
-	docker run --rm -it --network pharos-test-net -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_PORT=5433 -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres pharos-ci:latest /bin/bash -c "bin/rails spec"
+	docker run -d --network pharos-test-net --hostname pharos-test-db --name pharos-test-db -p 5432 postgres:9.6.6-alpine
+	docker run -e RAILS_ENV=test -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_PORT=5432 -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-test-db --network pharos-test-net --rm --name pharos-migration pharos-ci:latest /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup"
+	docker run --rm -it --network pharos-test-net -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_PORT=5432 -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres pharos-ci:latest /bin/bash -c "bin/rails spec"
 	docker stop pharos-test-db && docker rm pharos-test-db
 	docker network rm pharos-test-net
 
