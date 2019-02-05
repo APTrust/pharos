@@ -10,14 +10,12 @@ env:
 services:
   - docker
 
-before_install:
-  - if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load; fi
-
 cache:
   directories:
   - $CACHE_DIR
 
 before_script:
+    - if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load; fi
     - sudo apt update -y
     - sudo apt install --only-upgrade docker-ce -y
     - sudo service postgresql stop
