@@ -28,4 +28,6 @@ script:
 deploy:
   - provider: script 
     script: make publish-ci
-
+    on:
+      branch: docker
+    skip_cleanup: true
