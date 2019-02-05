@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
-                                  :vacuum, :enable_otp, :disable_otp, :verify_twofa]
+                                  :vacuum, :enable_otp, :disable_otp, :verify_twofa, :generate_backup_codes]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -73,7 +73,7 @@ class UsersController < ApplicationController
     authorize @user
     @user.otp_secret = User.generate_otp_secret
     @user.enabled_two_factor = true
-    unless Rails.env.test?
+    unless Rails.env.test? || !@user.authy_id.nil?
       authy = Authy::API.register_user(
           email: @user.email,
           cellphone: @user.phone_number,
@@ -84,13 +84,25 @@ class UsersController < ApplicationController
     @codes = @user.generate_otp_backup_codes!
     @user.save!
     redirect_to @user
+    flash[:notice] = 'Two Factor Authentication has been enabled.'
   end
 
   def disable_otp
     authorize @user
     @user.enabled_two_factor = false
     @user.save!
-    redirect_to root_path
+    redirect_to @user
+    flash[:notice] = 'Two Factor Authentication has been disabled.'
+  end
+
+  def generate_backup_codes
+    authorize @user
+    @codes = @user.generate_otp_backup_codes!
+    @user.save!
+    respond_to do |format|
+      format.json { render json: { user: @user, codes: @codes } }
+      format.html { render 'show' }
+    end
   end
 
   def verify_twofa

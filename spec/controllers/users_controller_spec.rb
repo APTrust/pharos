@@ -109,6 +109,7 @@ RSpec.describe UsersController, type: :controller do
       let(:admin_user) { FactoryBot.create(:user, :admin) }
       let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: admin_user.institution_id) }
       let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
+
       it 'for myself should succeed' do
         get :disable_otp, params: { id: admin_user.id }, format: :json
         expect(response.status).to eq(302)
@@ -125,6 +126,36 @@ RSpec.describe UsersController, type: :controller do
         get :disable_otp, params: { id: user_of_different_institution.id }, format: :json
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq false
+      end
+    end
+
+    describe 'generating backup two factor authentication codes' do
+      let(:admin_user) { FactoryBot.create(:user, :admin) }
+      let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: admin_user.institution_id) }
+      let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
+
+      it 'for myself should succeed' do
+        old_codes = admin_user.generate_otp_backup_codes!
+        admin_user.save!
+        get :generate_backup_codes, params: { id: admin_user.id }, format: :json
+        expect(response.status).to eq(200)
+        expect(assigns[:codes[0]]).not_to eq old_codes[0]
+      end
+
+      it 'for another user at my institution should succeed' do
+        old_codes = user_at_institution.generate_otp_backup_codes!
+        user_at_institution.save!
+        get :generate_backup_codes, params: { id: user_at_institution.id }, format: :json
+        expect(response.status).to eq(200)
+        expect(assigns[:codes[0]]).not_to eq old_codes[0]
+      end
+
+      it 'for another user not at my institution should succeed' do
+        old_codes = user_of_different_institution.generate_otp_backup_codes!
+        user_of_different_institution.save!
+        get :generate_backup_codes, params: { id: user_of_different_institution.id }, format: :json
+        expect(response.status).to eq(200)
+        expect(assigns[:codes[0]]).not_to eq old_codes[0]
       end
     end
 
@@ -414,6 +445,35 @@ RSpec.describe UsersController, type: :controller do
         expect(response.status).to eq(403)
       end
     end
+
+    describe 'generating backup two factor authentication codes' do
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
+      let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
+      let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user) }
+
+      it 'for myself should succeed' do
+        old_codes = institutional_admin.generate_otp_backup_codes!
+        institutional_admin.save!
+        get :generate_backup_codes, params: { id: institutional_admin.id }, format: :json
+        expect(response.status).to eq(200)
+        expect(assigns[:codes[0]]).not_to eq old_codes[0]
+      end
+
+      it 'for another user at my institution should succeed' do
+        old_codes = user_at_institution.generate_otp_backup_codes!
+        user_at_institution.save!
+        get :generate_backup_codes, params: { id: user_at_institution.id }, format: :json
+        expect(response.status).to eq(200)
+        expect(assigns[:codes[0]]).not_to eq old_codes[0]
+      end
+
+      it 'for another user not at my institution should not succeed' do
+        old_codes = user_of_different_institution.generate_otp_backup_codes!
+        user_of_different_institution.save!
+        get :generate_backup_codes, params: { id: user_of_different_institution.id }, format: :json
+        expect(response.status).to eq(403)
+      end
+    end
   end
 
   describe 'An Institutional User' do
@@ -483,6 +543,24 @@ RSpec.describe UsersController, type: :controller do
         get :disable_otp, params: { id: other_user.id }, format: :json
         expect(response.status).to eq(403)
       end
+    end
+
+    describe 'generating backup two factor authentication codes' do
+      it 'for myself should succeed' do
+        old_codes = user.generate_otp_backup_codes!
+        user.save!
+        get :generate_backup_codes, params: { id: user.id }, format: :json
+        expect(response.status).to eq(200)
+        expect(assigns[:codes[0]]).not_to eq old_codes[0]
+      end
+
+      it 'for another user should not succeed' do
+        old_codes = other_user.generate_otp_backup_codes!
+        other_user.save!
+        get :generate_backup_codes, params: { id: other_user.id }, format: :json
+        expect(response.status).to eq(403)
+      end
+
     end
 
   end

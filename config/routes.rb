@@ -183,6 +183,7 @@ Rails.application.routes.draw do
   post 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
   post 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
   post 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
+  get 'users/:id/backup_codes', to: 'users#generate_backup_codes', as: :backup_codes
   get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
 
   resources :verifications, only: [:edit, :update]

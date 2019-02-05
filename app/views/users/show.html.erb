@@ -26,8 +26,11 @@
                   :method => :post, class: 'btn btn-normal doc-action-btn' %>
 <% end %>
 
+<h4>Backup Codes</h4>
+<%= button_to "Generate Backup Codes", backup_codes_path(@user.id),
+                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
 <% if @codes %>
-    <h4>Backup Codes</h4>
+    <br>
     <p><strong class="badge badge-danger">Important!</strong> Write these backups codes down in a safe place.
       They can be used once to login to your account if your two factor device is unavailable.
       They will never be displayed again for security reasons.</p>
@@ -37,8 +40,7 @@
       <% end %>
     </ul>
 <% end %>
-
-
+<br>
 
 <h4>Roles</h4>
 <ul class="unstyled">

@@ -133,6 +133,11 @@ class UserPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
+  def generate_backup_codes?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
   def edit?
     update?
   end
