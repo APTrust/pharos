@@ -98,6 +98,12 @@ publish:
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 
+publish-ci:
+
+	docker login -u $(DOCKER_USER) -p $(DOCKER_PWD) $(REGISTRY)
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME) aptrust/$(NAME):$(REVISION) && \
+	docker push $(REGISTRY)/$(REPOSITORY)/pharos
+	docker push aptrust/pharos
 
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
