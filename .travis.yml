@@ -1,17 +1,31 @@
 sudo: required
 
-
 services:
-  - docker
+- docker
+
+env:
+  global:
+  - secure: DQWpGBJR9oafVCvklPmXdb/1mz43x4afBAuf94R7x+R9GzOdI0B6d45baWTEyM9DkP9WINaph5rrpMCo8DgumPkPE54tChoUd/wqsl2MK43sFm/Y7LoQBrdpTlYKQDDMxMM76zSa1Ba0SsXX1iAEXfXP3GUTSyjmh/KvMfGmoqahgBb4gpBOdhxAIBv/pOetpgxCS8tgx8jbMlsOOT9SaBf4du9usPeb6T9R2lzfY7+/L4F0/74M9MAIQnazdCH0m0wbSxFDgnrmUj5J1+S4C1lBHYGWcl4OFmoNLdEQZF0DyscAPlblWcpnyUVz6T1+/eyAZa+A9yUxdbRBN2DGEyeNDSvDfC1Cfw9VOZ1rTzkb433zXjmh/4ONgrN4DGfTguM0AB6cwbVbMp7Mrdqy/awUTKLnl37nsx0zWdtuDq/wFT28w0qfqQGdPZJZoUpWG04Tooigh3GTULhgCr81RhqKSJccbe6HUlWBizINR9fRlSk95CTLkHtDQ80FH6Vo6dtWHMqBQaF75sIYLPqF5AzzSCIVdRtN31J60rWuKSozhYg/rb2OL0g7mAlTxrPbP/9spE04l4JOx4ENz+GBbXpOBnL3vENY+N0+1cbs6NCxmOL7hlLcEhFD2I9XRtlRawG1AeJZmb4VdgYWyZT1JP683ffUKYXvAQkSO8Lm6ww=
+  - secure: ShF+ni0T5+pfveyaQ7Dl5IOeyLj8XnKgVNFm52EgyynAAdm2Q7k49yuH8v+yRtxKgMSJHM4ldoZBgZN6edZYfoF5oUuf6UzBTScjiJdP6FljykL/B43ArFWzSmqQS9UKlcB7y+XFiDSwPBGd5wrAmkY2FruJEcpaNqBFFYM/qyTAOByWPPHC0kjvGMUwVORLyxuKsCdf7B/Kfa7AmDtSDL4wTGa5d2+5kQXSC8FkEqNow6Ux0qa+WgukI2vp/R39oEq6LH8ronl7M9g33sDZflH8f21A/ni22UHjoQUplIX3D12RTJHkXcN/MORvWoSjPRxEDSyUDmVnBQod/Pg0nNsrmiv9shEaFe0BM3NF5wEbJ9l14VbmsfsxhgXNvn47PCK2wyK5hN+9K4msbRNDxe/o/Tro9IKOQ1wAEbEys26XyokA9Hcyo6Pi9QS9z6uaQoXkFhmEjmmSHKEcHIohRGZjmHdWcxMQnFE9sRQQRZ1EqaDWKvpFN6DyIwHpes+sBnIukm/Z4XNz2Gbs99LkMBgBxfM0RhPFc4XlkLN6+dio3oNcNxOgPTo4g3iQeokpMu37Mptum5hXuqXBzcBVwjmCbSJvdSGt1Inf8A9ZHM70jvMjfec7F4PBKbO1oaQSFqenXqY3ljWlFlEIay0hVdFmIMJorjQRD+5Iz+QXSrY=
 
 before_script:
-    - sudo apt update -y
-    - sudo apt install --only-upgrade docker-ce -y
-    - sudo service postgresql stop
+- sudo apt update -y
+- sudo apt install --only-upgrade docker-ce -y
+- sudo service postgresql stop
+
 script:
-    # Keep intermediate containers for caching
-    - docker pull aptrust/pharos:latest
-    - docker build --rm=false -t aptrust/pharos:latest  .
-    - docker network create -d bridge pharos-test-net 
-    - docker run -d --network pharos-test-net -h pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
-    - docker run -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" -e RAILS_ENV=test -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres --network pharos-test-net aptrust/pharos:latest /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup; bin/rails spec"
+- docker pull aptrust/pharos:latest
+- docker build --rm=false -t aptrust/pharos:latest  .
+- docker network create -d bridge pharos-test-net
+- docker run -d --network pharos-test-net -h pharos-test-db --name pharos-test-db
+  -p 5432:5432 postgres:9.6.6-alpine
+- docker run -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" -e
+  RAILS_ENV=test -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db
+  -e PHAROS_DB_USER=postgres --network pharos-test-net aptrust/pharos:latest /bin/bash
+  -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup; bin/rails
+  spec"
+
+deploy:
+  - provider: script 
+    script: make publish-ci
+
