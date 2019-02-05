@@ -40,4 +40,8 @@ $(document).ready(function() {
         var formData = $(e.currentTarget).serialize();
         attemptOneTouchVerification(formData);
     });
+
+    $('#login-btn').click(function() {
+      $('#push-notification-loader').removeClass("hidden");
+    });
 });
