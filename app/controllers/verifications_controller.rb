@@ -20,7 +20,7 @@ class VerificationsController < ApplicationController
         @user.save!
         redirect_to @user, flash: { notice: 'Your phone number has been verified.' }
       else
-        redirect_to current_user, flash: { error: 'Incorrect one time password. Please try again later.' }
+        redirect_to current_user, flash: { error: 'Incorrect one time password, phone number has not been verified.' }
       end
     end
   end

@@ -109,7 +109,7 @@ class UsersController < ApplicationController
     authorize @user
     one_touch = Authy::OneTouch.send_approval_request(
         id: current_user.authy_id,
-        message: 'Request to Login to APTrust Repository Website',
+        message: 'Request to Verify Phone Number for APTrust Repository Website',
         details: {
             'Email Address' => current_user.email,
         }
@@ -126,7 +126,7 @@ class UsersController < ApplicationController
                                  phone_number: current_user.phone_number,
                                  message: "Your new one time password is: #{current_user.current_otp}"
                              })
-      redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
+      redirect_to edit_verification_path(id: current_user.id, verification_type: 'phone_number')
     else
       one_touch_status
     end
@@ -289,6 +289,31 @@ class UsersController < ApplicationController
       when 'roles'
         query = 'VACUUM (VERBOSE, ANALYZE) roles_users'
         ActiveRecord::Base.connection.exec_query(query)
+    end
+  end
+
+  def one_touch_status
+    @user = current_user
+    status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
+
+    if !status.ok?
+      render json: { err: 'One Touch Status Error' }, status: :internal_server_error and return
+    end
+
+    if status['approval_request']['seconds_to_expire'] <= 0
+      redirect_to @user, flash: { error: 'This push notification has expired' }
+    else
+      if status['approval_request']['status'] == 'approved'
+        session.delete(:uuid) || session.delete('uuid')
+        @user.confirmed_two_factor = true
+        @user.save!
+        redirect_to @user, flash: { notice: 'Your phone number has been verified.' }
+      elsif status['approval_request']['status'] == 'denied'
+        redirect_to @user, flash: { error: 'This request was denied, phone number has not been verified.' }
+      else
+        sleep 1
+        one_touch_status
+      end
     end
   end
 end
