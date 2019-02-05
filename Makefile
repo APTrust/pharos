@@ -94,16 +94,16 @@ devstop: ## Stop and remove running Docker containers
 
 publish:
 	docker login $(REGISTRY)
-	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos && \
+	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 
 publish-ci:
-      echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin
-      docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME)  && \
-      docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION) && \
-      docker push $(REGISTRY)/$(REPOSITORY)/$(NAME)
-      docker push aptrust/$(NAME)
+	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME) 
+	docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION)
+	docker push $(REGISTRY)/$(REPOSITORY)/$(NAME)
+	docker push aptrust/$(NAME)
 
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
