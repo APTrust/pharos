@@ -12,7 +12,6 @@ script:
     # Keep intermediate containers for caching
     - docker pull aptrust/pharos:latest
     - docker build --rm=false -t aptrust/pharos:latest  .
-    - docker network create -d bridge pharos-test-net
+    - docker network create -d bridge pharos-test-net 
     - docker run -d --network pharos-test-net -h pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
-    - docker run -e RAILS_ENV=test -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres --network pharos-test-net aptrust/pharos:latest /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup"
-     - docker run -it --network pharos-test-net -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres aptrust/pharos:latest /bin/bash -c "bin/rails spec"
+    - docker run -e RAILS_ENV=test -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres --network pharos-test-net aptrust/pharos:latest /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup; bin/rails spec"
