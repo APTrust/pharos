@@ -20,7 +20,8 @@ before_script:
     - sudo apt install --only-upgrade docker-ce -y
     - sudo service postgresql stop
 script:
-    - docker build -t pharos-ci:latest .
+    # Keep intermediate containers for caching
+    - docker build -t pharos-ci:latest --rm=false .
     - docker network create -d bridge pharos-test-net
     - docker run -d --network pharos-test-net --hostname pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
     - docker run -e RAILS_ENV=test -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres --network pharos-test-net --rm pharos-ci:latest /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup"
