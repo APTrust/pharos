@@ -304,8 +304,10 @@ class WorkItemsController < ApplicationController
     authorize current_user
     log = Email.log_restoration(@work_item.id)
     NotificationMailer.spot_test_restoration_notification(@work_item, log).deliver!
+    @work_item.note += " Email sent to admins at #{@work_item.institution.name}"
+    @work_item.save
     respond_to do |format|
-      format.json { render json: { message: "Admin users at #{@work_item.institution.name} have recieved a spot test restoration email for #{@work_item.object_identifier}" }, status: 200 }
+      format.json { render json: @work_item, status: :ok }
     end
   end
 
