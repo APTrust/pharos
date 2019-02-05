@@ -98,8 +98,8 @@ publish:
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 
-publish-ci:
-	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin
+publish-$ci:
+	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
 	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME) 
 	docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION)
 	docker push $(REGISTRY)/$(REPOSITORY)/$(NAME)
