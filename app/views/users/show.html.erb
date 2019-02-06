@@ -10,11 +10,13 @@
 </address>
 
 
-<% if current_user.enabled_two_factor %>
-    <% if current_user.confirmed_two_factor %>
+<% if @user.enabled_two_factor %>
+    <% if @user.confirmed_two_factor %>
         <h4>Two Factor Authentication Enabled</h4>
-        <%= button_to "Disable Two Factor Authentication", users_disable_otp_path(@user.id),
-                      :method => :post, class: 'btn btn-normal doc-action-btn' %>
+        <% unless @user.otp_required_for_login %>
+            <%= button_to "Disable Two Factor Authentication", users_disable_otp_path(@user.id),
+                          :method => :get, class: 'btn btn-normal doc-action-btn' %>
+        <% end %>
     <% else %>
         <h4>Verify Phone Number for Two Factor Authentication</h4>
         <p>For the verification process, Pharos will send you an Authy push notification if you have the Authy app installed,
@@ -22,30 +24,31 @@
         or enter the one time code in the form to verify the phone number on file in the application. If your phone number is not
         accurate, please update it before you attempt to verify. </p>
         <%= button_to "Verify Phone Number For Two Factor Authentication", users_verify_twofa_path(@user.id),
-                      :method => :post, class: 'btn btn-normal doc-action-btn' %>
+                      :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% end %>
+
+    <h4>Backup Codes</h4>
+    <%= button_to "Generate Backup Codes", backup_codes_path(@user.id),
+                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
+    <% if @codes %>
+        <br>
+        <p><strong class="badge badge-danger">Important!</strong> Write these backups codes down in a safe place.
+          They can be used once to login to your account if your two factor device is unavailable.
+          They will never be displayed again for security reasons.</p>
+        <ul class="unstyled">
+          <% @codes.each do |code| %>
+              <li><%= code %></li>
+          <% end %>
+        </ul>
+    <% end %>
+    <br>
+
 <% else %>
     <h4>Two Factor Authentication Not Enabled</h4>
     <p>Please ensure you have an accurate phone number listed in your profile before you enable two factor authentication. </p>
     <%= button_to "Enable Two Factor Authentication", users_enable_otp_path(@user.id),
-                  :method => :post, class: 'btn btn-normal doc-action-btn' %>
-<% end %>
-
-<h4>Backup Codes</h4>
-<%= button_to "Generate Backup Codes", backup_codes_path(@user.id),
                   :method => :get, class: 'btn btn-normal doc-action-btn' %>
-<% if @codes %>
-    <br>
-    <p><strong class="badge badge-danger">Important!</strong> Write these backups codes down in a safe place.
-      They can be used once to login to your account if your two factor device is unavailable.
-      They will never be displayed again for security reasons.</p>
-    <ul class="unstyled">
-      <% @codes.each do |code| %>
-          <li><%= code %></li>
-      <% end %>
-    </ul>
 <% end %>
-<br>
 
 <h4>Roles</h4>
 <ul class="unstyled">

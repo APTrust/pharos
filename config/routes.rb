@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
   get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
   get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
+  get '/:institution_identifier/enable_otp', to: 'institutions#enable_otp', as: :enable_otp_institution, institution_identifier: institution_ptrn
+  get '/:institution_identifier/disable_otp', to: 'institutions#disable_otp', as: :disable_otp_institution, institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/trigger_bulk_delete', to: 'institutions#trigger_bulk_delete', as: :api_bulk_deletion, format: :json, institution_identifier: institution_ptrn
   get '/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :api_bulk_deletion_institutional_confirmation, format: :json, institution_identifier: institution_ptrn
@@ -180,9 +182,9 @@ Rails.application.routes.draw do
   get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
-  post 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
-  post 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
-  post 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
+  get 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
+  get 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
+  get 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
   get 'users/:id/backup_codes', to: 'users#generate_backup_codes', as: :backup_codes
   get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
 

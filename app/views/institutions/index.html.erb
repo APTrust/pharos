@@ -23,6 +23,11 @@
         <% else %>
             <td><%= deactivate_link institution %></td>
         <% end %>
+        <% if institution.otp_enabled %>
+            <td><%= disable_otp_link institution %></td>
+        <% else %>
+            <td><%= enable_otp_link institution %></td>
+        <% end %>
         <td><%= destroy_link institution %></td>
       </tr>
   <% end %>

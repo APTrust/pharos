@@ -84,15 +84,30 @@ class UsersController < ApplicationController
     @codes = @user.generate_otp_backup_codes!
     @user.save!
     redirect_to @user
-    flash[:notice] = 'Two Factor Authentication has been enabled.'
+    (current_user == @user) ? usr = '' : usr = ' for this user'
+    flash[:notice] = "Two Factor Authentication has been enabled#{usr}."
   end
 
   def disable_otp
     authorize @user
-    @user.enabled_two_factor = false
-    @user.save!
-    redirect_to @user
-    flash[:notice] = 'Two Factor Authentication has been disabled.'
+    if @user.otp_required_for_login
+      if (current_user.admin? || current_user.institutional_admin?) && current_user != @user
+        @user.enabled_two_factor = false
+        @user.save!
+        redirect_to @user
+        flash[:notice] = 'Two Factor Authentication has been disabled for this user.'
+      else
+        redirect_to @user
+        (current_user == @user) ? usr = 'you' : usr = 'this user'
+        flash[:notice] = "Two Factor Authentication cannot be disabled at this time because it is required for #{usr}."
+      end
+    else
+      @user.enabled_two_factor = false
+      @user.save!
+      redirect_to @user
+      (current_user == @user) ? usr = '' : usr = ' for this user'
+      flash[:notice] = "Two Factor Authentication has been disabled#{usr}."
+    end
   end
 
   def generate_backup_codes

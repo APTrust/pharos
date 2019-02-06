@@ -5,7 +5,7 @@ class InstitutionsController < ApplicationController
   before_action :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot, :deactivate, :reactivate,
                                           :trigger_bulk_delete, :partial_confirmation_bulk_delete, :final_confirmation_bulk_delete,
-                                          :finished_bulk_delete]
+                                          :finished_bulk_delete, :enable_otp, :disable_otp]
   respond_to :json, :html
   after_action :verify_authorized, except: :index
   after_action :verify_policy_scoped, only: :index
@@ -83,6 +83,42 @@ class InstitutionsController < ApplicationController
     respond_to do |format|
       format.html { render 'show' }
     end
+  end
+
+  def enable_otp
+    authorize @institution
+    @institution.users.each do |usr|
+      usr.otp_secret = User.generate_otp_secret
+      usr.enabled_two_factor = true
+      usr.otp_required_for_login = true
+      unless Rails.env.test? || !usr.authy_id.nil?
+        authy = Authy::API.register_user(
+            email: usr.email,
+            cellphone: usr.phone_number,
+            country_code: usr.phone_number[1]
+        )
+        usr.update(authy_id: authy.id)
+      end
+      usr.save!
+    end
+    @institution.otp_enabled = true
+    @institution.save!
+    render 'show'
+    flash[:notice] = 'Two Factor Authentication has been enabled for all users at your institution.'
+  end
+
+  def disable_otp
+    authorize @institution
+    @institution.users.each do |usr|
+      if usr.institutional_user?
+        usr.otp_required_for_login = false
+        usr.save!
+      end
+    end
+    @institution.otp_enabled = false
+    @institution.save!
+    render 'show'
+    flash[:notice] = 'Two Factor Authentication is no longer required for users at your institution.'
   end
 
   def single_snapshot

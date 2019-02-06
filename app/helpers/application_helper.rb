@@ -41,6 +41,32 @@ module ApplicationHelper
     end
   end
 
+  def enable_otp_link(object, content = nil, options={})
+    content ||= '<i class="glyphicon glyphicon-thumbs-up"></i> Enable 2FA'
+    options[:class] = 'btn doc-action-btn btn-success btn-sm' if options[:class].nil?
+    options[:method] = :get if options[:method].nil?
+    if object.is_a?(Institution)
+      options[:data] = { confirm: 'Are you sure you want to enable two factor authentication across your entire institution?' } if options[:confirm].nil?
+      link_to(content.html_safe, enable_otp_institution_path(object), options) if policy(object).enable_otp?
+    else
+      options[:data] = { confirm: 'Are you sure you want to enable two factor authentication for this user?' } if options[:confirm].nil?
+      link_to(content.html_safe, users_enable_otp_path(object), options) if policy(object).enable_otp?
+    end
+  end
+
+  def disable_otp_link(object, content = nil, options={})
+    content ||= '<i class="glyphicon glyphicon-thumbs-down"></i> Disable 2FA'
+    options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
+    options[:method] = :get if options[:method].nil?
+    if object.is_a?(Institution)
+      options[:data] = { confirm: 'Are you sure you want to disable two factor authentication across your entire institution?' } if options[:confirm].nil?
+      link_to(content.html_safe, disable_otp_institution_path(object), options) if policy(object).disable_otp?
+    else
+      options[:data] = { confirm: 'Are you sure you want to disable two factor authentication for this user?' } if options[:confirm].nil?
+      link_to(content.html_safe, users_disable_otp_path(object), options) if policy(object).disable_otp?
+    end
+  end
+
   def destroy_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-trash"></i> Delete'
     options[:class] = 'btn doc-action-btn btn-danger btn-sm' if options[:class].nil?
