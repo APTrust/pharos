@@ -1,18 +1,14 @@
 sudo: required
-
 services:
 - docker
-
 env:
   global:
-  - secure: DQWpGBJR9oafVCvklPmXdb/1mz43x4afBAuf94R7x+R9GzOdI0B6d45baWTEyM9DkP9WINaph5rrpMCo8DgumPkPE54tChoUd/wqsl2MK43sFm/Y7LoQBrdpTlYKQDDMxMM76zSa1Ba0SsXX1iAEXfXP3GUTSyjmh/KvMfGmoqahgBb4gpBOdhxAIBv/pOetpgxCS8tgx8jbMlsOOT9SaBf4du9usPeb6T9R2lzfY7+/L4F0/74M9MAIQnazdCH0m0wbSxFDgnrmUj5J1+S4C1lBHYGWcl4OFmoNLdEQZF0DyscAPlblWcpnyUVz6T1+/eyAZa+A9yUxdbRBN2DGEyeNDSvDfC1Cfw9VOZ1rTzkb433zXjmh/4ONgrN4DGfTguM0AB6cwbVbMp7Mrdqy/awUTKLnl37nsx0zWdtuDq/wFT28w0qfqQGdPZJZoUpWG04Tooigh3GTULhgCr81RhqKSJccbe6HUlWBizINR9fRlSk95CTLkHtDQ80FH6Vo6dtWHMqBQaF75sIYLPqF5AzzSCIVdRtN31J60rWuKSozhYg/rb2OL0g7mAlTxrPbP/9spE04l4JOx4ENz+GBbXpOBnL3vENY+N0+1cbs6NCxmOL7hlLcEhFD2I9XRtlRawG1AeJZmb4VdgYWyZT1JP683ffUKYXvAQkSO8Lm6ww=
-  - secure: ShF+ni0T5+pfveyaQ7Dl5IOeyLj8XnKgVNFm52EgyynAAdm2Q7k49yuH8v+yRtxKgMSJHM4ldoZBgZN6edZYfoF5oUuf6UzBTScjiJdP6FljykL/B43ArFWzSmqQS9UKlcB7y+XFiDSwPBGd5wrAmkY2FruJEcpaNqBFFYM/qyTAOByWPPHC0kjvGMUwVORLyxuKsCdf7B/Kfa7AmDtSDL4wTGa5d2+5kQXSC8FkEqNow6Ux0qa+WgukI2vp/R39oEq6LH8ronl7M9g33sDZflH8f21A/ni22UHjoQUplIX3D12RTJHkXcN/MORvWoSjPRxEDSyUDmVnBQod/Pg0nNsrmiv9shEaFe0BM3NF5wEbJ9l14VbmsfsxhgXNvn47PCK2wyK5hN+9K4msbRNDxe/o/Tro9IKOQ1wAEbEys26XyokA9Hcyo6Pi9QS9z6uaQoXkFhmEjmmSHKEcHIohRGZjmHdWcxMQnFE9sRQQRZ1EqaDWKvpFN6DyIwHpes+sBnIukm/Z4XNz2Gbs99LkMBgBxfM0RhPFc4XlkLN6+dio3oNcNxOgPTo4g3iQeokpMu37Mptum5hXuqXBzcBVwjmCbSJvdSGt1Inf8A9ZHM70jvMjfec7F4PBKbO1oaQSFqenXqY3ljWlFlEIay0hVdFmIMJorjQRD+5Iz+QXSrY=
-
+  - secure: aTy4+EDSJ4mnzoIMTLosYLadb92dpuI1VYaKY3z917Ks2ugtKyhUl9DnImQWdAZwnt54Q+1s8Y5Dv62qNvG5Z1ESTFrqiFuJvxDJGLKjIK3D7LO/6DZK8uHLSkZEk90k/xgl6YTaMGDlFlnTS7pikFxSoUFsYXdMC3LH3mkdlQqSlbBrs8RD0x4NEBL3NCAl10WNpKAcTLYTPcy2rBcCYYB3v3zfbO+7VNK3qxIjNSmgpqW5XdC/I+E7gRroGfwLG7M7nmvMC6KAMT5fMfpoaiLTTSspk4D6SCioYwvhotNsTFAkAidcQvNr2phKsvKmxXEWtWSPk8iE7HpUTvyGj47ESgHA6aJmYUs2m8vySJjSWhFejy2XKwYqK8nCL6DtCkdu24WDj4knumFDRoUe5VvchosR6ntqUs3xT6Y4+1XW4WIN8rUK7W1/AjHruhqsigwvEhrave+/e9MSJ1w2qgmSJGLJ+h3Y+4/LSr0sosqZWgOH91WIPEHgUl/hFZMqRs31lyR38fdbnjTcJNFLpQkYtitxLfRaq9Zf5UHtxCT36dL5P1QCAxyGBxteZKTO+ACLLHrBxlaRlPoVOYrT7wvADIlsm3jDXhdkf9rf2ZQs/cOD91uKFyInWE/CpL2/Atp1RFUrgWbvoR3/sRC/wz78A4+VepyVMjOSzE85S1Q=
+  - secure: TYHzYfFxRpqILrcGIBgDkUVRHHDKJxAnhtMJ44OFB9YD/fWgTxWl04nd4YA/KvxId0d5nrq7z0O4zF4e6ZEHagCnv9ZG4Xc3kVLzkhCp4ZIqBKMkBd5copZGNZAjRVH6e6fsXQhUK/hVTULhtyvNVr950fWrZzk00lfRLn+F7J8AbWAxqKPEhaiJIH0NdfsoQti1GRC98g6vpeLWDP/OyNUPc73xH0ALS/1fiPILTLESM6w06OuLHn5j1GqJPowMYhVR7bDwOXKvpdbljp3V9vWOv0o6gEPvfJJC0YZdWjw7ncCo8Guy11NDBPibcF6x9uzE6dV4O3zA7/RRJV5PJGt7dCeYqKZt4aY2fJsBupVXi2a1N/qFwN8uIWh1g6yNKGa9kxznh727PAet+G8ucncwzBu+FRSlFdJUpif4eLpVPaebnVNXc6PpwFbOUftP12sM2EbvPuu/sA4q6FNYg/R0ydsvFt6/IEgV25pmJYF+2ZFz91W1L0STxMcl78kXsyoyDhRIdEBoM/3RlmggqUAkQ06BQ41/SJJnnY/38dsPLlK/pTcN/fzYuL25IyOFG7P8gpBTHanzjS7Bejc2T3S0hsNTkliGwSk3V+aJzrAGcp+A9XVbMTXg8OchUjKRe1Io2/E9NcyrIfctaLtKeZ2EOxx+ra9r4sjkjbcGpbk=
 before_script:
 - sudo apt update -y
 - sudo apt install --only-upgrade docker-ce -y
 - sudo service postgresql stop
-
 script:
 - docker pull aptrust/pharos:latest
 - docker build --rm=false -t aptrust/pharos:latest  .
@@ -24,10 +20,9 @@ script:
   -e PHAROS_DB_USER=postgres --network pharos-test-net aptrust/pharos:latest /bin/bash
   -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup; bin/rails
   spec"
-
 deploy:
-  - provider: script 
-    script: make -w publish-ci
-    on:
-      branch: docker
-    skip_cleanup: true
+- provider: script
+  script: make -w publish-ci
+  on:
+    branch: docker
+  skip_cleanup: true
