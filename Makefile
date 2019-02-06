@@ -100,10 +100,11 @@ publish:
 
 publish-ci:
 	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
-	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/aptrust/$(NAME) 
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION) 
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):latest 
 	docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION)
 	docker tag aptrust/$(NAME) aptrust/$(NAME):latest
-	docker push $(REGISTRY)/$(REPOSITORY)/aptrust/$(NAME)
+	docker push $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
 #	docker push aptrust/$(NAME)
 
 # Docker release - build, tag and push the container
