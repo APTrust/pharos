@@ -93,6 +93,7 @@ class UsersController < ApplicationController
     if @user.otp_required_for_login
       if (current_user.admin? || current_user.institutional_admin?) && current_user != @user
         @user.enabled_two_factor = false
+        @user.otp_required_for_login = false #TODO: Figure out the internal logic here. If it's turned on for whole inst, should it be allowable to turn off for single user?
         @user.save!
         redirect_to @user
         flash[:notice] = 'Two Factor Authentication has been disabled for this user.'

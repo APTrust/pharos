@@ -555,6 +555,61 @@ RSpec.describe InstitutionsController, type: :controller do
     end
   end
 
+  describe 'GET enable_otp' do
+    describe 'for an institutional admin' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'enables two factor authentication for all users at an institution' do
+        get :enable_otp, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(assigns[:institution].users.first.enabled_two_factor).to eq true
+        expect(assigns[:institution].users.first.otp_required_for_login).to eq true
+        expect(assigns[:institution].users.last.enabled_two_factor).to eq true
+        expect(assigns[:institution].users.last.otp_required_for_login).to eq true
+        expect(assigns[:institution].otp_enabled).to eq true
+      end
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :enable_otp, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
+  describe 'GET disable_otp' do
+    describe 'for an institutional admin' do
+      before do
+        sign_in institutional_admin
+      end
+
+      it 'allows two factor authentication to be turned off for all users at an institution' do
+        get :enable_otp, params: { institution_identifier: institutional_admin.institution.to_param }
+        get :disable_otp, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(assigns[:institution].otp_enabled).to eq false
+      end
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+      end
+
+      it 'responds unauthorized' do
+        get :disable_otp, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
   describe 'POST trigger_bulk_delete' do
     describe 'for admin user' do
       before do
