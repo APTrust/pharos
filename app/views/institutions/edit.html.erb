@@ -2,7 +2,31 @@
 
 <h1>Editing institution</h1>
 
-<%= render 'form' %>
+<%= simple_form_for([@institution.becomes(Institution)], html: {class: 'form-horizontal'}) do |f| %>
+
+    <%= f.error_notification %>
+
+    <div class="form-inputs">
+      <%= f.input :name %>
+      <%= f.input :brief_name %>
+      <%= f.input :identifier, readonly: true %>
+      <%= f.input :dpn_uuid %>
+      <%= f.input :type, collection: types_for_select, as: :select, label: 'Institution Type' %>
+      <%= f.input :member_institution_id, collection: member_institutions_for_select, as: :select, label: 'Member Institution' %>
+      <p>Leave this field blank if creating a new member institution.</p>
+    </div>
+    <br>
+    <div class="form-actions">
+
+      <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm') do %>
+          <i class="glyphicon glyphicon-check"></i> Submit
+      <% end %>
+      <%= link_to institutions_path(@institution), {class: 'btn doc-action-btn btn-warning btn-sm'} do %>
+          <i class="glyphicon glyphicon-remove"></i> Cancel
+      <% end %>
+
+    </div>
+<% end %>
 
 <%= link_to 'Show', institution_path(@institution) %> |
 <%= link_to 'Back', institutions_path %>
