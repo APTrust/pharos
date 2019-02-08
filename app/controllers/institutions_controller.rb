@@ -90,7 +90,6 @@ class InstitutionsController < ApplicationController
     @institution.users.each do |usr|
       usr.otp_secret = User.generate_otp_secret
       usr.enabled_two_factor = true
-      usr.otp_required_for_login = true
       unless Rails.env.test? || !usr.authy_id.nil?
         authy = Authy::API.register_user(
             email: usr.email,
@@ -109,16 +108,10 @@ class InstitutionsController < ApplicationController
 
   def disable_otp
     authorize @institution
-    @institution.users.each do |usr|
-      if usr.institutional_user?
-        usr.otp_required_for_login = false
-        usr.save!
-      end
-    end
     @institution.otp_enabled = false
     @institution.save!
     render 'show'
-    flash[:notice] = 'Two Factor Authentication is no longer required for users at your institution.'
+    flash[:notice] = 'Two Factor Authentication is no longer required for institutional users at your institution.'
   end
 
   def single_snapshot

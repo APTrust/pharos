@@ -26,8 +26,6 @@ class User < ActiveRecord::Base
   validates_plausible_phone :phone_number
   #validate :phone_number_length
 
-  before_save :update_otp
-
   # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
   scope :readable, ->(current_user) { where('(1=1)') }
 
@@ -186,10 +184,6 @@ class User < ActiveRecord::Base
 
   def phone_number_length
     errors.add(:phone_number, 'is not the proper length') if phone_number.length < 10
-  end
-
-  def update_otp
-    self.otp_required_for_login = true if self.admin? || self.institutional_admin?
   end
 
 end

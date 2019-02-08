@@ -13,10 +13,8 @@
 <% if @user.enabled_two_factor %>
     <% if @user.confirmed_two_factor %>
         <h4>Two Factor Authentication Enabled</h4>
-        <% unless @user.otp_required_for_login %>
-            <%= button_to "Disable Two Factor Authentication", users_disable_otp_path(@user.id),
-                          :method => :get, class: 'btn btn-normal doc-action-btn' %>
-        <% end %>
+        <%= button_to "Disable Two Factor Authentication", users_disable_otp_path(@user.id),
+                      :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% else %>
         <h4>Verify Phone Number for Two Factor Authentication</h4>
         <p>For the verification process, Pharos will send you an Authy push notification if you have the Authy app installed,

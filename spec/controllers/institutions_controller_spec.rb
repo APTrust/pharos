@@ -564,9 +564,7 @@ RSpec.describe InstitutionsController, type: :controller do
       it 'enables two factor authentication for all users at an institution' do
         get :enable_otp, params: { institution_identifier: institutional_admin.institution.to_param }
         expect(assigns[:institution].users.first.enabled_two_factor).to eq true
-        expect(assigns[:institution].users.first.otp_required_for_login).to eq true
         expect(assigns[:institution].users.last.enabled_two_factor).to eq true
-        expect(assigns[:institution].users.last.otp_required_for_login).to eq true
         expect(assigns[:institution].otp_enabled).to eq true
       end
     end

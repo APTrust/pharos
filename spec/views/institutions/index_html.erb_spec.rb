@@ -20,7 +20,7 @@ describe 'institutions/index.html.erb' do
 
   describe 'A user with access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, create?: true, destroy?: false, deactivate?: true)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, create?: true, destroy?: false, deactivate?: true, enable_otp?: true, disable_otp?: true)
       render
     end
 
@@ -35,7 +35,7 @@ describe 'institutions/index.html.erb' do
 
   describe 'A user without access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: false, edit?: false, create?: false, destroy?: false, deactivate?: false)
+      allow(view).to receive(:policy).and_return double(show?: false, edit?: false, create?: false, destroy?: false, deactivate?: false, enable_otp?: false, disable_otp?: false)
       render
     end
 

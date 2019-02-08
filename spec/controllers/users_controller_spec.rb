@@ -571,8 +571,9 @@ RSpec.describe UsersController, type: :controller do
 
       it 'for myself should fail if I am required to use 2FA' do
         user.enabled_two_factor = true
-        user.otp_required_for_login = true
+        user.institution.otp_enabled = true
         user.save!
+        user.institution.save!
         get :disable_otp, params: { id: user.id }, format: :json
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq true
