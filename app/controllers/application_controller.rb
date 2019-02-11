@@ -88,70 +88,48 @@ class ApplicationController < ActionController::Base
   end
 
   def force_two_factor
-    # unless current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id)
-    #   if current_user.required_to_use_twofa?
-    #     if !current_user.enabled_two_factor
-    #       if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id
-    #         return
-    #       else
-    #         redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
-    #       end
-    #     elsif !current_user.confirmed_two_factor
-    #       if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id
-    #         return
-    #       else
-    #         redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
-    #       end
-    #     end
-    #   end
-    # end
-
-    puts "Controller check: #{params[:controller]}, status: #{params[:controller] == 'users'}"
-    puts "Action check: #{params[:action]}, status: #{params[:action] == 'show'}"
-    puts "ID check: #{params[:id]}, User ID: #{current_user.id}, status: #{params[:id] == current_user.id.to_s}"
-
-    if current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s)
-      puts "Testing force two factor, location 1 *****************************************************************"
-      puts "Return out of method"
+    if Rails.env.test? || current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s)
+      # puts "Testing force two factor, location 1 *****************************************************************"
+      # puts "Return out of method"
       return
     else
-      puts "Testing force two factor, location 2 *****************************************************************"
-      puts "Continue into if statement for required to use 2FA"
+      # puts "Testing force two factor, location 2 *****************************************************************"
+      # puts "Continue into if statement for required to use 2FA"
       if current_user.required_to_use_twofa?
-        puts "Testing force two factor, location 3 *****************************************************************"
-        puts "Continue into if statement for enabled vs confirmed vs nothing"
+        # puts "Testing force two factor, location 3 *****************************************************************"
+        # puts "Continue into if statement for enabled vs confirmed vs nothing"
         if !current_user.enabled_two_factor
-          puts "Testing force two factor, location 5 *****************************************************************"
-          puts "Continue into if statement for controller check - enable_otp"
+          # puts "Testing force two factor, location 5 *****************************************************************"
+          # puts "Continue into if statement for controller check - enable_otp"
           if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
-            puts "Testing force two factor, location 8 *****************************************************************"
-            puts "Inside enable_otp action, return out of method"
+            # puts "Testing force two factor, location 8 *****************************************************************"
+            # puts "Inside enable_otp action, return out of method"
             return
           else
-            puts "Testing force two factor, location 9 *****************************************************************"
-            puts "Elsewhere. Redirect."
+            # puts "Testing force two factor, location 9 *****************************************************************"
+            # puts "Elsewhere. Redirect."
             redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
           end
         elsif !current_user.confirmed_two_factor
-          puts "Testing force two factor, location 6 *****************************************************************"
-          puts "Continue into if statement for controller check - verify_twofa"
+          # puts "Testing force two factor, location 6 *****************************************************************"
+          # puts "Continue into if statement for controller check - verify_twofa"
           if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
-            puts "Testing force two factor, location 10 *****************************************************************"
-            puts "Inside verify_two action, return out of method"
+            # puts "Testing force two factor, location 10 *****************************************************************"
+            # puts "Inside verify_two action, return out of method"
             return
           else
-            puts "Testing force two factor, location 11 *****************************************************************"
-            puts "Elsewhere. Redirect. "
+            # puts "Testing force two factor, location 11 *****************************************************************"
+            # puts "Elsewhere. Redirect. "
             redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
           end
         else
-          puts "Testing force two factor, location 7 *****************************************************************"
-          puts "Two factor is both enabled and confirmed, doesn't matter where we are, return out of method"
+          # puts "Testing force two factor, location 7 *****************************************************************"
+          # puts "Two factor is both enabled and confirmed, doesn't matter where we are, return out of method"
           return
         end
       else
-        puts "Testing force two factor, location 4 *****************************************************************"
-        puts "User isn't required to use 2FA, don't care what they do. Return out of method. "
+        # puts "Testing force two factor, location 4 *****************************************************************"
+        # puts "User isn't required to use 2FA, don't care what they do. Return out of method. "
         return
       end
     end
