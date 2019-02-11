@@ -125,7 +125,7 @@ class InstitutionsController < ApplicationController
       end
     end
     NotificationMailer.snapshot_notification(@wb_hash).deliver!
-    #write_snapshots_to_spreadsheet if Rails.env.production?
+    write_snapshots_to_spreadsheet if Rails.env.production?
     respond_to do |format|
       format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
       format.html {
