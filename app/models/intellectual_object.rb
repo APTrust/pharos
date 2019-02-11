@@ -96,8 +96,13 @@ class IntellectualObject < ActiveRecord::Base
     save!
   end
 
+  def active_file_count
+    #force Generic Files to use object id / state index
+    GenericFile.where(intellectual_object_id: self.id).where(state: 'A').count
+  end
+
   def mark_deleted(attributes)
-    if self.generic_files.where(state: 'A').count > 0
+    if self.active_file_count > 0
       raise 'Object cannot be marked deleted until all of its files have been marked deleted.'
     end
     if self.state == 'D'

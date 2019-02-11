@@ -39,7 +39,7 @@ class NotificationMailer < ApplicationMailer
     users.each { |user| emails.push(user.email) }
     emails.push('help@aptrust.org')
     email_log.user_list = emails.join('; ')
-    email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that a spot test of the restoration system has been performed on one of your bags. Please help APTrust out by downloading the restored bag and letting us know if any problems occur. Click #{@item_url} to view the Work Item record of the restored bag. Click #{@download_url} to download the restored bag from S3. Please contact the APTrust team by replying to this email if you have any questions, or if you have any problems."
+    email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that a spot test of the restoration system has been performed on one of your bags. Please help APTrust out by downloading the restored bag and letting us know if any problems occur. Click #{@item_url} to view the Work Item record of the restored bag. The restored bag is available from S3 at #{@download_url}. You'll need your APTrust S3 credentials and an S3 client to download it. Please contact the APTrust team by replying to this email if you have any questions, or if you have any problems."
     email_log.save!
     mail(to: emails, subject: 'Restoration System Spot Test')
   end
