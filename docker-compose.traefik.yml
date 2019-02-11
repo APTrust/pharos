@@ -30,10 +30,11 @@ services:
 #    env_file:
 #      - ".env"
     labels:
-     - traefik.backend=pharos
-     - traefik.frontend.rule=Host:pharos2.docker1.aptrust.org
-     - traefik.port=9292
-     - traefik.docker.network=proxy
+     - "traefik.backend=pharos"
+     - "traefik.frontend.rule=Host:pharos2.docker1.aptrust.org"
+     - "traefik.port=9292"
+     - "traefik.docker.network=proxy"
+     - "traefik.basic.protocol=http"
     networks:
       - internal
       - proxy
@@ -57,7 +58,7 @@ services:
     networks:
       - internal
     labels:
-      - traefik.enable=false
+      - "traefik.enable=false"
   reverse-proxy:
     image: traefik # The official Traefik docker image
     command: --api --docker --logLevel="DEBUG" # Enables the web UI and tells Træfik to listen to docker
@@ -68,6 +69,7 @@ services:
     volumes:
       - ./docker/traefik/traefik.toml:/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+      - ./docker/traefik/acme.json:/acme.json
     networks:
       - proxy
 # https://stackoverflow.com/questions/51884667/how-to-serve-static-content-with-nginx-and-django-gunicorn-when-using-traefik/51887971
