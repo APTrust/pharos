@@ -34,7 +34,7 @@ revision: ## Show me the git hash
 	echo "$(REVISION)"
 
 build: ## Build the Pharos container
-	docker build -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+	docker build -e PHAROS_REVISION=$(REVISION) -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 build-nc: ## Build the Pharos container, no cached layers.
 	docker build --no-cache -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
@@ -100,8 +100,8 @@ publish:
 
 publish-ci:
 	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
-	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION) 
-	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):latest 
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):latest
 	docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION)
 	docker tag aptrust/$(NAME) aptrust/$(NAME):latest
 	docker push $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
