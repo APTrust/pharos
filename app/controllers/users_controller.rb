@@ -95,6 +95,9 @@ class UsersController < ApplicationController
         redirect_to @user
         (current_user == @user) ? usr = 'you' : usr = 'this user'
         flash[:notice] = "Two Factor Authentication cannot be disabled at this time because it is required for #{usr}."
+      elsif @user.institution.otp_enabled
+        redirect_to @user
+        flash[:notice] = 'Two Factor Authentication cannot be disabled at this time because it is required for this institution.'
       else
         @user.enabled_two_factor = false
         @user.save!
@@ -326,6 +329,7 @@ class UsersController < ApplicationController
       if status['approval_request']['status'] == 'approved'
         session.delete(:uuid) || session.delete('uuid')
         @user.confirmed_two_factor = true
+        session[:verified] = true
         @user.save!
         redirect_to @user, flash: { notice: 'Your phone number has been verified.' }
       elsif status['approval_request']['status'] == 'denied'

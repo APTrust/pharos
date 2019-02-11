@@ -9,15 +9,12 @@ class ApplicationController < ActionController::Base
   end
 
   before_action do
-    if params[:use_backup_code] && params[:use_backup_code] == '1'
-      session[:backup_code] = true
-    end
+    session[:backup_code] = true if params[:use_backup_code] && params[:use_backup_code] == '1'
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
-
   before_action :verify_user!, unless: :devise_controller?
-  #before_action :authenticate_authy_request, :only => [:callback]
+  before_action :force_two_factor, unless: :devise_controller?
 
   def verify_user!
     start_verification if requires_verification?
@@ -89,35 +86,76 @@ class ApplicationController < ActionController::Base
       end
     end
   end
-  helper_method :one_touch_status
 
-  # def callback
-  #   authy_id = params[:authy_id]
-  #   puts "HERE 1: Authy ID: #{params[:authy_id]} ***************************************************************"
-  #   if authy_id != 1234
-  #     begin
-  #       @user = User.find_by! authy_id: authy_id
-  #       puts "HERE 2: User email: #{@user.email} ***************************************************************"
-  #       @user.update(authy_status: params[:status])
-  #       token = Authy::API.verify(id: @user.authy_id, token: params[:token])
-  #       if token.ok?
-  #         puts "HERE 3: Token: #{params[:token]} ***************************************************************"
-  #         session[:user_id] = @user.id
-  #         session[:verified] = true
-  #         session[:pre_2fa_auth_user_id] = nil
-  #         redirect_to account_path
-  #       else
-  #         puts "HERE 4: Token: #{params[:token]} ***************************************************************"
-  #         session[:verified] = false
-  #         flash.now[:danger] = 'Incorrect code, please try again'
-  #         redirect_to new_session_path
-  #       end
-  #     rescue => e
-  #       puts e.message
-  #     end
-  #   end
-  #   #render plain: 'ok'
-  # end
+  def force_two_factor
+    # unless current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id)
+    #   if current_user.required_to_use_twofa?
+    #     if !current_user.enabled_two_factor
+    #       if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id
+    #         return
+    #       else
+    #         redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
+    #       end
+    #     elsif !current_user.confirmed_two_factor
+    #       if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id
+    #         return
+    #       else
+    #         redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
+    #       end
+    #     end
+    #   end
+    # end
+
+    puts "Controller check: #{params[:controller]}, status: #{params[:controller] == 'users'}"
+    puts "Action check: #{params[:action]}, status: #{params[:action] == 'show'}"
+    puts "ID check: #{params[:id]}, User ID: #{current_user.id}, status: #{params[:id] == current_user.id.to_s}"
+
+    if current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s)
+      puts "Testing force two factor, location 1 *****************************************************************"
+      puts "Return out of method"
+      return
+    else
+      puts "Testing force two factor, location 2 *****************************************************************"
+      puts "Continue into if statement for required to use 2FA"
+      if current_user.required_to_use_twofa?
+        puts "Testing force two factor, location 3 *****************************************************************"
+        puts "Continue into if statement for enabled vs confirmed vs nothing"
+        if !current_user.enabled_two_factor
+          puts "Testing force two factor, location 5 *****************************************************************"
+          puts "Continue into if statement for controller check - enable_otp"
+          if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
+            puts "Testing force two factor, location 8 *****************************************************************"
+            puts "Inside enable_otp action, return out of method"
+            return
+          else
+            puts "Testing force two factor, location 9 *****************************************************************"
+            puts "Elsewhere. Redirect."
+            redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
+          end
+        elsif !current_user.confirmed_two_factor
+          puts "Testing force two factor, location 6 *****************************************************************"
+          puts "Continue into if statement for controller check - verify_twofa"
+          if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
+            puts "Testing force two factor, location 10 *****************************************************************"
+            puts "Inside verify_two action, return out of method"
+            return
+          else
+            puts "Testing force two factor, location 11 *****************************************************************"
+            puts "Elsewhere. Redirect. "
+            redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
+          end
+        else
+          puts "Testing force two factor, location 7 *****************************************************************"
+          puts "Two factor is both enabled and confirmed, doesn't matter where we are, return out of method"
+          return
+        end
+      else
+        puts "Testing force two factor, location 4 *****************************************************************"
+        puts "User isn't required to use 2FA, don't care what they do. Return out of method. "
+        return
+      end
+    end
+  end
 
   # Adds a few additional behaviors into the application controller
   include ApiAuth
@@ -277,27 +315,5 @@ class ApplicationController < ActionController::Base
     str = str << "&identifier_like=#{params[:identifier_like]}" if params[:identifier_like].present?
     str
   end
-
-  private
-
-  # def authenticate_authy_request
-  #   url = request.url
-  #   raw_params = JSON.parse(request.raw_post)
-  #   nonce = request.headers["X-Authy-Signature-Nonce"]
-  #   sorted_params = (Hash[raw_params.sort]).to_query
-  #
-  #   # data format of Authy digest
-  #   data = nonce + "|" + request.method + "|" + url + "|" + sorted_params
-  #
-  #   digest = OpenSSL::HMAC.digest('sha256', Authy.api_key, data)
-  #   digest_in_base64 = Base64.encode64(digest)
-  #
-  #   theirs = (request.headers['X-Authy-Signature']).strip
-  #   mine = digest_in_base64.strip
-  #
-  #   unless theirs == mine
-  #     render plain: 'invalid request signature'
-  #   end
-  # end
 
 end

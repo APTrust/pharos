@@ -84,6 +84,10 @@ class User < ActiveRecord::Base
     self.enabled_two_factor == true && self.confirmed_two_factor == true
   end
 
+  def required_to_use_twofa?
+    self.institution.otp_enabled || self.admin? || self.institutional_admin?
+  end
+
   def otp_qr_code
     issuer = 'APTrust'
     label = "#{issuer}:#{self.email}"
