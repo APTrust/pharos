@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_04_203804) do
+ActiveRecord::Schema.define(version: 2018_11_27_171941) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -175,6 +175,7 @@ ActiveRecord::Schema.define(version: 2018_10_04_203804) do
     t.index ["institution_id", "updated_at"], name: "index_generic_files_on_institution_id_and_updated_at"
     t.index ["institution_id"], name: "index_generic_files_on_institution_id"
     t.index ["intellectual_object_id", "file_format"], name: "index_generic_files_on_intellectual_object_id_and_file_format"
+    t.index ["intellectual_object_id", "state"], name: "index_generic_files_on_intellectual_object_id_and_state"
     t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
     t.index ["size", "state"], name: "index_generic_files_on_size_and_state"
     t.index ["size"], name: "index_generic_files_on_size"
