@@ -73,8 +73,8 @@ services:
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
       - ./docker/traefik/traefik.toml:/traefik.toml
+      - /srv/docker/pharos/data/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
-      - ./docker/traefik/acme.json:/acme.json
     networks:
       - proxy
 # https://stackoverflow.com/questions/51884667/how-to-serve-static-content-with-nginx-and-django-gunicorn-when-using-traefik/51887971
