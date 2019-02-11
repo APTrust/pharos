@@ -145,7 +145,7 @@ class GenericFilesController < ApplicationController
 
   def confirm_destroy
     authorize @generic_file, :soft_delete?
-    if @generic_file.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS('delete')).with_file_identifier(@generic_file.identifier).count == 1)
+    if @generic_file.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS['delete']).with_file_identifier(@generic_file.identifier).count == 1)
       respond_to do |format|
         message = 'This deletion request has already been confirmed and queued for deletion by someone else.'
         format.json {

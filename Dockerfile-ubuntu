@@ -1,4 +1,4 @@
-FROM ruby:slim
+FROM ruby:2.6-alpine3.7
 
 MAINTAINER Christian Dahlhausen <christian@aptrust.org>
 

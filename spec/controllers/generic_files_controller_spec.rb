@@ -490,6 +490,20 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(wi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
         end
 
+        it 'should not delete the file if the file already has a deletion work item' do
+          file = FactoryBot.create(:generic_file, intellectual_object_id: @intellectual_object.id)
+          token = FactoryBot.create(:confirmation_token, institution_id: 15)
+          count_before = Email.all.count
+          item = FactoryBot.create(:work_item, generic_file_identifier: file.identifier, generic_file: file, action: 'Delete', status: 'Success', stage: 'Resolve')
+          delete :confirm_destroy, params: { generic_file_identifier: file.identifier, confirmation_token: token.token, requesting_user_id: user.id }
+          expect(response).to redirect_to generic_file_path(file)
+          expect(flash[:notice]).to include 'This deletion request has already been confirmed and queued for deletion by someone else.'
+          reloaded_object = GenericFile.find(file.id)
+          expect(reloaded_object.state).to eq 'A'
+          expect(reloaded_object.premis_events.count).to eq 0
+          count_after = Email.all.count
+          expect(count_after).to eq count_before
+        end
       end
     end
   end

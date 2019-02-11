@@ -8,16 +8,14 @@ Rails.application.configure do
 
   # Don't reload classes between integration tests. We're going to run
   # a whole suite of tests, so just load everything once.
-  config.cache_classes = false
+  config.cache_classes = true
 
   # Don't care if the mailer can't send.
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
-  # Do not eager load code on boot. This avoids loading your whole application
-  # just for the purpose of running a single test. If you are using a tool that
-  # preloads Rails for running tests, you may have to set it to true.
-  config.eager_load = false
+  # Eager load code on boot.
+  config.eager_load = true
 
   # Configure static file server for tests with Cache-Control for performance.
   config.public_file_server.enabled = true
@@ -46,7 +44,8 @@ Rails.application.configure do
   config.show_send_to_dpn_button = true
 
   # Log debug messages, because we're testing.
-  config.log_level = :warn
+  config.colorize_logging = false
+  config.log_level = :debug
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true

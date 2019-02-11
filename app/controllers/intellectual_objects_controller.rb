@@ -115,7 +115,7 @@ class IntellectualObjectsController < ApplicationController
 
   def confirm_destroy
     authorize @intellectual_object, :soft_delete?
-    if @intellectual_object.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS('delete')).with_object_identifier(@intellectual_object.identifier).count != 0)
+    if @intellectual_object.confirmation_token.nil? && (WorkItem.with_action(Pharos::Application::PHAROS_ACTIONS['delete']).with_object_identifier(@intellectual_object.identifier).count != 0)
       respond_to do |format|
         message = 'This deletion request has already been confirmed and queued for deletion by someone else.'
         format.json {

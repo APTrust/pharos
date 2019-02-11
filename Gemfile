@@ -1,13 +1,10 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.1'
+gem 'rails', '5.2.2'
 gem 'rails-controller-testing'
-# Use SCSS for stylesheets
-gem 'sassc'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.19'
+gem 'uglifier', '>= 4.1.20'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2.2'
 
@@ -22,7 +19,7 @@ gem 'jbuilder', '~> 2.8.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 1.0.0', group: :doc
 
-gem 'pg', '1.1.3' # Necessary for talking to our RDS instance
+gem 'pg', '1.1.4' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
@@ -38,13 +35,14 @@ gem 'wkhtmltopdf-binary'
 gem 'google_drive'
 
 #gem 'omniauth-google-oauth2'
-gem 'simple_form', '~> 4.0.1'
+gem 'simple_form', '~> 4.1.0'
 gem 'phony_rails'
 gem 'inherited_resources', '1.9.0'
 gem 'uuidtools'
 
 gem 'kaminari'
-gem 'bootstrap-sass', '~> 3.3.7'
+gem 'sassc-rails'
+gem 'bootstrap-sass', '~> 3.4.0'
 
 # These gems aren't required directly but are required in various dependencies and
 # needed specific updating due to security warnings
@@ -56,13 +54,16 @@ gem 'rack', '~> 2.0.6'
 # S3 connector
 #gem 'aws-sdk-core'
 
-# Graylog logging gems
-gem 'gelf'
-gem 'awesome_print'
-gem 'rails_semantic_logger'
-
 gem 'activerecord-nulldb-adapter'
 gem 'puma'
+
+
+group :demo, :production do
+  # Graylog logging gems
+  gem 'rails_semantic_logger'
+  gem 'gelf'
+  gem 'awesome_print'
+end
 
 group :development do
   gem 'meta_request', '=0.6.0'
@@ -77,8 +78,8 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.11.0'
-  gem 'shoulda-matchers', '~> 3.1.2'
+  gem 'capybara', '3.13.2'
+  gem 'shoulda-matchers', '~> 3.1.3'
   gem 'coveralls', '0.8.22', require: false
 end
 
@@ -87,7 +88,7 @@ group :development, :test, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.8.1'
+  gem 'rspec-rails', '~> 3.8.2'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end

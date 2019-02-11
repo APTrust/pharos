@@ -13,26 +13,25 @@ services:
     ports:
       - '5432:5432'
   pharos:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: aptrust/pharos
+    image: registry.gitlab.com/aptrust/container-registry/pharos
     environment:
-      - DOCKERIZED='true'
+      - DOCKERIZED=true
     #TODO: Change to development after updating databse settings for development
       - RAILS_ENV=${RAILS_ENV:-demo}
       - ENVIRONMENT=demo
       - PHAROS_DB_HOST=db
       - PHAROS_DB_USER='pharos'
-#      PHAROS_DB_PASSWORD: 'password'
+#      PHAROS_DB_PWD: 'password'
       - SECRET_KEY_BASE= '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
-      - VIRTUAL_HOST=pharos.docker.localhost
+      - VIRTUAL_HOST=pharos.localhost
       - VIRTUAL_PORT=9292
 # TODO: -e demo needs fixing. doesn't read env vars in command line here. maybe dockfile cmd needs env var as entrypoint?
+    command: bundle exec puma -p9292 -e $RAILS_ENV
+    #@expose:
+    #  - 9292
     labels:
-      - VIRTUAL_HOST=pharos.docker.localhost
+      - VIRTUAL_HOST=pharos.localhost
       - VIRTUAL_PORT=9292
-    command: bundle exec puma -p9292
     volumes:
       - .:/pharos
     depends_on:
@@ -40,7 +39,7 @@ services:
       - migration
       - nginx-proxy
     ports:
-     - "9292:9292"
+      - "9292:9292"
   migration:
     image: aptrust/pharos
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
@@ -50,7 +49,7 @@ services:
       RAILS_ENV: 'demo'
       PHAROS_DB_HOST: 'db'
       PHAROS_DB_USER: 'pharos'
-    #    PHAROS_DB_PASSWORD: 'password'
+    #    PHAROS_DB_PWD: 'password'
       SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
     volumes:
       - .:/pharos
@@ -67,4 +66,4 @@ services:
       - ./docker/nginx-proxy/vhost:/etc/nginx/vhost.d
       - ./docker/nginx-proxy/public:/etc/share/nginx/html
       - ./public:/etc/share/nginx/html/pharos
-      - ./docker/pharos.docker.localhost:/etc/nginx/vhost.d/pharos.docker.localhost
+      - ./docker/pharos.localhost:/etc/nginx/vhost.d/pharos.localhost
