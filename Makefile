@@ -95,6 +95,7 @@ devstop: ## Stop and remove running Docker containers
 publish:
 	docker login $(REGISTRY)
 	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos
+	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 
