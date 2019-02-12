@@ -17,6 +17,7 @@ REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
 NAME=$(shell basename $(CURDIR))
 REVISION=$(shell git log -1 --pretty=%h)
+BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 TAG = $(NAME):$(REVISION)
 
 # HELP
