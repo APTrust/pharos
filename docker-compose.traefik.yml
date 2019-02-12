@@ -11,7 +11,7 @@ services:
     networks:
       - internal
     labels:
-      - traefik.enable=false
+      - "traefik.enable=false"
   pharos:
     image: aptrust/pharos
     command: bundle exec puma -p9292 -e ${RAILS_ENV}
@@ -25,6 +25,7 @@ services:
       RAILS_ENV: ${RAILS_ENV:-demo}
       PHAROS_DB_HOST: ${PHAROS_DB_HOST:-db}
       PHAROS_DB_PORT: ${PHAROS_DB_PORT:-5432}
+      PHAROS_DB_NAME: ${PHAROS_DB_NAME:-pharos}
       PHAROS_DB_USER: ${PHAROS_DB_USER:-pharos}
       PHAROS_DB_PWD: ${PHAROS_DB_PWD:-pharos}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:-74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412}
@@ -35,7 +36,6 @@ services:
      - "traefik.frontend.rule=Host:pharos2.docker1.aptrust.org"
      - "traefik.port=9292"
      - "traefik.docker.network=proxy"
-     - "traefik.basic.protocol=http"
     networks:
       - internal
       - proxy
@@ -74,7 +74,7 @@ services:
     volumes:
       - ./docker/traefik/traefik.toml:/traefik.toml
       - /srv/docker/pharos/data/acme.json:/acme.json
-      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - proxy
 # https://stackoverflow.com/questions/51884667/how-to-serve-static-content-with-nginx-and-django-gunicorn-when-using-traefik/51887971
