@@ -2,7 +2,6 @@ default: &default
   adapter: postgresql
   pool: 5
   timeout: 5000
-  host: <%= ENV['PHAROS_DB_HOST'] || 'db' %>
   port: <%= ENV['PHAROS_DB_PORT'] || 5432 %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos' %>
   username: <%= ENV['PHAROS_DB_USER'] || 'pharos' %>
