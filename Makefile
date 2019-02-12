@@ -16,9 +16,9 @@
 REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
 NAME=$(shell basename $(CURDIR))
-VERSION = latest
-TAG = $(NAME):$(VERSION)
-REVISION=$(shell git rev-parse --short=2 HEAD)
+REVISION=$(shell git log -1 --pretty=%h)
+BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+TAG = $(NAME):$(REVISION)
 
 # HELP
 # This will output the help for each task
@@ -31,10 +31,10 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 revision: ## Show me the git hash
-	echo "$(REVISION)"
+	@echo $(REVISION)
 
 build: ## Build the Pharos container
-	docker build -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+	docker build -e PHAROS_REVISION=$(REVISION) -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 build-nc: ## Build the Pharos container, no cached layers.
 	docker build --no-cache -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
@@ -55,8 +55,17 @@ runex: ## Start Pharos container, run command and exit.
 
 %:
 	    @true
+test-ci: ## Run Pharos spec tests in CI
+	docker pull aptrust/pharos:latest
+	docker build --rm=false -t aptrust/pharos:latest  .
+	docker network create -d bridge pharos-test-net
+	docker run -d --network pharos-test-net -h pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
+	docker run -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" -e RAILS_ENV=test -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres --network pharos-test-net aptrust/pharos:latest /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup; bin/rails spec"
+	docker stop pharos-test-db && docker rm pharos-test-db
+	docker network rm pharos-test-net
 
-tests: ## Run Pharos spec tests
+
+test: ## Run Pharos spec tests
 	docker network create -d bridge pharos-test-net > /dev/null 2>&1 || true
 	docker start pharos-test-db > /dev/null 2>&1 || docker run -d --network pharos-test-net --hostname pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
 	docker run  -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-test-db --network pharos-test-net --rm --name pharos-migration $(TAG) /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup"
@@ -85,10 +94,18 @@ devstop: ## Stop and remove running Docker containers
 
 publish:
 	docker login $(REGISTRY)
-	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos && \
+	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 
+publish-ci:
+	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
+	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):latest
+	docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION)
+	docker tag aptrust/$(NAME) aptrust/$(NAME):latest
+	docker push $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
+#	docker push aptrust/$(NAME)
 
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab

@@ -11,7 +11,7 @@ services:
     networks:
       - internal
     labels:
-      - traefik.enable=false
+      - "traefik.enable=false"
   pharos:
     image: aptrust/pharos
     command: bundle exec puma -p9292 -e ${RAILS_ENV}
@@ -21,19 +21,21 @@ services:
       - db
       - migration
     environment:
-      DOCKERIZED: 'true'
-      RAILS_ENV: 'demo'
-      PHAROS_DB_HOST: db
-      PHAROS_DB_USER: 'pharos'
-      PHAROS_DB_PWD: 'pharos'
-      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
-#    env_file:
-#      - ".env"
+      DOCKERIZED: ${DOCKERIZED:-true}
+      RAILS_ENV: ${RAILS_ENV:-demo}
+      PHAROS_DB_HOST: ${PHAROS_DB_HOST:-db}
+      PHAROS_DB_PORT: ${PHAROS_DB_PORT:-5432}
+      PHAROS_DB_NAME: ${PHAROS_DB_NAME:-pharos}
+      PHAROS_DB_USER: ${PHAROS_DB_USER:-pharos}
+      PHAROS_DB_PWD: ${PHAROS_DB_PWD:-pharos}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412}
+    env_file:
+      - ".env"
     labels:
-     - traefik.backend=pharos
-     - traefik.frontend.rule=Host:pharos2.docker1.aptrust.org
-     - traefik.port=9292
-     - traefik.docker.network=proxy
+     - "traefik.backend=pharos"
+     - "traefik.frontend.rule=Host:pharos2.docker1.aptrust.org"
+     - "traefik.port=9292"
+     - "traefik.docker.network=proxy"
     networks:
       - internal
       - proxy
@@ -44,12 +46,16 @@ services:
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
     command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
     environment:
-      DOCKERIZED: 'true'
-      RAILS_ENV: 'demo'
-      PHAROS_DB_HOST: 'db'
-      PHAROS_DB_USER: 'pharos'
-    #    PHAROS_DB_PWD: 'password'
-      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
+      DOCKERIZED: ${DOCKERIZED:-true}
+      RAILS_ENV: ${RAILS_ENV:-demo}
+      PHAROS_DB_HOST: ${PHAROS_DB_HOST:-db}
+      PHAROS_DB_PORT: ${PHAROS_DB_PORT:-5432}
+      PHAROS_DB_NAME: ${PHAROS_DB_NAME:-pharos}
+      PHAROS_DB_USER: ${PHAROS_DB_USER:-pharos}
+      PHAROS_DB_PWD: ${PHAROS_DB_PWD:-pharos}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412}
+    env_file:
+      - ".env"
     volumes:
       - .:/pharos
     depends_on:
@@ -57,7 +63,7 @@ services:
     networks:
       - internal
     labels:
-      - traefik.enable=false
+      - "traefik.enable=false"
   reverse-proxy:
     image: traefik # The official Traefik docker image
     command: --api --docker --logLevel="DEBUG" # Enables the web UI and tells Træfik to listen to docker
@@ -67,7 +73,8 @@ services:
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
       - ./docker/traefik/traefik.toml:/traefik.toml
-      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+      - /srv/docker/pharos/data/acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - proxy
 # https://stackoverflow.com/questions/51884667/how-to-serve-static-content-with-nginx-and-django-gunicorn-when-using-traefik/51887971

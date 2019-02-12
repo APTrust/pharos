@@ -23,14 +23,13 @@ gem 'pg', '1.1.4' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.5.0'
+gem 'devise', '4.6.0'
 gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
 gem 'aws-sdk-sns'
 gem 'rqrcode'
 gem 'devise-authy'
-
 gem 'rake'
 gem 'email_validator'
 
