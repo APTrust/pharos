@@ -16,9 +16,8 @@
 REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
 NAME=$(shell basename $(CURDIR))
-VERSION = latest
-TAG = $(NAME):$(VERSION)
-REVISION=$(shell git rev-parse --short=2 HEAD)
+REVISION=$(shell git log -1 --pretty=%h)
+TAG = $(NAME):$(REVISION)
 
 # HELP
 # This will output the help for each task
@@ -31,7 +30,7 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 revision: ## Show me the git hash
-	echo "$(REVISION)"
+	@echo $(REVISION)
 
 build: ## Build the Pharos container
 	docker build -e PHAROS_REVISION=$(REVISION) -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
