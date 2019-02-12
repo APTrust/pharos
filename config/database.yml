@@ -2,11 +2,8 @@ default: &default
   adapter: postgresql
   pool: 5
   timeout: 5000
-  host: <%= ENV['PHAROS_DB_HOST'] || 'db' %>
+  host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   port: <%= ENV['PHAROS_DB_PORT'] || 5432 %>
-  database: <%= ENV['PHAROS_DB_NAME'] || 'pharos' %>
-  username: <%= ENV['PHAROS_DB_USER'] || 'pharos' %>
-  password: <%= ENV['PHAROS_DB_PWD'] || 'password' %>
 
 development:
   <<: *default
@@ -20,16 +17,16 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
+  host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'travis_ci_test' %>
   username: <%= ENV['PHAROS_DB_USER'] || 'postgres' %>
-  host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
 
 # Database for integration tests. This will be emptied between
 # tests.
 integration:
   <<: *default
-  database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
+  database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
 
 # Demo environment for APTrust Demo system
 demo:
