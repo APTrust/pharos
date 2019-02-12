@@ -4,12 +4,14 @@ default: &default
   timeout: 5000
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   port: <%= ENV['PHAROS_DB_PORT'] || 5432 %>
+  username: <%= ENV['PHAROS_DB_USER'] || 'postgres' %>
+  password: <%= ENV['PHAROS_DB_PWD'] || '' %>
+
 
 development:
   <<: *default
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_development' %>
-  username: <%= ENV['PHAROS_DB_USER'] || 'postgres' %>
 
 
 # Warning: The database defined as "test" will be erased and
@@ -19,7 +21,6 @@ test:
   <<: *default
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'travis_ci_test' %>
-  username: <%= ENV['PHAROS_DB_USER'] || 'postgres' %>
 
 # Database for integration tests. This will be emptied between
 # tests.
