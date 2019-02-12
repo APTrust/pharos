@@ -36,6 +36,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -59,6 +60,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully' do
@@ -72,6 +74,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -95,6 +98,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -117,6 +121,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { institution_identifier: institutional_user.institution.to_param }
@@ -138,6 +143,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for an API user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { institution_identifier: CGI.escape(admin_user.institution.to_param) }
@@ -177,7 +183,10 @@ RSpec.describe InstitutionsController, type: :controller do
         let(:inst1) { FactoryBot.create(:member_institution) }
         let(:inst2) { FactoryBot.create(:subscription_institution) }
         let(:user) { FactoryBot.create(:user, :institutional_user, institution_id: inst1.id) }
-        before { sign_in user }
+        before do
+          sign_in user
+          session[:verified] = true
+        end
 
         it 'should be unauthorized for member institutions' do
           get :edit, params: { institution_identifier: inst1 }
@@ -199,17 +208,22 @@ RSpec.describe InstitutionsController, type: :controller do
         let(:inst4) { FactoryBot.create(:subscription_institution) }
         let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: inst1.id) }
         let(:user2) { FactoryBot.create(:user, :institutional_admin, institution_id: inst3.id) }
-        #before { sign_in user }
+        #before do
+        #   sign_in user
+        #   session[:verified] = true
+        # }
 
         describe 'editing my own institution' do
           it 'should show the institution edit form for member institutions' do
             sign_in user
+            session[:verified] = true
             get :edit, params: { institution_identifier: inst1 }
             expect(response).to be_successful
           end
 
           it 'should show the institution edit form for subscription institutions' do
             sign_in user2
+            session[:verified] = true
             get :edit, params: { institution_identifier: inst3 }
             expect(response).to be_successful
           end
@@ -218,6 +232,7 @@ RSpec.describe InstitutionsController, type: :controller do
         describe 'editing an institution other than my own' do
           it 'should be unauthorized for member institutions' do
             sign_in user
+            session[:verified] = true
             get :edit, params: { institution_identifier: inst2 }
             expect(response).to redirect_to root_url
             expect(flash[:alert]).to eq 'You are not authorized to access this page.'
@@ -225,6 +240,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
           it 'should be unauthorized for subscription institutions' do
             sign_in user2
+            session[:verified] = true
             get :edit, params: { institution_identifier: inst4 }
             expect(response).to redirect_to root_url
             expect(flash[:alert]).to eq 'You are not authorized to access this page.'
@@ -236,7 +252,10 @@ RSpec.describe InstitutionsController, type: :controller do
         let(:inst1) { FactoryBot.create(:member_institution) }
         let(:inst2) { FactoryBot.create(:subscription_institution) }
         let(:user) { FactoryBot.create(:user, :admin, institution_id: inst1.id) }
-        before { sign_in user }
+        before do
+          sign_in user
+          session[:verified] = true
+        end
 
         it 'should show the institution edit form for member institutions' do
           get :edit, params: { institution_identifier: inst1 }
@@ -271,9 +290,10 @@ RSpec.describe InstitutionsController, type: :controller do
       let(:user) { FactoryBot.create(:user, :admin) }
       let(:inst1) { FactoryBot.create(:member_institution) }
       let(:inst2) { FactoryBot.create(:subscription_institution) }
-      before {
+      before do
         sign_in user
-      }
+        session[:verified] = true
+      end
 
       it 'should update fields for member institutions' do
         patch :update, params: { institution_identifier: inst1, institution: {name: 'Foo'} }
@@ -303,6 +323,7 @@ RSpec.describe InstitutionsController, type: :controller do
       let (:attributes2) { FactoryBot.attributes_for(:subscription_institution, member_institution_id: current_member.id) }
       before do
         sign_in admin_user
+        session[:verified] = true
         current_member.save! #needs to be instantiated before the test below
       end
 
@@ -335,6 +356,7 @@ RSpec.describe InstitutionsController, type: :controller do
       let (:attributes2) { FactoryBot.attributes_for(:subscription_institution, member_institution_id: current_member.id) }
       before do
         sign_in institutional_admin
+        session[:verified] = true
         current_member.save! #needs to be instantiated before the test below
       end
 
@@ -360,6 +382,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and creates a snapshot' do
@@ -376,6 +399,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -389,6 +413,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -403,6 +428,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and creates a snapshot' do
@@ -431,6 +457,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -444,6 +471,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -458,6 +486,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and deactivates the institution and associated users' do
@@ -479,6 +508,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -492,6 +522,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -506,6 +537,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and reactivates the institution and associated users' do
@@ -532,6 +564,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -545,6 +578,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -559,6 +593,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for an institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'enables two factor authentication for all users at an institution' do
@@ -572,6 +607,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -586,6 +622,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for an institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'allows two factor authentication to be turned off for all users at an institution' do
@@ -598,6 +635,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -612,6 +650,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and sends an email to an institutional admin asking for confirmation of a bulk delete' do
@@ -647,6 +686,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -660,6 +700,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -674,6 +715,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -687,6 +729,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully and sends an email to aptrust admins requesting additional confirmation' do
@@ -745,6 +788,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -759,6 +803,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and queues items for deletion' do
@@ -873,6 +918,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -886,6 +932,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -901,6 +948,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and marks the items as deleted' do
@@ -953,6 +1001,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -966,6 +1015,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -981,6 +1031,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully and sends out an deletion notification email with a CSV attachment' do
@@ -1006,6 +1057,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do
@@ -1019,6 +1071,7 @@ RSpec.describe InstitutionsController, type: :controller do
     describe 'for institutional_user user' do
       before do
         sign_in institutional_user
+        session[:verified] = true
       end
 
       it 'responds unauthorized' do

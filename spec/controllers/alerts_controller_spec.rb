@@ -35,6 +35,7 @@ RSpec.describe AlertsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'returns a list of each possible alert type from the last 24 hours (html)' do
@@ -67,6 +68,7 @@ RSpec.describe AlertsController, type: :controller do
     describe 'for institutional admins' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'allows access only to alerts on their content (html)' do
@@ -80,6 +82,7 @@ RSpec.describe AlertsController, type: :controller do
     describe 'for institutional users' do
       before do
         sign_in @institutional_user
+        session[:verified] = true
       end
 
       it 'denies access (html)' do
@@ -98,6 +101,7 @@ RSpec.describe AlertsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'returns a list of alert counts (html)' do
@@ -134,6 +138,7 @@ RSpec.describe AlertsController, type: :controller do
     describe 'for institutional admins' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'allows access (html)' do
@@ -145,6 +150,7 @@ RSpec.describe AlertsController, type: :controller do
     describe 'for institutional users' do
       before do
         sign_in @institutional_user
+        session[:verified] = true
       end
 
       it 'denies access (html)' do

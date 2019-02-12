@@ -8,6 +8,7 @@ feature 'Access Denied' do
 
   scenario 'Unauthorized user tries to view page' do
     login_as(@user)
+    inject_session verified: true
 
     # Visit the path of an institution that is not the user's
     visit(institution_path(@institution))

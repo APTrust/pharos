@@ -10,7 +10,10 @@ RSpec.describe UsersController, type: :controller do
     let(:admin_user) { FactoryBot.create(:user, :admin) }
     let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
 
-    before { sign_in admin_user }
+    before do
+      sign_in admin_user
+      session[:verified] = true
+    end
 
     describe 'who gets a list of users' do
       let!(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
@@ -211,7 +214,10 @@ RSpec.describe UsersController, type: :controller do
   describe 'An Institutional Administrator' do
     let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
 
-    before { sign_in institutional_admin }
+    before do
+      sign_in institutional_admin
+      session[:verified] = true
+    end
 
     describe 'who gets a list of users' do
       let!(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
@@ -503,7 +509,10 @@ RSpec.describe UsersController, type: :controller do
   describe 'An Institutional User' do
     let!(:user) { FactoryBot.create(:user, :institutional_user)}
     let!(:other_user) { FactoryBot.create(:user, :institutional_user) }
-    before { sign_in user }
+    before do
+      sign_in user
+      session[:verified] = true
+    end
 
     it 'generates a new API key' do
       patch :generate_api_key, params: { id: user.id }

@@ -96,5 +96,8 @@ RSpec.configure do |config|
   #For devise testing
   config.include Devise::Test::ControllerHelpers, :type => :controller
 
+  config.include InjectSession, type: :feature
+  config.include InjectSession, type: :request
+
   # config.backtrace_exclusion_patterns = Array.new
 end

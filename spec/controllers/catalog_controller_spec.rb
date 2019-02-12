@@ -73,6 +73,7 @@ RSpec.describe CatalogController, type: :controller do
       describe 'as an admin user' do
         before do
           sign_in admin_user
+          session[:verified] = true
         end
 
         describe 'for intellectual object searches' do
@@ -224,6 +225,7 @@ RSpec.describe CatalogController, type: :controller do
       describe 'as an institutional admin user' do
         before do
           sign_in inst_admin
+          session[:verified] = true
         end
 
         describe 'for intellectual object searches' do
@@ -291,6 +293,7 @@ RSpec.describe CatalogController, type: :controller do
       describe 'as an institutional user' do
         before do
           sign_in inst_user
+          session[:verified] = true
         end
 
         describe 'for intellectual object searches' do
@@ -391,6 +394,7 @@ RSpec.describe CatalogController, type: :controller do
   describe 'GET #feed' do
     before do
       sign_in admin_user
+      session[:verified] = true
     end
 
     it 'returns an RSS feed with current work items' do

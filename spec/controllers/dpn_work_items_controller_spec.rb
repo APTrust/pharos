@@ -23,6 +23,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns successfully when no parameters are given' do
@@ -98,6 +99,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -111,6 +113,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
   describe 'POST #create' do
     before do
       sign_in admin_user
+      session[:verified] = true
     end
 
     it 'successfully creates the dpn item' do
@@ -129,6 +132,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -142,6 +146,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with both the action, stage, status and the state updated' do
@@ -165,6 +170,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -178,6 +184,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with both the work item and the state item set' do
@@ -196,6 +203,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -209,6 +217,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :requeue, params: { id: item_one.id, delete_state_item: 'false', task: 'store' }
@@ -230,6 +239,7 @@ RSpec.describe DpnWorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'does not allow the user to requeue the item' do

@@ -24,6 +24,7 @@ describe 'API Authentication: Editing an Intellectual Object via API request' do
     let(:login_headers) {{ 'X-Pharos-API-User' => user.email, 'X-Pharos-API-Key' => valid_key }}
 
     it 'should update the object' do
+      inject_session verified: true
       params = update_fields.to_json
       headers = initial_headers.merge(login_headers)
       response = patch(intellectual_object_path(obj), headers: headers, params: params)

@@ -24,6 +24,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -103,6 +104,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'assigns the requested items as @items' do
@@ -116,6 +118,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { id: item.id }
@@ -153,6 +156,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       # it 'restricts API usage' do
@@ -175,6 +179,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
       it 'responds successfully with an HTTP 200 status code' do
         get :requeue, params: { id: item.id }
@@ -201,6 +206,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'does not allow the user to requeue the item' do
@@ -217,6 +223,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'does expose :state, :node, or :id through admin #api_show' do
@@ -229,6 +236,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'does NOT expose :state, :node, or :id through admin #api_show' do
@@ -254,6 +262,7 @@ RSpec.describe WorkItemsController, type: :controller do
       let(:item_two) { FactoryBot.create(:work_item, object_identifier: object.identifier, status: 'Failed') }
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'accepts extended queue data - state, node, pid' do
@@ -297,6 +306,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'restricts institutional admins from API usage when updating by id' do
@@ -316,6 +326,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -343,6 +354,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
         2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -368,6 +380,7 @@ RSpec.describe WorkItemsController, type: :controller do
                             retry: true)
         WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'should return only items with the specified object_identifier' do
@@ -381,6 +394,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                             stage: Pharos::Application::PHAROS_STAGES['requested'],
                             status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -408,6 +422,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
         2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
                             stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -433,6 +448,7 @@ RSpec.describe WorkItemsController, type: :controller do
                             retry: true)
         WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'should return only items with the specified object_identifier' do
@@ -446,6 +462,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
                             stage: Pharos::Application::PHAROS_STAGES['requested'],
                             status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -473,6 +490,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
         2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
                             stage: Pharos::Application::PHAROS_STAGES['requested'],
@@ -505,6 +523,7 @@ RSpec.describe WorkItemsController, type: :controller do
         wi.generic_file_identifier = new_file.identifier
         wi.save
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'should return only items with the specified object_identifier' do
@@ -518,6 +537,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -592,6 +612,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user - with duplicate entries' do
       before do
         sign_in admin_user
+        session[:verified] = true
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                                  stage: Pharos::Application::PHAROS_STAGES['requested'],
                                  status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -630,6 +651,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
         WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
                             stage: Pharos::Application::PHAROS_STAGES['requested'],
                             status: Pharos::Application::PHAROS_STATUSES['pend'],
@@ -650,6 +672,7 @@ RSpec.describe WorkItemsController, type: :controller do
       let (:attributes) { FactoryBot.attributes_for(:work_item) }
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       after do
@@ -712,6 +735,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       after do
@@ -742,6 +766,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
     it 'admin can get items ingested since' do
       sign_in user
+      session[:verified] = true
       get :ingested_since, params: { since: '2009-01-01' }, format: :json
       expect(response).to be_successful
       expect(assigns(:items).length).to eq 10
@@ -749,6 +774,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
     it 'missing date causes error' do
       sign_in user
+      session[:verified] = true
       expected = { 'error' => 'Param since must be a valid datetime' }.to_json
       get :ingested_since, params: { since: '' }, format: :json
       expect(response.status).to eq 400
@@ -757,6 +783,7 @@ RSpec.describe WorkItemsController, type: :controller do
 
     it 'non admin users can not use API ingested since route' do
       sign_in other_user
+      session[:verified] = true
       get :ingested_since, params: { since: '2009-01-01' }, format: :json
       expect(response.status).to eq 403
     end
@@ -780,6 +807,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns all records when no criteria specified' do
@@ -823,6 +851,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'restricts institutional admins from API usage' do
@@ -847,6 +876,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for an admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns all items when no other parameters are specified' do
@@ -880,6 +910,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for an institutional admin user' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it "returns only the items within the user's institution" do
@@ -904,6 +935,7 @@ RSpec.describe WorkItemsController, type: :controller do
   #     let(:item_one) { FactoryBot.create(:work_item, institution_id: institution.id, intellectual_object_id: object.id, object_identifier: object.identifier) }
   #     before do
   #       sign_in admin_user
+  #       session[:verified] = true
   #       WorkItem.delete_all
   #     end
   #
@@ -929,6 +961,7 @@ RSpec.describe WorkItemsController, type: :controller do
   describe 'GET #notify_of_successful_restoration' do
     before do
       sign_in admin_user
+      session[:verified] = true
     end
 
     it 'creates an email log of the notification email containing the restored items' do
@@ -946,6 +979,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for an admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'creates an email log of the notification email containing the spot test notice and download link' do
@@ -965,6 +999,7 @@ RSpec.describe WorkItemsController, type: :controller do
     describe 'for an institutional admin' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'forbids access to the spot test endpoint' do

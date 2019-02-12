@@ -7,6 +7,8 @@ FactoryBot.define do
     roles { [Role.where(name: 'public').first_or_create] }
     institution_id { FactoryBot.create(:member_institution).id }
     deactivated_at { nil }
+    enabled_two_factor { true }
+    confirmed_two_factor { true }
 
     factory :aptrust_user, class: 'User' do
       roles { [Role.where(name: 'admin').first_or_create] }
@@ -28,7 +30,6 @@ FactoryBot.define do
 
     trait :institutional_admin do
       roles { [Role.where(name: 'institutional_admin').first_or_create]}
-
     end
 
     trait :institutional_user do

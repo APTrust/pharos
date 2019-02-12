@@ -10,6 +10,7 @@ describe 'Adding a new user' do
   let(:admin_user) { FactoryBot.create(:user, :admin) }
   it 'should work' do
     login_as admin_user
+    inject_session verified: true
 
     visit '/'
     click_link 'New User'

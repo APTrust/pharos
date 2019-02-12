@@ -15,6 +15,7 @@ describe 'Faceting' do
 
     before do
       login_as user
+      inject_session verified: true
     end
 
     describe 'Events list' do

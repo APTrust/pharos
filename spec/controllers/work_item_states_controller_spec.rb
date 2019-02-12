@@ -21,6 +21,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
   describe 'POST #create' do
     before do
       sign_in admin_user
+      session[:verified] = true
     end
 
     it 'successfully creates the state item' do
@@ -37,6 +38,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with both the action and the state updated' do
@@ -55,6 +57,7 @@ RSpec.describe WorkItemStatesController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with both the work item and the state item set' do
