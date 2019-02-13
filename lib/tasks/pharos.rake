@@ -655,7 +655,7 @@ namespace :pharos do
     name = "APTrustAdmin"
     email = "ops@aptrust.org"
     phone_number ="4341234567"
-    password ="password"
+    password ="password123"
     User.create!(name: name, email: email, password: password,
                  phone_number: phone_number, institution_id: aptrust.id,
                  roles: [admin_role])
