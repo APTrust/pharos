@@ -9,6 +9,9 @@ before_script:
 - sudo apt update -y
 - sudo apt install --only-upgrade docker-ce -y
 - sudo service postgresql stop
+- sudo cp .env.test .env
+- env
+- export
 script:
         #- docker pull aptrust/pharos:latest
 - docker build --rm=false -t aptrust/pharos:latest  .
