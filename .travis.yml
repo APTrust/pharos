@@ -10,7 +10,7 @@ before_script:
 - sudo apt install --only-upgrade docker-ce -y
 - sudo service postgresql stop
 script:
-- docker pull aptrust/pharos:latest
+        #- docker pull aptrust/pharos:latest
 - docker build --rm=false -t aptrust/pharos:latest  .
 - docker network create -d bridge pharos-test-net
 - docker run -d --network pharos-test-net -h pharos-test-db --name pharos-test-db
