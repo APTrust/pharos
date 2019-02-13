@@ -232,4 +232,10 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'New Completed Deletions')
   end
 
+  def welcome_email(subject, password)
+    @subject = subject
+    @password = password
+    mail(to: subject.email, subject: 'Welcome to APTrust!')
+  end
+
 end

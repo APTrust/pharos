@@ -192,6 +192,7 @@ Rails.application.routes.draw do
   get 'verifications/pending', to: 'verifications#pending', as: :verification_pending
   get 'verifications/enter_backup/:id', to: 'verifications#enter_backup', as: :enter_backup_verification
   put 'verifications/check_backup/:id', to: 'verifications#check_backup', as: :check_backup_verification
+  get 'verifications/email/:id', to: 'verifications#verify_email', as: :email_verification
 
   #get '/verification_callback', to: 'application#callback', as: :verification_callback
 

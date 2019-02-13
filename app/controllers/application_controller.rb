@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :verify_user!, unless: :devise_controller?
-  before_action :force_two_factor, unless: :devise_controller?
+  before_action :forced_redirections, unless: :devise_controller?
 
   def verify_user!
     requires_verification? ? start_verification : session[:verified] = true
@@ -87,8 +87,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def force_two_factor
-    if current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s)
+  def forced_redirections
+    if current_user.nil?
+      return
+    elsif current_user.sign_in_count == 1
+      if params[:controller] == 'users' && params[:action] == 'edit_password' && params[:id] == current_user.id.to_s
+        return
+      else
+        redirect_to edit_user_password_path(current_user), flash: { warning: 'You are required to change your password now.' }
+      end
+    elsif current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s)
       return
     else
       if current_user.required_to_use_twofa?

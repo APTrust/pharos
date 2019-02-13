@@ -29,6 +29,12 @@ class UsersController < ApplicationController
           country_code: @user.phone_number[1]
       )
       @user.update(authy_id: authy.id)
+
+      password = "ABCabc-#{SecureRandom.hex(4)}"
+      @user.password = password
+      @user.password_confirmation = password
+      @user.save!
+      NotificationMailer.welcome_email(@user, password).deliver!
     end
   end
 
@@ -61,6 +67,11 @@ class UsersController < ApplicationController
     @user = User.find(current_user.id)
     authorize @user
     if @user.update_with_password(user_params)
+      if @user.sign_in_count == 1
+        @user.sign_in_count == 2
+        @user.save!
+        # TODO send email to verify email
+      end
       sign_in @user, :bypass => true
       redirect_to root_path
       flash[:notice] = 'Successfully changed password.'

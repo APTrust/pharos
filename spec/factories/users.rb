@@ -9,6 +9,7 @@ FactoryBot.define do
     deactivated_at { nil }
     enabled_two_factor { true }
     confirmed_two_factor { true }
+    sign_in_count { 5 }
 
     factory :aptrust_user, class: 'User' do
       roles { [Role.where(name: 'admin').first_or_create] }
