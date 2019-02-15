@@ -40,7 +40,7 @@ build-nc: ## Build the Pharos container, no cached layers.
 	docker build --no-cache -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
-	docker-compose up
+	docker-compose -e DOCKER_TAG_NAME=$(REVISION) up
 
 down: ## Stop containers for Pharos, Postgresql, Nginx
 	docker-compose down
