@@ -96,6 +96,7 @@ publish:
 	docker login $(REGISTRY)
 	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos
 	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
+	docker tag aptrust/pharos aptrust/pharos:latest
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 
