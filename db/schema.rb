@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_06_194329) do
+ActiveRecord::Schema.define(version: 2019_02_15_215918) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 2019_02_06_194329) do
     t.integer "intellectual_object_id"
     t.integer "generic_file_id"
     t.integer "institution_id"
+    t.integer "user_id"
   end
 
   create_table "dpn_bags", id: false, force: :cascade do |t|
@@ -329,6 +330,7 @@ ActiveRecord::Schema.define(version: 2019_02_06_194329) do
     t.string "authy_id"
     t.datetime "last_sign_in_with_authy"
     t.string "authy_status"
+    t.boolean "email_verified", default: false
     t.index ["authy_id"], name: "index_users_on_authy_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"

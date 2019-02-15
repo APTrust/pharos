@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
-                                  :vacuum, :enable_otp, :disable_otp, :verify_twofa, :generate_backup_codes]
+                                  :vacuum, :enable_otp, :disable_otp, :verify_twofa, :generate_backup_codes, :verify_email, :email_confirmation]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -29,6 +29,12 @@ class UsersController < ApplicationController
           country_code: @user.phone_number[1]
       )
       @user.update(authy_id: authy.id)
+
+      password = "ABCabc-#{SecureRandom.hex(4)}"
+      @user.password = password
+      @user.password_confirmation = password
+      @user.save!
+      NotificationMailer.welcome_email(@user, password).deliver!
     end
   end
 
@@ -61,6 +67,11 @@ class UsersController < ApplicationController
     @user = User.find(current_user.id)
     authorize @user
     if @user.update_with_password(user_params)
+      if @user.sign_in_count == 1
+        @user.sign_in_count == 2
+        @user.save!
+        # TODO send email to verify email
+      end
       sign_in @user, :bypass => true
       redirect_to root_path
       flash[:notice] = 'Successfully changed password.'
@@ -155,10 +166,40 @@ class UsersController < ApplicationController
     end
   end
 
+  def verify_email
+    authorize @user
+    ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
+    token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
+    token.save!
+    NotificationMailer.email_verification(@user, token).deliver!
+    respond_to do |format|
+      format.json { render json: { user: @user, message: 'Instructions on verifying email address have been sent.' } }
+      format.html { render 'show', flash: { notice: 'Instructions on verifying email address have been sent.' } }
+    end
+  end
+
+  def email_confirmation
+    authorize @user
+    token = ConfirmationToken.where(user_id: @user.id).first
+    if token.token == params[:confirmation_token]
+      @user.email_verified = true
+      @user.save!
+      respond_to do |format|
+        format.json { render json: { user: @user, message: 'Your email has been verified.' } }
+        format.html { render 'show', flash: { notice: 'Your email has been successfully verified.' } }
+      end
+    else
+      ConfirmationToken.where(user_id: @user.id).delete_all
+      respond_to do |format|
+        format.json { render json: { user: @user, message: 'Invalid confirmation token.' } }
+        format.html { render 'show', flash: { error: 'Invalid confirmation token.' } }
+      end
+    end
+  end
+
   def generate_api_key
     authorize @user
     @user.generate_api_key
-
     if @user.save
       msg = ['Please record this key.  If you lose it, you will have to generate a new key.',
              "Your API secret key is: #{@user.api_secret_key}"]

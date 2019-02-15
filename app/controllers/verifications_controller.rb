@@ -25,10 +25,6 @@ class VerificationsController < ApplicationController
     end
   end
 
-  def pending
-
-  end
-
   def enter_backup
 
   end
@@ -41,4 +37,5 @@ class VerificationsController < ApplicationController
       redirect_to enter_backup_verification_path(id: params[:id]), flash: { error: 'Incorrect backup code.' }
     end
   end
+
 end

@@ -232,4 +232,16 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'New Completed Deletions')
   end
 
+  def welcome_email(subject, password)
+    @subject = subject
+    @password = password
+    mail(to: subject.email, subject: 'Welcome to APTrust!')
+  end
+
+  def email_verification(subject, confirmation_token)
+    @subject = subject
+    @confirmation_url = email_confirmation_url(@subject, confirmation_token: confirmation_token.token)
+    mail(to: subject.email, subject: 'Verify Your Email')
+  end
+
 end

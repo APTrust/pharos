@@ -187,6 +187,8 @@ Rails.application.routes.draw do
   get 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
   get 'users/:id/backup_codes', to: 'users#generate_backup_codes', as: :backup_codes
   get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
+  get 'users/:id/verify_email', to: 'users#verify_email', as: :email_verification
+  get 'users/:id/email_confirmation', to: 'users#email_confirmation', as: :email_confirmation
 
   resources :verifications, only: [:edit, :update]
   get 'verifications/pending', to: 'verifications#pending', as: :verification_pending
