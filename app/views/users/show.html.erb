@@ -9,11 +9,13 @@
   <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br><br>
 </address>
 
+<%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
+                      :method => :get, class: 'btn btn-normal doc-action-btn' %>
 
 <% if @user.enabled_two_factor %>
     <% if @user.confirmed_two_factor %>
         <h4>Two Factor Authentication Enabled</h4>
-        <%= button_to "Disable Two Factor Authentication", users_disable_otp_path(@user.id),
+        <%= button_to 'Disable Two Factor Authentication', users_disable_otp_path(@user.id),
                       :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% else %>
         <h4>Verify Phone Number for Two Factor Authentication</h4>
@@ -21,19 +23,19 @@
         otherwise it will send you a text message with a one time code. Please either click "approve" on the push notification
         or enter the one time code in the form to verify the phone number on file in the application. If your phone number is not
         accurate, please update it before you attempt to verify. </p>
-        <%= button_to "Verify Phone Number For Two Factor Authentication", users_verify_twofa_path(@user.id),
+        <%= button_to 'Verify Phone Number For Two Factor Authentication', users_verify_twofa_path(@user.id),
                       :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% end %>
 
     <h4>Backup Codes</h4>
-    <%= button_to "Generate Backup Codes", backup_codes_path(@user.id),
+    <%= button_to 'Generate Backup Codes', backup_codes_path(@user.id),
                   :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% if @codes %>
         <br>
         <p><strong class="badge badge-danger">Important!</strong> Write these backups codes down in a safe place.
           They can be used once to login to your account if your two factor device is unavailable.
           They will never be displayed again for security reasons.</p>
-        <ul class="unstyled">
+        <ul class='unstyled'>
           <% @codes.each do |code| %>
               <li><%= code %></li>
           <% end %>

@@ -38,7 +38,4 @@ class VerificationsController < ApplicationController
     end
   end
 
-  def verify_email
-
-  end
 end

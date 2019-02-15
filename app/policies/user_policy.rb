@@ -118,6 +118,14 @@ class UserPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
+  def verify_email?
+    user == record || user.admin || (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def email_confirmation?
+    user == record
+  end
+
   def enable_otp?
     user == record ||  user.admin? ||
         (user.institutional_admin? && (user.institution_id == record.institution_id))
