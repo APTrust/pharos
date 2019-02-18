@@ -13,7 +13,7 @@ services:
     labels:
       - "traefik.enable=false"
   pharos:
-    image: aptrust/pharos
+    image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
     command: bundle exec puma -p9292 -e ${RAILS_ENV}
     volumes:
       - .:/pharos
@@ -33,7 +33,7 @@ services:
       - ".env"
     labels:
      - "traefik.backend=pharos"
-     - "traefik.frontend.rule=Host:pharos2.docker1.aptrust.org"
+     - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}"
      - "traefik.port=9292"
      - "traefik.docker.network=proxy"
     networks:
@@ -42,7 +42,7 @@ services:
     ports:
      - "9292:9292"
   migration:
-    image: aptrust/pharos
+    image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
     command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
     environment:
@@ -72,8 +72,8 @@ services:
       - "443:443"     # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
-      - ./docker/traefik/traefik.toml:/traefik.toml
-      - /srv/docker/pharos/data/acme.json:/acme.json
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik/}/traefik.toml:/traefik.toml
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik/}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - proxy
@@ -92,7 +92,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.assets.backend=nginx-assets"
-      - "traefik.assets.frontend.rule=Host:pharos2.docker1.aptrust.org;PathPrefix:/assets"
+      - "traefik.assets.frontend.rule=Host:${VIRTUAL_HOST:-localhost};PathPrefix:/assets"
       - "traefik.docker.network=proxy"
 #      - "traefik.protocol=https"
       - "traefik.port=80"
