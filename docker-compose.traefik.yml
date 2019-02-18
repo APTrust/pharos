@@ -11,7 +11,7 @@ services:
     networks:
       - internal
     labels:
-      - "traefik.enable=false"
+      - traefik.enable=false
   pharos:
     image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
     command: bundle exec puma -p9292 -e ${RAILS_ENV}
@@ -32,10 +32,10 @@ services:
     env_file:
       - ".env"
     labels:
-     - "traefik.backend=pharos"
-     - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}"
-     - "traefik.port=9292"
-     - "traefik.docker.network=proxy"
+     - traefik.backend=pharos
+     - traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}
+     - traefik.port=9292
+     - traefik.docker.network=proxy
     networks:
       - internal
       - proxy
@@ -63,7 +63,7 @@ services:
     networks:
       - internal
     labels:
-      - "traefik.enable=false"
+      - traefik.enable=false
   reverse-proxy:
     image: traefik # The official Traefik docker image
     command: --api --docker # Enables the web UI and tells Træfik to listen to docker
@@ -90,12 +90,12 @@ services:
     #    - internal
         - proxy
     labels:
-      - "traefik.enable=true"
-      - "traefik.assets.backend=nginx-assets"
-      - "traefik.assets.frontend.rule=Host:${VIRTUAL_HOST:-localhost};PathPrefix:/assets"
-      - "traefik.docker.network=proxy"
+      - traefik.enable=true
+      - traefik.assets.backend=nginx-assets
+      - traefik.assets.frontend.rule=Host:${VIRTUAL_HOST:-localhost};PathPrefix:/assets
+      - traefik.docker.network=proxy
 #      - "traefik.protocol=https"
-      - "traefik.port=80"
+      - traefik.port=80
 #      - "traefik.frontend.entryPoints=https"
 
 networks:
