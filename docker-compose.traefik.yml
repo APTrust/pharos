@@ -33,7 +33,7 @@ services:
       - ".env"
     labels:
      - "traefik.backend=pharos"
-     - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}
+     - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}"
      - "traefik.port=9292"
      - "traefik.docker.network=proxy"
     networks:
@@ -72,8 +72,8 @@ services:
       - "443:443"     # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
-      - ./docker/traefik/traefik.toml:/traefik.toml
-      - /srv/docker/pharos/data/acme.json:/acme.json
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik/}/traefik.toml:/traefik.toml
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik/}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - proxy
