@@ -66,14 +66,14 @@ services:
       - "traefik.enable=false"
   reverse-proxy:
     image: traefik # The official Traefik docker image
-    command: --api --docker --logLevel="DEBUG" # Enables the web UI and tells Træfik to listen to docker
+    command: --api --docker # Enables the web UI and tells Træfik to listen to docker
     ports:
       - "80:80"     # The HTTP port
       - "443:443"     # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
-      - ${DOCKERAPP_DATA_PATH:-./docker/traefik/}/traefik.toml:/traefik.toml
-      - ${DOCKERAPP_DATA_PATH:-./docker/traefik/}/acme.json:/acme.json
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik}/traefik.toml:/traefik.toml
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - proxy
