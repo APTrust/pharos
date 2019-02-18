@@ -42,7 +42,7 @@ gem 'uuidtools'
 
 gem 'kaminari'
 gem 'sassc-rails'
-gem 'bootstrap-sass', '~> 3.4.0'
+gem 'bootstrap-sass', '~> 3.4.1'
 
 # These gems aren't required directly but are required in various dependencies and
 # needed specific updating due to security warnings
