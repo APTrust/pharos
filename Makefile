@@ -34,13 +34,13 @@ revision: ## Show me the git hash
 	@echo $(REVISION)
 
 build: ## Build the Pharos container
-	docker build --build-arg PHAROS_REVISION=$(REVISION) -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+	docker build --no-cache --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 build-nc: ## Build the Pharos container, no cached layers.
 	docker build --no-cache -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
-	docker-compose up
+	docker-compose -e DOCKER_TAG_NAME=$(REVISION) up
 
 down: ## Stop containers for Pharos, Postgresql, Nginx
 	docker-compose down
@@ -96,6 +96,7 @@ publish:
 	docker login $(REGISTRY)
 	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos
 	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
+	docker tag aptrust/pharos aptrust/pharos:latest
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push aptrust/pharos
 

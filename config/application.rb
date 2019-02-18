@@ -32,7 +32,7 @@ module Pharos
 
     config.i18n.enforce_available_locales = true
 
-    #config.serve_static_assets = true
+	#config.public_file_server.enable = false
     config.assets.version = '1.0'
     config.before_configuration do
       env_file = File.join(Rails.root, 'config', 'dev_env.yml')
