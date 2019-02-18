@@ -67,10 +67,13 @@ class UsersController < ApplicationController
     @user = User.find(current_user.id)
     authorize @user
     if @user.update_with_password(user_params)
-      if @user.sign_in_count == 1
-        @user.sign_in_count == 2
+      unless @user.initial_password_updated
+        @user.initial_password_updated = true
         @user.save!
-        # TODO send email to verify email
+        ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
+        token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
+        token.save!
+        NotificationMailer.email_verification(@user, token).deliver!
       end
       sign_in @user, :bypass => true
       redirect_to root_path
