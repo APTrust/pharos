@@ -33,7 +33,7 @@ services:
       - ".env"
     labels:
      - "traefik.backend=pharos"
-     - "traefik.frontend.rule=Host:pharos2.docker1.aptrust.org"
+     - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}
      - "traefik.port=9292"
      - "traefik.docker.network=proxy"
     networks:
@@ -92,7 +92,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.assets.backend=nginx-assets"
-      - "traefik.assets.frontend.rule=Host:pharos2.docker1.aptrust.org;PathPrefix:/assets"
+      - "traefik.assets.frontend.rule=Host:${VIRTUAL_HOST:-localhost};PathPrefix:/assets"
       - "traefik.docker.network=proxy"
 #      - "traefik.protocol=https"
       - "traefik.port=80"
