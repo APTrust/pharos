@@ -8,7 +8,7 @@ LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 # - postgresql-client-9.4: In case you want to talk directly to postgres
 
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
-    nodejs postgresql-client postgresql-dev ruby-bundler libstdc++ \
+    nodejs postgresql-client postgresql-dev python ruby-bundler libstdc++ \
     tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal libxml2-dev libxslt-dev
 
 RUN addgroup -S somegroup -g 1000 && adduser -S -G somegroup somebody -u 1000
