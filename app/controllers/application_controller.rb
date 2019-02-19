@@ -17,11 +17,13 @@ class ApplicationController < ActionController::Base
   before_action :forced_redirections, unless: :devise_controller?
 
   def verify_user!
-    requires_verification? ? start_verification : session[:verified] = true
+    start_verification if requires_verification?
   end
 
   def requires_verification?
+    #puts "HERE #{current_user.inspect } **************************************"
     unless current_user.nil?
+      #puts "HERE session[:verified]: #{ session[:verified] } & needs 2FA?: #{ current_user.need_two_factor_authentication? } "
       session[:verified].nil? && current_user.need_two_factor_authentication?
     end
   end
@@ -37,12 +39,15 @@ class ApplicationController < ActionController::Base
               'Email Address' => current_user.email,
           }
       )
+      #puts "Testing one_touch.ok?: #{ one_touch.ok? } *******************************************"
       if !one_touch.ok?
         render json: { err: 'Create Push Error' }, status: :internal_server_error and return
       end
+      #puts "Testing one_touch success: #{ one_touch['success'] } ****************************************"
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
+      #puts "Testing user status: #{ current_user.sms_user? } ****************************************"
       if current_user.sms_user?
         sms = Aws::SNS::Client.new
         response = sms.publish({
@@ -90,8 +95,8 @@ class ApplicationController < ActionController::Base
   def forced_redirections
     if current_user.nil?
       return
-    elsif current_user.sign_in_count == 1
-      if params[:controller] == 'users' && params[:action] == 'edit_password' && params[:id] == current_user.id.to_s
+    elsif !current_user.initial_password_updated
+      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'show') && params[:id] == current_user.id.to_s
         return
       else
         redirect_to edit_user_password_path(current_user), flash: { warning: 'You are required to change your password now.' }

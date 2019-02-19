@@ -23,7 +23,7 @@ gem 'pg', '1.1.4' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.6.0'
+gem 'devise', '4.6.1'
 gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
@@ -48,7 +48,7 @@ gem 'uuidtools'
 
 gem 'kaminari'
 gem 'sassc-rails'
-gem 'bootstrap-sass', '~> 3.4.0'
+gem 'bootstrap-sass', '~> 3.4.1'
 
 # These gems aren't required directly but are required in various dependencies and
 # needed specific updating due to security warnings
@@ -82,7 +82,7 @@ end
 
 group :test do
   gem 'capybara', '3.13.2'
-  gem 'shoulda-matchers', '~> 3.1.3'
+  gem 'shoulda-matchers', '~> 4.0.0'
   gem 'coveralls', '0.8.22', require: false
 end
 
