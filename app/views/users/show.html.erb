@@ -9,9 +9,11 @@
   <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br><br>
 </address>
 
-<%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
+<% unless @user.email_verified %>
+  <%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
                       :method => :get, class: 'btn btn-normal doc-action-btn' %>
-
+  <br>
+<% end %>
 <% if @user.enabled_two_factor %>
     <% if @user.confirmed_two_factor %>
         <h4>Two Factor Authentication Enabled</h4>
@@ -27,6 +29,7 @@
                       :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% end %>
 
+    <br>
     <h4>Backup Codes</h4>
     <%= button_to 'Generate Backup Codes', backup_codes_path(@user.id),
                   :method => :get, class: 'btn btn-normal doc-action-btn' %>
@@ -56,6 +59,7 @@
       <li><%= role.name.titleize %></li>
   <% end %>
 </ul>
+<br>
 
 <%= render 'api_key' %>
 

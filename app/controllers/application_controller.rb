@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   end
 
   before_action do
-    session[:backup_code] = true if params[:use_backup_code] && params[:use_backup_code] == '1'
+    session[:two_factor_option] = params[:two_factor_option] if session[:two_factor_option].nil?
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
@@ -21,17 +21,20 @@ class ApplicationController < ActionController::Base
   end
 
   def requires_verification?
-    #puts "HERE #{current_user.inspect } **************************************"
     unless current_user.nil?
-      #puts "HERE session[:verified]: #{ session[:verified] } & needs 2FA?: #{ current_user.need_two_factor_authentication? } "
       session[:verified].nil? && current_user.need_two_factor_authentication?
     end
   end
 
   def start_verification
-    if session[:backup_code]
+    if session[:two_factor_option] == nil
+      session.delete(:authy)
+      session.delete(:verified)
+      sign_out(@user)
+      redirect_to new_user_session_path, flash: { error: 'You must select an option for two factor sign in.' }
+    elsif session[:two_factor_option] == 'Backup Code'
       redirect_to enter_backup_verification_path(id: current_user.id), flash: { alert: 'Please enter a backup code.' }
-    else
+    elsif session[:two_factor_option] == 'Push Notification'
       one_touch = Authy::OneTouch.send_approval_request(
           id: current_user.authy_id,
           message: 'Request to Login to APTrust Repository Website',
@@ -39,25 +42,20 @@ class ApplicationController < ActionController::Base
               'Email Address' => current_user.email,
           }
       )
-      #puts "Testing one_touch.ok?: #{ one_touch.ok? } *******************************************"
-      if !one_touch.ok?
+      unless one_touch.ok?
         render json: { err: 'Create Push Error' }, status: :internal_server_error and return
       end
-      #puts "Testing one_touch success: #{ one_touch['success'] } ****************************************"
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
-      #puts "Testing user status: #{ current_user.sms_user? } ****************************************"
-      if current_user.sms_user?
-        sms = Aws::SNS::Client.new
-        response = sms.publish({
-                                   phone_number: current_user.phone_number,
-                                   message: "Your new one time password is: #{current_user.current_otp}"
-                               })
-        redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
-      else
-        one_touch_status
-      end
+      one_touch_status
+    elsif session[:two_factor_option] == 'Text Message'
+      sms = Aws::SNS::Client.new
+      response = sms.publish({
+                                 phone_number: current_user.phone_number,
+                                 message: "Your new one time password is: #{current_user.current_otp}"
+                             })
+      redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
     end
   end
 
@@ -72,6 +70,7 @@ class ApplicationController < ActionController::Base
     if status['approval_request']['seconds_to_expire'] <= 0
       session.delete(:authy)
       session.delete(:verified)
+      session.delete(:two_factor_option)
       sign_out(@user)
       redirect_to new_user_session_path, flash: { error: 'This push notification has expired' }
     else
@@ -79,10 +78,12 @@ class ApplicationController < ActionController::Base
         session.delete(:uuid) || session.delete('uuid')
         session[:authy] = true
         session[:verified] = true
+        session.delete(:two_factor_option)
         redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
       elsif status['approval_request']['status'] == 'denied'
         session.delete(:authy)
         session.delete(:verified)
+        session.delete(:two_factor_option)
         sign_out(@user)
         redirect_to new_user_session_path, flash: { error: 'This request was denied.' }
       else
@@ -93,13 +94,13 @@ class ApplicationController < ActionController::Base
   end
 
   def forced_redirections
-    if current_user.nil?
+    if current_user.nil? || session[:verified].nil?
       return
     elsif !current_user.initial_password_updated
-      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'show') && params[:id] == current_user.id.to_s
+      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
         return
       else
-        redirect_to edit_user_password_path(current_user), flash: { warning: 'You are required to change your password now.' }
+        redirect_to current_user, flash: { error: 'You are required to change your password now.' }
       end
     # elsif !current_user.email_verified
     #   if params[:controller] == 'users' && (params[:action] == 'verify_email' || params[:action] == 'email_confirmation' || params[:action] == 'show') && params[:id] == current_user.id.to_s
@@ -107,7 +108,7 @@ class ApplicationController < ActionController::Base
     #   else
     #     redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
     #   end
-    elsif current_user.nil? || (params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s)
+    elsif params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s
       return
     else
       if current_user.required_to_use_twofa?
@@ -155,8 +156,12 @@ class ApplicationController < ActionController::Base
   # return 403 Forbidden if permission is denied
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-  def after_sign_in_path_for(resource)
-    session['user_return_to'] || root_path
+  # def after_sign_in_path_for(resource)
+  #   session['user_return_to'] || root_path
+  # end
+
+  def after_sign_in_path_for(resource_or_scope)
+    stored_location_for(resource_or_scope) || root_path
   end
 
   protected
@@ -176,6 +181,15 @@ class ApplicationController < ActionController::Base
       format.html { redirect_to root_url, alert: 'You are not authorized to access this page.' }
       format.json { render :json => { :status => 'error', :message => 'You are not authorized to access this page.' }, :status => :forbidden }
     end
+  end
+
+  def storable_location?
+    request.get? && is_navigational_format? && !devise_controller? && !request.xhr? && !verifications_controller?
+  end
+
+  def store_user_location!
+    # :user is the scope we are authenticating
+    store_location_for(:user, request.fullpath)
   end
 
   # Logs an exception with stacktrace

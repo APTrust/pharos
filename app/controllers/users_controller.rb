@@ -76,7 +76,7 @@ class UsersController < ApplicationController
         NotificationMailer.email_verification(@user, token).deliver!
       end
       sign_in @user, :bypass => true
-      redirect_to root_path
+      redirect_to @user
       flash[:notice] = 'Successfully changed password.'
     else
       render :edit_password

@@ -14,7 +14,18 @@
         <div><%= f.check_box :remember_me %> <%= f.label :remember_me %></div>
     <% end -%>
 
-    <div><%= check_box_tag(:use_backup_code) %> <%= label_tag(:use_backup_code, 'I need to use a backup code to log in.') %></div>
+
+    <div class="form_row">
+      <h4>Two Factor Option:</h4>
+      <p>If you are using two factor authentication, please select one of the following options.
+        Please note that push notifications will only work if you have the Authy app installed.</p>
+      <% [ 'Push Notification', 'Text Message', 'Backup Code'].each do |opt| %>
+          <%= radio_button_tag 'two_factor_option', opt, @two_factor_option == opt %>
+          <%= label_tag "two_factor_option_#{opt[0...3]}", opt.humanize %><br>
+      <% end %>
+    </div>
+
+
 
     <br/>
     <%= button_tag(type: 'submit', class: "btn doc-action-btn btn-normal", id: "login-btn") do %>
