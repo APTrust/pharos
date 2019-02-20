@@ -81,7 +81,7 @@ Rails.application.configure do
 
   # send password reset emails to a file
   config.action_mailer.default_url_options = {
-    :host => 'repo.aptrust.org',
+	:host => ENV['PHAROS_HOST'] || 'repo.aptrust.org'
     :protocol => 'https'
   }
   config.action_mailer.delivery_method = :smtp
