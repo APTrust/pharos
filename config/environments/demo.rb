@@ -64,7 +64,7 @@ Rails.application.configure do
     config.rails_semantic_logger.add_file_appender = false
     config.rails_semantic_logger.add_appender(io: STDOUT, level: config.log_level, formatter: config.rails_semantic_logger.format)
   else
-    config.semantic_logger.add_appender(file_name: 'ENV['RAILS_ENV'].log')
+    config.semantic_logger.add_appender(file_name: ENV['RAILS_ENV'].log)
   end
 
   config.rails_semantic_logger.semantic   = false
@@ -93,7 +93,7 @@ Rails.application.configure do
 
   # send password reset emails to a file
   config.action_mailer.default_url_options = {
-	:host => ENV['PHAROS_HOST'] || 'demo.aptrust.org'
+	:host => ENV['PHAROS_HOST'] || 'demo.aptrust.org',
     :protocol => 'https'
   }
   config.action_mailer.delivery_method = :smtp
