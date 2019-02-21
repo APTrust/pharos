@@ -75,7 +75,7 @@ class UsersController < ApplicationController
         token.save!
         NotificationMailer.email_verification(@user, token).deliver!
       end
-      sign_in @user, :bypass => true
+      bypass_sign_in(@user)
       redirect_to @user
       flash[:notice] = 'Successfully changed password.'
     else
@@ -177,7 +177,10 @@ class UsersController < ApplicationController
     NotificationMailer.email_verification(@user, token).deliver!
     respond_to do |format|
       format.json { render json: { user: @user, message: 'Instructions on verifying email address have been sent.' } }
-      format.html { render 'show', flash: { notice: 'Instructions on verifying email address have been sent.' } }
+      format.html {
+        render 'show'
+        flash[:notice] = 'Instructions on verifying email address have been sent.'
+      }
     end
   end
 
@@ -189,13 +192,19 @@ class UsersController < ApplicationController
       @user.save!
       respond_to do |format|
         format.json { render json: { user: @user, message: 'Your email has been verified.' } }
-        format.html { render 'show', flash: { notice: 'Your email has been successfully verified.' } }
+        format.html {
+          render 'show'
+          flash[:notice] = 'Your email has been successfully verified.'
+        }
       end
     else
       ConfirmationToken.where(user_id: @user.id).delete_all
       respond_to do |format|
         format.json { render json: { user: @user, message: 'Invalid confirmation token.' } }
-        format.html { render 'show', flash: { error: 'Invalid confirmation token.' } }
+        format.html {
+          render 'show'
+          flash[:error] = 'Invalid confirmation token.'
+        }
       end
     end
   end

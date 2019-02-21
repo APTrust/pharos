@@ -102,12 +102,12 @@ class ApplicationController < ActionController::Base
       else
         redirect_to current_user, flash: { error: 'You are required to change your password now.' }
       end
-    # elsif !current_user.email_verified
-    #   if params[:controller] == 'users' && (params[:action] == 'verify_email' || params[:action] == 'email_confirmation' || params[:action] == 'show') && params[:id] == current_user.id.to_s
-    #     return
-    #   else
-    #     redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
-    #   end
+    elsif !current_user.email_verified
+      if params[:controller] == 'users' && (params[:action] == 'verify_email' || params[:action] == 'email_confirmation' || params[:action] == 'show') && params[:id] == current_user.id.to_s
+        return
+      else
+        redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
+      end
     elsif params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s
       return
     else

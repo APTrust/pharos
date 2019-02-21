@@ -40,6 +40,7 @@ RSpec.describe UsersController, type: :controller do
     describe 'can create Institutional Administrators' do
       let(:institutional_admin_role_id) { Role.where(name: 'institutional_admin').first_or_create.id}
       let(:attributes) { FactoryBot.attributes_for(:user, role_ids: institutional_admin_role_id) }
+      let(:other_attributes) { FactoryBot.attributes_for(:user, role_ids: institutional_admin_role_id) }
 
       it 'unless no parameters are passed' do
         expect {
@@ -53,6 +54,15 @@ RSpec.describe UsersController, type: :controller do
         }.to change(User, :count).by(1)
         response.should redirect_to user_url(assigns[:user])
         expect(assigns[:user]).to be_institutional_admin
+      end
+
+      it 'and will send a welcome email to the new user' do
+        expect{
+          post :create, params: { user: other_attributes }
+        }.to change(User, :count).by(1)
+        email = ActionMailer::Base.deliveries.last
+        expect(email.body.encoded).to include('You now have an account with a temporary password.')
+        expect(email.body.encoded).to include('Your temporary password is ABCabc-')
       end
     end
 
@@ -504,6 +514,57 @@ RSpec.describe UsersController, type: :controller do
         expect(response.status).to eq(403)
       end
     end
+
+    describe 'updating password' do
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, initial_password_updated: false, password: 'testpassword')}
+
+      it 'for myself should succeed and update initial_password_updated if false' do
+        get :update_password, params: { id: institutional_admin.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
+        expect(response.status).to eq(302)
+        expect(assigns[:user].initial_password_updated).to eq true
+      end
+
+      it 'should send email instructions to verify email address if first time updating password' do
+        institutional_admin.initial_password_updated = false
+        institutional_admin.save!
+        get :update_password, params: { id: institutional_admin.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
+        expect(response.status).to eq(302)
+        email = ActionMailer::Base.deliveries.last
+        token = ConfirmationToken.where(user_id: institutional_admin.id).first
+        expect(email.body.encoded).to include("http://localhost:3000/users/#{institutional_admin.id}/email_confirmation?confirmation_token=#{token.token}")
+      end
+    end
+
+    describe 'verifying email' do
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, email_verified: false)}
+
+      it '#GET verify email should send an email with instructions on verifying my email address' do
+        get :verify_email, params: { id: institutional_admin.id }
+        expect(response.status).to eq(200)
+        email = ActionMailer::Base.deliveries.last
+        token = ConfirmationToken.where(user_id: institutional_admin.id).first
+        expect(email.body.encoded).to include("http://localhost:3000/users/#{institutional_admin.id}/email_confirmation?confirmation_token=#{token.token}")
+      end
+
+      it '#GET email_confirmation should succeed if confirmation token is correct and update email_verified' do
+        get :verify_email, params: { id: institutional_admin.id }
+        token = ConfirmationToken.where(user_id: institutional_admin.id).first
+        get :email_confirmation, params: { id: institutional_admin.id, confirmation_token: token.token }
+        expect(response.status).to eq(200)
+        expect(assigns[:user].email_verified).to eq true
+        expect(flash[:notice]).to eq 'Your email has been successfully verified.'
+      end
+
+      it '#GET email_confirmation should fail if token is incorrect' do
+        get :verify_email, params: { id: institutional_admin.id }
+        token = ConfirmationToken.where(user_id: institutional_admin.id).first
+        get :email_confirmation, params: { id: institutional_admin.id, confirmation_token: SecureRandom.hex }
+        expect(response.status).to eq(200)
+        expect(assigns[:user].email_verified).to eq false
+        expect(flash[:error]).to eq 'Invalid confirmation token.'
+      end
+    end
+
   end
 
   describe 'An Institutional User' do
@@ -612,6 +673,56 @@ RSpec.describe UsersController, type: :controller do
         expect(response.status).to eq(403)
       end
 
+    end
+
+    describe 'updating password' do
+      let(:user) { FactoryBot.create(:user, :institutional_admin, initial_password_updated: false, password: 'testpassword')}
+
+      it 'for myself should succeed and update initial_password_updated if false' do
+        get :update_password, params: { id: user.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
+        expect(response.status).to eq(302)
+        expect(assigns[:user].initial_password_updated).to eq true
+      end
+
+      it 'should send email instructions to verify email address if first time updating password' do
+        user.initial_password_updated = false
+        user.save!
+        get :update_password, params: { id: user.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
+        expect(response.status).to eq(302)
+        email = ActionMailer::Base.deliveries.last
+        token = ConfirmationToken.where(user_id: user.id).first
+        expect(email.body.encoded).to include("http://localhost:3000/users/#{user.id}/email_confirmation?confirmation_token=#{token.token}")
+      end
+    end
+
+    describe 'verifying email' do
+      let(:user) { FactoryBot.create(:user, :institutional_admin, email_verified: false)}
+
+      it '#GET verify email should send an email with instructions on verifying my email address' do
+        get :verify_email, params: { id: user.id }
+        expect(response.status).to eq(200)
+        email = ActionMailer::Base.deliveries.last
+        token = ConfirmationToken.where(user_id: user.id).first
+        expect(email.body.encoded).to include("http://localhost:3000/users/#{user.id}/email_confirmation?confirmation_token=#{token.token}")
+      end
+
+      it '#GET email_confirmation should succeed if confirmation token is correct and update email_verified' do
+        get :verify_email, params: { id: user.id }
+        token = ConfirmationToken.where(user_id: user.id).first
+        get :email_confirmation, params: { id: user.id, confirmation_token: token.token }
+        expect(response.status).to eq(200)
+        expect(assigns[:user].email_verified).to eq true
+        expect(flash[:notice]).to eq 'Your email has been successfully verified.'
+      end
+
+      it '#GET email_confirmation should fail if token is incorrect' do
+        get :verify_email, params: { id: user.id }
+        token = ConfirmationToken.where(user_id: user.id).first
+        get :email_confirmation, params: { id: user.id, confirmation_token: SecureRandom.hex }
+        expect(response.status).to eq(200)
+        expect(assigns[:user].email_verified).to eq false
+        expect(flash[:error]).to eq 'Invalid confirmation token.'
+      end
     end
 
   end
