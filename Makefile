@@ -39,16 +39,15 @@ up: ## Start containers for Pharos, Postgresql, Nginx
 down: ## Stop containers for Pharos, Postgresql, Nginx
 	docker-compose down
 
-
 run: ## Just run Pharos in foreground
 	docker run -p 9292:9292 $(TAG)
 
-runex: ## Start Pharos container, run command and exit.
+runcmd: ## Start Pharos container, run command and exit.
 	docker run $(TAG) $(filter-out $@, $(MAKECMDGOALS))
-#	docker exec $(TAG) $(filter-out $@, $(MAKECMDGOALS))
 
 %:
-	    @true
+	@true
+
 test-ci: ## Run Pharos spec tests in CI
 	docker pull aptrust/pharos:latest
 	docker build --rm=false -t aptrust/pharos:latest  .
