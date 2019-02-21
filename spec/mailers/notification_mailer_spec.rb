@@ -620,8 +620,52 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.from).to eq(['info@aptrust.org'])
     end
 
-    it 'assigns @object_url' do
+    it 'includes specific snapshot text' do
       expect(mail.body.encoded).to include('Here are the latest snapshot results broken down by institution.')
+    end
+  end
+
+  describe 'welcome_email' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:password) { 'temppassword' }
+    let(:mail) { described_class.welcome_email(user, password).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('Welcome to APTrust!')
+    end
+
+    it 'renders the reciever email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'includes specific password text' do
+      expect(mail.body.encoded).to include('Your temporary password is temppassword.')
+    end
+  end
+
+  describe 'email_verification' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:token) { FactoryBot.create(:confirmation_token, user: user) }
+    let(:mail) { described_class.email_verification(user, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('Verify Your Email')
+    end
+
+    it 'renders the reciever email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['info@aptrust.org'])
+    end
+
+    it 'assigns @confirmation_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/users/#{user.id}/email_confirmation?confirmation_token=#{token.token}")
     end
   end
 end
