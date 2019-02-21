@@ -27,11 +27,11 @@ help: ## This help.
 revision: ## Show me the git hash
 	@echo $(REVISION)
 
-build: ## Build the Pharos container
-	docker build --no-cache --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+build: ## Build the Pharos container from current repo. Make sure to commit all changes beforehand
+	docker build --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 build-nc: ## Build the Pharos container, no cached layers.
-	docker build --no-cache -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+	docker build --no-cache --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
 	docker-compose -e DOCKER_TAG_NAME=$(REVISION) up
@@ -87,21 +87,20 @@ devstop: ## Stop and remove running Docker containers
 	docker stop pharos-dev-web
 
 publish:
+	# GITLAB
 	docker login $(REGISTRY)
-	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos
-	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
-	docker tag aptrust/pharos aptrust/pharos:latest
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
-	docker push aptrust/pharos
+	# Docker Hub
+	#docker login docker.io
+	#docker push aptrust/pharos
 
 publish-ci:
-	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
-	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
-	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):latest
-	docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION)
-	docker tag aptrust/$(NAME) aptrust/$(NAME):latest
-	docker push $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
-#	docker push aptrust/$(NAME)
+	@echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
+	docker tag $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:latest
+	docker push $(REGISTRY)/$(REPOSITORY)/pharos
+	# Docker Hub
+	#docker login docker.io
+	#docker push aptrust/pharos
 
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
