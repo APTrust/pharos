@@ -1,17 +1,11 @@
 #!/bin/bash
-# Docker_start.sh
-# Script to provision a development environment
-# with docker-ce and start pharos in a container as per docker-compose.yml
-
-# 1. ID OS - Linux or OSX
-# 2. If OSX, install homebrew
-# 3. Install Docker-CE on osx (brew cask install docker/linux: apt-get install docker)
-# 4. Run make build to build the latest version of Pharos
-# 5. docker-compose up -f docker-compose-dev.yml
-# 6. Connect to pharos.docker.localhost in your browser.
-
-# -  make restart: docker-compose up -d -f docker-compose-dev.yml
+# Makefile to wrap common docker and dev related tasks. Just type 'make' to get
+# help.
 #
+# Requirements:
+#  - Install Docker locally
+#	 	Mac OS `brew cask install docker`
+#    	Linux: `apt-get install docker`
 
 REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
