@@ -1,17 +1,11 @@
 #!/bin/bash
-# Docker_start.sh
-# Script to provision a development environment
-# with docker-ce and start pharos in a container as per docker-compose.yml
-
-# 1. ID OS - Linux or OSX
-# 2. If OSX, install homebrew
-# 3. Install Docker-CE on osx (brew cask install docker/linux: apt-get install docker)
-# 4. Run make build to build the latest version of Pharos
-# 5. docker-compose up -f docker-compose-dev.yml
-# 6. Connect to pharos.docker.localhost in your browser.
-
-# -  make restart: docker-compose up -d -f docker-compose-dev.yml
+# Makefile to wrap common docker and dev related tasks. Just type 'make' to get
+# help.
 #
+# Requirements:
+#  - Install Docker locally
+#	 	Mac OS `brew cask install docker`
+#    	Linux: `apt-get install docker`
 
 REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
@@ -33,11 +27,11 @@ help: ## This help.
 revision: ## Show me the git hash
 	@echo $(REVISION)
 
-build: ## Build the Pharos container
-	docker build --no-cache --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+build: ## Build the Pharos container from current repo. Make sure to commit all changes beforehand
+	docker build --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 build-nc: ## Build the Pharos container, no cached layers.
-	docker build --no-cache -t aptrust/$(TAG) -t $(TAG) -t $(NAME):$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+	docker build --no-cache --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
 	docker-compose -e DOCKER_TAG_NAME=$(REVISION) up
@@ -45,16 +39,15 @@ up: ## Start containers for Pharos, Postgresql, Nginx
 down: ## Stop containers for Pharos, Postgresql, Nginx
 	docker-compose down
 
-
 run: ## Just run Pharos in foreground
 	docker run -p 9292:9292 $(TAG)
 
-runex: ## Start Pharos container, run command and exit.
+runcmd: ## Start Pharos container, run command and exit.
 	docker run $(TAG) $(filter-out $@, $(MAKECMDGOALS))
-#	docker exec $(TAG) $(filter-out $@, $(MAKECMDGOALS))
 
 %:
-	    @true
+	@true
+
 test-ci: ## Run Pharos spec tests in CI
 	docker pull aptrust/pharos:latest
 	docker build --rm=false -t aptrust/pharos:latest  .
@@ -93,21 +86,20 @@ devstop: ## Stop and remove running Docker containers
 	docker stop pharos-dev-web
 
 publish:
+	# GITLAB
 	docker login $(REGISTRY)
-	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos
-	docker tag aptrust/pharos $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
-	docker tag aptrust/pharos aptrust/pharos:latest
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
-	docker push aptrust/pharos
+	# Docker Hub
+	#docker login docker.io
+	#docker push aptrust/pharos
 
 publish-ci:
-	echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
-	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
-	docker tag aptrust/$(NAME) $(REGISTRY)/$(REPOSITORY)/$(NAME):latest
-	docker tag aptrust/$(NAME) aptrust/$(NAME):$(REVISION)
-	docker tag aptrust/$(NAME) aptrust/$(NAME):latest
-	docker push $(REGISTRY)/$(REPOSITORY)/$(NAME):$(REVISION)
-#	docker push aptrust/$(NAME)
+	@echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
+	docker tag $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:latest
+	docker push $(REGISTRY)/$(REPOSITORY)/pharos
+	# Docker Hub
+	#docker login docker.io
+	#docker push aptrust/pharos
 
 # Docker release - build, tag and push the container
 release: build publish ## Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab
