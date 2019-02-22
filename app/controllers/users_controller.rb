@@ -144,28 +144,35 @@ class UsersController < ApplicationController
 
   def verify_twofa
     authorize @user
-    one_touch = Authy::OneTouch.send_approval_request(
-        id: current_user.authy_id,
-        message: 'Request to Verify Phone Number for APTrust Repository Website',
-        details: {
-            'Email Address' => current_user.email,
-        }
-    )
-    if !one_touch.ok?
-      render json: { err: 'Create Push Error' }, status: :internal_server_error and return
-    end
-    session[:uuid] = one_touch.approval_request['uuid']
-    status = one_touch['success'] ? :onetouch : :sms
-    current_user.update(authy_status: status)
-    if current_user.sms_user?
+    puts "HERE checking param: #{params[:verification_option]} *******************************************"
+    if params[:verification_option] == 'push'
+      one_touch = Authy::OneTouch.send_approval_request(
+          id: current_user.authy_id,
+          message: 'Request to Verify Phone Number for APTrust Repository Website',
+          details: {
+              'Email Address' => current_user.email,
+          }
+      )
+      unless one_touch.ok?
+        respond_to do |format|
+          format.json { render json: { error: 'Create Push Error' }, status: :internal_server_error }
+          format.html {
+            render 'show'
+            flash[:error] = 'There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help.'
+          }
+        end
+      end
+      session[:uuid] = one_touch.approval_request['uuid']
+      status = one_touch['success'] ? :onetouch : :sms
+      current_user.update(authy_status: status)
+      one_touch_status
+    elsif params[:verification_option] == 'sms'
       sms = Aws::SNS::Client.new
       response = sms.publish({
                                  phone_number: current_user.phone_number,
                                  message: "Your new one time password is: #{current_user.current_otp}"
                              })
       redirect_to edit_verification_path(id: current_user.id, verification_type: 'phone_number')
-    else
-      one_touch_status
     end
   end
 
@@ -372,8 +379,14 @@ class UsersController < ApplicationController
     @user = current_user
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
 
-    if !status.ok?
-      render json: { err: 'One Touch Status Error' }, status: :internal_server_error and return
+    unless status.ok?
+      respond_to do |format|
+        format.json { render json: { err: 'One Touch Status Error' }, status: :internal_server_error }
+        format.html {
+          render 'show'
+          flash[:error] = 'There was a problem verifying your push notification. Please contact your administrator or an APTrust administrator for help.'
+        }
+      end
     end
 
     if status['approval_request']['seconds_to_expire'] <= 0

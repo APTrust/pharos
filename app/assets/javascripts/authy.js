@@ -42,6 +42,12 @@ $(document).ready(function() {
     });
 
     $('#login-btn').click(function() {
-      $('#push-notification-loader').removeClass("hidden");
+      if($('#two_factor_option_Push_Notification').checked) {
+          $('#push-notification-loader').removeClass("hidden");
+      }
+    });
+
+    $('#phone_verification_push_btn').click(function() {
+          $('#verification-loader').removeClass("hidden");
     });
 });

@@ -43,6 +43,16 @@ class ApplicationController < ActionController::Base
           }
       )
       unless one_touch.ok?
+        session.delete(:authy)
+        session.delete(:verified)
+        session.delete(:two_factor_option)
+        sign_out(@user)
+        respond_to do |format|
+          format.json { render json: { error: 'Create Push Error' }, status: :internal_server_error }
+          format.html {
+            redirect_to new_user_session_path, flash: { error: 'There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help.' }
+          }
+        end
         render json: { err: 'Create Push Error' }, status: :internal_server_error and return
       end
       session[:uuid] = one_touch.approval_request['uuid']
@@ -94,7 +104,7 @@ class ApplicationController < ActionController::Base
   end
 
   def forced_redirections
-    if current_user.nil? || session[:verified].nil?
+    if current_user.nil?
       return
     elsif !current_user.initial_password_updated
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
@@ -121,6 +131,7 @@ class ApplicationController < ActionController::Base
         elsif !current_user.confirmed_two_factor
           if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
             return
+          elsif params[:controller] == 'verifications' && (params[:action] == 'edit' || params[:action] == 'update')
           else
             redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
           end

@@ -9,7 +9,6 @@ class VerificationsController < ApplicationController
     if params[:verification_type] == 'login'
       if current_user.validate_and_consume_otp!(params[:code])
         session[:verified] = true
-        #session.delete(:two_factor_option)
         flash[:notice] = 'Signed in successfully.'
         redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
       else
@@ -20,6 +19,7 @@ class VerificationsController < ApplicationController
         @user = User.find(params[:id])
         @user.confirmed_two_factor = true
         @user.save!
+        session[:verified] = true
         redirect_to @user, flash: { notice: 'Phone number has been verified.' }
       else
         redirect_to @user, flash: { error: 'Incorrect one time password, phone number has not been verified.' }
