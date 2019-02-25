@@ -347,7 +347,7 @@ namespace :pharos do
     duplicate_events = []
 
     db.execute('SELECT id, name, brief_name, identifier, dpn_uuid FROM institutions') do |inst_row|
-      current_inst = Institution.create(name: inst_row[1], brief_name: inst_row[2], identifier: inst_row[3],
+      current_inst = Institution.create(name: inst_row[1], identifier: inst_row[3],
                                         dpn_uuid: inst_row[4], state: 'A')
       current_inst.save!
       puts "Created Institution: #{current_inst.name}"

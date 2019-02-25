@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_27_171941) do
+ActiveRecord::Schema.define(version: 2019_02_25_162511) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 2018_11_27_171941) do
     t.integer "intellectual_object_id"
     t.integer "generic_file_id"
     t.integer "institution_id"
+    t.integer "user_id"
   end
 
   create_table "dpn_bags", id: false, force: :cascade do |t|
@@ -187,7 +188,6 @@ ActiveRecord::Schema.define(version: 2018_11_27_171941) do
   create_table "institutions", id: false, force: :cascade do |t|
     t.serial "id", null: false
     t.string "name"
-    t.string "brief_name"
     t.string "identifier"
     t.string "dpn_uuid"
     t.datetime "created_at", null: false
@@ -196,6 +196,7 @@ ActiveRecord::Schema.define(version: 2018_11_27_171941) do
     t.string "type"
     t.integer "member_institution_id"
     t.datetime "deactivated_at"
+    t.boolean "otp_enabled"
     t.index ["name"], name: "index_institutions_on_name"
   end
 
@@ -317,6 +318,20 @@ ActiveRecord::Schema.define(version: 2018_11_27_171941) do
     t.text "encrypted_api_secret_key"
     t.datetime "password_changed_at"
     t.datetime "deactivated_at"
+    t.string "encrypted_otp_secret"
+    t.string "encrypted_otp_secret_iv"
+    t.string "encrypted_otp_secret_salt"
+    t.integer "consumed_timestep"
+    t.boolean "otp_required_for_login"
+    t.boolean "enabled_two_factor", default: false
+    t.boolean "confirmed_two_factor", default: false
+    t.string "otp_backup_codes", array: true
+    t.string "authy_id"
+    t.datetime "last_sign_in_with_authy"
+    t.string "authy_status"
+    t.boolean "email_verified", default: false
+    t.boolean "initial_password_updated", default: false
+    t.index ["authy_id"], name: "index_users_on_authy_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"
     t.index ["password_changed_at"], name: "index_users_on_password_changed_at"
