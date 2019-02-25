@@ -200,11 +200,9 @@ module ApplicationHelper
 
   def pretty_date(date)
     unless date.nil? || date == ''
-      # date = date.strftime('%a, %b %d, %Y %H:%M:%S')
-      # date += ' -GMT'
-      date = date.strftime('%Y-%m-%dT%H:%M:%S') #ISO Format
-      date += '+00:00'
-      
+      zoned_date = date.in_time_zone(Time.zone)
+      pretty_date = zoned_date.strftime('%Y-%m-%dT%H:%M:%S %Z') #ISO Format
+      pretty_date
     end
   end
 
