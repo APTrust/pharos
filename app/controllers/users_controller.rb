@@ -165,6 +165,7 @@ class UsersController < ApplicationController
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
+      session[:verify_timeout] = 300
       one_touch_status
     elsif params[:verification_option] == 'sms'
       sms = Aws::SNS::Client.new
@@ -389,7 +390,7 @@ class UsersController < ApplicationController
       end
     end
 
-    if status['approval_request']['seconds_to_expire'] <= 0
+    if session[:verify_timeout] <= 0
       redirect_to @user, flash: { error: 'This push notification has expired' }
     else
       if status['approval_request']['status'] == 'approved'
@@ -402,6 +403,7 @@ class UsersController < ApplicationController
         redirect_to @user, flash: { error: 'This request was denied, phone number has not been verified.' }
       else
         sleep 1
+        session[:verify_timeout] -= 1
         one_touch_status
       end
     end

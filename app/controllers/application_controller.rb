@@ -58,6 +58,7 @@ class ApplicationController < ActionController::Base
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
+      session[:one_touch_timeout] = 300
       one_touch_status
     elsif session[:two_factor_option] == 'Text Message'
       sms = Aws::SNS::Client.new
@@ -77,7 +78,7 @@ class ApplicationController < ActionController::Base
       render json: { err: 'One Touch Status Error' }, status: :internal_server_error and return
     end
 
-    if status['approval_request']['seconds_to_expire'] <= 0
+    if session[:one_touch_timeout] <= 0
       session.delete(:authy)
       session.delete(:verified)
       session.delete(:two_factor_option)
@@ -98,6 +99,7 @@ class ApplicationController < ActionController::Base
         redirect_to new_user_session_path, flash: { error: 'This request was denied.' }
       else
         sleep 1
+        session[:one_touch_timeout] -= 1
         one_touch_status
       end
     end
