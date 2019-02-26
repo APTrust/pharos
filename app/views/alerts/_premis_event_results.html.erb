@@ -11,7 +11,7 @@
       <tr>
         <td><a href="<%= generic_file_path(generic_file_identifier: event.generic_file_identifier) %>" ><%= truncate(event.generic_file_identifier, length: 80) %></a></td>
         <td><%= event.identifier %></td>
-        <td><%= event.date_time %></td>
+        <td><%= pretty_date(event.date_time) %></td>
       </tr>
   <% end %>
   </tbody>

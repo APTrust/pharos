@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_18_215507) do
+ActiveRecord::Schema.define(version: 2019_02_25_162511) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -182,7 +182,6 @@ ActiveRecord::Schema.define(version: 2019_02_18_215507) do
 
   create_table "institutions", force: :cascade do |t|
     t.string "name"
-    t.string "brief_name"
     t.string "identifier"
     t.string "dpn_uuid"
     t.datetime "created_at", null: false
@@ -312,12 +311,12 @@ ActiveRecord::Schema.define(version: 2019_02_18_215507) do
     t.integer "institution_id"
     t.text "encrypted_api_secret_key"
     t.datetime "password_changed_at"
+    t.datetime "deactivated_at"
     t.string "encrypted_otp_secret"
     t.string "encrypted_otp_secret_iv"
     t.string "encrypted_otp_secret_salt"
     t.integer "consumed_timestep"
     t.boolean "otp_required_for_login"
-    t.datetime "deactivated_at"
     t.boolean "enabled_two_factor", default: false
     t.boolean "confirmed_two_factor", default: false
     t.string "otp_backup_codes", array: true

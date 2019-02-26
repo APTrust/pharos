@@ -19,12 +19,12 @@
         <% if item.queued_at.nil? %>
             <td> </td>
         <% else %>
-            <td><%= item.queued_at.to_date %></td>
+            <td><%= pretty_date(item.queued_at.to_date) %></td>
         <% end %>
         <% if item.completed_at.nil? %>
             <td> </td>
         <% else %>
-            <td><%= item.completed_at.to_date %></td>
+            <td><%= pretty_date(item.completed_at.to_date) %></td>
         <% end %>
         <td><%= dpn_process_time(item) %></td>
         <th><%= truncate(item.note, length: 50) %></th>

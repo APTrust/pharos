@@ -14,13 +14,15 @@
   <section class="object_info">
     <dl class="dl-horizontal dl-invert">
       <dt>Institution</dt>
-      <dd><%= link_to @generic_file.intellectual_object.institution.name, institution_path(@generic_file.intellectual_object.institution) %> [<%= @generic_file.intellectual_object.institution.brief_name %>]</dd>
+      <dd><%= link_to @generic_file.intellectual_object.institution.name, institution_path(@generic_file.intellectual_object.institution) %></dd>
       <dt>Intellectual Object</dt>
-      <dd><%= link_to @generic_file.intellectual_object.title, @generic_file.intellectual_object %> [<%= @generic_file.intellectual_object.access %>]</dd>
+      <dd><%= link_to @generic_file.intellectual_object.title, @generic_file.intellectual_object %></dd>
       <dt>Identifier</dt>
       <dd><%= @generic_file.identifier %></dd>
       <dt>URL to File</dt>
       <dd><%= @generic_file.uri %></dd>
+      <dt>Access</dt>
+      <dd><%= @generic_file.intellectual_object.access %></dd>
       <dt>MimeType<dt>
       <dd><%= @generic_file.file_format %></dd>
       <dt>Filesize<dt>
