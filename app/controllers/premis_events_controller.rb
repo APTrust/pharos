@@ -186,6 +186,7 @@ class PremisEventsController < ApplicationController
     result = ActiveRecord::Base.connection.exec_query(query)
     count = result[0]['count']
     set_page_counts(count)
+    params[:sort] = 'date' if params[:sort].nil?
     case params[:sort]
       when 'date'
         @premis_events = @premis_events.order('date_time DESC')
