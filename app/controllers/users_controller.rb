@@ -69,11 +69,12 @@ class UsersController < ApplicationController
     if @user.update_with_password(user_params)
       unless @user.initial_password_updated
         @user.initial_password_updated = true
+        @user.email_verified = true
         @user.save!
-        ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
-        token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
-        token.save!
-        NotificationMailer.email_verification(@user, token).deliver!
+        # ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
+        # token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
+        # token.save!
+        # NotificationMailer.email_verification(@user, token).deliver!
       end
       bypass_sign_in(@user)
       redirect_to @user

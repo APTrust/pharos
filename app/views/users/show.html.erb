@@ -70,6 +70,7 @@
 <hr />
 
 <%= edit_link(@user) %>
+<%= link_to 'Change Password', edit_password_user_path(@user), class: 'btn btn-normal doc-action-btn' %>
 <% if @user.deactivated? %>
     <%= reactivate_link(@user) %>
 <% else %>

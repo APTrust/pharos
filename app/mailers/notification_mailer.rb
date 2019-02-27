@@ -235,6 +235,7 @@ class NotificationMailer < ApplicationMailer
   def welcome_email(subject, password)
     @subject = subject
     @password = password
+    @login_url = new_user_session_url
     mail(to: subject.email, subject: 'Welcome to APTrust!')
   end
 
