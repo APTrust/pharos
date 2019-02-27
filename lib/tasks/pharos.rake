@@ -596,6 +596,14 @@ namespace :pharos do
     print_storage_report(args[:end_date])
   end
 
+  desc 'Two Factor Passwords'
+  task :two_factor_passwords => :environment do
+    User.all.each do |usr|
+      usr.initial_password_updated = true
+      usr.save!
+      puts "#{usr.name} has been updated."
+    end
+  end
 
   # To get total GB deposited by each institution through the end of July, 2018:
   #
