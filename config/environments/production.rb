@@ -54,6 +54,13 @@ Rails.application.configure do
 
    # Semantic logger
   #config.colorize_logging = false
+  if ENV["DOCKERIZED"] == 'true'
+    STDOUT.sync = true
+    config.semantic_logger.add_appender(io: STDOUT, level: config.log_level, formatter: config.rails_semantic_logger.format)
+  else
+    config.semantic_logger.add_appender(file_name: ENV['RAILS_ENV'] + ".log")
+  end
+
   config.rails_semantic_logger.semantic   = false
   config.rails_semantic_logger.started    = true
   config.rails_semantic_logger.processing = true
