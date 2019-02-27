@@ -46,7 +46,11 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :warn
+  if ENV['PHAROS_LOG_LEVEL'].present?
+    config.log_level = ":" + ENV['PHAROS_LOG_LEVEL'].downcase.strip.to_sym
+  else
+	config.log_level = :warn
+  end
 
    # Semantic logger
   #config.colorize_logging = false
