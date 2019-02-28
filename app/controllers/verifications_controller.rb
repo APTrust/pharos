@@ -16,13 +16,12 @@ class VerificationsController < ApplicationController
       end
     elsif params[:verification_type] == 'phone_number'
       if current_user.validate_and_consume_otp!(params[:code])
-        @user = User.find(params[:id])
-        @user.confirmed_two_factor = true
-        @user.save!
+        current_user.confirmed_two_factor = true
+        current_user.save!
         session[:verified] = true
-        redirect_to @user, flash: { notice: 'Phone number has been verified.' }
+        redirect_to current_user, flash: { notice: 'Phone number has been verified.' }
       else
-        redirect_to @user, flash: { error: 'Incorrect one time password, phone number has not been verified.' }
+        redirect_to current_user, flash: { error: 'Incorrect one time password, phone number has not been verified.' }
       end
     end
   end

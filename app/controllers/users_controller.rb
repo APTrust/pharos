@@ -145,7 +145,6 @@ class UsersController < ApplicationController
 
   def verify_twofa
     authorize @user
-    puts "HERE checking param: #{params[:verification_option]} *******************************************"
     if params[:verification_option] == 'push'
       one_touch = Authy::OneTouch.send_approval_request(
           id: current_user.authy_id,
