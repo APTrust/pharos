@@ -522,16 +522,7 @@ RSpec.describe UsersController, type: :controller do
         get :update_password, params: { id: institutional_admin.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
         expect(response.status).to eq(302)
         expect(assigns[:user].initial_password_updated).to eq true
-      end
-
-      it 'should send email instructions to verify email address if first time updating password' do
-        institutional_admin.initial_password_updated = false
-        institutional_admin.save!
-        get :update_password, params: { id: institutional_admin.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
-        expect(response.status).to eq(302)
-        email = ActionMailer::Base.deliveries.last
-        token = ConfirmationToken.where(user_id: institutional_admin.id).first
-        expect(email.body.encoded).to include("http://localhost:3000/users/#{institutional_admin.id}/email_confirmation?confirmation_token=#{token.token}")
+        expect(assigns[:user].email_verified).to eq true
       end
     end
 
@@ -682,16 +673,7 @@ RSpec.describe UsersController, type: :controller do
         get :update_password, params: { id: user.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
         expect(response.status).to eq(302)
         expect(assigns[:user].initial_password_updated).to eq true
-      end
-
-      it 'should send email instructions to verify email address if first time updating password' do
-        user.initial_password_updated = false
-        user.save!
-        get :update_password, params: { id: user.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
-        expect(response.status).to eq(302)
-        email = ActionMailer::Base.deliveries.last
-        token = ConfirmationToken.where(user_id: user.id).first
-        expect(email.body.encoded).to include("http://localhost:3000/users/#{user.id}/email_confirmation?confirmation_token=#{token.token}")
+        expect(assigns[:user].email_verified).to eq true
       end
     end
 
