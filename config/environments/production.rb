@@ -46,10 +46,21 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :warn
+  if ENV['PHAROS_LOG_LEVEL'].present?
+    config.log_level = ":" + ENV['PHAROS_LOG_LEVEL'].downcase.strip.to_sym
+  else
+	config.log_level = :warn
+  end
 
    # Semantic logger
   #config.colorize_logging = false
+  if ENV["DOCKERIZED"] == 'true'
+    STDOUT.sync = true
+    config.semantic_logger.add_appender(io: STDOUT, level: config.log_level, formatter: config.rails_semantic_logger.format)
+  else
+    config.semantic_logger.add_appender(file_name: ENV['RAILS_ENV'] + ".log")
+  end
+
   config.rails_semantic_logger.semantic   = false
   config.rails_semantic_logger.started    = true
   config.rails_semantic_logger.processing = true
