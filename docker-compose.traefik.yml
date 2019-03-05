@@ -25,7 +25,7 @@ services:
       delay: 5s
       max_attempts: 3
       window: 120s
-	command: bundle exec puma -p9292 -e ${RAILS_ENV}
+    command: bundle exec puma -p9292 -e ${RAILS_ENV}
     volumes:
       - .:/pharos
     depends_on:
