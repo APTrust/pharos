@@ -2,17 +2,17 @@ version: '3'
 services:
   db:
     image: postgres:9.6.6-alpine
-	restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
+    restart_policy:
+       condition: on-failure
+       delay: 5s
+       max_attempts: 3
+       window: 120s
     container_name: postgres
     environment:
       POSTGRES_USER: pharos
       POSTGRES_DB: pharos
     volumes:
-      - ./docker/pharos-postgres:/var/lib/postgresql/data
+      - ${DOCKERAPP_DATA_PATH:-./docker/pharos-postgres}:/var/lib/postgresql/data
     networks:
       - internal
     labels:
@@ -21,10 +21,10 @@ services:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     #    image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
     restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3
+      window: 120s
 	command: bundle exec puma -p9292 -e ${RAILS_ENV}
     volumes:
       - .:/pharos
