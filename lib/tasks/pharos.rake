@@ -605,6 +605,17 @@ namespace :pharos do
     end
   end
 
+  desc 'Set SMS Defaults'
+  task :set_sms_defaults => :environment do
+    sms = Aws::SNS::Client.new
+    response = sms.set_sms_attributes({
+        attributes: {
+          'DefaultSenderID' => 'APTrust',
+          'DefaultSMSType' => 'Transactional',
+        },
+    })
+  end
+
   # To get total GB deposited by each institution through the end of July, 2018:
   #
   # inst_storage_summary('2018-07-31')
