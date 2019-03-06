@@ -7,3 +7,5 @@
     </div>
     <%= submit_tag 'Verify One Time Code', class: "btn btn-primary" %>
 <% end %>
+<br>
+<%= button_to 'Back To Login', destroy_user_session_path, method: 'delete', class: 'btn btn-warning' %>
