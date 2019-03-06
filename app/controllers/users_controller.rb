@@ -108,11 +108,11 @@ class UsersController < ApplicationController
     if current_user.admin? || current_user.institutional_admin?
       if current_user == @user || @user.admin? || @user.institutional_admin?
         redirect_to @user
-        (current_user == @user) ? usr = 'you' : usr = 'this user'
+        (current_user == @user) ? usr = 'you based on your role as an administrator' : usr = 'this user based on their role as an administrator'
         flash[:notice] = "Two Factor Authentication cannot be disabled at this time because it is required for #{usr}."
       elsif @user.institution.otp_enabled
         redirect_to @user
-        flash[:notice] = 'Two Factor Authentication cannot be disabled at this time because it is required for this institution.'
+        flash[:notice] = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at this institution.'
       else
         @user.enabled_two_factor = false
         @user.save!
@@ -122,7 +122,7 @@ class UsersController < ApplicationController
     else
       if @user.institution.otp_enabled
         redirect_to @user
-        flash[:notice] = 'Two Factor Authentication cannot be disabled at this time because it is required for your institution.'
+        flash[:notice] = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at your institution.'
       else
         @user.enabled_two_factor = false
         @user.save!
