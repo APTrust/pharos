@@ -98,39 +98,43 @@ class UsersController < ApplicationController
     end
     @codes = @user.generate_otp_backup_codes!
     @user.save!
-    redirect_to @user
     (current_user == @user) ? usr = '' : usr = ' for this user'
     flash[:notice] = "Two Factor Authentication has been enabled#{usr}."
+    if params[:redirect_loc] && params[:redirect_loc] == 'index'
+      redirect_to users_path
+    else
+      redirect_to @user
+    end
   end
 
   def disable_otp
     authorize @user
     if current_user.admin? || current_user.institutional_admin?
       if current_user == @user || @user.admin? || @user.institutional_admin?
-        redirect_to @user
         (current_user == @user) ? usr = 'you based on your role as an administrator' : usr = 'this user based on their role as an administrator'
         flash[:alert] = "Two Factor Authentication cannot be disabled at this time because it is required for #{usr}."
       elsif @user.institution.otp_enabled
-        redirect_to @user
+
         flash[:alert] = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at this institution.'
       else
         @user.enabled_two_factor = false
         @user.save!
-        redirect_to @user
         flash[:notice] = 'Two Factor Authentication has been disabled for this user.'
       end
     else
       if @user.institution.otp_enabled
-        redirect_to @user
         flash[:alert] = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at your institution.'
       else
         @user.enabled_two_factor = false
         @user.save!
-        redirect_to @user
         flash[:notice] = 'Two Factor Authentication has been disabled.'
       end
     end
-
+    if params[:redirect_loc] && params[:redirect_loc] == 'index'
+      redirect_to users_path
+    else
+      redirect_to @user
+    end
   end
 
   def generate_backup_codes
