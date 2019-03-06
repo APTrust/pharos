@@ -48,7 +48,7 @@ Rails.application.configure do
   # when problems arise.
 #  config.log_level = :warn
   if ENV['PHAROS_LOG_LEVEL'].present?
-    config.log_level = ":" + ENV['PHAROS_LOG_LEVEL'].downcase.strip.to_sym
+    config.log_level = ENV['PHAROS_LOG_LEVEL'].downcase.strip.to_sym
   else
 	config.log_level = :warn
   end

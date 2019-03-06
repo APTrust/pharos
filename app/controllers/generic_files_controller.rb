@@ -401,6 +401,7 @@ class GenericFilesController < ApplicationController
     get_state_counts(@generic_files)
     count = @generic_files.count
     set_page_counts(count)
+    params[:sort] = 'name' if params[:sort].nil?
     case params[:sort]
       when 'date'
         @generic_files = @generic_files.order('updated_at DESC')

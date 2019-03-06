@@ -377,6 +377,7 @@ class IntellectualObjectsController < ApplicationController
     get_state_counts(@intellectual_objects)
     count = @intellectual_objects.count
     set_page_counts(count)
+    params[:sort] = 'name' if params[:sort].nil?
     case params[:sort]
       when 'date'
         @intellectual_objects = @intellectual_objects.order('updated_at DESC')

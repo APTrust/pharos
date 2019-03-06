@@ -81,13 +81,14 @@ devclean: ## Stop and remove running Docker containers
 	docker stop pharos-dev-web && docker rm -v pharos-dev-web || true
 	docker network rm pharos-dev-net
 
-devstop: ## Stop and remove running Docker containers
+devstop: ## Stop running Docker containers. Can pick up dev later
 	docker stop pharos-dev-db
 	docker stop pharos-dev-web
 
 publish:
 	# GITLAB
 	docker login $(REGISTRY)
+	docker tag $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:latest
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	# Docker Hub
 	#docker login docker.io
