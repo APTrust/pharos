@@ -27,9 +27,8 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 # make sure that docker and ansible are installed locally. After build the
 # container will be pushed to the server and restarted.
 
-COPY Gemfile .
-COPY Gemfile.lock .
-RUN bundle install
+COPY Gemfile Gemfile.lock ./
+RUN bundle install --jobs=4 --without=["development" "test"] --no-cache
 
 COPY . $WORKDIR
 
