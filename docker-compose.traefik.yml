@@ -8,7 +8,8 @@ services:
       POSTGRES_USER: pharos
       POSTGRES_DB: pharos
     volumes:
-      - ${DOCKERAPP_DATA_PATH:-./docker/pharos-postgres}:/var/lib/postgresql/data
+#      - ${PGDATA_PATH:-./docker/pgdata}:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     networks:
       - internal
     labels:
@@ -108,3 +109,5 @@ networks:
     external: true
   internal:
     external: false
+ volumes:
+    - pgdata
