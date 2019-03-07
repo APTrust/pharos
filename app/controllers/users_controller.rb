@@ -170,7 +170,7 @@ class UsersController < ApplicationController
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
       session[:verify_timeout] = 300
-      one_touch_status
+      one_touch_status_for_users
     elsif params[:verification_option] == 'sms'
       sms = Aws::SNS::Client.new
       response = sms.publish({
@@ -380,7 +380,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def one_touch_status
+  def one_touch_status_for_users
     @user = current_user
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
 
