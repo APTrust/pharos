@@ -191,7 +191,7 @@ Rails.application.routes.draw do
   get 'users/:id/email_confirmation', to: 'users#email_confirmation', as: :email_confirmation
 
   resources :verifications, only: [:edit, :update]
-  get 'verifications/pending', to: 'verifications#pending', as: :verification_pending
+  get 'verifications/login', to: 'verifications#login', as: :verification_login
   get 'verifications/enter_backup/:id', to: 'verifications#enter_backup', as: :enter_backup_verification
   put 'verifications/check_backup/:id', to: 'verifications#check_backup', as: :check_backup_verification
 

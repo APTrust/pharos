@@ -1,6 +1,10 @@
 class VerificationsController < ApplicationController
   skip_before_action :verify_user!
 
+  def login
+
+  end
+
   def edit
 
   end
