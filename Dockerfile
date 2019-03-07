@@ -20,6 +20,7 @@ WORKDIR /pharos
 # Set Timezone & Locale
 ENV TZ=UTC
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+ENV SECRET_KEY_BASE=${SECRET_KEY_BASE:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4c37bb506f1288f8976a187a4df1fdd820ad88b8382009c84de50f2d53a09d4c17ff2e64f8a99dc4da6a4987}
 
 # Set Environment
 # Environment to be set in .env file and populated by Ansible with correct
@@ -39,7 +40,10 @@ COPY . $WORKDIR
 # to provide the rails environment and app. It assumes an external db (per env)
 
 # Provide dummy data to Rails so it can pre-compile assets.
-RUN bundle exec rake RAILS_ENV=production DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken assets:precompile
+#RUN bundle exec rake RAILS_ENV=production DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken assets:precompile
+RUN RAILS_ENV=test bundle exec rake assets:precompile
+RUN RAILS_ENV=production bundle exec rake assets:precompile
+RUN RAILS_ENV=demo bundle exec rake assets:precompile
 
 # Expose rails server port
 EXPOSE 9292
