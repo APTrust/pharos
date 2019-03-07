@@ -12,7 +12,7 @@ class VerificationsController < ApplicationController
         flash[:notice] = 'Signed in successfully.'
         redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
       else
-        redirect_to edit_verification_path(id: params[:id]), flash: { error: 'Incorrect one time password.' }
+        redirect_to edit_verification_path(id: params[:id], verification_type: 'login'), flash: { error: 'Incorrect one-time authorization code.' }
       end
     elsif params[:verification_type] == 'phone_number'
       if current_user.validate_and_consume_otp!(params[:code])
@@ -21,7 +21,7 @@ class VerificationsController < ApplicationController
         session[:verified] = true
         redirect_to current_user, flash: { notice: 'Phone number has been verified.' }
       else
-        redirect_to current_user, flash: { error: 'Incorrect one time password, phone number has not been verified.' }
+        redirect_to current_user, flash: { error: 'Incorrect one-time authorization code, phone number has not been verified.' }
       end
     end
   end
