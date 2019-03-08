@@ -9,7 +9,8 @@ LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
     nodejs postgresql-client postgresql-dev python py-requests py-argparse \
-    ruby-bundler libstdc++ tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal libxml2-dev libxslt-dev
+    ruby-bundler libstdc++ tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal \
+	libxml2-dev libxslt-dev
 
 RUN addgroup -S somegroup -g 1000 && adduser -S -G somegroup somebody -u 1000
 
@@ -19,33 +20,16 @@ WORKDIR /pharos
 # Set Timezone & Locale
 ENV TZ=UTC
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+ENV SECRET_KEY_BASE=${SECRET_KEY_BASE:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4c37bb506f1288f8976a187a4df1fdd820ad88b8382009c84de50f2d53a09d4c17ff2e64f8a99dc4da6a4987}
 
 # Set Environment
 # Environment to be set in .env file and populated by Ansible with correct
 # values. Ansible shall start container build and deploy. build script should
 # make sure that docker and ansible are installed locally. After build the
 # container will be pushed to the server and restarted.
-#ENV PHAROS_DB_HOST='here'
-#ENV PHAROS_DB_NAME='pharos'
-#ENV PHAROS_DB_USER='root'
-#ENV PHAROS_DB_PWD=''
-ENV RAILS_ENV=${RAILS_ENV:-development}
-ENV DEVISE_SECRET_KEY=${DEVISE_SECRET_KEY:-61becfbecdb004668f7a040c857c2d5f030f857212e1941dc89efc064a1065b516057495c6e0d860493d6dd376df154c2ee174f4ad40d14581c39a5240502b6b}
-ENV RAILS_SECRET_KEY=${RAILS_SECRET_KEY:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4c37bb506f1288f8976a187a4df1fdd820ad88b8382009c84de50f2d53a09d4c17ff2e64f8a99dc4da6a4987}
-ENV SECRET_KEY_BASE=${SECRET_KEY_BASE:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4c37bb506f1288f8976a187a4df1fdd820ad88b8382009c84de50f2d53a09d4c17ff2e64f8a99dc4da6a4987}
-ENV TWO_FACTOR_KEY=${TWO_FACTOR_KEY:-bb9043530987217fbe7885de7d46235db6ac1bddb1fd6a9dc9172538697a988c9148a1d652fa0b3ad09ea0938bc3db68b45a165eb2c71891d952305bd2495325}
-ENV PHAROS_DB_HOST=${PHAROS_DB_HOST:-db}
-ENV PHAROS_DB_PORT=${PHAROS_DB_PORT:-5432}
-ENV PHAROS_DB_USER=${PHAROS_DB_USER:-postgres}
-ENV PHAROS_DB_PWD=${PHAROS_DB_PWD:-''}
-ENV AWS_SES_USER=${AWS_SES_USER:-none}
-ENV AWS_SES_PWD=${AWS_SES_PWD:-somesecretsauce}
-ENV PHAROS_RELEASE=${PHAROS_RELEASE:-latest}
-ENV NSQ_BASE_URL=${NSQ_BASE_URL:-http://nsq:4151}
 
-COPY Gemfile .
-COPY Gemfile.lock .
-RUN bundle install
+COPY Gemfile Gemfile.lock ./
+RUN bundle install --jobs=4 --without=["development" "test"] --no-cache
 
 COPY . $WORKDIR
 
@@ -56,7 +40,10 @@ COPY . $WORKDIR
 # to provide the rails environment and app. It assumes an external db (per env)
 
 # Provide dummy data to Rails so it can pre-compile assets.
-RUN bundle exec rake RAILS_ENV=production DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken assets:precompile
+#RUN bundle exec rake RAILS_ENV=production DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken assets:precompile
+RUN RAILS_ENV=test bundle exec rake assets:precompile
+RUN RAILS_ENV=production bundle exec rake assets:precompile
+RUN RAILS_ENV=demo bundle exec rake assets:precompile
 
 # Expose rails server port
 EXPOSE 9292
