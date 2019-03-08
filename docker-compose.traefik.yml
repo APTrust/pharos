@@ -36,8 +36,9 @@ services:
     env_file:
       - ".env"
     labels:
+     - traefik.enable=true
      - traefik.backend=pharos
-     - traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}
+     - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}"
      - traefik.port=9292
      - traefik.docker.network=proxy
     networks:
