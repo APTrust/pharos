@@ -30,7 +30,6 @@ class ApplicationController < ActionController::Base
     if session[:two_factor_option] == nil
       session.delete(:authy)
       session.delete(:verified)
-      #sign_out(@user)
       redirect_to verification_login_path, flash: { notice: 'You must select an option for two factor sign in.' }
     elsif session[:two_factor_option] == 'Backup Code'
       redirect_to enter_backup_verification_path(id: current_user.id), flash: { alert: 'Please enter a backup code.' }
@@ -50,10 +49,9 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
           format.json { render json: { error: 'Create Push Error' }, status: :internal_server_error }
           format.html {
-            redirect_to new_user_session_path, flash: { error: 'There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help.' }
+            redirect_to new_user_session_path, flash: { error: 'There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.' }
           }
         end
-        render json: { err: 'Create Push Error' }, status: :internal_server_error and return
       end
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
@@ -74,8 +72,13 @@ class ApplicationController < ActionController::Base
     @user = current_user
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
 
-    if !status.ok?
-      render json: { err: 'One Touch Status Error' }, status: :internal_server_error and return
+    unless status.ok?
+      respond_to do |format|
+        format.json { render json: { error: 'One Touch Status Error' }, status: :internal_server_error }
+        format.html {
+          redirect_to root_path, flash: { error: 'There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.' }
+        }
+      end
     end
 
     if session[:one_touch_timeout] <= 0
@@ -168,10 +171,6 @@ class ApplicationController < ActionController::Base
   # Globally rescue authorization errors in controller
   # return 403 Forbidden if permission is denied
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-
-  # def after_sign_in_path_for(resource)
-  #   session['user_return_to'] || root_path
-  # end
 
   def after_sign_in_path_for(resource_or_scope)
     stored_location_for(resource_or_scope) || root_path

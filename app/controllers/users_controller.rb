@@ -162,7 +162,7 @@ class UsersController < ApplicationController
           format.json { render json: { error: 'Create Push Error' }, status: :internal_server_error }
           format.html {
             render 'show'
-            flash[:error] = 'There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help.'
+            flash[:error] = 'There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.'
           }
         end
       end
@@ -389,7 +389,7 @@ class UsersController < ApplicationController
         format.json { render json: { err: 'One Touch Status Error' }, status: :internal_server_error }
         format.html {
           render 'show'
-          flash[:error] = 'There was a problem verifying your push notification. Please contact your administrator or an APTrust administrator for help.'
+          flash[:error] = 'There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.'
         }
       end
     end
@@ -400,15 +400,15 @@ class UsersController < ApplicationController
       if status['approval_request']['status'] == 'approved'
         session.delete(:uuid) || session.delete('uuid')
         @user.confirmed_two_factor = true
-        session[:verified] = true
         @user.save!
+        session[:verified] = true
         redirect_to @user, flash: { notice: 'Your phone number has been verified.' }
       elsif status['approval_request']['status'] == 'denied'
         redirect_to @user, flash: { error: 'This request was denied, phone number has not been verified.' }
       else
         sleep 1
         session[:verify_timeout] -= 1
-        one_touch_status
+        one_touch_status_for_users
       end
     end
   end
