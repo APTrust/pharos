@@ -109,5 +109,5 @@ networks:
     external: true
   internal:
     external: false
- volumes:
+volumes:
     - pgdata
