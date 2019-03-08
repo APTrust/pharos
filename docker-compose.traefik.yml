@@ -73,7 +73,7 @@ services:
   reverse-proxy:
     image: traefik # The official Traefik docker image
     restart: on-failure
-    command: --api --docker # Enables the web UI and tells Træfik to listen to docker
+    command: --api --docker --docker.domain=${DOCKER_DOMAIN} # Enables the web UI and tells Træfik to listen to docker
     ports:
       - "80:80"     # The HTTP port
       - "443:443"     # The HTTP port
