@@ -177,4 +177,6 @@ Rails.application.routes.draw do
   end
 
   root :to => 'institutions#show'
+
+  match '*path', to: 'application#catch_404', via: :all
 end

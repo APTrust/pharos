@@ -31,6 +31,18 @@ class ApplicationController < ActionController::Base
   # return 403 Forbidden if permission is denied
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+  rescue_from ActionController::RoutingError do |exception|
+    logger.error 'Routing error occurred'
+    respond_to do |format|
+      format.html { render 'shared/404' }
+      format.json { render :json => { status: 'error', message: 'The page you were looking for could not be found! If you were searching for a specific object or file, check to make sure you have the correct identifier and try again. If you believe you have reached this message in error, please contact your administrator or an APTrust administrator.' }, status: 404 }
+    end
+  end
+
+  def catch_404
+    raise ActionController::RoutingError.new(params[:path])
+  end
+
   def after_sign_in_path_for(resource)
     session['user_return_to'] || root_path
   end
@@ -44,7 +56,7 @@ class ApplicationController < ActionController::Base
     #default: 'You are not authorized to perform this action.'
     respond_to do |format|
       format.html { redirect_to root_url, alert: 'You are not authorized to access this page.' }
-      format.json { render :json => { :status => 'error', :message => 'You are not authorized to access this page.' }, :status => :forbidden }
+      format.json { render :json => { status: 'error', message: 'You are not authorized to access this page.' }, status: :forbidden }
     end
   end
 
