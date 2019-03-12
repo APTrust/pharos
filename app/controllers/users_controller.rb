@@ -88,17 +88,19 @@ class UsersController < ApplicationController
     authorize @user
     @user.otp_secret = User.generate_otp_secret
     @user.enabled_two_factor = true
-    unless Rails.env.test? || !@user.authy_id.nil?
-      authy = Authy::API.register_user(
-          email: @user.email,
-          cellphone: @user.phone_number,
-          country_code: @user.phone_number[1]
-      )
-      @user.update(authy_id: authy.id)
+    unless Rails.env.test?
+      if @user.authy_id.nil? || @user.authy_id == ''
+        authy = Authy::API.register_user(
+            email: @user.email,
+            cellphone: @user.phone_number,
+            country_code: @user.phone_number[1]
+        )
+        @user.update(authy_id: authy.id)
+      end
     end
     @codes = @user.generate_otp_backup_codes!
     @user.save!
-    (current_user == @user) ? usr = '' : usr = ' for this user'
+    (current_user == @user) ? usr = 'for your account' : usr = ' for this user'
     flash[:notice] = "Two Factor Authentication has been enabled#{usr}."
     if params[:redirect_loc] && params[:redirect_loc] == 'index'
       redirect_to users_path
@@ -166,6 +168,7 @@ class UsersController < ApplicationController
           }
         end
       end
+
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
