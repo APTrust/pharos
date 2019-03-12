@@ -100,12 +100,12 @@ class UsersController < ApplicationController
     end
     @codes = @user.generate_otp_backup_codes!
     @user.save!
-    (current_user == @user) ? usr = 'for your account' : usr = ' for this user'
+    (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
     flash[:notice] = "Two Factor Authentication has been enabled#{usr}."
     if params[:redirect_loc] && params[:redirect_loc] == 'index'
       redirect_to users_path
     else
-      redirect_to @user
+      render 'show'
     end
   end
 
