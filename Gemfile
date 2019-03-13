@@ -51,6 +51,8 @@ gem 'mail', '>= 2.7.1'
 gem 'sprockets', '>= 3.7.2'
 gem 'loofah', '~> 2.2.3'
 gem 'rack', '~> 2.0.6'
+gem 'actionview', '>= 5.2.2.1'
+gem 'railties', '>= 5.2.2.1'
 
 # S3 connector
 #gem 'aws-sdk-core'
