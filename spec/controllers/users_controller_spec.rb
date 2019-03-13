@@ -100,7 +100,7 @@ RSpec.describe UsersController, type: :controller do
         admin_user.enabled_two_factor = false
         admin_user.save!
         get :enable_otp, params: { id: admin_user.id }, format: :json
-        expect(response.status).to eq(302)
+        expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
       end
@@ -109,7 +109,7 @@ RSpec.describe UsersController, type: :controller do
         user_at_institution.enabled_two_factor = false
         user_at_institution.save!
         get :enable_otp, params: { id: user_at_institution.id }, format: :json
-        expect(response.status).to eq(302)
+        expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
       end
@@ -118,7 +118,7 @@ RSpec.describe UsersController, type: :controller do
         user_of_different_institution.enabled_two_factor = false
         user_of_different_institution.save!
         get :enable_otp, params: { id: user_of_different_institution.id }, format: :json
-        expect(response.status).to eq(302)
+        expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
       end
@@ -436,7 +436,7 @@ RSpec.describe UsersController, type: :controller do
         institutional_admin.enabled_two_factor = false
         institutional_admin.save!
         get :enable_otp, params: { id: institutional_admin.id }, format: :json
-        expect(response.status).to eq(302)
+        expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
       end
@@ -445,7 +445,7 @@ RSpec.describe UsersController, type: :controller do
         user_at_institution.enabled_two_factor = false
         user_at_institution.save!
         get :enable_otp, params: { id: user_at_institution.id }, format: :json
-        expect(response.status).to eq(302)
+        expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
       end
@@ -608,7 +608,7 @@ RSpec.describe UsersController, type: :controller do
         user.enabled_two_factor = false
         user.save!
         get :enable_otp, params: { id: user.id }, format: :json
-        expect(response.status).to eq(302)
+        expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
       end

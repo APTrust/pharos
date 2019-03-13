@@ -105,7 +105,10 @@ class UsersController < ApplicationController
     if params[:redirect_loc] && params[:redirect_loc] == 'index'
       redirect_to users_path
     else
-      render 'show'
+      respond_to do |format|
+        format.json { render json: { user: @user, codes: @codes } }
+        format.html { render 'show' }
+      end
     end
   end
 
