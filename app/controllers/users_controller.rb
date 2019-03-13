@@ -103,8 +103,8 @@ class UsersController < ApplicationController
             redirect_to users_path
           else
             respond_to do |format|
-              format.json { render json: { status: :error, message: "An error occurred while trying to enable Two Factor Authentication: #{authy.errors.inspect}" } }
-              format.html { render 'show' }
+              format.json { render json: { status: :error, message: "An error occurred while trying to enable Two Factor Authentication: #{authy.errors.inspect}" } } and return
+              format.html { render 'show' } and return
             end
           end
         end
