@@ -42,7 +42,8 @@ $(document).ready(function() {
     });
 
     $('#verification-login-btn').click(function() {
-        if($('#two_factor_option_Push_Notification').checked) {
+        var checked_val = document.querySelector('input[name = "two_factor_option"]:checked').value;
+        if(checked_val == "Push Notification") {
             $('#push-notification-loader').removeClass("hidden");
         }
     });
