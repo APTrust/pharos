@@ -95,13 +95,25 @@ class UsersController < ApplicationController
             cellphone: @user.phone_number,
             country_code: @user.phone_number[1]
         )
-        @user.update(authy_id: authy.id)
+        if authy.ok?
+          @user.update(authy_id: authy.id)
+        else
+          flash[:notice] = 'An error occurred while trying to enable Two Factor Authentication.'
+          if params[:redirect_loc] && params[:redirect_loc] == 'index'
+            redirect_to users_path
+          else
+            respond_to do |format|
+              format.json { render json: { status: :error, message: "An error occurred while trying to enable Two Factor Authentication: #{authy.errors.inspect}" } }
+              format.html { render 'show' }
+            end
+          end
+        end
       end
     end
     @codes = @user.generate_otp_backup_codes!
     @user.save!
     (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
-    flash[:notice] = "Two Factor Authentication has been enabled#{usr}."
+    flash[:notice] = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{self.authy_id}."
     if params[:redirect_loc] && params[:redirect_loc] == 'index'
       redirect_to users_path
     else
