@@ -14,13 +14,15 @@
                       :method => :get, class: 'btn btn-normal doc-action-btn' %>
   <br>
 <% end %>
+
+<h4>Two Factor Authentication</h4>
 <% if @user.enabled_two_factor %>
     <% if @user.confirmed_two_factor %>
-        <h4>Two Factor Authentication Enabled</h4>
-        <%= button_to 'Disable Two Factor Authentication', users_disable_otp_path(@user.id),
-                      :method => :get, class: 'btn btn-normal doc-action-btn' %>
+        <h5>Status: Enabled</h5>
+        <%= button_to 'Disable 2FA', users_disable_otp_path(@user.id),
+                      :method => :get, class: 'btn btn-warning doc-action-btn' %>
     <% else %>
-        <h4>Verify Phone Number for Two Factor Authentication</h4>
+        <h5>Status: Phone Number Needs Verification</h5>
 
         <%= link_to 'Verify Phone Number via SMS', users_verify_twofa_path(@user.id, verification_option: 'sms'),
                     class: 'btn btn-normal doc-action-btn' %>
@@ -51,10 +53,10 @@
     <br>
 
 <% else %>
-    <h4>Two Factor Authentication Not Enabled</h4>
+    <h5>Status: Not Enabled</h5>
     <p>Please ensure you have an accurate phone number listed in your profile before you enable two factor authentication. </p>
-    <%= button_to "Enable Two Factor Authentication", users_enable_otp_path(@user.id),
-                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
+    <%= button_to "Enable 2FA", users_enable_otp_path(@user.id),
+                  :method => :get, class: 'btn btn-success doc-action-btn' %>
 <% end %>
 
 <h4>Roles</h4>
