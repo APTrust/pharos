@@ -93,10 +93,15 @@ class UsersController < ApplicationController
             cellphone: @user.phone_number,
             country_code: @user.phone_number[1]
         )
-        @user.update(authy_id: authy.id) if authy.ok?
+        if authy.ok?
+          @user.update(authy_id: authy.id)
+        else
+          authy.errors
+        end
       end
     end
     if authy && !authy.errors.nil?
+      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:notice] = 'An error occurred while trying to enable Two Factor Authentication.'
     else
       @user.otp_secret = User.generate_otp_secret
