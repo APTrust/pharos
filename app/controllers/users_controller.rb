@@ -184,6 +184,7 @@ class UsersController < ApplicationController
         end
       end
 
+      puts "**************************Checking one touch contents: #{one_touch.inspect}"
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
