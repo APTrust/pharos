@@ -86,8 +86,6 @@ class UsersController < ApplicationController
 
   def enable_otp
     authorize @user
-    @user.otp_secret = User.generate_otp_secret
-    @user.enabled_two_factor = true
     unless Rails.env.test?
       if @user.authy_id.nil? || @user.authy_id == ''
         authy = Authy::API.register_user(
@@ -100,16 +98,18 @@ class UsersController < ApplicationController
         else
           flash[:notice] = 'An error occurred while trying to enable Two Factor Authentication.'
           if params[:redirect_loc] && params[:redirect_loc] == 'index'
-            redirect_to users_path
+            redirect_to users_path and return
           else
             respond_to do |format|
-              format.json { render json: { status: :error, message: "An error occurred while trying to enable Two Factor Authentication: #{authy.errors.inspect}" } } and return
-              format.html { render 'show' } and return
+              format.json { render json: { status: :error, message: "An error occurred while trying to enable Two Factor Authentication: #{authy.errors.inspect}" } and return }
+              format.html { render 'show' and return }
             end
           end
         end
       end
     end
+    @user.otp_secret = User.generate_otp_secret
+    @user.enabled_two_factor = true
     @codes = @user.generate_otp_backup_codes!
     @user.save!
     (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
