@@ -173,6 +173,18 @@ class ApplicationController < ActionController::Base
   # return 403 Forbidden if permission is denied
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+  rescue_from ActionController::RoutingError do |exception|
+    logger.error 'Routing error occurred'
+    respond_to do |format|
+      format.html { render 'shared/404', status: 404 }
+      format.json { render :json => { status: 'error', message: 'The page you were looking for could not be found! If you were searching for a specific object or file, check to make sure you have the correct identifier and try again. If you believe you have reached this message in error, please contact your administrator or an APTrust administrator.' }, status: 404 }
+    end
+  end
+
+  def catch_404
+    raise ActionController::RoutingError.new(params[:path])
+  end
+
   def after_sign_in_path_for(resource_or_scope)
     stored_location_for(resource_or_scope) || root_path
   end
@@ -181,17 +193,6 @@ class ApplicationController < ActionController::Base
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_in, keys: [:otp_attempt])
-    rescue_from ActionController::RoutingError do |exception|
-      logger.error 'Routing error occurred'
-      respond_to do |format|
-        format.html { render 'shared/404', status: 404 }
-        format.json { render :json => { status: 'error', message: 'The page you were looking for could not be found! If you were searching for a specific object or file, check to make sure you have the correct identifier and try again. If you believe you have reached this message in error, please contact your administrator or an APTrust administrator.' }, status: 404 }
-      end
-    end
-  end
-
-  def catch_404
-    raise ActionController::RoutingError.new(params[:path])
   end
 
   private
