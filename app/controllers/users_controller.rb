@@ -101,8 +101,8 @@ class UsersController < ApplicationController
       end
     end
     if authy && !authy.errors.nil?
-      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
-      flash[:notice] = 'An error occurred while trying to enable Two Factor Authentication.'
+      #puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
+      flash[:error] = 'An error occurred while trying to enable Two Factor Authentication.'
     else
       @user.otp_secret = User.generate_otp_secret
       @user.enabled_two_factor = true
@@ -151,6 +151,32 @@ class UsersController < ApplicationController
     end
   end
 
+  def register_authy_user
+    authorize @user
+    if @user.authy_id.nil? || @user.authy_id == ''
+      authy = Authy::API.register_user(
+          email: @user.email,
+          cellphone: @user.phone_number,
+          country_code: @user.phone_number[1]
+      )
+      if authy.ok?
+        @user.update(authy_id: authy.id)
+      else
+        authy.errors
+      end
+    end
+    if authy && !authy.errors.nil?
+      #puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
+      flash[:error] = 'An error occurred while trying to register for Authy.'
+    else
+      flash[:notice] = "Registered for Authy. Authy ID is #{@user.authy_id}."
+    end
+    respond_to do |format|
+      format.json { render json: { user: @user, codes: @codes } }
+      format.html { render 'show' }
+    end
+  end
+
   def generate_backup_codes
     authorize @user
     @codes = @user.generate_otp_backup_codes!
@@ -181,7 +207,7 @@ class UsersController < ApplicationController
         end
       end
 
-      puts "**************************Checking one touch contents: #{one_touch.inspect}"
+      #puts "**************************Checking one touch contents: #{one_touch.inspect}"
       session[:uuid] = one_touch.approval_request['uuid']
       status = one_touch['success'] ? :onetouch : :sms
       current_user.update(authy_status: status)
