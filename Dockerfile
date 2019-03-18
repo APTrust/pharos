@@ -1,3 +1,5 @@
+FROM madnight/docker-alpine-wkhtmltopdf as builder
+
 FROM ruby:2.6-alpine3.7
 LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 
@@ -10,7 +12,11 @@ LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
     nodejs postgresql-client postgresql-dev python py-requests py-argparse \
     ruby-bundler libstdc++ tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal \
-	libxml2-dev libxslt-dev
+	libxml2-dev libxslt-dev \
+# Following packages for wkhtmltopdf only
+    libgcc libstdc++ libx11 glib libxrender libxext libintl \
+    libcrypto1.0 libssl1.0 \
+    ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
 
 RUN addgroup -S somegroup -g 1000 && adduser -S -G somegroup somebody -u 1000
 
@@ -27,6 +33,8 @@ ENV SECRET_KEY_BASE=${SECRET_KEY_BASE:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4
 # values. Ansible shall start container build and deploy. build script should
 # make sure that docker and ansible are installed locally. After build the
 # container will be pushed to the server and restarted.
+
+COPY --from=builder /bin/wkhtmltopdf /bin/wkhtmltopdf
 
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --jobs=4 --without=["development" "test"] --no-cache
