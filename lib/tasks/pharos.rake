@@ -650,7 +650,6 @@ namespace :pharos do
       if existing_inst.nil?
         puts "Creating #{partner[0]}"
         Institution.create!(name: partner[0],
-                            brief_name: partner[1],
                             identifier: partner[2],
                             dpn_uuid: partner[3],
                             type: 'MemberInstitution')
