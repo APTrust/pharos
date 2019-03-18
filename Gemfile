@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.2'
+gem 'rails', '5.2.2.1'
 gem 'rails-controller-testing'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.1.20'
@@ -57,6 +57,8 @@ gem 'mail', '>= 2.7.1'
 gem 'sprockets', '>= 3.7.2'
 gem 'loofah', '~> 2.2.3'
 gem 'rack', '~> 2.0.6'
+gem 'actionview', '>= 5.2.2.1'
+gem 'railties', '>= 5.2.2.1'
 
 gem 'activerecord-nulldb-adapter'
 gem 'puma'
@@ -82,7 +84,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.13.2'
+  gem 'capybara', '3.14.0'
   gem 'shoulda-matchers', '~> 4.0.1'
   gem 'coveralls', '0.8.22', require: false
 end
