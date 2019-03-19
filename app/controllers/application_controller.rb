@@ -54,11 +54,25 @@ class ApplicationController < ActionController::Base
         end
       end
       #puts "**************************Checking one touch contents: #{one_touch.inspect}"
-      session[:uuid] = one_touch.approval_request['uuid']
-      status = one_touch['success'] ? :onetouch : :sms
-      current_user.update(authy_status: status)
-      session[:one_touch_timeout] = 300
-      one_touch_status
+      if one_touch.errors.nil?
+        session[:uuid] = one_touch.approval_request['uuid']
+        status = one_touch['success'] ? :onetouch : :sms
+        current_user.update(authy_status: status)
+        session[:one_touch_timeout] = 300
+        one_touch_status
+      else
+        session.delete(:authy)
+        session.delete(:verified)
+        session.delete(:two_factor_option)
+        sign_out(@user)
+        respond_to do |format|
+          format.json { render json: { error: 'Create Push Error', message: one_touch.inspect }, status: :internal_server_error }
+          format.html {
+            redirect_to new_user_session_path, flash: { error: "There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{one_touch[:errors][:message]}" }
+          }
+        end
+      end
+
     elsif session[:two_factor_option] == 'Text Message'
       sms = Aws::SNS::Client.new
       response = sms.publish({

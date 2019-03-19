@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
-                                  :vacuum, :enable_otp, :disable_otp, :verify_twofa, :generate_backup_codes, :verify_email, :email_confirmation]
+                                  :vacuum, :enable_otp, :disable_otp, :register_authy_user, :verify_twofa, :generate_backup_codes, :verify_email, :email_confirmation]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -101,7 +101,7 @@ class UsersController < ApplicationController
       end
     end
     if authy && !authy.errors.nil?
-      #puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
+      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:error] = 'An error occurred while trying to enable Two Factor Authentication.'
     else
       @user.otp_secret = User.generate_otp_secret
@@ -166,7 +166,7 @@ class UsersController < ApplicationController
       end
     end
     if authy && !authy.errors.nil?
-      #puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
+      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:error] = 'An error occurred while trying to register for Authy.'
     else
       flash[:notice] = "Registered for Authy. Authy ID is #{@user.authy_id}."
@@ -208,11 +208,22 @@ class UsersController < ApplicationController
       end
 
       #puts "**************************Checking one touch contents: #{one_touch.inspect}"
-      session[:uuid] = one_touch.approval_request['uuid']
-      status = one_touch['success'] ? :onetouch : :sms
-      current_user.update(authy_status: status)
-      session[:verify_timeout] = 300
-      one_touch_status_for_users
+      if one_touch.errors.nil?
+        session[:uuid] = one_touch.approval_request['uuid']
+        status = one_touch['success'] ? :onetouch : :sms
+        current_user.update(authy_status: status)
+        session[:verify_timeout] = 300
+        one_touch_status_for_users
+      else
+        respond_to do |format|
+          format.json { render json: { error: 'Create Push Error', message: one_touch.inspect }, status: :internal_server_error }
+          format.html {
+            render 'show'
+            flash[:error] = "There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help, and let them know that the error was: #{one_touch[:errors][:message]}"
+          }
+        end
+      end
+
     elsif params[:verification_option] == 'sms'
       sms = Aws::SNS::Client.new
       response = sms.publish({
