@@ -23,12 +23,12 @@ class UsersController < ApplicationController
     if @user.save
       session[:user_id] = @user.id
 
-      authy = Authy::API.register_user(
-          email: @user.email,
-          cellphone: @user.phone_number,
-          country_code: @user.phone_number[1]
-      )
-      @user.update(authy_id: authy.id)
+      # authy = Authy::API.register_user(
+      #     email: @user.email,
+      #     cellphone: @user.phone_number,
+      #     country_code: @user.phone_number[1]
+      # )
+      # @user.update(authy_id: authy.id)
 
       password = "ABCabc-#{SecureRandom.hex(4)}"
       @user.password = password
@@ -208,7 +208,7 @@ class UsersController < ApplicationController
       end
 
       #puts "**************************Checking one touch contents: #{one_touch.inspect}"
-      if one_touch.errors.nil?
+      if one_touch[:errors].nil? || one_touch[:errors].empty?
         session[:uuid] = one_touch.approval_request['uuid']
         status = one_touch['success'] ? :onetouch : :sms
         current_user.update(authy_status: status)
