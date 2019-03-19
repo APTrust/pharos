@@ -35,7 +35,6 @@ gem 'email_validator'
 
 # Used to generate PDFs for reports
 gem 'wicked_pdf'
-gem 'wkhtmltopdf-binary-edge'
 
 # Used to create or edit google sheets
 gem 'google_drive'
@@ -81,6 +80,7 @@ group :development do
   gem 'spring'
   # We don't use this gem directly but actionpack and actionview depend on it and it needs upgrading to fix a security warning
   gem 'rails-html-sanitizer', '1.0.4'
+  gem 'wkhtmltopdf-binary'
 end
 
 group :test do
