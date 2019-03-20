@@ -172,7 +172,7 @@ class UsersController < ApplicationController
       flash[:notice] = "Registered for Authy. Authy ID is #{@user.authy_id}."
     end
     respond_to do |format|
-      format.json { render json: { user: @user, codes: @codes } }
+      format.json { render json: { user: @user, message: 'Registered for Authy.' } }
       format.html { render 'show' }
     end
   end
