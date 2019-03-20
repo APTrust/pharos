@@ -100,7 +100,7 @@ class UsersController < ApplicationController
         end
       end
     end
-    if authy && !authy.errors.nil?
+    if authy && !authy[:errors].empty?
       puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:error] = 'An error occurred while trying to enable Two Factor Authentication.'
     else
@@ -165,7 +165,7 @@ class UsersController < ApplicationController
         authy.errors
       end
     end
-    if authy && !authy.errors.nil?
+    if authy && !authy[:errors].empty?
       puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:error] = 'An error occurred while trying to register for Authy.'
     else
