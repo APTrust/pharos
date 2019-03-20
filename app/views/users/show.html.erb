@@ -21,8 +21,10 @@
         <h5>Status: Enabled</h5>
         <%= button_to 'Disable 2FA', users_disable_otp_path(@user.id),
                       :method => :get, class: 'btn btn-warning doc-action-btn' %>
-        <%= button_to 'Register w/Authy', users_register_for_authy_path(@user.id),
-                      :method => :get, class: 'btn btn-primary doc-action-btn' %>
+        <% if (current_user.authy_id.nil? || current_user.authy_id == '') %>
+            <%= button_to 'Register w/Authy', users_register_for_authy_path(@user.id),
+                          :method => :get, class: 'btn btn-primary doc-action-btn' %>
+        <% end %>
     <% else %>
         <h5>Status: Phone Number Needs Verification</h5>
 
