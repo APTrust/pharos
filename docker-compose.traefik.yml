@@ -21,9 +21,9 @@ services:
     command: bundle exec puma -p9292 -e ${RAILS_ENV}
     volumes:
       - .:/pharos
-      - ./.env:./.env
+      - ./.env:/pharos/.env
       - assets:/pharos/public
-      - ${DOCKERAPP_DATA_PATH:-./docker}pharos/log:./log
+      - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
     depends_on:
       - db
       - migration
