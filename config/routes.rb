@@ -162,10 +162,6 @@ Rails.application.routes.draw do
 
   # USER ROUTES
   devise_for :users,
-  controllers: {
-      passwords: 'passwords',
-      #omniauthcallbacks: 'users/omniauth_callbacks'
-  },
   pathnames: {
       verify_authy: '/verify-token',
       enable_authy: '/enable-authy',
