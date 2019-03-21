@@ -7,9 +7,13 @@ services:
   # - gem update --system
   # - gem install bundler:2.0.1
 install: true
+addons:
+  apt:
+    packages:
+      - docker-ce
 before_script:
-- sudo apt update -y
-- sudo apt install --only-upgrade docker-ce -y
+        #- sudo apt update -y
+        #- sudo apt install --only-upgrade docker-ce -y
 - sudo service postgresql stop
 - sudo cp .env.test .env
 - env
