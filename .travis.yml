@@ -1,4 +1,8 @@
 sudo: required
+language: ruby
+rvm:
+ - 2.6.2
+
 services:
 - docker
 env:
@@ -8,6 +12,7 @@ env:
   - secure: "hYYli+x4TUHfhphGwrkI539FOEi1xJVdUZ6gs5Ru5qVyxAxUldhbxWWqfKyNgqLgJs1CVjrnXqgNiE+FvLz5+TbSVJu62YBuzTBKbEnbZi17Ibtl2XDcbYFyuFX2dOg2hgRgJBVArFHm7/NcEbESfK+RFovfN8U8Og92iTLo7amgOOof8W54BWJuW46Cx4H8kZPPTbKQIldvnLvlA0nRjFMhnES4aY6qduFwER5Tl3plERDxyYSxi2IXAs5ZyOBVELUEjJJQ1DjP57MfR9kmbYqt9TdCoSXxBKXKGGP2jBvzHmtDDIe4Sdb24qUvAP62s+B3AEQhD7NXVwjNVWxqexfQqj+XyHIrE5OAApA0+snEn65ZUJvIHtD/irrpA8w5t/B+/2yH+4PV4GylCeMqkswmJPWxGTvnhSDxjc/3q28zFUrIV7Hkg3dS7ResJvL97hz3bKIlDQ3duQe+87+Ez/a8B7kTwktHed7dauYUhw96YBwxdtTX+Hc+TVyFej0esl8C6STcG/061m+K1cbc4V3UXHaSC5PDxKVr04hh9T86JUX07+vaZGpO8LIw3I1IZef6L1bWdn39SxNacIl5O7jpezb80PVFRx2C5y7bN8I3hYpWpDJKQlowpkPuqlhWXgd6QRhD1s+rdF9y2vmk745tl/aCyLOZaEvzZTR0LsI="
   - secure: "edWJf3HhM7xYfyiFiZXOFpEpnhbRsZ1njetRQcc5d7lcZ+GrRi7a6kjMqiNVnwQ8nFF/+fLMTSLE6v5dNoX+WgvMkfmK5GDeUQ1EtDXBYMxUaB5qyNfT7WOm/JFzMGAp2R+22xTTx04K3leaREVracHL5OL8JSXD7qtwYIuRPenBokZtMzKaPHXe9L90q5Y/xoWX5T2+7LHtIqviz0bQ5eRJCqEXnHzC3wEQ6kVxNHXvmUptBjC9XH6dT/IG5pKrkLUJEyxyKzoZrRIAIzz6frzzsAr51g/ZZD2W7lWw2YD8Yqq6Mkh5ZcX1Rs5+2MrlG085Lhe+0DD9KahuQvm8pVj4IJ712CNHecgkr53uKRfZ2KmMBSHTv3/1xlcT2gTxmz8hwvrMY8cjgdDKpIFNDWzMPYjgdLG+4hFFiqNrT01yP2/n39a3yJcH3VH+aPB7ywSr3pFlnQ1/LAVMjyulwegL81n94vVr7awL+YfPna4yrevsfnKleAAPJ8/mbEucjPPH1AAVm28b5lWzpG4SsWB64SGNt1WIl239mPn45+DGsRAdFU0oXmuI7se0ILmcihWS4V+KsxWEc3i0goSXxkNqMM6ro4sM5uF5gfslnXSBmXkJEP1JOcekOaVBSjNvXiDRzjpZ11w7xIDDTrW0U2yY0t5LGj/HMZBN2lSyDKE="
 before_script:
+- gem install -v 2.0.1 bundler --no-rdoc --no-ri
 - sudo apt update -y
 - sudo apt install --only-upgrade docker-ce -y
 - sudo service postgresql stop
