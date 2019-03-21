@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :verify_user!, unless: :devise_controller?
-  before_action :forced_redirections, unless: :devise_controller?
+  # before_action :forced_redirections, unless: :devise_controller?
 
   def verify_user!
     start_verification if requires_verification?
