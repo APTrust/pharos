@@ -2,7 +2,7 @@ version: '3.5'
 services:
   db:
     image: postgres:9.6.6-alpine
-    restart: on-failure
+    restart: always
     container_name: postgres
     environment:
       POSTGRES_USER: pharos
@@ -17,7 +17,7 @@ services:
   pharos:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     #    image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
-    restart: on-failure
+    restart: always
     command: bundle exec puma -p9292 -e ${RAILS_ENV}
     volumes:
       - ./.env:/pharos/.env
@@ -54,7 +54,7 @@ services:
       - traefik.enable=false
   traefik-proxy:
     image: traefik # The official Traefik docker image
-    restart: on-failure
+    restart: always
     command: --api --docker --docker.domain=${DOCKER_DOMAIN}
     ports:
       - "80:80"     # The HTTP port
@@ -70,7 +70,7 @@ services:
   nginx-assets:
     image: nginx:alpine
     command: [nginx-debug, '-g', 'daemon off;']
-    restart: on-failure
+    restart: always
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - assets:/etc/share/nginx/html/pharos
