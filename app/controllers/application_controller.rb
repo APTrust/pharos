@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action do
-    resource = controller_path.singularize.gsub('/', '_').to_sym 
+    resource = controller_path.singularize.gsub('/', '_').to_sym
     method = "#{resource}_params"
     params[resource] &&= send(method) if respond_to?(method, true)
 
@@ -13,7 +13,8 @@ class ApplicationController < ActionController::Base
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
-  before_action :verify_user!, unless: :devise_controller?
+  unless (!api_check.nil? && api_check.include?('api')
+  	before_action :verify_user!, unless: :devise_controller?
   # before_action :forced_redirections, unless: :devise_controller?
 
   def verify_user!
