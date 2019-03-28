@@ -18,7 +18,7 @@ services:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     #    image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
     restart: always
-    command: bundle exec puma -p9292 -e ${RAILS_ENV}
+    command: bundle exec puma -w3 -p9292 -e ${RAILS_ENV}
     volumes:
       - ./.env:/pharos/.env
       - assets:/pharos/public
