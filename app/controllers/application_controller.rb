@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include ApiAuth
   before_action do
     resource = controller_path.singularize.gsub('/', '_').to_sym
     method = "#{resource}_params"
@@ -13,16 +14,19 @@ class ApplicationController < ActionController::Base
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
-  unless (api_request?)
-  	before_action :verify_user!, unless: :devise_controller?
+  before_action :verify_user!, unless: :devise_controller? || api_request?
+
+  # Are we done with this? If so, delete the following line.
   # before_action :forced_redirections, unless: :devise_controller?
-  end
 
   def verify_user!
     start_verification if requires_verification?
   end
 
   def requires_verification?
+    if api_request? && user_signed_in?
+      return false
+    end
     unless current_user.nil?
       session[:verified].nil? && current_user.need_two_factor_authentication?
     end
