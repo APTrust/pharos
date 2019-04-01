@@ -15,14 +15,14 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0'
 tags:
   - name: intellectual_object
-    description: What your bags are translated into
+    description: Archival Information Package (AIP). The bagit bag for ingest.
   - name: generic_file
     description: Individual files in Intellectual Objects
   - name: premis_event
-    description: Singular events that happen to Intellectual Objects and/or Generic Files
+    description: Singular events of Intellectual Objects and/or Generic Files
   - name: work_item
     description: >-
-      An internal object that keeps track of the status of ingests, restoration,
+      An internal object tracks the status of ingests, restoration,
       and deletion requests
   - name: dpn_bag
     description: Packaged bag version of an intellectual object to be sent to DPN
