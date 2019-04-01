@@ -1,2 +1,0 @@
-module GenericFilesHelper
-end

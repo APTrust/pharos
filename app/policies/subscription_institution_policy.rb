@@ -1,3 +1,0 @@
-class SubscriptionInstitutionPolicy < InstitutionPolicy
-
-end
