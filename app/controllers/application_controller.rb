@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
-  before_action :verify_user!, unless: :devise_controller? || api_request?
+  before_action :verify_user!, unless: :devise_controller?
 
   # Are we done with this? If so, delete the following line.
   # before_action :forced_redirections, unless: :devise_controller?
