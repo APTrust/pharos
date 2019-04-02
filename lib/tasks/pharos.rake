@@ -357,17 +357,17 @@ namespace :pharos do
                 updated_at, name, phone_number, institution_pid, encrypted_api_secret_key, roles FROM users WHERE
                 institution_pid = ?', inst_row[0]) do |u_row|
         if u_row[17] == 'Inst_User'
-          user = User.create(email: u_row[1], password: 'password', reset_password_token: nil, reset_password_sent_at: nil,
+          user = User.create(email: u_row[1], password: 'password1!', reset_password_token: nil, reset_password_sent_at: nil,
                              remember_created_at: u_row[5], sign_in_count: u_row[6], current_sign_in_at: u_row[7], last_sign_in_at: u_row[8],
                              current_sign_in_ip: u_row[9], last_sign_in_ip: u_row[10], created_at: u_row[11], updated_at: u_row[12], name: u_row[13],
                              phone_number: u_row[14], institution_id: current_inst.id, encrypted_api_secret_key: u_row[16], roles: [inst_user_role])
         elsif u_row[17] == 'Inst_Admin'
-          user = User.create(email: u_row[1], password: 'password', reset_password_token: nil, reset_password_sent_at: nil,
+          user = User.create(email: u_row[1], password: 'password1!', reset_password_token: nil, reset_password_sent_at: nil,
                              remember_created_at: u_row[5], sign_in_count: u_row[6], current_sign_in_at: u_row[7], last_sign_in_at: u_row[8],
                              current_sign_in_ip: u_row[9], last_sign_in_ip: u_row[10], created_at: u_row[11], updated_at: u_row[12], name: u_row[13],
                              phone_number: u_row[14], institution_id: current_inst.id, encrypted_api_secret_key: u_row[16], roles: [inst_admin_role])
         elsif u_row[17] == 'Admin'
-          user = User.create(email: u_row[1], password: 'password', reset_password_token: nil, reset_password_sent_at: nil,
+          user = User.create(email: u_row[1], password: 'password1!', reset_password_token: nil, reset_password_sent_at: nil,
                              remember_created_at: u_row[5], sign_in_count: u_row[6], current_sign_in_at: u_row[7], last_sign_in_at: u_row[8],
                              current_sign_in_ip: u_row[9], last_sign_in_ip: u_row[10], created_at: u_row[11], updated_at: u_row[12], name: u_row[13],
                              phone_number: u_row[14], institution_id: current_inst.id, encrypted_api_secret_key: u_row[16], roles: [admin_role])
@@ -596,6 +596,25 @@ namespace :pharos do
     print_storage_report(args[:end_date])
   end
 
+  desc 'Two Factor Passwords'
+  task :two_factor_passwords => :environment do
+    User.all.each do |usr|
+      usr.initial_password_updated = true
+      usr.save!
+      puts "#{usr.name} has been updated."
+    end
+  end
+
+  desc 'Set SMS Defaults'
+  task :set_sms_defaults => :environment do
+    sms = Aws::SNS::Client.new
+    response = sms.set_sms_attributes({
+        attributes: {
+          'DefaultSenderID' => 'APTrust',
+          'DefaultSMSType' => 'Transactional',
+        },
+    })
+  end
 
   # To get total GB deposited by each institution through the end of July, 2018:
   #
@@ -631,7 +650,6 @@ namespace :pharos do
       if existing_inst.nil?
         puts "Creating #{partner[0]}"
         Institution.create!(name: partner[0],
-                            brief_name: partner[1],
                             identifier: partner[2],
                             dpn_uuid: partner[3],
                             type: 'MemberInstitution')
