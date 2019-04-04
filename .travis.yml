@@ -27,6 +27,10 @@ deploy:
     keep-history: true
     verbose: true
     local-dir: docs
+    on:
+      branch:
+        - feature/two_factor
+        - develop
   - provider: script
     script: make -w publish-ci
     on:
