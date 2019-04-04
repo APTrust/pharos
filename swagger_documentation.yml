@@ -6,36 +6,197 @@ info:
     [https://wiki.aptrust.org/Member_API](https://wiki.aptrust.org/Member_API).
     The Member API basepath is
     [https://repo.aptrust.org/member-api/v2](https://repo.aptrust.org/member-api/v2).
-  version: 1.0.0
+  version: "0.1-oas3"
   title: APTrust Member API
   contact:
     email: help@aptrust.org
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0'
-tags:
-  - name: intellectual_object
-    description: What your bags are translated into
-  - name: generic_file
-    description: Individual files in Intellectual Objects
-  - name: premis_event
-    description: Singular events that happen to Intellectual Objects and/or Generic Files
-  - name: work_item
-    description: >-
-      An internal object that keeps track of the status of ingests, restoration,
-      and deletion requests
-  - name: dpn_bag
-    description: Packaged bag version of an intellectual object to be sent to DPN
+servers:
+  - url: 'http://demo.aptrust.org'
+    description: APTrust Demo/Test server
+  - url: 'http://repo.aptrust.org'
+    description: APTrust Production server
 paths:
-  /objects:
+  /member-api/v2/events:
     get:
-      tags:
-        - intellectual_object
-      summary: Index of Intellectual Objects
       description: >-
-        Retrieves a list of all intellectual objects; limited by institution for
-        all users below the level of APTrust administrator
-      operationId: getObjects
+        The Event resource represents a single Premis Event, attached to either
+        and Intellectual Object or a Generic File
       responses:
-        default:
-          description: Default error sample response
+        '200':
+          description: A JSON array of intellectual objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+      parameters:
+        - in: query
+          name: event_identifier
+          schema:
+            type: string
+          description: >-
+            Premis Event with this exact identifier. The identifier has the
+            format of a Random hex
+          example: 12f9dc69-e753-435f-b1fd-1d6bc1229957
+        - in: query
+          name: event_type
+          schema:
+            type: string
+            enum:
+              - access assigment
+              - capture
+              - compression
+              - creation
+              - deaccession
+              - decompression
+              - decryption
+              - deletion
+              - message digest
+              - fixity check
+              - identifier assignment
+              - ingestion
+              - migration
+              - normalization
+              - replication
+              - digital signature validation
+              - validation
+              - virus_check
+          description: Premis Events with specific event_type attribute.
+          example: ingestion
+        - in: query
+          name: intellectual_object_identifier
+          schema:
+            type: string
+          description: >-
+            Premis Events with this exact intellectual object identifier. The
+            identifier has the format of institution domain, followed by a
+            slash, followed by the original bag name, minus the extension.
+          example: umich.edu/umich.fulcrum-heb-qj72p722r
+        - in: query
+          name: intellectual_object_identifier_like
+          schema:
+            type: string
+          description: >-
+            Premis Events whose intellectual object identifier contains the
+            specified string.
+          example: ''
+        - in: query
+          name: generic_file_identifier
+          schema:
+            type: string
+          description: >-
+            Premis Events with this exact generic file identifier. The
+            identifier has the format of institution domain, followed by a
+            slash, followed by the original file name, including the extension.
+          example: 12f9dc69-e753-435f-b1fd-1d6bc1229957
+        - in: query
+          name: generic_file_identifier_like
+          schema:
+            type: string
+          description: >-
+            Return only Premis Events whose generic file identifier contains the
+            specified string.
+          example: ''
+        - in: query
+          name: outcome
+          schema:
+            type: string
+            enum:
+              - Pending
+              - Started
+              - Success
+              - Failed
+              - Cancelled
+          description: Return only Premis Events with this outcome
+          example: '?outcome=success'
+        - in: query
+          name: created_before
+          schema:
+            type: string
+          description: >-
+            Premis Events created before the specified timestamp. Use the ISO
+            8660 datetime format for this parameter
+          example: '?created_before=2016-01-27T00:00:00Z'
+        - in: query
+          name: created_after
+          schema:
+            type: string
+          description: >-
+            Premis Events created after the specified timestamp. Use the ISO
+            8660 datetime format for this parameter
+          example: '?created_after=2016-01-27T00:00:00Z'
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: >-
+            Page X of results, where X is an integer. If this is not specified,
+            it defaults to 1.
+          example: '?outcome=success'
+        - in: query
+          name: per_page
+          schema:
+            type: string
+            default: 10
+          description: >-
+            The number of items to include in the page of results. If this is
+            not specified, it defaults to 10.
+          example: '?outcome=success'
+  /member-api/v2/files:
+    get:
+      description: >-
+        Returns a list of Generic Files belonging to a particular Intellectual
+        Object. It requires that the user specify the
+        intellectual_object_identifer as url-encoded, and as part of the base
+        URL.
+      responses:
+        '200':
+          description: A JSON array of intellectual objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /member-api/v2/items:
+    get:
+      description: >-
+        Returns a list of items in the APTrust work queue, including items where
+        the work has been completed. Use this endpoint to check the status of
+        any of the following: bag ingest requests, restoration requests,
+        deletion requests, requests to send items to DPN
+      responses:
+        '200':
+          description: A JSON array of intellectual objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      required:
+        - id
+        - name
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://yourauthurl.com'
+          scopes:
+            scope_name: Enter your scopes here
