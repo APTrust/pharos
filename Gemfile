@@ -37,7 +37,7 @@ gem 'google_drive'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 4.1.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.9.0'
+gem 'inherited_resources', '1.10.0'
 gem 'uuidtools'
 
 gem 'kaminari'
