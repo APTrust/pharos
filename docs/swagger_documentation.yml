@@ -160,6 +160,10 @@ components:
       type: apiKey
       in: header
       name: X-Pharos-API-KEY
+    UserId:
+      type: apiKey
+      in: header
+      name: X-Pharos-API-User
  parameters:
     event:
         id:
@@ -261,3 +265,4 @@ components:
           example: ""
 security:
   - ApiKeyAuth: []
+    UserId: []
