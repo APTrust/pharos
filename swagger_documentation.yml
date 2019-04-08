@@ -14,9 +14,9 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0'
 servers:
-  - url: 'http://demo.aptrust.org'
+  - url: 'https://demo.aptrust.org'
     description: APTrust Demo/Test server
-  - url: 'http://repo.aptrust.org'
+  - url: 'https://repo.aptrust.org'
     description: APTrust Production server
 paths:
   /member-api/v2/events/{generic_file_identifier}:
