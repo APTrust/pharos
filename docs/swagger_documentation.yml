@@ -88,7 +88,6 @@ paths:
           schema:
             type: string
           description: "Source of the object attribute listed above."
-          example: "http://www.ruby-doc.org"
         - name: institution_id
           in: query
           schema:
