@@ -18,6 +18,8 @@ servers:
     description: APTrust Demo/Test server
   - url: 'https://repo.aptrust.org'
     description: APTrust Production server
+  - url: 'https://twofactor.docker1.aptrust.org'
+    description: APTrust 2fa staging server for cors check
 paths:
   /member-api/v2/events/{generic_file_identifier}:
     get:
@@ -69,7 +71,8 @@ paths:
           description: "A brief message explaining the purpose of the premis event generation, tailored to the type of event that was created."
         - name: outcome_information
           in: query
-          type: string
+          schema:
+            type: string
           allowEmptyValue: true
           description: "Additional information pertinent to the individual process that was run in tandem with the event generation. May be empty."
         - name: outcome
@@ -77,10 +80,6 @@ paths:
           schema:
             type: string
           description: "Outcome of the event"
-          example: "Success"
-          enum:
-            - "success"
-            - "failure"
         - name: object
           in: query
           schema:
@@ -96,12 +95,12 @@ paths:
         - name: institution_id
           in: query
           schema:
-            type: int
+            type: string
           description: "ID of the institution to which the event belongs."
         - name: intellectual_object_id
           in: query
           schema:
-            type: int
+            type: string
           description: "ID of the intellectual object to which the event belongs."
         - name: generic_file_id
           in: query
@@ -111,12 +110,13 @@ paths:
           description: "ID of the generic file to which the event belongs, if it is associated with a generic file. May be empty."
         - name: created_at
           in: query
-          type: datetime
+          schema:
+            type: string
           description: "Time of creation of object"
         - name: updated_at
           in: query
           schema:
-            type: datetime
+            type: string
           description: "Time of last update of object"
         - name: old_uuid
           in: query
