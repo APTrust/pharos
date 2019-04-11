@@ -42,13 +42,11 @@ paths:
             type: string
           description: "Premis Events belonging to a particular Generic File. Requires to specify the generic_file_identifer as url-encoded."
           required: true
-          example: "virginia.edu%2Fvirginia.bag_of_photos%2Fphoto_one.tiff"
         - name: id
           in: query
           schema:
             type: integer
           description: "APTrust's internal ID for an object."
-          example: "10"
         - name: identifier
           in: query
           schema:
@@ -85,13 +83,11 @@ paths:
           schema:
             type: string
           description: "Name and version of the code base or gem that was responsible for the process run in tandem with the event generation."
-          example: "Ruby 2.3.1"
         - name: agent
           in: query
           schema:
             type: string
           description: "Source of the object attribute listed above."
-          example: "http://www.ruby-doc.org"
         - name: institution_id
           in: query
           schema:
