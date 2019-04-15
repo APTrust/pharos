@@ -1,0 +1,483 @@
+<!doctype html>
+<html>
+  <head>
+    <title>APTrust Member API</title>
+    <style type="text/css">
+      body {
+      	font-family: Trebuchet MS, sans-serif;
+      	font-size: 15px;
+      	color: #444;
+      	margin-right: 24px;
+      }
+      
+      h1	{
+      	font-size: 25px;
+      }
+      h2	{
+      	font-size: 20px;
+      }
+      h3	{
+      	font-size: 16px;
+      	font-weight: bold;
+      }
+      hr	{
+      	height: 1px;
+      	border: 0;
+      	color: #ddd;
+      	background-color: #ddd;
+      }
+      
+      .app-desc {
+        clear: both;
+        margin-left: 20px;
+      }
+      .param-name {
+        width: 100%;
+      }
+      .license-info {
+        margin-left: 20px;
+      }
+      
+      .license-url {
+        margin-left: 20px;
+      }
+      
+      .model {
+        margin: 0 0 0px 20px;
+      }
+      
+      .method {
+        margin-left: 20px;
+      }
+      
+      .method-notes	{
+      	margin: 10px 0 20px 0;
+      	font-size: 90%;
+      	color: #555;
+      }
+      
+      pre {
+        padding: 10px;
+        margin-bottom: 2px;
+      }
+      
+      .http-method {
+       text-transform: uppercase;
+      }
+      
+      pre.get {
+        background-color: #0f6ab4;
+      }
+      
+      pre.post {
+        background-color: #10a54a;
+      }
+      
+      pre.put {
+        background-color: #c5862b;
+      }
+      
+      pre.delete {
+        background-color: #a41e22;
+      }
+      
+      .huge	{
+      	color: #fff;
+      }
+      
+      pre.example {
+        background-color: #f3f3f3;
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+      
+      code {
+        white-space: pre;
+      }
+      
+      .nickname {
+        font-weight: bold;
+      }
+      
+      .method-path {
+        font-size: 1.5em;
+        background-color: #0f6ab4;
+      }
+      
+      .up {
+        float:right;
+      }
+      
+      .parameter {
+        width: 500px;
+      }
+      
+      .param {
+        width: 500px;
+        padding: 10px 0 0 20px;
+        font-weight: bold;
+      }
+      
+      .param-desc {
+        width: 700px;
+        padding: 0 0 0 20px;
+        color: #777;
+      }
+      
+      .param-type {
+        font-style: italic;
+      }
+      
+      .param-enum-header {
+      width: 700px;
+      padding: 0 0 0 60px;
+      color: #777;
+      font-weight: bold;
+      }
+      
+      .param-enum {
+      width: 700px;
+      padding: 0 0 0 80px;
+      color: #777;
+      font-style: italic;
+      }
+      
+      .field-label {
+        padding: 0;
+        margin: 0;
+        clear: both;
+      }
+      
+      .field-items	{
+      	padding: 0 0 15px 0;
+      	margin-bottom: 15px;
+      }
+      
+      .return-type {
+        clear: both;
+        padding-bottom: 10px;
+      }
+      
+      .param-header {
+        font-weight: bold;
+      }
+      
+      .method-tags {
+        text-align: right;
+      }
+      
+      .method-tag {
+        background: none repeat scroll 0% 0% #24A600;
+        border-radius: 3px;
+        padding: 2px 10px;
+        margin: 2px;
+        color: #FFF;
+        display: inline-block;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>APTrust Member API</h1>
+    <div class="app-desc">This is the documentation for the APTrust Pharos Member API, which can be found in another location at <a href="https://wiki.aptrust.org/Member_API">https://wiki.aptrust.org/Member_API</a>. The Member API basepath is <a href="https://repo.aptrust.org/member-api/v2">https://repo.aptrust.org/member-api/v2</a>.</div>
+    <div class="app-desc">More information: <a href="https://helloreverb.com">https://helloreverb.com</a></div>
+    <div class="app-desc">Contact Info: <a href="help@aptrust.org">help@aptrust.org</a></div>
+    <div class="app-desc">Version: 0.1-oas3</div>
+    
+    <div class="license-info">Apache 2.0</div>
+    <div class="license-url">http://www.apache.org/licenses/LICENSE-2.0</div>
+  <h2>Access</h2>
+    <ol>
+      <li>APIKey KeyParamName:X-Pharos-API-KEY KeyInQuery:false KeyInHeader:true</li>
+      <li>APIKey KeyParamName:X-Pharos-API-User KeyInQuery:false KeyInHeader:true</li>
+    </ol>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#memberApiV2EventsGenericFileIdentifierGet"><code><span class="http-method">get</span> /member-api/v2/events/{generic_file_identifier}</code></a></li>
+  <li><a href="#memberApiV2EventsInstitutionIdentifierGet"><code><span class="http-method">get</span> /member-api/v2/events/{institution_identifier}</code></a></li>
+  <li><a href="#memberApiV2EventsIntellectualObjectIdentifierGet"><code><span class="http-method">get</span> /member-api/v2/events/{intellectual_object_identifier}</code></a></li>
+  <li><a href="#memberApiV2FilesGet"><code><span class="http-method">get</span> /member-api/v2/files</code></a></li>
+  <li><a href="#memberApiV2ItemsGet"><code><span class="http-method">get</span> /member-api/v2/items</code></a></li>
+  <li><a href="#memberApiV2ObjectsGet"><code><span class="http-method">get</span> /member-api/v2/objects</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="memberApiV2EventsGenericFileIdentifierGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /member-api/v2/events/{generic_file_identifier}</code></pre></div>
+    <div class="method-summary">Premis Events of a generic file (<span class="nickname">memberApiV2EventsGenericFileIdentifierGet</span>)</div>
+    <div class="method-notes">List of Premis Events belonging to a particular Generic File. It requires that the user specify the generic_file_identifer as url-encoded, and as part of the base URL.</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">generic_file_identifier (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Premis Events belonging to a particular Generic File. Requires to specify the generic_file_identifer as url-encoded. </div>    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">id (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; APTrust&#x27;s internal ID for an object. </div>      <div class="param">identifier (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; The unique identifier for an event in the APTrust repository. It is generated by APTrust when the event is created. </div>      <div class="param">event_type (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Refers to the type of Premis Event that was created. </div>      <div class="param">date_time (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Date when the premis event was created. </div>      <div class="param">detail (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; A brief message explaining the purpose of the premis event generation, tailored to the type of event that was created. </div>      <div class="param">outcome_information (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Additional information pertinent to the individual process that was run in tandem with the event generation. May be empty. </div>      <div class="param">outcome (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Outcome of the event </div>      <div class="param">object (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Name and version of the code base or gem that was responsible for the process run in tandem with the event generation. </div>      <div class="param">agent (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Source of the object attribute listed above. </div>      <div class="param">institution_id (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; ID of the institution to which the event belongs. </div>      <div class="param">intellectual_object_id (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; ID of the intellectual object to which the event belongs. </div>      <div class="param">generic_file_id (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; ID of the generic file to which the event belongs, if it is associated with a generic file. May be empty. </div>      <div class="param">created_at (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Time of creation of object </div>      <div class="param">updated_at (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Time of last update of object </div>      <div class="param">old_uuid (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Previous identifier of the event if the identifier was a duplicate - something Pharos no longer allows. </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      #/definitions/event
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A JSON array of Premis Events
+        <a href="##/definitions/event">#/definitions/event</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="memberApiV2EventsInstitutionIdentifierGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /member-api/v2/events/{institution_identifier}</code></pre></div>
+    <div class="method-summary">Premis events of a specific institution (<span class="nickname">memberApiV2EventsInstitutionIdentifierGet</span>)</div>
+    <div class="method-notes">List of Premis Events belonging to a particular institution.</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">institution_identifier (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; &amp;quot;List of Premis Events belonging to a particular institution.&amp;quot; </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      #/definitions/event
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A JSON array of Premis Events
+        <a href="##/definitions/event">#/definitions/event</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="memberApiV2EventsIntellectualObjectIdentifierGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /member-api/v2/events/{intellectual_object_identifier}</code></pre></div>
+    <div class="method-summary">Premis Events of an intellectual object (<span class="nickname">memberApiV2EventsIntellectualObjectIdentifierGet</span>)</div>
+    <div class="method-notes">List of Premis Events belonging to a particular intellectual object. It requires that the user specify the generic_file_identifer as url-encoded, and as part of the base URL.</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">intellectual_object_identifier (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; &amp;quot;List of Premis Events belonging to a particular Intellectual Object. Requires the intellectual_object_identifer to be url-encoded.&amp;quot; </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      #/definitions/event
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A JSON array of Premis Events
+        <a href="##/definitions/event">#/definitions/event</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="memberApiV2FilesGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /member-api/v2/files</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">memberApiV2FilesGet</span>)</div>
+    <div class="method-notes">Returns a list of Generic Files belonging to a particular Intellectual Object. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL.</div>
+
+
+
+
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">event_identifier (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; Premis Event with this exact identifier. The identifier has the format of a Random hex </div>    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      array[String]
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A JSON array of intellectual objects
+        
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="memberApiV2ItemsGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /member-api/v2/items</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">memberApiV2ItemsGet</span>)</div>
+    <div class="method-notes">Returns a list of items in the APTrust work queue, including items where the work has been completed. Use this endpoint to check the status of any of the following: bag ingest requests, restoration requests, deletion requests, requests to send items to DPN</div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      array[String]
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A JSON array of intellectual objects
+        
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="memberApiV2ObjectsGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /member-api/v2/objects</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">memberApiV2ObjectsGet</span>)</div>
+    <div class="method-notes">This endpoint returns a list of Intellectual Objects belonging to your institution. Intellectual Objects are usually fully ingested bags, though when bags are uploaded  in multiple parts, the Intellectual Object may appear before all of the component  bags are fully ingested.</div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      array[String]
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    A JSON array of intellectual objects
+        
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+  </ol>
+
+  </body>
+</html>
