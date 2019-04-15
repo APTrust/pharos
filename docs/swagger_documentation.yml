@@ -6,7 +6,7 @@ info:
     [https://wiki.aptrust.org/Member_API](https://wiki.aptrust.org/Member_API).
     The Member API basepath is
     [https://repo.aptrust.org/member-api/v2](https://repo.aptrust.org/member-api/v2).
-  version: "0.1-oas3"
+  version: "0.2-oas3"
   title: APTrust Member API
   contact:
     email: help@aptrust.org
