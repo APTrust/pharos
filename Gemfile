@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.2.1'
+gem 'rails', '5.2.3'
 gem 'rails-controller-testing'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.1.20'
@@ -23,7 +23,7 @@ gem 'pg', '1.1.4' # Necessary for talking to our RDS instance
 
 gem 'pundit'
 gem 'figaro'
-gem 'devise', '4.6.1'
+gem 'devise', '4.6.2'
 gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
@@ -42,7 +42,7 @@ gem 'google_drive'
 #gem 'omniauth-google-oauth2'
 gem 'simple_form', '~> 4.1.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.9.0'
+gem 'inherited_resources', '1.10.0'
 gem 'uuidtools'
 
 gem 'kaminari'
@@ -55,7 +55,7 @@ gem 'browser-timezone-rails'
 gem 'mail', '>= 2.7.1'
 gem 'sprockets', '>= 3.7.2'
 gem 'loofah', '~> 2.2.3'
-gem 'rack', '~> 2.0.6'
+gem 'rack', '~> 2.0.7'
 gem 'actionview', '>= 5.2.2.1'
 gem 'railties', '>= 5.2.2.1'
 
@@ -84,7 +84,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.14.0'
+  gem 'capybara', '3.16.2'
   gem 'shoulda-matchers', '~> 4.0.1'
   gem 'coveralls', '0.8.22', require: false
 end
