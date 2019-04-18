@@ -61,7 +61,7 @@ RSpec.describe UsersController, type: :controller do
           post :create, params: { user: other_attributes }
         }.to change(User, :count).by(1)
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include('You now have an account with a temporary password.')
+        expect(email.body.encoded).to include('An account with a temporary password has been created for you.')
         expect(email.body.encoded).to include('Your temporary password is ABCabc-')
       end
     end
