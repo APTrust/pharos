@@ -1,5 +1,5 @@
 class NotificationMailer < ApplicationMailer
-  default from: 'info@aptrust.org'
+  default from: 'help@aptrust.org'
 
   def failed_fixity_notification(event, email_log)
     @event_institution = event.institution
