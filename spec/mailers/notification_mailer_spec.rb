@@ -34,7 +34,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @event_url' do
@@ -62,7 +62,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @item_url' do
@@ -89,7 +89,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @events_url' do
@@ -126,7 +126,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @items_url' do
@@ -160,7 +160,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @item_url' do
@@ -190,7 +190,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -225,7 +225,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -268,7 +268,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -299,7 +299,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -329,7 +329,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -360,7 +360,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -396,7 +396,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @confirmation_url' do
@@ -443,7 +443,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @confirmation_url' do
@@ -497,7 +497,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'has an email log with proper associations' do
@@ -547,7 +547,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'has an email log with proper associations' do
@@ -588,7 +588,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'has a csv attachment' do
@@ -617,7 +617,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'includes specific snapshot text' do
@@ -639,7 +639,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'includes specific password text' do
@@ -661,7 +661,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @confirmation_url' do
