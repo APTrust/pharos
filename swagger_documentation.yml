@@ -29,7 +29,7 @@ paths:
         requires that the user specify the generic_file_identifer as
         url-encoded, and as part of the base URL.
       tags:
-        - events
+        - Premis Events
       responses:
         '200':
           description: A JSON array of Premis Events
@@ -114,7 +114,7 @@ paths:
   '/member-api/v2/events/{intellectual_object_identifier}':
     get:
       tags:
-        - events
+        - Premis Events
       summary: Premis Events of an intellectual object
       description: >-
         List of Premis Events belonging to a particular intellectual object. It
@@ -200,7 +200,7 @@ paths:
   '/member-api/v2/events/{institution_identifier}':
     get:
       tags:
-        - events
+        - Premis Events
       summary: Premis events of a specific institution
       description: List of Premis Events belonging to a particular institution.
       responses:
@@ -278,6 +278,8 @@ paths:
             Number of items in the page of results. If this is not specified, it defaults to 10.  
   '/member-api/v2/files/{intellectual_object_identifier}':
     get:
+      tags:
+        - Generic Files
       description: >-
         Returns a list of Generic Files belonging to a particular Intellectual
         Object. It requires that the user specify the
@@ -375,11 +377,10 @@ paths:
             The number of items to include in the page of results. If this is not specified, it defaults to 10.  
   '/member-api/v2/items':
     get:
+      tags:
+        - Work Items
       description: 
-        "Returns a list of items in the APTrust work queue, including items where
-        the work has been completed. Use this endpoint to check the status of
-        any of the following bag ingest requests, restoration requests,
-        deletion requests, requests to send items to DPN"
+        "Returns a list of items in the APTrust work queue, including items where the work has been completed. Use this endpoint to check the status of any of the following bag ingest requests, restoration requests, deletion requests, requests to send items to DPN"
       responses:
         '200':
           description: A JSON array of intellectual objects
@@ -517,8 +518,144 @@ paths:
         
   '/member-api/v2/objects':
     get:
+      tags:
+        - Intellectual Objects
       description: >-
         This endpoint returns a list of Intellectual Objects belonging to your institution. Intellectual Objects are usually fully ingested bags, though when bags are uploaded in multiple parts, the Intellectual Object may appear before all of the component bags are fully ingested.
+      responses:
+        '200':
+          description: A JSON array of intellectual objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Objects'
+      parameters:
+        - name: description
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact description. 
+        - name: description_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only Intellectual Objects whose description contains the specified string.
+        - name: identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact identifier. 
+        - name: identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only Intellectual Objects whose identifier contains the specified string.
+        - name: alt_identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact alternative identifier. 
+        - name: alt_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only Intellectual Objects whose alternative identifier contains the specified string.
+        - name: etag
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact etag.
+        - name: etag_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only Intellectual Objects whose etag contains the specified string.
+        - name: bag_name
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Object with this exact bag name.
+        - name: bag_name_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only those Intellectual Objects whose bag name contains the specified string.
+        - name: created_before
+          in: query
+          schema:
+            type: string            
+            format: date-time
+          description: >-
+            Return only items created before the specified timestamp.
+        - name: created_after
+          in: query
+          schema:
+            type: string            
+            format: date-time
+          description: >-
+            Return only items created after the specified timestamp.
+        - name: updated_before
+          in: query
+          schema:
+            type: string            
+            format: date-time
+          description: >-
+            Return only items updated before the specified timestamp.
+        - name: updated_after
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only items updated after the specified timestamp.
+        - name: access
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only items with a specified level of access (consortia, institution, restricted).
+        - name: state
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items having the specified state. 
+        - name: file_format
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only Intellectual Objects that have one or more associated generic files with the specified file format.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: >-
+            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: >-
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+  '/member-api/v2/objects/{intellectual_object_identifier}/restore':
+    get:
+      tags:
+        - Intellectual Objects
+      description: >-
+        Allows a user to specify an intellectual object (via identifier) to be restored. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the restoration request.
       responses:
         '200':
           description: A JSON array of intellectual objects
@@ -528,6 +665,22 @@ paths:
                 type: array
                 items:
                   type: string
+      parameters:
+        - name: intellectual_object_identifier 
+          in: path
+          schema:
+            type: string
+          description: >-
+            Trigger a restore of a particular Intellectual
+            Object. Requires the intellectual_object_identifer to be
+            url-encoded.
+          required: true
+        - name: identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Generic Files with this exact identifier.
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -822,6 +975,77 @@ components:
           description: Generic file  ID.
           example: null
           nullable: true
+    Object:
+      properties:
+        id:
+          type: integer
+          description: APTrust's internal ID for an object.
+          example: '10'
+        title:
+          type: string
+          description: The title of the intellectual object, taken from the Title tag of the aptrust-info.txt tag file.
+          example: 'Roots of Alternative Medicine'
+        description:
+          type: string
+          description: >-
+            The description of the bag, taken from the Description tag of the aptrust-info.txt file. This may be an empty string, as the Description tag contents are optional.
+          example: ''
+        access:
+          type: string
+          description: >-
+             The access rights to this object, as specified in the Access tag of the aptrust-info.txt tag file. 
+                consortia - Any APTrust member may view information about this object in the APTrust Web UI.
+                institution - Only users and admins from the object's owning institution can view information about this object.
+                restricted - Users and admins from the object's institution can see that the object is in the repository, but some details about the object are accessible to institutional admins only.
+          enum: 
+            - consortia
+            - institution
+            - restricted
+          example: 'consortia'
+        bag_name:
+          type: string
+          description: The name of the bag. This matches the name of the tar file uploaded into the receiving bucket, minus the .tar or .bag00x.of00x.tar extension.
+          example: 'virginia.edu_dc3acb8'
+        identifier:
+          type: string
+          description: The unique identifier for this bag in the APTrust repository. This is composed of the depositing institution's domain name, plus a slash, plus the bag name. This is the identifier to use when you are looking for a specific bag.
+          example: 'virginia.edu/virginia.edu_dc3acb8'
+        state:
+          type: string
+          description:  \'A\' for active, \'D\' is for deleted. An active bag is one that is still in the repository. Deleted bags have been deleted from the repository by some user. You can find out when a bag was deleted and who requested the deletion by querying the Items endpoint and filtering down to bags with a specific identifier and action=Delete.
+          example: 'A'
+        alt_identifier:
+          type: array
+          items:
+            type: string
+          description: Although this is an array of strings, it will always contain either zero or one element. If you sent a value for the Internal-Sender-Identifier field in your bag_info.txt file, that value will appear as the first item in the alt_identifier array.
+          example: 'med:377892276'
+        etag:
+          type: string
+          description: >-
+            The etag of the tar file you uploaded that eventually became this intellectual object. S3 returns the etag on successful upload. For single-part uploads, the etag is the md5 digest of the tar file. For larger, multipart uploads, the etag looks like an md5 checksum, followed by a dash and the number of parts in the multipart upload. Amazon has some documentation on that here, and you'll find a good overview of how multipart etags are calculated here. The purpose of including the etag in the intellectual object JSON is to help you know which uploaded tar file we used to build your intellectual object. See the ingest documentation for more info about what happens when you upload multiple versions of the same bag.
+          example: c8b80aadba6adabff06d35e029175daf
+        created_at:
+          type: string
+          format: date-time
+          description: Time of creation of item
+          example: '2014-11-24T18:56:11.348Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Time of last update of item
+          example: '2014-11-24T19:17:03.715Z'
+        institution_id:
+          type: integer
+          description: >-
+              Internal ID of institution
+          example: "345168"
+        dpn_uuid:
+          type: string
+          description: >-
+              Contains the UUID of the object in DPN if it has been sent to DPN and successfully ingested.
+          example: null
+        
 
     Events:
       type: array
@@ -835,6 +1059,10 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Item'
+    Objects:
+      type: array
+      items:
+        $ref: '#/components/schemas/Object'
     Error:
       required:
         - code
@@ -849,4 +1077,3 @@ security:
   - ApiKeyAuth: []
     UserId: []
     
-
