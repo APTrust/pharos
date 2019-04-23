@@ -142,8 +142,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def verify_twofa?
-    user == record ||  user.admin? ||
-        (user.institutional_admin? && (user.institution_id == record.institution_id))
+    user == record
   end
 
   def generate_backup_codes?
