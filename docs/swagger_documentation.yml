@@ -375,15 +375,119 @@ paths:
             default: 10
           description: >-
             The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+  '/member-api/v2/files/restore/{generic_file_id}':
+    get:
+      tags:
+        - Generic Files
+      description: >-
+        Returns a list of Generic Files belonging to a particular Intellectual
+        Object. It requires that the user specify the
+        intellectual_object_identifer as url-encoded, and as part of the base
+        URL.
+      responses:
+        '200':
+          description: A JSON array of intellectual objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Files'
+      parameters:
+        - name: generic_file_id 
+          in: path
+          schema:
+            type: string
+          description: >-
+            Generic file ID to be restored
+          required: true
+        - name: identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Generic Files with this exact identifier.
+        - name: identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only Generic Files whose identifier contains the 
+            specified string
+        - name: uri
+          in: query
+          schema:
+            type: string
+          description: >-
+           Return only the Generic Files with this exact URI.
+        - name: uri_like
+          in: query
+          schema:
+            type: string
+          description: >-
+           Return only Generic Files whose URI contains the specified string.
+        - name: file_format
+          in: query
+          schema:
+            type: string
+          description: >-
+           Return only Generic Files that have the specified file format.  
+        - name: created_before
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files created before the specified timestamp.
+        - name: created_after
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files created after the specified timestamp.
+        - name: updated_before
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files updated before the specified timestamp.
+        - name: updated_after
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files updated after the specified timestamp.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: >-
+            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: >-
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+
   '/member-api/v2/items':
     get:
       tags:
         - Work Items
-      description: 
-        "Returns a list of items in the APTrust work queue, including items where the work has been completed. Use this endpoint to check the status of any of the following bag ingest requests, restoration requests, deletion requests, requests to send items to DPN"
+      summary:  Returns a list of items in the APTrust work queue
+      description: |
+        Returns a list of items in the APTrust work queue, including items where the work has been completed. Use this endpoint to check the status of any of the following 
+        * Bag ingest requests
+        * Restoration requests
+        * Deletion requests
+        * Requests to send items to DPN
       responses:
         '200':
-          description: A JSON array of intellectual objects
+          description: OK
+
           content:
             application/json:
               schema:
@@ -515,7 +619,6 @@ paths:
             default: 10
           description: >-
             The number of items to include in the page of results. If this is not specified, it defaults to 10.  
-        
   '/member-api/v2/objects':
     get:
       tags:
@@ -650,6 +753,148 @@ paths:
             default: 10
           description: >-
             The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+  '/member-api/v2/objects/{institution_identifier}':
+    get:
+      tags:
+        - Intellectual Objects
+      summary: This endpoint returns a list of Intellectual Objects belonging to an institution. Only APTrust Administrators have access to other institutions.
+      description: >-
+        This endpoint returns a list of Intellectual Objects belonging to an institution. Intellectual Objects are usually fully ingested bags, though when bags are uploaded in multiple parts, the Intellectual Object may appear before all of the component bags are fully ingested.
+      responses:
+        '200':
+          description: A JSON array of intellectual objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Objects'
+      parameters:
+        - in: path
+          name: institution_identifier
+          schema:
+            type: string
+          description: '"List of Objects belonging to a particular institution."'
+          required: true
+        - name: description
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact description. 
+        - name: description_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only Intellectual Objects whose description contains the specified string.
+        - name: identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact identifier. 
+        - name: identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only Intellectual Objects whose identifier contains the specified string.
+        - name: alt_identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact alternative identifier. 
+        - name: alt_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only Intellectual Objects whose alternative identifier contains the specified string.
+        - name: etag
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact etag.
+        - name: etag_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only Intellectual Objects whose etag contains the specified string.
+        - name: bag_name
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Object with this exact bag name.
+        - name: bag_name_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only those Intellectual Objects whose bag name contains the specified string.
+        - name: created_before
+          in: query
+          schema:
+            type: string            
+            format: date-time
+          description: >-
+            Return only items created before the specified timestamp.
+        - name: created_after
+          in: query
+          schema:
+            type: string            
+            format: date-time
+          description: >-
+            Return only items created after the specified timestamp.
+        - name: updated_before
+          in: query
+          schema:
+            type: string            
+            format: date-time
+          description: >-
+            Return only items updated before the specified timestamp.
+        - name: updated_after
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only items updated after the specified timestamp.
+        - name: access
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only items with a specified level of access (consortia, institution, restricted).
+        - name: state
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items having the specified state. 
+        - name: file_format
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only Intellectual Objects that have one or more associated generic files with the specified file format.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: >-
+            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: >-
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+
   '/member-api/v2/objects/{intellectual_object_identifier}/restore':
     get:
       tags:
@@ -1046,7 +1291,6 @@ components:
               Contains the UUID of the object in DPN if it has been sent to DPN and successfully ingested.
           example: null
         
-
     Events:
       type: array
       items:
