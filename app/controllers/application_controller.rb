@@ -16,8 +16,7 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :verify_user!, unless: :devise_controller?
 
-  # Are we done with this? If so, delete the following line.
-  # before_action :forced_redirections, unless: :devise_controller?
+  before_action :forced_redirections, unless: :devise_controller?
 
   def verify_user!
     start_verification if requires_verification?
@@ -147,26 +146,27 @@ class ApplicationController < ActionController::Base
     elsif params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s
       return
     else
-      if current_user.required_to_use_twofa?
-        if !current_user.enabled_two_factor
-          if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
-            return
-          else
-            redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
-          end
-        elsif !current_user.confirmed_two_factor
-          if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
-            return
-          elsif params[:controller] == 'verifications' && (params[:action] == 'edit' || params[:action] == 'update')
-          else
-            redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
-          end
-        else
-          return
-        end
-      else
-        return
-      end
+      # if current_user.required_to_use_twofa?
+      #   if !current_user.enabled_two_factor
+      #     if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
+      #       return
+      #     else
+      #       redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
+      #     end
+      #   elsif !current_user.confirmed_two_factor
+      #     if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
+      #       return
+      #     elsif params[:controller] == 'verifications' && (params[:action] == 'edit' || params[:action] == 'update')
+      #     else
+      #       redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
+      #     end
+      #   else
+      #     return
+      #   end
+      # else
+      #   return
+      # end
+      return
     end
   end
 
