@@ -23,7 +23,7 @@ servers:
 paths:
   '/member-api/v2/events/{generic_file_identifier}':
     get:
-      summary: Premis Events of a generic file
+      summary: Premis Events of a generic file`
       description: >-
         List of Premis Events belonging to a particular Generic File. It
         requires that the user specify the generic_file_identifer as
@@ -894,7 +894,28 @@ paths:
             default: 10
           description: >-
             The number of items to include in the page of results. If this is not specified, it defaults to 10.  
-
+  '/member-api/v2/objects/{intellectual_object_identifier}/dpn':
+    put:
+      tags:
+        - Intellectual Objects
+      summary: This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN
+      description: >-
+        This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the DPN request. If the request is unsuccessful, the user will return an error message with an explanation. 
+      deprecated: true
+      responses:
+        '200':
+          description: A JSON array of intellectual objects
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/SendtoDPNResponses'
+      parameters:
+        - in: path
+          name: intellectual_object_identifier
+          schema:
+            type: string
+          description: 'Intellectual Object identifier to be sent to DPN'
+          required: true
   '/member-api/v2/objects/{intellectual_object_identifier}/restore':
     get:
       tags:
@@ -907,9 +928,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                $ref: '#/components/schemas/ObjectRestores'
       parameters:
         - name: intellectual_object_identifier 
           in: path
@@ -989,6 +1008,11 @@ components:
             Additional information pertinent to the individual process that was
             run in tandem with the event generation. May be empty.
           example: Generated with ruby SecureRandom.uuid()
+        outcome_detail:
+          type: string
+          description: >-
+              MD5 or SHA256 checksum associated with the process that was run in tandem with the event generation OR link to object location in case of a replication event.
+          example: "https://s3-us-west-2.amazonaws.com/aptrust.test.preservation.oregon/a1814f2a-2fad-4a97-bfbe-d614499c66a6"
         outcome:
           type: string
           description: Outcome of the event
@@ -1290,7 +1314,42 @@ components:
           description: >-
               Contains the UUID of the object in DPN if it has been sent to DPN and successfully ingested.
           example: null
-        
+    ObjectRestoreResponse:
+      properties:
+        status:
+          description: Description of restoration request outcome. 
+          type: string
+          enum:
+            - error
+            - ok
+        message:
+          description: Explanation of restoration request. 
+          type: string
+          enum:
+            - "This item has been deleted and cannot be queued for restoration."
+            - "Your item has been queued for restoration."
+            - "Your object cannot be queued for restoration at this time due to a pending #{pending.action} request."
+        work_item_id:
+          description: "ID of the work item if the request was successful. If the request was unsuccessful it will be \"0\""
+          type: integer
+          example: '1234'
+    SendToDPNResponseFailed:
+      properties:
+        status:
+          type: string
+          enum:
+            - error
+            - conflict
+        message:
+          type: string
+          enum: 
+            - 'We are not currently sending objects to DPN.'
+            - 'This item cannot be sent to DPN because the depositing institution is not a DPN member.'
+            - 'This item has already been sent to DPN.'
+            - 'This item has been deleted and cannot be sent to DPN.'
+            - 'This item cannot be sent to DPN at this time because it is greater than 250GB.'
+            - 'Your item has been queued for DPN.'
+            - "Your object cannot be sent to DPN at this time due to a pending #{pending.action} request."
     Events:
       type: array
       items:
@@ -1307,6 +1366,16 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Object'
+    ObjectRestores:
+      type: array
+      items: 
+        $ref: '#/components/schemas/ObjectRestoreResponse'
+    SendtoDPNResponses:
+      type: array
+      items: 
+        oneOf:
+          - $ref: '#/components/schemas/Item'
+          - $ref: '#/components/schemas/SendToDPNResponseFailed'
     Error:
       required:
         - code
