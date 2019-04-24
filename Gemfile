@@ -81,6 +81,7 @@ group :development do
   # We don't use this gem directly but actionpack and actionview depend on it and it needs upgrading to fix a security warning
   gem 'rails-html-sanitizer', '1.0.4'
   gem 'wkhtmltopdf-binary'
+  gem 'rb-readline'
 end
 
 group :test do

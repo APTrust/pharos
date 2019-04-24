@@ -135,7 +135,7 @@ class ApplicationController < ActionController::Base
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
         return
       else
-        redirect_to current_user, flash: { error: 'You are required to change your password now.' }
+        redirect_to current_user, flash: { error: 'Your initial password is only meant to be temporary, please change your password now.' }
       end
     elsif !current_user.email_verified
       if params[:controller] == 'users' && (params[:action] == 'verify_email' || params[:action] == 'email_confirmation' || params[:action] == 'show') && params[:id] == current_user.id.to_s
