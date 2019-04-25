@@ -34,6 +34,8 @@ module Pharos
 
 	#config.public_file_server.enable = false
     config.assets.version = '1.0'
+	config.assets.precompile += %w(.svg)
+
     config.before_configuration do
       env_file = File.join(Rails.root, 'config', 'dev_env.yml')
       YAML.load(File.open(env_file)).each do |key, value|
