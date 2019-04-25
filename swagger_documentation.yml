@@ -43,6 +43,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'  
       parameters:
         - in: path
           name: generic_file_identifier
@@ -149,42 +153,42 @@ paths:
           in: query
           schema:
             type: string
-          description: Refers to the type of Premis Event that was created.
+          description: "Refers to the type of Premis Event that was created."
         - name: intellectual_object_identifier
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact intellectual object identifier
+          description: "Return only the Premis Events with this exact intellectual object identifier"
         - name: intellectual_object_identifier_like
           in: query
           schema:
             type: string
-          description: Return only Premis Events whose intellectual object identifier contains the specified string.
+          description: "Return only Premis Events whose intellectual object identifier contains the specified string."
         - name: generic_file_identifier
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact generic file identifier. 
+          description: "Return only the Premis Events with this exact generic file identifier."
         - name: generic_file_identifier_like
           in: query
           schema:
             type: string
-          description: Return only Premis Events whose intellectual object identifier contains the specified string
+          description: "Return only Premis Events whose intellectual object identifier contains the specified string"
         - name: outcome
           in: query
           schema:
             type: string
-          description: Outcome of the event
+          description: "Outcome of the event"
         - name: created_before
           in: query
           schema:
             type: string
-          description: Premis Events created before the specified timestamp
+          description: "Premis Events created before the specified timestamp"
         - name: created_after
           in: query
           schema:
             type: string
-          description: Premis Events created after the specified timestamp
+          description: "Premis Events created after the specified timestamp"
         - name: page
           in: query
           schema:
@@ -228,42 +232,46 @@ paths:
           in: query
           schema:
             type: string
-          description: Refers to the type of Premis Event that was created.
+          description: "Refers to the type of Premis Event that was created."
         - name: intellectual_object_identifier
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact intellectual object identifier
+          description: >-
+            Return only the Premis Events with this exact intellectual object identifier
         - name: intellectual_object_identifier_like
           in: query
           schema:
             type: string
-          description: Return only Premis Events whose intellectual object identifier contains the specified string.
+          description: >-
+            Return only Premis Events whose intellectual object identifier contains the specified string.
         - name: generic_file_identifier
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact generic file identifier. 
+          description: >-
+            Return only the Premis Events with this exact generic file identifier. 
         - name: generic_file_identifier_like
           in: query
           schema:
             type: string
-          description: Return only Premis Events whose intellectual object identifier contains the specified string
+          description: >-
+            Return only Premis Events whose intellectual object identifier contains the specified string
         - name: outcome
           in: query
           schema:
             type: string
-          description: Outcome of the event
+          description: "Outcome of the event"
         - name: created_before
           in: query
           schema:
             type: string
-          description: Premis Events created before the specified timestamp
+          description: "Premis Events created before the specified timestamp"
         - name: created_after
           in: query
           schema:
             type: string
-          description: Premis Events created after the specified timestamp
+          description: "Premis Events created after the specified timestamp"
         - name: page
           in: query
           schema:
@@ -391,6 +399,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Files'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       parameters:
         - name: generic_file_id 
           in: path
@@ -939,12 +953,6 @@ paths:
             Object. Requires the intellectual_object_identifer to be
             url-encoded.
           required: true
-        - name: identifier
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only the Generic Files with this exact identifier.
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -1386,6 +1394,19 @@ components:
           format: int32
         message:
           type: string
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
 security:
   - ApiKeyAuth: []
     UserId: []
