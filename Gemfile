@@ -85,7 +85,7 @@ group :development do
 end
 
 group :test do
-  gem 'capybara', '3.16.2'
+  gem 'capybara', '3.17.0'
   gem 'shoulda-matchers', '~> 4.0.1'
   gem 'coveralls', '0.8.22', require: false
 end
