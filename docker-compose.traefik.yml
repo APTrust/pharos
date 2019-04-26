@@ -28,17 +28,21 @@ services:
       - migration
     env_file:
       - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
     labels:
-     - traefik.enable=true
-     - traefik.backend=pharos
-     - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}"
-     - traefik.port=9292
-     - traefik.docker.network=frontend
+      - traefik.enable=true
+      - traefik.backend=pharos
+      - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}"
+      - traefik.port=9292
+      - traefik.docker.network=frontend
     networks:
       - backend
       - frontend
     ports:
-     - "9292:9292"
+      - "9292:9292"
   migration:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     #image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
@@ -46,6 +50,10 @@ services:
     command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
     env_file:
       - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
     depends_on:
       - db
     networks:
@@ -76,7 +84,7 @@ services:
       - assets:/etc/share/nginx/html/pharos
     networks:
     #    - backend
-        - frontend
+      - frontend
     labels:
       - traefik.enable=true
       - traefik.assets.backend=nginx-assets
