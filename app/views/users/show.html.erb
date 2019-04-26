@@ -3,10 +3,9 @@
 <h4>User Information</h4>
 <%= gravatar_for @user %>
 <address>
-
   <strong><%= @user.name %></strong> (<em><%= @user.institution.name %></em>)<br />
-  <a href="mailto:#"><%= @user.email %></a><br>
-  <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br><br>
+  <a href="mailto:#"><%= @user.email %></a><br />
+  <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br /><br />
 </address>
 <%= edit_link(@user) %>
 <%= link_to 'Change Password', edit_password_user_path(@user), class: 'btn btn-normal doc-action-btn' %>
@@ -21,7 +20,7 @@
 <% unless @user.email_verified %>
   <%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
                       :method => :get, class: 'btn btn-normal doc-action-btn' %>
-  <br>
+  <br />
 <% end %>
 
 <h4>Two Factor Authentication</h4>
@@ -39,7 +38,7 @@
 
         <%= link_to 'Verify Phone Number via SMS', users_verify_twofa_path(@user.id, verification_option: 'sms'),
                     class: 'btn btn-normal doc-action-btn' %>
-        <br>
+        <br />
         <%= link_to 'Verify Phone Number via Push Notification', users_verify_twofa_path(@user.id, verification_option: 'push'),
                     class: 'btn btn-normal doc-action-btn', id: 'phone_verification_push_btn' %><p>(requires Authy app installation)</p>
         <div id="verification-loader" class="hidden">
@@ -48,12 +47,12 @@
         </div>
     <% end %>
 
-    <br>
+    <br />
     <h4>Backup Codes</h4>
     <%= button_to 'Generate Backup Codes', backup_codes_path(@user.id),
                   :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% if @codes %>
-        <br>
+        <br />
         <p><span class="badge badge-danger">Important!</span> Write these backup codes down in a safe place.
           They can be used once to login to your account if your two factor device is unavailable.
           They will never be displayed again for security reasons.</p>
@@ -63,7 +62,7 @@
           <% end %>
         </ul>
     <% end %>
-    <br>
+    <br />
 
 <% else %>
     <h5>Status: Not Enabled</h5>
@@ -75,19 +74,21 @@
 <div>
   <h5>If you haven't already, consider downloading Authy and using push notifications!</h5>
   <span><a href="https://play.google.com/store/apps/details?id=com.authy.authy" target="_blank">
-			  <%= link_to image_tag("aptrust/google-play.svg", alt: "Get it on Google Play") %>
-            </a></span>
+      <%= link_to image_tag("aptrust/google-play.svg", alt: "Get it on Google Play") %>
+    </a>
+  </span>
   <span><a href="https://itunes.apple.com/us/app/authy/id494168017" target="_blank">
-			  <%= link_to image_tag("aptrust/app-store.svg", alt: "Download on the App Store") %>
-            </a></span>
+      <%= link_to image_tag("aptrust/app-store.svg", alt: "Download on the App Store") %>
+    </a>
+  </span>
 </div>
-<br>
+<br />
 <h4>Roles</h4>
 <ul class="unstyled">
   <% @user.roles.each do |role| %>
       <li><%= role.name.titleize %></li>
   <% end %>
 </ul>
-<br>
+<br />
 
 <%= render 'api_key' %>
