@@ -43,8 +43,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
       parameters:
@@ -53,7 +53,7 @@ paths:
           schema:
             type: string
           description: >-
-            Premis Events belonging to a particular Generic File. Requires to
+            Premis Events belonging to a particular Generic File. Requires user to
             specify the generic_file_identifer as url-encoded.
           required: true
         - name: event_identifier
@@ -72,7 +72,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact intellectual object identifier
+          description: Return only the Premis Events with this exact intellectual object identifier.
         - name: intellectual_object_identifier_like
           in: query
           schema:
@@ -87,22 +87,22 @@ paths:
           in: query
           schema:
             type: string
-          description: Return only Premis Events whose intellectual object identifier contains the specified string
+          description: Return only Premis Events whose generic file identifier contains the specified string.
         - name: outcome
           in: query
           schema:
             type: string
-          description: Outcome of the event
+          description: Outcome of the event.
         - name: created_before
           in: query
           schema:
             type: string
-          description: Premis Events created before the specified timestamp
+          description: Premis Events created before the specified timestamp.
         - name: created_after
           in: query
           schema:
             type: string
-          description: Premis Events created after the specified timestamp
+          description: Premis Events created after the specified timestamp.
         - name: page
           in: query
           schema:
@@ -122,7 +122,7 @@ paths:
       summary: Premis Events of an intellectual object
       description: >-
         List of Premis Events belonging to a particular intellectual object. It
-        requires that the user specify the generic_file_identifer as
+        requires that the user specify the intellectual_object_identifer as
         url-encoded, and as part of the base URL.
       responses:
         '200':
@@ -158,7 +158,7 @@ paths:
           in: query
           schema:
             type: string
-          description: "Return only the Premis Events with this exact intellectual object identifier"
+          description: "Return only the Premis Events with this exact intellectual object identifier."
         - name: intellectual_object_identifier_like
           in: query
           schema:
@@ -173,22 +173,22 @@ paths:
           in: query
           schema:
             type: string
-          description: "Return only Premis Events whose intellectual object identifier contains the specified string"
+          description: "Return only Premis Events whose generic file identifier contains the specified string."
         - name: outcome
           in: query
           schema:
             type: string
-          description: "Outcome of the event"
+          description: "Outcome of the event."
         - name: created_before
           in: query
           schema:
             type: string
-          description: "Premis Events created before the specified timestamp"
+          description: "Premis Events created before the specified timestamp."
         - name: created_after
           in: query
           schema:
             type: string
-          description: "Premis Events created after the specified timestamp"
+          description: "Premis Events created after the specified timestamp."
         - name: page
           in: query
           schema:
@@ -206,7 +206,9 @@ paths:
       tags:
         - Premis Events
       summary: Premis events of a specific institution
-      description: List of Premis Events belonging to a particular institution.
+      description: >-
+        List of Premis Events belonging to a particular institution. It
+        requires that the user specify the institution_identifer as part of the base URL.
       responses:
         '200':
           description: A JSON array of Premis Events
@@ -219,7 +221,7 @@ paths:
           name: institution_identifier
           schema:
             type: string
-          description: '"List of Premis Events belonging to a particular institution."'
+          description: "List of Premis Events belonging to a particular institution."
           required: true
         - name: event_identifier
           in: query
@@ -238,7 +240,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact intellectual object identifier
+            Return only the Premis Events with this exact intellectual object identifier.
         - name: intellectual_object_identifier_like
           in: query
           schema:
@@ -256,22 +258,22 @@ paths:
           schema:
             type: string
           description: >-
-            Return only Premis Events whose intellectual object identifier contains the specified string
+            Return only Premis Events whose generic file identifier contains the specified string.
         - name: outcome
           in: query
           schema:
             type: string
-          description: "Outcome of the event"
+          description: "Outcome of the event."
         - name: created_before
           in: query
           schema:
             type: string
-          description: "Premis Events created before the specified timestamp"
+          description: "Premis Events created before the specified timestamp."
         - name: created_after
           in: query
           schema:
             type: string
-          description: "Premis Events created after the specified timestamp"
+          description: "Premis Events created after the specified timestamp."
         - name: page
           in: query
           schema:
@@ -295,7 +297,7 @@ paths:
         URL.
       responses:
         '200':
-          description: A JSON array of intellectual objects
+          description: A JSON array of generic files
           content:
             application/json:
               schema:
@@ -321,8 +323,8 @@ paths:
           schema:
             type: string
           description: >-
-            Return only Generic Files whose identifier contains the
-            specified string
+            Return only Generic Files whose identifier contains the 
+            specified string.
         - name: uri
           in: query
           schema:
@@ -388,17 +390,14 @@ paths:
       tags:
         - Generic Files
       description: >-
-        Returns a list of Generic Files belonging to a particular Intellectual
-        Object. It requires that the user specify the
-        intellectual_object_identifer as url-encoded, and as part of the base
-        URL.
+        Allows a user to specify a generic file (via identifier) to be restored. It requires that the user specify the generic_file_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
       responses:
         '200':
-          description: A JSON array of intellectual objects
+          description: JSON containing the status and Work Item ID.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Files'
+                $ref: '#/components/schemas/RestoreResponses'
         '404':
           description: Not found
           content:
@@ -413,80 +412,6 @@ paths:
           description: >-
             Generic file ID to be restored
           required: true
-        - name: identifier
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only the Generic Files with this exact identifier.
-        - name: identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Generic Files whose identifier contains the
-            specified string
-        - name: uri
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only the Generic Files with this exact URI.
-        - name: uri_like
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only Generic Files whose URI contains the specified string.
-        - name: file_format
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only Generic Files that have the specified file format.
-        - name: created_before
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files created before the specified timestamp.
-        - name: created_after
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files created after the specified timestamp.
-        - name: updated_before
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files updated before the specified timestamp.
-        - name: updated_after
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files updated after the specified timestamp.
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-          description: >-
-            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
-        - name: per_page
-          in: query
-          schema:
-            type: integer
-            default: 10
-          description: >-
-            The number of items to include in the page of results. If this is not specified, it defaults to 10.
-
   '/member-api/v2/items':
     get:
       tags:
@@ -500,7 +425,7 @@ paths:
         * Requests to send items to DPN
       responses:
         '200':
-          description: OK
+          description: A JSON array of work items
 
           content:
             application/json:
@@ -773,7 +698,7 @@ paths:
         - Intellectual Objects
       summary: This endpoint returns a list of Intellectual Objects belonging to an institution. Only APTrust Administrators have access to other institutions.
       description: >-
-        This endpoint returns a list of Intellectual Objects belonging to an institution. Intellectual Objects are usually fully ingested bags, though when bags are uploaded in multiple parts, the Intellectual Object may appear before all of the component bags are fully ingested.
+        This endpoint returns a list of Intellectual Objects belonging to an institution. Intellectual Objects are usually fully ingested bags, though when bags are uploaded in multiple parts, the Intellectual Object may appear before all of the component bags are fully ingested. The institution_identifier must be included in the base URL.
       responses:
         '200':
           description: A JSON array of intellectual objects
@@ -786,7 +711,7 @@ paths:
           name: institution_identifier
           schema:
             type: string
-          description: '"List of Objects belonging to a particular institution."'
+          description: "List of Objects belonging to a particular institution."
           required: true
         - name: description
           in: query
@@ -918,7 +843,7 @@ paths:
       deprecated: true
       responses:
         '200':
-          description: A JSON array of intellectual objects
+          description: JSON of a single work item
           content:
             application/json:
               schema:
@@ -935,14 +860,14 @@ paths:
       tags:
         - Intellectual Objects
       description: >-
-        Allows a user to specify an intellectual object (via identifier) to be restored. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the restoration request.
+        Allows a user to specify an intellectual object (via identifier) to be restored. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
       responses:
         '200':
-          description: A JSON array of intellectual objects
+          description: JSON containing the status and Work Item ID.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ObjectRestores'
+                $ref: '#/components/schemas/RestoreResponses'
       parameters:
         - name: intellectual_object_identifier
           in: path
@@ -1067,6 +992,8 @@ components:
           description: Identifier of the intellectual object to which the event belongs.
           example: virginia.edu/va.edu_dc
         generic_file_identifier:
+          type: string
+          description: Identifier of the generic file to which the event belongs. May be empty.
           example: virginia.edu/va.edu_dc/photo.tiff
         old_uuid:
           type: string
@@ -1088,9 +1015,9 @@ components:
         identifier:
           type: string
           description: >-
-            The unique identifier for an event in the APTrust repository. It is
-            generated by APTrust when the event is created.
-          example: 12f9dc69-e753-435f-b1fd-1d6bc1229957
+            The unique identifier for a file in the APTrust repository. It is
+            generated based on the file name by APTrust when the file is created.
+          example: 'virginia.edu/photos/data/first.jpg'
         intellectual_object_id:
           type: integer
           description: ID of the intellectual object to which the file belongs.
@@ -1157,10 +1084,9 @@ components:
           type: string
           description: "Note about the stage of ingest or problems."
           example: 'No problems'
-        stage:
+        action:
           type: string
-          description: >-
-              Stage of work item.
+          description: "The action the work item is describing."
           example: "Ingest"
           enum:
             - Ingest
@@ -1169,6 +1095,24 @@ components:
             - Glacier Restore
             - Delete
             - DPN
+        stage:
+          type: string
+          description: >-
+              Stage of work item. 
+          example: "Fetch"
+          enum:
+            - Requested
+            - Receive
+            - Fetch
+            - Unpack
+            - Validate
+            - Store
+            - Record
+            - Cleanup
+            - Resolve
+            - Package
+            - Restoring
+            - Available in S3
         status:
           type: string
           description: >-
@@ -1176,7 +1120,7 @@ components:
           example: "Success"
           enum:
             - Success
-            - Fail
+            - Failed
             - Pending
             - Started
             - Cancelled
@@ -1229,6 +1173,16 @@ components:
           description: Datestamp when the stage of ingest/restore has started
           example: null
           nullable: true
+        inst_approver:
+          type: string
+          description: The institutional administrator who approved a delete action
+          nullable: true
+          example: "test.person@virginia.edu"
+        aptrust_approver:
+          type: string
+          description: The APTrust administrator who approved a delete action
+          nullable: true
+          example: "kelly.cobb@aptrust.org"
         institution_id:
           type: integer
           description: >-
@@ -1236,7 +1190,7 @@ components:
           example: "345172"
         object_identifier:
           type: string
-          description: Identifier of the intellectual object.
+          description: Identifier of the intellectual object the work item is associated with
           example: "ncsu.edu/ncsu.1840.16-1020"
         intellectual_object_id:
           type: integer
@@ -1244,13 +1198,13 @@ components:
           example: "859375938295"
         generic_file_identifier:
           type: string
-          description: Identifier of the generic file.
-          example: null
+          description: Identifier of the generic file the work item is associated with
+          example: "ncsu.edu/ncsu.1840.16-1020/data/first.pdf"
           nullable: true
         generic_file_id:
           type: integer
           description: Generic file  ID.
-          example: null
+          example: "38480928475948"
           nullable: true
     Object:
       properties:
@@ -1305,12 +1259,12 @@ components:
         created_at:
           type: string
           format: date-time
-          description: Time of creation of item
+          description: Time of creation of intellectual object
           example: '2014-11-24T18:56:11.348Z'
         updated_at:
           type: string
           format: date-time
-          description: Time of last update of item
+          description: Time of last update of intellectual object
           example: '2014-11-24T19:17:03.715Z'
         institution_id:
           type: integer
@@ -1321,8 +1275,9 @@ components:
           type: string
           description: >-
               Contains the UUID of the object in DPN if it has been sent to DPN and successfully ingested.
+          nullable: true
           example: null
-    ObjectRestoreResponse:
+    RestoreResponse:
       properties:
         status:
           description: Description of restoration request outcome.
@@ -1374,10 +1329,10 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Object'
-    ObjectRestores:
+    RestoreResponses:
       type: array
       items:
-        $ref: '#/components/schemas/ObjectRestoreResponse'
+        $ref: '#/components/schemas/RestoreResponse'
     SendtoDPNResponses:
       type: array
       items:
@@ -1401,8 +1356,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Unauthorized
+    Forbidden:
+      description: Forbidden
       content:
         application/json:
           schema:
