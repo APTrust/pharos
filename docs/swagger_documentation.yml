@@ -46,7 +46,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound'  
+          $ref: '#/components/responses/NotFound'
       parameters:
         - in: path
           name: generic_file_identifier
@@ -82,7 +82,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact generic file identifier. 
+          description: Return only the Premis Events with this exact generic file identifier.
         - name: generic_file_identifier_like
           in: query
           schema:
@@ -108,13 +108,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return page X of results, where X is an integer. If this is not specified, it defaults to 1. 
+            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
         - name: per_page
           in: query
           schema:
             type: string
           description: >-
-            Number of items in the page of results. If this is not specified, it defaults to 10.  
+            Number of items in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/events/{intellectual_object_identifier}':
     get:
       tags:
@@ -194,13 +194,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return page X of results, where X is an integer. If this is not specified, it defaults to 1. 
+            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
         - name: per_page
           in: query
           schema:
             type: string
           description: >-
-            Number of items in the page of results. If this is not specified, it defaults to 10.  
+            Number of items in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/events/{institution_identifier}':
     get:
       tags:
@@ -250,7 +250,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact generic file identifier. 
+            Return only the Premis Events with this exact generic file identifier.
         - name: generic_file_identifier_like
           in: query
           schema:
@@ -277,13 +277,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return page X of results, where X is an integer. If this is not specified, it defaults to 1. 
+            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
         - name: per_page
           in: query
           schema:
             type: string
           description: >-
-            Number of items in the page of results. If this is not specified, it defaults to 10.  
+            Number of items in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/files/{intellectual_object_identifier}':
     get:
       tags:
@@ -301,7 +301,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Files'
       parameters:
-        - name: intellectual_object_identifier 
+        - name: intellectual_object_identifier
           in: path
           schema:
             type: string
@@ -321,7 +321,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only Generic Files whose identifier contains the 
+            Return only Generic Files whose identifier contains the
             specified string
         - name: uri
           in: query
@@ -340,7 +340,7 @@ paths:
           schema:
             type: string
           description: >-
-           Return only Generic Files that have the specified file format.  
+           Return only Generic Files that have the specified file format.
         - name: created_before
           in: query
           schema:
@@ -382,7 +382,7 @@ paths:
             type: integer
             default: 10
           description: >-
-            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/files/restore/{generic_file_id}':
     get:
       tags:
@@ -406,94 +406,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       parameters:
-        - name: generic_file_id 
+        - name: generic_file_id
           in: path
           schema:
             type: string
           description: >-
             Generic file ID to be restored
           required: true
-        - name: identifier
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only the Generic Files with this exact identifier.
-        - name: identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Generic Files whose identifier contains the 
-            specified string
-        - name: uri
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only the Generic Files with this exact URI.
-        - name: uri_like
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only Generic Files whose URI contains the specified string.
-        - name: file_format
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only Generic Files that have the specified file format.  
-        - name: created_before
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files created before the specified timestamp.
-        - name: created_after
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files created after the specified timestamp.
-        - name: updated_before
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files updated before the specified timestamp.
-        - name: updated_after
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files updated after the specified timestamp.
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-          description: >-
-            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
-        - name: per_page
-          in: query
-          schema:
-            type: integer
-            default: 10
-          description: >-
-            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
-
   '/member-api/v2/items':
     get:
       tags:
         - Work Items
       summary:  Returns a list of items in the APTrust work queue
       description: |
-        Returns a list of items in the APTrust work queue, including items where the work has been completed. Use this endpoint to check the status of any of the following 
+        Returns a list of items in the APTrust work queue, including items where the work has been completed. Use this endpoint to check the status of any of the following
         * Bag ingest requests
         * Restoration requests
         * Deletion requests
@@ -510,21 +436,21 @@ paths:
         - name: created_before
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items created before the specified timestamp.
         - name: created_after
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items created after the specified timestamp.
         - name: updated_before
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items updated before the specified timestamp.
@@ -540,7 +466,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact tar file name. 
+            Return only items with the exact tar file name.
         - name: name_contains
           in: query
           schema:
@@ -552,7 +478,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact etag. 
+            Return only items with the exact etag.
         - name: etag_contains
           in: query
           schema:
@@ -570,25 +496,25 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items having the specified action. 
+            Return only items having the specified action.
         - name: stage
           in: query
           schema:
             type: string
           description: >-
-            Return only items having the specified stage. 
+            Return only items having the specified stage.
         - name: status
           in: query
           schema:
             type: string
           description: >-
-            Return only items having the specified status. Stages include "Requested", "Receive", "Fetch", "Unpack", "Validate", "Store", "Record", "Cleanup" and "Resolve". 
+            Return only items having the specified status. Stages include "Requested", "Receive", "Fetch", "Unpack", "Validate", "Store", "Record", "Cleanup" and "Resolve".
         - name: object_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only items with the exact object identifier. 
+            Return only items with the exact object identifier.
         - name: object_identifier_contains
           in: query
           schema:
@@ -600,7 +526,7 @@ paths:
           schema:
             type: string
           description: >-
-             Return only items with the exact file identifier specified. Useful for finding all items associated with a specific file. 
+             Return only items with the exact file identifier specified. Useful for finding all items associated with a specific file.
         - name: file_identifier_contains
           in: query
           schema:
@@ -632,7 +558,7 @@ paths:
             type: integer
             default: 10
           description: >-
-            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/objects':
     get:
       tags:
@@ -652,7 +578,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact description. 
+            Return only the Intellectual Objects with this exact description.
         - name: description_like
           in: query
           schema:
@@ -664,7 +590,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact identifier. 
+            Return only the Intellectual Objects with this exact identifier.
         - name: identifier_like
           in: query
           schema:
@@ -676,7 +602,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact alternative identifier. 
+            Return only the Intellectual Objects with this exact alternative identifier.
         - name: alt_identifier_like
           in: query
           schema:
@@ -710,21 +636,21 @@ paths:
         - name: created_before
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items created before the specified timestamp.
         - name: created_after
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items created after the specified timestamp.
         - name: updated_before
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items updated before the specified timestamp.
@@ -746,7 +672,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items having the specified state. 
+            Return only items having the specified state.
         - name: file_format
           in: query
           schema:
@@ -766,7 +692,7 @@ paths:
             type: integer
             default: 10
           description: >-
-            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/objects/{institution_identifier}':
     get:
       tags:
@@ -793,7 +719,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact description. 
+            Return only the Intellectual Objects with this exact description.
         - name: description_like
           in: query
           schema:
@@ -805,7 +731,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact identifier. 
+            Return only the Intellectual Objects with this exact identifier.
         - name: identifier_like
           in: query
           schema:
@@ -817,7 +743,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact alternative identifier. 
+            Return only the Intellectual Objects with this exact alternative identifier.
         - name: alt_identifier_like
           in: query
           schema:
@@ -851,21 +777,21 @@ paths:
         - name: created_before
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items created before the specified timestamp.
         - name: created_after
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items created after the specified timestamp.
         - name: updated_before
           in: query
           schema:
-            type: string            
+            type: string
             format: date-time
           description: >-
             Return only items updated before the specified timestamp.
@@ -887,7 +813,7 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items having the specified state. 
+            Return only items having the specified state.
         - name: file_format
           in: query
           schema:
@@ -907,14 +833,14 @@ paths:
             type: integer
             default: 10
           description: >-
-            The number of items to include in the page of results. If this is not specified, it defaults to 10.  
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/objects/{intellectual_object_identifier}/dpn':
     put:
       tags:
         - Intellectual Objects
       summary: This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN
       description: >-
-        This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the DPN request. If the request is unsuccessful, the user will return an error message with an explanation. 
+        This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the DPN request. If the request is unsuccessful, the user will return an error message with an explanation.
       deprecated: true
       responses:
         '200':
@@ -944,7 +870,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ObjectRestores'
       parameters:
-        - name: intellectual_object_identifier 
+        - name: intellectual_object_identifier
           in: path
           schema:
             type: string
@@ -1160,7 +1086,7 @@ components:
         stage:
           type: string
           description: >-
-              Stage of work item. 
+              Stage of work item.
           example: "Ingest"
           enum:
             - Ingest
@@ -1172,18 +1098,18 @@ components:
         status:
           type: string
           description: >-
-              Status of work item. 
+              Status of work item.
           example: "Success"
           enum:
             - Success
             - Fail
             - Pending
             - Started
-            - Cancelled 
+            - Cancelled
         outcome:
           type: string
           description: >-
-              Status of work item. 
+              Status of work item.
           example: "Success"
           enum:
             - Success
@@ -1270,11 +1196,11 @@ components:
         access:
           type: string
           description: >-
-             The access rights to this object, as specified in the Access tag of the aptrust-info.txt tag file. 
+             The access rights to this object, as specified in the Access tag of the aptrust-info.txt tag file.
                 consortia - Any APTrust member may view information about this object in the APTrust Web UI.
                 institution - Only users and admins from the object's owning institution can view information about this object.
                 restricted - Users and admins from the object's institution can see that the object is in the repository, but some details about the object are accessible to institutional admins only.
-          enum: 
+          enum:
             - consortia
             - institution
             - restricted
@@ -1325,13 +1251,13 @@ components:
     ObjectRestoreResponse:
       properties:
         status:
-          description: Description of restoration request outcome. 
+          description: Description of restoration request outcome.
           type: string
           enum:
             - error
             - ok
         message:
-          description: Explanation of restoration request. 
+          description: Explanation of restoration request.
           type: string
           enum:
             - "This item has been deleted and cannot be queued for restoration."
@@ -1350,7 +1276,7 @@ components:
             - conflict
         message:
           type: string
-          enum: 
+          enum:
             - 'We are not currently sending objects to DPN.'
             - 'This item cannot be sent to DPN because the depositing institution is not a DPN member.'
             - 'This item has already been sent to DPN.'
@@ -1376,11 +1302,11 @@ components:
         $ref: '#/components/schemas/Object'
     ObjectRestores:
       type: array
-      items: 
+      items:
         $ref: '#/components/schemas/ObjectRestoreResponse'
     SendtoDPNResponses:
       type: array
-      items: 
+      items:
         oneOf:
           - $ref: '#/components/schemas/Item'
           - $ref: '#/components/schemas/SendToDPNResponseFailed'
@@ -1410,4 +1336,4 @@ components:
 security:
   - ApiKeyAuth: []
     UserId: []
-    
+
