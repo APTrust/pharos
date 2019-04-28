@@ -6,7 +6,7 @@ gem 'rails-controller-testing'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.1.20'
 # Use CoffeeScript for .coffee assets and views
-gem 'coffee-rails', '~> 4.2.2'
+gem 'coffee-rails', '~> 5.0.0'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
