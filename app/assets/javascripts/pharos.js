@@ -60,6 +60,17 @@ function activateNavTab(id) {
     $('#'+id).addClass('active');
 }
 
+function autofillUserCreateForm() {
+    var pass = document.getElementById("user_password");
+    pass.value = "passwordabc";
+    $("label[for='user_password']").addClass("hidden");
+    //pass.classList.add("hidden");
+    var passCon = document.getElementById("user_password_confirmation");
+    passCon.value = "passwordabc";
+    $("label[for='user_password_confirmation']").addClass("hidden");
+    //passCon.classList.add("hidden");
+}
+
 $(document).ready(function(){
     fixFilters();
     activateTabs();
@@ -67,4 +78,5 @@ $(document).ready(function(){
     fixSearchBreadcrumb();
     addClickFunctions();
     pass_popover();
+    autofillUserCreateForm();
 });
