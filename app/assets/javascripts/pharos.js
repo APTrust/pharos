@@ -60,15 +60,18 @@ function activateNavTab(id) {
     $('#'+id).addClass('active');
 }
 
+// This function autofills the password and password confirmation forms
+// in the new user form, then hide the labels (the inputs are hidden in
+// the form itself) because that was the only way to get rid of the now
+// defunct fields that are overridden by the welcome email and temporary
+// password a new user receives.
 function autofillUserCreateForm() {
     var pass = document.getElementById("user_password");
     pass.value = "passwordabc";
     $("label[for='user_password']").addClass("hidden");
-    //pass.classList.add("hidden");
     var passCon = document.getElementById("user_password_confirmation");
     passCon.value = "passwordabc";
     $("label[for='user_password_confirmation']").addClass("hidden");
-    //passCon.classList.add("hidden");
 }
 
 $(document).ready(function(){
