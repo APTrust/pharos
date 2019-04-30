@@ -66,12 +66,12 @@ function activateNavTab(id) {
 // defunct fields that are overridden by the welcome email and temporary
 // password a new user receives.
 function autofillUserCreateForm() {
-    var pass = document.getElementById("user_password");
+    var pass = document.getElementById("new_user_password");
     pass.value = "passwordabc";
-    $("label[for='user_password']").addClass("hidden");
-    var passCon = document.getElementById("user_password_confirmation");
+    $("label[for='new_user_password']").addClass("hidden");
+    var passCon = document.getElementById("new_user_password_confirmation");
     passCon.value = "passwordabc";
-    $("label[for='user_password_confirmation']").addClass("hidden");
+    $("label[for='new_user_password_confirmation']").addClass("hidden");
 }
 
 $(document).ready(function(){
