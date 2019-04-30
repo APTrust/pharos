@@ -245,4 +245,11 @@ class NotificationMailer < ApplicationMailer
     mail(to: subject.email, subject: 'Verify Your Email')
   end
 
+  def admin_password_reset(subject, password)
+    @subject = subject
+    @password = password
+    @login_url = new_user_session_url
+    mail(to: subject.email, subject: 'An Admin Has Reset Your Password')
+  end
+
 end

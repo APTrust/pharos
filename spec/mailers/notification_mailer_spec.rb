@@ -668,4 +668,26 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.body.encoded).to include("http://localhost:3000/users/#{user.id}/email_confirmation?confirmation_token=#{token.token}")
     end
   end
+
+  describe 'admin_password_reset' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:password) { 'newpassword' }
+    let(:mail) { described_class.admin_password_reset(user, password).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('An Admin Has Reset Your Password')
+    end
+
+    it 'renders the reciever email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'includes specific password text' do
+      expect(mail.body.encoded).to include('Your new password is newpassword')
+    end
+  end
 end

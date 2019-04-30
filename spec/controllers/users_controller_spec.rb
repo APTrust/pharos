@@ -77,6 +77,9 @@ RSpec.describe UsersController, type: :controller do
       get :admin_password_reset, params: { id: institutional_admin }
       expect(assigns[:user]).to eq institutional_admin
       expect(assigns[:user].password).not_to eq password
+      email = ActionMailer::Base.deliveries.last
+      expect(email.body.encoded).to include("Your new password is ")
+      expect(flash[:notice]).to eq "Password has been reset for #{institutional_admin.email}. They will be notified of their new password via email."
     end
 
     it 'can deactivate a user' do

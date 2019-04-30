@@ -295,8 +295,9 @@ class UsersController < ApplicationController
     @user.password = password
     @user.password_confirmation = password
     @user.save!
+    NotificationMailer.admin_password_reset(@user, password).deliver!
     redirect_to @user
-    flash[:notice] = "Reset password for #{@user.email}. Please notify the user that #{password} is their new password."
+    flash[:notice] = "Password has been reset for #{@user.email}. They will be notified of their new password via email."
   end
 
   def deactivate
