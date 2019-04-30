@@ -6,7 +6,7 @@
 
 <%= simple_form_for(@user, html: {class: 'form-horizontal'}) do |f| %>
     <%= devise_error_messages! %>
-    <%= render 'shared/password_popup' %>
+    <p>Creating a password here is not necessary. A temporary password will be generated and sent to the user in a welcome email.</p>
 
     <div class="form-inputs">
       <%= f.input :name, autofocus: true %>
