@@ -135,13 +135,27 @@ class ApplicationController < ActionController::Base
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
         return
       else
-        redirect_to current_user, flash: { error: 'Your initial password is only meant to be temporary, please change your password now.' }
+        respond_to do |format|
+          format.json {
+            redirect_to current_user
+            render json: { error: 'Your initial password is only meant to be temporary, please change your password now.' }, status: :tbd }
+          format.html {
+            redirect_to current_user, flash: { error: 'Your initial password is only meant to be temporary, please change your password now.' }
+          }
+        end
       end
     elsif !current_user.email_verified
       if params[:controller] == 'users' && (params[:action] == 'verify_email' || params[:action] == 'email_confirmation' || params[:action] == 'show') && params[:id] == current_user.id.to_s
         return
       else
-        redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
+        respond_to do |format|
+          format.json {
+            redirect_to current_user
+            render json: { error: 'You are required to verify your email address before you can continue using this website.' }, status: :tbd }
+          format.html {
+            redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
+          }
+        end
       end
     elsif params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s
       return
@@ -151,14 +165,29 @@ class ApplicationController < ActionController::Base
       #     if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
       #       return
       #     else
-      #       redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
+      #       respond_to do |format|
+      #         format.json {
+      #           redirect_to current_user
+      #           render json: { error: 'You are required to use two factor authentication, please enable it now.' }, status: :tbd }
+      #         format.html {
+      #           redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
+      #         }
+      #       end
       #     end
       #   elsif !current_user.confirmed_two_factor
       #     if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
       #       return
       #     elsif params[:controller] == 'verifications' && (params[:action] == 'edit' || params[:action] == 'update')
+      #       return
       #     else
-      #       redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
+      #       respond_to do |format|
+      #         format.json {
+      #           redirect_to current_user
+      #           render json: { error: 'You are required to use two factor authentication, please verify your phone number now.' }, status: :tbd }
+      #         format.html {
+      #           redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
+      #         }
+      #       end
       #     end
       #   else
       #     return
