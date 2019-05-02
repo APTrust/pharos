@@ -605,6 +605,15 @@ namespace :pharos do
     end
   end
 
+  desc 'Two Factor Emails'
+  task :two_factor_emails => :environment do
+    User.all.each do |usr|
+      usr.email_verified = true
+      usr.save!
+      puts "#{usr.name} has been updated."
+    end
+  end
+
   desc 'Set SMS Defaults'
   task :set_sms_defaults => :environment do
     sms = Aws::SNS::Client.new
