@@ -527,6 +527,13 @@ RSpec.describe UsersController, type: :controller do
         expect(assigns[:user].initial_password_updated).to eq true
         expect(assigns[:user].email_verified).to eq true
       end
+
+      it 'should not work if the password is the same as one of a previous three passwords' do
+        get :update_password, params: { id: institutional_admin.id, user: { password: 'newpassword', password_confirmation: 'newpassword', current_password: 'testpassword' } }
+        expect(response.status).to eq(302)
+        get :update_password, params: { id: institutional_admin.id, user: { password: 'testpassword', password_confirmation: 'testpassword', current_password: 'newpassword' } }
+        expect(assigns(:user).errors[:password]).to eq ['was used previously.']
+      end
     end
 
     describe 'verifying email' do
