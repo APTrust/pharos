@@ -69,7 +69,7 @@ group :demo, :production do
 end
 
 group :development do
-  gem 'meta_request', '=0.6.0'
+  gem 'meta_request', '0.7.0'
   gem 'better_errors'
   #gem 'binding_of_caller'
   # Access an IRB console on exception pages or by using <%= console %> in views
