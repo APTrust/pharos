@@ -14,11 +14,12 @@ services:
       - '5432:5432'
   pharos:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
-    #command: bundle exec puma -p9292 -e $RAILS_ENV
     command: bundle exec puma -w3 -p9292 -e ${RAILS_ENV}
     labels:
-      - VIRTUAL_HOST={$VIRTUAL_HOST:-pharos.localhost}
+      - VIRTUAL_HOST=${VIRTUAL_HOST:-pharos.localhost}
       - VIRTUAL_PORT=9292
+      - LETSENCRYPT_HOST=${VIRTUAL_HOST:-}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-ops@aprust.org}
     volumes:
       - ./.env:/pharos/.env
       - assets:/pharos/public
@@ -57,8 +58,18 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - .${DOCKERAPP_DATA_PATH:-./docker/nginx-proxy}/certs:/etc/nginx/certs:ro
       - .${DOCKERAPP_DATA_PATH:-./docker/nginx-proxy}/vhost.d:/etc/nginx/vhost.d}
-      - assets:/etc/share/nginx/html/pharos
       - .${DOCKERAPP_DATA_PATH:-./docker/nginx-proxy}/pharos.localhost:/etc/nginx/vhost.d/pharos.localhost}
-volumes:
+      - assets:/etc/share/nginx/html/pharos
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:v1.5
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - .${DOCKERAPP_DATA_PATH:-./docker/nginx-proxy}/certs:/etc/nginx/certs:rw
+      - .${DOCKERAPP_DATA_PATH:-./docker/nginx-proxy}/vhost.d:/etc/nginx/vhost.d}
+      - .${DOCKERAPP_DATA_PATH:-./docker/nginx-proxy}/pharos.localhost:/etc/nginx/vhost.d/pharos.localhost}
+      - assets:/etc/share/nginx/html/pharos
+ volumes:
   pgdata:
   assets:
