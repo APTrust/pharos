@@ -62,7 +62,7 @@ module Pharos
         'ingest' => 'Ingest',
         'fixity' => 'Fixity Check',
         'restore' => 'Restore',
-				'glacier_restore' => 'Glacier Restore',
+		'glacier_restore' => 'Glacier Restore',
         'delete' => 'Delete',
         'dpn' => 'DPN'
     }
@@ -88,7 +88,7 @@ module Pharos
         'virus_check' => 'virus check'
     }
 
-    PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR)
+    PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR Glacier-Deep-VA Glacier-Deep-OH Glacier-Deep-OR)
 
     DPN_TASKS = %w(sync ingest replication restore fixity)
 
