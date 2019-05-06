@@ -131,6 +131,19 @@ class ApplicationController < ActionController::Base
   def forced_redirections
     if current_user.nil?
       return
+    elsif current_user.force_password_update
+      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
+        return
+      else
+        respond_to do |format|
+          format.json {
+            redirect_to current_user
+            render json: { error: 'One of your admins has requested you change your password now, please do that immediately.' }, status: :locked }
+          format.html {
+            redirect_to current_user, flash: { error: 'One of your admins has requested you change your password now, please do that immediately.' }
+          }
+        end
+      end
     elsif !current_user.initial_password_updated
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
         return

@@ -177,6 +177,15 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def forced_password_update?
+    return false if (user.institutional_admin? && record.admin?)
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def mass_forced_password_update?
+    user.admin? || user.institutional_admin?
+  end
+
   def deactivate?
     return false if (user.institutional_admin? && record.admin?)
     user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id))

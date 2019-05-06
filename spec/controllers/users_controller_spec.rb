@@ -566,6 +566,24 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
+    describe 'forcing a user to update their password' do
+      let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, force_password_update: false)}
+      let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id, force_password_update: false) }
+      let(:user_of_different_institution) {  FactoryBot.create(:user, :institutional_user, force_password_update: false) }
+
+      it 'at my own institution should succeed' do
+        get :forced_password_update, params: { id: user_at_institution.id }
+        expect(response.status).to eq(302)
+        expect(assigns[:user].force_password_update).to eq true
+        expect(flash[:notice]).to eq 'This user will be forced to change their password upon next login.'
+      end
+
+      it 'at another institution should not succeed' do
+        get :forced_password_update, params: { id: user_of_different_institution.id }, format: :json
+        expect(response.status).to eq(403)
+      end
+    end
+
   end
 
   describe 'An Institutional User' do

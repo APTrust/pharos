@@ -11,6 +11,7 @@ FactoryBot.define do
     confirmed_two_factor { true }
     email_verified { true }
     initial_password_updated { true }
+    force_password_update { false }
     sign_in_count { 5 }
 
     factory :aptrust_user, class: 'User' do

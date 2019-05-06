@@ -3,7 +3,8 @@ class UsersController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
-                                  :vacuum, :enable_otp, :disable_otp, :register_authy_user, :verify_twofa, :generate_backup_codes, :verify_email, :email_confirmation]
+                                  :vacuum, :enable_otp, :disable_otp, :register_authy_user, :verify_twofa, :generate_backup_codes,
+                                  :verify_email, :email_confirmation, :forced_password_update]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -76,11 +77,25 @@ class UsersController < ApplicationController
         # token.save!
         # NotificationMailer.email_verification(@user, token).deliver!
       end
+      if @user.force_password_update
+        @user.force_password_update = false
+        @user.save!
+      end
       bypass_sign_in(@user)
       redirect_to @user
       flash[:notice] = 'Successfully changed password.'
     else
       render :edit_password
+    end
+  end
+
+  def forced_password_update
+    authorize @user
+    @user.force_password_update = true
+    @user.save!
+    respond_to do |format|
+      format.json { render json: { message: 'This user will be forced to change their password upon next login.' }, status: :ok }
+      format.html { redirect_to @user, flash: { notice: 'This user will be forced to change their password upon next login.' } }
     end
   end
 
