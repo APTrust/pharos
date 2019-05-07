@@ -589,6 +589,50 @@ RSpec.describe InstitutionsController, type: :controller do
     end
   end
 
+  describe 'GET mass_force_password_update' do
+    describe 'for institutional_admin' do
+      before do
+        sign_in admin_user
+        session[:verified] = true
+      end
+
+      it 'responds successfully and sets all associated users to need a password update' do
+        get :mass_forced_password_update, params: { institution_identifier: admin_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:notice]).to eq "All users at #{admin_user.institution.name} will be forced to change their password upon next login."
+        expect(assigns[:users].first.force_password_update).to eq true
+        expect(assigns[:users].last.force_password_update).to eq true
+      end
+    end
+
+    describe 'for institutional_admin user' do
+      before do
+        sign_in institutional_admin
+        session[:verified] = true
+      end
+
+      it 'responds successfully' do
+        get :mass_forced_password_update, params: { institution_identifier: institutional_admin.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:notice]).to eq "All users at #{institutional_admin.institution.name} will be forced to change their password upon next login."
+      end
+
+    end
+
+    describe 'for institutional_user user' do
+      before do
+        sign_in institutional_user
+        session[:verified] = true
+      end
+
+      it 'responds unauthorized' do
+        get :mass_forced_password_update, params: { institution_identifier: institutional_user.institution.to_param }
+        expect(response).to redirect_to root_path
+        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+      end
+    end
+  end
+
   describe 'GET enable_otp' do
     describe 'for an institutional admin' do
       before do

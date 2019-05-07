@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
   get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
   get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
-
+  get 'institutions/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
@@ -174,6 +174,7 @@ Rails.application.routes.draw do
     patch 'generate_api_key', on: :member
   end
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
+  get 'users/:id/forced_password_update', to: 'users#forced_password_update', as: :user_forced_password_update
   get 'users/:id/deactivate', to: 'users#deactivate', as: :deactivate_user
   get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum

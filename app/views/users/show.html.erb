@@ -8,7 +8,10 @@
   <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br /><br />
 </address>
 <%= edit_link(@user) %>
-<%= link_to 'Change Password', edit_password_user_path(@user), class: 'btn btn-normal doc-action-btn' %>
+<%= link_to 'Change Password', edit_password_user_path(@user), class: 'btn btn-normal doc-action-btn btn-sm' %>
+<% if current_user.admin? || current_user.institutional_admin? %>
+    <%= link_to 'Force Password Update', user_forced_password_update_path(@user), class: 'btn btn-warning doc-action-btn btn-sm' %>
+<% end %>
 <% if @user.deactivated? %>
     <%= reactivate_link(@user) %>
 <% else %>

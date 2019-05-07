@@ -5,7 +5,7 @@ class InstitutionsController < ApplicationController
   before_action :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot, :deactivate, :reactivate,
                                           :trigger_bulk_delete, :partial_confirmation_bulk_delete, :final_confirmation_bulk_delete,
-                                          :finished_bulk_delete, :enable_otp, :disable_otp]
+                                          :finished_bulk_delete, :enable_otp, :disable_otp, :mass_forced_password_update]
   respond_to :json, :html
   after_action :verify_authorized, except: :index
   after_action :verify_policy_scoped, only: :index
@@ -82,6 +82,19 @@ class InstitutionsController < ApplicationController
     flash[:notice] = "All users at #{@institution.name} have been reactivated."
     respond_to do |format|
       format.html { render 'show' }
+    end
+  end
+
+  def mass_forced_password_update
+    authorize @institution
+    @users = @institution.users
+    @users.each do |usr|
+      usr.force_password_update = true
+      usr.save!
+    end
+    respond_to do |format|
+      format.json { render json: { message: "All users at #{@institution.name} will be forced to change their password upon next login." }, status: :ok }
+      format.html { redirect_to root_path, flash: { notice: "All users at #{@institution.name} will be forced to change their password upon next login." } }
     end
   end
 
