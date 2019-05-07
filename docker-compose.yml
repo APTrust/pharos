@@ -2,6 +2,7 @@ version: '3'
 services:
   db:
     image: postgres:9.6.6-alpine
+    restart: always
     environment:
       POSTGRES_USER: pharos
       POSTGRES_DB: pharos
@@ -11,6 +12,7 @@ services:
       - '5432:5432'
   pharos:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
+    restart: always
     command: bundle exec puma -w3 -p9292 -e ${RAILS_ENV}
     volumes:
       - assets:/pharos/public
@@ -23,6 +25,7 @@ services:
       - ".env"
   nginx-proxy:
     image: jwilder/nginx-proxy
+    restart: always
     container_name: nginx-proxy
     ports:
       - "80:80"
@@ -41,6 +44,7 @@ services:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
     depends_on:
       - nginx-proxy
     environment:
