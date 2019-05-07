@@ -1,0 +1,3 @@
+location /assets/ {
+    alias /etc/share/nginx/html/pharos/assets/;
+}
