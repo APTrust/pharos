@@ -352,6 +352,43 @@ class UsersController < ApplicationController
     end
   end
 
+  def account_confirmations
+    authorize current_user
+    Users.all.each do |user|
+      unless user.admin?
+        user.account_confirmed = false
+        user.save!
+        ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
+        token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
+        token.save!
+        NotificationMailer.account_confirmation(user, token).deliver!
+      end
+    end
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'All users except admins have been sent their yearly account confirmation email.' }, status: :ok }
+      format.html { flash[:notice] = 'All users except admins have been sent their yearly account confirmation email.' }
+    end
+  end
+
+  def indiv_confirmation_email
+    authorize @user
+    user.account_confirmed = false
+    user.save!
+    ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
+    token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
+    token.save!
+    NotificationMailer.account_confirmation(user, token).deliver!
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: "A new account confirmation email has been sent to this email address: #{@user.email}." }, status: :ok }
+      format.html { flash[:notice] = "A new account confirmation email has been sent to this email address: #{@user.email}." }
+    end
+  end
+
+  def confirm_account
+    authorize @user
+
+  end
+
   private
 
   # If an id is passed through params, use it.  Otherwise default to show the current user.

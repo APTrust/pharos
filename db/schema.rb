@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_06_195647) do
+ActiveRecord::Schema.define(version: 2019_05_07_190448) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -332,6 +332,7 @@ ActiveRecord::Schema.define(version: 2019_05_06_195647) do
     t.boolean "email_verified", default: false
     t.boolean "initial_password_updated", default: false
     t.boolean "force_password_update", default: false
+    t.boolean "account_confirmed", default: true
     t.index ["authy_id"], name: "index_users_on_authy_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"
