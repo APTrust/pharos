@@ -45,7 +45,7 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def indiv_confirmation?
+  def indiv_confirmation_email?
     user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id)) || user == record
   end
 

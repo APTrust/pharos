@@ -690,4 +690,26 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.body.encoded).to include('Your new password is newpassword')
     end
   end
+
+  describe 'email_verification' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:token) { FactoryBot.create(:confirmation_token, user: user) }
+    let(:mail) { described_class.account_confirmation(user, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('Confirm Your Account')
+    end
+
+    it 'renders the reciever email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'assigns @confirmation_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/users/#{user.id}/confirm_account?confirmation_token=#{token.token}")
+    end
+  end
 end

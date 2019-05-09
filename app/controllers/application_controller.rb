@@ -157,19 +157,19 @@ class ApplicationController < ActionController::Base
           }
         end
       end
-    # elsif !current_user.account_confirmation
-    #   if params[:controller] == 'users' && (params[:action] == 'show' || params[:action] == 'indiv_confirmation_email') && params[:id] == current_user.id.to_s
-    #     return
-    #   else
-    #     respond_to do |format|
-    #       format.json {
-    #         redirect_to current_user
-    #         render json: { status: 'error', message: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }, status: :locked }
-    #       format.html {
-    #         redirect_to current_user, flash: { error: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }
-    #       }
-    #     end
-    #   end
+    elsif !current_user.account_confirmed
+      if params[:controller] == 'users' && (params[:action] == 'show' || params[:action] == 'indiv_confirmation_email' || params[:action] == 'confirm_account') && params[:id] == current_user.id.to_s
+        return
+      else
+        respond_to do |format|
+          format.json {
+            redirect_to current_user
+            render json: { status: 'error', message: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }, status: :locked }
+          format.html {
+            redirect_to current_user, flash: { error: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }
+          }
+        end
+      end
     elsif current_user.force_password_update
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
         return

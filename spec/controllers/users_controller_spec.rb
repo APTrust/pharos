@@ -25,6 +25,31 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
+    it 'should be able to perform yearly account confirmations' do
+      get :account_confirmations, format: :json
+      expect(response.status).to eq(200)
+      User.all.each do |user|
+        unless user.admin?
+          expect(user.account_confirmed).to eq false
+          expect(user.confirmation_token).not_to be_nil
+          email = ActionMailer::Base.deliveries.last
+          expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+          expect(email.body.encoded).to include("http://localhost:3000/users/#{user.id}/confirm_account?confirmation_token=#{user.confirmation_token.token}")
+        end
+      end
+    end
+
+    it 'should be able to resend an account confirmation email' do
+      get :indiv_confirmation_email, params: { id: institutional_admin }
+      expect(response.status).to eq(302)
+      expect(assigns[:user].account_confirmed).to eq false
+      token = ConfirmationToken.where(user_id: assigns[:user].id).first
+      expect(token).not_to be_nil
+      email = ActionMailer::Base.deliveries.last
+      expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+      expect(email.body.encoded).to include("http://localhost:3000/users/#{assigns[:user].id}/confirm_account?confirmation_token=#{token.token}")
+    end
+
     it 'can show an Institutional Administrators' do
       get :show, params: { id: institutional_admin }
       response.should be_successful
@@ -222,10 +247,14 @@ RSpec.describe UsersController, type: :controller do
         response.should redirect_to user_url(institutional_admin)
       end
     end
+
+
   end
 
   describe 'An Institutional Administrator' do
     let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
+    let(:institutional_user) { FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution.id) }
+    let(:other_user) { FactoryBot.create(:user, :institutional_user) }
 
     before do
       sign_in institutional_admin
@@ -431,6 +460,27 @@ RSpec.describe UsersController, type: :controller do
       expect(response.status).to eq(403)
     end
 
+    it 'should not be able to perform yearly account confirmations' do
+      get :account_confirmations, format: :json
+      expect(response.status).to eq(403)
+    end
+
+    it 'should be able to resend an account confirmation email for a user at own institution' do
+      get :indiv_confirmation_email, params: { id: institutional_user }
+      expect(response.status).to eq(302)
+      expect(assigns[:user].account_confirmed).to eq false
+      token = ConfirmationToken.where(user_id: assigns[:user].id).first
+      expect(token).not_to be_nil
+      email = ActionMailer::Base.deliveries.last
+      expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+      expect(email.body.encoded).to include("http://localhost:3000/users/#{assigns[:user].id}/confirm_account?confirmation_token=#{token.token}")
+    end
+
+    it 'should not be able to resend an account confirmation email for a user at another institution' do
+      get :indiv_confirmation_email, params: { id: other_user }, format: :json
+      expect(response.status).to eq(403)
+    end
+
     describe 'enabling two factor authentication' do
       let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
       let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
@@ -619,6 +669,37 @@ RSpec.describe UsersController, type: :controller do
     it 'should not be able to perform vacuum operations' do
       get :vacuum, params: { vacuum_target: 'snapshots' }, format: :json
       expect(response.status).to eq(403)
+    end
+
+    it 'should not be able to perform yearly account confirmations' do
+      get :account_confirmations, format: :json
+      expect(response.status).to eq(403)
+    end
+
+    it 'should be able to resend an account confirmation email for themselves' do
+      get :indiv_confirmation_email, params: { id: user }
+      expect(response.status).to eq(302)
+      expect(assigns[:user].account_confirmed).to eq false
+      token = ConfirmationToken.where(user_id: assigns[:user].id).first
+      expect(token).not_to be_nil
+      email = ActionMailer::Base.deliveries.last
+      expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+      expect(email.body.encoded).to include("http://localhost:3000/users/#{assigns[:user].id}/confirm_account?confirmation_token=#{token.token}")
+    end
+
+    it 'should not be able to resend an account confirmation email for someone else' do
+      get :indiv_confirmation_email, params: { id: other_user }, format: :json
+      expect(response.status).to eq(403)
+    end
+
+    it 'should properly confirm an account once the confirmation link has been clicked' do
+      get :indiv_confirmation_email, params: { id: user }
+      token = ConfirmationToken.where(user_id: assigns[:user].id).first
+      expect(assigns[:user].account_confirmed).to eq false
+      get :confirm_account, params: { id: user, confirmation_token: token.token }
+      expect(assigns[:user].account_confirmed).to eq true
+      expect(response.status).to eq(302)
+      expect(flash[:notice]).to eq 'Your account has been confirmed for the next year.'
     end
 
     it 'should not be able to deactivate users' do
