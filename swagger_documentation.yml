@@ -26,7 +26,7 @@ paths:
       summary: Premis Events of a generic file`
       description: >-
         List of Premis Events belonging to a particular Generic File. It
-        requires that the user specify the generic_file_identifer as
+        requires that the user specify the generic_file_identifier as
         url-encoded, and as part of the base URL.
       tags:
         - Premis Events
@@ -54,7 +54,7 @@ paths:
             type: string
           description: >-
             Premis Events belonging to a particular Generic File. Requires user to
-            specify the generic_file_identifer as url-encoded.
+            specify the generic_file_identifier as url-encoded.
           required: true
         - name: event_identifier
           in: query
@@ -72,22 +72,12 @@ paths:
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact intellectual object identifier.
-        - name: intellectual_object_identifier_like
-          in: query
-          schema:
-            type: string
-          description: Return only Premis Events whose intellectual object identifier contains the specified string.
+          description: Return only the Premis Events with this exact intellectual object identifier if provided or Premis Events with the fragment of the identifier provided.
         - name: generic_file_identifier
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact generic file identifier.
-        - name: generic_file_identifier_like
-          in: query
-          schema:
-            type: string
-          description: Return only Premis Events whose generic file identifier contains the specified string.
+          description: Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided.
         - name: outcome
           in: query
           schema:
@@ -122,7 +112,7 @@ paths:
       summary: Premis Events of an intellectual object
       description: >-
         List of Premis Events belonging to a particular intellectual object. It
-        requires that the user specify the intellectual_object_identifer as
+        requires that the user specify the intellectual_object_identifier as
         url-encoded, and as part of the base URL.
       responses:
         '200':
@@ -138,7 +128,7 @@ paths:
             type: string
           description: >-
             Premis Events belonging to a particular Intellectual
-            Object. Requires the intellectual_object_identifer to be
+            Object. Requires the intellectual_object_identifier to be
             url-encoded.
           required: true
           example: virginia.edu/va.edu_dc
@@ -158,22 +148,12 @@ paths:
           in: query
           schema:
             type: string
-          description: "Return only the Premis Events with this exact intellectual object identifier."
-        - name: intellectual_object_identifier_like
-          in: query
-          schema:
-            type: string
-          description: "Return only Premis Events whose intellectual object identifier contains the specified string."
+          description: "Return only the Premis Events with this exact intellectual object identifier or Premis Events with the fragment of the identifier provided."
         - name: generic_file_identifier
           in: query
           schema:
             type: string
-          description: "Return only the Premis Events with this exact generic file identifier."
-        - name: generic_file_identifier_like
-          in: query
-          schema:
-            type: string
-          description: "Return only Premis Events whose generic file identifier contains the specified string."
+          description: "Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided."
         - name: outcome
           in: query
           schema:
@@ -208,7 +188,7 @@ paths:
       summary: Premis events of a specific institution
       description: >-
         List of Premis Events belonging to a particular institution. It
-        requires that the user specify the institution_identifer as part of the base URL.
+        requires that the user specify the institution_identifier as part of the base URL.
       responses:
         '200':
           description: A JSON array of Premis Events
@@ -240,25 +220,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact intellectual object identifier.
-        - name: intellectual_object_identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Premis Events whose intellectual object identifier contains the specified string.
+            Return only the Premis Events with this exact intellectual object identifier or Premis Events with the fragment of the identifier provided.
         - name: generic_file_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact generic file identifier.
-        - name: generic_file_identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Premis Events whose generic file identifier contains the specified string.
+            Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided.
         - name: outcome
           in: query
           schema:
@@ -293,7 +261,7 @@ paths:
       description: >-
         Returns a list of Generic Files belonging to a particular Intellectual
         Object. It requires that the user specify the
-        intellectual_object_identifer as url-encoded, and as part of the base
+        intellectual_object_identifier as url-encoded, and as part of the base
         URL.
       responses:
         '200':
@@ -309,7 +277,7 @@ paths:
             type: string
           description: >-
             Premis Events belonging to a particular Intellectual
-            Object. Requires the intellectual_object_identifer to be
+            Object. Requires the intellectual_object_identifier to be
             url-encoded.
           required: true
         - name: identifier
@@ -317,26 +285,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Generic Files with this exact identifier.
-        - name: identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Generic Files whose identifier contains the 
-            specified string.
+            Return only the Generic Files with this exact identifier or Generic Files with the fragment of the identifier provided.
         - name: uri
           in: query
           schema:
             type: string
           description: >-
-           Return only the Generic Files with this exact URI.
-        - name: uri_like
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only Generic Files whose URI contains the specified string.
+           Return only the Generic Files with this exact URI or Generic Files with the fragment of the URI provided.
         - name: file_format
           in: query
           schema:
@@ -390,7 +345,7 @@ paths:
       tags:
         - Generic Files
       description: >-
-        Allows a user to specify a generic file (via identifier) to be restored. It requires that the user specify the generic_file_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
+        Allows a user to specify a generic file (via identifier) to be restored. It requires that the user specify the generic_file_identifier as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
       responses:
         '200':
           description: JSON containing the status and Work Item ID.
@@ -412,79 +367,6 @@ paths:
           description: >-
             Generic file ID to be restored
           required: true
-        - name: identifier
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only the Generic Files with this exact identifier.
-        - name: identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Generic Files whose identifier contains the
-            specified string.
-        - name: uri
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only the Generic Files with this exact URI.
-        - name: uri_like
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only Generic Files whose URI contains the specified string.
-        - name: file_format
-          in: query
-          schema:
-            type: string
-          description: >-
-           Return only Generic Files that have the specified file format.
-        - name: created_before
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files created before the specified timestamp.
-        - name: created_after
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files created after the specified timestamp.
-        - name: updated_before
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files updated before the specified timestamp.
-        - name: updated_after
-          in: query
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            Return only Generic Files updated after the specified timestamp.
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-          description: >-
-            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
-        - name: per_page
-          in: query
-          schema:
-            type: integer
-            default: 10
-          description: >-
-            The number of items to include in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/items':
     get:
       tags:
@@ -538,25 +420,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact tar file name.
-        - name: name_contains
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only items whose tar file name contains the specified string.
+            Return only items with the exact tar file name or items with the fragment of the name provided.
         - name: etag
           in: query
           schema:
             type: string
           description: >-
-            Return only items with the exact etag.
-        - name: etag_contains
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only items whose etag name contains the specified string.
+            Return only items with the exact etag or items with the fragment of the etag provided.
         - name: bag_date
           in: query
           schema:
@@ -586,25 +456,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact object identifier.
-        - name: object_identifier_contains
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only items whose object identifier name contains the specified string.
+            Return only items with the exact object identifier  or items with the fragment of the object identifier provided.
         - name: file_identifier
           in: query
           schema:
             type: string
           description: >-
-             Return only items with the exact file identifier specified. Useful for finding all items associated with a specific file.
-        - name: file_identifier_contains
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only items whose file identifier contains the specified string.
+             Return only items with the exact file identifier specified or items with the fragment of the file identifier provided. Useful for finding all items associated with a specific file.
         - name: access
           in: query
           schema:
@@ -650,61 +508,31 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact description.
-        - name: description_like
-          in: query
-          schema:
-            type: string
-          description: >-
-             Return only Intellectual Objects whose description contains the specified string.
+            Return only the Intellectual Objects with this exact description or Intellectual Objects with the fragment of the description provided.
         - name: identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact identifier.
-        - name: identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-             Return only Intellectual Objects whose identifier contains the specified string.
+            Return only the Intellectual Objects with this exact identifier or Intellectual Objects with the fragment of the identifier provided.
         - name: alt_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact alternative identifier.
-        - name: alt_identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-             Return only Intellectual Objects whose alternative identifier contains the specified string.
+            Return only the Intellectual Objects with this exact alternative identifier or Intellectual Objects with the fragment of the alternative identifier provided.
         - name: etag
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact etag.
-        - name: etag_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Intellectual Objects whose etag contains the specified string.
+            Return only the Intellectual Objects with this exact etag  or Intellectual Objects with the fragment of the etag provided.
         - name: bag_name
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Object with this exact bag name.
-        - name: bag_name_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only those Intellectual Objects whose bag name contains the specified string.
+            Return only the Intellectual Object with this exact bag name  or Intellectual Objects with the fragment of the bag name provided.
         - name: created_before
           in: query
           schema:
@@ -791,61 +619,31 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact description.
-        - name: description_like
-          in: query
-          schema:
-            type: string
-          description: >-
-             Return only Intellectual Objects whose description contains the specified string.
+            Return only the Intellectual Objects with this exact description  or Intellectual Objects with the fragment of the description provided.
         - name: identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact identifier.
-        - name: identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-             Return only Intellectual Objects whose identifier contains the specified string.
+            Return only the Intellectual Objects with this exact identifier  or Intellectual Objects with the fragment of the identifier provided.
         - name: alt_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact alternative identifier.
-        - name: alt_identifier_like
-          in: query
-          schema:
-            type: string
-          description: >-
-             Return only Intellectual Objects whose alternative identifier contains the specified string.
+            Return only the Intellectual Objects with this exact alternative identifier  or Intellectual Objects with the fragment of the alternative identifier provided.
         - name: etag
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact etag.
-        - name: etag_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only Intellectual Objects whose etag contains the specified string.
+            Return only the Intellectual Objects with this exact etag  or Intellectual Objects with the fragment of the etag provided.
         - name: bag_name
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Object with this exact bag name.
-        - name: bag_name_like
-          in: query
-          schema:
-            type: string
-          description: >-
-            Return only those Intellectual Objects whose bag name contains the specified string.
+            Return only the Intellectual Object with this exact bag name  or Intellectual Objects with the fragment of the bag name provided.
         - name: created_before
           in: query
           schema:
@@ -912,7 +710,7 @@ paths:
         - Intellectual Objects
       summary: This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN
       description: >-
-        This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the DPN request. If the request is unsuccessful, the user will return an error message with an explanation.
+        This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN. It requires that the user specify the intellectual_object_identifier as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the DPN request. If the request is unsuccessful, the user will return an error message with an explanation.
       deprecated: true
       responses:
         '200':
@@ -933,7 +731,7 @@ paths:
       tags:
         - Intellectual Objects
       description: >-
-        Allows a user to specify an intellectual object (via identifier) to be restored. It requires that the user specify the intellectual_object_identifer as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
+        Allows a user to specify an intellectual object (via identifier) to be restored. It requires that the user specify the intellectual_object_identifier as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
       responses:
         '200':
           description: JSON containing the status and Work Item ID.
@@ -948,7 +746,7 @@ paths:
             type: string
           description: >-
             Trigger a restore of a particular Intellectual
-            Object. Requires the intellectual_object_identifer to be
+            Object. Requires the intellectual_object_identifier to be
             url-encoded.
           required: true
 components:
