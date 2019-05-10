@@ -41,6 +41,18 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def account_confirmations?
+    user.admin?
+  end
+
+  def indiv_confirmation_email?
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id)) || user == record
+  end
+
+  def confirm_account?
+    user == record
+  end
+
   def deletion_notifications?
     user.admin?
   end

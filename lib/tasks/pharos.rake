@@ -614,6 +614,16 @@ namespace :pharos do
     end
   end
 
+  desc 'Deactivate Unused Accounts'
+  task :deactive_unused_accounts => :environment do
+    User.all.each do |usr|
+      unless usr.account_confirmed
+        usr.soft_delete
+        puts "#{usr.name} has been deactivated."
+      end
+    end
+  end
+
   desc 'Set SMS Defaults'
   task :set_sms_defaults => :environment do
     sms = Aws::SNS::Client.new

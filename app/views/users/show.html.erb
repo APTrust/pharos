@@ -18,6 +18,13 @@
     <%= deactivate_link(@user) %>
 <% end %>
 <%= destroy_link(@user) %>
+<br><br>
+<% unless @user.account_confirmed %>
+    <h5>Resend Account Confirmation Email</h5>
+    <p>If you lost, or never received, an email with a confirmation URL for your account confirmation you can resend a confirmation email here. </p>
+    <%= link_to 'Resend Email', indiv_confirmation_email_path(@user), class: 'btn btn-normal doc-action-btn btn-sm' %>
+<% end %>
+
 <hr />
 
 <% unless @user.email_verified %>

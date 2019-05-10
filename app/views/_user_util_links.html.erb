@@ -32,6 +32,7 @@
                 <% if policy(current_user).vacuum? %>
                     <li class="divider"></li>
                     <li><%= link_to 'Vacuum Operations', vacuum_path %></li>
+                    <li><%= link_to 'Account Confirmations', account_confirmations_path %></li>
                 <% end %>
               </ul>
             </li>

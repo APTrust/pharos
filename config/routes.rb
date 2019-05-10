@@ -179,6 +179,12 @@ Rails.application.routes.draw do
   get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
+  get '/account_confirmations', to: 'users#account_confirmations', format: [:json, :html], as: :account_confirmations
+  get '/api/v2/account_confirmations', to: 'users#account_confirmations', format: [:json, :html], as: :api_account_confirmations
+  get '/users/:id/individual_account_confirmation', to: 'users#indiv_confirmation_email', format: [:json, :html], as: :indiv_confirmation_email
+  get '/api/v2/users/:id/individual_account_confirmation', to: 'users#indiv_confirmation_email', format: [:json, :html], as: :api_indiv_confirmation_email
+  get '/users/:id/confirm_account', to: 'users#confirm_account', format: [:json, :html], as: :confirm_account
+  get '/api/v2/users/:id/confirm_account', to: 'users#confirm_account', format: [:json, :html], as: :api_confirm_account
   get 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
   get 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
   get 'users/:id/register_authy', to: 'users#register_authy_user', as: :users_register_for_authy

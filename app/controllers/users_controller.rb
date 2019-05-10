@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
                                   :vacuum, :enable_otp, :disable_otp, :register_authy_user, :verify_twofa, :generate_backup_codes,
-                                  :verify_email, :email_confirmation, :forced_password_update]
+                                  :verify_email, :email_confirmation, :forced_password_update, :indiv_confirmation_email, :confirm_account]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -348,6 +348,57 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.json { }
         format.html { }
+      end
+    end
+  end
+
+  def account_confirmations
+    authorize current_user
+    User.all.each do |user|
+      unless user.admin?
+        user.account_confirmed = false
+        user.save!
+        ConfirmationToken.where(user_id: user.id).delete_all # delete any old tokens. Only the new one should be valid
+        token = ConfirmationToken.create(user: user, token: SecureRandom.hex)
+        token.save!
+        NotificationMailer.account_confirmation(user, token).deliver!
+      end
+    end
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: 'All users except admins have been sent their yearly account confirmation email.' }, status: :ok }
+      format.html { redirect_to root_path, flash: { notice: 'All users except admins have been sent their yearly account confirmation email.' } }
+    end
+  end
+
+  def indiv_confirmation_email
+    authorize @user
+    @user.account_confirmed = false
+    @user.save!
+    ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
+    token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
+    token.save!
+    NotificationMailer.account_confirmation(@user, token).deliver!
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: "A new account confirmation email has been sent to this email address: #{@user.email}." }, status: :ok }
+      format.html { redirect_to @user, flash: { notice: "A new account confirmation email has been sent to this email address: #{@user.email}." } }
+    end
+  end
+
+  def confirm_account
+    authorize @user
+    token = ConfirmationToken.where(user_id: @user.id).first
+    if token.token == params[:confirmation_token]
+      @user.account_confirmed = true
+      @user.save!
+      respond_to do |format|
+        format.json { render json: { user: @user, message: 'Your account has been confirmed for the next year.' } }
+        format.html { redirect_to @user, flash: { notice: 'Your account has been confirmed for the next year.' } }
+      end
+    else
+      ConfirmationToken.where(user_id: @user.id).delete_all
+      respond_to do |format|
+        format.json { render json: { user: @user, message: 'Invalid confirmation token.' } }
+        format.html { redirect_to @user, flash: { error: 'Invalid confirmation token.' } }
       end
     end
   end

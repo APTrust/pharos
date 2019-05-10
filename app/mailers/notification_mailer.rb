@@ -252,4 +252,10 @@ class NotificationMailer < ApplicationMailer
     mail(to: subject.email, subject: 'An Admin Has Reset Your Password')
   end
 
+  def account_confirmation(subject, confirmation_token)
+    @subject = subject
+    @confirmation_url = confirm_account_url(@subject, confirmation_token: confirmation_token.token)
+    mail(to: subject.email, subject: 'Confirm Your Account')
+  end
+
 end

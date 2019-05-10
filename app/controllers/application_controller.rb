@@ -131,19 +131,6 @@ class ApplicationController < ActionController::Base
   def forced_redirections
     if current_user.nil?
       return
-    elsif current_user.force_password_update
-      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
-        return
-      else
-        respond_to do |format|
-          format.json {
-            redirect_to current_user
-            render json: { error: 'One of your admins has requested you change your password now, please do that immediately.' }, status: :locked }
-          format.html {
-            redirect_to current_user, flash: { error: 'One of your admins has requested you change your password now, please do that immediately.' }
-          }
-        end
-      end
     elsif !current_user.initial_password_updated
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
         return
@@ -151,7 +138,7 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
           format.json {
             redirect_to current_user
-            render json: { error: 'Your initial password is only meant to be temporary, please change your password now.' }, status: :locked }
+            render json: { status: 'error', message: 'Your initial password is only meant to be temporary, please change your password now.' }, status: :locked }
           format.html {
             redirect_to current_user, flash: { error: 'Your initial password is only meant to be temporary, please change your password now.' }
           }
@@ -164,9 +151,35 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
           format.json {
             redirect_to current_user
-            render json: { error: 'You are required to verify your email address before you can continue using this website.' }, status: :locked }
+            render json: { status: 'error', message: 'You are required to verify your email address before you can continue using this website.' }, status: :locked }
           format.html {
             redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
+          }
+        end
+      end
+    elsif !current_user.account_confirmed
+      if params[:controller] == 'users' && (params[:action] == 'show' || params[:action] == 'indiv_confirmation_email' || params[:action] == 'confirm_account') && params[:id] == current_user.id.to_s
+        return
+      else
+        respond_to do |format|
+          format.json {
+            redirect_to current_user
+            render json: { status: 'error', message: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }, status: :locked }
+          format.html {
+            redirect_to current_user, flash: { error: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }
+          }
+        end
+      end
+    elsif current_user.force_password_update
+      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
+        return
+      else
+        respond_to do |format|
+          format.json {
+            redirect_to current_user
+            render json: { status: 'error', message: 'One of your admins has requested you change your password now, please do that immediately.' }, status: :locked }
+          format.html {
+            redirect_to current_user, flash: { error: 'One of your admins has requested you change your password now, please do that immediately.' }
           }
         end
       end
@@ -181,7 +194,7 @@ class ApplicationController < ActionController::Base
       #       respond_to do |format|
       #         format.json {
       #           redirect_to current_user
-      #           render json: { error: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
+      #           render json: { status: 'error', message: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
       #         format.html {
       #           redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
       #         }
@@ -196,7 +209,7 @@ class ApplicationController < ActionController::Base
       #       respond_to do |format|
       #         format.json {
       #           redirect_to current_user
-      #           render json: { error: 'You are required to use two factor authentication, please verify your phone number now.' }, status: :locked }
+      #           render json: { status: 'error', message: 'You are required to use two factor authentication, please verify your phone number now.' }, status: :locked }
       #         format.html {
       #           redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
       #         }
