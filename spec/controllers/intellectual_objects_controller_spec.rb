@@ -132,25 +132,25 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           get :index, params: { description: 'Founded in Aberdeen in 1928.' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { description_like: 'Aberdeen' }
+          get :index, params: { description: 'Aberdeen' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { identifier: 'test.edu/baggie?c=152' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { identifier_like: 'baggie' }
+          get :index, params: { identifier: 'baggie' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { alt_identifier: 'test.edu/some-bag' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { alt_identifier_like: 'some-bag' }
+          get :index, params: { alt_identifier: 'some-bag' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { bag_group_identifier: 'This is a collection.' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { bag_group_identifier_like: 'collection' }
+          get :index, params: { bag_group_identifier: 'collection' }
           expect(assigns(:intellectual_objects).size).to eq 1
         end
       end

@@ -857,7 +857,7 @@ RSpec.describe WorkItemsController, type: :controller do
       end
 
       it 'filters down to the right records and has the right count' do
-        get :index, format: :json, params: { name_contains: 'item1' }
+        get :index, format: :json, params: { name: 'item1' }
         assigns(:items).should_not include(user_item)
         assigns(:items).should_not include(item)
         assigns(:items).should include(item1)
