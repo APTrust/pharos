@@ -384,10 +384,8 @@ class GenericFilesController < ApplicationController
   def filter_count_and_sort
     params[:state] = 'A' if params[:state].nil?
     @generic_files = @generic_files
-                         .with_identifier(params[:identifier])
-                         .with_identifier_like(params[:identifier_like])
-                         .with_uri(params[:uri])
-                         .with_uri_like(params[:uri_like])
+                         .with_identifier_like(params[:identifier])
+                         .with_uri_like(params[:uri])
                          .created_before(params[:created_before])
                          .created_after(params[:created_after])
                          .updated_before(params[:updated_before])

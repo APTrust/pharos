@@ -174,10 +174,8 @@ class PremisEventsController < ApplicationController
                          .created_before(params[:created_before])
                          .created_after(params[:created_after])
                          .with_event_identifier(params[:event_identifier])
-                         .with_object_identifier(params[:object_identifier])
-                         .with_object_identifier_like(params[:object_identifier_like])
-                         .with_file_identifier(params[:file_identifier])
-                         .with_file_identifier_like(params[:file_identifier_like])
+                         .with_object_identifier_like(params[:object_identifier])
+                         .with_file_identifier_like(params[:file_identifier])
     @selected = {}
     get_event_institution_counts(@premis_events)
     get_event_type_counts(@premis_events)
