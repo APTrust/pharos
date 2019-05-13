@@ -478,6 +478,7 @@ class WorkItemsController < ApplicationController
     bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
     bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
     date = format_date if params[:updated_since].present?
+    parameter_deprecation
     @items = @items
                  .created_before(params[:created_before])
                  .created_after(params[:created_after])
@@ -516,6 +517,14 @@ class WorkItemsController < ApplicationController
       when 'institution'
         @items = @items.joins(:institution).order('institutions.name')
     end
+  end
+
+  def parameter_deprecation
+    params[:name] = params[:name_contains] if params[:name_contains]
+    params[:name] = params[:name_exact] if params[:name_exact]
+    params[:object_identifier] = params[:object_identifier_contains] if params[:object_identifier_contains]
+    params[:file_identifier] = params[:file_identifier_contains] if params[:file_identifier_contains]
+    params[:etag] = params[:etag_contains] if params[:etag_contains]
   end
 
   def check_for_completed_restoration

@@ -349,6 +349,7 @@ class IntellectualObjectsController < ApplicationController
 
   def filter_count_and_sort
     params[:state] = 'A' if params[:state].nil?
+    parameter_deprecation
     @intellectual_objects = @intellectual_objects
                                 .with_institution(params[:institution])
                                 .with_description_like(params[:description])
@@ -380,6 +381,15 @@ class IntellectualObjectsController < ApplicationController
       when 'institution'
         @intellectual_objects = @intellectual_objects.joins(:institution).order('institutions.name')
     end
+  end
+
+  def parameter_deprecation
+    params[:identifier] = params[:identifier_like] if params[:identifier_like]
+    params[:description] = params[:description_like] if params[:description_like]
+    params[:bag_group_identifier] = params[:bag_group_identifier_like] if params[:bag_group_identifier_like]
+    params[:bag_name] = params[:bag_name_like] if params[:bag_name_like]
+    params[:alt_identifier] = params[:alt_identifier_like] if params[:alt_identifier_like]
+    params[:etag] = params[:etag_like] if params[:etag_like]
   end
 
 end

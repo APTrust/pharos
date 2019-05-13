@@ -383,6 +383,7 @@ class GenericFilesController < ApplicationController
 
   def filter_count_and_sort
     params[:state] = 'A' if params[:state].nil?
+    parameter_deprecation
     @generic_files = @generic_files
                          .with_identifier_like(params[:identifier])
                          .with_uri_like(params[:uri])
@@ -408,6 +409,11 @@ class GenericFilesController < ApplicationController
       when 'institution'
         @generic_files = @generic_files.joins(:institution).order('institutions.name')
     end
+  end
+
+  def parameter_deprecation
+    params[:identifier] = params[:identifier_like] if params[:identifier_like]
+    params[:uri] = params[:uri_like] if params[:uri_like]
   end
 
   private
