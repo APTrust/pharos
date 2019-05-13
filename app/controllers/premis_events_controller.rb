@@ -166,6 +166,7 @@ class PremisEventsController < ApplicationController
   end
 
   def filter_count_and_sort
+    parameter_deprecation
     @premis_events = @premis_events
                          .with_institution(params[:institution])
                          .with_type(params[:event_type])
@@ -193,6 +194,11 @@ class PremisEventsController < ApplicationController
       when 'institution'
         @premis_events = @premis_events.joins(:institution).order('institutions.name')
     end
+  end
+
+  def parameter_deprecation
+    params[:object_identifier] = params[:object_identifier_like] if params[:object_identifier_like]
+    params[:file_identifier] = params[:file_identifier_like] if params[:file_identifier_like]
   end
 
   private
