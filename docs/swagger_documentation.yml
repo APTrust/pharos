@@ -254,6 +254,95 @@ paths:
             type: string
           description: >-
             Number of items in the page of results. If this is not specified, it defaults to 10.
+  '/member-api/v2/files/{institution_identifier}':
+    get:
+      tags:
+        - Generic Files
+      description: >-
+        Returns a list of Generic Files belonging to a particular Institution.
+        It requires that the user specify the institution_identifier as
+        part of the base URL.
+      responses:
+        '200':
+          description: A JSON array of generic files
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Files'
+      parameters:
+        - name: institution_identifier
+          in: path
+          schema:
+            type: string
+          description: >-
+            Generic Files belonging to a particular Institution.
+          required: true
+        - name: intellectual_object_identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Generic Files with this exact intellectual_object_identifier or Generic Files with the fragment of the intellectual_object_identifier provided.
+        - name: identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Generic Files with this exact identifier or Generic Files with the fragment of the identifier provided.
+        - name: uri
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only the Generic Files with this exact URI or Generic Files with the fragment of the URI provided.
+        - name: file_format
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only Generic Files that have the specified file format.
+        - name: created_before
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files created before the specified timestamp.
+        - name: created_after
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files created after the specified timestamp.
+        - name: updated_before
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files updated before the specified timestamp.
+        - name: updated_after
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            Return only Generic Files updated after the specified timestamp.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: >-
+            Return page X of results, where X is an integer. If this is not specified, it defaults to 1.
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: >-
+            The number of items to include in the page of results. If this is not specified, it defaults to 10.
   '/member-api/v2/files/{intellectual_object_identifier}':
     get:
       tags:
@@ -276,7 +365,7 @@ paths:
           schema:
             type: string
           description: >-
-            Premis Events belonging to a particular Intellectual
+            Generic Files belonging to a particular Intellectual
             Object. Requires the intellectual_object_identifier to be
             url-encoded.
           required: true
