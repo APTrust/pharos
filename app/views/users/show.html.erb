@@ -43,6 +43,8 @@
             <%= button_to 'Register w/Authy', users_register_for_authy_path(@user.id),
                           :method => :get, class: 'btn btn-primary doc-action-btn' %>
         <% end %>
+        <%= button_to 'Change Authy Phone Number', user_authy_number_path(@user.id),
+                      :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% else %>
         <h5>Status: Phone Number Needs Verification</h5>
 

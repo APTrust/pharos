@@ -148,6 +148,11 @@ class UserPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
+  def change_authy_phone_number?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
   def register_authy_user?
     user == record ||  user.admin? ||
         (user.institutional_admin? && (user.institution_id == record.institution_id))

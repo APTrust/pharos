@@ -4,7 +4,8 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
                                   :vacuum, :enable_otp, :disable_otp, :register_authy_user, :verify_twofa, :generate_backup_codes,
-                                  :verify_email, :email_confirmation, :forced_password_update, :indiv_confirmation_email, :confirm_account]
+                                  :verify_email, :email_confirmation, :forced_password_update, :indiv_confirmation_email, :confirm_account,
+                                  :change_authy_phone_number]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -183,12 +184,48 @@ class UsersController < ApplicationController
     if authy && !authy[:errors].nil? && !authy[:errors].empty?
       puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:error] = 'An error occurred while trying to register for Authy.'
+      message = 'An error occurred while trying to register for Authy.'
     else
       flash[:notice] = "Registered for Authy. Authy ID is #{@user.authy_id}."
+      message = "Registered for Authy. Authy ID is #{@user.authy_id}."
     end
     respond_to do |format|
-      format.json { render json: { user: @user, message: 'Registered for Authy.' } }
+      format.json { render json: { user: @user, message: message } }
       format.html { render 'show' }
+    end
+  end
+
+  def change_authy_phone_number
+    authorize @user
+    response = Authy::API.delete_user(id: @user.authy_id)
+    if response.ok?
+      @user.update(authy_id: nil)
+      second_response = Authy::API.register_user(
+          email: @user.email,
+          cellphone: @user.phone_number,
+          country_code: @user.phone_number[1]
+      )
+      if second_response.ok?
+        @user.update(authy_id: second_response.id)
+        respond_to do |format|
+          message = 'The phone number for this Authy account has been successfully updated.'
+          format.json { render json: { user: @user, message: message } }
+          format.html { redirect_to @user, flash: { notice: message } }
+        end
+      else
+        respond_to do |format|
+          message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
+                      + 'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
+          format.json { render json: { user: @user, message: message } }
+          format.html { redirect_to @user, flash: { notice: message } }
+        end
+      end
+    else
+      respond_to do |format|
+        message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications until it has been properly updated. Please try again later.'
+        format.json { render json: { user: @user, message: message } }
+        format.html { redirect_to @user, flash: { notice: message } }
+      end
     end
   end
 
