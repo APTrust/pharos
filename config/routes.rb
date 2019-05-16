@@ -57,6 +57,7 @@ Rails.application.routes.draw do
   put '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#update', format: :json, intellectual_object_identifier: object_ptrn
   resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/files'
   get 'member-api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: :json, intellectual_object_identifier: object_ptrn
+  get 'member-api/v2/files/:institution_identifier', to: 'generic_files#index', format: :json, institution_identifier: institution_ptrn
   delete 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :file_confirm_destroy
   delete 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :api_file_confirm_destroy
   get 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_confirm_destroy
