@@ -1,0 +1,30 @@
+<div class="modal" tabindex="-1" role="dialog" id="authy_phone_modal" title="Update Phone Number for Authy">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Phone Number</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>This form will update the phone number in both your Pharos account and your Authy account.</p>
+        <%= simple_form_for(@user,  url: { action: :change_authy_phone_number, format: :html, id: @user.id}, html: {class: 'form-horizontal', method: :get}) do |f| %>
+            <div class="form-inputs">
+              <%= f.input :phone_number %>
+              <p>If you don't change this field, it will default to the current number in your account. </p>
+            </div>
+            <br>
+            <div class="form-actions">
+              <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm') do %>
+                  <i class="glyphicon glyphicon-check"></i> Submit
+              <% end %>
+              <%= link_to @user, class: 'btn doc-action-btn btn-warning btn-sm' do %>
+                  <i class="glyphicon glyphicon-remove"></i> Cancel
+              <% end %>
+            </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

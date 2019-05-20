@@ -197,6 +197,8 @@ class UsersController < ApplicationController
 
   def change_authy_phone_number
     authorize @user
+    @user.phone_number = params[:user][:phone_number]
+    @user.save!
     response = Authy::API.delete_user(id: @user.authy_id)
     if response.ok?
       @user.update(authy_id: nil)
@@ -208,7 +210,7 @@ class UsersController < ApplicationController
       if second_response.ok?
         @user.update(authy_id: second_response.id)
         respond_to do |format|
-          message = 'The phone number for this Authy account has been successfully updated.'
+          message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
           format.json { render json: { user: @user, message: message } }
           format.html { redirect_to @user, flash: { notice: message } }
         end

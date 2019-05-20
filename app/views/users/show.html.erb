@@ -37,14 +37,14 @@
 <% if @user.enabled_two_factor %>
     <% if @user.confirmed_two_factor %>
         <h5>Status: Enabled</h5>
-        <%= button_to 'Disable 2FA', users_disable_otp_path(@user.id),
+        <%= link_to 'Disable 2FA', users_disable_otp_path(@user.id), id: 'disable_twofa',
                       :method => :get, class: 'btn btn-warning doc-action-btn' %>
         <% if (current_user.authy_id.nil? || current_user.authy_id == '') %>
-            <%= button_to 'Register w/Authy', users_register_for_authy_path(@user.id),
+            <%= link_to 'Register w/Authy', users_register_for_authy_path(@user.id), id: 'register_with_authy',
                           :method => :get, class: 'btn btn-primary doc-action-btn' %>
         <% end %>
-        <%= button_to 'Change Authy Phone Number', user_authy_number_path(@user.id),
-                      :method => :get, class: 'btn btn-normal doc-action-btn' %>
+        <%= link_to 'Change Authy Phone Number', "#", class: 'btn btn-normal doc-action-btn', data: {toggle: "modal", target: "#authy_phone_modal"} %>
+        <%= render 'phone_number_modal' %>
     <% else %>
         <h5>Status: Phone Number Needs Verification</h5>
 

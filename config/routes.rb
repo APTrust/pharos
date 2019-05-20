@@ -189,7 +189,7 @@ Rails.application.routes.draw do
   get 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
   get 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
   get 'users/:id/register_authy', to: 'users#register_authy_user', as: :users_register_for_authy
-  get 'users/:id/change_authy_number', to: 'users#change_authy_phone_number', as: :user_authy_number
+  get 'users/:id/change_authy_phone_number', to: 'users#change_authy_phone_number', as: :user_authy_number
   get 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
   get 'users/:id/backup_codes', to: 'users#generate_backup_codes', as: :backup_codes
   get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
