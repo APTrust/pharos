@@ -614,6 +614,15 @@ namespace :pharos do
     end
   end
 
+  desc 'Two Factor Account Confirmations'
+  task :two_factor_account_confirmations => :environment do
+    User.all.each do |usr|
+      usr.account_confirmed = true
+      usr.save!
+      puts "#{usr.name} has been updated."
+    end
+  end
+
   desc 'Deactivate Unused Accounts'
   task :deactive_unused_accounts => :environment do
     User.all.each do |usr|
