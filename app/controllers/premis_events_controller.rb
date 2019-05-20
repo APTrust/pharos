@@ -12,9 +12,11 @@ class PremisEventsController < ApplicationController
     @premis_events = PremisEvent.discoverable(current_user)
     if params[:object_identifier]
       load_intellectual_object
+      for_selected_object
       identifier = params[:object_identifier]
     elsif params[:file_identifier]
       load_generic_file
+      for_selected_file
       identifier = params[:file_identifier]
     elsif params[:institution_identifier]
       load_institution
@@ -165,6 +167,14 @@ class PremisEventsController < ApplicationController
     end
   end
 
+  def for_selected_object
+    @premis_events = @premis_events.with_object_identifier(params[:object_identifier]) if params[:object_identifier]
+  end
+
+  def for_selected_file
+    @premis_events = @premis_events.with_file_identifier(params[:file_identifier]) if params[:file_identifier]
+  end
+
   def filter_count_and_sort
     parameter_deprecation
     @premis_events = @premis_events
@@ -175,8 +185,12 @@ class PremisEventsController < ApplicationController
                          .created_before(params[:created_before])
                          .created_after(params[:created_after])
                          .with_event_identifier(params[:event_identifier])
-                         .with_object_identifier_like(params[:object_identifier])
-                         .with_file_identifier_like(params[:file_identifier])
+    if @parent.is_a?(Institution)
+      @premis_events = @premis_events
+                          .with_object_identifier_like(params[:object_identifier])
+                          .with_file_identifier_like(params[:file_identifier])
+    end
+    @premis_events = @premis_events.with_file_identifier_like(params[:file_identifier]) if @parent.is_a?(IntellectualObject)
     @selected = {}
     get_event_institution_counts(@premis_events)
     get_event_type_counts(@premis_events)
