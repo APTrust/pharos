@@ -407,7 +407,7 @@ class UsersController < ApplicationController
       format.json { render json: { status: 'success', message: 'All users except admins have been sent their yearly account confirmation email.' }, status: :ok }
       format.html {
         flash[:notice] = 'All users except admins have been sent their yearly account confirmation email.'
-        redirect_to root_path
+        redirect_back fallback_location: root_path
       }
     end
   end
