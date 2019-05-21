@@ -26,8 +26,9 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it 'should be able to perform yearly account confirmations' do
-      get :account_confirmations, format: :json
-      expect(response.status).to eq(200)
+      get :account_confirmations, format: :html
+      expect(response.status).to eq(302)
+      expect(flash[:notice]).to eq('All users except admins have been sent their yearly account confirmation email.')
       User.all.each do |user|
         unless user.admin?
           expect(user.account_confirmed).to eq false

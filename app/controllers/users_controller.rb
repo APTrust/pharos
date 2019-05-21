@@ -405,7 +405,10 @@ class UsersController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: { status: 'success', message: 'All users except admins have been sent their yearly account confirmation email.' }, status: :ok }
-      format.html { redirect_to root_path, flash: { notice: 'All users except admins have been sent their yearly account confirmation email.' } }
+      format.html {
+        flash[:notice] = 'All users except admins have been sent their yearly account confirmation email.'
+        redirect_to root_path
+      }
     end
   end
 
