@@ -26,15 +26,16 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it 'should be able to perform yearly account confirmations' do
-      get :account_confirmations, format: :json
-      expect(response.status).to eq(200)
+      get :account_confirmations, format: :html
+      expect(response.status).to eq(302)
+      expect(flash[:notice]).to eq('All users except admins have been sent their yearly account confirmation email.')
       User.all.each do |user|
         unless user.admin?
           expect(user.account_confirmed).to eq false
-          expect(user.confirmation_token).not_to be_nil
+          token = ConfirmationToken.where(user_id: user.id).first
+          expect(token).not_to be_nil
           email = ActionMailer::Base.deliveries.last
           expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
-          expect(email.body.encoded).to include("http://localhost:3000/users/#{user.id}/confirm_account?confirmation_token=#{user.confirmation_token.token}")
         end
       end
     end

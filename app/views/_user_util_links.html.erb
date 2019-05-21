@@ -32,7 +32,7 @@
                 <% if policy(current_user).vacuum? %>
                     <li class="divider"></li>
                     <li><%= link_to 'Vacuum Operations', vacuum_path %></li>
-                    <li><%= link_to 'Account Confirmations', account_confirmations_path %></li>
+                    <li><%= link_to 'Account Confirmations', account_confirmations_path, data: { confirm: 'Are you sure you want to send out account confirmation emails to all users?' } %></li>
                 <% end %>
               </ul>
             </li>
