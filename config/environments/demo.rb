@@ -70,6 +70,9 @@ Rails.application.configure do
   config.rails_semantic_logger.started    = true
   config.rails_semantic_logger.processing = true
   config.rails_semantic_logger.rendered   = true
+  config.rails_semantic_logger.quiet_assets = true
+  config.colorize_logging = false
+
 
   if ENV['PHAROS_LOGSERVER'].present?
     #config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
