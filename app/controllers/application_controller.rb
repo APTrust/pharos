@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :set_format
   before_action :verify_user!, unless: :devise_controller?
 
   #before_action :forced_redirections, unless: :devise_controller?
@@ -276,6 +277,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_format
+    request.format = 'html' unless request.format == 'json' || request.format == 'html' || request.format == 'rss'
+  end
 
   def user_not_authorized(exception)
     #policy_name = exception.policy.class.to_s.underscore
