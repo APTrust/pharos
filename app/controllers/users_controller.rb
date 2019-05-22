@@ -437,7 +437,6 @@ class UsersController < ApplicationController
         format.html { redirect_to @user, flash: { notice: 'Your account has been confirmed for the next year.' } }
       end
     else
-      ConfirmationToken.where(user_id: @user.id).delete_all
       respond_to do |format|
         format.json { render json: { user: @user, message: 'Invalid confirmation token.' } }
         format.html { redirect_to @user, flash: { error: 'Invalid confirmation token.' } }
