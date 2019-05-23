@@ -1,9 +1,9 @@
-<p>Hey <%= @subject.name %>,</p>
+<p>Hello <%= @subject.name %>,</p>
 <br>
 <p>Welcome to Pharos, the APTrust web application.</p>
 <br>
 <p>Before you can continue using the website, we need to verify your email address. <br>
-Please click <a href="<%= @confirmation_url %>">here</a> to verify.</p>
+Please click <a href="<%= @confirmation_url %>"><%= @confirmation_url %></a> to verify.</p>
 <br>
 <p>Please contact the APTrust team if you have any questions.
   eMail - help@aptrust.org
