@@ -1,4 +1,4 @@
-location /member-api {
+location / {
 		set $cors '';
 		if ($http_origin ~ '^https?://(localhost|demo\.aptrust\.org|aptrust\.github\.io)') {
 				set $cors 'true';
