@@ -228,7 +228,6 @@ class ApplicationController < ActionController::Base
       # end
       return
     end
-    return
   end
 
   # Adds a few additional behaviors into the application controller
