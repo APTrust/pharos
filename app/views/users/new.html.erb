@@ -17,8 +17,8 @@
 
       <%= f.association :roles, collection: roles_for_select, as: :radio_buttons %>
 
-      <%= f.input :password, autocomplete: :on, input_html: { class: '', id: 'new_user_password'} %>
-      <%= f.input :password_confirmation, autocomplete: :on, input_html: { class: '', id: 'new_user_password_confirmation' } %>
+      <%= f.input :password, autocomplete: :on, input_html: { class: 'hidden', id: 'new_user_password'} %>
+      <%= f.input :password_confirmation, autocomplete: :on, input_html: { class: 'hidden', id: 'new_user_password_confirmation' } %>
 
     </div>
     <br>
@@ -31,3 +31,7 @@
       <% end %>
     </div>
 <% end %>
+
+<script>
+  autofillUserCreateForm();
+</script>
