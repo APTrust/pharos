@@ -95,7 +95,6 @@ publish:
 publish-ci:
 	@echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
 	docker tag $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:latest
-	docker tag $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:$(TRAVIS_BRANCH)
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	# Docker Hub
 	#docker login docker.io
