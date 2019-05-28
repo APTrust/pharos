@@ -81,5 +81,5 @@ $(document).ready(function(){
     fixSearchBreadcrumb();
     addClickFunctions();
     pass_popover();
-    //autofillUserCreateForm();
+    autofillUserCreateForm();
 });
