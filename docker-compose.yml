@@ -55,7 +55,6 @@ services:
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/certs:/etc/nginx/certs:ro
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
       - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
-      - ./docker/nginx-proxy/cors_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_cors_location
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/vhost.d:/etc/nginx/vhost.d
       - assets:/etc/share/nginx/html/pharos
     labels:
