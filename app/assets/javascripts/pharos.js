@@ -72,6 +72,11 @@ function autofillUserCreateForm() {
     $("label[for='new_user_password_confirmation']").addClass('hidden');
 }
 
+// Test function to test deploy and recreation of assets
+function dropout() {
+    $('.dropdown-toggle').dropdown();
+}
+
 $(document).ready(function(){
     fixFilters();
     activateTabs();
