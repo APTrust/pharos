@@ -1,5 +1,5 @@
 # Generate the assets
-FROM pharos:latest AS build
+FROM pharos AS build
 WORKDIR /pharos/public
 # Build the final image used to serve them
 FROM aptrust/nginx-proxy
