@@ -29,6 +29,9 @@ revision: ## Show me the git hash
 
 build: ## Build the Pharos container from current repo. Make sure to commit all changes beforehand
 	docker build --build-arg PHAROS_RELEASE=$(REVISION) -t $(TAG) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+	docker build -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy:pharos -t aptrust/nginx-proxy:pharos -f Dockerfile.nginx .
+
+
 
 build-nc: ## Build the Pharos container, no cached layers.
 	docker build --no-cache --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
@@ -88,6 +91,7 @@ publish:
 	docker login $(REGISTRY)
 	docker tag $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:latest
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
+	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy:pharos
 	# Docker Hub
 	#docker login docker.io
 	#docker push aptrust/pharos
@@ -96,6 +100,7 @@ publish-ci:
 	@echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
 	docker tag $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:latest
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos
+	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy:pharos
 	# Docker Hub
 	#docker login docker.io
 	#docker push aptrust/pharos
