@@ -52,9 +52,7 @@ runcmd: ## Start Pharos container, run command and exit.
 %:
 	@true
 
-test-ci: ## Run Pharos spec tests in CI
-	build
-	#docker build --rm=false --build-arg PHAROS_RELEASE=$(REVISION) -t $(TAG) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
+test-ci: build ## Run Pharos spec tests in CI
 	docker network create -d bridge pharos-test-net
 	docker run -d --network pharos-test-net -h pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
 	docker run -e TRAVIS_JOB_ID="$(TRAVIS_JOB_ID)" -e TRAVIS_BRANCH="$(TRAVIS_BRANCH)" -e RAILS_ENV=test -e PHAROS_DB_NAME=travis_ci_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres --network pharos-test-net $(TAG) /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup; bin/rails spec"
