@@ -358,10 +358,10 @@ class Institution < ActiveRecord::Base
 
   def set_bucket_names
     return if self.identifier.nil?
-    self.repo_receiving_bucket = "aptrust.receiving.#{self.identifier}" if self.repo_receiving_bucket.nil? || self.repo_receiving_bucket == ''
-    self.repo_restore_bucket = "aptrust.restore.#{self.identifier}" if self.repo_restore_bucket.nil? || self.repo_restore_bucket == ''
-    self.demo_receiving_bucket = "aptrust.receiving.test.#{self.identifier}" if self.demo_receiving_bucket.nil? || self.demo_receiving_bucket == ''
-    self.demo_restore_bucket = "aptrust.restore.test.#{self.identifier}" if self.demo_restore_bucket.nil? || self.demo_restore_bucket == ''
+    self.repo_receiving_bucket = "aptrust.receiving.#{self.identifier}"
+    self.repo_restore_bucket = "aptrust.restore.#{self.identifier}"
+    self.demo_receiving_bucket = "aptrust.receiving.test.#{self.identifier}"
+    self.demo_restore_bucket = "aptrust.restore.test.#{self.identifier}"
   end
 
   def sanitize_update_params

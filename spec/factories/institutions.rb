@@ -13,7 +13,7 @@ FactoryBot.define do
     repo_receiving_bucket { "aptrust.receiving.#{identifier}" }
     repo_restore_bucket { "aptrust.restore.#{identifier}" }
     demo_receiving_bucket { "aptrust.receiving.test.#{identifier}" }
-    demo_restore_bucket { "aptrust.receiving.test.#{identifier}" }
+    demo_restore_bucket { "aptrust.restore.test.#{identifier}" }
   end
 
   factory :subscription_institution do
@@ -26,7 +26,7 @@ FactoryBot.define do
     repo_receiving_bucket { "aptrust.receiving.#{identifier}" }
     repo_restore_bucket { "aptrust.restore.#{identifier}" }
     demo_receiving_bucket { "aptrust.receiving.test.#{identifier}" }
-    demo_restore_bucket { "aptrust.receiving.test.#{identifier}" }
+    demo_restore_bucket { "aptrust.restore.test.#{identifier}" }
   end
 
   factory :aptrust, class: 'Institution' do
@@ -38,6 +38,6 @@ FactoryBot.define do
     repo_receiving_bucket { "aptrust.receiving.#{identifier}" }
     repo_restore_bucket { "aptrust.restore.#{identifier}" }
     demo_receiving_bucket { "aptrust.receiving.test.#{identifier}" }
-    demo_restore_bucket { "aptrust.receiving.test.#{identifier}" }
+    demo_restore_bucket { "aptrust.restore.test.#{identifier}" }
   end
 end
