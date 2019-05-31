@@ -616,6 +616,18 @@ namespace :pharos do
     })
   end
 
+  desc 'Set Bucket Attributes'
+  task :set_bucket_attributes => :environment do
+    Institution.all.each do |inst|
+      inst.repo_receiving_bucket = "aptrust.receiving.#{inst.identifier}"
+      inst.repo_restore_bucket = "aptrust.restore.#{inst.identifier}"
+      inst.demo_receiving_bucket = "aptrust.receiving.test#{inst.identifier}"
+      inst.demo_restore_bucket = "aptrust.restore.test#{inst.identifier}"
+      inst.save!
+      puts "Updated Institution: #{inst.name}"
+    end
+  end
+
   # To get total GB deposited by each institution through the end of July, 2018:
   #
   # inst_storage_summary('2018-07-31')

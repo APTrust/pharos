@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_30_213224) do
+ActiveRecord::Schema.define(version: 2019_05_31_163431) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -191,10 +191,10 @@ ActiveRecord::Schema.define(version: 2019_05_30_213224) do
     t.integer "member_institution_id"
     t.datetime "deactivated_at"
     t.boolean "otp_enabled"
-    t.string "repo_receiving_bucket", null: false
-    t.string "repo_restore_bucket", null: false
-    t.string "demo_receiving_bucket", null: false
-    t.string "demo_restore_bucket", null: false
+    t.string "repo_receiving_bucket"
+    t.string "repo_restore_bucket"
+    t.string "demo_receiving_bucket"
+    t.string "demo_restore_bucket"
     t.index ["name"], name: "index_institutions_on_name"
   end
 
