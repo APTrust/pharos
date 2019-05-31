@@ -12,19 +12,22 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
-  #before_validation :sanitize_update_params, on: :update
+  # NOTE: To pass migrations for adding bucket params, comment out the before_validation
+  # :sanitze_update_params and the attr_readonly lines for the bucket attributes.
+
+  before_validation :sanitize_update_params, on: :update
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
-  #validate :identifier_is_unique
+  validate :identifier_is_unique
 
   before_save :set_bucket_names
 
   attr_readonly :identifier
-  # attr_readonly :repo_receiving_bucket
-  # attr_readonly :repo_restore_bucket
-  # attr_readonly :demo_receiving_bucket
-  # attr_readonly :demo_restore_bucket
+  attr_readonly :repo_receiving_bucket
+  attr_readonly :repo_restore_bucket
+  attr_readonly :demo_receiving_bucket
+  attr_readonly :demo_restore_bucket
 
   before_destroy :check_for_associations
 
