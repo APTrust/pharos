@@ -21,10 +21,10 @@ class Institution < ActiveRecord::Base
   before_save :set_bucket_names
 
   attr_readonly :identifier
-  attr_readonly :repo_receiving_bucket
-  attr_readonly :repo_restore_bucket
-  attr_readonly :demo_receiving_bucket
-  attr_readonly :demo_restore_bucket
+  # attr_readonly :repo_receiving_bucket
+  # attr_readonly :repo_restore_bucket
+  # attr_readonly :demo_receiving_bucket
+  # attr_readonly :demo_restore_bucket
 
   before_destroy :check_for_associations
 
@@ -363,10 +363,10 @@ class Institution < ActiveRecord::Base
 
   def sanitize_update_params
     restore_attributes(['identifier', :identifier])
-    # restore_attributes(['repo_receiving_bucket', :repo_receiving_bucket])
-    # restore_attributes(['repo_restore_bucket', :repo_restore_bucket])
-    # restore_attributes(['demo_receiving_bucket', :demo_receiving_bucket])
-    # restore_attributes(['demo_restore_bucket', :demo_restore_bucket])
+    restore_attributes(['repo_receiving_bucket', :repo_receiving_bucket])
+    restore_attributes(['repo_restore_bucket', :repo_restore_bucket])
+    restore_attributes(['demo_receiving_bucket', :demo_receiving_bucket])
+    restore_attributes(['demo_restore_bucket', :demo_restore_bucket])
   end
 
   def check_for_associations

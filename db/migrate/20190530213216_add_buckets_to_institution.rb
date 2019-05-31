@@ -13,10 +13,6 @@ class AddBucketsToInstitution < ActiveRecord::Migration[5.2]
       inst.save!
       puts "Updated Institution: #{inst.name}"
     end
-
-    Institution.all.each do |inst|
-      puts "checking: #{inst.repo_receiving_bucket}"
-    end
   end
 
   def down
