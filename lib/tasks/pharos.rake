@@ -621,8 +621,8 @@ namespace :pharos do
     Institution.all.each do |inst|
       inst.repo_receiving_bucket = "aptrust.receiving.#{inst.identifier}"
       inst.repo_restore_bucket = "aptrust.restore.#{inst.identifier}"
-      inst.demo_receiving_bucket = "aptrust.receiving.test#{inst.identifier}"
-      inst.demo_restore_bucket = "aptrust.restore.test#{inst.identifier}"
+      inst.demo_receiving_bucket = "aptrust.receiving.test.#{inst.identifier}"
+      inst.demo_restore_bucket = "aptrust.restore.test.#{inst.identifier}"
       inst.save!
       puts "Updated Institution: #{inst.name}"
     end
