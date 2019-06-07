@@ -63,9 +63,9 @@ services:
     image: jrcs/letsencrypt-nginx-proxy-companion
     restart: always
     depends_on:
-      - nginx-proxy
+      - nginx-proxy-pharos
     environment:
-      - NGINX_PROXY_CONTAINER=nginx-proxy
+      - NGINX_PROXY_CONTAINER=nginx-proxy-pharos
       - DEBUG=false
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
