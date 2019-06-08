@@ -41,7 +41,7 @@ services:
     depends_on:
       - db
   nginx-proxy-pharos:
-    image: aptrust/nginx-proxy-pharos
+    image: registry.gitlab.com/aptrust/container-registry/nginx-proxy-pharos:${DOCKER_TAG_NAME:-latest}
     restart: always
     container_name: nginx-proxy-pharos
     ports:
