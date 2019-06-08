@@ -1,6 +1,6 @@
-ARG PRELEASE=latest
+ARG PHAROS_RELEASE=latest
 # Generate the assets
-FROM pharos:$PRELEASE AS build
+FROM pharos:${PHAROS_RELEASE} AS build
 WORKDIR /pharos/public
 # Build the final image used to serve them
 FROM aptrust/nginx-proxy
