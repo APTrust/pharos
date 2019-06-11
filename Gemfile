@@ -52,6 +52,7 @@ group :development do
   gem 'web-console', '~> 3.7.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+  gem 'rb-readline'
 end
 
 group :test, :development do

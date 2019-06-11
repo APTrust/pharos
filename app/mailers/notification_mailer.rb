@@ -222,13 +222,13 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'New Snapshots')
   end
 
-  def deletion_notification(subject, csv)
+  def deletion_notification(subject, zip)
     @subject = subject
     users = []
     @subject.admin_users.each { |user| users.push(user) }
     emails = []
     users.each { |user| emails.push(user.email) }
-    attachments['deletions.csv'] = { mime_type: 'text/csv', content: csv }
+    attachments['deletions.tar.gz'] = { mime_type: 'application/gzip', content: zip }
     mail(to: emails, subject: 'New Completed Deletions')
   end
 
