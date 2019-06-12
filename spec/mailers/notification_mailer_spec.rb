@@ -591,12 +591,12 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.from).to eq(['info@aptrust.org'])
     end
 
-    it 'has a csv attachment' do
+    it 'has a zip attachment' do
       expect(mail.attachments.count).to eq(1)
       attachment = mail.attachments[0]
       attachment.should be_a_kind_of(Mail::Part)
-      attachment.content_type.should eq('text/csv')
-      attachment.filename.should == 'deletions.csv'
+      attachment.content_type.should eq('application/gzip')
+      attachment.filename.should == 'deletions.tar.gz'
     end
   end
 

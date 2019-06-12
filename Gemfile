@@ -53,11 +53,12 @@ group :development do
   gem 'web-console', '~> 3.7.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+  gem 'rb-readline'
 end
 
 group :test, :development do
   gem 'capybara', '3.22.0'
-  gem 'shoulda-matchers', '~> 4.0.1'
+  gem 'shoulda-matchers', '~> 4.1.0'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
 end

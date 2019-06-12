@@ -209,66 +209,71 @@ class WorkItemsController < ApplicationController
     end
   end
 
-  def items_for_restore
-    restore = Pharos::Application::PHAROS_ACTIONS['restore']
-    requested = Pharos::Application::PHAROS_STAGES['requested']
-    pending = Pharos::Application::PHAROS_STATUSES['pend']
-    @items = WorkItem.with_action(restore)
-    @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
-    authorize @items
-    # Get items for a single object, which may consist of multiple bags.
-    # Return anything for that object identifier with action=Restore and retry=true
-    if !request[:object_identifier].blank?
-      @items = @items.with_object_identifier(request[:object_identifier])
-    else
-      # If user is not looking for a single bag, return all requested/pending items.
-      @items = @items.where(stage: requested, status: pending, retry: true)
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
+  # These three methods were commented out on June 11, 2019 as they are legacy methods that were
+  # used in bagman's 1.0 services but are no longer used. They will be deleted in due time if no
+  # requests are made by depositors to bring them back. They were never advertised so the hope is
+  # there will be no trouble removing them.
 
-  def items_for_dpn
-    dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
-    requested = Pharos::Application::PHAROS_STAGES['requested']
-    pending = Pharos::Application::PHAROS_STATUSES['pend']
-    @items = WorkItem.with_action(dpn)
-    @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
-    authorize @items
-    # Get items for a single object, which may consist of multiple bags.
-    # Return anything for that object identifier with action=DPN and retry=true
-    if !request[:object_identifier].blank?
-      @items = @items.with_object_identifier(request[:object_identifier])
-    else
-       # If user is not looking for a single bag, return all requested/pending items.
-       @items = @items.where(stage: requested, status: pending, retry: true)
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
+  # def items_for_restore
+  #   restore = Pharos::Application::PHAROS_ACTIONS['restore']
+  #   requested = Pharos::Application::PHAROS_STAGES['requested']
+  #   pending = Pharos::Application::PHAROS_STATUSES['pend']
+  #   @items = WorkItem.with_action(restore)
+  #   @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
+  #   authorize @items
+  #   # Get items for a single object, which may consist of multiple bags.
+  #   # Return anything for that object identifier with action=Restore and retry=true
+  #   if !request[:object_identifier].blank?
+  #     @items = @items.with_object_identifier(request[:object_identifier])
+  #   else
+  #     # If user is not looking for a single bag, return all requested/pending items.
+  #     @items = @items.where(stage: requested, status: pending, retry: true)
+  #   end
+  #   respond_to do |format|
+  #     format.json { render json: @items, status: :ok }
+  #   end
+  # end
 
-  def items_for_delete
-    delete = Pharos::Application::PHAROS_ACTIONS['delete']
-    requested = Pharos::Application::PHAROS_STAGES['requested']
-    pending = Pharos::Application::PHAROS_STATUSES['pend']
-    failed = Pharos::Application::PHAROS_STATUSES['fail']
-    @items = WorkItem.with_action(delete)
-    @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
-    authorize @items
-    # Return a record for a single file?
-    if !request[:generic_file_identifier].blank?
-      @items = @items.with_file_identifier(request[:generic_file_identifier])
-    else
-      # If user is not looking for a single bag, return all requested items
-      # where retry is true and status is pending or failed.
-      @items = @items.where(stage: requested, status: [pending, failed], retry: true)
-    end
-    respond_to do |format|
-      format.json { render json: @items, status: :ok }
-    end
-  end
+  # def items_for_dpn
+  #   dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
+  #   requested = Pharos::Application::PHAROS_STAGES['requested']
+  #   pending = Pharos::Application::PHAROS_STATUSES['pend']
+  #   @items = WorkItem.with_action(dpn)
+  #   @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
+  #   authorize @items
+  #   # Get items for a single object, which may consist of multiple bags.
+  #   # Return anything for that object identifier with action=DPN and retry=true
+  #   if !request[:object_identifier].blank?
+  #     @items = @items.with_object_identifier(request[:object_identifier])
+  #   else
+  #      # If user is not looking for a single bag, return all requested/pending items.
+  #      @items = @items.where(stage: requested, status: pending, retry: true)
+  #   end
+  #   respond_to do |format|
+  #     format.json { render json: @items, status: :ok }
+  #   end
+  # end
+
+  # def items_for_delete
+  #   delete = Pharos::Application::PHAROS_ACTIONS['delete']
+  #   requested = Pharos::Application::PHAROS_STAGES['requested']
+  #   pending = Pharos::Application::PHAROS_STATUSES['pend']
+  #   failed = Pharos::Application::PHAROS_STATUSES['fail']
+  #   @items = WorkItem.with_action(delete)
+  #   @items = @items.with_institution(current_user.institution_id) unless current_user.admin?
+  #   authorize @items
+  #   # Return a record for a single file?
+  #   if !request[:generic_file_identifier].blank?
+  #     @items = @items.with_file_identifier(request[:generic_file_identifier])
+  #   else
+  #     # If user is not looking for a single bag, return all requested items
+  #     # where retry is true and status is pending or failed.
+  #     @items = @items.where(stage: requested, status: [pending, failed], retry: true)
+  #   end
+  #   respond_to do |format|
+  #     format.json { render json: @items, status: :ok }
+  #   end
+  # end
 
   def notify_of_successful_restoration
     authorize current_user
