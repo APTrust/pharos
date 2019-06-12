@@ -20,7 +20,6 @@ gem 'figaro'
 gem 'devise', '4.6.2'
 gem 'rake'
 gem 'email_validator'
-gem 'rb-readline'
 
 # Used to generate PDFs for reports
 gem 'wicked_pdf'
