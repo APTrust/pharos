@@ -322,216 +322,216 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
-  describe 'GET #items_for_restore' do
-    describe 'for admin user' do
-      before do
-        sign_in admin_user
-        session[:verified] = true
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
-                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
-                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 retry: true)
-      end
-
-      it 'responds successfully with an HTTP 200 status code' do
-        get :items_for_restore, format: :json
-        expect(response).to be_successful
-      end
-
-      it 'assigns the correct @items' do
-        get :items_for_restore, format: :json
-        expect(assigns(:items).count).to eq(WorkItem.count)
-      end
-
-      it 'does not include items where retry == false' do
-        WorkItem.update_all(retry: false)
-        get :items_for_restore, format: :json
-        expect(assigns(:items).count).to eq(0)
-      end
-
-    end
-
-    describe 'for institutional admin' do
-      before do
-        sign_in institutional_admin
-        session[:verified] = true
-        2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
-                                 stage: Pharos::Application::PHAROS_STAGES['requested'],
-                                 status: Pharos::Application::PHAROS_STATUSES['pend'],
-                                 institution_id: institutional_admin.institution.id,
-                                 retry: true)
-
-      end
-
-      it 'restricts access to the admin API' do
-        get :items_for_restore, format: :json
-        expect(response.status).to eq 403
-      end
-    end
-
-    describe 'with object_identifier param' do
-      before do
-        3.times do
-          FactoryBot.create(:work_item,institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
-        end
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
-                            institution_id: institution.id,
-                            retry: true)
-        WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
-        sign_in admin_user
-        session[:verified] = true
-      end
-
-      it 'should return only items with the specified object_identifier' do
-        get :items_for_restore, params: { object_identifier: 'mickey/mouse' }, format: :json
-        expect(assigns(:items).count).to eq(2)
-      end
-    end
-  end
-
-  describe 'GET #items_for_dpn' do
-    describe 'for admin user' do
-      before do
-        sign_in admin_user
-        session[:verified] = true
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
-                            stage: Pharos::Application::PHAROS_STAGES['requested'],
-                            status: Pharos::Application::PHAROS_STATUSES['pend'],
-                            retry: true)
-      end
-
-      it 'responds successfully with an HTTP 200 status code' do
-        get :items_for_dpn, format: :json
-        expect(response).to be_successful
-      end
-
-      it 'assigns the correct @items' do
-        get :items_for_dpn, format: :json
-        expect(assigns(:items).count).to eq(WorkItem.count)
-      end
-
-      it 'does not include items where retry == false' do
-        WorkItem.update_all(retry: false)
-        get :items_for_dpn, format: :json
-        expect(assigns(:items).count).to eq(0)
-      end
-
-    end
-
-    describe 'for institutional admin' do
-      before do
-        sign_in institutional_admin
-        session[:verified] = true
-        2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
-                            stage: Pharos::Application::PHAROS_STAGES['requested'],
-                            status: Pharos::Application::PHAROS_STATUSES['pend'],
-                            institution_id: institutional_admin.institution.id,
-                            retry: true)
-
-      end
-
-      it 'restricts access to the admin API' do
-        get :items_for_dpn, format: :json
-        expect(response.status).to eq 403
-      end
-    end
-
-    describe 'with object_identifier param' do
-      before do
-        3.times do
-          FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, intellectual_object: object, object_identifier: object.identifier)
-        end
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
-                            institution_id: institution.id,
-                            retry: true)
-        WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
-        sign_in admin_user
-        session[:verified] = true
-      end
-
-      it 'should return only items with the specified object_identifier' do
-        get :items_for_dpn, params: { object_identifier: 'mickey/mouse' }, format: :json
-        expect(assigns(:items).count).to eq(2)
-      end
-    end
-  end
-
-  describe 'GET #items_for_delete' do
-    describe 'for admin user' do
-      before do
-        sign_in admin_user
-        session[:verified] = true
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
-                            stage: Pharos::Application::PHAROS_STAGES['requested'],
-                            status: Pharos::Application::PHAROS_STATUSES['pend'],
-                            retry: true)
-      end
-
-      it 'responds successfully with an HTTP 200 status code' do
-        get :items_for_delete, format: :json
-        expect(response).to be_successful
-      end
-
-      it 'assigns the correct @items' do
-        get :items_for_delete, format: :json
-        expect(assigns(:items).count).to eq(WorkItem.count)
-      end
-
-      it 'does not include items where retry == false' do
-        WorkItem.update_all(retry: false)
-        get :items_for_delete, format: :json
-        expect(assigns(:items).count).to eq(0)
-      end
-
-    end
-
-    describe 'for institutional admin' do
-      before do
-        sign_in institutional_admin
-        session[:verified] = true
-        2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
-        WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
-                            stage: Pharos::Application::PHAROS_STAGES['requested'],
-                            status: Pharos::Application::PHAROS_STATUSES['pend'],
-                            institution_id: institutional_admin.institution.id,
-                            retry: true)
-      end
-
-      it 'restricts access to the admin API' do
-        get :items_for_delete, format: :json
-        expect(response.status).to eq 403
-      end
-    end
-
-    describe 'with object_identifier param' do
-      before do
-        3.times do
-          FactoryBot.create(:work_item,
-                             action: Pharos::Application::PHAROS_ACTIONS['delete'],
-                             stage: Pharos::Application::PHAROS_STAGES['requested'],
-                             status: Pharos::Application::PHAROS_STATUSES['pend'],
-                             institution: institutional_admin.institution,
-                             object_identifier: object.identifier,
-                             intellectual_object: object,
-                             generic_file_identifier: file.identifier,
-                             retry: true)
-        end
-        new_file = FactoryBot.create(:generic_file)
-        wi = WorkItem.last
-        wi.generic_file_identifier = new_file.identifier
-        wi.save
-        sign_in admin_user
-        session[:verified] = true
-      end
-
-      it 'should return only items with the specified object_identifier' do
-        get :items_for_delete, params: { generic_file_identifier: file.identifier }, format: :json
-        expect(assigns(:items).count).to eq(2)
-      end
-    end
-  end
+  # describe 'GET #items_for_restore' do
+  #   describe 'for admin user' do
+  #     before do
+  #       sign_in admin_user
+  #       session[:verified] = true
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+  #                                stage: Pharos::Application::PHAROS_STAGES['requested'],
+  #                                status: Pharos::Application::PHAROS_STATUSES['pend'],
+  #                                retry: true)
+  #     end
+  #
+  #     it 'responds successfully with an HTTP 200 status code' do
+  #       get :items_for_restore, format: :json
+  #       expect(response).to be_successful
+  #     end
+  #
+  #     it 'assigns the correct @items' do
+  #       get :items_for_restore, format: :json
+  #       expect(assigns(:items).count).to eq(WorkItem.count)
+  #     end
+  #
+  #     it 'does not include items where retry == false' do
+  #       WorkItem.update_all(retry: false)
+  #       get :items_for_restore, format: :json
+  #       expect(assigns(:items).count).to eq(0)
+  #     end
+  #
+  #   end
+  #
+  #   describe 'for institutional admin' do
+  #     before do
+  #       sign_in institutional_admin
+  #       session[:verified] = true
+  #       2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+  #                                stage: Pharos::Application::PHAROS_STAGES['requested'],
+  #                                status: Pharos::Application::PHAROS_STATUSES['pend'],
+  #                                institution_id: institutional_admin.institution.id,
+  #                                retry: true)
+  #
+  #     end
+  #
+  #     it 'restricts access to the admin API' do
+  #       get :items_for_restore, format: :json
+  #       expect(response.status).to eq 403
+  #     end
+  #   end
+  #
+  #   describe 'with object_identifier param' do
+  #     before do
+  #       3.times do
+  #         FactoryBot.create(:work_item,institution: institution, intellectual_object: object, object_identifier: object.identifier, action: Pharos::Application::PHAROS_ACTIONS['fixity'])
+  #       end
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['restore'],
+  #                           institution_id: institution.id,
+  #                           retry: true)
+  #       WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
+  #       sign_in admin_user
+  #       session[:verified] = true
+  #     end
+  #
+  #     it 'should return only items with the specified object_identifier' do
+  #       get :items_for_restore, params: { object_identifier: 'mickey/mouse' }, format: :json
+  #       expect(assigns(:items).count).to eq(2)
+  #     end
+  #   end
+  # end
+  #
+  # describe 'GET #items_for_dpn' do
+  #   describe 'for admin user' do
+  #     before do
+  #       sign_in admin_user
+  #       session[:verified] = true
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+  #                           stage: Pharos::Application::PHAROS_STAGES['requested'],
+  #                           status: Pharos::Application::PHAROS_STATUSES['pend'],
+  #                           retry: true)
+  #     end
+  #
+  #     it 'responds successfully with an HTTP 200 status code' do
+  #       get :items_for_dpn, format: :json
+  #       expect(response).to be_successful
+  #     end
+  #
+  #     it 'assigns the correct @items' do
+  #       get :items_for_dpn, format: :json
+  #       expect(assigns(:items).count).to eq(WorkItem.count)
+  #     end
+  #
+  #     it 'does not include items where retry == false' do
+  #       WorkItem.update_all(retry: false)
+  #       get :items_for_dpn, format: :json
+  #       expect(assigns(:items).count).to eq(0)
+  #     end
+  #
+  #   end
+  #
+  #   describe 'for institutional admin' do
+  #     before do
+  #       sign_in institutional_admin
+  #       session[:verified] = true
+  #       2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+  #                           stage: Pharos::Application::PHAROS_STAGES['requested'],
+  #                           status: Pharos::Application::PHAROS_STATUSES['pend'],
+  #                           institution_id: institutional_admin.institution.id,
+  #                           retry: true)
+  #
+  #     end
+  #
+  #     it 'restricts access to the admin API' do
+  #       get :items_for_dpn, format: :json
+  #       expect(response.status).to eq 403
+  #     end
+  #   end
+  #
+  #   describe 'with object_identifier param' do
+  #     before do
+  #       3.times do
+  #         FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['fixity'], institution: institution, intellectual_object: object, object_identifier: object.identifier)
+  #       end
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['dpn'],
+  #                           institution_id: institution.id,
+  #                           retry: true)
+  #       WorkItem.all.limit(2).update_all(object_identifier: 'mickey/mouse')
+  #       sign_in admin_user
+  #       session[:verified] = true
+  #     end
+  #
+  #     it 'should return only items with the specified object_identifier' do
+  #       get :items_for_dpn, params: { object_identifier: 'mickey/mouse' }, format: :json
+  #       expect(assigns(:items).count).to eq(2)
+  #     end
+  #   end
+  # end
+  #
+  # describe 'GET #items_for_delete' do
+  #   describe 'for admin user' do
+  #     before do
+  #       sign_in admin_user
+  #       session[:verified] = true
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
+  #                           stage: Pharos::Application::PHAROS_STAGES['requested'],
+  #                           status: Pharos::Application::PHAROS_STATUSES['pend'],
+  #                           retry: true)
+  #     end
+  #
+  #     it 'responds successfully with an HTTP 200 status code' do
+  #       get :items_for_delete, format: :json
+  #       expect(response).to be_successful
+  #     end
+  #
+  #     it 'assigns the correct @items' do
+  #       get :items_for_delete, format: :json
+  #       expect(assigns(:items).count).to eq(WorkItem.count)
+  #     end
+  #
+  #     it 'does not include items where retry == false' do
+  #       WorkItem.update_all(retry: false)
+  #       get :items_for_delete, format: :json
+  #       expect(assigns(:items).count).to eq(0)
+  #     end
+  #
+  #   end
+  #
+  #   describe 'for institutional admin' do
+  #     before do
+  #       sign_in institutional_admin
+  #       session[:verified] = true
+  #       2.times { FactoryBot.create(:work_item, institution: institution, intellectual_object: object, object_identifier: object.identifier) }
+  #       WorkItem.update_all(action: Pharos::Application::PHAROS_ACTIONS['delete'],
+  #                           stage: Pharos::Application::PHAROS_STAGES['requested'],
+  #                           status: Pharos::Application::PHAROS_STATUSES['pend'],
+  #                           institution_id: institutional_admin.institution.id,
+  #                           retry: true)
+  #     end
+  #
+  #     it 'restricts access to the admin API' do
+  #       get :items_for_delete, format: :json
+  #       expect(response.status).to eq 403
+  #     end
+  #   end
+  #
+  #   describe 'with object_identifier param' do
+  #     before do
+  #       3.times do
+  #         FactoryBot.create(:work_item,
+  #                            action: Pharos::Application::PHAROS_ACTIONS['delete'],
+  #                            stage: Pharos::Application::PHAROS_STAGES['requested'],
+  #                            status: Pharos::Application::PHAROS_STATUSES['pend'],
+  #                            institution: institutional_admin.institution,
+  #                            object_identifier: object.identifier,
+  #                            intellectual_object: object,
+  #                            generic_file_identifier: file.identifier,
+  #                            retry: true)
+  #       end
+  #       new_file = FactoryBot.create(:generic_file)
+  #       wi = WorkItem.last
+  #       wi.generic_file_identifier = new_file.identifier
+  #       wi.save
+  #       sign_in admin_user
+  #       session[:verified] = true
+  #     end
+  #
+  #     it 'should return only items with the specified object_identifier' do
+  #       get :items_for_delete, params: { generic_file_identifier: file.identifier }, format: :json
+  #       expect(assigns(:items).count).to eq(2)
+  #     end
+  #   end
+  # end
 
   describe 'POST #set_restoration_status' do
     describe 'for admin user' do

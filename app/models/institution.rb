@@ -1,5 +1,6 @@
 class Institution < ActiveRecord::Base
   require 'csv'
+  require 'zlib'
 
   self.primary_key = 'id'
   has_many :users
@@ -94,6 +95,11 @@ class Institution < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def generate_deletion_zipped_csv(deletion_items)
+    csv = generate_deletion_csv(deletion_items)
+    Zlib::Deflate.deflate(csv)
   end
 
   def generate_confirmation_csv(bulk_job)
