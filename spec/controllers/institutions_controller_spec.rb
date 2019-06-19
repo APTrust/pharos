@@ -287,24 +287,24 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(assigns(:institution).name).to eq 'Foo'
       end
 
-      it 'should ignore updates to read only fields' do
-        test_inst = FactoryBot.create(:member_institution, identifier: 'test.edu')
-        patch :update, params: { institution_identifier: test_inst, institution: {name: 'Foo', identifier: 'foo.edu',
-                                                                                  repo_receiving_bucket: 'something.else.foo.edu',
-                                                                                  repo_restore_bucket: 'something.restore.foo.edu',
-                                                                                  demo_receiving_bucket: 'something.else.test.foo.edu',
-                                                                                  demo_restore_bucket: 'something.restore.test.foo.edu' } }
-        expect(assigns(:institution).name).to eq 'Foo'
-        expect(assigns(:institution).identifier).not_to eq 'foo.edu'
-        expect(assigns(:institution).repo_receiving_bucket).not_to eq 'something.else.foo.edu'
-        expect(assigns(:institution).repo_receiving_bucket).to eq 'aptrust.receiving.test.edu'
-        expect(assigns(:institution).repo_restore_bucket).not_to eq 'something.restore.foo.edu'
-        expect(assigns(:institution).repo_restore_bucket).to eq 'aptrust.restore.test.edu'
-        expect(assigns(:institution).demo_receiving_bucket).not_to eq 'something.else.test.foo.edu'
-        expect(assigns(:institution).demo_receiving_bucket).to eq 'aptrust.receiving.test.test.edu'
-        expect(assigns(:institution).demo_restore_bucket).not_to eq 'something.restore.test.foo.edu'
-        expect(assigns(:institution).demo_restore_bucket).to eq 'aptrust.restore.test.test.edu'
-      end
+      # it 'should ignore updates to read only fields' do
+      #   test_inst = FactoryBot.create(:member_institution, identifier: 'test.edu')
+      #   patch :update, params: { institution_identifier: test_inst, institution: {name: 'Foo', identifier: 'foo.edu',
+      #                                                                             repo_receiving_bucket: 'something.else.foo.edu',
+      #                                                                             repo_restore_bucket: 'something.restore.foo.edu',
+      #                                                                             demo_receiving_bucket: 'something.else.test.foo.edu',
+      #                                                                             demo_restore_bucket: 'something.restore.test.foo.edu' } }
+      #   expect(assigns(:institution).name).to eq 'Foo'
+      #   expect(assigns(:institution).identifier).not_to eq 'foo.edu'
+      #   expect(assigns(:institution).repo_receiving_bucket).not_to eq 'something.else.foo.edu'
+      #   expect(assigns(:institution).repo_receiving_bucket).to eq 'aptrust.receiving.test.edu'
+      #   expect(assigns(:institution).repo_restore_bucket).not_to eq 'something.restore.foo.edu'
+      #   expect(assigns(:institution).repo_restore_bucket).to eq 'aptrust.restore.test.edu'
+      #   expect(assigns(:institution).demo_receiving_bucket).not_to eq 'something.else.test.foo.edu'
+      #   expect(assigns(:institution).demo_receiving_bucket).to eq 'aptrust.receiving.test.test.edu'
+      #   expect(assigns(:institution).demo_restore_bucket).not_to eq 'something.restore.test.foo.edu'
+      #   expect(assigns(:institution).demo_restore_bucket).to eq 'aptrust.restore.test.test.edu'
+      # end
     end
   end
 
