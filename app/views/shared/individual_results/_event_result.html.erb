@@ -6,12 +6,15 @@
 
     <%- # main title container for doc partial view -%>
     <h5 class="index_title col-sm-9 col-lg-9">
-      <% if current.generic_file.nil? %>
+      <% if current.generic_file_identifier == '' && current.intellectual_object_identifier == '' %>
+          <% link_ident = current.identifier %>
+          <%= counter %>. <%= link_to link_ident, current %>
+      <% elsif current.generic_file_identifier == '' %>
           <% link_ident = current.intellectual_object_identifier %>
-          <%= counter %>. <%= link_to link_ident, current.intellectual_object %>
+          <%= counter %>. <%= link_to link_ident, intellectual_object_path(link_ident) %>
       <% else %>
           <% link_ident = current.generic_file_identifier %>
-          <%= counter %>. <%= link_to link_ident, current.generic_file %>
+          <%= counter %>. <%= link_to link_ident, generic_file_path(link_ident) %>
       <% end %>
     </h5>
 
