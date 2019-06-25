@@ -13,6 +13,11 @@ describe User do
     user.institution.id.should == user.institution_id
   end
 
+  it 'should set a proper grace period' do
+    time = Time.now.change(usec: 0)
+    user.grace_period.change(usec: 0).should == time
+  end
+
   describe 'as an admin' do
     subject { FactoryBot.create(:user, :admin) }
     its(:groups) { should match_array %w(registered admin) }

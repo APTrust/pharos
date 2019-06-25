@@ -193,16 +193,22 @@ class ApplicationController < ActionController::Base
     else
       if current_user.required_to_use_twofa?
         if !current_user.enabled_two_factor
-          if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
+          date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
+          if date_dif < 30
+            flash[:notice] = "You have #{date_dif} day(s) left to enable Two Factor Authentication before it will become mandatory. Please update your phone number to a valid textable and/or smartphone enabled number before then."
             return
           else
-            respond_to do |format|
-              format.json {
-                redirect_to current_user
-                render json: { status: 'error', message: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
-              format.html {
-                redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
-              }
+            if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
+              return
+            else
+              respond_to do |format|
+                format.json {
+                  redirect_to current_user
+                  render json: { status: 'error', message: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
+                format.html {
+                  redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
+                }
+              end
             end
           end
         elsif !current_user.confirmed_two_factor

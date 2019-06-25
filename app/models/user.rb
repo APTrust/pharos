@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   validates :name, presence: true
   phony_normalize :phone_number, :default_country_code => 'US'
   validates_plausible_phone :phone_number
+  validate :init_grace_period, on: :create
   #validate :phone_number_length
 
   # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
@@ -188,6 +189,12 @@ class User < ActiveRecord::Base
 
   def phone_number_length
     errors.add(:phone_number, 'is not the proper length') if phone_number.length < 10
+  end
+
+  def init_grace_period
+    if self.grace_period == ''
+      self.grace_period = DateTime.now
+    end
   end
 
 end

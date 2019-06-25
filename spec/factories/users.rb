@@ -14,6 +14,7 @@ FactoryBot.define do
     force_password_update { false }
     account_confirmed { true }
     sign_in_count { 5 }
+    grace_period { Time.now }
 
     factory :aptrust_user, class: 'User' do
       roles { [Role.where(name: 'admin').first_or_create] }

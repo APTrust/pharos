@@ -623,6 +623,24 @@ namespace :pharos do
     end
   end
 
+  desc 'Update Grace Period'
+  task :update_grace_period, [:user_email] => [:environment] do |t, args|
+    email = args[:user_email]
+    user = User.where(email: email).first
+    user.grace_period = DateTime.now
+    user.save!
+    puts "#{user.name}'s grace period for Two Factor Authentication has been reset for another 30 days."
+  end
+
+  desc 'Pre Date Grace Periods'
+  task :pre_date_user_grace_periods => :environment do
+    User.all.each do |usr|
+      usr.grace_period = DateTime.now - 30.days
+      usr.save!
+      puts "#{user.name}'s grace period for Two Factor Authentication has been set for 30 days ago."
+    end
+  end
+
   desc 'Deactivate Unused Accounts'
   task :deactive_unused_accounts => :environment do
     User.all.each do |usr|

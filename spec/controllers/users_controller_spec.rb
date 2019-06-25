@@ -80,6 +80,7 @@ RSpec.describe UsersController, type: :controller do
         }.to change(User, :count).by(1)
         response.should redirect_to user_url(assigns[:user])
         expect(assigns[:user]).to be_institutional_admin
+        expect(assigns[:user].grace_period).not_to be_nil
       end
 
       it 'and will send a welcome email to the new user' do
