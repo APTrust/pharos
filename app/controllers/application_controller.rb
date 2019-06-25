@@ -191,42 +191,42 @@ class ApplicationController < ActionController::Base
     elsif params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s
       return
     else
-      # if current_user.required_to_use_twofa?
-      #   if !current_user.enabled_two_factor
-      #     if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
-      #       return
-      #     else
-      #       respond_to do |format|
-      #         format.json {
-      #           redirect_to current_user
-      #           render json: { status: 'error', message: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
-      #         format.html {
-      #           redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
-      #         }
-      #       end
-      #     end
-      #   elsif !current_user.confirmed_two_factor
-      #     if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
-      #       return
-      #     elsif params[:controller] == 'verifications' && (params[:action] == 'edit' || params[:action] == 'update')
-      #       return
-      #     else
-      #       respond_to do |format|
-      #         format.json {
-      #           redirect_to current_user
-      #           render json: { status: 'error', message: 'You are required to use two factor authentication, please verify your phone number now.' }, status: :locked }
-      #         format.html {
-      #           redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
-      #         }
-      #       end
-      #     end
-      #   else
-      #     return
-      #   end
-      # else
-      #   return
-      # end
-      return
+      if current_user.required_to_use_twofa?
+        if !current_user.enabled_two_factor
+          if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
+            return
+          else
+            respond_to do |format|
+              format.json {
+                redirect_to current_user
+                render json: { status: 'error', message: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
+              format.html {
+                redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
+              }
+            end
+          end
+        elsif !current_user.confirmed_two_factor
+          if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
+            return
+          elsif params[:controller] == 'verifications' && (params[:action] == 'edit' || params[:action] == 'update')
+            return
+          else
+            respond_to do |format|
+              format.json {
+                redirect_to current_user
+                render json: { status: 'error', message: 'You are required to use two factor authentication, please verify your phone number now.' }, status: :locked }
+              format.html {
+                redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
+              }
+            end
+          end
+        else
+          return
+        end
+      else
+        return
+      end
+      # return
     end
   end
 
