@@ -65,7 +65,7 @@ RSpec.describe UsersController, type: :controller do
 
     describe 'can create Institutional Administrators' do
       let(:institutional_admin_role_id) { Role.where(name: 'institutional_admin').first_or_create.id}
-      let(:attributes) { FactoryBot.attributes_for(:user, role_ids: institutional_admin_role_id) }
+      let(:attributes) { FactoryBot.attributes_for(:user, role_ids: institutional_admin_role_id, grace_period: nil) }
       let(:other_attributes) { FactoryBot.attributes_for(:user, role_ids: institutional_admin_role_id) }
 
       it 'unless no parameters are passed' do

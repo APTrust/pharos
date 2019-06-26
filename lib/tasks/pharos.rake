@@ -641,6 +641,15 @@ namespace :pharos do
     end
   end
 
+  desc 'Set Production Grace Periods'
+  task :prodcution_grace_periods => :environment do
+    User.all.each do |usr|
+      usr.grace_period = DateTime.now
+      usr.save!
+      puts "#{user.name}'s grace period for Two Factor Authentication has been set for today."
+    end
+  end
+
   desc 'Deactivate Unused Accounts'
   task :deactive_unused_accounts => :environment do
     User.all.each do |usr|

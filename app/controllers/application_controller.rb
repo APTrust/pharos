@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
   end
 
   before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :set_grace_period_notice, unless: :devise_controller?
   before_action :set_format
   before_action :verify_user!, unless: :devise_controller?
 
@@ -195,7 +196,6 @@ class ApplicationController < ActionController::Base
         if !current_user.enabled_two_factor
           date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
           if date_dif < 30
-            flash[:notice] = "You have #{date_dif} day(s) left to enable Two Factor Authentication before it will become mandatory. Please update your phone number to a valid textable and/or smartphone enabled number before then."
             return
           else
             if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
@@ -233,6 +233,13 @@ class ApplicationController < ActionController::Base
         return
       end
       # return
+    end
+  end
+
+  def set_grace_period_notice
+    unless Rails.env.test?
+      date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
+      flash[:notice] = "You have #{30 - date_dif} day(s) left to enable Two Factor Authentication before it will become mandatory. Please update your phone number to a valid textable and/or smartphone enabled number before then." if date_dif < 30 && request.referrer.include?('/users/sign_in')
     end
   end
 
