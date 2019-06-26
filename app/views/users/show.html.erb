@@ -47,7 +47,10 @@
         <%= render 'phone_number_modal' %>
     <% else %>
         <h5>Status: Phone Number Needs Verification</h5>
-
+        <p>If you reached this point and previously forgot to update your phone number, you will need either your institutional administrator
+        or an APTrust administrator to change your number to once capable of receiving text messages. Then you will have to verify your phone
+        number using the SMS option below. Once you have done that, please click the "Change Authy Number" button to update the phone number
+        that is linked to your Pharos Authy account. Only then will you be able to use push notifications, should you so choose.</p>
         <%= link_to 'Verify Phone Number via SMS', users_verify_twofa_path(@user.id, verification_option: 'sms'),
                     class: 'btn btn-normal doc-action-btn' %>
         <br />
