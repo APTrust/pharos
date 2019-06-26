@@ -14,8 +14,8 @@ describe User do
   end
 
   it 'should set a proper grace period' do
-    time = Time.now.change(usec: 0)
-    user.grace_period.change(usec: 0).should == time
+    time = Time.now.change(sec: 0)
+    user.grace_period.change(sec: 0).should == time
   end
 
   describe 'as an admin' do

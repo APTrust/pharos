@@ -142,7 +142,7 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           format.json {
-            redirect_to current_user
+            # redirect_to current_user
             render json: { status: 'error', message: 'Your initial password is only meant to be temporary, please change your password now.' }, status: :locked }
           format.html {
             redirect_to current_user, flash: { error: 'Your initial password is only meant to be temporary, please change your password now.' }
@@ -155,7 +155,7 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           format.json {
-            redirect_to current_user
+            # redirect_to current_user
             render json: { status: 'error', message: 'You are required to verify your email address before you can continue using this website.' }, status: :locked }
           format.html {
             redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
@@ -168,7 +168,7 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           format.json {
-            redirect_to current_user
+            # redirect_to current_user
             render json: { status: 'error', message: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }, status: :locked }
           format.html {
             redirect_to current_user, flash: { error: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }
@@ -181,7 +181,7 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           format.json {
-            redirect_to current_user
+            # redirect_to current_user
             render json: { status: 'error', message: 'One of your admins has requested you change your password now, please do that immediately.' }, status: :locked }
           format.html {
             redirect_to current_user, flash: { error: 'One of your admins has requested you change your password now, please do that immediately.' }
@@ -203,7 +203,7 @@ class ApplicationController < ActionController::Base
             else
               respond_to do |format|
                 format.json {
-                  redirect_to current_user
+                  # redirect_to current_user
                   render json: { status: 'error', message: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
                 format.html {
                   redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
@@ -219,7 +219,7 @@ class ApplicationController < ActionController::Base
           else
             respond_to do |format|
               format.json {
-                redirect_to current_user
+                # redirect_to current_user
                 render json: { status: 'error', message: 'You are required to use two factor authentication, please verify your phone number now.' }, status: :locked }
               format.html {
                 redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
