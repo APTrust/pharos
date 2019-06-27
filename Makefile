@@ -11,7 +11,7 @@ REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
 NAME=$(shell basename $(CURDIR))
 REVISION=$(shell git log -1 --pretty=%h)
-BRANCH := $(subst /,_,$(shell git rev-parse --abbrev-ref HEAD))
+BRANCH = $(subst /,_,$(shell git rev-parse --abbrev-ref HEAD))
 TAG = $(NAME):$(REVISION)
 
 # HELP
@@ -102,7 +102,7 @@ publish:
 
 publish-ci:
 	@echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
-	docker tag  $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
+	#docker tag  $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
 	#docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH)
 	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos
