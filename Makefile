@@ -12,6 +12,7 @@ REPOSITORY = container-registry
 NAME=$(shell basename $(CURDIR))
 REVISION=$(shell git log -1 --pretty=%h)
 BRANCH = $(subst /,_,$(shell git rev-parse --abbrev-ref HEAD))
+PUSHBRANCH = $(subst /,_,$(TRAVIS_BRANCH))
 TAG = $(NAME):$(REVISION)
 
 # HELP
@@ -104,7 +105,6 @@ publish-ci:
 	@echo $(DOCKER_PWD) | docker login -u $(DOCKER_USER) --password-stdin $(REGISTRY)
 	#docker tag  $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)
 	#docker push $(REGISTRY)/$(REPOSITORY)/pharos
-	PUSHBRANCH = $(subst /,_,$(TRAVIS_BRANCH))
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(PUSHBRANCH)
 	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos
 	# Docker Hub
