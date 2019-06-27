@@ -637,7 +637,7 @@ namespace :pharos do
     User.all.each do |usr|
       usr.grace_period = DateTime.now - 30.days
       usr.save!
-      puts "#{user.name}'s grace period for Two Factor Authentication has been set for 30 days ago."
+      puts "#{usr.name}'s grace period for Two Factor Authentication has been set for 30 days ago."
     end
   end
 
@@ -646,7 +646,7 @@ namespace :pharos do
     User.all.each do |usr|
       usr.grace_period = DateTime.now
       usr.save!
-      puts "#{user.name}'s grace period for Two Factor Authentication has been set for today."
+      puts "#{usr.name}'s grace period for Two Factor Authentication has been set for today."
     end
   end
 
