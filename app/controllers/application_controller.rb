@@ -237,9 +237,13 @@ class ApplicationController < ActionController::Base
   end
 
   def set_grace_period_notice
-    unless Rails.env.test?
+    unless current_user.nil?
       date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
-      flash[:notice] = "You have #{30 - date_dif} day(s) left to enable Two Factor Authentication before it will become mandatory. Please update your phone number to a valid textable and/or smartphone enabled number before then." if date_dif < 30 && request.referrer.include?('/users/sign_in')
+      if date_dif < 30 && !current_user.confirmed_two_factor
+        unless Rails.env.test? || request.referrer.nil?
+          flash[:notice] = "You have #{30 - date_dif} day(s) left to enable Two Factor Authentication before it will become mandatory. Please update your phone number to a valid textable and/or smartphone enabled number before then." if date_dif < 30 && request.referrer.include?('/users/sign_in')
+        end
+      end
     end
   end
 

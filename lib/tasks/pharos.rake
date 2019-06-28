@@ -642,7 +642,7 @@ namespace :pharos do
   end
 
   desc 'Set Production Grace Periods'
-  task :prodcution_grace_periods => :environment do
+  task :production_grace_periods => :environment do
     User.all.each do |usr|
       usr.grace_period = DateTime.now
       usr.save!
