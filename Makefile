@@ -32,9 +32,7 @@ revision: ## Show me the git hash
 build: ## Build the Pharos container from current repo. Make sure to commit all changes beforehand
 	echo $(REVISION) >> .revision
 	docker build --build-arg PHAROS_RELEASE=$(REVISION) -t $(TAG) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) .
-	docker build --build-arg PHAROS_RELEASE=${REVISION} -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos -t aptrust/nginx-proxy-pharos -f Dockerfile.nginx .
-
-
+	docker build --build-arg PHAROS_RELEASE=${REVISION} -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION)-$(BRANCH) -t aptrust/nginx-proxy-pharos -f Dockerfile.nginx .
 
 build-nc: ## Build the Pharos container, no cached layers.
 	echo $(REVISION) >> .revision
@@ -95,7 +93,7 @@ publish:
 	docker login $(REGISTRY)
 #	docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH)
-	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos
+	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION)-$(BRANCH)
 	#docker build --build-arg PHAROS_RELEASE=${REVISION} -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos -t aptrust/nginx-proxy-pharos -f Dockerfile.nginx .
 	# Docker Hub
 	#docker login docker.io
@@ -106,7 +104,7 @@ publish-ci:
 	docker tag  $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION) $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(PUSHBRANCH)
 	#docker push $(REGISTRY)/$(REPOSITORY)/pharos
 	docker push $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(PUSHBRANCH)
-	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos
+	docker push $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION)-$(PUSHBRANCH)
 	# Docker Hub
 	#docker login docker.io
 	#docker push aptrust/pharos
