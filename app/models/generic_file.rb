@@ -32,7 +32,8 @@ class GenericFile < ActiveRecord::Base
   scope :with_storage_option, ->(param) { where(storage_option: param) unless param.blank? }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
-        .where('intellectual_objects.access = ?', param) unless param.blank?
+        .where('intellectual_objects.access = ?', param)
+        .preload(:intellectual_object) unless param.blank?
   }
   scope :discoverable, ->(current_user) {
     joins(:intellectual_object)
