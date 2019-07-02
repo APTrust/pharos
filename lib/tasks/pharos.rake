@@ -623,6 +623,15 @@ namespace :pharos do
     end
   end
 
+  desc 'Test User Grace Period'
+  task :test_user_grace_period, [:user_email] => [:environment] do |t, args|
+    email = args[:user_email]
+    user = User.where(email: email).first
+    user.grace_period = DateTime.now + 11.months
+    user.save!
+    puts "#{user.name}'s grace period for Two Factor Authentication has been reset for one year."
+  end
+
   desc 'Update Grace Period'
   task :update_grace_period, [:user_email] => [:environment] do |t, args|
     email = args[:user_email]
