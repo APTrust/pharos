@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include ApiAuth
+  include Pundit
   before_action do
     resource = controller_path.singularize.gsub('/', '_').to_sym
     method = "#{resource}_params"
@@ -17,8 +18,6 @@ class ApplicationController < ActionController::Base
   before_action :set_grace_period_notice, unless: :devise_controller?
   before_action :set_format
   before_action :verify_user!, unless: :devise_controller?
-
-  #before_action :forced_redirections, unless: :devise_controller?
 
   def verify_user!
     if requires_verification?
@@ -135,7 +134,7 @@ class ApplicationController < ActionController::Base
   end
 
   def forced_redirections
-    if current_user.nil?
+    if current_user.nil? || api_request?
       return
     elsif !current_user.initial_password_updated
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
@@ -246,11 +245,6 @@ class ApplicationController < ActionController::Base
       end
     end
   end
-
-  # Adds a few additional behaviors into the application controller
-  include ApiAuth
-  # Authorization mechanism
-  include Pundit
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
