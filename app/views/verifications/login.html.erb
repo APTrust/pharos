@@ -6,7 +6,7 @@
         Please note that push notifications will only work if you have the Authy app installed.</p>
       <% [ 'Push Notification', 'Text Message', 'Backup Code'].each do |opt| %>
           <%= radio_button_tag 'two_factor_option', opt, @two_factor_option == opt %>
-          <%= label_tag "two_factor_option_#{opt[0...3]}", opt.humanize %><br>
+          <%= label_tag "two_factor_option_#{opt}", opt.humanize %><br>
       <% end %>
     </div>
 
