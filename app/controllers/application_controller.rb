@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
     if requires_verification?
       start_verification
     else
-      forced_redirections
+      forced_redirections unless api_request?
     end
   end
 
@@ -134,7 +134,7 @@ class ApplicationController < ActionController::Base
   end
 
   def forced_redirections
-    if current_user.nil? || api_request?
+    if current_user.nil?
       return
     elsif !current_user.initial_password_updated
       if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
