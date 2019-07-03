@@ -118,7 +118,7 @@ class UsersController < ApplicationController
     end
     if authy && !authy[:errors].nil? && !authy[:errors].empty?
       logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
-      #puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
+      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:error] = 'An error occurred while trying to enable Two Factor Authentication.'
     else
       @user.otp_secret = User.generate_otp_secret
@@ -184,7 +184,7 @@ class UsersController < ApplicationController
     end
     if authy && !authy[:errors].nil? && !authy[:errors].empty?
       logger.info "************************Testing Authy Errors hash: #{authy.errors.inspect}"
-      #puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
+      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
       flash[:error] = 'An error occurred while trying to register for Authy.'
       message = 'An error occurred while trying to register for Authy.'
     else
@@ -264,7 +264,7 @@ class UsersController < ApplicationController
       end
 
       logger.info "Checking one touch contents: #{one_touch.inspect}"
-      #puts "**************************Checking one touch contents: #{one_touch.inspect}"
+      puts "**************************Checking one touch contents: #{one_touch.inspect}"
       if one_touch[:errors].nil? || one_touch[:errors].empty?
         session[:uuid] = one_touch.approval_request['uuid']
         status = one_touch['success'] ? :onetouch : :sms
