@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include ApiAuth
   include Pundit
+  include AuthorizationForcedRedirects
   before_action do
     resource = controller_path.singularize.gsub('/', '_').to_sym
     method = "#{resource}_params"
@@ -38,98 +39,55 @@ class ApplicationController < ActionController::Base
 
   def start_verification
     if session[:two_factor_option] == nil
-      session.delete(:authy)
-      session.delete(:verified)
+      delete_session_variables
       redirect_to verification_login_path, flash: { notice: 'You must select an option for two factor sign in.' }
     elsif session[:two_factor_option] == 'Backup Code'
       redirect_to enter_backup_verification_path(id: current_user.id), flash: { alert: 'Please enter a backup code.' }
     elsif session[:two_factor_option] == 'Push Notification'
-      one_touch = Authy::OneTouch.send_approval_request(
-          id: current_user.authy_id,
-          message: 'Request to Login to APTrust Repository Website',
-          details: {
-              'Email Address' => current_user.email,
-          }
-      )
-      unless one_touch.ok?
-        session.delete(:authy)
-        session.delete(:verified)
-        session.delete(:two_factor_option)
-        sign_out(@user)
-        respond_to do |format|
-          format.json { render json: { error: 'Create Push Error' }, status: :internal_server_error }
-          format.html {
-            redirect_to new_user_session_path, flash: { error: 'There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.' }
-          }
-        end
-      end
-      logger.info "Checking one touch contents: #{one_touch.inspect}"
-      puts "**************************Checking one touch contents: #{one_touch.inspect}"
-      if one_touch['errors'].nil? || one_touch['errors'].empty?
-        session[:uuid] = one_touch.approval_request['uuid']
-        status = one_touch['success'] ? :onetouch : :sms
-        current_user.update(authy_status: status)
-        session[:one_touch_timeout] = 300
-        one_touch_status
+      one_touch = generate_one_touch
+      if one_touch.ok? && (one_touch['errors'].nil? || one_touch['errors'].empty?)
+        check_one_touch(one_touch)
       else
-        session.delete(:authy)
-        session.delete(:verified)
-        session.delete(:two_factor_option)
-        sign_out(@user)
+        logger.info "Checking one touch contents: #{one_touch.inspect}"
+        delete_session_variables
+        sign_out(current_user)
         respond_to do |format|
           format.json { render json: { error: 'Create Push Error', message: one_touch.inspect }, status: :internal_server_error }
-          format.html {
-            redirect_to new_user_session_path, flash: { error: "There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{one_touch[:errors][:message]}" }
-          }
+          format.html { redirect_to new_user_session_path, flash: { error: "There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{one_touch[:errors][:message]}" } }
         end
       end
-
     elsif session[:two_factor_option] == 'Text Message'
-      sms = Aws::SNS::Client.new
-      response = sms.publish({
-                                 phone_number: current_user.phone_number,
-                                 message: "Your new one time password is: #{current_user.current_otp}"
-                             })
+      send_sms
       redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
     end
   end
 
   def one_touch_status
-    @user = current_user
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
-
-    unless status.ok?
+    if status.ok? && (status['errors'].nil? || status['errors'].empty?)
+      if session[:one_touch_timeout] <= 0
+        delete_session_variables
+        sign_out(current_user)
+        redirect_to new_user_session_path, flash: { error: 'This push notification has expired' }
+      else
+        if status['approval_request']['status'] == 'approved'
+          approve_session
+          redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
+        elsif status['approval_request']['status'] == 'denied'
+          delete_session_variables
+          sign_out(current_user)
+          redirect_to new_user_session_path, flash: { error: 'This request was denied.' }
+        else
+          recheck_one_touch_status
+        end
+      end
+    else
+      logger.info "Checking one touch contents: #{one_touch.inspect}"
+      delete_session_variables
+      sign_out(current_user)
       respond_to do |format|
         format.json { render json: { error: 'One Touch Status Error' }, status: :internal_server_error }
-        format.html {
-          redirect_to root_path, flash: { error: 'There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.' }
-        }
-      end
-    end
-
-    if session[:one_touch_timeout] <= 0
-      session.delete(:authy)
-      session.delete(:verified)
-      session.delete(:two_factor_option)
-      sign_out(@user)
-      redirect_to new_user_session_path, flash: { error: 'This push notification has expired' }
-    else
-      if status['approval_request']['status'] == 'approved'
-        session.delete(:uuid) || session.delete('uuid')
-        session[:authy] = true
-        session[:verified] = true
-        session.delete(:two_factor_option)
-        redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
-      elsif status['approval_request']['status'] == 'denied'
-        session.delete(:authy)
-        session.delete(:verified)
-        session.delete(:two_factor_option)
-        sign_out(@user)
-        redirect_to new_user_session_path, flash: { error: 'This request was denied.' }
-      else
-        sleep 1
-        session[:one_touch_timeout] -= 1
-        one_touch_status
+        format.html { redirect_to root_path, flash: { error: "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status[:errors][:message]}" } }
       end
     end
   end
@@ -138,93 +96,52 @@ class ApplicationController < ActionController::Base
     if current_user.nil?
       return
     elsif !current_user.initial_password_updated
-      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
+      if right_controller && right_action('password')
         return
       else
-        respond_to do |format|
-          format.json {
-            # redirect_to current_user
-            render json: { status: 'error', message: 'Your initial password is only meant to be temporary, please change your password now.' }, status: :locked }
-          format.html {
-            redirect_to current_user, flash: { error: 'Your initial password is only meant to be temporary, please change your password now.' }
-          }
-        end
+        msg = 'Your initial password is only meant to be temporary, please change your password now.'
+        forced_redirect_return(msg)
       end
     elsif !current_user.email_verified
-      if params[:controller] == 'users' && (params[:action] == 'verify_email' || params[:action] == 'email_confirmation' || params[:action] == 'show') && params[:id] == current_user.id.to_s
+      if right_controller_and_id && right_action('email')
         return
       else
-        respond_to do |format|
-          format.json {
-            # redirect_to current_user
-            render json: { status: 'error', message: 'You are required to verify your email address before you can continue using this website.' }, status: :locked }
-          format.html {
-            redirect_to current_user, flash: { error: 'You are required to verify your email address before you can continue using this website.' }
-          }
-        end
+        msg = 'You are required to verify your email address before you can continue using this website.'
+        forced_redirect_return(msg)
       end
     elsif !current_user.account_confirmed
-      if params[:controller] == 'users' && (params[:action] == 'show' || params[:action] == 'indiv_confirmation_email' || params[:action] == 'confirm_account') && params[:id] == current_user.id.to_s
+      if right_controller_and_id && right_action('account')
         return
       else
-        respond_to do |format|
-          format.json {
-            # redirect_to current_user
-            render json: { status: 'error', message: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }, status: :locked }
-          format.html {
-            redirect_to current_user, flash: { error: 'You must confirm your account every year, please do that by clicking the link in your confirmation email.' }
-          }
-        end
+        msg = 'You must confirm your account every year, please do that by clicking the link in your confirmation email.'
+        forced_redirect_return(msg)
       end
     elsif current_user.force_password_update
-      if params[:controller] == 'users' && (params[:action] == 'edit_password' || params[:action] == 'update_password' || (params[:action] == 'show' && params[:id] == current_user.id.to_s))
+      if right_controller && right_action('password')
         return
       else
-        respond_to do |format|
-          format.json {
-            # redirect_to current_user
-            render json: { status: 'error', message: 'One of your admins has requested you change your password now, please do that immediately.' }, status: :locked }
-          format.html {
-            redirect_to current_user, flash: { error: 'One of your admins has requested you change your password now, please do that immediately.' }
-          }
-        end
+        msg = 'One of your admins has requested you change your password now, please do that immediately.'
+        forced_redirect_return(msg)
       end
-    elsif params[:controller] == 'users' && params[:action] == 'show' && params[:id] == current_user.id.to_s
+    elsif right_controller_and_id && right_action('release')
       return
     else
       if current_user.required_to_use_twofa?
         if !current_user.enabled_two_factor
           date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
-          if date_dif < 30
+          if (date_dif < 30) || (right_controller_and_id && right_action('twofa_enable'))
             return
           else
-            if params[:controller] == 'users' && params[:action] == 'enable_otp' && params[:id] == current_user.id.to_s
-              return
-            else
-              respond_to do |format|
-                format.json {
-                  # redirect_to current_user
-                  render json: { status: 'error', message: 'You are required to use two factor authentication, please enable it now.' }, status: :locked }
-                format.html {
-                  redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please enable it now.' }
-                }
-              end
-            end
+            msg = 'You are required to use two factor authentication, please enable it now.'
+            forced_redirect_return(msg)
           end
         elsif !current_user.confirmed_two_factor
-          if params[:controller] == 'users' && params[:action] == 'verify_twofa' && params[:id] == current_user.id.to_s
-            return
-          elsif params[:controller] == 'verifications' && (params[:action] == 'edit' || params[:action] == 'update')
+          if (right_controller_and_id && right_action('twofa_confirm')) ||
+              (params[:controller] == 'verifications' && right_action('verification'))
             return
           else
-            respond_to do |format|
-              format.json {
-                # redirect_to current_user
-                render json: { status: 'error', message: 'You are required to use two factor authentication, please verify your phone number now.' }, status: :locked }
-              format.html {
-                redirect_to current_user, flash: { error: 'You are required to use two factor authentication, please verify your phone number now.' }
-              }
-            end
+            msg = 'You are required to use two factor authentication, please verify your phone number now.'
+            forced_redirect_return(msg)
           end
         else
           return
@@ -232,7 +149,6 @@ class ApplicationController < ActionController::Base
       else
         return
       end
-      # return
     end
   end
 
