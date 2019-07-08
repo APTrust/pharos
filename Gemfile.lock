@@ -137,7 +137,6 @@ GEM
     email_validator (2.0.1)
       activemodel
     encryptor (3.0.0)
-    equatable (0.6.0)
     erubi (1.8.0)
     execjs (2.7.0)
     factory_bot (5.0.2)
