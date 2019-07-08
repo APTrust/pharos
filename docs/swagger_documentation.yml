@@ -36,7 +36,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Events'
+                $ref: '#/components/schemas/EventsResponse'
         default:
           description: unexpected error
           content:
@@ -1299,6 +1299,25 @@ components:
         oneOf:
           - $ref: '#/components/schemas/Item'
           - $ref: '#/components/schemas/SendToDPNResponseFailed'
+    EventsResponse:
+      properties:
+        count:
+          type: integer
+          description: The number of events being returned
+          enum: 6
+        next:
+          type: string
+          description: A link for the next page of results, empty if the user is on the last page.
+          enum: 'http://localhost:3000/member-api/v2/events/virginia.edu%2Fvirginia.edu_dc3acb8?page=3&per_page=2'
+        previous:
+          type: string
+          description: A link for the previous page of results, empty if the user is on the first page.
+          enum: 'http://localhost:3000/member-api/v2/events/virginia.edu%2Fvirginia.edu_dc3acb8?page=1&per_page=2'
+        results:
+          type: array
+          description: The list of events being returned.
+          items:
+            $ref: '#/components/schemas/Events'
     Error:
       required:
         - code
