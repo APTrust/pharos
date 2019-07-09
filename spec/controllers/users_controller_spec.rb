@@ -250,6 +250,29 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
+    describe 'while testing forced_redirections' do
+      let(:admin_user_two) { FactoryBot.create(:user, :admin, account_confirmed: false) }
+      let(:valid_key) { '123' }
+      let(:api_user) { FactoryBot.create(:user, :admin, account_confirmed: false, api_secret_key: valid_key, enabled_two_factor: false,
+                                         confirmed_two_factor: false, email_verified: false, initial_password_updated: false,
+                                         force_password_update: true) }
+      let(:initial_headers) {{ 'CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json' }}
+
+      it 'for non API calls should get caught' do
+        sign_in admin_user_two
+        get :index
+        response.should redirect_to user_url(admin_user_two)
+        flash[:error].should eq('You must confirm your account every year, please do that by clicking the link in your confirmation email.')
+      end
+
+      describe 'for API calls' do
+        let(:login_headers) {{ 'X-Pharos-API-User' => api_user.email, 'X-Pharos-API-Key' => valid_key }}
+        it 'should not get caught' do
+          get :index
+          response.should be_successful
+        end
+      end
+    end
 
   end
 

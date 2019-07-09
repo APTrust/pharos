@@ -64,8 +64,8 @@ class ApplicationController < ActionController::Base
         end
       end
       logger.info "Checking one touch contents: #{one_touch.inspect}"
-      #puts "**************************Checking one touch contents: #{one_touch.inspect}"
-      if one_touch[:errors].nil? || one_touch[:errors].empty?
+      puts "**************************Checking one touch contents: #{one_touch.inspect}"
+      if one_touch['errors'].nil? || one_touch['errors'].empty?
         session[:uuid] = one_touch.approval_request['uuid']
         status = one_touch['success'] ? :onetouch : :sms
         current_user.update(authy_status: status)
