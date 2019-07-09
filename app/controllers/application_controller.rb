@@ -127,7 +127,6 @@ class ApplicationController < ActionController::Base
       return
     else
       if current_user.required_to_use_twofa?
-        puts "Testing: #{current_user.enabled_two_factor}"
         if !current_user.enabled_two_factor
           date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
           if (date_dif < 30) || (right_controller_and_id && right_action('twofa_enable'))
