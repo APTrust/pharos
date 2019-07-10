@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
     elsif session[:two_factor_option] == 'Backup Code'
       redirect_to enter_backup_verification_path(id: current_user.id), flash: { alert: 'Please enter a backup code.' }
     elsif session[:two_factor_option] == 'Push Notification'
-      one_touch = generate_one_touch
+      one_touch = generate_one_touch('Request to Login to APTrust Repository Website')
       if one_touch.ok? && (one_touch['errors'].nil? || one_touch['errors'].empty?)
         check_one_touch(one_touch)
       else

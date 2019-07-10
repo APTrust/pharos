@@ -69,19 +69,7 @@ class UsersController < ApplicationController
     @user = User.find(current_user.id)
     authorize @user
     if @user.update_with_password(user_params)
-      unless @user.initial_password_updated
-        @user.initial_password_updated = true
-        @user.email_verified = true
-        @user.save!
-        # ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
-        # token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
-        # token.save!
-        # NotificationMailer.email_verification(@user, token).deliver!
-      end
-      if @user.force_password_update
-        @user.force_password_update = false
-        @user.save!
-      end
+      update_password_attributes(@user)
       bypass_sign_in(@user)
       redirect_to @user
       flash[:notice] = 'Successfully changed password.'
@@ -103,68 +91,52 @@ class UsersController < ApplicationController
   def enable_otp
     authorize @user
     unless Rails.env.test?
-      if @user.authy_id.nil? || @user.authy_id == ''
-        authy = Authy::API.register_user(
-            email: @user.email,
-            cellphone: @user.phone_number,
-            country_code: @user.phone_number[1]
-        )
-        if authy.ok?
-          @user.update(authy_id: authy.id)
-        else
-          authy.errors
-        end
-      end
+      authy = generate_authy_account(@user) if (@user.authy_id.nil? || @user.authy_id == '')
     end
     if authy && !authy['errors'].nil? && !authy['errors'].empty?
       logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
-      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
-      flash[:error] = 'An error occurred while trying to enable Two Factor Authentication.'
+      msg = 'An error occurred while trying to enable Two Factor Authentication.'
+      flash[:error] = msg
     else
-      @user.otp_secret = User.generate_otp_secret
-      @user.enabled_two_factor = true
-      @codes = @user.generate_otp_backup_codes!
-      @user.save!
+      @codes = update_enable_otp_attributes(@user)
       (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
-      flash[:notice] = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{@user.authy_id}."
+      msg = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{@user.authy_id}."
+      flash[:notice] = msg
     end
-    if params[:redirect_loc] && params[:redirect_loc] == 'index'
-      redirect_to users_path
-    else
-      respond_to do |format|
-        format.json { render json: { user: @user, codes: @codes } }
-        format.html { render 'show' }
-      end
+    respond_to do |format|
+      format.json { render json: { user: @user, codes: @codes, message: msg } }
+      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? redirect_to users_path : render 'show' }
     end
   end
 
   def disable_otp
     authorize @user
-    if current_user.admin? || current_user.institutional_admin?
-      if current_user == @user || @user.admin? || @user.institutional_admin?
-        (current_user == @user) ? usr = 'you based on your role as an administrator' : usr = 'this user based on their role as an administrator'
-        flash[:alert] = "Two Factor Authentication cannot be disabled at this time because it is required for #{usr}."
-      elsif @user.institution.otp_enabled
-
-        flash[:alert] = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at this institution.'
+    if current_user_is_an_admin
+      if current_user == @user || user_is_an_admin(@user)
+        (current_user == @user) ? msg_opt = 'you based on your role as an administrator' : msg_opt = 'this user based on their role as an administrator'
+        msg = "Two Factor Authentication cannot be disabled at this time because it is required for #{msg_opt}."
+        flash[:alert] = msg
+      elsif user_inst_requires_twofa(@user)
+        msg = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at this institution.'
+        flash[:alert] = msg
       else
-        @user.enabled_two_factor = false
-        @user.save!
-        flash[:notice] = 'Two Factor Authentication has been disabled for this user.'
+        disable_twofa(@user)
+        msg = 'Two Factor Authentication has been disabled for this user.'
+        flash[:notice] = msg
       end
     else
-      if @user.institution.otp_enabled
-        flash[:alert] = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at your institution.'
+      if user_inst_requires_twofa(@user)
+        msg = 'Two Factor Authentication cannot be disabled at this time because it is required for all users at your institution.'
+        flash[:alert] = msg
       else
-        @user.enabled_two_factor = false
-        @user.save!
-        flash[:notice] = 'Two Factor Authentication has been disabled.'
+        disable_twofa(@user)
+        msg = 'Two Factor Authentication has been disabled.'
+        flash[:notice] = msg
       end
     end
-    if params[:redirect_loc] && params[:redirect_loc] == 'index'
-      redirect_to users_path
-    else
-      redirect_to @user
+    respond_to do |format|
+      format.json { render json: { user: @user, message: msg } }
+      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? redirect_to users_path : redirect_to @user }
     end
   end
 
@@ -221,14 +193,14 @@ class UsersController < ApplicationController
           message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
                       + 'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
           format.json { render json: { user: @user, message: message } }
-          format.html { redirect_to @user, flash: { notice: message } }
+          format.html { redirect_to @user, flash: { error: message } }
         end
       end
     else
       respond_to do |format|
         message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications until it has been properly updated. Please try again later.'
         format.json { render json: { user: @user, message: message } }
-        format.html { redirect_to @user, flash: { notice: message } }
+        format.html { redirect_to @user, flash: { error: message } }
       end
     end
   end
@@ -246,56 +218,25 @@ class UsersController < ApplicationController
   def verify_twofa
     authorize @user
     if params[:verification_option] == 'push'
-      one_touch = Authy::OneTouch.send_approval_request(
-          id: current_user.authy_id,
-          message: 'Request to Verify Phone Number for APTrust Repository Website',
-          details: {
-              'Email Address' => current_user.email,
-          }
-      )
-      unless one_touch.ok?
-        respond_to do |format|
-          format.json { render json: { error: 'Create Push Error' }, status: :internal_server_error }
-          format.html {
-            render 'show'
-            flash[:error] = 'There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.'
-          }
-        end
-      end
-
-      logger.info "Checking one touch contents: #{one_touch.inspect}"
-      puts "**************************Checking one touch contents: #{one_touch.inspect}"
-      if one_touch['errors'].nil? || one_touch['errors'].empty?
-        session[:uuid] = one_touch.approval_request['uuid']
-        status = one_touch['success'] ? :onetouch : :sms
-        current_user.update(authy_status: status)
-        session[:verify_timeout] = 300
-        one_touch_status_for_users
+      one_touch = generate_one_touch('Request to Verify Phone Number for APTrust Repository Website')
+      if one_touch.ok && (one_touch['errors'].nil? || one_touch['errors'].empty?)
+        check_one_touch_verify(one_touch)
       else
+        logger.info "Checking one touch contents: #{one_touch.inspect}"
         respond_to do |format|
           format.json { render json: { error: 'Create Push Error', message: one_touch.inspect }, status: :internal_server_error }
-          format.html {
-            render 'show'
-            flash[:error] = "There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help, and let them know that the error was: #{one_touch[:errors][:message]}"
-          }
+          format.html { redirect_to @user, flash: { error: "There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help, and let them know that the error was: #{one_touch[:errors][:message]}" } }
         end
       end
-
     elsif params[:verification_option] == 'sms'
-      sms = Aws::SNS::Client.new
-      response = sms.publish({
-                                 phone_number: current_user.phone_number,
-                                 message: "Your new one time password is: #{current_user.current_otp}"
-                             })
+      send_sms
       redirect_to edit_verification_path(id: current_user.id, verification_type: 'phone_number')
     end
   end
 
   def verify_email
     authorize @user
-    ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
-    token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
-    token.save!
+    token = create_user_confirmation_token(@user)
     NotificationMailer.email_verification(@user, token).deliver!
     respond_to do |format|
       format.json { render json: { user: @user, message: 'Instructions on verifying email address have been sent.' } }
@@ -312,22 +253,16 @@ class UsersController < ApplicationController
     if token.token == params[:confirmation_token]
       @user.email_verified = true
       @user.save!
-      respond_to do |format|
-        format.json { render json: { user: @user, message: 'Your email has been verified.' } }
-        format.html {
-          render 'show'
-          flash[:notice] = 'Your email has been successfully verified.'
-        }
-      end
+      msg = 'Your email has been successfully verified.'
+      flash[:notice] = msg
     else
       ConfirmationToken.where(user_id: @user.id).delete_all
-      respond_to do |format|
-        format.json { render json: { user: @user, message: 'Invalid confirmation token.' } }
-        format.html {
-          render 'show'
-          flash[:error] = 'Invalid confirmation token.'
-        }
-      end
+      msg = 'Invalid confirmation token.'
+      flash[:error] = msg
+    end
+    respond_to do |format|
+      format.json { render json: { user: @user, message: msg } }
+      format.html { render 'show' }
     end
   end
 
@@ -398,11 +333,8 @@ class UsersController < ApplicationController
     authorize current_user
     User.all.each do |user|
       unless user.admin?
-        user.account_confirmed = false
-        user.save!
-        ConfirmationToken.where(user_id: user.id).delete_all # delete any old tokens. Only the new one should be valid
-        token = ConfirmationToken.create(user: user, token: SecureRandom.hex)
-        token.save!
+        update_account_attributes(user)
+        token = create_user_confirmation_token(user)
         NotificationMailer.account_confirmation(user, token).deliver!
       end
     end
@@ -417,11 +349,8 @@ class UsersController < ApplicationController
 
   def indiv_confirmation_email
     authorize @user
-    @user.account_confirmed = false
-    @user.save!
-    ConfirmationToken.where(user_id: @user.id).delete_all # delete any old tokens. Only the new one should be valid
-    token = ConfirmationToken.create(user: @user, token: SecureRandom.hex)
-    token.save!
+    update_account_attributes(@user)
+    token = create_user_confirmation_token(@user)
     NotificationMailer.account_confirmation(@user, token).deliver!
     respond_to do |format|
       format.json { render json: { status: 'success', message: "A new account confirmation email has been sent to this email address: #{@user.email}." }, status: :ok }
@@ -547,33 +476,34 @@ class UsersController < ApplicationController
   def one_touch_status_for_users
     @user = current_user
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
-
-    unless status.ok?
-      respond_to do |format|
-        format.json { render json: { err: 'One Touch Status Error' }, status: :internal_server_error }
-        format.html {
-          render 'show'
-          flash[:error] = 'There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help.'
-        }
-      end
-    end
-
-    if session[:verify_timeout] <= 0
-      redirect_to @user, flash: { error: 'This push notification has expired' }
-    else
-      if status['approval_request']['status'] == 'approved'
-        session.delete(:uuid) || session.delete('uuid')
-        @user.confirmed_two_factor = true
-        @user.save!
-        session[:verified] = true
-        redirect_to @user, flash: { notice: 'Your phone number has been verified.' }
-      elsif status['approval_request']['status'] == 'denied'
-        redirect_to @user, flash: { error: 'This request was denied, phone number has not been verified.' }
+    if status.ok? && (status['errors'].nil? || status['errors'].empty?)
+      if session[:verify_timeout] <= 0
+        msg = 'This push notification has expired'
+        flash[:error] = msg
+        status = :conflict
       else
-        sleep 1
-        session[:verify_timeout] -= 1
-        one_touch_status_for_users
+        if status['approval_request']['status'] == 'approved'
+          update_confirmed_two_factor_updates(@user)
+          msg = 'Your phone number has been verified.'
+          flash[:notice] = msg
+          status = :ok
+        elsif status['approval_request']['status'] == 'denied'
+          msg = 'This request was denied, phone number has not been verified.'
+          flash[:error] = msg
+          status = :forbidden
+        else
+          recheck_one_touch_status_user
+        end
       end
+    else
+      logger.info "Checking one touch contents: #{status.inspect}"
+      msg = "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status[:errors][:message]}."
+      flash[:error] = msg
+      status = :internal_server_error
+    end
+    respond_to do |format|
+      format.json { render json: { message: msg }, status: status }
+      format.html { redirect_to @user }
     end
   end
 end
