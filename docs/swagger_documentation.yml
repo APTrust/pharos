@@ -23,7 +23,7 @@ servers:
 paths:
   '/member-api/v2/events/{generic_file_identifier}':
     get:
-      summary: Premis Events of a generic file`
+      summary: Premis Events of a generic file
       description: >-
         List of Premis Events belonging to a particular Generic File. It
         requires that the user specify the generic_file_identifier as
@@ -36,7 +36,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Events'
+                $ref: '#/components/schemas/EventsResponse'
         default:
           description: unexpected error
           content:
@@ -120,7 +120,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Events'
+                $ref: '#/components/schemas/EventsResponse'
       parameters:
         - in: path
           name: intellectual_object_identifier
@@ -195,7 +195,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Events'
+                $ref: '#/components/schemas/EventsResponse'
       parameters:
         - in: path
           name: institution_identifier
@@ -258,6 +258,7 @@ paths:
     get:
       tags:
         - Generic Files
+      summary: Generic Files of an Institution.
       description: >-
         Returns a list of Generic Files belonging to a particular Institution.
         It requires that the user specify the institution_identifier as
@@ -268,7 +269,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Files'
+                $ref: '#/components/schemas/FilesResponse'
       parameters:
         - name: institution_identifier
           in: path
@@ -347,6 +348,7 @@ paths:
     get:
       tags:
         - Generic Files
+      summary: Generic Files of an Intellectual Object
       description: >-
         Returns a list of Generic Files belonging to a particular Intellectual
         Object. It requires that the user specify the
@@ -358,7 +360,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Files'
+                $ref: '#/components/schemas/FilesResponse'
       parameters:
         - name: intellectual_object_identifier
           in: path
@@ -433,6 +435,7 @@ paths:
     get:
       tags:
         - Generic Files
+      summary: Restore a specific Generic File
       description: >-
         Allows a user to specify a generic file (via identifier) to be restored. It requires that the user specify the generic_file_identifier as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
       responses:
@@ -474,7 +477,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Items'
+                $ref: '#/components/schemas/ItemsResponse'
       parameters:
         - name: created_before
           in: query
@@ -582,6 +585,7 @@ paths:
     get:
       tags:
         - Intellectual Objects
+      summary: Intellectual Objects for a user's institution.
       description: >-
         This endpoint returns a list of Intellectual Objects belonging to your institution. Intellectual Objects are usually fully ingested bags, though when bags are uploaded in multiple parts, the Intellectual Object may appear before all of the component bags are fully ingested.
       responses:
@@ -590,7 +594,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Objects'
+                $ref: '#/components/schemas/ObjectsResponse'
       parameters:
         - name: description
           in: query
@@ -695,7 +699,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Objects'
+                $ref: '#/components/schemas/ObjectsResponse'
       parameters:
         - in: path
           name: institution_identifier
@@ -819,6 +823,7 @@ paths:
     get:
       tags:
         - Intellectual Objects
+      summary: Restore a specific Intellectual Object.
       description: >-
         Allows a user to specify an intellectual object (via identifier) to be restored. It requires that the user specify the intellectual_object_identifier as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return the ID of a newly created work item with specifics pertaining to the restoration request.
       responses:
@@ -1299,6 +1304,110 @@ components:
         oneOf:
           - $ref: '#/components/schemas/Item'
           - $ref: '#/components/schemas/SendToDPNResponseFailed'
+    EventsResponse:
+      properties:
+        count:
+          type: integer
+          description: The number of Premis Events being returned
+          enum:
+            - 6
+            - 4
+            - 7
+        next:
+          type: string
+          description: A link for the next page of results, empty if the user is on the last page.
+          enum:
+            - http://localhost:3000/member-api/v2/events/virginia.edu%2Fvirginia.edu_dc3acb8?page=3&per_page=2
+            - http://localhost:3000/member-api/v2/events/virginia.edu?page=3&per_page=2
+            - http://localhost:3000/member-api/v2/events/virginia.edu%2Fvirginia.edu_dc3acb8%2Fdata%2Fphoto.jpg?page=3&per_page=2
+        previous:
+          type: string
+          description: A link for the previous page of results, empty if the user is on the first page.
+          enum:
+            - http://localhost:3000/member-api/v2/events/virginia.edu%2Fvirginia.edu_dc3acb8?page=1&per_page=2
+            - http://localhost:3000/member-api/v2/events/virginia.edu%2Fvirginia.edu_dc3acb8%2Fdata%2Fphoto.jpg?page=1&per_page=2
+            - http://localhost:3000/member-api/v2/events/virginia.edu?page=1&per_page=2
+        results:
+          type: array
+          description: The list of Premis Events being returned.
+          items:
+            $ref: '#/components/schemas/Event'
+    FilesResponse:
+      properties:
+        count:
+          type: integer
+          description: The number of Generic Files being returned
+          enum:
+            - 6
+            - 4
+            - 7
+        next:
+          type: string
+          description: A link for the next page of results, empty if the user is on the last page.
+          enum:
+            - http://localhost:3000/member-api/v2/files/virginia.edu%2Fvirginia.edu_dc3acb8?page=3&per_page=4
+            - http://localhost:3000/member-api/v2/files/virginia.edu?page=3&per_page=4
+        previous:
+          type: string
+          description: A link for the previous page of results, empty if the user is on the first page.
+          enum:
+            - http://localhost:3000/member-api/v2/files/virginia.edu%2Fvirginia.edu_dc3acb8?page=1&per_page=4
+            - http://localhost:3000/member-api/v2/files/virginia.edu?page=1&per_page=4
+        results:
+          type: array
+          description: The list of Generic Files being returned.
+          items:
+            $ref: '#/components/schemas/File'
+    ObjectsResponse:
+      properties:
+        count:
+          type: integer
+          description: The number of Intellectual Objects being returned
+          enum:
+            - 6
+            - 4
+            - 7
+        next:
+          type: string
+          description: A link for the next page of results, empty if the user is on the last page.
+          enum:
+            - http://localhost:3000/member-api/v2/objects?page=3&per_page=5&state=A
+            - http://localhost:3000/member-api/v2/objects/virginia.edu?page=3&per_page=5&state=A
+        previous:
+          type: string
+          description: A link for the previous page of results, empty if the user is on the first page.
+          enum:
+            - http://localhost:3000/member-api/v2/objects?page=1&per_page=5&state=A
+            - http://localhost:3000/member-api/v2/objects/virginia.edu?page=1&per_page=5&state=A
+        results:
+          type: array
+          description: The list of Intellectual Objects being returned.
+          items:
+            $ref: '#/components/schemas/Object'
+    ItemsResponse:
+      properties:
+        count:
+          type: integer
+          description: The number of Work Items being returned
+          enum:
+            - 6
+            - 4
+            - 7
+        next:
+          type: string
+          description: A link for the next page of results, empty if the user is on the last page.
+          enum:
+            - http://test.aptrust.org/member-api/v2/items/?page=11&per_page=5
+        previous:
+          type: string
+          description: A link for the previous page of results, empty if the user is on the first page.
+          enum:
+            - http://test.aptrust.org/member-api/v2/items/?page=9&per_page=5
+        results:
+          type: array
+          description: The list of Work Items being returned.
+          items:
+            $ref: '#/components/schemas/Item'
     Error:
       required:
         - code
