@@ -24,14 +24,6 @@ class UsersController < ApplicationController
     create!(notice: 'User was successfully created.')
     if @user.save
       session[:user_id] = @user.id
-
-      # authy = Authy::API.register_user(
-      #     email: @user.email,
-      #     cellphone: @user.phone_number,
-      #     country_code: @user.phone_number[1]
-      # )
-      # @user.update(authy_id: authy.id)
-
       password = "ABCabc-#{SecureRandom.hex(4)}"
       @user.password = password
       @user.password_confirmation = password
@@ -105,13 +97,7 @@ class UsersController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: { user: @user, codes: @codes, message: msg } }
-      format.html {
-        if params[:redirect_loc] && params[:redirect_loc] == 'index'
-          redirect_to users_path
-        else
-          redirect_to @user
-        end
-      }
+      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (redirect_to @user) }
     end
   end
 
@@ -142,37 +128,22 @@ class UsersController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: { user: @user, message: msg } }
-      format.html {
-        if (params[:redirect_loc] && params[:redirect_loc] == 'index')
-          redirect_to users_path
-        else
-          redirect_to @user
-        end }
+      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (redirect_to @user) }
     end
   end
 
   def register_authy_user
     authorize @user
     if @user.authy_id.nil? || @user.authy_id == ''
-      authy = Authy::API.register_user(
-          email: @user.email,
-          cellphone: @user.phone_number,
-          country_code: @user.phone_number[1]
-      )
-      if authy.ok?
-        @user.update(authy_id: authy.id)
-      else
-        authy.errors
-      end
+      authy = generate_authy_account(@user)
     end
     if authy && !authy['errors'].nil? && !authy['errors'].empty?
-      logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
-      puts "************************Testing Authy Errors hash: #{authy.errors.inspect}"
-      flash[:error] = 'An error occurred while trying to register for Authy.'
+      logger.info "Register Authy Errors Hash: #{authy.errors.inspect}"
       message = 'An error occurred while trying to register for Authy.'
+      flash[:error] = message
     else
-      flash[:notice] = "Registered for Authy. Authy ID is #{@user.authy_id}."
       message = "Registered for Authy. Authy ID is #{@user.authy_id}."
+      flash[:notice] = message
     end
     respond_to do |format|
       format.json { render json: { user: @user, message: message } }
@@ -182,37 +153,28 @@ class UsersController < ApplicationController
 
   def change_authy_phone_number
     authorize @user
-    @user.phone_number = params[:user][:phone_number]
-    @user.save!
+    update_phone_number(@user)
     response = Authy::API.delete_user(id: @user.authy_id)
     if response.ok?
       @user.update(authy_id: nil)
-      second_response = Authy::API.register_user(
-          email: @user.email,
-          cellphone: @user.phone_number,
-          country_code: @user.phone_number[1]
-      )
-      if second_response.ok?
-        @user.update(authy_id: second_response.id)
-        respond_to do |format|
-          message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
-          format.json { render json: { user: @user, message: message } }
-          format.html { redirect_to @user, flash: { notice: message } }
-        end
+      second_response = generate_authy_account(@user)
+      if second_response.ok? && (authy['errors'].nil? || authy['errors'].empty?)
+        message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
+        flash[:notice] = message
       else
-        respond_to do |format|
-          message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
-                      + 'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
-          format.json { render json: { user: @user, message: message } }
-          format.html { redirect_to @user, flash: { error: message } }
-        end
+        logger.info "Re-Generate Authy Account Errors: #{second_response.errors.inspect}"
+        message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
+        + 'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
+        flash[:error] = message
       end
     else
-      respond_to do |format|
-        message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications until it has been properly updated. Please try again later.'
-        format.json { render json: { user: @user, message: message } }
-        format.html { redirect_to @user, flash: { error: message } }
-      end
+      logger.info "Delete Authy Account Errors: #{response.errors.inspect}"
+      message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications until it has been properly updated. Please try again later.'
+      flash[:error] = message
+    end
+    respond_to do |format|
+      format.json { render json: { user: @user, message: message } }
+      format.html { redirect_to @user }
     end
   end
 
@@ -288,7 +250,6 @@ class UsersController < ApplicationController
     else
       flash[:alert] = 'ERROR: Unable to create API key.'
     end
-
     redirect_to user_path(@user)
   end
 
@@ -494,7 +455,7 @@ class UsersController < ApplicationController
         status = :conflict
       else
         if status['approval_request']['status'] == 'approved'
-          update_confirmed_two_factor_updates(@user)
+          confirmed_two_factor_updates(@user)
           msg = 'Your phone number has been verified.'
           flash[:notice] = msg
           status = :ok

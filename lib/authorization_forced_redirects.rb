@@ -51,7 +51,7 @@ module AuthorizationForcedRedirects
     one_touch_status_for_users
   end
 
-  def update_confirmed_two_factor_updates(usr)
+  def confirmed_two_factor_updates(usr)
     session.delete(:uuid) || session.delete('uuid')
     usr.confirmed_two_factor = true
     usr.save!
@@ -151,16 +151,21 @@ module AuthorizationForcedRedirects
     codes
   end
 
+  def update_account_attributes(usr)
+    usr.account_confirmed = false
+    usr.save!
+  end
+
+  def update_phone_number(usr)
+    usr.phone_number = params[:user][:phone_number]
+    usr.save!
+  end
+
   def create_user_confirmation_token(usr)
     ConfirmationToken.where(user_id: usr.id).delete_all # delete any old tokens. Only the new one should be valid
     token = ConfirmationToken.create(user: usr, token: SecureRandom.hex)
     token.save!
     token
-  end
-
-  def update_account_attributes(usr)
-    usr.account_confirmed = false
-    usr.save!
   end
 
 end
