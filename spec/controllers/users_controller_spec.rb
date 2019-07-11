@@ -162,7 +162,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for myself should fail' do  # admins are required to use two factor authentication
         admin_user.enabled_two_factor = true
         admin_user.save!
-        get :disable_otp, params: { id: admin_user.id }, format: :json
+        get :disable_otp, params: { id: admin_user.id }, format: :html
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq true
       end
@@ -170,7 +170,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user at my institution should succeed' do
         user_at_institution.enabled_two_factor = true
         user_at_institution.save!
-        get :disable_otp, params: { id: user_at_institution.id }, format: :json
+        get :disable_otp, params: { id: user_at_institution.id }, format: :html
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq false
       end
@@ -178,7 +178,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user not at my institution should succeed' do
         user_of_different_institution.enabled_two_factor = true
         user_of_different_institution.save!
-        get :disable_otp, params: { id: user_of_different_institution.id }, format: :json
+        get :disable_otp, params: { id: user_of_different_institution.id }, format: :html
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq false
       end
@@ -543,7 +543,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for myself should fail' do # admins are required to use two factor authentication
         institutional_admin.enabled_two_factor = true
         institutional_admin.save!
-        get :disable_otp, params: { id: institutional_admin.id }, format: :json
+        get :disable_otp, params: { id: institutional_admin.id }, format: :html
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq true
       end
@@ -551,7 +551,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user at my institution should succeed' do
         user_at_institution.enabled_two_factor = true
         user_at_institution.save!
-        get :disable_otp, params: { id: user_at_institution.id }, format: :json
+        get :disable_otp, params: { id: user_at_institution.id }, format: :html
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq false
       end
@@ -759,7 +759,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for myself should succeed' do
         user.enabled_two_factor = true
         user.save!
-        get :disable_otp, params: { id: user.id }, format: :json
+        get :disable_otp, params: { id: user.id }, format: :html
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq false
       end
@@ -769,7 +769,7 @@ RSpec.describe UsersController, type: :controller do
         user.institution.otp_enabled = true
         user.save!
         user.institution.save!
-        get :disable_otp, params: { id: user.id }, format: :json
+        get :disable_otp, params: { id: user.id }, format: :html
         expect(response.status).to eq(302)
         expect(assigns[:user].enabled_two_factor).to eq true
       end

@@ -105,7 +105,13 @@ class UsersController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: { user: @user, codes: @codes, message: msg } }
-      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? redirect_to users_path : render 'show' }
+      format.html {
+        if params[:redirect_loc] && params[:redirect_loc] == 'index'
+          redirect_to users_path
+        else
+          redirect_to @user
+        end
+      }
     end
   end
 
@@ -136,7 +142,12 @@ class UsersController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: { user: @user, message: msg } }
-      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? redirect_to users_path : redirect_to @user }
+      format.html {
+        if (params[:redirect_loc] && params[:redirect_loc] == 'index')
+          redirect_to users_path
+        else
+          redirect_to @user
+        end }
     end
   end
 
