@@ -147,7 +147,7 @@ class UsersController < ApplicationController
     end
     respond_to do |format|
       format.json { render json: { user: @user, message: message } }
-      format.html { render 'show' }
+      format.html { redirect_to @user }
     end
   end
 
@@ -158,7 +158,7 @@ class UsersController < ApplicationController
     if response.ok?
       @user.update(authy_id: nil)
       second_response = generate_authy_account(@user)
-      if second_response.ok? && (authy['errors'].nil? || authy['errors'].empty?)
+      if second_response.ok? && (second_response['errors'].nil? || second_response['errors'].empty?)
         message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
         flash[:notice] = message
       else
@@ -192,7 +192,7 @@ class UsersController < ApplicationController
     authorize @user
     if params[:verification_option] == 'push'
       one_touch = generate_one_touch('Request to Verify Phone Number for APTrust Repository Website')
-      if one_touch.ok && (one_touch['errors'].nil? || one_touch['errors'].empty?)
+      if one_touch.ok? && (one_touch['errors'].nil? || one_touch['errors'].empty?)
         check_one_touch_verify(one_touch)
       else
         logger.info "Checking one touch contents: #{one_touch.inspect}"
@@ -229,7 +229,6 @@ class UsersController < ApplicationController
       msg = 'Your email has been successfully verified.'
       flash[:notice] = msg
     else
-      ConfirmationToken.where(user_id: @user.id).delete_all
       msg = 'Invalid confirmation token.'
       flash[:error] = msg
     end
@@ -452,17 +451,26 @@ class UsersController < ApplicationController
       if session[:verify_timeout] <= 0
         msg = 'This push notification has expired'
         flash[:error] = msg
-        status = :conflict
+        respond_to do |format|
+          format.json { render json: { message: msg }, status: :conflict }
+          format.html { redirect_to @user }
+        end
       else
         if status['approval_request']['status'] == 'approved'
           confirmed_two_factor_updates(@user)
           msg = 'Your phone number has been verified.'
           flash[:notice] = msg
-          status = :ok
+          respond_to do |format|
+            format.json { render json: { message: msg }, status: :ok }
+            format.html { redirect_to @user }
+          end
         elsif status['approval_request']['status'] == 'denied'
           msg = 'This request was denied, phone number has not been verified.'
           flash[:error] = msg
-          status = :forbidden
+          respond_to do |format|
+            format.json { render json: { message: msg }, status: :forbidden }
+            format.html { redirect_to @user }
+          end
         else
           recheck_one_touch_status_user
         end
@@ -471,11 +479,10 @@ class UsersController < ApplicationController
       logger.info "Checking one touch contents: #{status.inspect}"
       msg = "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status[:errors][:message]}."
       flash[:error] = msg
-      status = :internal_server_error
-    end
-    respond_to do |format|
-      format.json { render json: { message: msg }, status: status }
-      format.html { redirect_to @user }
+      respond_to do |format|
+        format.json { render json: { message: msg }, status: :internal_server_error }
+        format.html { redirect_to @user }
+      end
     end
   end
 end

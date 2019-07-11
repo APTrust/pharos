@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
         end
       end
     else
-      logger.info "Checking one touch contents: #{one_touch.inspect}"
+      logger.info "Checking one touch contents: #{status.inspect}"
       delete_session_variables
       sign_out(current_user)
       respond_to do |format|

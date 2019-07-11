@@ -56,6 +56,7 @@ module AuthorizationForcedRedirects
     usr.confirmed_two_factor = true
     usr.save!
     session[:verified] = true
+    bypass_sign_in(usr)
   end
 
   def send_sms
