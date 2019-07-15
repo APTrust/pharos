@@ -235,8 +235,9 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
-    rails_semantic_logger (4.4.1)
-      rails (>= 3.2)
+    rails_semantic_logger (4.4.2)
+      rack
+      railties (>= 3.2)
       semantic_logger (~> 4.4)
     railties (5.2.3)
       actionpack (= 5.2.3)
