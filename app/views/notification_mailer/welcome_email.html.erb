@@ -9,20 +9,50 @@ the URL below to login with your email address and temporary password. You will
 be prompted to change this password after your initial login. A new password
 has to be least 10 characters long.</p>
 
-<p>If you have been setup as an institutional admin you will be required to enable
-two-factor authentication after your first login. You will be guided through the
-setup process. Otherwise this feature is optional, though we highly recommend
-to enable it.</p>
-
-<p>Your login is <%= @subject.email %></p>
-<p>Your temporary password is <%= @password %></p>
+<p>Your login is <%= @subject.email %>.</p>
+<p>Your temporary password is <%= @password %>.</p>
 
 <p>Login URL: <%= @login_url %><p>
+
+<% if @subject.institutional_admin? || @subject.admin? %>
+  <p>You have been setup as an institutional admin or and APTrust admin and you will be
+  required to enable two factor authentication within 30 days. After 30 days, two factor
+  authentication becomes mandatory.</p>
+<% else %>
+  <p>You have been setup as an institutional user in our system. We encourage you to setup
+  two factor authentication. It is optional unless required by your institutional admin(s).</p>
+<% end %>
+
+<p>To enable two factor authentication, visit your user profile page
+(<%= @subject_url %>). Once you have enabled two factor authentication you will need
+to verify your phone number through a text message or push notification. Once that is
+done, two factor authentication setup is complete and you will be prompted to use it
+at every login.</p>
+
+<p>Pharos has a Member API that can be used to view Intellectual Objects, Generic Files,
+Premis Events, and Work Items. It can also be used to restore individual Intellectual
+Objects and Generic Files. To check out all of the endpoints and experiment with them
+  please see our Swagger documentation. <a href="https://aptrust.github.io/pharos/#/">Swagger Docs</a></p>
+
+<p>To generate an API key to use the Member API please visit your user profile page and
+click the "Generate API Key" button, then save the API key in a safe place. If you lose
+  it you will need to generate a new one.</p>
+
+<p>In addition to the Member API key, you will also be issued AWS credentials. Those will
+be sent to you in a separate Privnote email that will be destroyed once it has been
+opened. Please save those credentials in a safe space as well. They will be used to
+  Upload, restore, and delete content from AWS.</p>
+
+<p>You can find more documentation on using APTrust on our wiki at <a href="https://wiki.aptrust.org/Using_APTrust">Using APTrust</a>.</p>
 
 <p>Please contact the APTrust team if you have any questions.
 eMail - help@aptrust.org
 Slack - http://bit.ly/aptrust-slack #aptrust_community
+Community listserv - community@aptrust.org
+(Both the slack channel and the community listserv can be subscribed to without needing
+APTrust staff approval.)
 </p>
+
 <p>Thanks so much for joining the APTrust preservation community.</p>
 
 <p>The APTrust Team</p>
