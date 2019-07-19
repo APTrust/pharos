@@ -250,6 +250,7 @@ class NotificationMailer < ApplicationMailer
     @subject = subject
     @password = password
     @login_url = new_user_session_url
+    @subject_url = user_url(@subject.id)
     Rails.env.production? ? prefix = '[APTrust Production] - ' : prefix = '[APTrust Demo] - '
     mail(to: subject.email, subject: "#{prefix}Welcome to APTrust!")
   end
