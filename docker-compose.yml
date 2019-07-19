@@ -3,9 +3,8 @@ services:
   db:
     image: postgres:9.6.6-alpine
     restart: always
-    environment:
-      POSTGRES_USER: pharos
-      POSTGRES_DB: pharos
+    env_file:
+      - ".env"
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
