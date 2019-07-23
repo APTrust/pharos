@@ -6,7 +6,7 @@ services:
     env_file:
       - ".env"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - :${DOCKERAPP_DATA_PATH:-./docker}/pgdata:/var/lib/postgresql/data
     ports:
       - '5432:5432'
   pharos:
@@ -73,5 +73,4 @@ services:
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/vhost.d:/etc/nginx/vhost.d:rw
 volumes:
-  pgdata:
   assets:
