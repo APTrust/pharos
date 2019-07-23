@@ -6,7 +6,7 @@ services:
     env_file:
       - ".env"
     volumes:
-      - :${DOCKERAPP_DATA_PATH:-./docker}/pgdata:/var/lib/postgresql/data
+      - ${DOCKERAPP_DATA_PATH:-./docker}/pgdata:/var/lib/postgresql/data
     ports:
       - '5432:5432'
   pharos:
