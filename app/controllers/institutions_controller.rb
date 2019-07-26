@@ -115,16 +115,16 @@ class InstitutionsController < ApplicationController
     end
     @institution.otp_enabled = true
     @institution.save!
-    render 'show'
     flash[:notice] = 'Two Factor Authentication has been enabled for all users at your institution.'
+    render 'show'
   end
 
   def disable_otp
     authorize @institution
     @institution.otp_enabled = false
     @institution.save!
-    render 'show'
     flash[:notice] = 'Two Factor Authentication is no longer required for institutional users at your institution.'
+    render 'show'
   end
 
   def single_snapshot
