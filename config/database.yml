@@ -29,6 +29,10 @@ integration:
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
 
+staging:
+  <<: *default
+  database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_staging' %>
+
 # Demo environment for APTrust Demo system
 demo:
   <<: *default
