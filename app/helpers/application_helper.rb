@@ -45,7 +45,7 @@ module ApplicationHelper
     options[:class] = 'btn doc-action-btn btn-success btn-sm' if options[:class].nil?
     options[:method] = :get if options[:method].nil?
     if object.is_a?(Institution)
-      content ||= '<i class="glyphicon glyphicon-thumbs-up"></i> Enable 2FA For Institution'
+      content ||= '<i class="glyphicon glyphicon-thumbs-up"></i> Enable Mandatory Institution-wide 2FA'
       options[:data] = { confirm: 'Are you sure you want to enable two factor authentication across your entire institution?' } if options[:confirm].nil?
       link_to(content.html_safe, enable_otp_institution_path(object), options) if policy(object).enable_otp?
     else
@@ -59,7 +59,7 @@ module ApplicationHelper
     options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
     options[:method] = :get if options[:method].nil?
     if object.is_a?(Institution)
-      content ||= '<i class="glyphicon glyphicon-thumbs-down"></i> Disable 2FA For Institution'
+      content ||= '<i class="glyphicon glyphicon-thumbs-down"></i> Disable Mandatory Institution-wide 2FA'
       options[:data] = { confirm: 'Are you sure you want to disable two factor authentication for your entire institution?' } if options[:confirm].nil?
       link_to(content.html_safe, disable_otp_institution_path(object), options) if policy(object).disable_otp?
     else
