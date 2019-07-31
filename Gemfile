@@ -44,7 +44,7 @@ gem 'browser-timezone-rails'
 gem 'activerecord-nulldb-adapter'
 gem 'puma', '3.12.0'
 
-group :demo, :production do
+group :demo, :production, :staging do
   # Graylog logging gems
   gem 'rails_semantic_logger'
   gem 'gelf'
@@ -68,7 +68,7 @@ group :test, :development do
   gem 'rails-controller-testing'
 end
 
-group :development, :test, :demo, :production, :integration do
+group :development, :test, :staging, :demo, :production, :integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_bot_rails'
