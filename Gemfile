@@ -24,6 +24,8 @@ gem 'email_validator'
 # Used to generate PDFs for reports
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+# Generate zip files
+gem 'rubyzip'
 # Used to create or edit google sheets
 gem 'google_drive'
 

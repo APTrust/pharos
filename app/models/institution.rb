@@ -1,6 +1,8 @@
 class Institution < ActiveRecord::Base
   require 'csv'
   require 'zlib'
+  require 'rubygems'
+  require 'zip'
 
   self.primary_key = 'id'
   has_many :users
@@ -66,7 +68,7 @@ class Institution < ActiveRecord::Base
   def new_deletion_items
     latest_email = Email.where(institution_id: self.id, email_type: 'deletion_notifications').order(id: :asc).limit(1).first
     if latest_email.nil?
-      time = Time.now - 48.hours
+      time = Time.now - 1.month
       deletion_items = WorkItem.with_institution(self.id)
                            .created_after(time)
                            .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
@@ -83,8 +85,11 @@ class Institution < ActiveRecord::Base
   end
 
   def generate_deletion_csv(deletion_items)
+    Dir.mkdir('./tmp/deletions') unless File.exist?('./tmp/deletions')
+    Dir.mkdir("./tmp/deletions/#{Time.now.month}-#{Time.now.year}") unless File.exist?("./tmp/deletions/#{Time.now.month}-#{Time.now.year}")
     attributes = ['Generic File Identifier', 'Date Deleted', 'Requested By', 'Approved By', 'APTrust Approver']
-    CSV.generate(headers: true) do |csv|
+    inst_name = deletion_items.first.institution.name.split(' ').join('_')
+    CSV.open("./tmp/deletions/#{Time.now.month}-#{Time.now.year}/#{inst_name}.csv", 'wb') do |csv|
       csv << attributes
       deletion_items.each do |item|
         unless item.generic_file_identifier.nil?
@@ -99,7 +104,11 @@ class Institution < ActiveRecord::Base
 
   def generate_deletion_zipped_csv(deletion_items)
     csv = generate_deletion_csv(deletion_items)
-    Zlib::Deflate.deflate(csv)
+    directory = "./tmp/deletions/#{Time.now.month}-#{Time.now.year}"
+    inst_name = deletion_items.first.institution.name.split(' ').join('_')
+    output_file = "./tmp/deletions/#{Time.now.month}-#{Time.now.year}/#{inst_name}.zip"
+    zf = ZipFileGenerator.new(directory, output_file)
+    zf.write()
   end
 
   def generate_confirmation_csv(bulk_job)
