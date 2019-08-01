@@ -85,11 +85,18 @@ class Institution < ActiveRecord::Base
   end
 
   def generate_deletion_csv(deletion_items)
-    Dir.mkdir('./tmp/deletions') unless File.exist?('./tmp/deletions')
-    Dir.mkdir("./tmp/deletions/#{Time.now.month}-#{Time.now.year}") unless File.exist?("./tmp/deletions/#{Time.now.month}-#{Time.now.year}")
+    if Rails.env.production?
+      directory = './tmp/deletions_production'
+    elsif Rails.env.demo?
+      directory = './tmp/deletions_demo'
+    else
+      directory = './tmp/deletions_test'
+    end
+    Dir.mkdir("#{directory}") unless File.exist?("#{directory}")
+    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}") unless File.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}")
     attributes = ['Generic File Identifier', 'Date Deleted', 'Requested By', 'Approved By', 'APTrust Approver']
     inst_name = deletion_items.first.institution.name.split(' ').join('_')
-    CSV.open("./tmp/deletions/#{Time.now.month}-#{Time.now.year}/#{inst_name}.csv", 'wb') do |csv|
+    CSV.open("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}.csv", 'wb') do |csv|
       csv << attributes
       deletion_items.each do |item|
         unless item.generic_file_identifier.nil?
@@ -100,13 +107,20 @@ class Institution < ActiveRecord::Base
         end
       end
     end
+
   end
 
   def generate_deletion_zipped_csv(deletion_items)
+    if Rails.env.production?
+      directory = "./tmp/deletions_production/#{Time.now.month}-#{Time.now.year}"
+    elsif Rails.env.demo?
+      directory = "./tmp/deletions_demo/#{Time.now.month}-#{Time.now.year}"
+    else
+      directory = "./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}"
+    end
     csv = generate_deletion_csv(deletion_items)
-    directory = "./tmp/deletions/#{Time.now.month}-#{Time.now.year}"
     inst_name = deletion_items.first.institution.name.split(' ').join('_')
-    output_file = "./tmp/deletions/#{Time.now.month}-#{Time.now.year}/#{inst_name}.zip"
+    output_file = "#{directory}/#{inst_name}.zip"
     zf = ZipFileGenerator.new(directory, output_file)
     zf.write()
   end

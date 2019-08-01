@@ -1,4 +1,6 @@
 require "spec_helper"
+require 'rubygems'
+require 'zip'
 
 RSpec.describe NotificationMailer, type: :mailer do
   before :all do
@@ -575,8 +577,8 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:latest_email) { FactoryBot.create(:deletion_notification_email) }
     let(:item_one) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one) }
     let(:item_two) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two) }
-    let(:csv) { institution.generate_deletion_csv([item_one, item_two]) }
-    let(:mail) { described_class.deletion_notification(institution, csv) }
+    let(:zip) { institution.generate_deletion_zipped_csv([item_one, item_two]) }
+    let(:mail) { described_class.deletion_notification(institution) }
 
     it 'renders the subject' do
       expect(mail.subject).to eq('New Completed Deletions')
@@ -595,8 +597,8 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.attachments.count).to eq(1)
       attachment = mail.attachments[0]
       attachment.should be_a_kind_of(Mail::Part)
-      attachment.content_type.should eq('application/gzip')
-      attachment.filename.should == 'deletions.tar.gz'
+      attachment.content_type.should eq('application/zip')
+      attachment.filename.should == 'deletions.zip'
     end
   end
 

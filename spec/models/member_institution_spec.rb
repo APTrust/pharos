@@ -181,10 +181,20 @@ RSpec.describe MemberInstitution, :type => :model do
       it 'should generate a csv file for new deletion work items' do
         item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, generic_file_identifier: file_one.identifier, institution_id: subject.id)
         item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
-        csv = subject.generate_deletion_csv([item_one, item_two])
-        expect(csv).to include('Generic File Identifier,Date Deleted,Requested By,Approved By,APTrust Approver')
-        expect(csv).to include("#{item_one.generic_file_identifier},#{item_one.date.to_s},#{item_one.user},NA,NA")
-        expect(csv).to include("#{item_two.generic_file_identifier},#{item_two.date.to_s},#{item_two.user},NA,NA")
+        subject.generate_deletion_csv([item_one, item_two])
+        inst_name = subject.name.split(' ').join('_')
+        csv = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}.csv")
+        line_one = false
+        line_two = false
+        line_three = false
+        File.open(csv, 'r').each do |line|
+          line_one = true if line.include?('Generic File Identifier,Date Deleted,Requested By,Approved By,APTrust Approver')
+          line_two = true if line.include?("#{item_one.generic_file_identifier},#{item_one.date.to_s},#{item_one.user},NA,NA")
+          line_three = true if line.include?("#{item_two.generic_file_identifier},#{item_two.date.to_s},#{item_two.user},NA,NA")
+        end
+        expect(line_one).to eq true
+        expect(line_two).to eq true
+        expect(line_three).to eq true
       end
     end
 
