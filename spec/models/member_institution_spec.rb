@@ -183,7 +183,7 @@ RSpec.describe MemberInstitution, :type => :model do
         item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
         subject.generate_deletion_csv([item_one, item_two])
         inst_name = subject.name.split(' ').join('_')
-        csv = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}.csv")
+        csv = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv")
         line_one = false
         line_two = false
         line_three = false
