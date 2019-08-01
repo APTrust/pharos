@@ -575,25 +575,29 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
     let(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
     let(:latest_email) { FactoryBot.create(:deletion_notification_email) }
-    let(:item_one) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one) }
-    let(:item_two) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two) }
+    let(:item_one) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, institution: institution) }
+    let(:item_two) { FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, institution: institution) }
     let(:zip) { institution.generate_deletion_zipped_csv([item_one, item_two]) }
     let(:mail) { described_class.deletion_notification(institution) }
 
     it 'renders the subject' do
+      zip.nil? #evaluate zip to force it to get made
       expect(mail.subject).to eq('New Completed Deletions')
     end
 
     it 'renders the receiver email' do
+      zip.nil? #evaluate zip to force it to get made
       user.institutional_admin? #including this because if the user isn't used somehow for spec to realize it exists.
       expect(mail.to).to include(user.email)
     end
 
     it 'renders the sender email' do
+      zip.nil? #evaluate zip to force it to get made
       expect(mail.from).to eq(['info@aptrust.org'])
     end
 
     it 'has a zip attachment' do
+      zip.nil? #evaluate zip to force it to get made
       expect(mail.attachments.count).to eq(1)
       attachment = mail.attachments[0]
       attachment.should be_a_kind_of(Mail::Part)
