@@ -157,9 +157,6 @@ RSpec.describe MemberInstitution, :type => :model do
       let!(:item) { FactoryBot.create(:intellectual_object, institution: subject) }
       after { item.destroy }
 
-      after do
-        Institution.remove_directory('test')
-      end
       it 'deleting should be blocked' do
         subject.destroy.should be false
         expect(Institution.exists?(subject.id)).to be true
@@ -171,6 +168,10 @@ RSpec.describe MemberInstitution, :type => :model do
       let!(:object_two) { FactoryBot.create(:intellectual_object, institution: subject) }
       let!(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
       let!(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+
+      after (:all) do
+        Institution.remove_directory('test')
+      end
 
       it 'should return a list of new deletion items' do
         latest_email = FactoryBot.create(:deletion_notification_email, institution_id: subject.id)
