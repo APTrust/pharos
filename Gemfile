@@ -62,6 +62,7 @@ group :test, :development do
   gem 'shoulda-matchers', '~> 4.1.1'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
+  gem 'mimemagic'
 end
 
 group :development, :test, :demo, :production, :integration do

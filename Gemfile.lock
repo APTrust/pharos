@@ -373,6 +373,7 @@ DEPENDENCIES
   jquery-ui-rails
   kaminari
   meta_request (= 0.7.0)
+  mimemagic
   pg (= 1.1.4)
   phony_rails
   puma (= 3.12.0)

@@ -580,6 +580,10 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:zip) { institution.generate_deletion_zipped_csv([item_one, item_two]) }
     let(:mail) { described_class.deletion_notification(institution) }
 
+    after do
+      Institution.remove_directory('test')
+    end
+
     it 'renders the subject' do
       zip.nil? #evaluate zip to force it to get made
       expect(mail.subject).to eq('New Completed Deletions')

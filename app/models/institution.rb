@@ -86,19 +86,19 @@ class Institution < ActiveRecord::Base
 
   def generate_deletion_csv(deletion_items)
     if Rails.env.production?
-      directory = './tmp/deletions_production'
+      env = 'production'
     elsif Rails.env.demo?
-      directory = './tmp/deletions_demo'
+      env = 'demo'
     else
-      directory = './tmp/deletions_test'
+      env = 'test'
     end
+    directory = "./tmp/deletions_#{env}"
     inst_name = deletion_items.first.institution.name.split(' ').join('_')
-    Dir.mkdir("#{directory}") unless File.exist?("#{directory}")
-    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}") unless File.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}")
-    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}") unless File.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}")
+    Dir.mkdir("#{directory}") unless Dir.exist?("#{directory}")
+    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}")
+    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}")
     attributes = ['Generic File Identifier', 'Date Deleted', 'Requested By', 'Approved By', 'APTrust Approver']
-    CSV.open("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'wb') do |csv|
-      csv << attributes
+    CSV.open("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'w', write_headers: true, headers: attributes) do |csv|
       deletion_items.each do |item|
         unless item.generic_file_identifier.nil?
           item.inst_approver.nil? ? inst_app = 'NA' : inst_app = item.inst_approver
@@ -108,7 +108,6 @@ class Institution < ActiveRecord::Base
         end
       end
     end
-
   end
 
   def generate_deletion_zipped_csv(deletion_items)
@@ -124,6 +123,15 @@ class Institution < ActiveRecord::Base
     output_file = "#{directory}/#{inst_name}.zip"
     zf = ZipFileGenerator.new(directory, output_file)
     zf.write()
+  end
+
+  def self.remove_directory(env)
+    if env == 'test'
+      directory = "./tmp/deletions_#{env}/#{Time.now.month}-#{Time.now.year}"
+    else
+      directory = "./tmp/deletions_#{env}/#{Time.now.month - 3.months}-#{Time.now.year}"
+    end
+    FileUtils.rm_rf(directory)
   end
 
   def generate_confirmation_csv(bulk_job)
