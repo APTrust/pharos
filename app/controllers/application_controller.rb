@@ -156,7 +156,7 @@ class ApplicationController < ActionController::Base
     time_period = ENV['PHAROS_2FA_GRACE_PERIOD'].to_i
     unless current_user.nil?
       date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
-      if date_dif <= time_period && date_dif > 0 && !current_user.confirmed_two_factor
+      if date_dif <= time_period && date_dif >= 0 && !current_user.confirmed_two_factor
         if Rails.env.test? || request.referrer.nil? || !request.referrer.include?('/users/sign_in')
           flash.clear
         else
