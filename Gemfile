@@ -31,7 +31,7 @@ gem 'google_drive'
 
 gem 'simple_form', '~> 4.1.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.10.0'
+gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
 gem 'kaminari'
 gem 'sassc-rails'
@@ -48,7 +48,7 @@ group :demo, :production do
 end
 
 group :development do
-  gem 'meta_request', '=0.7.0'
+  gem 'meta_request', '0.7.2'
   gem 'better_errors'
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 3.7.0'
@@ -58,8 +58,8 @@ group :development do
 end
 
 group :test, :development do
-  gem 'capybara', '3.27.0'
-  gem 'shoulda-matchers', '~> 4.1.1'
+  gem 'capybara', '3.28.0'
+  gem 'shoulda-matchers', '~> 4.1.2'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
   gem 'mimemagic'
