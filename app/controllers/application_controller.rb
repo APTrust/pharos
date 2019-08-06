@@ -129,7 +129,7 @@ class ApplicationController < ActionController::Base
       if current_user.required_to_use_twofa?
         if !current_user.enabled_two_factor
           date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
-          if (date_dif < 30) || (right_controller_and_id && right_action('twofa_enable'))
+          if (date_dif <= ENV['PHAROS_2FA_GRACE_PERIOD'].to_i) || (right_controller_and_id && right_action('twofa_enable'))
             return
           else
             msg = 'You are required to use two factor authentication, please enable it now.'
@@ -153,11 +153,14 @@ class ApplicationController < ActionController::Base
   end
 
   def set_grace_period_notice
+    time_period = ENV['PHAROS_2FA_GRACE_PERIOD'].to_i
     unless current_user.nil?
       date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
-      if date_dif < 30 && date_dif > 0 && !current_user.confirmed_two_factor
-        unless Rails.env.test? || request.referrer.nil?
-          flash[:notice] = "You have #{30 - date_dif} day(s) left to enable Two Factor Authentication before it will become mandatory. Please update your phone number to a valid textable and/or smartphone enabled number before then." if date_dif < 30 && request.referrer.include?('/users/sign_in')
+      if date_dif <= time_period && date_dif > 0 && !current_user.confirmed_two_factor
+        if Rails.env.test? || request.referrer.nil? || !request.referrer.include?('/users/sign_in')
+          flash.clear
+        else
+          flash[:notice] = "You have #{time_period - date_dif} day(s) left to enable Two Factor Authentication. Right now enabling Two Factor Authentication is optional, but after this grace period is over it will become mandatory. Please update your phone number to a valid mobile phone number and/or smartphone enabled number before enabling Two Factor Authentication, otherwise the process will not work as expected." if date_dif < time_period && request.referrer.include?('/users/sign_in')
         end
       end
     end

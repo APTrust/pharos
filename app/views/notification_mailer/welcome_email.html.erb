@@ -24,10 +24,14 @@ has to be least 10 characters long.</p>
 <% end %>
 
 <p>To enable two factor authentication, visit your user profile page
-(<%= @subject_url %>). Once you have enabled two factor authentication you will need
+(<%= @subject_url %>). Please note that before you attempt to enable two factor
+authentication you MUST have a mobile phone number registered on your account, otherwise
+the process will not work. Once you have enabled two factor authentication you will need
 to verify your phone number through a text message or push notification. Once that is
 done, two factor authentication setup is complete and you will be prompted to use it
-at every login.</p>
+at every login. There is a grace period between the creation of your account and the time
+when two factor authentication must be set up for mandatory users. For the Pharos production
+environment, that grace period is 30 days. For the demo environment it is 90 days.</p>
 
 <p>Pharos has an API that can be used to view Intellectual Objects, Generic Files,
 Premis Events, and Work Items. It can also be used to restore individual Intellectual
