@@ -16,7 +16,7 @@ describe 'Adding a new user' do
     click_link 'New User'
     fill_in 'Name', with: 'Sonja Something'
     fill_in 'Email', with: 'sonja@example.com'
-    fill_in 'Phone number', with: '7128582392'
+    fill_in 'Mobile Phone Number', with: '7128582392'
     select 'APTrust', from: 'Institution'
     choose 'Institutional Admin'
     fill_in 'Password', with: 'Password123'
