@@ -7,6 +7,11 @@ describe User do
   let(:inst_id) { subject.institution_id }
   let(:stale_user) { FactoryBot.create(:user, created_at: DateTime.now - 88.days) }
 
+  before :all do
+    User.delete_all
+    Institution.delete_all
+  end
+
   after :all do
     User.delete_all
     Institution.delete_all
@@ -145,16 +150,16 @@ describe User do
 
   describe 'stale_users' do
     it 'should retrieve a list of stale users' do
-      user.created_at = DateTime.now - 88.days
+      user.created_at = DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 15).days
       user.save!
-      inst_admin.created_at = DateTime.now - 88.days
+      inst_admin.created_at = DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 1).days
       inst_admin.save!
-      stale_user.created_at = DateTime.now - 100.days
+      stale_user.created_at = DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 1).days
       stale_user.save!
       users = User.stale_users
       users.count.should eq 2
-      users[0].should eq user
-      users[1].should eq inst_admin
+      users[0].should eq inst_admin
+      users[1].should eq stale_user
     end
   end
 

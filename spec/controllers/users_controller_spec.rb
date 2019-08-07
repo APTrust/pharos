@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe UsersController, type: :controller do
-  after do
+  after :all do
     User.delete_all
     Institution.delete_all
   end
@@ -276,7 +276,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it 'can send a stale user notification' do
-      stale_user.created_at = DateTime.now - 88.days
+      stale_user.created_at = DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 1).days
       stale_user.save!
       get :stale_user_notification, format: :html
       expect(response.status).to eq(302)
@@ -284,7 +284,7 @@ RSpec.describe UsersController, type: :controller do
       expect(email.body.encoded).to include('Here are the latest stale users')
       expect(email.body.encoded).to include(stale_user.name)
       expect(email.body.encoded).to include(stale_user.email)
-      expect(flash[:notice]).to eq 'The stale user notification email has been sent to Bradley.'
+      expect(flash[:notice]).to eq 'The stale user notification email has been sent to the team.'
     end
 
   end

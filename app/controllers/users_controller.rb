@@ -351,7 +351,7 @@ class UsersController < ApplicationController
     authorize current_user
     stale_users = User.stale_users
     NotificationMailer.stale_user_notification(stale_users).deliver! unless stale_users == []
-    msg = 'The stale user notification email has been sent to Bradley.'
+    msg = 'The stale user notification email has been sent to the team.'
     flash[:notice] = msg
     respond_to do |format|
       format.json { render json: { status: 'success', message: msg }, status: :ok }
