@@ -613,7 +613,6 @@ RSpec.describe NotificationMailer, type: :mailer do
 
     it 'renders the receiver email' do
       expect(mail.to).to include('team@aptrust.org')
-      expect(mail.to).to include('chip.german@aptrust.org')
     end
 
     it 'renders the sender email' do
@@ -722,7 +721,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the receiver email' do
-      expect(mail.to).to eq ['bradley.daigle@aptrust.org']
+      expect(mail.to).to eq ['team@aptrust.org']
     end
 
     it 'renders the sender email' do
