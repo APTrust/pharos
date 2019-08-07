@@ -149,13 +149,12 @@ describe User do
       user.save!
       inst_admin.created_at = DateTime.now - 88.days
       inst_admin.save!
-      stale_user.created_at = DateTime.now - 88.days
+      stale_user.created_at = DateTime.now - 100.days
       stale_user.save!
       users = User.stale_users
-      users.count.should eq 3
+      users.count.should eq 2
       users[0].should eq user
       users[1].should eq inst_admin
-      users[2].should eq stale_user
     end
   end
 

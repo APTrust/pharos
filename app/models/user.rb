@@ -90,7 +90,9 @@ class User < ActiveRecord::Base
   end
 
   def self.stale_users
-    users = User.where('created_at <= ?', DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 3).days)
+    users = User.where('created_at <= ? AND created_at >= ?',
+                       DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 3).days,
+                       DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i + 7).days, )
     stale_users = []
     users.each do |usr|
       items = WorkItem.where(user: usr.email)

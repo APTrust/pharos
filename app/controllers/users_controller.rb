@@ -350,7 +350,7 @@ class UsersController < ApplicationController
   def stale_user_notification
     authorize current_user
     stale_users = User.stale_users
-    NotificationMailer.stale_user_notification(stale_users).deliver!
+    NotificationMailer.stale_user_notification(stale_users).deliver! unless stale_users == []
     msg = 'The stale user notification email has been sent to Bradley.'
     flash[:notice] = msg
     respond_to do |format|
