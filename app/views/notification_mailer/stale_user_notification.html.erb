@@ -1,0 +1,28 @@
+<p>Bradley,</p>
+<br>
+<% if Rails.env.demo? %>
+    <p>Here are the latest stale users for the demo repository.</p>
+<% elsif Rails.env.production? %>
+    <p>Here are the latest stale users for the production repository.</p>
+<% else %>
+    <p>Here are the latest stale users.</p>
+<% end %>
+<br>
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |usr| %>
+        <tr>
+          <td><%= usr.name %></td>
+          <td><%= usr.email %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

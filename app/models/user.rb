@@ -89,11 +89,14 @@ class User < ActiveRecord::Base
     self.institution.otp_enabled || self.admin? || self.institutional_admin?
   end
 
-  def otp_qr_code
-    issuer = 'APTrust'
-    label = "#{issuer}:#{self.email}"
-    qrcode = RQRCode::QRCode.new(otp_provisioning_uri(label, issuer: issuer))
-    qrcode.as_svg(module_size: 4)
+  def self.stale_users
+    users = User.where('created_at <= ?', DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 3).days)
+    stale_users = []
+    users.each do |usr|
+      items = WorkItem.where(user: usr.email)
+      stale_users.push(usr) if items.count == 0
+    end
+    stale_users
   end
 
   def role_id

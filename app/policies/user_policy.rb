@@ -167,6 +167,10 @@ class UserPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
+  def stale_user_notification?
+    user.admin?
+  end
+
   def edit?
     update?
   end

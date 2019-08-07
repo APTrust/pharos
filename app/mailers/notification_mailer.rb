@@ -277,4 +277,10 @@ class NotificationMailer < ApplicationMailer
     mail(to: subject.email, subject: "#{prefix}Confirm Your Account")
   end
 
+  def stale_user_notification(users)
+    @users = users
+    Rails.env.production? ? prefix = '[APTrust Production] - ' : prefix = '[APTrust Demo] - '
+    mail(to: 'bradley.daigle@aptrust.org', subject: "#{prefix}Stale Users")
+  end
+
 end

@@ -634,7 +634,7 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.subject).to eq('[APTrust Demo] - Welcome to APTrust!')
     end
 
-    it 'renders the reciever email' do
+    it 'renders the receiver email' do
       expect(mail.to).to include(user.email)
     end
 
@@ -656,7 +656,7 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.subject).to eq('[APTrust Demo] - Verify Your Email')
     end
 
-    it 'renders the reciever email' do
+    it 'renders the receiver email' do
       expect(mail.to).to include(user.email)
     end
 
@@ -678,7 +678,7 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.subject).to eq('[APTrust Demo] - An Admin Has Reset Your Password')
     end
 
-    it 'renders the reciever email' do
+    it 'renders the receiver email' do
       expect(mail.to).to include(user.email)
     end
 
@@ -700,7 +700,7 @@ RSpec.describe NotificationMailer, type: :mailer do
       expect(mail.subject).to eq('[APTrust Demo] - Confirm Your Account')
     end
 
-    it 'renders the reciever email' do
+    it 'renders the receiver email' do
       expect(mail.to).to include(user.email)
     end
 
@@ -710,6 +710,28 @@ RSpec.describe NotificationMailer, type: :mailer do
 
     it 'assigns @confirmation_url' do
       expect(mail.body.encoded).to include("http://localhost:3000/users/#{user.id}/confirm_account?confirmation_token=#{token.token}")
+    end
+  end
+
+  describe 'stale_user_notification' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:mail) { described_class.stale_user_notification([user]).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq('[APTrust Demo] - Stale Users')
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to eq ['bradley.daigle@aptrust.org']
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'includes specific text about stale users' do
+      expect(mail.body.encoded).to include(user.name)
+      expect(mail.body.encoded).to include(user.email)
     end
   end
 end

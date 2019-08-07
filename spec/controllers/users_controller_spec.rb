@@ -9,6 +9,7 @@ RSpec.describe UsersController, type: :controller do
   describe 'An APTrust Administrator' do
     let(:admin_user) { FactoryBot.create(:user, :admin) }
     let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin)}
+    let(:stale_user) { FactoryBot.create(:user) }
 
     before do
       sign_in admin_user
@@ -105,7 +106,7 @@ RSpec.describe UsersController, type: :controller do
       expect(assigns[:user]).to eq institutional_admin
       expect(assigns[:user].password).not_to eq password
       email = ActionMailer::Base.deliveries.last
-      expect(email.body.encoded).to include("Your new password is ")
+      expect(email.body.encoded).to include('Your new password is ')
       expect(flash[:notice]).to eq "Password has been reset for #{institutional_admin.email}. They will be notified of their new password via email."
     end
 
@@ -272,6 +273,18 @@ RSpec.describe UsersController, type: :controller do
           response.should be_successful
         end
       end
+    end
+
+    it 'can send a stale user notification' do
+      stale_user.created_at = DateTime.now - 88.days
+      stale_user.save!
+      get :stale_user_notification, format: :html
+      expect(response.status).to eq(302)
+      email = ActionMailer::Base.deliveries.last
+      expect(email.body.encoded).to include('Here are the latest stale users')
+      expect(email.body.encoded).to include(stale_user.name)
+      expect(email.body.encoded).to include(stale_user.email)
+      expect(flash[:notice]).to eq 'The stale user notification email has been sent to Bradley.'
     end
 
   end
@@ -485,6 +498,11 @@ RSpec.describe UsersController, type: :controller do
       expect(response.status).to eq(403)
     end
 
+    it 'should not be able to send a stale user notification' do
+      get :stale_user_notification, format: :json
+      expect(response.status).to eq(403)
+    end
+
     it 'should not be able to perform yearly account confirmations' do
       get :account_confirmations, format: :json
       expect(response.status).to eq(403)
@@ -693,6 +711,11 @@ RSpec.describe UsersController, type: :controller do
 
     it 'should not be able to perform vacuum operations' do
       get :vacuum, params: { vacuum_target: 'snapshots' }, format: :json
+      expect(response.status).to eq(403)
+    end
+
+    it 'should not be able to send a stale user notification' do
+      get :stale_user_notification, format: :json
       expect(response.status).to eq(403)
     end
 

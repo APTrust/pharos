@@ -1,0 +1,13 @@
+Bradley,
+
+<% if Rails.env.demo? %>
+    Here are the latest stale users for the demo repository.
+<% elsif Rails.env.production? %>
+    Here are the latest stale users for the production repository.
+<% else %>
+    Here are the latest stale users.
+<% end %>
+
+<% @users.each do |usr| %>
+  <%= usr.name %> : <%= usr.email %>
+<% end %>

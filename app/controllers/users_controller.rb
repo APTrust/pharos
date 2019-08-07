@@ -347,6 +347,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def stale_user_notification
+    authorize current_user
+    stale_users = User.stale_users
+    NotificationMailer.stale_user_notification(stale_users).deliver!
+    msg = 'The stale user notification email has been sent to Bradley.'
+    flash[:notice] = msg
+    respond_to do |format|
+      format.json { render json: { status: 'success', message: msg }, status: :ok }
+      format.html {
+        request.env['HTTP_REFERER'].nil? ? (redirect_to root_path) : (redirect_to(request.env['HTTP_REFERER']))
+      }
+    end
+  end
+
   private
 
   # If an id is passed through params, use it.  Otherwise default to show the current user.

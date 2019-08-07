@@ -180,6 +180,8 @@ Rails.application.routes.draw do
   get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
+  get '/stale_users', to: 'users#stale_user_notification', format: [:json, :html], as: :stale_users
+  get '/api/v2/stale_users', to: 'users#stale_user_notification', format: [:json, :html], as: :api_stale_users
   get '/account_confirmations', to: 'users#account_confirmations', format: [:json, :html], as: :account_confirmations
   get '/api/v2/account_confirmations', to: 'users#account_confirmations', format: [:json, :html], as: :api_account_confirmations
   get '/users/:id/individual_account_confirmation', to: 'users#indiv_confirmation_email', format: [:json, :html], as: :indiv_confirmation_email
