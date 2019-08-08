@@ -1,7 +1,5 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
-ENV['PHAROS_2FA_GRACE_PERIOD']='90'
-ENV['TWO_FACTOR_KEY']='16ccccbe3b6784fdb5168f77a6fc27494016c55f6a5e2f3247fe54a635cb3c171d711c35f8877b5c70aa02fd80a830843ce214ef1f0762cf0ec2feb978d50a48'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
