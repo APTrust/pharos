@@ -44,7 +44,7 @@
                           :method => :get, class: 'btn btn-primary doc-action-btn' %>
         <% end %>
         <%= link_to 'Change Mobile Phone Number For Authy', "#", class: 'btn btn-normal doc-action-btn', data: {toggle: "modal", target: "#authy_phone_modal"} %>
-        <%= render 'phone_number_modal' %>
+        <%= render 'authy_phone_number_modal' %>
     <% else %>
         <h5>Status: Mobile Phone Number Needs Verification</h5>
         <p>If you reached this point and previously forgot to use or update your phone number to a mobile phone number, you will need your institutional administrator
@@ -82,8 +82,8 @@
 <% else %>
     <h5>Status: Not Enabled</h5>
     <p>Please ensure you have an accurate phone number listed in your profile before you enable two factor authentication. </p>
-    <%= button_to "Enable 2FA", users_enable_otp_path(@user.id),
-                  :method => :get, class: 'btn btn-success doc-action-btn' %>
+    <%= link_to 'Enable 2FA', "#", class: 'btn btn-success doc-action-btn', data: {toggle: "modal", target: "#enable_phone_modal"} %>
+    <%= render 'enable_phone_number_modal' %>
 <% end %>
 
 <div>

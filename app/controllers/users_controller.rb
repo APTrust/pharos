@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
                                   :vacuum, :enable_otp, :disable_otp, :register_authy_user, :verify_twofa, :generate_backup_codes,
                                   :verify_email, :email_confirmation, :forced_password_update, :indiv_confirmation_email, :confirm_account,
-                                  :change_authy_phone_number]
+                                  :change_authy_phone_number, :update_phone_number]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -82,22 +82,32 @@ class UsersController < ApplicationController
 
   def enable_otp
     authorize @user
-    unless Rails.env.test?
-      authy = generate_authy_account(@user) if (@user.authy_id.nil? || @user.authy_id == '')
-    end
-    if authy && !authy['errors'].nil? && !authy['errors'].empty?
-      logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
-      msg = 'An error occurred while trying to enable Two Factor Authentication.'
+    if params[:user][:phone_number].nil? || params[:user][:phone_number] == ''
+      msg = 'You must have a phone number listed in order to enable Two Factor Authentication.'
       flash[:error] = msg
+      respond_to do |format|
+        format.json { render json: { user: @user, message: msg } }
+        format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (redirect_to @user) }
+      end
     else
-      @codes = update_enable_otp_attributes(@user)
-      (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
-      msg = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{@user.authy_id}."
-      flash[:notice] = msg
-    end
-    respond_to do |format|
-      format.json { render json: { user: @user, codes: @codes, message: msg } }
-      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (render 'show') }
+      update_phone_number(@user)
+      unless Rails.env.test?
+        authy = generate_authy_account(@user) if (@user.authy_id.nil? || @user.authy_id == '')
+      end
+      if authy && !authy['errors'].nil? && !authy['errors'].empty?
+        logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
+        msg = 'An error occurred while trying to enable Two Factor Authentication.'
+        flash[:error] = msg
+      else
+        @codes = update_enable_otp_attributes(@user)
+        (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
+        msg = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{@user.authy_id}."
+        flash[:notice] = msg
+      end
+      respond_to do |format|
+        format.json { render json: { user: @user, codes: @codes, message: msg } }
+        format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (redirect_to @user) }
+      end
     end
   end
 
