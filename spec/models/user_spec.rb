@@ -17,6 +17,9 @@ describe User do
     Institution.delete_all
   end
 
+  it { should validate_presence_of(:email) }
+  it { should validate_presence_of(:name) }
+
   # it_behaves_like "two_factor_authenticatable"
   # it_behaves_like "two_factor_backupable"
 

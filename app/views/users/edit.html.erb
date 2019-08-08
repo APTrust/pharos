@@ -11,6 +11,9 @@
       <%= f.input :name, autofocus: true %>
       <%= f.input :email %>
       <%= f.input :phone_number, label: 'Mobile Phone Number' %>
+      <p>This phone number will be required for Two Factor Authentication in the future, if you have not already reached the point
+      where Two Factor Authentication has become mandatory. Please make sure it is a phone number that can receive SMS messages
+      and/or Authy push notifications.</p>
 
       <% if current_user.admin?  %>
           <%= f.input :institution_id, collection: institutions_for_select, as: :select, label: 'Institution' %>

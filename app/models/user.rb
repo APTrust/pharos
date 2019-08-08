@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
 
   validates :email, presence: true, uniqueness: true
   validate :email_is_valid
-  validates :phone_number, presence: true
+  # validates :phone_number, presence: true
   validates :role_ids, presence: true
   validates :institution_id, presence: true
   validate :institution_id_points_at_institution
@@ -25,7 +25,6 @@ class User < ActiveRecord::Base
   phony_normalize :phone_number, :default_country_code => 'US'
   validates_plausible_phone :phone_number
   validate :init_grace_period, on: :create
-  #validate :phone_number_length
 
   # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
   scope :readable, ->(current_user) { where('(1=1)') }
