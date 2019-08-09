@@ -1,7 +1,16 @@
-defaultEntryPoints = ["http", "https"]
 
+defaultEntryPoints = ["http", "https"]
+logLevel = "WARNING"
 [web]
 address = ":8080"
+
+[retry]
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "aptrust.org"
+watch = true
+exposedByDefault = false
 
 [entryPoints]
 
@@ -17,11 +26,9 @@ address = ":443"
 
 [acme]
 email = "christian.dahlhausen@aptrust.org"
-caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 storage = "acme.json"
 entryPoint = "https"
-onDemand = true
-OnHostRule = false
+onHostRule = true
 
 [acme.httpChallenge]
   entryPoint = "http"
