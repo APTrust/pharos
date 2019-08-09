@@ -48,6 +48,9 @@ down: ## Stop containers for Pharos, Postgresql, Nginx
 run: ## Just run Pharos in foreground
 	docker run -p 9292:9292 $(TAG)
 
+runshell: ## Run Pharos container with interactive shell
+	docker run -it -p 9292:9292 $(TAG) bash
+
 runcmd: ## Start Pharos container, run command and exit.
 	docker run $(TAG) $(filter-out $@, $(MAKECMDGOALS))
 
