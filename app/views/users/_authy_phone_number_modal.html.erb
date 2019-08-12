@@ -11,8 +11,10 @@
         <p>This form will update the phone number in both your Pharos account and your Authy account.</p>
         <p>Please use a mobile phone number for Two Factor Authentication purposes or it will not work.</p>
         <%= simple_form_for(@user,  url: { action: :change_authy_phone_number, format: :html, id: @user.id}, html: {class: 'form-horizontal', method: :get}) do |f| %>
+            <%= devise_error_messages! %>
+
             <div class="form-inputs" id="authy-modal-form">
-              <%= f.input :phone_number %>
+              <%= f.input :phone_number, required: true %>
               <p>If you don't change this field, it will default to the current number in your account. </p>
             </div>
             <br>

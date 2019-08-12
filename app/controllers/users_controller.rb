@@ -85,29 +85,30 @@ class UsersController < ApplicationController
     if params[:user][:phone_number].nil? || params[:user][:phone_number] == ''
       msg = 'You must have a phone number listed in order to enable Two Factor Authentication.'
       flash[:error] = msg
-      respond_to do |format|
-        format.json { render json: { user: @user, message: msg } }
-        format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (redirect_to @user) }
-      end
     else
-      update_phone_number(@user)
-      unless Rails.env.test?
-        authy = generate_authy_account(@user) if (@user.authy_id.nil? || @user.authy_id == '')
-      end
-      if authy && !authy['errors'].nil? && !authy['errors'].empty?
-        logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
-        msg = 'An error occurred while trying to enable Two Factor Authentication.'
-        flash[:error] = msg
+      @user.phone_number = params[:user][:phone_number]
+      if @user.save
+        unless Rails.env.test?
+          authy = generate_authy_account(@user) if (@user.authy_id.nil? || @user.authy_id == '')
+        end
+        if authy && !authy['errors'].nil? && !authy['errors'].empty?
+          logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
+          msg = 'An error occurred while trying to enable Two Factor Authentication.'
+          flash[:error] = msg
+        else
+          @codes = update_enable_otp_attributes(@user)
+          (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
+          msg = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{@user.authy_id}."
+          flash[:notice] = msg
+        end
       else
-        @codes = update_enable_otp_attributes(@user)
-        (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
-        msg = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{@user.authy_id}."
-        flash[:notice] = msg
+        msg = "The phone number #{params[:user][:phone_number]} is invalid. Please try again."
+        flash[:error] = msg
       end
-      respond_to do |format|
-        format.json { render json: { user: @user, codes: @codes, message: msg } }
-        format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (redirect_to @user) }
-      end
+    end
+    respond_to do |format|
+      @codes ? format.json { render json: {user: @user, codes: @codes, message: msg} } : format.json { render json: {user: @user, message: msg} }
+      format.html { (params[:redirect_loc] && params[:redirect_loc] == 'index') ? (redirect_to users_path) : (redirect_to @user) }
     end
   end
 
@@ -163,24 +164,34 @@ class UsersController < ApplicationController
 
   def change_authy_phone_number
     authorize @user
-    update_phone_number(@user)
-    response = Authy::API.delete_user(id: @user.authy_id)
-    if response.ok?
-      @user.update(authy_id: nil)
-      second_response = generate_authy_account(@user)
-      if second_response.ok? && (second_response['errors'].nil? || second_response['errors'].empty?)
-        message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
-        flash[:notice] = message
-      else
-        logger.info "Re-Generate Authy Account Errors: #{second_response.errors.inspect}"
-        message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
-        + 'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
-        flash[:error] = message
-      end
+    if params[:user][:phone_number].nil? || params[:user][:phone_number] == ''
+      msg = 'You must have a phone number listed in order to change your number with Authy.'
+      flash[:error] = msg
     else
-      logger.info "Delete Authy Account Errors: #{response.errors.inspect}"
-      message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications until it has been properly updated. Please try again later.'
-      flash[:error] = message
+      @user.phone_number = params[:user][:phone_number]
+      if @user.save
+        response = Authy::API.delete_user(id: @user.authy_id)
+        if response.ok?
+          @user.update(authy_id: nil)
+          second_response = generate_authy_account(@user)
+          if second_response.ok? && (second_response['errors'].nil? || second_response['errors'].empty?)
+            message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
+            flash[:notice] = message
+          else
+            logger.info "Re-Generate Authy Account Errors: #{second_response.errors.inspect}"
+            message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
+            + 'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
+            flash[:error] = message
+          end
+        else
+          logger.info "Delete Authy Account Errors: #{response.errors.inspect}"
+          message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications until it has been properly updated. Please try again later.'
+          flash[:error] = message
+        end
+      else
+        msg = "The phone number #{params[:user][:phone_number]} is invalid. Please try again."
+        flash[:error] = msg
+      end
     end
     respond_to do |format|
       format.json { render json: { user: @user, message: message } }

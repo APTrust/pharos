@@ -12,14 +12,16 @@
                 <p>Please use a mobile phone number or enabling Two Factor Authentication will not work and you will need to contact
                 an APTrust administrator for help in continuing the process.</p>
                 <%= simple_form_for(@user,  url: { action: :enable_otp, format: :html, id: @user.id}, html: {class: 'form-horizontal', method: :get}) do |f| %>
-                <div class="form-inputs" id="enable-modal-form">
-                    <%= f.input :phone_number, label: 'Mobile Phone Number', include_blank: false, required: true %>
+                  <%= devise_error_messages! %>
+
+                  <div class="form-inputs" id="enable-modal-form">
+                    <%= f.input :phone_number, label: 'Mobile Phone Number', required: true  %>
                     <p>If you don't change this field, it will default to the current number in your account. If that number is not a
                     mobile number the Two Factor Authentication process will not work.</p>
                 </div>
                 <br>
                 <div class="form-actions">
-                    <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm') do %>
+                    <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm', id: 'enable-otp-form-submit') do %>
                         <i class="glyphicon glyphicon-check"></i> Submit
                     <% end %>
                     <%= link_to @user, class: 'btn doc-action-btn btn-warning btn-sm' do %>
