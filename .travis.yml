@@ -10,7 +10,7 @@ addons:
       - git
 before_script:
   - sudo service postgresql stop
-  - sudo cp .env.test .env
+    #  - sudo cp .env.test .env
   - env
   - export
 
