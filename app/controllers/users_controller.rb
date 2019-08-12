@@ -45,6 +45,27 @@ class UsersController < ApplicationController
   def update
     authorize @user
     update!
+    if params[:user][:phone_number] && (!@user.authy_id.nil? || !@user.authy_id == '')
+      response = Authy::API.delete_user(id: @user.authy_id)
+      if response.ok?
+        @user.update(authy_id: nil)
+        second_response = generate_authy_account(@user)
+        if second_response.ok? && (second_response['errors'].nil? || second_response['errors'].empty?)
+          message = ' The phone number for both this Pharos account and Authy account has been successfully updated.'
+          flash[:notice] += message
+        else
+          logger.info "Re-Generate Authy Account Errors: #{second_response.errors.inspect}"
+          message = 'The phone number associated with this Authy account was unable to be updated at this time.'
+          + 'Authy push notifications will not be able to be used until it has been properly updated.'
+          flash[:error] += message
+        end
+      else
+        logger.info "Delete Authy Account Errors: #{response.errors.inspect}"
+        message = 'The phone number associated with this Authy account was unable to be updated at this time.'
+        + 'Authy push notifications will not be able to be used until it has been properly updated.'
+        flash[:error] += message
+      end
+    end
   end
 
   def destroy
