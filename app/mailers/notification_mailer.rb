@@ -229,13 +229,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     inst_name = @subject.name.split(' ').join('_')
-    if Rails.env.production?
-      directory = "./tmp/deletions_production/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
-    elsif Rails.env.demo?
-      directory = "./tmp/deletions_demo/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
-    else
-      directory = "./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
-    end
+    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
     zip = File.read("#{directory}/#{inst_name}.zip")
     attachments['deletions.zip'] = { mime_type: 'application/zip', content: zip }
     mail(to: emails, subject: 'New Completed Deletions')

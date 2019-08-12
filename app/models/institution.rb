@@ -85,14 +85,7 @@ class Institution < ActiveRecord::Base
   end
 
   def generate_deletion_csv(deletion_items)
-    if Rails.env.production?
-      env = 'production'
-    elsif Rails.env.demo?
-      env = 'demo'
-    else
-      env = 'test'
-    end
-    directory = "./tmp/deletions_#{env}"
+    directory = "./tmp/deletions_#{Rails.env}"
     inst_name = deletion_items.first.institution.name.split(' ').join('_')
     Dir.mkdir("#{directory}") unless Dir.exist?("#{directory}")
     Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}")
@@ -112,13 +105,7 @@ class Institution < ActiveRecord::Base
 
   def generate_deletion_zipped_csv(deletion_items)
     inst_name = deletion_items.first.institution.name.split(' ').join('_')
-    if Rails.env.production?
-      directory = "./tmp/deletions_production/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
-    elsif Rails.env.demo?
-      directory = "./tmp/deletions_demo/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
-    else
-      directory = "./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
-    end
+    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
     csv = generate_deletion_csv(deletion_items)
     output_file = "#{directory}/#{inst_name}.zip"
     zf = ZipFileGenerator.new(directory, output_file)
