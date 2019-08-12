@@ -45,16 +45,16 @@ class ApplicationController < ActionController::Base
       redirect_to enter_backup_verification_path(id: current_user.id), flash: { alert: 'Please enter a backup code.' }
     elsif session[:two_factor_option] == 'Push Notification'
       one_touch = generate_one_touch('Request to Login to APTrust Repository Website')
-      if one_touch.ok? && (one_touch['errors'].nil? || one_touch['errors'].empty?)
-        check_one_touch(one_touch)
-      else
+      if !one_touch['errors'].nil? && !one_touch['errors'].empty?
         logger.info "Checking one touch contents: #{one_touch.inspect}"
         delete_session_variables
         sign_out(current_user)
         respond_to do |format|
           format.json { render json: { error: 'Create Push Error', message: one_touch.inspect }, status: :internal_server_error }
-          format.html { redirect_to new_user_session_path, flash: { error: "There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{one_touch[:errors][:message]}" } }
+          format.html { redirect_to new_user_session_path, flash: { error: "There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{one_touch['errors']['message']}" } }
         end
+      elsif one_touch.ok?
+        check_one_touch(one_touch)
       end
     elsif session[:two_factor_option] == 'Text Message'
       send_sms
@@ -64,7 +64,15 @@ class ApplicationController < ActionController::Base
 
   def one_touch_status
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
-    if status.ok? && (status['errors'].nil? || status['errors'].empty?)
+    if !status['errors'].nil? && !status['errors'].empty?
+      logger.info "Checking one touch contents: #{status.inspect}"
+      delete_session_variables
+      sign_out(current_user)
+      respond_to do |format|
+        format.json { render json: { error: 'One Touch Status Error' }, status: :internal_server_error }
+        format.html { redirect_to root_path, flash: { error: "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status['errors']['message']}" } }
+      end
+    elsif status.ok?
       if session[:one_touch_timeout] <= 0
         delete_session_variables
         sign_out(current_user)
@@ -80,14 +88,6 @@ class ApplicationController < ActionController::Base
         else
           recheck_one_touch_status
         end
-      end
-    else
-      logger.info "Checking one touch contents: #{status.inspect}"
-      delete_session_variables
-      sign_out(current_user)
-      respond_to do |format|
-        format.json { render json: { error: 'One Touch Status Error' }, status: :internal_server_error }
-        format.html { redirect_to root_path, flash: { error: "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status[:errors][:message]}" } }
       end
     end
   end

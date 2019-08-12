@@ -195,14 +195,14 @@ class UsersController < ApplicationController
         if response.ok?
           @user.update(authy_id: nil)
           second_response = generate_authy_account(@user)
-          if second_response.ok? && (second_response['errors'].nil? || second_response['errors'].empty?)
-            message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
-            flash[:notice] = message
-          else
+          if !second_response['errors'].nil? && !second_response['errors'].empty?
             logger.info "Re-Generate Authy Account Errors: #{second_response.errors.inspect}"
             message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
             + 'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
             flash[:error] = message
+          elsif second_response.ok?
+            message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
+            flash[:notice] = message
           end
         else
           logger.info "Delete Authy Account Errors: #{response.errors.inspect}"
@@ -234,14 +234,14 @@ class UsersController < ApplicationController
     authorize @user
     if params[:verification_option] == 'push'
       one_touch = generate_one_touch('Request to Verify Phone Number for APTrust Repository Website')
-      if one_touch.ok? && (one_touch['errors'].nil? || one_touch['errors'].empty?)
-        check_one_touch_verify(one_touch)
-      else
+      if !one_touch['errors'].nil? && !one_touch['errors'].empty?
         logger.info "Checking one touch contents: #{one_touch.inspect}"
         respond_to do |format|
           format.json { render json: { error: 'Create Push Error', message: one_touch.inspect }, status: :internal_server_error }
-          format.html { redirect_to @user, flash: { error: "There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help, and let them know that the error was: #{one_touch[:errors][:message]}" } }
+          format.html { redirect_to @user, flash: { error: "There was an error creating your push notification. Please contact your administrator or an APTrust administrator for help, and let them know that the error was: #{one_touch['errors']['message']}" } }
         end
+      elsif one_touch.ok?
+        check_one_touch_verify(one_touch)
       end
     elsif params[:verification_option] == 'sms'
       send_sms
@@ -503,7 +503,15 @@ class UsersController < ApplicationController
   def one_touch_status_for_users
     @user = current_user
     status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
-    if status.ok? && (status['errors'].nil? || status['errors'].empty?)
+    if !status['errors'].nil? && !status['errors'].empty?
+      logger.info "Checking one touch contents: #{status.inspect}"
+      msg = "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status['errors']['message']}."
+      flash[:error] = msg
+      respond_to do |format|
+        format.json { render json: { message: msg }, status: :internal_server_error }
+        format.html { redirect_to @user }
+      end
+    elsif status.ok?
       if session[:verify_timeout] <= 0
         msg = 'This push notification has expired'
         flash[:error] = msg
@@ -530,14 +538,6 @@ class UsersController < ApplicationController
         else
           recheck_one_touch_status_user
         end
-      end
-    else
-      logger.info "Checking one touch contents: #{status.inspect}"
-      msg = "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status[:errors][:message]}."
-      flash[:error] = msg
-      respond_to do |format|
-        format.json { render json: { message: msg }, status: :internal_server_error }
-        format.html { redirect_to @user }
       end
     end
   end
