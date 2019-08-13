@@ -1,69 +1,78 @@
-# This is the development version.
-# Which docker-compose defaults to if no param is given.
-# https://wiki.ssdt-ohio.org/display/rtd/Using+nginx-proxy
 version: '3'
 services:
   db:
     image: postgres:9.6.6-alpine
-    environment:
-      POSTGRES_USER: pharos
-      POSTGRES_DB: pharos
+    restart: always
+    env_file:
+      - ".env"
     volumes:
-      - ./docker/pharos-postgres:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+      - ${DOCKERAPP_DATA_PATH:-./docker}/pgdata:/pgdata
     ports:
       - '5432:5432'
   pharos:
-    image: registry.gitlab.com/aptrust/container-registry/pharos
-    environment:
-      - DOCKERIZED=true
-    #TODO: Change to development after updating databse settings for development
-      - RAILS_ENV=${RAILS_ENV:-demo}
-      - ENVIRONMENT=demo
-      - PHAROS_DB_HOST=db
-      - PHAROS_DB_USER='pharos'
-#      PHAROS_DB_PWD: 'password'
-      - SECRET_KEY_BASE= '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
-      - VIRTUAL_HOST=pharos.localhost
-      - VIRTUAL_PORT=9292
-# TODO: -e demo needs fixing. doesn't read env vars in command line here. maybe dockfile cmd needs env var as entrypoint?
-    command: bundle exec puma -p9292 -e $RAILS_ENV
-    #@expose:
-    #  - 9292
-    labels:
-      - VIRTUAL_HOST=pharos.localhost
-      - VIRTUAL_PORT=9292
+    image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
+    restart: always
+    command: bundle exec puma -w3 -p9292 -e ${RAILS_ENV}
     volumes:
-      - .:/pharos
+      - assets:/pharos/public
+      - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
     depends_on:
       - db
       - migration
-      - nginx-proxy
     ports:
       - "9292:9292"
+    env_file:
+      - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
   migration:
-    image: aptrust/pharos
+    image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
     command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
-    environment:
-      DOCKERIZED: 'true'
-      RAILS_ENV: 'demo'
-      PHAROS_DB_HOST: 'db'
-      PHAROS_DB_USER: 'pharos'
-    #    PHAROS_DB_PWD: 'password'
-      SECRET_KEY_BASE: '74455f96b7e2ed8c5a798d9d302eded8f82327de69ee094e479b73318dce4dcc62f5cccd7ac285fe9a39fdd9e7658b54e35971eb630bf8695e6c3d47da265412'
-    volumes:
-      - .:/pharos
+    env_file:
+      - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
     depends_on:
       - db
-  nginx-proxy:
-    image: jwilder/nginx-proxy:alpine
+  nginx-proxy-pharos:
+    image: registry.gitlab.com/aptrust/container-registry/nginx-proxy-pharos:${DOCKER_TAG_NAME:-latest}
+    restart: always
+    container_name: nginx-proxy-pharos
     ports:
       - "80:80"
       - "443:443"
+#    environment:
+#      - DEFAULT_HOST=docker1.aptrust.org
+#      - DHPARAM_GENERATION=false
     volumes:
-      -  /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./docker/nginx-proxy/certs:/etc/nginx/certs:ro
-      - ./docker/nginx-proxy/vhost:/etc/nginx/vhost.d
-      - ./docker/nginx-proxy/public:/etc/share/nginx/html
-      - ./public:/etc/share/nginx/html/pharos
-      - ./docker/pharos.localhost:/etc/nginx/vhost.d/pharos.localhost
+      - /var/run/docker.sock:/tmp/docker.sock
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/certs:/etc/nginx/certs:ro
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
+      - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/vhost.d:/etc/nginx/vhost.d
+      - assets:/etc/share/nginx/html/pharos
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    depends_on:
+      - nginx-proxy-pharos
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy-pharos
+      - DEBUG=false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - assets:/usr/share/nginx/html/pharos:rw
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/certs:/etc/nginx/certs:rw
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/vhost.d:/etc/nginx/vhost.d:rw
+volumes:
+  pgdata:
+  assets:
