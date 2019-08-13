@@ -28,9 +28,9 @@
 <hr />
 
 <% unless @user.email_verified %>
-  <%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
-                      :method => :get, class: 'btn btn-normal doc-action-btn' %>
-  <br />
+    <%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
+                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
+    <br />
 <% end %>
 
 <h4>Two Factor Authentication</h4>
@@ -38,18 +38,21 @@
     <% if @user.confirmed_two_factor %>
         <h5>Status: Enabled</h5>
         <%= link_to 'Disable 2FA', users_disable_otp_path(@user.id), id: 'disable_twofa',
-                      :method => :get, class: 'btn btn-warning doc-action-btn' %>
+                    :method => :get, class: 'btn btn-warning doc-action-btn' %>
         <% if (current_user.authy_id.nil? || current_user.authy_id == '') %>
             <%= link_to 'Register w/Authy', users_register_for_authy_path(@user.id), id: 'register_with_authy',
-                          :method => :get, class: 'btn btn-primary doc-action-btn' %>
+                        :method => :get, class: 'btn btn-primary doc-action-btn' %>
         <% end %>
         <%= link_to 'Change Mobile Phone Number For Authy', "#", class: 'btn btn-normal doc-action-btn', data: {toggle: "modal", target: "#authy_phone_modal"} %>
         <%= render 'authy_phone_number_modal' %>
+        <% if @user.errors.any? %>
+            <script>$('#authy_phone_modal').modal('show');</script>
+        <% end %>
     <% else %>
         <h5>Status: Mobile Phone Number Needs Verification</h5>
         <p>If the phone number in your user profile is not able to receive text messages or push notifications you will need your
-        institutional administrator or an APTrust administrator to change the number to one capable of receiving text messages.
-        After that has been done, you can continue with the phone number verification process. </p>
+          institutional administrator or an APTrust administrator to change the number to one capable of receiving text messages.
+          After that has been done, you can continue with the phone number verification process. </p>
         <%= link_to 'Verify Phone Number via SMS', users_verify_twofa_path(@user.id, verification_option: 'sms'),
                     class: 'btn btn-normal doc-action-btn' %>
         <br />
@@ -83,6 +86,9 @@
     <p>Please ensure you have an accurate phone number listed in your profile before you enable two factor authentication. </p>
     <%= link_to 'Enable 2FA', "#", class: 'btn btn-success doc-action-btn', data: {toggle: "modal", target: "#enable_phone_modal"} %>
     <%= render 'enable_phone_number_modal' %>
+    <% if @user.errors.any? %>
+        <script>$('#enable_phone_modal').modal('show');</script>
+    <% end %>
 <% end %>
 
 <div>

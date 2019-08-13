@@ -35,6 +35,9 @@
         <% else %>
             <td><%= link_to 'Enable 2FA', "#", class: 'btn btn-success doc-action-btn', data: {toggle: "modal", target: "#enable_phone_modal_#{user.id}"} %></td>
             <%= render 'enable_phone_number_index_modal', user: user %>
+            <% if user.errors.any? %>
+                <script>$('#enable_phone_modal_<%= user.id %>').modal('show');</script>
+            <% end %>
         <% end %>
         <td><%= destroy_link user %></td>
       </tr>

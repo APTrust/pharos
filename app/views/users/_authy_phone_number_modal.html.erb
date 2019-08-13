@@ -10,22 +10,41 @@
       <div class="modal-body">
         <p>This form will update the phone number in both your Pharos account and your Authy account.</p>
         <p>Please use a mobile phone number for Two Factor Authentication purposes or it will not work.</p>
-        <%= simple_form_for(@user,  url: { action: :change_authy_phone_number, format: :html, id: @user.id}, html: {class: 'form-horizontal', method: :get}) do |f| %>
-            <%= devise_error_messages! %>
+        <% if request.original_url.include?("#{@user.id}/change_authy_phone_number") %>
+            <% url = 'change_authy_phone_number' %>
+        <% else %>
+            <% url = "#{@user.id}/change_authy_phone_number" %>
+        <% end %>
+        <%= form_tag(url, method: :get) do %>
+            <% if @user.errors.any? %>
+                <div id="error_explanation">
+                  <p class="alert">Please review the problems below:</p>
+                </div>
+            <% end %>
 
-            <div class="form-inputs" id="authy-modal-form">
-              <%= f.input :phone_number, required: true %>
+            <div class="field">
+              <%= label_tag "phone_number", "Mobile Phone Number" %>
+              <br>
               <p>If you don't change this field, it will default to the current number in your account. </p>
+              <% if params[:phone_number] %>
+                  <%= text_field_tag "phone_number", params[:phone_number] %>
+              <% else %>
+                  <%= text_field_tag "phone_number", @user.phone_number %>
+              <% end %>
+              <% if @user.errors[:phone_number].any?  %>
+                  <br>
+                  <% @user.errors.full_messages.each do |message| %>
+                      <span class="alert"><%= message %></span>
+                  <% end %>
+              <% end %>
             </div>
             <br>
-            <div class="form-actions">
-              <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm') do %>
-                  <i class="glyphicon glyphicon-check"></i> Submit
-              <% end %>
-              <%= link_to @user, class: 'btn doc-action-btn btn-warning btn-sm' do %>
-                  <i class="glyphicon glyphicon-remove"></i> Cancel
-              <% end %>
-            </div>
+            <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm', id: 'enable-otp-form-submit') do %>
+                <i class="glyphicon glyphicon-check"></i> Submit
+            <% end %>
+            <%= link_to @user, class: 'btn doc-action-btn btn-warning btn-sm' do %>
+                <i class="glyphicon glyphicon-remove"></i> Cancel
+            <% end %>
         <% end %>
       </div>
     </div>

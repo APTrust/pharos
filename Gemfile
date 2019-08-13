@@ -25,6 +25,7 @@ gem 'aws-sdk-sns'
 gem 'devise-authy'
 gem 'rake'
 gem 'email_validator'
+gem 'phonelib'
 
 # Used to generate PDFs for reports
 gem 'wicked_pdf'
