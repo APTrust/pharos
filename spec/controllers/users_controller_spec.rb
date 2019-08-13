@@ -130,7 +130,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for myself should succeed' do
         admin_user.enabled_two_factor = false
         admin_user.save!
-        get :enable_otp, params: { id: admin_user.id }, format: :json
+        get :enable_otp, params: { id: admin_user.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
@@ -139,7 +139,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user at my institution should succeed' do
         user_at_institution.enabled_two_factor = false
         user_at_institution.save!
-        get :enable_otp, params: { id: user_at_institution.id }, format: :json
+        get :enable_otp, params: { id: user_at_institution.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
@@ -148,7 +148,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user not at my institution should succeed' do
         user_of_different_institution.enabled_two_factor = false
         user_of_different_institution.save!
-        get :enable_otp, params: { id: user_of_different_institution.id }, format: :json
+        get :enable_otp, params: { id: user_of_different_institution.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
@@ -531,7 +531,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for myself should succeed' do
         institutional_admin.enabled_two_factor = false
         institutional_admin.save!
-        get :enable_otp, params: { id: institutional_admin.id }, format: :json
+        get :enable_otp, params: { id: institutional_admin.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
@@ -540,7 +540,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user at my institution should succeed' do
         user_at_institution.enabled_two_factor = false
         user_at_institution.save!
-        get :enable_otp, params: { id: user_at_institution.id }, format: :json
+        get :enable_otp, params: { id: user_at_institution.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
@@ -549,7 +549,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user not at my institution should not succeed' do
         user_of_different_institution.enabled_two_factor = false
         user_of_different_institution.save!
-        get :enable_otp, params: { id: user_of_different_institution.id }, format: :json
+        get :enable_otp, params: { id: user_of_different_institution.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(403)
       end
     end
@@ -764,7 +764,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for myself should succeed' do
         user.enabled_two_factor = false
         user.save!
-        get :enable_otp, params: { id: user.id }, format: :json
+        get :enable_otp, params: { id: user.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(200)
         expect(assigns[:user].enabled_two_factor).to eq true
         expect(assigns[:codes]).not_to be_nil
@@ -773,7 +773,7 @@ RSpec.describe UsersController, type: :controller do
       it 'for another user should not succeed' do
         other_user.enabled_two_factor = false
         other_user.save!
-        get :enable_otp, params: { id: other_user.id }, format: :json
+        get :enable_otp, params: { id: other_user.id, user: { phone_number: '8055559014' } }, format: :json
         expect(response.status).to eq(403)
       end
     end

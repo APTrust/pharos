@@ -33,7 +33,8 @@
         <% if user.enabled_two_factor %>
             <td><%= disable_otp_link user %></td>
         <% else %>
-            <td><%= enable_otp_link user %></td>
+            <td><%= link_to 'Enable 2FA', "#", class: 'btn btn-success doc-action-btn', data: {toggle: "modal", target: "#enable_phone_modal_#{user.id}"} %></td>
+            <%= render 'enable_phone_number_index_modal', user: user %>
         <% end %>
         <td><%= destroy_link user %></td>
       </tr>
