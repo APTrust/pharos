@@ -11,13 +11,13 @@
         <p>This form will update the phone number in both your Pharos account for Two Factor Authentication purposes.</p>
         <p>Please use a mobile phone number or enabling Two Factor Authentication will not work and you will need to contact
           an APTrust administrator for help in continuing the process.</p>
-        <% if request.original_url.include?("#{user.id}/enable_otp") %>
+        <% if request.original_url.include?("users/#{user.id}/enable_otp") %>
             <% url = 'enable_otp' %>
         <% else %>
-            <% url = "#{user.id}/enable_otp" %>
+            <% url = "users/#{user.id}/enable_otp" %>
         <% end %>
-        <%= form_tag("users/#{user.id}/enable_otp", method: :get) do %>
-            <% if user.errors.any? %>
+        <%= form_tag(url, method: :get) do %>
+            <% if @user && @user.errors.any? %>
                 <div id="error_explanation">
                   <p class="alert">Please review the problems below:</p>
                 </div>
@@ -32,9 +32,9 @@
               <% else %>
                   <%= text_field_tag 'phone_number', user.phone_number %>
               <% end %>
-              <% if user.errors[:phone_number].any?  %>
+              <% if @user && @user.errors[:phone_number].any?  %>
                   <br>
-                  <% user.errors.full_messages.each do |message| %>
+                  <% @user.errors.full_messages.each do |message| %>
                       <span class="alert"><%= message %></span>
                   <% end %>
               <% end %>

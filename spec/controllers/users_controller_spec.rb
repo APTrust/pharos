@@ -668,7 +668,7 @@ RSpec.describe UsersController, type: :controller do
         get :forced_password_update, params: { id: user_at_institution.id }
         expect(response.status).to eq(302)
         expect(assigns[:user].force_password_update).to eq true
-        expect(flash[:notice]).to eq 'This user will be forced to change their password upon next login.'
+        expect(flash[:notice]).to eq "#{assigns[:user].name} will be forced to change their password upon next login."
       end
 
       it 'at another institution should not succeed' do

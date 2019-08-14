@@ -95,9 +95,10 @@ class UsersController < ApplicationController
     authorize @user
     @user.force_password_update = true
     @user.save!
+    msg = "#{@user.name} will be forced to change their password upon next login."
     respond_to do |format|
-      format.json { render json: { message: 'This user will be forced to change their password upon next login.' }, status: :ok }
-      format.html { redirect_to @user, flash: { notice: 'This user will be forced to change their password upon next login.' } }
+      format.json { render json: { message: msg }, status: :ok }
+      format.html { redirect_to @user, flash: { notice: msg } }
     end
   end
 
@@ -124,7 +125,7 @@ class UsersController < ApplicationController
         flash[:error] = msg
       else
         @codes = update_enable_otp_attributes(@user)
-        (current_user == @user) ? usr = ' for your account' : usr = ' for this user'
+        (current_user == @user) ? usr = ' for your account' : usr = " for #{@user.name}"
         msg = "Two Factor Authentication has been enabled#{usr}. Authy ID is #{@user.authy_id}."
         flash[:notice] = msg
       end
@@ -146,7 +147,7 @@ class UsersController < ApplicationController
     authorize @user
     if current_user_is_an_admin
       if current_user == @user || user_is_an_admin(@user)
-        (current_user == @user) ? msg_opt = 'you based on your role as an administrator' : msg_opt = 'this user based on their role as an administrator'
+        (current_user == @user) ? msg_opt = 'you based on your role as an administrator' : msg_opt = "#{@user.name} based on their role as an administrator"
         msg = "Two Factor Authentication cannot be disabled at this time because it is required for #{msg_opt}."
         flash[:alert] = msg
       elsif user_inst_requires_twofa(@user)
@@ -154,7 +155,7 @@ class UsersController < ApplicationController
         flash[:alert] = msg
       else
         disable_twofa(@user)
-        msg = 'Two Factor Authentication has been disabled for this user.'
+        msg = "Two Factor Authentication has been disabled for #{@user.name}."
         flash[:notice] = msg
       end
     else

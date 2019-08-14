@@ -22,4 +22,9 @@ module UsersHelper
       ''
     end
   end
+
+  def persist_errors(user)
+    user.errors.add(:phone_number, @user.errors.messages[:phone_number][0]) if @user && @user.errors.any? && user.id == @user.id
+    user
+  end
 end
