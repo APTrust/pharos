@@ -105,6 +105,7 @@ class UsersController < ApplicationController
   def enable_otp
     authorize @user
     flash.clear
+    params[:phone_number] = @user.phone_number if params[:phone_number].nil?
     if params[:phone_number].nil? || params[:phone_number] == ''
       msg = 'You must have a phone number listed in order to enable Two Factor Authentication.'
       flash[:error] = msg
@@ -135,7 +136,11 @@ class UsersController < ApplicationController
       format.html {
         if params[:redirect_loc] && params[:redirect_loc] == 'index'
           @users = policy_scope(User)
-          render 'index'
+          if msg.include?('Authy ID is')
+            redirect_to users_path
+          else
+            render 'index'
+          end
         else
           render 'show'
         end

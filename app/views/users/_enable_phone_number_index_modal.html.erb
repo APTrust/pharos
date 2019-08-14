@@ -11,7 +11,8 @@
         <p>This form will update the phone number in both your Pharos account for Two Factor Authentication purposes.</p>
         <p>Please use a mobile phone number or enabling Two Factor Authentication will not work and you will need to contact
           an APTrust administrator for help in continuing the process.</p>
-        <% if request.original_url.include?("users/#{user.id}/enable_otp") %>
+        <% if request.original_url.include?('users/') %>
+            <% params[:id] = user.id %>
             <% url = 'enable_otp' %>
         <% else %>
             <% url = "users/#{user.id}/enable_otp" %>
@@ -44,7 +45,7 @@
             <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm', id: 'enable-otp-form-submit') do %>
                 <i class="glyphicon glyphicon-check"></i> Submit
             <% end %>
-            <%= link_to users_path, class: 'btn doc-action-btn btn-warning btn-sm' do %>
+            <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-warning btn-sm', 'data-dismiss' => 'modal' ) do %>
                 <i class="glyphicon glyphicon-remove"></i> Cancel
             <% end %>
         <% end %>

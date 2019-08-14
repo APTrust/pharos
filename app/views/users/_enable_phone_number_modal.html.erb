@@ -44,7 +44,7 @@
                   <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm', id: 'enable-otp-form-submit') do %>
                       <i class="glyphicon glyphicon-check"></i> Submit
                   <% end %>
-                  <%= link_to @user, class: 'btn doc-action-btn btn-warning btn-sm' do %>
+                  <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-warning btn-sm', 'data-dismiss' => 'modal' ) do %>
                       <i class="glyphicon glyphicon-remove"></i> Cancel
                   <% end %>
                 <% end %>
