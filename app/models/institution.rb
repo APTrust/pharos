@@ -17,7 +17,8 @@ class Institution < ActiveRecord::Base
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
-  validate :identifier_is_unique
+  validate :domain_is_allowed
+  validates_uniqueness_of :identifier
 
   attr_readonly :identifier
 
@@ -336,21 +337,10 @@ class Institution < ActiveRecord::Base
     errors.add(:name, 'has already been taken') if Institution.where(name: self.name).reject{|r| r == self}.any?
   end
 
-  def identifier_is_unique
+  def domain_is_allowed
     return if self.identifier.nil?
-    count = 0;
-    insts = Institution.where(identifier: self.identifier)
-    count +=1 if insts.count == 1 && insts.first.id != self.id
-    count = insts.count if insts.count > 1
-    if(count > 0)
-      errors.add(:identifier, 'has already been taken')
-    end
-    unless self.identifier.include?('.')
-      errors.add(:identifier, 'must be a valid domain name')
-    end
-    unless self.identifier.include?('com') || self.identifier.include?('org') || self.identifier.include?('edu')
-      errors.add(:identifier, "must end in '.com', '.org', or '.edu'")
-    end
+    errors.add(:identifier, 'must be a valid domain name') unless self.identifier.include?('.')
+    errors.add(:identifier, "must end in '.com', '.org', '.edu', or .museum") unless Pharos::Application::VALID_DOMAINS.include?(self.identifier.split('.').last)
   end
 
   def sanitize_update_params
