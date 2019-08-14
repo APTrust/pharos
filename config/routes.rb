@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
 
   # INSTITUTION ROUTES
-  institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)/
+  institution_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)/
   resources :institutions, format: [:json, :html], param: :institution_identifier, institution_identifier: institution_ptrn
   resources :institutions, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'api/v2/institutions'
   get ':institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :institution_snapshot
@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   get 'institutions/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update
 
   # INTELLECTUAL OBJECT ROUTES
-  object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
+  object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
   resources :intellectual_objects, only: [:show, :edit, :update, :destroy], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'objects'
   get 'objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_restore
   get 'objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_send_to_dpn
@@ -49,7 +49,7 @@ Rails.application.routes.draw do
   get 'api/v2/objects/:intellectual_object_identifier/finish_delete', to: 'intellectual_objects#finished_destroy', format: :json, intellectual_object_identifier: object_ptrn, as: :get_api_object_finish_destroy
 
   # GENERIC FILE ROUTES
-  file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
+  file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :html }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :json }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
   get 'files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files

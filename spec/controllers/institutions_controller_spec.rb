@@ -357,7 +357,7 @@ RSpec.describe InstitutionsController, type: :controller do
       before do
         sign_in institutional_admin
         session[:verified] = true
-        current_member.save! #needs to be instantiated before the test below
+        #current_member.save! #needs to be instantiated before the test below
       end
 
       it 'should be unauthorized for member institutions' do
@@ -369,6 +369,7 @@ RSpec.describe InstitutionsController, type: :controller do
       end
 
       it 'should be unauthorized for subscription institutions' do
+        current_member.save!
         expect {
           post :create, params: { institution: attributes2 }
         }.to_not change(Institution, :count)

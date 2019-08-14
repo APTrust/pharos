@@ -107,6 +107,8 @@ module Pharos
     APTRUST_NAME = 'APTrust'
     APTRUST_ID = 'aptrust.org'
 
+    VALID_DOMAINS = %w(com edu org museum)
+
     PARAMS_HASH = [:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
                    :file_association, :type, :state, :event_type, :outcome, :q, :search_field, :object_type,
                    :institution_identifier, :name_contains, :name_exact, :method, :bag_date, :name, :etag, :etag_contains,
