@@ -235,7 +235,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'assigns @confirmation_url' do
-      expect(mail.body.encoded).to include("http://localhost:3000/files/confirm_delete/#{CGI.escape(file.identifier)}?confirmation_token=#{token.token}&requesting_user_id=#{user.id}")
+      expect(mail.body.encoded).to include("http://localhost:3000/files/confirm_delete/#{CGI.escape(file.identifier)}?confirmation_token=#{token.token}&format=html&requesting_user_id=#{user.id}")
     end
 
     it 'has an email log with proper associations' do
