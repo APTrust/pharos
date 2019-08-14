@@ -89,10 +89,10 @@ class Institution < ActiveRecord::Base
     directory = "./tmp/deletions_#{Rails.env}"
     inst_name = deletion_items.first.institution.name.split(' ').join('_')
     Dir.mkdir("#{directory}") unless Dir.exist?("#{directory}")
-    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}")
-    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}")
+    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}")
+    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}")
     attributes = ['Generic File Identifier', 'Date Deleted', 'Requested By', 'Approved By', 'APTrust Approver']
-    CSV.open("#{directory}/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'w', write_headers: true, headers: attributes) do |csv|
+    CSV.open("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'w', write_headers: true, headers: attributes) do |csv|
       deletion_items.each do |item|
         unless item.generic_file_identifier.nil?
           item.inst_approver.nil? ? inst_app = 'NA' : inst_app = item.inst_approver
@@ -106,7 +106,7 @@ class Institution < ActiveRecord::Base
 
   def generate_deletion_zipped_csv(deletion_items)
     inst_name = deletion_items.first.institution.name.split(' ').join('_')
-    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
+    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
     csv = generate_deletion_csv(deletion_items)
     output_file = "#{directory}/#{inst_name}.zip"
     zf = ZipFileGenerator.new(directory, output_file)
@@ -115,9 +115,9 @@ class Institution < ActiveRecord::Base
 
   def self.remove_directory(env)
     if env == 'test'
-      directory = "./tmp/deletions_#{env}/#{Time.now.month}-#{Time.now.year}"
+      directory = "./tmp/deletions_#{env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}"
     else
-      directory = "./tmp/deletions_#{env}/#{Time.now.month - 3.months}-#{Time.now.year}"
+      directory = "./tmp/deletions_#{env}/#{Time.now.month - 3.months}-#{Time.now.day}-#{Time.now.year}"
     end
     FileUtils.rm_rf(directory)
   end

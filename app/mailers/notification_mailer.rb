@@ -229,7 +229,7 @@ class NotificationMailer < ApplicationMailer
     emails = []
     users.each { |user| emails.push(user.email) }
     inst_name = @subject.name.split(' ').join('_')
-    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
+    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
     zip = File.read("#{directory}/#{inst_name}.zip")
     attachments['deletions.zip'] = { mime_type: 'application/zip', content: zip }
     mail(to: emails, subject: 'New Completed Deletions')

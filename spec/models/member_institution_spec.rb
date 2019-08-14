@@ -189,8 +189,8 @@ RSpec.describe MemberInstitution, :type => :model do
         item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
         subject.generate_deletion_csv([item_one, item_two])
         inst_name = subject.name.split(' ').join('_')
-        csv = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'r')
-        File.dirname("./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv").should eq "./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
+        csv = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'r')
+        File.dirname("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv").should eq "./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
         # MimeMagic doesn't recognize text files and puts out nil instead, other ruby file mimetype matching gem is no longer maintained
         # mimetype = MimeMagic.by_magic(csv)
         # mimetype.should eq ('text/csv')
@@ -212,8 +212,8 @@ RSpec.describe MemberInstitution, :type => :model do
         item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
         subject.generate_deletion_zipped_csv([item_one, item_two])
         inst_name = subject.name.split(' ').join('_')
-        zip = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.zip")
-        File.dirname("./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}/#{inst_name}.zip").should eq "./tmp/deletions_test/#{Time.now.month}-#{Time.now.year}/#{inst_name}"
+        zip = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.zip")
+        File.dirname("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.zip").should eq "./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
         mimetype = MimeMagic.by_magic(zip)
         mimetype.should eq ('application/zip')
       end
