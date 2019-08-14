@@ -430,6 +430,8 @@ RSpec.describe GenericFilesController, type: :controller do
           expect(count_after).to eq count_before + 1
           email = ActionMailer::Base.deliveries.last
           expect(email.body.encoded).to include("http://localhost:3000/files/#{CGI.escape(file.identifier)}")
+          expect(email.body.encoded).to include("http://localhost:3000/files/confirm_delete/#{CGI.escape(file.identifier)}")
+          expect(email.body.encoded).to include("&format=html&requesting_user_id=#{user.id}")
           expect(email.body.encoded).to include('has requested the deletion')
           expect(file.confirmation_token.token).not_to be_nil
         end

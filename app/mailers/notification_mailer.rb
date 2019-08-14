@@ -90,7 +90,7 @@ class NotificationMailer < ApplicationMailer
       subject_line = @subject.identifier
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
-      @confirmation_url = file_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
+      @confirmation_url = file_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token, 'format' => 'html')
       subject_line = @subject.identifier
     end
     users = @subject_institution.deletion_admin_user(requesting_user)
