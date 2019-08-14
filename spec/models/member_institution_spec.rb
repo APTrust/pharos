@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'mimemagic'
 
 RSpec.describe MemberInstitution, :type => :model do
   before(:all) do
@@ -155,6 +156,7 @@ RSpec.describe MemberInstitution, :type => :model do
     describe 'with an associated intellectual object' do
       let!(:item) { FactoryBot.create(:intellectual_object, institution: subject) }
       after { item.destroy }
+
       it 'deleting should be blocked' do
         subject.destroy.should be false
         expect(Institution.exists?(subject.id)).to be true
@@ -166,6 +168,10 @@ RSpec.describe MemberInstitution, :type => :model do
       let!(:object_two) { FactoryBot.create(:intellectual_object, institution: subject) }
       let!(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
       let!(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+
+      after (:all) do
+        Institution.remove_directory('test')
+      end
 
       it 'should return a list of new deletion items' do
         latest_email = FactoryBot.create(:deletion_notification_email, institution_id: subject.id)
@@ -181,10 +187,35 @@ RSpec.describe MemberInstitution, :type => :model do
       it 'should generate a csv file for new deletion work items' do
         item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, generic_file_identifier: file_one.identifier, institution_id: subject.id)
         item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
-        csv = subject.generate_deletion_csv([item_one, item_two])
-        expect(csv).to include('Generic File Identifier,Date Deleted,Requested By,Approved By,APTrust Approver')
-        expect(csv).to include("#{item_one.generic_file_identifier},#{item_one.date.to_s},#{item_one.user},NA,NA")
-        expect(csv).to include("#{item_two.generic_file_identifier},#{item_two.date.to_s},#{item_two.user},NA,NA")
+        subject.generate_deletion_csv([item_one, item_two])
+        inst_name = subject.name.split(' ').join('_')
+        csv = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'r')
+        File.dirname("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv").should eq "./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
+        # MimeMagic doesn't recognize text files and puts out nil instead, other ruby file mimetype matching gem is no longer maintained
+        # mimetype = MimeMagic.by_magic(csv)
+        # mimetype.should eq ('text/csv')
+        line_one = false
+        line_two = false
+        line_three = false
+        csv.each do |line|
+          line_one = true if line.include?('Generic File Identifier,Date Deleted,Requested By,Approved By,APTrust Approver')
+          line_two = true if line.include?("#{item_one.generic_file_identifier},#{item_one.date.to_s},#{item_one.user},NA,NA")
+          line_three = true if line.include?("#{item_two.generic_file_identifier},#{item_two.date.to_s},#{item_two.user},NA,NA")
+        end
+        expect(line_one).to eq true
+        expect(line_two).to eq true
+        expect(line_three).to eq true
+      end
+
+      it 'should generate a zip file for new deletion work items' do
+        item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, generic_file_identifier: file_one.identifier, institution_id: subject.id)
+        item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, generic_file_identifier: file_two.identifier, institution_id: subject.id)
+        subject.generate_deletion_zipped_csv([item_one, item_two])
+        inst_name = subject.name.split(' ').join('_')
+        zip = File.open("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.zip")
+        File.dirname("./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.zip").should eq "./tmp/deletions_test/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
+        mimetype = MimeMagic.by_magic(zip)
+        mimetype.should eq ('application/zip')
       end
     end
 

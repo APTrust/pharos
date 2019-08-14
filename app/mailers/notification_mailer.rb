@@ -234,13 +234,16 @@ class NotificationMailer < ApplicationMailer
     mail(to: 'team@aptrust.org', subject: "#{prefix}New Snapshots")
   end
 
-  def deletion_notification(subject, zip)
+  def deletion_notification(subject)
     @subject = subject
     users = []
     @subject.admin_users.each { |user| users.push(user) }
     emails = []
     users.each { |user| emails.push(user.email) }
-    attachments['deletions.tar.gz'] = { mime_type: 'application/gzip', content: zip }
+    inst_name = @subject.name.split(' ').join('_')
+    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
+    zip = File.read("#{directory}/#{inst_name}.zip")
+    attachments['deletions.zip'] = { mime_type: 'application/zip', content: zip }
     Rails.env.production? ? prefix = '[APTrust Production] - ' : prefix = '[APTrust Demo] - '
     mail(to: emails, subject: "#{prefix}New Completed Deletions")
   end

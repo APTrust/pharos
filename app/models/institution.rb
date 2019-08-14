@@ -1,6 +1,8 @@
 class Institution < ActiveRecord::Base
   require 'csv'
   require 'zlib'
+  require 'rubygems'
+  require 'zip'
 
   self.primary_key = 'id'
   has_many :users
@@ -67,7 +69,7 @@ class Institution < ActiveRecord::Base
   def new_deletion_items
     latest_email = Email.where(institution_id: self.id, email_type: 'deletion_notifications').order(id: :asc).limit(1).first
     if latest_email.nil?
-      time = Time.now - 48.hours
+      time = Time.now - 1.month
       deletion_items = WorkItem.with_institution(self.id)
                            .created_after(time)
                            .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
@@ -84,9 +86,13 @@ class Institution < ActiveRecord::Base
   end
 
   def generate_deletion_csv(deletion_items)
+    directory = "./tmp/deletions_#{Rails.env}"
+    inst_name = deletion_items.first.institution.name.split(' ').join('_')
+    Dir.mkdir("#{directory}") unless Dir.exist?("#{directory}")
+    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}")
+    Dir.mkdir("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}") unless Dir.exist?("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}")
     attributes = ['Generic File Identifier', 'Date Deleted', 'Requested By', 'Approved By', 'APTrust Approver']
-    CSV.generate(headers: true) do |csv|
-      csv << attributes
+    CSV.open("#{directory}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}/#{inst_name}.csv", 'w', write_headers: true, headers: attributes) do |csv|
       deletion_items.each do |item|
         unless item.generic_file_identifier.nil?
           item.inst_approver.nil? ? inst_app = 'NA' : inst_app = item.inst_approver
@@ -99,8 +105,21 @@ class Institution < ActiveRecord::Base
   end
 
   def generate_deletion_zipped_csv(deletion_items)
+    inst_name = deletion_items.first.institution.name.split(' ').join('_')
+    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
     csv = generate_deletion_csv(deletion_items)
-    Zlib::Deflate.deflate(csv)
+    output_file = "#{directory}/#{inst_name}.zip"
+    zf = ZipFileGenerator.new(directory, output_file)
+    zf.write()
+  end
+
+  def self.remove_directory(env)
+    if env == 'test'
+      directory = "./tmp/deletions_#{env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}"
+    else
+      directory = "./tmp/deletions_#{env}/#{Time.now.month - 3.months}-#{Time.now.day}-#{Time.now.year}"
+    end
+    FileUtils.rm_rf(directory)
   end
 
   def generate_confirmation_csv(bulk_job)
