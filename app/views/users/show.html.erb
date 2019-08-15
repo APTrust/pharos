@@ -4,8 +4,8 @@
 <%= gravatar_for @user %>
 <address>
   <strong><%= @user.name %></strong> (<em><%= @user.institution.name %></em>)<br />
-  <a href="mailto:#"><%= @user.email %></a><br />
-  <abbr title="Phone">Mobile Phone Number: </abbr><%= @user.phone_number %><br /><br />
+  Email: <a href="mailto:#"><%= @user.email %></a><br />
+  Mobile Phone Number: <%= @user.phone_number %> <br /><br />
 </address>
 <%= edit_link(@user) %>
 <%= link_to 'Change Password', edit_password_user_path(@user), class: 'btn btn-normal doc-action-btn btn-sm' %>
