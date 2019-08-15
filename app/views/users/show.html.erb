@@ -9,6 +9,12 @@
 </address>
 <%= edit_link(@user) %>
 <%= link_to 'Change Password', edit_password_user_path(@user), class: 'btn btn-normal doc-action-btn btn-sm' %>
+<%= link_to 'Change Mobile Phone Number', "#", class: 'btn btn-normal doc-action-btn btn-sm', data: {toggle: "modal", target: "#authy_phone_modal"} %>
+<%= render 'authy_phone_number_modal' %>
+<% if @user.errors.any? %>
+   <script>$('#authy_phone_modal').modal('show');</script>
+<% end %>
+
 <% if current_user.admin? || current_user.institutional_admin? %>
     <%= link_to 'Force Password Update', user_forced_password_update_path(@user), class: 'btn btn-warning doc-action-btn btn-sm' %>
 <% end %>
@@ -42,11 +48,6 @@
         <% if (current_user.authy_id.nil? || current_user.authy_id == '') %>
             <%= link_to 'Register w/Authy', users_register_for_authy_path(@user.id), id: 'register_with_authy',
                         :method => :get, class: 'btn btn-primary doc-action-btn' %>
-        <% end %>
-        <%= link_to 'Change Mobile Phone Number For Authy', "#", class: 'btn btn-normal doc-action-btn', data: {toggle: "modal", target: "#authy_phone_modal"} %>
-        <%= render 'authy_phone_number_modal' %>
-        <% if @user.errors.any? %>
-            <script>$('#authy_phone_modal').modal('show');</script>
         <% end %>
     <% else %>
         <h5>Status: Mobile Phone Number Needs Verification</h5>
