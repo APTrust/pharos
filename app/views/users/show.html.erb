@@ -33,10 +33,10 @@
     <br />
 <% end %>
 
-<h4>Two Factor Authentication</h4>
+<h4>Two Factor Authentication (2FA)</h4>
 <% if @user.enabled_two_factor %>
     <% if @user.confirmed_two_factor %>
-        <h5>Status: Enabled</h5>
+		<h5>Status:</h5> Enabled
         <%= link_to 'Disable 2FA', users_disable_otp_path(@user.id), id: 'disable_twofa',
                     :method => :get, class: 'btn btn-warning doc-action-btn' %>
         <% if (current_user.authy_id.nil? || current_user.authy_id == '') %>
@@ -65,14 +65,15 @@
     <% end %>
 
     <br />
+    <br />
     <h4>Backup Codes</h4>
     <%= button_to 'Generate Backup Codes', backup_codes_path(@user.id),
                   :method => :get, class: 'btn btn-normal doc-action-btn' %>
     <% if @codes %>
         <br />
         <p><span class="badge badge-danger">Important!</span> Write these backup codes down in a safe place.
-          They can be used once to login to your account if your two factor device is unavailable.
-          They will never be displayed again for security reasons.</p>
+          Each code can be used once to login to your account in case your two factor device is unavailable.
+          For security reasons they will not be displayed again.</p>
         <ul class='unstyled'>
           <% @codes.each do |code| %>
               <li><%= code %></li>
@@ -94,11 +95,11 @@
 <div>
   <h5>If you haven't already, consider downloading Authy and using push notifications!</h5>
   <span><a href="https://play.google.com/store/apps/details?id=com.authy.authy" target="_blank">
-      <%= image_tag("aptrust/google-play.svg", alt: "Get it on Google Play") %>
+      <%= image_tag("aptrust/google-play.svg", size: "152x40", alt: "Get it on Google Play") %>
     </a>
   </span>
   <span><a href="https://itunes.apple.com/us/app/authy/id494168017" target="_blank">
-      <%= image_tag("aptrust/app-store.svg", alt: "Download on the App Store") %>
+      <%= image_tag("aptrust/app-store.svg", size: "152x40", alt: "Download on the App Store") %>
     </a>
   </span>
 </div>
