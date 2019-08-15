@@ -607,7 +607,6 @@ RSpec.describe InstitutionsController, type: :controller do
         admin_user.institution.users.each do |usr|
           expect(usr.force_password_update).to eq true unless usr.id == admin_user.id
         end
-        expect(assigns[:users].last.force_password_update).to eq true
       end
     end
 
