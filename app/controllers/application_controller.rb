@@ -129,11 +129,16 @@ class ApplicationController < ActionController::Base
       if current_user.required_to_use_twofa?
         if !current_user.enabled_two_factor
           date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
-          if (date_dif <= ENV['PHAROS_2FA_GRACE_PERIOD'].to_i) || (right_controller_and_id && right_action('twofa_enable'))
-            return
-          else
-            msg = 'You are required to use two factor authentication, please enable it now.'
+          if current_user.institution.otp_enabled
+            msg = 'An administrator has made Two Factor Authentication mandatory for your institution. Please enable it now.'
             forced_redirect_return(msg)
+          else
+            if (date_dif <= ENV['PHAROS_2FA_GRACE_PERIOD'].to_i) || (right_controller_and_id && right_action('twofa_enable'))
+              return
+            else
+              msg = 'You are required to use two factor authentication, please enable it now.'
+              forced_redirect_return(msg)
+            end
           end
         elsif !current_user.confirmed_two_factor
           if (right_controller_and_id && right_action('twofa_confirm')) ||
@@ -158,9 +163,14 @@ class ApplicationController < ActionController::Base
       date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
       if date_dif <= time_period && date_dif >= 0 && !current_user.confirmed_two_factor
         if Rails.env.test? || request.referrer.nil? || !request.referrer.include?('/users/sign_in')
-          flash.clear
+          # flash.clear
         else
-          flash[:notice] = "You have #{time_period - date_dif} day(s) left to enable Two Factor Authentication. Right now enabling Two Factor Authentication is optional, but after this grace period is over it will become mandatory. Please update your phone number to a valid mobile phone number and/or smartphone enabled number before enabling Two Factor Authentication, otherwise the process will not work as expected." if date_dif < time_period && request.referrer.include?('/users/sign_in')
+          if date_dif < time_period && request.referrer.include?('/users/sign_in') && !current_user.institution.otp_enabled
+            flash[:notice] = "You have #{time_period - date_dif} day(s) left to enable Two Factor Authentication. "
+            + 'Right now enabling Two Factor Authentication is optional, but after this grace period is over it will become '
+            + 'mandatory. Please update your phone number to a valid mobile phone number and/or smartphone enabled number before '
+            + 'enabling Two Factor Authentication, otherwise the process will not work as expected.'
+          end
         end
       end
     end

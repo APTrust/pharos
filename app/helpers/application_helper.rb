@@ -46,11 +46,11 @@ module ApplicationHelper
     options[:method] = :get if options[:method].nil?
     if object.is_a?(Institution)
       content ||= '<i class="glyphicon glyphicon-thumbs-up"></i> Enable Mandatory Institution-wide 2FA'
-      options[:data] = { confirm: 'Are you sure you want to enable two factor authentication across your entire institution?' } if options[:confirm].nil?
+      options[:data] = { confirm: 'Are you sure you want to make Two Factor Authentication mandatory across your entire institution? This will eliminate any remaining grace period left for users at your institution and require them to immediately enable Two Factor Authentication.' } if options[:confirm].nil?
       link_to(content.html_safe, enable_otp_institution_path(object), options) if policy(object).enable_otp?
     else
       content ||= '<i class="glyphicon glyphicon-thumbs-up"></i> Enable 2FA'
-      options[:data] = { confirm: 'Are you sure you want to enable two factor authentication for this user?' } if options[:confirm].nil?
+      options[:data] = { confirm: 'Are you sure you want to enable Two Factor Authentication for this user?' } if options[:confirm].nil?
       link_to(content.html_safe, users_enable_otp_path(object, redirect_loc: 'index'), options) if policy(object).enable_otp?
     end
   end
@@ -60,11 +60,11 @@ module ApplicationHelper
     options[:method] = :get if options[:method].nil?
     if object.is_a?(Institution)
       content ||= '<i class="glyphicon glyphicon-thumbs-down"></i> Disable Mandatory Institution-wide 2FA'
-      options[:data] = { confirm: 'Are you sure you want to disable two factor authentication for your entire institution?' } if options[:confirm].nil?
+      options[:data] = { confirm: 'Are you sure you want to disable mandatory Two Factor Authentication for your entire institution?' } if options[:confirm].nil?
       link_to(content.html_safe, disable_otp_institution_path(object), options) if policy(object).disable_otp?
     else
       content ||= '<i class="glyphicon glyphicon-thumbs-down"></i> Disable 2FA'
-      options[:data] = { confirm: 'Are you sure you want to disable two factor authentication for this user?' } if options[:confirm].nil?
+      options[:data] = { confirm: 'Are you sure you want to disable Two Factor Authentication for this user?' } if options[:confirm].nil?
       link_to(content.html_safe, users_disable_otp_path(object, redirect_loc: 'index'), options) if policy(object).disable_otp?
     end
   end

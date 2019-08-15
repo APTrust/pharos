@@ -44,8 +44,9 @@ class UsersController < ApplicationController
 
   def update
     authorize @user
+    old_num = @user.phone_number
     update!
-    if params[:user][:phone_number] && (!@user.authy_id.nil? || !@user.authy_id == '')
+    if !(@user.phone_number == old_num) && (!@user.authy_id.nil? || !@user.authy_id == '')
       response = Authy::API.delete_user(id: @user.authy_id)
       if response.ok?
         @user.update(authy_id: nil)
