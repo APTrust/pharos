@@ -197,9 +197,7 @@ class User < ActiveRecord::Base
   end
 
   def init_grace_period
-    if self.grace_period.nil? || self.grace_period == ''
-      self.grace_period = DateTime.now
-    end
+    self.grace_period = DateTime.now
   end
 
   def self.phone_number_is_valid

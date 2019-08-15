@@ -10,8 +10,8 @@ Rails.application.routes.draw do
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
   get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
   get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
-  get '/:institution_identifier/enable_otp', to: 'institutions#enable_otp', as: :enable_otp_institution, institution_identifier: institution_ptrn
-  get '/:institution_identifier/disable_otp', to: 'institutions#disable_otp', as: :disable_otp_institution, institution_identifier: institution_ptrn
+  get '/:institution_identifier/enable_otp', to: 'institutions#enable_otp', as: :enable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/:institution_identifier/disable_otp', to: 'institutions#disable_otp', as: :disable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/trigger_bulk_delete', to: 'institutions#trigger_bulk_delete', as: :api_bulk_deletion, format: :json, institution_identifier: institution_ptrn
   get '/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :api_bulk_deletion_institutional_confirmation, format: :json, institution_identifier: institution_ptrn
@@ -21,7 +21,8 @@ Rails.application.routes.draw do
   post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
   get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
   get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
-  get 'institutions/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update
+  get '/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :api_mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/

@@ -89,42 +89,39 @@ class InstitutionsController < ApplicationController
     authorize @institution
     @users = @institution.users
     @users.each do |usr|
-      usr.force_password_update = true
+      usr.force_password_update = true unless usr.id == current_user.id
       usr.save!
     end
+    msg = "All users at #{@institution.name} will be forced to change their password upon next login. If you forced password "+
+        'changes at your own institution, you will not be forced to change your own password but it is highly encouraged.'
     respond_to do |format|
-      format.json { render json: { message: "All users at #{@institution.name} will be forced to change their password upon next login." }, status: :ok }
-      format.html { redirect_to root_path, flash: { notice: "All users at #{@institution.name} will be forced to change their password upon next login." } }
+      format.json { render json: { message: msg }, status: :ok }
+      format.html { redirect_to root_path, flash: { notice: msg } }
     end
   end
 
   def enable_otp
     authorize @institution
-    @institution.users.each do |usr|
-      usr.otp_secret = User.generate_otp_secret
-      usr.enabled_two_factor = true
-      unless Rails.env.test? || !usr.authy_id.nil?
-        authy = Authy::API.register_user(
-            email: usr.email,
-            cellphone: usr.phone_number,
-            country_code: usr.phone_number[1]
-        )
-        usr.update(authy_id: authy.id)
-      end
-      usr.save!
-    end
     @institution.otp_enabled = true
     @institution.save!
-    flash[:notice] = 'Two Factor Authentication has been enabled for all users at your institution.'
-    render 'show'
+    msg = "Two Factor Authentication is now required for all users at #{@institution.name}."
+    flash[:notice] = msg
+    respond_to do |format|
+      format.json { render json: { message: msg }, status: :ok }
+      format.html { render 'show' }
+    end
   end
 
   def disable_otp
     authorize @institution
     @institution.otp_enabled = false
     @institution.save!
-    flash[:notice] = 'Two Factor Authentication is no longer required for institutional users at your institution.'
-    render 'show'
+    msg = "Two Factor Authentication is no longer required for institutional users at #{@institution.name}"
+    flash[:notice] = msg
+    respond_to do |format|
+      format.json { render json: { message: msg }, status: :ok }
+      format.html { render 'show' }
+    end
   end
 
   def single_snapshot

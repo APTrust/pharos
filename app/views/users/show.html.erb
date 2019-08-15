@@ -59,6 +59,8 @@
         <br />
         <%= link_to 'Verify Phone Number via Push Notification', users_verify_twofa_path(@user.id, verification_option: 'push'),
                     class: 'btn btn-normal doc-action-btn', id: 'phone_verification_push_btn' %><p>(requires Authy app installation)</p>
+        <%= link_to 'Disable 2FA', users_disable_otp_path(@user.id), id: 'disable_twofa',
+        :method => :get, class: 'btn btn-warning doc-action-btn' %>
         <div id="verification-loader" class="hidden">
           <h4>Please check your Authy app for a push notification. Waiting for a response...</h4>
           <div class="loader"></div>

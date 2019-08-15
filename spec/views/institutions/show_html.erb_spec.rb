@@ -13,7 +13,7 @@ describe 'institutions/show.html.erb' do
 
   describe 'A user with access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, enable_otp?: true, disable_otp?: true)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, enable_otp?: true, disable_otp?: true, mass_forced_password_update?: true)
       render
     end
 
