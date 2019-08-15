@@ -21,7 +21,8 @@ Rails.application.routes.draw do
   post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
   get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
   get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
-  get 'institutions/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update
+  get '/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :api_mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/

@@ -30,9 +30,7 @@
     <% else %>
       <%= enable_otp_link(@institution) %>
     <% end %>
-    <% if current_user.admin? || current_user.institutional_admin? %>
-        <%= link_to 'Institution Wide Force Password Update', mass_forced_password_update_path(@institution), class: 'btn btn-warning doc-action-btn btn-sm' %>
-    <% end %>
+    <%= mass_pass_update_link(@institution) %>
 
     <%= render 'shared/work_items' %>
 

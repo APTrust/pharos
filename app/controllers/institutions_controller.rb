@@ -89,12 +89,14 @@ class InstitutionsController < ApplicationController
     authorize @institution
     @users = @institution.users
     @users.each do |usr|
-      usr.force_password_update = true
+      usr.force_password_update = true unless usr.id == current_user.id
       usr.save!
     end
+    msg = "All users at #{@institution.name} will be forced to change their password upon next login. If you forced password "+
+        'changes at your own institution, you will not be forced to change your own password but it is highly encouraged.'
     respond_to do |format|
-      format.json { render json: { message: "All users at #{@institution.name} will be forced to change their password upon next login." }, status: :ok }
-      format.html { redirect_to root_path, flash: { notice: "All users at #{@institution.name} will be forced to change their password upon next login." } }
+      format.json { render json: { message: msg }, status: :ok }
+      format.html { redirect_to root_path, flash: { notice: msg } }
     end
   end
 
