@@ -602,7 +602,7 @@ RSpec.describe InstitutionsController, type: :controller do
           FactoryBot.create(:user, :institutional_user, institution_id: admin_user.institution.id)
         end
         get :mass_forced_password_update, params: { institution_identifier: admin_user.institution.to_param }
-        expect(response).to redirect_to root_path
+        expect(response).to redirect_to institution_path(admin_user.institution)
         expect(flash[:notice]).to eq "All users at #{admin_user.institution.name} will be forced to change their password upon next login. If you forced password changes at your own institution, you will not be forced to change your own password but it is highly encouraged."
         admin_user.institution.users.each do |usr|
           expect(usr.force_password_update).to eq true unless usr.id == admin_user.id
@@ -618,7 +618,7 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully' do
         get :mass_forced_password_update, params: { institution_identifier: institutional_admin.institution.to_param }
-        expect(response).to redirect_to root_path
+        expect(response).to redirect_to institution_path(institutional_admin.institution)
         expect(flash[:notice]).to eq "All users at #{institutional_admin.institution.name} will be forced to change their password upon next login. If you forced password changes at your own institution, you will not be forced to change your own password but it is highly encouraged."
       end
 
