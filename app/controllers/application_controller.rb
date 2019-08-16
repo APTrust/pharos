@@ -159,7 +159,7 @@ class ApplicationController < ActionController::Base
 
   def set_grace_period_notice
     time_period = ENV['PHAROS_2FA_GRACE_PERIOD'].to_i
-    unless current_user.nil? || current_user.institution.otp_enabled || (current_user.enabled_two_factor && !current_user.confirmed_two_factor)
+    unless current_user.nil? || current_user.institution.otp_enabled || (current_user.enabled_two_factor && !current_user.confirmed_two_factor) || current_user.institutional_user?
       date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
       if date_dif <= time_period && date_dif >= 0 && !current_user.confirmed_two_factor
         if Rails.env.test? || request.referrer.nil? || !request.referrer.include?('/users/sign_in')
