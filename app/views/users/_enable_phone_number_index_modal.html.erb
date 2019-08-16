@@ -8,9 +8,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>This form will update the phone number in both your Pharos account for Two Factor Authentication purposes.</p>
-        <p>Please use a mobile phone number or enabling Two Factor Authentication will not work and you will need to contact
-          an APTrust administrator for help in continuing the process.</p>
+		 <p>Two-Factor Authentication requires a working mobile phone number that is able to receive text messages and/or able to receive push notifications per Authy mobile app. (Depending on how you choose to authenticate).</p>
         <% if request.original_url.include?('users/') %>
             <% params[:id] = user.id %>
             <% url = 'enable_otp' %>
@@ -26,8 +24,6 @@
             <div class="field">
               <%= label_tag 'phone_number', 'Mobile Phone Number' %>
               <br>
-              <p>If you don't change this field, it will default to the current number in your account. If that number is not a
-                mobile number the Two Factor Authentication process will not work.</p>
               <% if params[:phone_number] %>
                   <%= text_field_tag 'phone_number', params[:phone_number] %>
               <% else %>

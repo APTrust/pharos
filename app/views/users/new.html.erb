@@ -6,14 +6,13 @@
 
 <%= simple_form_for(@user, html: {class: 'form-horizontal'}) do |f| %>
     <%= devise_error_messages! %>
-    <p>Creating a password here is not necessary. A temporary password will be generated and sent to the user in a welcome email.</p>
+	<p>A temporary password will be generated and send to the user in a welcome email. </p>
 
     <div class="form-inputs">
       <%= f.input :name, autofocus: true %>
       <%= f.input :email %>
-      <%= f.input :phone_number, label: 'Mobile Phone Number' %>
-      <p>This phone number is optional on creation but later will be required for Two Factor Authentication. If you set it now,
-      make sure it is a phone number that can receive SMS messages and/or Authy push notifications.</p>
+      <%= f.input :phone_number, label: 'Mobile Phone Number (Optional, only required for two factor authentication)' %>
+      <p>Make sure the phone associated with the number can receive SMS messages and/or Authy push notifications.</p>
 
       <%= f.input :institution_id, collection: institutions_for_select, as: :select, label: 'Institution' %>
 
