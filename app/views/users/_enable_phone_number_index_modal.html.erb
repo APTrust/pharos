@@ -9,14 +9,9 @@
       </div>
       <div class="modal-body">
 		 <p>Two-Factor Authentication requires a working mobile phone number that is able to receive text messages and/or able to receive push notifications per Authy mobile app. (Depending on how you choose to authenticate).</p>
-        <% if request.original_url.include?('users/') %>
-            <% params[:id] = user.id %>
-            <% url = 'enable_otp' %>
-        <% else %>
-            <% url = "users/#{user.id}/enable_otp" %>
-        <% end %>
-        <%= form_tag(url, method: :get) do %>
-            <% if @user && @user.errors.any? %>
+     <p>This form changes your phone number in Pharos and in the Pharos Authy account.</p>
+        <%= form_tag(url_for(controller: 'users', action: 'enable_otp', id: user.id), method: :get) do %>
+            <% if @user && @user == user && @user.errors.any? %>
                 <div id="error_explanation">
                   <p class="alert">Please review the problems below:</p>
                 </div>
@@ -24,12 +19,12 @@
             <div class="field">
               <%= label_tag 'phone_number', 'Mobile Phone Number' %>
               <br>
-              <% if params[:phone_number] %>
+              <% if @user && @user == user && params[:phone_number] %>
                   <%= text_field_tag 'phone_number', params[:phone_number] %>
               <% else %>
                   <%= text_field_tag 'phone_number', user.phone_number %>
               <% end %>
-              <% if @user && @user.errors[:phone_number].any?  %>
+              <% if @user && @user == user && @user.errors[:phone_number].any?  %>
                   <br>
                   <% @user.errors.full_messages.each do |message| %>
                       <span class="alert"><%= message %></span>

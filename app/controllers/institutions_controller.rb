@@ -96,7 +96,7 @@ class InstitutionsController < ApplicationController
         'changes at your own institution, you will not be forced to change your own password but it is highly encouraged.'
     respond_to do |format|
       format.json { render json: { message: msg }, status: :ok }
-      format.html { redirect_to root_path, flash: { notice: msg } }
+      format.html { redirect_to institution_path(@institution), flash: { notice: msg } }
     end
   end
 
