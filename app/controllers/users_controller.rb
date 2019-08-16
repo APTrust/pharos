@@ -46,7 +46,7 @@ class UsersController < ApplicationController
     authorize @user
     old_num = @user.phone_number
     update!
-    if !(@user.phone_number == old_num) && (!@user.authy_id.nil? || !@user.authy_id == '')
+    if @user.authy_id.present? && !(@user.phone_number == old_num)
       response = Authy::API.delete_user(id: @user.authy_id)
       if response.ok?
         @user.update(authy_id: nil)
@@ -56,14 +56,12 @@ class UsersController < ApplicationController
           flash[:notice] ? flash[:notice] += message : flash[:notice] = message
         else
           logger.info "Re-Generate Authy Account Errors: #{second_response.errors.inspect}"
-          message = 'The phone number associated with this Authy account was unable to be updated at this time.'
-          + 'Authy push notifications will not be able to be used until it has been properly updated.'
+          message = 'The phone number associated with this Authy account was unable to be updated at this time. Authy push notifications will not be able to be used until it has been properly updated.'
           flash[:error] ? flash[:error] += message : flash[:error] = message
         end
       else
         logger.info "Delete Authy Account Errors: #{response.errors.inspect}"
-        message = 'The phone number associated with this Authy account was unable to be updated at this time.'
-        + 'Authy push notifications will not be able to be used until it has been properly updated.'
+        message = 'The phone number associated with this Authy account was unable to be updated at this time. Authy push notifications will not be able to be used until it has been properly updated.'
         flash[:error] ? flash[:error] += message : flash[:error] = message
       end
     end
@@ -107,7 +105,7 @@ class UsersController < ApplicationController
     authorize @user
     flash.clear
     params[:phone_number] = @user.phone_number if params[:phone_number].nil?
-    if params[:phone_number].nil? || params[:phone_number] == ''
+    if params[:phone_number].blank?
       msg = 'You must have a phone number listed in order to enable Two Factor Authentication.'
       flash[:error] = msg
       @user.errors.add(:phone_number, 'must not be blank')
@@ -119,7 +117,7 @@ class UsersController < ApplicationController
       @user.phone_number = params[:phone_number]
       @user.save!
       unless Rails.env.test?
-        authy = generate_authy_account(@user) if (@user.authy_id.nil? || @user.authy_id == '')
+        authy = generate_authy_account(@user) if (@user.authy_id.blank?)
       end
       if authy && !authy['errors'].nil? && !authy['errors'].empty?
         logger.info "Testing Authy Errors hash: #{authy.errors.inspect}"
@@ -182,7 +180,7 @@ class UsersController < ApplicationController
 
   def register_authy_user
     authorize @user
-    if @user.authy_id.nil? || @user.authy_id == ''
+    if @user.authy_id.blank?
       authy = generate_authy_account(@user)
     end
     if authy && !authy['errors'].nil? && !authy['errors'].empty?
@@ -202,7 +200,7 @@ class UsersController < ApplicationController
   def change_authy_phone_number
     authorize @user
     flash.clear
-    if params[:phone_number].nil? || params[:phone_number] == ''
+    if params[:phone_number].blank?
       msg = 'You must have a phone number listed in order to change your number with Authy.'
       flash[:error] = msg
       @user.errors.add(:phone_number, 'must not be blank')
@@ -219,8 +217,7 @@ class UsersController < ApplicationController
         second_response = generate_authy_account(@user)
         if !second_response['errors'].nil? && !second_response['errors'].empty?
           logger.info "Re-Generate Authy Account Errors: #{second_response.errors.inspect}"
-          message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications'
-          +'until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
+          message = 'The Authy account was unable to be updated at this time, you will not be able to use Authy push notifications until it has been properly updated. If you now see a "Register with Authy" button, please try using that.'
           flash[:error] = message
         elsif second_response.ok?
           message = 'The phone number for both this Pharos account and Authy account has been successfully updated.'
