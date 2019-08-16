@@ -652,7 +652,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'includes specific password text' do
-      expect(mail.body.encoded).to include('Your temporary password is temppassword.')
+      expect(mail.body.encoded).to include('Temporary password: temppassword')
     end
   end
 

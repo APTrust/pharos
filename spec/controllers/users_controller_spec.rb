@@ -90,7 +90,7 @@ RSpec.describe UsersController, type: :controller do
         }.to change(User, :count).by(1)
         email = ActionMailer::Base.deliveries.last
         expect(email.body.encoded).to include('An account with a temporary password has been created for you.')
-        expect(email.body.encoded).to include('Your temporary password is ABCabc-')
+        expect(email.body.encoded).to include('Temporary password: ABCabc-')
       end
     end
 
