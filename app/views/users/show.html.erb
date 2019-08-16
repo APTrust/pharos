@@ -37,7 +37,7 @@
 <h4>Two Factor Authentication (2FA)</h4>
 <% if @user.enabled_two_factor %>
     <% if @user.confirmed_two_factor %>
-		<h5>Status:</h5> Enabled
+		<h5>Status: Enabled</h5>
         <%= link_to 'Disable 2FA', users_disable_otp_path(@user.id), id: 'disable_twofa',
                     :method => :get, class: 'btn btn-warning doc-action-btn' %>
         <% if (current_user.authy_id.nil? || current_user.authy_id == '') %>
