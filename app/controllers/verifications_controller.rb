@@ -36,6 +36,7 @@ class VerificationsController < ApplicationController
 
   def check_backup
     if current_user.invalidate_otp_backup_code!(params[:code])
+      current_user.save!
       session[:verified] = true
       session.delete(:two_factor_option)
       redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
