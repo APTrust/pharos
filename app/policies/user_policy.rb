@@ -131,7 +131,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def verify_email?
-    user == record || user.admin || (user.institutional_admin? && (user.institution_id == record.institution_id))
+    user == record || user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
   def email_confirmation?
