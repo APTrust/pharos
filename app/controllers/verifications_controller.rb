@@ -41,7 +41,7 @@ class VerificationsController < ApplicationController
       session.delete(:two_factor_option)
       redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
     else
-      redirect_to enter_backup_verification_path(id: params[:id]), flash: { error: 'Incorrect backup code.' }
+      redirect_to enter_backup_verification_path(id: params[:id]), flash: { error: 'This backup code is either incorrect or has been used previously.' }
     end
   end
 
