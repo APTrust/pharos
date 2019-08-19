@@ -11,6 +11,7 @@ REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
 NAME=$(shell basename $(CURDIR))
 REVISION=$(shell git log -1 --pretty=%h)
+REVISION=$(shell git rev-parse --short=7 HEAD)
 BRANCH = $(subst /,_,$(shell git rev-parse --abbrev-ref HEAD))
 PUSHBRANCH = $(subst /,_,$(TRAVIS_BRANCH))
 TAG = $(NAME):$(REVISION)
@@ -40,7 +41,7 @@ build-nc: ## Build the Pharos container, no cached layers.
 	docker build --build-arg PHAROS_RELEASE=${REVISION} -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos -t aptrust/nginx-proxy-pharos -f Dockerfile.nginx .
 
 up: ## Start containers for Pharos, Postgresql, Nginx
-	docker-compose -e DOCKER_TAG_NAME=$(REVISION) up
+	DOCKER_TAG_NAME=$(REVISION) docker-compose up
 
 down: ## Stop containers for Pharos, Postgresql, Nginx
 	docker-compose down

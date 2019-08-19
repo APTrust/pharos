@@ -1,0 +1,103 @@
+version: '3.5'
+services:
+  db:
+    image: postgres:9.6.6-alpine
+    restart: always
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pharos
+      POSTGRES_DB: pharos
+    volumes:
+#      - ${PGDATA_PATH:-./docker/pgdata}:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    labels:
+      - traefik.enable=false
+  pharos:
+    image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
+    #    image: aptrust/pharos:${DOCKER_TAG_NAME:-latest}
+    restart: always
+    command: bundle exec puma -w3 -p9292 -e ${RAILS_ENV}
+    volumes:
+      - ./.env:/pharos/.env
+      - assets:/pharos/public
+      - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
+    depends_on:
+      - db
+      - migration
+    env_file:
+      - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
+    labels:
+      - traefik.enable=true
+      - traefik.backend=pharos
+      - "traefik.frontend.rule=Host:${VIRTUAL_HOST:-localhost}"
+      - traefik.port=9292
+      - traefik.docker.network=frontend
+    networks:
+      - backend
+      - frontend
+    ports:
+      - "9292:9292"
+  migration:
+    image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
+    # Note: Sleep 5 seconds before init db, so psql has time to start up.
+    command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+    env_file:
+      - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
+    depends_on:
+      - db
+    networks:
+      - backend
+    labels:
+      - traefik.enable=false
+  traefik-proxy:
+    image: traefik # The official Traefik docker image
+    restart: always
+    command: --api --docker --docker.domain=${DOCKER_DOMAIN}
+    ports:
+      - "80:80"     # The HTTP port
+      - "443:443"     # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
+    volumes:
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik}/traefik.toml:/traefik.toml
+      - ${DOCKERAPP_DATA_PATH:-./docker/traefik}/acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - frontend
+# https://stackoverflow.com/questions/51884667/how-to-serve-static-content-with-nginx-and-django-gunicorn-when-using-traefik/51887971
+  nginx-assets:
+    image: nginx:alpine
+    command: [nginx-debug, '-g', 'daemon off;']
+    restart: always
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - assets:/etc/share/nginx/html/pharos
+    networks:
+    #    - backend
+      - frontend
+    labels:
+      - traefik.enable=true
+      - traefik.assets.backend=nginx-assets
+      - "traefik.assets.frontend.rule=Host:${VIRTUAL_HOST:-localhost};PathPrefix:/assets"
+      - traefik.docker.network=frontend
+#      - "traefik.protocol=https"
+      - traefik.port=80
+#      - "traefik.frontend.entryPoints=https"
+
+networks:
+  frontend:
+    name: frontend
+  backend:
+    name: backend
+volumes:
+  pgdata:
+  assets:

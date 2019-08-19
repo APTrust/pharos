@@ -24,6 +24,8 @@ gem 'email_validator'
 # Used to generate PDFs for reports
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+# Generate zip files
+gem 'rubyzip'
 # Used to create or edit google sheets
 gem 'google_drive'
 
@@ -60,6 +62,7 @@ group :test, :development do
   gem 'shoulda-matchers', '~> 4.1.2'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
+  gem 'mimemagic'
 end
 
 group :development, :test, :demo, :production, :integration do

@@ -85,7 +85,7 @@ class NotificationMailer < ApplicationMailer
       subject_line = @subject.identifier
     elsif @subject.is_a?(GenericFile)
       @subject_url = generic_file_url(@subject)
-      @confirmation_url = file_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token)
+      @confirmation_url = file_confirm_destroy_url(@subject, requesting_user_id: @requesting_user.id, confirmation_token: confirmation_token.token, 'format' => 'html')
       subject_line = @subject.identifier
     end
     users = @subject_institution.deletion_admin_user(requesting_user)
@@ -222,13 +222,16 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: 'New Snapshots')
   end
 
-  def deletion_notification(subject, zip)
+  def deletion_notification(subject)
     @subject = subject
     users = []
     @subject.admin_users.each { |user| users.push(user) }
     emails = []
     users.each { |user| emails.push(user.email) }
-    attachments['deletions.tar.gz'] = { mime_type: 'application/gzip', content: zip }
+    inst_name = @subject.name.split(' ').join('_')
+    directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
+    zip = File.read("#{directory}/#{inst_name}.zip")
+    attachments['deletions.zip'] = { mime_type: 'application/zip', content: zip }
     mail(to: emails, subject: 'New Completed Deletions')
   end
 

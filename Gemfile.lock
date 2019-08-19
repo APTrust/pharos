@@ -204,7 +204,7 @@ GEM
       phony (> 2.15)
     public_suffix (3.1.1)
     puma (3.12.0)
-    pundit (2.0.1)
+    pundit (2.1.0)
       activesupport (>= 3.0.0)
     rack (2.0.7)
     rack-contrib (2.1.0)
@@ -278,6 +278,7 @@ GEM
       rspec-mocks (~> 3.8.0)
       rspec-support (~> 3.8.0)
     rspec-support (3.8.0)
+    rubyzip (1.2.3)
     sassc (2.0.1)
       ffi (~> 1.9)
       rake
@@ -370,6 +371,7 @@ DEPENDENCIES
   jquery-ui-rails
   kaminari
   meta_request (= 0.7.2)
+  mimemagic
   pg (= 1.1.4)
   phony_rails
   puma (= 3.12.0)
@@ -382,6 +384,7 @@ DEPENDENCIES
   rspec-activemodel-mocks
   rspec-its
   rspec-rails (~> 3.8.2)
+  rubyzip
   sassc-rails
   shoulda-matchers (~> 4.1.2)
   simple_form (~> 4.1.0)

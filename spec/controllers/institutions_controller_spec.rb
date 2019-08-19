@@ -993,6 +993,9 @@ RSpec.describe InstitutionsController, type: :controller do
         email = ActionMailer::Base.deliveries.last
         expect(email.body.encoded).to include('new deletion requests that have completed')
         expect(email.attachments.count).to eq(1)
+        expect(email.attachments[0].filename).to eq('deletions.zip')
+        expect(email.attachments[0].content_type).to eq('application/zip')
+        Institution.remove_directory('test')
       end
     end
 

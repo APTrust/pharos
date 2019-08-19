@@ -132,7 +132,7 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
-    describe 'show an Institutinal User' do
+    describe 'show an Institutional User' do
       describe 'at my institution' do
         let(:user_at_institution) {  FactoryBot.create(:user, :institutional_user, institution_id: institutional_admin.institution_id) }
         it 'can show the Institutional Users for my institution' do
