@@ -1,47 +1,47 @@
 <div class="modal" tabindex="-1" role="dialog" id="enable_phone_modal" title="Update Phone Number for Two Factor Authentication">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Mobile Phone Number</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-		        <p>Two-Factor Authentication requires a working mobile phone number that is able to
-				receive text messages and/or able to receive push notifications per Authy mobile app.
-				(Depending on how you choose to authenticate).</p>
-                <%= form_tag(url_for(controller: 'users', action: 'enable_otp', id: @user.id), method: :get) do %>
-                  <% if @user.errors.any? %>
-                      <div id="error_explanation">
-                        <p class="alert">Please review the problems below:</p>
-                      </div>
-                  <% end %>
-
-                  <div class="field">
-                    <%= label_tag "phone_number", "Mobile Phone Number" %>
-                    <br>
-                    <% if params[:phone_number] %>
-                        <%= text_field_tag "phone_number", params[:phone_number] %>
-                    <% else %>
-                        <%= text_field_tag "phone_number", @user.phone_number %>
-                    <% end %>
-                    <% if @user.errors[:phone_number].any?  %>
-                        <br>
-                        <% @user.errors.full_messages.each do |message| %>
-                            <span class="alert"><%= message %></span>
-                        <% end %>
-                    <% end %>
-                  </div>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Mobile Phone Number</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Two-Factor Authentication requires a working mobile phone number that is able to
+          receive text messages and/or able to receive push notifications per Authy mobile app.
+          (Depending on how you choose to authenticate).</p>
+        <p>This form changes your phone number in Pharos and in the Pharos Authy account.</p>
+        <%= form_tag(url_for(controller: 'users', action: 'enable_otp', id: @user.id), method: :get) do %>
+            <% if @user.errors.any? %>
+                <div id="error_explanation">
+                  <p class="alert">Please review the problems below:</p>
+                </div>
+            <% end %>
+            <div class="field">
+              <%= label_tag "phone_number", "Mobile Phone Number" %>
+              <br>
+              <% if params[:phone_number] %>
+                  <%= text_field_tag "phone_number", params[:phone_number] %>
+              <% else %>
+                  <%= text_field_tag "phone_number", @user.phone_number %>
+              <% end %>
+              <% if @user.errors[:phone_number].any? %>
                   <br>
-                  <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm', id: 'enable-otp-form-submit') do %>
-                      <i class="glyphicon glyphicon-check"></i> Submit
+                  <% @user.errors.full_messages.each do |message| %>
+                      <span class="alert"><%= message %></span>
                   <% end %>
-                  <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-warning btn-sm', 'data-dismiss' => 'modal' ) do %>
-                      <i class="glyphicon glyphicon-remove"></i> Cancel
-                  <% end %>
-                <% end %>
+              <% end %>
             </div>
-        </div>
+            <br>
+            <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm', id: 'enable-otp-form-submit') do %>
+                <i class="glyphicon glyphicon-check"></i> Submit
+            <% end %>
+            <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-warning btn-sm', 'data-dismiss' => 'modal') do %>
+                <i class="glyphicon glyphicon-remove"></i> Cancel
+            <% end %>
+        <% end %>
+      </div>
     </div>
+  </div>
 </div>

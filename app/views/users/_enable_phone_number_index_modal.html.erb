@@ -8,8 +8,10 @@
         </button>
       </div>
       <div class="modal-body">
-		 <p>Two-Factor Authentication requires a working mobile phone number that is able to receive text messages and/or able to receive push notifications per Authy mobile app. (Depending on how you choose to authenticate).</p>
-     <p>This form changes your phone number in Pharos and in the Pharos Authy account.</p>
+        <p>Two-Factor Authentication requires a working mobile phone number that is able to
+          receive text messages and/or able to receive push notifications per Authy mobile app.
+          (Depending on how this user chooses to authenticate).</p>
+        <p>This form changes the user's phone number in Pharos and in the Pharos Authy account.</p>
         <%= form_tag(url_for(controller: 'users', action: 'enable_otp', id: user.id), method: :get) do %>
             <% if @user && @user == user && @user.errors.any? %>
                 <div id="error_explanation">
@@ -24,7 +26,7 @@
               <% else %>
                   <%= text_field_tag 'phone_number', user.phone_number %>
               <% end %>
-              <% if @user && @user == user && @user.errors[:phone_number].any?  %>
+              <% if @user && @user == user && @user.errors[:phone_number].any? %>
                   <br>
                   <% @user.errors.full_messages.each do |message| %>
                       <span class="alert"><%= message %></span>
@@ -36,7 +38,7 @@
             <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm', id: 'enable-otp-form-submit') do %>
                 <i class="glyphicon glyphicon-check"></i> Submit
             <% end %>
-            <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-warning btn-sm', 'data-dismiss' => 'modal' ) do %>
+            <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-warning btn-sm', 'data-dismiss' => 'modal') do %>
                 <i class="glyphicon glyphicon-remove"></i> Cancel
             <% end %>
         <% end %>
