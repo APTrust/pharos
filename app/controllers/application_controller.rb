@@ -130,8 +130,12 @@ class ApplicationController < ActionController::Base
         if !current_user.enabled_two_factor
           date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
           if current_user.institution.otp_enabled
-            msg = 'An administrator has made Two Factor Authentication mandatory for your institution. Please enable it now.'
-            forced_redirect_return(msg)
+            if right_controller_and_id && right_action('twofa_enable')
+              return
+            else
+              msg = 'An administrator has made Two Factor Authentication mandatory for your institution. Please enable it now.'
+              forced_redirect_return(msg)
+            end
           else
             if (date_dif <= ENV['PHAROS_2FA_GRACE_PERIOD'].to_i) || (right_controller_and_id && right_action('twofa_enable'))
               return
