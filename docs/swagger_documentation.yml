@@ -63,19 +63,8 @@ paths:
               - application/json
           required: true
           description: The type of content the user will receive from the API endpoint.
-        - in: header
-          name: X-Pharos-API-User
-          schema:
-            type: string
-            format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
-        - in: header
-          name: X-Pharos-API-Key
-          schema:
-            type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+        - $ref: '#/components/securitySchemes/UserId'
+        - $ref: '#/components/securitySchemes/ApiKeyAuth'
         - in: path
           name: generic_file_identifier
           schema:
@@ -1154,14 +1143,23 @@ paths:
           required: true
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-Pharos-API-KEY
     UserId:
       type: apiKey
       in: header
       name: X-Pharos-API-User
+      schema:
+        type: string
+        format: email
+      required: true
+      description: The email address of a user with a valid account in the Pharos APTrust system.
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Pharos-API-KEY
+      schema:
+        type: string
+      required: true
+      description: The API key the user generated in their Pharos profile, used to authenticate the user.
   schemas:
     Event:
       properties:
@@ -1741,6 +1739,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
 security:
-  - ApiKeyAuth: []
-    UserId: []
+  - UserId: []
+    ApiKeyAuth: []
+
 
