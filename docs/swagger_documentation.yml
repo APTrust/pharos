@@ -654,15 +654,15 @@ paths:
              type: string
              enum:
                - application/json
-            description: The type of content the user will send to the API endpoint (required only in a PUT or POST request).
+           description: The type of content the user will send to the API endpoint (required only in a PUT or POST request).
          - in: header
            name: Accept
            schema:
              type: string
              enum:
                - application/json
-            required: true
-            description: The type of content the user will receive from the API endpoint.
+           required: true
+           description: The type of content the user will receive from the API endpoint.
          - in: header
            name: X-Pharos-API-User
            schema:
