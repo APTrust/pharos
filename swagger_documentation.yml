@@ -48,7 +48,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       parameters:
-        - $ref: '#/components/securitySchemes/userId'
         - in: header
           name: Content-Type
           schema:
@@ -62,21 +61,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - in: path
           name: generic_file_identifier
           schema:
@@ -164,21 +160,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - in: path
           name: intellectual_object_identifier
           schema:
@@ -267,21 +260,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - in: path
           name: institution_identifier
           schema:
@@ -369,21 +359,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - name: institution_identifier
           in: path
           schema:
@@ -488,21 +475,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - name: intellectual_object_identifier
           in: path
           schema:
@@ -606,21 +590,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - name: generic_file_id
           in: path
           schema:
@@ -661,21 +642,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - name: created_before
           in: query
           schema:
@@ -806,21 +784,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - name: description
           in: query
           schema:
@@ -939,21 +914,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - in: path
           name: institution_identifier
           schema:
@@ -1072,29 +1044,25 @@ paths:
             type: string
             enum:
               - application/json
-          description: The type of content the user will send to the API endpoint (required only in a PUT or POST request).
-          required: true
+          description: The type of content the user will send to the API endpoint. This parameter is required.
         - in: header
           name: Accept
           schema:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - in: path
           name: intellectual_object_identifier
           schema:
@@ -1129,21 +1097,18 @@ paths:
             type: string
             enum:
               - application/json
-          required: true
-          description: The type of content the user will receive from the API endpoint.
+          description: The type of content the user will receive from the API endpoint. This parameter is required.
         - in: header
           name: X-Pharos-API-User
           schema:
             type: string
             format: email
-          required: true
-          description: The email address of a user with a valid account in the Pharos APTrust system.
+          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
         - in: header
           name: X-Pharos-API-Key
           schema:
             type: string
-          required: true
-          description: The API key the user generated in their Pharos profile, used to authenticate the user.
+          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
         - name: intellectual_object_identifier
           in: path
           schema:
