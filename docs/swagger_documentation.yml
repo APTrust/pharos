@@ -1124,18 +1124,11 @@ components:
       type: apiKey
       in: header
       name: X-Pharos-API-User
-      schema:
-        type: string
-        format: email
-      required: true
       description: The email address of a user with a valid account in the Pharos APTrust system.
     ApiKeyAuth:
       type: apiKey
       in: header
-      name: X-Pharos-API-KEY
-      schema:
-        type: string
-      required: true
+      name: X-Pharos-API-Key
       description: The API key the user generated in their Pharos profile, used to authenticate the user.
   schemas:
     Event:
