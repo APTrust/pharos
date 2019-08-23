@@ -48,7 +48,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       parameters:
-        - $ref: '#/components/securitySchemes/userId'
         - in: header
           name: Content-Type
           schema:
