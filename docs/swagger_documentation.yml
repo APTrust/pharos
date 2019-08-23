@@ -55,6 +55,7 @@ paths:
             enum:
               - application/json
           description: The type of content the user will send to the API endpoint (required only in a PUT or POST request).
+        - $ref: '#/components/securitySchemes/userId'
         - in: header
           name: Accept
           schema:
