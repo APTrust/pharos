@@ -55,6 +55,7 @@ paths:
             enum:
               - application/json
           description: The type of content the user will send to the API endpoint (required only in a PUT or POST request).
+        - $ref: '#/components/securitySchemes/userId'
         - in: header
           name: Accept
           schema:
@@ -378,8 +379,8 @@ paths:
           required: true
           description: The email address of a user with a valid account in the Pharos APTrust system.
         - in: header
-           name: X-Pharos-API-Key
-           schema:
+          name: X-Pharos-API-Key
+          schema:
             type: string
           required: true
           description: The API key the user generated in their Pharos profile, used to authenticate the user.
