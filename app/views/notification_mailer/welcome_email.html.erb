@@ -15,12 +15,13 @@ has to be least 10 characters long.</p>
 <p>Login URL: <%= @login_url %><p>
 
 <% if @subject.institutional_admin? || @subject.admin? %>
-  <p>You have been setup as an institutional admin or and APTrust admin and you will be
-  required to enable two factor authentication within 30 days. After 30 days, two factor
-  authentication becomes mandatory.</p>
+  <p>You have been setup as an institutional admin or an APTrust admin and you will be
+    required to enable two factor authentication within 30 days on production or 90 days on demo.
+    After that grace period, two factor authentication becomes mandatory.</p>
 <% else %>
   <p>You have been setup as an institutional user in our system. We encourage you to setup
-  two factor authentication. It is optional unless required by your institutional admin(s).</p>
+    two factor authentication. However, it is optional unless required by an institutional admin at
+    your institution for the entire institution.</p>
 <% end %>
 
 <p>To enable two factor authentication, visit your user profile page
@@ -30,7 +31,7 @@ the process will not work. Once you have enabled two factor authentication you w
 to verify your phone number through a text message or push notification. Once that is
 done, two factor authentication setup is complete and you will be prompted to use it
 at every login. There is a grace period between the creation of your account and the time
-when two factor authentication must be set up for mandatory users. For the Pharos production
+when two factor authentication must be set up for mandatory users. For tdhe Pharos production
 environment, that grace period is 30 days. For the demo environment it is 90 days.</p>
 
 <p>Pharos has an API that can be used to view Intellectual Objects, Generic Files,
