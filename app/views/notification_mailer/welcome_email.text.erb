@@ -15,12 +15,13 @@ Temporary password: <%= @password %>
 Login URL: <%= @login_url %>
 
 <% if @subject.institutional_admin? || @subject.admin? %>
-    You have been setup as an institutional admin or and APTrust admin and you will be
-    required to enable two factor authentication within 30 days. After 30 days, two factor
-    authentication becomes mandatory.
+    You have been setup as an institutional admin or an APTrust admin and you will be
+    required to enable two factor authentication within 30 days on production or 90 days on demo.
+    After that grace period, two factor authentication becomes mandatory.
 <% else %>
     You have been setup as an institutional user in our system. We encourage you to setup
-    two factor authentication. It is optional unless required by your institutional admin(s).
+    two factor authentication. However, it is optional unless required by an institutional admin at
+    your institution for the entire institution.
 <% end %>
 
 To enable two factor authentication, visit your user profile page
