@@ -49,6 +49,27 @@ RSpec.describe IntellectualObject, :type => :model do
       subject.bag_group_identifier.should == 'This is a connected collection.'
     end
 
+    it 'should properly set a bagit_profile_identifier' do
+      subject.bagit_profile_identifier = 'bagit/profile/identifier'
+      subject.bagit_profile_identifier.should == 'bagit/profile/identifier'
+    end
+
+    it 'should properly set a source_organization' do
+      subject.source_organization = 'University of Virginia'
+      subject.source_organization.should == 'University of Virginia'
+    end
+
+    it 'should properly set an internal_sender_identifier' do
+      subject.internal_sender_identifier = 'internal/sender/identifier'
+      subject.internal_sender_identifier.should == 'internal/sender/identifier'
+    end
+
+    it 'should properly set an internal_sender_description' do
+      exp = Faker::Lorem.paragraph
+      subject.internal_sender_description = exp
+      subject.internal_sender_description.should == exp
+    end
+
     it 'should properly set an alternative identifier' do
       exp = 'test.edu/123456'
       subject.alt_identifier = exp

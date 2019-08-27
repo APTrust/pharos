@@ -193,6 +193,18 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj2
       end
+
+      it 'should not reveal the bagit_profile_identifier in a json request' do
+        get :show, params: { intellectual_object_identifier: obj2 }, format: :json
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj2
+        data = JSON.parse(response.body)
+        expect(data.has_key?('bagit_profile_identifier')).to be false
+        expect(data.has_key?('bag_group_identifier')).to be true
+        expect(data.has_key?('source_organization')).to be true
+        expect(data.has_key?('internal_sender_identifier')).to be true
+        expect(data.has_key?('internal_sender_description')).to be true
+      end
     end
 
     describe 'when signed in as institutional admin' do
@@ -277,6 +289,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(data.has_key?('generic_files')).to be true
         expect(data['generic_files'][0].has_key?('checksums')).to be true
         expect(data['generic_files'][0].has_key?('premis_events')).to be true
+        expect(data.has_key?('bagit_profile_identifier')).to be true
+        expect(data.has_key?('bag_group_identifier')).to be true
+        expect(data.has_key?('source_organization')).to be true
+        expect(data.has_key?('internal_sender_identifier')).to be true
+        expect(data.has_key?('internal_sender_description')).to be true
       end
 
     end
@@ -343,7 +360,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bag_group_identifier: 'collection_one', storage_option: 'Glacier-VA') }
+    let(:exp) { Faker::Lorem.paragraph }
+    let(:simple_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}',
+                                        bag_group_identifier: 'collection_one', storage_option: 'Glacier-VA',
+                                        source_organization: 'University of Virginia', bagit_profile_identifier: 'bagit/profile/identifier',
+                                        internal_sender_identifier: 'internal/sender/identifier', internal_sender_description: exp) }
     let(:bad_obj) { FactoryBot.build(:intellectual_object, institution: inst1, ingest_state: '{[]}', bag_group_identifier: 'collection_two', storage_option: 'somewhere-else') }
 
     after do
@@ -407,6 +428,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         expect(saved_obj.etag).to eq '90908111'
         expect(saved_obj.bag_group_identifier).to eq 'collection_one'
         expect(saved_obj.storage_option).to eq 'Glacier-VA'
+        expect(saved_obj.source_organization).to eq 'University of Virginia'
+        expect(saved_obj.bagit_profile_identifier).to eq 'bagit/profile/identifier'
+        expect(saved_obj.internal_sender_identifier).to eq 'internal/sender/identifier'
+        expect(saved_obj.internal_sender_description).to eq exp
       end
 
       it 'should reject a storage_option that is not allowed' do
@@ -463,16 +488,26 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as system admin' do
       before { sign_in sys_admin }
       it 'should update the object and respond with redirect (html)' do
-        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', storage_option: 'Glacier-VA', ingest_state: '{[A]}'} }
+        exp_two =  Faker::Lorem.paragraph
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', storage_option: 'Glacier-VA', ingest_state: '{[A]}',
+                                                                                             source_organization: 'University of Arizona',
+                                                                                             bagit_profile_identifier: 'bagit/profile/something',
+                                                                                             internal_sender_identifier: 'internal/sender/something',
+                                                                                             internal_sender_description: exp_two} }
         expect(response).to redirect_to intellectual_object_path(obj1.identifier)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Foo'
         expect(saved_obj.storage_option).to eq 'Glacier-VA'
         expect(saved_obj.ingest_state).to eq '{[A]}'
+        expect(saved_obj.source_organization).to eq 'University of Arizona'
+        expect(saved_obj.bagit_profile_identifier).to eq 'bagit/profile/something'
+        expect(saved_obj.internal_sender_identifier).to eq 'internal/sender/something'
+        expect(saved_obj.internal_sender_description).to eq exp_two
       end
 
       it 'should update the object and respond with json (json)' do
-        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}', etag: '12345678', bag_group_identifier: 'collection_two'} }, format: :json
+        patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Food', ingest_state: '{[D]}',
+                                                                                             etag: '12345678', bag_group_identifier: 'collection_two'} }, format: :json
         expect(response.status).to eq (200)
         saved_obj = IntellectualObject.where(identifier: obj1.identifier).first
         expect(saved_obj.title).to eq 'Food'

@@ -272,7 +272,8 @@ class IntellectualObjectsController < ApplicationController
     include_list.push(:premis_events) if params[:include_events]
     include_list.push(active_files: {include: [:checksums]}) if params[:include_files]
     include_list.push(:ingest_state) if (params[:with_ingest_state] == 'true' && current_user.admin?)
-    options_hash = {include: include_list}
+    current_user.admin? ? options_hash = {include: include_list} : options_hash = {include: include_list, except: [:bagit_profile_identifier]}
+
     data = @intellectual_object.serializable_hash(options_hash)
     data[:state] = @intellectual_object.state
     data[:generic_files] = data.delete('active_files') if params[:include_all_relations] || params[:include_files]
@@ -283,7 +284,9 @@ class IntellectualObjectsController < ApplicationController
     params.require(:intellectual_object).permit(:institution_id, :title, :etag, :storage_option,
                                                 :description, :access, :identifier,
                                                 :bag_name, :alt_identifier, :ingest_state,
-                                                :bag_group_identifier, generic_files_attributes:
+                                                :bag_group_identifier, :bagit_profile_identifier,
+                                                :source_organization, :internal_sender_identifier,
+                                                :internal_sender_description, generic_files_attributes:
                                                 [:id, :uri, :identifier,
                                                  :size, :created, :modified, :file_format,
                                                  premis_events_attributes:
@@ -305,7 +308,9 @@ class IntellectualObjectsController < ApplicationController
 
   def update_params
     params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state, :storage_option,
-                                                :alt_identifier, :state, :dpn_uuid, :etag, :bag_group_identifier)
+                                                :alt_identifier, :state, :dpn_uuid, :etag, :bag_group_identifier,
+                                                :bagit_profile_identifier, :source_organization,
+                                                :internal_sender_identifier, :internal_sender_description)
   end
 
   def load_object
