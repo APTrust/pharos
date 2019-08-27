@@ -7,8 +7,17 @@
       <%= f.input :identifier %>
       <%= f.input :dpn_uuid %>
       <%= f.input :type, collection: types_for_select, as: :select, label: 'Institution Type' %>
-      <%= f.input :member_institution_id, collection: member_institutions_for_select, as: :select, label: 'Member Institution' %>
-      <p>Leave this field blank if creating a new member institution.</p>
+      <%= f.input :member_institution_id, collection: member_institutions_for_select, as: :select, label: 'Member Institution', input_html: { class: 'inst_form_input'} %>
+      <p class="inst_form_paragraph">Leave this field blank if creating a new member institution.</p>
+      <h4>The following fields are generated automatically upon creation of the new Institution.</h4>
+      <%= f.input :repo_receiving_bucket, readonly: true, input_html: { class: 'inst_form_input'} %>
+      <p class="inst_form_paragraph">aptrust.receiving.:identifier</p>
+      <%= f.input :repo_restore_bucket, readonly: true, input_html: { class: 'inst_form_input'} %>
+      <p class="inst_form_paragraph">aptrust.restore.:identifier</p>
+      <%= f.input :demo_receiving_bucket, readonly: true, input_html: { class: 'inst_form_input'} %>
+      <p class="inst_form_paragraph">aptrust.receiving.test.:identifier</p>
+      <%= f.input :demo_restore_bucket, readonly: true, input_html: { class: 'inst_form_input'} %>
+      <p class="inst_form_paragraph">aptrust.restore.test.:identifier</p>
     </div>
     <br>
     <div class="form-actions">

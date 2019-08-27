@@ -15,14 +15,20 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
-  before_validation :sanitize_update_params, on: :update
+  #before_validation :sanitize_update_params, on: :update
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
   validate :domain_is_allowed
   validates_uniqueness_of :identifier
 
+  before_save :set_bucket_names
+
   attr_readonly :identifier
+  # attr_readonly :repo_receiving_bucket
+  # attr_readonly :repo_restore_bucket
+  # attr_readonly :demo_receiving_bucket
+  # attr_readonly :demo_restore_bucket
 
   before_destroy :check_for_associations
 
@@ -362,8 +368,20 @@ class Institution < ActiveRecord::Base
     errors.add(:identifier, "must end in '.com', '.org', '.edu', or .museum") unless Pharos::Application::VALID_DOMAINS.include?(self.identifier.split('.').last)
   end
 
+  def set_bucket_names
+    return if self.identifier.nil?
+    self.repo_receiving_bucket = "aptrust.receiving.#{self.identifier}"
+    self.repo_restore_bucket = "aptrust.restore.#{self.identifier}"
+    self.demo_receiving_bucket = "aptrust.receiving.test.#{self.identifier}"
+    self.demo_restore_bucket = "aptrust.restore.test.#{self.identifier}"
+  end
+
   def sanitize_update_params
     restore_attributes(['identifier', :identifier])
+    restore_attributes(['repo_receiving_bucket', :repo_receiving_bucket])
+    restore_attributes(['repo_restore_bucket', :repo_restore_bucket])
+    restore_attributes(['demo_receiving_bucket', :demo_receiving_bucket])
+    restore_attributes(['demo_restore_bucket', :demo_restore_bucket])
   end
 
   def check_for_associations
