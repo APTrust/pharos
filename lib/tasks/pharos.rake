@@ -616,6 +616,16 @@ namespace :pharos do
     })
   end
 
+  desc 'Set Bucket Attributes'
+  task :set_bucket_attributes => :environment do
+    Institution.all.each do |inst|
+      inst.receiving_bucket = "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{inst.identifier}"
+      inst.restore_bucket = "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{inst.identifier}"
+      inst.save!
+      puts "Updated Institution: #{inst.name}"
+    end
+  end
+
   # To get total GB deposited by each institution through the end of July, 2018:
   #
   # inst_storage_summary('2018-07-31')

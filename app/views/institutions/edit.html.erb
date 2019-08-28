@@ -1,6 +1,6 @@
 <% @title = "Edit #{@institution.name}" %>
 
-<h1>Editing institution</h1>
+<h1>Editing Institution</h1>
 
 <%= simple_form_for([@institution.becomes(Institution)], html: {class: 'form-horizontal'}) do |f| %>
 
@@ -12,7 +12,9 @@
       <%= f.input :dpn_uuid %>
       <%= f.input :type, collection: types_for_select, as: :select, label: 'Institution Type' %>
       <%= f.input :member_institution_id, collection: member_institutions_for_select, as: :select, label: 'Member Institution' %>
-      <p>Leave this field blank if creating a new member institution.</p>
+      <p>Leave this field blank if editing a new member institution.</p>
+      <%= f.input :receiving_bucket, readonly: true %>
+      <%= f.input :restore_bucket, readonly: true %>
     </div>
     <br>
     <div class="form-actions">
@@ -26,6 +28,3 @@
 
     </div>
 <% end %>
-
-<%= link_to 'Show', institution_path(@institution) %> |
-<%= link_to 'Back', institutions_path %>

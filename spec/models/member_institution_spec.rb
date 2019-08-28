@@ -39,6 +39,18 @@ RSpec.describe MemberInstitution, :type => :model do
     end
   end
 
+  describe '#set_bucket_names' do
+    it 'should set the bucket attributes accordint to identifier' do
+      one = FactoryBot.build(:member_institution, identifier: 'colorado.edu',
+                                      receiving_bucket: nil,
+                                      restore_bucket: nil)
+
+      one.save!
+      one.receiving_bucket.should eq "#{Pharos::Application.config.pharos_receiving_bucket_prefix}colorado.edu"
+      one.restore_bucket.should eq "#{Pharos::Application.config.pharos_restore_bucket_prefix}colorado.edu"
+    end
+  end
+
   describe '#find_by_identifier' do
     it 'should validate uniqueness of the identifier' do
       one = FactoryBot.create(:member_institution, identifier: 'test.edu')

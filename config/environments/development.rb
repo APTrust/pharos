@@ -52,6 +52,7 @@ Rails.application.configure do
   if ENV['DOCKERIZED'] == 'true'
       config.web_console.whitelisted_ips = ENV['DOCKER_HOST_IP']
   end
-  #
-  #
+
+  config.pharos_receiving_bucket_prefix = 'aptrust.receiving.development.'
+  config.pharos_restore_bucket_prefix = 'aptrust.restore.development.'
 end

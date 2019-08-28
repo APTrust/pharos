@@ -15,14 +15,18 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
-  before_validation :sanitize_update_params, on: :update
+  # before_validation :sanitize_update_params, on: :update
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
   validate :domain_is_allowed
   validates_uniqueness_of :identifier
 
+  before_save :set_bucket_names
+
   attr_readonly :identifier
+  # attr_readonly :receiving_bucket
+  # attr_readonly :restore_bucket
 
   before_destroy :check_for_associations
 
@@ -362,8 +366,16 @@ class Institution < ActiveRecord::Base
     errors.add(:identifier, "must end in '.com', '.org', '.edu', or .museum") unless Pharos::Application::VALID_DOMAINS.include?(self.identifier.split('.').last)
   end
 
+  def set_bucket_names
+    return if self.identifier.nil?
+    self.receiving_bucket = "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{self.identifier}"
+    self.restore_bucket = "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{self.identifier}"
+  end
+
   def sanitize_update_params
     restore_attributes(['identifier', :identifier])
+    restore_attributes(['receiving_bucket', :receiving_bucket])
+    restore_attributes(['restore_bucket', :restore_bucket])
   end
 
   def check_for_associations

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_27_165038) do
+ActiveRecord::Schema.define(version: 2019_08_28_142435) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -191,10 +191,8 @@ ActiveRecord::Schema.define(version: 2019_08_27_165038) do
     t.integer "member_institution_id"
     t.datetime "deactivated_at"
     t.boolean "otp_enabled"
-    t.string "repo_receiving_bucket", null: false
-    t.string "repo_restore_bucket", null: false
-    t.string "demo_receiving_bucket", null: false
-    t.string "demo_restore_bucket", null: false
+    t.string "receiving_bucket", null: false
+    t.string "restore_bucket", null: false
     t.index ["name"], name: "index_institutions_on_name"
   end
 
@@ -335,7 +333,7 @@ ActiveRecord::Schema.define(version: 2019_08_27_165038) do
     t.boolean "initial_password_updated", default: false
     t.boolean "force_password_update", default: false
     t.boolean "account_confirmed", default: true
-    t.datetime "grace_period", default: "2019-06-25 20:39:56"
+    t.datetime "grace_period", default: "2019-06-25 20:40:12"
     t.string "aws_access_key", default: ""
     t.index ["authy_id"], name: "index_users_on_authy_id"
     t.index ["email"], name: "index_users_on_email", unique: true

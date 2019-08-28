@@ -10,8 +10,8 @@ FactoryBot.define do
     dpn_uuid
     type { 'MemberInstitution' }
     deactivated_at { nil }
-    receiving_bucket { "aptrust.receiving.#{identifier}" }
-    restore_bucket { "aptrust.restore.#{identifier}" }
+    receiving_bucket { "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{identifier}" }
+    restore_bucket { "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{identifier}" }
   end
 
   factory :subscription_institution do
@@ -21,8 +21,8 @@ FactoryBot.define do
     type { 'SubscriptionInstitution' }
     member_institution_id { FactoryBot.create(:member_institution).id }
     deactivated_at { nil }
-    receiving_bucket { "aptrust.receiving.#{identifier}" }
-    restore_bucket { "aptrust.restore.#{identifier}" }
+    receiving_bucket { "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{identifier}" }
+    restore_bucket { "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{identifier}" }
   end
 
   factory :aptrust, class: 'Institution' do
@@ -31,7 +31,7 @@ FactoryBot.define do
     dpn_uuid { '' }
     type { 'MemberInstitution' }
     deactivated_at { nil }
-    receiving_bucket { "aptrust.receiving.#{identifier}" }
-    restore_bucket { "aptrust.restore.#{identifier}" }
+    receiving_bucket { "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{identifier}" }
+    restore_bucket { "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{identifier}" }
   end
 end
