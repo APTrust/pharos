@@ -15,7 +15,7 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
-  #before_validation :sanitize_update_params, on: :update
+  # before_validation :sanitize_update_params, on: :update
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
@@ -25,10 +25,8 @@ class Institution < ActiveRecord::Base
   before_save :set_bucket_names
 
   attr_readonly :identifier
-  # attr_readonly :repo_receiving_bucket
-  # attr_readonly :repo_restore_bucket
-  # attr_readonly :demo_receiving_bucket
-  # attr_readonly :demo_restore_bucket
+  # attr_readonly :receiving_bucket
+  # attr_readonly :restore_bucket
 
   before_destroy :check_for_associations
 
@@ -370,18 +368,14 @@ class Institution < ActiveRecord::Base
 
   def set_bucket_names
     return if self.identifier.nil?
-    self.repo_receiving_bucket = "aptrust.receiving.#{self.identifier}"
-    self.repo_restore_bucket = "aptrust.restore.#{self.identifier}"
-    self.demo_receiving_bucket = "aptrust.receiving.test.#{self.identifier}"
-    self.demo_restore_bucket = "aptrust.restore.test.#{self.identifier}"
+    self.receiving_bucket = "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{self.identifier}"
+    self.restore_bucket = "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{self.identifier}"
   end
 
   def sanitize_update_params
     restore_attributes(['identifier', :identifier])
-    restore_attributes(['repo_receiving_bucket', :repo_receiving_bucket])
-    restore_attributes(['repo_restore_bucket', :repo_restore_bucket])
-    restore_attributes(['demo_receiving_bucket', :demo_receiving_bucket])
-    restore_attributes(['demo_restore_bucket', :demo_restore_bucket])
+    restore_attributes(['receiving_bucket', :receiving_bucket])
+    restore_attributes(['restore_bucket', :restore_bucket])
   end
 
   def check_for_associations

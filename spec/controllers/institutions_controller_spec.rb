@@ -290,20 +290,14 @@ RSpec.describe InstitutionsController, type: :controller do
       # it 'should ignore updates to read only fields' do
       #   test_inst = FactoryBot.create(:member_institution, identifier: 'test.edu')
       #   patch :update, params: { institution_identifier: test_inst, institution: {name: 'Foo', identifier: 'foo.edu',
-      #                                                                             repo_receiving_bucket: 'something.else.foo.edu',
-      #                                                                             repo_restore_bucket: 'something.restore.foo.edu',
-      #                                                                             demo_receiving_bucket: 'something.else.test.foo.edu',
-      #                                                                             demo_restore_bucket: 'something.restore.test.foo.edu' } }
+      #                                                                             receiving_bucket: 'something.else.foo.edu',
+      #                                                                             restore_bucket: 'something.restore.foo.edu' } }
       #   expect(assigns(:institution).name).to eq 'Foo'
       #   expect(assigns(:institution).identifier).not_to eq 'foo.edu'
-      #   expect(assigns(:institution).repo_receiving_bucket).not_to eq 'something.else.foo.edu'
-      #   expect(assigns(:institution).repo_receiving_bucket).to eq 'aptrust.receiving.test.edu'
-      #   expect(assigns(:institution).repo_restore_bucket).not_to eq 'something.restore.foo.edu'
-      #   expect(assigns(:institution).repo_restore_bucket).to eq 'aptrust.restore.test.edu'
-      #   expect(assigns(:institution).demo_receiving_bucket).not_to eq 'something.else.test.foo.edu'
-      #   expect(assigns(:institution).demo_receiving_bucket).to eq 'aptrust.receiving.test.test.edu'
-      #   expect(assigns(:institution).demo_restore_bucket).not_to eq 'something.restore.test.foo.edu'
-      #   expect(assigns(:institution).demo_restore_bucket).to eq 'aptrust.restore.test.test.edu'
+      #   expect(assigns(:institution).receiving_bucket).not_to eq 'something.else.foo.edu'
+      #   expect(assigns(:institution).receiving_bucket).to eq "#{Pharos::Application.config.pharos_receiving_bucket_prefix}test.edu"
+      #   expect(assigns(:institution).restore_bucket).not_to eq 'something.restore.foo.edu'
+      #   expect(assigns(:institution).restore_bucket).to eq "#{Pharos::Application.config.pharos_restore_bucket_prefix}test.edu"
       # end
     end
   end
@@ -313,8 +307,8 @@ RSpec.describe InstitutionsController, type: :controller do
       let (:current_member) { FactoryBot.create(:member_institution) }
       let (:attributes) { FactoryBot.attributes_for(:member_institution) }
       let (:attributes2) { FactoryBot.attributes_for(:subscription_institution, member_institution_id: current_member.id) }
-      let (:attributes3) { FactoryBot.attributes_for(:member_institution, repo_receiving_bucket: nil, repo_restore_bucket: nil, demo_receiving_bucket: nil, demo_restore_bucket: nil) }
-      let (:attributes4) { FactoryBot.attributes_for(:member_institution, repo_receiving_bucket: 'something.delete.test.edu', repo_restore_bucket: 'something.dpn.test.edu', demo_receiving_bucket: 'something.delete.test.test.edu', demo_restore_bucket: 'something.dpn.test.test.edu') }
+      let (:attributes3) { FactoryBot.attributes_for(:member_institution, receiving_bucket: nil, restore_bucket: nil) }
+      let (:attributes4) { FactoryBot.attributes_for(:member_institution, receiving_bucket: 'something.delete.test.edu', restore_bucket: 'something.dpn.test.edu') }
 
       before do
         sign_in admin_user
@@ -350,10 +344,8 @@ RSpec.describe InstitutionsController, type: :controller do
         response.should redirect_to institution_url(assigns[:institution])
         assigns[:institution].should be_kind_of Institution
         inst = assigns[:institution]
-        expect(inst.repo_receiving_bucket).to eq "aptrust.receiving.#{inst.identifier}"
-        expect(inst.repo_restore_bucket).to eq "aptrust.restore.#{inst.identifier}"
-        expect(inst.demo_receiving_bucket).to eq "aptrust.receiving.test.#{inst.identifier}"
-        expect(inst.demo_restore_bucket).to eq "aptrust.restore.test.#{inst.identifier}"
+        expect(inst.receiving_bucket).to eq "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{inst.identifier}"
+        expect(inst.restore_bucket).to eq "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{inst.identifier}"
       end
 
       it 'should override bucket names given in the parameters and set expected ones' do
@@ -363,14 +355,10 @@ RSpec.describe InstitutionsController, type: :controller do
         response.should redirect_to institution_url(assigns[:institution])
         assigns[:institution].should be_kind_of Institution
         inst = assigns[:institution]
-        expect(inst.repo_receiving_bucket).not_to eq 'something.delete.test.edu'
-        expect(inst.repo_restore_bucket).not_to eq 'something.dpn.test.edu'
-        expect(inst.demo_receiving_bucket).not_to eq 'something.delete.test.test.edu'
-        expect(inst.demo_restore_bucket).not_to eq 'something.dpn.test.test.edu'
-        expect(inst.repo_receiving_bucket).to eq "aptrust.receiving.#{inst.identifier}"
-        expect(inst.repo_restore_bucket).to eq "aptrust.restore.#{inst.identifier}"
-        expect(inst.demo_receiving_bucket).to eq "aptrust.receiving.test.#{inst.identifier}"
-        expect(inst.demo_restore_bucket).to eq "aptrust.restore.test.#{inst.identifier}"
+        expect(inst.receiving_bucket).not_to eq 'something.delete.test.edu'
+        expect(inst.restore_bucket).not_to eq 'something.dpn.test.edu'
+        expect(inst.receiving_bucket).to eq "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{inst.identifier}"
+        expect(inst.restore_bucket).to eq "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{inst.identifier}"
       end
     end
 

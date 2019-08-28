@@ -42,16 +42,12 @@ RSpec.describe MemberInstitution, :type => :model do
   describe '#set_bucket_names' do
     it 'should set the bucket attributes accordint to identifier' do
       one = FactoryBot.build(:member_institution, identifier: 'colorado.edu',
-                                      repo_receiving_bucket: nil,
-                                      repo_restore_bucket: nil,
-                                      demo_receiving_bucket: nil,
-                                      demo_restore_bucket: nil)
+                                      receiving_bucket: nil,
+                                      restore_bucket: nil)
 
       one.save!
-      one.repo_receiving_bucket.should eq 'aptrust.receiving.colorado.edu'
-      one.repo_restore_bucket.should eq 'aptrust.restore.colorado.edu'
-      one.demo_receiving_bucket.should eq 'aptrust.receiving.test.colorado.edu'
-      one.demo_restore_bucket.should eq 'aptrust.restore.test.colorado.edu'
+      one.receiving_bucket.should eq "#{Pharos::Application.config.pharos_receiving_bucket_prefix}colorado.edu"
+      one.restore_bucket.should eq "#{Pharos::Application.config.pharos_restore_bucket_prefix}colorado.edu"
     end
   end
 
