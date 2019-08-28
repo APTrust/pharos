@@ -1,6 +1,6 @@
 default: &default
   adapter: postgresql
-  pool: 5
+  pool: 15
   timeout: 5000
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   port: <%= ENV['PHAROS_DB_PORT'] || 5432 %>
@@ -28,6 +28,10 @@ integration:
   <<: *default
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
+
+staging:
+  <<: *default
+  database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_staging' %>
 
 # Demo environment for APTrust Demo system
 demo:
