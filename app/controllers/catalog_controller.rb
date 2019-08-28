@@ -64,6 +64,12 @@ class CatalogController < ApplicationController
           @results = objects.with_title_like(@q)
         when 'Bag Group Identifier'
           @results = objects.with_bag_group_identifier_like(@q)
+        when 'Source Organization'
+          @results = objects.with_source_organization_like(@q)
+        when 'Internal Sender Identifier'
+          @results = objects.with_internal_sender_identifier_like(@q)
+        when 'Internal Sender Description'
+          @results = objects.with_internal_sender_description_like(@q)
       end
     end
   end

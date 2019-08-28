@@ -18,12 +18,12 @@ RSpec.describe CatalogController, type: :controller do
     @institution = FactoryBot.create(:member_institution)
     @another_institution = FactoryBot.create(:subscription_institution)
 
-    @object_one = FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id, id: 1, bag_group_identifier: 'This is a collection.')
-    @object_two = FactoryBot.create(:institutional_intellectual_object, institution_id: @institution.id, alt_identifier: ['something/1234-5678'], id: 2)
-    @object_three = FactoryBot.create(:restricted_intellectual_object, institution_id: @institution.id, bag_name: 'fancy_bag/1234-5678', id: 3)
-    @object_four = FactoryBot.create(:consortial_intellectual_object, institution_id: @another_institution.id, title: 'This is an important bag', id: 4)
-    @object_five = FactoryBot.create(:institutional_intellectual_object, institution_id: @another_institution.id, identifier: 'test.edu/1234-5678', id: 5)
-    @object_six = FactoryBot.create(:restricted_intellectual_object, institution_id: @another_institution.id, id: 6)
+    @object_one = FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id, id: 1, bag_group_identifier: 'This is a collection.', internal_sender_description: 'This is a short paragraph. Kind of.')
+    @object_two = FactoryBot.create(:institutional_intellectual_object, institution_id: @institution.id, alt_identifier: ['something/1234-5678'], id: 2, internal_sender_description: 'This is another short paragraph but has only one sentence in it.')
+    @object_three = FactoryBot.create(:restricted_intellectual_object, institution_id: @institution.id, bag_name: 'fancy_bag/1234-5678', id: 3, internal_sender_identifier: '1234-5678-9108-9365')
+    @object_four = FactoryBot.create(:consortial_intellectual_object, institution_id: @another_institution.id, title: 'This is an important bag', id: 4, source_organization: 'University of Virginia')
+    @object_five = FactoryBot.create(:institutional_intellectual_object, institution_id: @another_institution.id, identifier: 'test.edu/1234-5678', id: 5, source_organization: 'University of Denver')
+    @object_six = FactoryBot.create(:restricted_intellectual_object, institution_id: @another_institution.id, id: 6, internal_sender_identifier: '1234-5678-9108-6380')
 
     @file_one = FactoryBot.create(:generic_file, intellectual_object: @object_one, uri: 'file://something/data/old_file.xml', id: 7)
     @file_two = FactoryBot.create(:generic_file, intellectual_object: @object_two, uri: 'file://fancy/data/new_file.xml', id: 8)
@@ -104,6 +104,36 @@ RSpec.describe CatalogController, type: :controller do
             get :search, params: { q: 'collection', search_field: 'Bag Group Identifier', object_type: 'Intellectual Objects' }
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @object_one.id
+          end
+
+          it 'should match an exact search on source organization' do
+            get :search, params: { q: 'University of Virginia', search_field: 'Source Organization', object_type: 'Intellectual Objects' }
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_four.id
+          end
+
+          it 'should match a partial search on source organization' do
+            get :search, params: { q: 'University', search_field: 'Source Organization', object_type: 'Intellectual Objects' }
+            expect(assigns(:paged_results).size).to eq 2
+            expect(assigns(:paged_results).map &:id).to match_array [@object_four.id, @object_five.id]
+          end
+
+          it 'should match an exact search on internal sender identifier' do
+            get :search, params: { q: '1234-5678-9108-9365', search_field: 'Internal Sender Identifier', object_type: 'Intellectual Objects' }
+            expect(assigns(:paged_results).size).to eq 1
+            expect(assigns(:paged_results).first.id).to eq @object_three.id
+          end
+
+          it 'should match a partial search on internal sender identifier' do
+            get :search, params: { q: '9108', search_field: 'Internal Sender Identifier', object_type: 'Intellectual Objects' }
+            expect(assigns(:paged_results).size).to eq 2
+            expect(assigns(:paged_results).map &:id).to match_array [@object_three.id, @object_six.id]
+          end
+
+          it 'should match a partial search on internal sender description' do
+            get :search, params: { q: 'paragraph', search_field: 'Internal Sender Description', object_type: 'Intellectual Objects' }
+            expect(assigns(:paged_results).size).to eq 2
+            expect(assigns(:paged_results).map &:id).to match_array [@object_one.id, @object_two.id]
           end
 
           it 'should strip the leading and trailing whitespace from a search term' do

@@ -370,6 +370,9 @@ class IntellectualObjectsController < ApplicationController
                                 .with_access(params[:access])
                                 .with_file_format(params[:file_format])
                                 .with_state(params[:state])
+                                .with_source_organization_like(params[:source_organization])
+                                .with_internal_sender_identifier_like(params[:internal_sender_identifier])
+                                .with_internal_sender_description_like(params[:internal_sender_description])
     @selected = {}
     get_object_format_counts(@intellectual_objects)
     get_institution_counts(@intellectual_objects)

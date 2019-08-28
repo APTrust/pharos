@@ -18,7 +18,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    title: 'Aberdeen Wanderers',
                                    description: 'Founded in Aberdeen in 1928.',
                                    etag: '4d05dc2aa07e411a55ef11bc6ade5ec1',
-                                   bag_group_identifier: 'This is a collection.') }
+                                   bag_group_identifier: 'This is a collection.',
+                                   source_organization: 'University of Colorado',
+                                   internal_sender_identifier: '1234-5678-9018-8362',
+                                   internal_sender_description: 'This is a paragraph. Of sorts.') }
   let!(:obj3) { FactoryBot.create(:institutional_intellectual_object,
                                    institution: inst2) }
   let!(:obj4) { FactoryBot.create(:restricted_intellectual_object,
@@ -151,6 +154,24 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { bag_group_identifier: 'collection' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { source_organization: 'University of Colorado' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { source_organization: 'Colorado' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { internal_sender_identifier: '1234-5678-9018-8362' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { internal_sender_identifier: '9018' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { internal_sender_description: 'This is a paragraph. Of sorts.' }
+          expect(assigns(:intellectual_objects).size).to eq 1
+
+          get :index, params: { internal_sender_description: 'paragraph' }
           expect(assigns(:intellectual_objects).size).to eq 1
         end
       end
