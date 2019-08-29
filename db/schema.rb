@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_28_142435) do
+ActiveRecord::Schema.define(version: 2019_08_29_155403) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,7 +212,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.text "ingest_state"
     t.string "bag_group_identifier", default: "", null: false
     t.string "storage_option", default: "standard"
-    t.text "bagit_profile_identifier"
+    t.string "bagit_profile_identifier"
     t.string "source_organization"
     t.string "internal_sender_identifier"
     t.text "internal_sender_description"
@@ -333,7 +333,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.boolean "initial_password_updated", default: false
     t.boolean "force_password_update", default: false
     t.boolean "account_confirmed", default: true
-    t.datetime "grace_period", default: "2019-06-25 20:40:12"
+    t.datetime "grace_period", default: "2019-06-25 20:39:56"
     t.string "aws_access_key", default: ""
     t.index ["authy_id"], name: "index_users_on_authy_id"
     t.index ["email"], name: "index_users_on_email", unique: true
