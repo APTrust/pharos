@@ -43,4 +43,7 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  config.pharos_receiving_bucket_prefix = 'aptrust.receiving.test.suite.'
+  config.pharos_restore_bucket_prefix = 'aptrust.restore.test.suite.'
 end

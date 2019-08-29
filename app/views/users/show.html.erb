@@ -116,3 +116,9 @@
 <br />
 
 <%= render 'api_key' %>
+
+<h4>AWS Buckets</h4>
+<ul clas="unstyled">
+  <li><strong>Receiving Bucket: </strong><%= @user.institution.receiving_bucket %></li>
+  <li><strong>Restore Bucket: </strong><%= @user.institution.restore_bucket %></li>
+</ul>

@@ -1,6 +1,6 @@
 <% @title = "Edit #{@institution.name}" %>
 
-<h1>Editing institution</h1>
+<h1>Editing Institution</h1>
 
 <%= simple_form_for([@institution.becomes(Institution)], html: {class: 'form-horizontal'}) do |f| %>
 
@@ -13,10 +13,8 @@
       <%= f.input :type, collection: types_for_select, as: :select, label: 'Institution Type' %>
       <%= f.input :member_institution_id, collection: member_institutions_for_select, as: :select, label: 'Member Institution' %>
       <p>Leave this field blank if editing a new member institution.</p>
-      <%= f.input :repo_receiving_bucket, readonly: true %>
-      <%= f.input :repo_restore_bucket, readonly: true %>
-      <%= f.input :demo_receiving_bucket, readonly: true %>
-      <%= f.input :demo_restore_bucket, readonly: true %>
+      <%= f.input :receiving_bucket, readonly: true %>
+      <%= f.input :restore_bucket, readonly: true %>
     </div>
     <br>
     <div class="form-actions">
