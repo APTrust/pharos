@@ -20,6 +20,13 @@
 <% end %>
 <%= destroy_link(@user) %>
 <br><br>
+<% unless @user.email_verified %>
+    <h5>Resend Email Verification</h5>
+    <p>If you lost, or never received, a welcome email and have not changed your password you may need to verify your email. Please do so now. </p>
+    <%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
+                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
+<% end %>
+
 <% unless @user.account_confirmed %>
     <h5>Resend Account Confirmation Email</h5>
     <p>If you lost, or never received, an email with a confirmation URL for your account confirmation you can resend a confirmation email here. </p>
@@ -27,12 +34,6 @@
 <% end %>
 
 <hr />
-
-<% unless @user.email_verified %>
-    <%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
-                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
-    <br />
-<% end %>
 
 <h4>Two Factor Authentication (2FA)</h4>
 <% if @user.enabled_two_factor %>
@@ -106,16 +107,21 @@
     </a>
   </span>
 </div>
-<br />
+
+<hr />
+
 <h4>Roles</h4>
 <ul class="unstyled">
   <% @user.roles.each do |role| %>
       <li><%= role.name.titleize %></li>
   <% end %>
 </ul>
-<br />
+
+<hr />
 
 <%= render 'api_key' %>
+
+<hr />
 
 <h4>AWS Buckets</h4>
 <ul clas="unstyled">
