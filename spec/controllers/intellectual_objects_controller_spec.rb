@@ -28,7 +28,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    institution: inst1,
                                    title: 'Manchester City',
                                    description: 'The other Manchester team.',
-                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec2') }
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec2',
+                                   bag_group_identifier: 'collection two',
+                                   source_organization: 'Colorado School of Mines',
+                                   internal_sender_identifier: '1234-5678-9018-9274',
+                                   internal_sender_description: 'This is another paragraph. Kind of.') }
   let!(:obj5) { FactoryBot.create(:restricted_intellectual_object,
                                    institution: inst2) }
   let!(:obj6) { FactoryBot.create(:institutional_intellectual_object,
@@ -154,25 +158,25 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { bag_group_identifier: 'collection' }
-          expect(assigns(:intellectual_objects).size).to eq 1
+          expect(assigns(:intellectual_objects).size).to eq 2
 
           get :index, params: { source_organization: 'University of Colorado' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { source_organization: 'Colorado' }
-          expect(assigns(:intellectual_objects).size).to eq 1
+          expect(assigns(:intellectual_objects).size).to eq 2
 
           get :index, params: { internal_sender_identifier: '1234-5678-9018-8362' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { internal_sender_identifier: '9018' }
-          expect(assigns(:intellectual_objects).size).to eq 1
+          expect(assigns(:intellectual_objects).size).to eq 2
 
           get :index, params: { internal_sender_description: 'This is a paragraph. Of sorts.' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { internal_sender_description: 'paragraph' }
-          expect(assigns(:intellectual_objects).size).to eq 1
+          expect(assigns(:intellectual_objects).size).to eq 2
         end
       end
     end
