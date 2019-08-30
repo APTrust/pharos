@@ -1,12 +1,6 @@
 Team,
 
-<% if Rails.env.demo? %>
-    Here are the latest snapshot results for the demo repository broken down by institution.
-<% elsif Rails.env.production? %>
-    Here are the latest snapshot results for the production repository broken down by institution.
-<% else %>
-    Here are the latest snapshot results broken down by institution.
-<% end %>
+Here are the latest snapshot results for the <%= Rails.env.capitalize %> repository broken down by institution.
 
   <% @snap_hash.each do |key, value| %>
       <%= key %> : <%= value %>

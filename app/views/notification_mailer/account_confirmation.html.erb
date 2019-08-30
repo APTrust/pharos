@@ -1,8 +1,8 @@
 <p>Hello <%= @subject.name %>,</p>
 <br>
-<p>Once a year we send out emails to confirm everyone's account to ensure your user account is still active.
-  You will have two weeks to confirm your account before your account will be deactivated. At that point,
-  if you are still an active user, you will need to contact an administrator to reactivate your account.</p>
+<p>Once a year we at APTrust send out emails to confirm everyone's account to ensure your user account is still active.
+  You will have two weeks to confirm your account on the <%= Rails.env.capitalize %> system before your account will be deactivated.
+  At that point, if you are still an active user, you will need to contact an administrator to reactivate your account.</p>
 <br>
 
 <a href="<%= @confirmation_url %>">Click here to confirm your account</a>

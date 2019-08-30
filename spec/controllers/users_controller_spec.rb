@@ -36,7 +36,7 @@ RSpec.describe UsersController, type: :controller do
           token = ConfirmationToken.where(user_id: user.id).first
           expect(token).not_to be_nil
           email = ActionMailer::Base.deliveries.last
-          expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+          expect(email.body.encoded).to include("You will have two weeks to confirm your account on the #{Rails.env.capitalize} system before your account will be deactivated.")
         end
       end
     end
@@ -48,7 +48,7 @@ RSpec.describe UsersController, type: :controller do
       token = ConfirmationToken.where(user_id: assigns[:user].id).first
       expect(token).not_to be_nil
       email = ActionMailer::Base.deliveries.last
-      expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+      expect(email.body.encoded).to include("You will have two weeks to confirm your account on the #{Rails.env.capitalize} system before your account will be deactivated.")
       expect(email.body.encoded).to include("http://localhost:3000/users/#{assigns[:user].id}/confirm_account?confirmation_token=#{token.token}")
     end
 
@@ -515,7 +515,7 @@ RSpec.describe UsersController, type: :controller do
       token = ConfirmationToken.where(user_id: assigns[:user].id).first
       expect(token).not_to be_nil
       email = ActionMailer::Base.deliveries.last
-      expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+      expect(email.body.encoded).to include("You will have two weeks to confirm your account on the #{Rails.env.capitalize} system before your account will be deactivated.")
       expect(email.body.encoded).to include("http://localhost:3000/users/#{assigns[:user].id}/confirm_account?confirmation_token=#{token.token}")
     end
 
@@ -731,7 +731,7 @@ RSpec.describe UsersController, type: :controller do
       token = ConfirmationToken.where(user_id: assigns[:user].id).first
       expect(token).not_to be_nil
       email = ActionMailer::Base.deliveries.last
-      expect(email.body.encoded).to include('You will have two weeks to confirm your account before your account will be deactivated.')
+      expect(email.body.encoded).to include("You will have two weeks to confirm your account on the #{Rails.env.capitalize} system before your account will be deactivated.")
       expect(email.body.encoded).to include("http://localhost:3000/users/#{assigns[:user].id}/confirm_account?confirmation_token=#{token.token}")
     end
 

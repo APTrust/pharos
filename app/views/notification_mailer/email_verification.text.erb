@@ -2,7 +2,7 @@ Hello <%= @subject.name %>,
 
 Welcome to Pharos, the APTrust web application.
 
-Before you can continue using the website, we need to verify your email address.
+Before you can continue using the <%= Rails.env.capitalize %> website, we need to verify your email address.
 Please click the following link to verify.
 <%= @confirmation_url %>
 

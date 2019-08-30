@@ -1,12 +1,6 @@
 <p>Team,</p>
 <br>
-<% if Rails.env.demo? %>
-    <p>Here are the latest stale users for the demo repository.</p>
-<% elsif Rails.env.production? %>
-    <p>Here are the latest stale users for the production repository.</p>
-<% else %>
-    <p>Here are the latest stale users.</p>
-<% end %>
+<p>Here are the latest stale users for the <%= Rails.env.capitalize %> repository.</p>
 <br>
 <div>
   <table class="table">

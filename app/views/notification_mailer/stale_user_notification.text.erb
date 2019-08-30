@@ -1,12 +1,6 @@
 Team,
 
-<% if Rails.env.demo? %>
-    Here are the latest stale users for the demo repository.
-<% elsif Rails.env.production? %>
-    Here are the latest stale users for the production repository.
-<% else %>
-    Here are the latest stale users.
-<% end %>
+Here are the latest stale users for the <%= Rails.env.capitalize %> repository.
 
 <% @users.each do |usr| %>
   <%= usr.name %> : <%= usr.email %>

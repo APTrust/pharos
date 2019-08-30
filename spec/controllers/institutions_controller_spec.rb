@@ -472,7 +472,7 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(assigns(:snapshots).first.first.apt_bytes).to eq 0
         expect(assigns(:snapshots).first.first.cost).to eq 0.00
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include('Here are the latest snapshot results broken down by institution.')
+        expect(email.body.encoded).to include("Here are the latest snapshot results for the #{Rails.env.capitalize} repository broken down by institution.")
       end
 
       it 'responds successfully and creates a snapshot (JSON)' do
@@ -484,7 +484,7 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(data['snapshots'][0][0].has_key?('institution_id')).to be true
         expect(data['snapshots'][0][1].has_key?('institution_id')).to be true
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include('Here are the latest snapshot results broken down by institution.')
+        expect(email.body.encoded).to include("Here are the latest snapshot results for the #{Rails.env.capitalize} repository broken down by institution.")
       end
     end
 

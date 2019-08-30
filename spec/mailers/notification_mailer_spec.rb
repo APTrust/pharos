@@ -630,7 +630,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'includes specific snapshot text' do
-      expect(mail.body.encoded).to include('Here are the latest snapshot results broken down by institution.')
+      expect(mail.body.encoded).to include("Here are the latest snapshot results for the #{Rails.env.capitalize} repository broken down by institution.")
     end
   end
 
