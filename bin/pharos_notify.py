@@ -46,9 +46,9 @@ parser.add_argument('-H', '--host', metavar='PHAROS_HOST', \
 	action=EnvDefault, envvar='PHAROS_HOST', \
         help='Host to connect to.')
 parser.add_argument('-o', '--opt', nargs='+', \
-        choices=['fixity', 'restore', 'snapshot', 'deletion'], \
+        choices=['fixity', 'restore', 'snapshot', 'deletion', 'stale_users'], \
         default=['fixity', 'restore'], \
-        help='Notification options (fixity, restore, snapshot, deletion [defaults to fixity,restore])')
+        help='Notification options (fixity, restore, snapshot, deletion, stale_users, [defaults to fixity,restore])')
 
 args = parser.parse_args()
 
@@ -67,6 +67,8 @@ for option in args.opt:
         OPT_ENDPOINT = '/group_snapshot'
     elif option == 'deletion':
         OPT_ENDPOINT = '/notifications/deletion'
+    elif option == 'stale_users':
+        OPT_ENDPOINT = '/notifications/stale_users'
 
     PHAROS_URL = 'https://' + args.host + '/api/v2' + OPT_ENDPOINT
     r_option = requests.get(PHAROS_URL, headers=headers)
