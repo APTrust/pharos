@@ -4,6 +4,6 @@ class AddConfirmationFlagToUsers < ActiveRecord::Migration[5.2]
   end
 
   def down
-    add_column :users, :account_confirmed
+    remove_column :users, :account_confirmed
   end
 end
