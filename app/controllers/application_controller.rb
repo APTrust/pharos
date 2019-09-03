@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   include Pundit
   include AuthorizationForcedRedirects
   before_action do
+    params[:user] = { email: request.headers["X-Pharos-API-User"] } if api_request? && params[:controller] == 'users'
+
     resource = controller_path.singularize.gsub('/', '_').to_sym
     method = "#{resource}_params"
     params[resource] &&= send(method) if respond_to?(method, true)
