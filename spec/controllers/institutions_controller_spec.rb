@@ -935,12 +935,16 @@ RSpec.describe InstitutionsController, type: :controller do
         extra_user = FactoryBot.create(:user, :institutional_admin, institution_id: institution_three.id)
         obj1 = FactoryBot.create(:intellectual_object, state: 'D', institution: institution_three)
         obj2 = FactoryBot.create(:intellectual_object, state: 'D', institution: institution_three)
+        obj3 = FactoryBot.create(:intellectual_object, state: 'D', institution: institution_three)
         file1 = FactoryBot.create(:generic_file, intellectual_object: obj1, state: 'D')
         file2 = FactoryBot.create(:generic_file, intellectual_object: obj2, state: 'D')
-        latest_email = FactoryBot.create(:deletion_notification_email, institution_id: institution_three.id)
+        file3 = FactoryBot.create(:generic_file, intellectual_object: obj3, state: 'D')
         sleep 1
         item1 = FactoryBot.create(:work_item, object_identifier: obj1.identifier, intellectual_object: obj1, generic_file_identifier: file1.identifier, generic_file: file1, action: 'Delete', status: 'Success', stage: 'Resolve', institution_id: institution_three.id)
         item2 = FactoryBot.create(:work_item, object_identifier: obj2.identifier, intellectual_object: obj2, generic_file_identifier: file2.identifier, generic_file: file2, action: 'Delete', status: 'Success', stage: 'Resolve', institution_id: institution_three.id)
+        item3 = FactoryBot.create(:work_item, object_identifier: obj3.identifier, intellectual_object: obj3, generic_file_identifier: file3.identifier, generic_file: file3, action: 'Delete', status: 'Success', stage: 'Resolve', institution_id: institution_three.id)
+        item3.created_at = Time.now - 2.month
+        item3.save!
         count_before = Email.all.count
         get :deletion_notifications
         count_after = Email.all.count
