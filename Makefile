@@ -48,7 +48,7 @@ run: ## Just run Pharos in foreground
 	docker run -p 9292:9292 $(TAG)
 
 runshell: ## Run Pharos container with interactive shell
-	docker run -it -p 9292:9292 $(TAG) bash
+	docker run -it --env-file=.env $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) bash
 
 runcmd: ## Start Pharos container, run command and exit.
 	docker run $(TAG) $(filter-out $@, $(MAKECMDGOALS))
