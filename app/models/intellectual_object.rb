@@ -79,9 +79,9 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def bytes_by_format
-    stats = self.generic_files.sum(:size)
+    stats = self.active_files.sum(:size)
     if stats
-      cross_tab = self.generic_files.group(:file_format).sum(:size)
+      cross_tab = self.active_files.group(:file_format).sum(:size)
       cross_tab['all'] = stats
       cross_tab
     else
