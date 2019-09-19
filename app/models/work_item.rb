@@ -289,7 +289,7 @@ class WorkItem < ActiveRecord::Base
     restore_item.node = nil
     restore_item.pid = 0
     restore_item.needs_admin_review = false
-    restore_item.size = item.size
+    restore_item.size = generic_file.size
     restore_item.stage_started_at = nil
     restore_item.queued_at = nil
     restore_item.save!
