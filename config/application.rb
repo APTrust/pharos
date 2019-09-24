@@ -28,7 +28,7 @@ module Pharos
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    VERSION = "1.0"
+	VERSION = "2.5"
 
     config.i18n.enforce_available_locales = true
 
