@@ -200,9 +200,11 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::RoutingError do |exception|
     logger.error "Routing error occurred. URL: #{request.url}"
     logger.error exception.backtrace.join("\n")
+    request.format = 'json' if api_request?
+    logger.error 'Routing error occurred'
     respond_to do |format|
       format.html { render 'shared/404', status: 404 }
-      format.json { render :json => { status: 'error', message: 'The page you were looking for could not be found! If you were searching for a specific object or file, check to make sure you have the correct identifier and try again. If you believe you have reached this message in error, please contact your administrator or an APTrust administrator.' }, status: 404 }
+      format.json { render :json => { status: 'error', message: 'The page you were looking for could not be found! If you were searching for a specific object or file, check to make sure you have the correct identifier and try again. If you believe you have reached this message in error, please contact your administrator or an APTrust administrator.', url: request.original_url }, status: 404 }
     end
   end
 

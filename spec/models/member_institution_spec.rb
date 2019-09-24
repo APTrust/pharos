@@ -178,22 +178,26 @@ RSpec.describe MemberInstitution, :type => :model do
     describe 'with associated work items' do
       let!(:object_one) { FactoryBot.create(:intellectual_object, institution: subject) }
       let!(:object_two) { FactoryBot.create(:intellectual_object, institution: subject) }
+      let!(:object_three) { FactoryBot.create(:intellectual_object, institution: subject) }
       let!(:file_one) { FactoryBot.create(:generic_file, intellectual_object: object_one) }
       let!(:file_two) { FactoryBot.create(:generic_file, intellectual_object: object_two) }
+      let!(:file_three) { FactoryBot.create(:generic_file, intellectual_object: object_three) }
 
       after (:all) do
         Institution.remove_directory('test')
       end
 
       it 'should return a list of new deletion items' do
-        latest_email = FactoryBot.create(:deletion_notification_email, institution_id: subject.id)
-        sleep 1
         item_one = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_one, institution_id: subject.id)
         item_two = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_two, institution_id: subject.id)
+        item_three = FactoryBot.create(:work_item, action: 'Delete', status: 'Success', stage: 'Resolve', generic_file: file_three, institution_id: subject.id)
+        item_three.created_at = Time.now - 2.month
+        item_three.save!
         items = subject.new_deletion_items
         items.count.should eq(2)
         expect(items).to include(item_one)
         expect(items).to include(item_two)
+        expect(items).not_to include(item_three)
       end
 
       it 'should generate a csv file for new deletion work items' do
