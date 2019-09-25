@@ -53,7 +53,7 @@ Rails.application.configure do
   end
 
    # Semantic logger
-  #config.colorize_logging = false
+  config.colorize_logging = false
   if ENV["DOCKERIZED"] == 'true'
     STDOUT.sync = true
     config.semantic_logger.add_appender(io: STDOUT, level: config.log_level, formatter: config.rails_semantic_logger.format)
