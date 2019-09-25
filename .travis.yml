@@ -31,13 +31,11 @@ deploy:
     local-dir: docs
     on:
       branch:
-        - feature/two_factor
         - develop
   - provider: script
     script: make -w publish-ci
     on:
       branch:
-        - feature/two_factor
         - develop
     skip_cleanup: true
 notifications:
