@@ -15,7 +15,7 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
-  # before_validation :sanitize_update_params, on: :update
+  before_validation :sanitize_update_params, on: :update
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
@@ -25,8 +25,8 @@ class Institution < ActiveRecord::Base
   before_save :set_bucket_names
 
   attr_readonly :identifier
-  # attr_readonly :receiving_bucket
-  # attr_readonly :restore_bucket
+  attr_readonly :receiving_bucket
+  attr_readonly :restore_bucket
 
   before_destroy :check_for_associations
 
