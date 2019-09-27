@@ -21,10 +21,9 @@ services:
       - db
       - migration
     ports:
-      - "9292:9292"
+      - 9292
     networks:
       - backend
-      - frontend
     env_file:
       - ".env"
     logging:
