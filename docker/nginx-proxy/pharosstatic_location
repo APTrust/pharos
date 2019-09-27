@@ -1,6 +1,13 @@
 location /assets/ {
     alias /etc/share/nginx/html/pharos/assets/;
 }
+location /api/ {
+        rewrite ^ $request_uri;
+        rewrite ^/api/(.*) $1 break;
+        return 400; #if the second rewrite won't match
+        proxy_pass http://staging.aptrust.org:9292/$uri;
+ }
+
 set $cors '';
 if ($http_origin ~ '^https?://(localhost|demo\.aptrust\.org|aptrust\.github\.io)') {
 		set $cors 'true';
