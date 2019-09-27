@@ -84,7 +84,6 @@ services:
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/certs:/etc/nginx/certs:rw
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/vhost.d:/etc/nginx/vhost.d:rw
-      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/conf.d:/etc/nginx/conf.d:rw
 networks:
   frontend:
   backend:
