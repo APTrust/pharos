@@ -61,7 +61,7 @@ services:
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
       - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
       - ./docker/nginx-proxy/graylog_nginx.conf:/etc/nginx/conf.d/graylog_nginx.conf
-      - ./docker/nginx-proxy/proxy_settings.conf:/etc/nginx/conf.d/proxy_settings_conf.conf
+      - ./docker/nginx-proxy/proxy_settings.conf:/etc/nginx/conf.d/proxy_settings.conf
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/vhost.d:/etc/nginx/vhost.d
       - assets:/etc/share/nginx/html/pharos
     labels:
