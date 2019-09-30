@@ -41,7 +41,7 @@ gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
 gem 'kaminari'
 gem 'sassc-rails'
-gem 'sassc', '2.2.0'
+gem 'sassc', '2.2.1'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'browser-timezone-rails'
 
