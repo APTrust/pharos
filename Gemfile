@@ -46,7 +46,7 @@ gem 'bootstrap-sass', '~> 3.4.1'
 gem 'browser-timezone-rails'
 
 gem 'activerecord-nulldb-adapter'
-gem 'puma', '3.12.0'
+gem 'puma', '4.2.0'
 
 group :demo, :production, :staging do
   # Graylog logging gems
