@@ -13,7 +13,7 @@ services:
   pharos:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     restart: always
-    command: bundle exec puma -w3 -p9292 -e ${RAILS_ENV}
+    command: bundle exec puma -w3 -t 8:32 --preload -p9292 -e ${RAILS_ENV}
     volumes:
       - assets:/pharos/public
       - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
@@ -59,6 +59,7 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/certs:/etc/nginx/certs:ro
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/:/var/log/nginx/:rw
       - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
       - ./docker/nginx-proxy/graylog_nginx.conf:/etc/nginx/conf.d/graylog_nginx.conf
       - ./docker/nginx-proxy/proxy_settings.conf:/etc/nginx/conf.d/proxy_settings.conf
