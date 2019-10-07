@@ -12,7 +12,7 @@ LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
     nodejs postgresql-client postgresql-dev python py-requests py-argparse \
     libstdc++ tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal \
-	libxml2-dev libxslt-dev \
+	libxml2-dev libxslt-dev readline readline-dev\
 # Following packages for wkhtmltopdf only
     libgcc libstdc++ libx11 glib libxrender libxext libintl \
     libcrypto1.0 libssl1.0 \
