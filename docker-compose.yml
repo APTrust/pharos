@@ -52,6 +52,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - 18080 # nginx_status port
 #    environment:
 #      - DEFAULT_HOST=docker1.aptrust.org
 #      - DHPARAM_GENERATION=false
