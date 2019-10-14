@@ -37,7 +37,9 @@ staging:
 demo:
   <<: *default
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_demo' %>
+  pool: 100
 
 production:
   <<: *default
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_production' %>
+  pool: 200
