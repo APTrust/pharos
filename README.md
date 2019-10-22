@@ -7,44 +7,58 @@ Build Status | Continuous Integration | Code Coverage
 --- | --- | ---
 develop | [![Build Status (Development)](https://travis-ci.org/APTrust/pharos.png?branch=develop)](https://travis-ci.org/APTrust/pharos) | [![Coverage Status](https://coveralls.io/repos/github/APTrust/pharos/badge.svg?branch=develop)](https://coveralls.io/github/APTrust/pharos?branch=develop)
 
-## APTrust Admin Console
-
-This application uses ActiveRecord to interact with a SQL database.
-
 ### Requirements
 
-See 'Gemfile' for a full list of current dependencies.
+Since mid 2019 the Pharos app has been containerized. You may use the Baremetal
+or Docker version for development. In this case you will need
 
-Overall Pharos targets the following versions or later
+#### Docker Version Requirements
+* [Docker Desktop](https://hub.docker.com/search/?type=edition&offering=community)
+* [Make](Makefile)
 
-* Ruby >= 2.2.0
-* Rails >= 4.2.7
+#### Baremetal Version Requirements
+* [Bundler](https://bundler.io)
+* [Ruby >= 2.5.0](https://www.ruby-lang.org/en/)
+* [Rails >= 5.2.3](https://rubyonrails.org/)
+* [Postgres](https://postgresapp.com/)
 
 Installing the Postgres gem on Mac with Postgres.app:
+```gem install pg -v 1.1.4 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin pg_config```
 
-`gem install pg -v 1.1.3 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin/pg_config`
+### Configuration
 
-If you have only one version of Postgres installed, substitute version number (e.g. 9.5 or 10.0) for 'latest' in the path above.
+We use [dotenv](https://github.com/bkeepers/dotenv) for application
+configuration. See `.env` file in this repository for configuration parameters
+with default/development values. This file is updated by deployment according to
+it's environment.
 
-### Additional Configuration
+### Development credentials
 
-We use the figaro gem for additional application configuration through 'pharos/config/application.yml' which is added
-to the .gitignore file by default.  You will need to copy 'pharos/config/application.yml.local' to
-'pharos/config/application.yml' and setup values as appropriate.
+After running `rake pharos:setup` or `make build` and `make dev`
+you can log in wiht
+Email: ops@aptrust.org
+Password: 'password123'
 
-Use the ``` rake secret ``` command to generate secret keys for rails and devise.  Paste those keys into the 'pharos/config/application.yml' file.
+### Docker Develeopment Quick Start
 
+Once you have the Docker suite installed you may run `make build`. This builds
+containers based of the current git version of the repository.
+`make dev` will start all containers (Postgres, Pharos, Nginx) and populate the
+database with seed data to get started.
+You may now open a web browser and open `http://localhost:9292` and log-in with
+development credentials
 
+------
 * Setup APTrust Institution object and Roles
 
-````
+```shell
 
 # create the db schema
 rake db:migrate
 
 # rake task to setup initial insitutions, roles and a default aptrust_admin user.
 rake pharos:setup
-````
+```
 
 The default admin user that is being setup as follows:
     name= "APTrustAdmin"
