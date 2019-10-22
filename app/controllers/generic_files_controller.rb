@@ -405,7 +405,11 @@ class GenericFilesController < ApplicationController
   end
 
   def filter_count_and_sort
-    params[:state] = 'A' if params[:state].nil?
+    current_url = url_for(only_path: false)
+    unless (current_url.include? 'api/v2') && (!params.include? :intellectual_object_identifier) &&
+                                (!params.include? :intellectual_object_id) && (!params.include? :state)
+      params[:state] = 'A' if params[:state].nil?
+    end
     parameter_deprecation
     @generic_files = @generic_files
                          .with_identifier_like(params[:identifier])

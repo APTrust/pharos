@@ -151,8 +151,8 @@ module ApplicationHelper
 
   def current_path(param, value)
     old_path = @current
-    old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except param) if old_path.include? param
-    old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except :page) if old_path.include? 'page'
+    old_path = url_for(only_path: false, params: (params.permit(Pharos::Application::PARAMS_HASH).except param)) if old_path.include? param
+    old_path = url_for(only_path: false, params: (params.permit(Pharos::Application::PARAMS_HASH).except :page)) if old_path.include? 'page'
     value = '' if value.nil?
     if value.kind_of?(Integer)
       encoded_val = value
@@ -167,8 +167,6 @@ module ApplicationHelper
     else
       new_path = "#{old_path}?#{param}=#{encoded_val}"
     end
-    # params[param] = encoded_val
-    # new_path = url_for(params.permit(Pharos::Application::PARAMS_HASH))
     new_path
   end
 

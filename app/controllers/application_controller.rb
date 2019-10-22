@@ -305,7 +305,7 @@ class ApplicationController < ActionController::Base
   def format_current
     params[:page] = @page
     params[:per_page] = @per_page
-    new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+    new_url = url_for(only_path: false, params: params.permit(Pharos::Application::PARAMS_HASH))
     new_url
   end
 
@@ -316,7 +316,7 @@ class ApplicationController < ActionController::Base
       new_page = @page + 1
       params[:page] = new_page
       params[:per_page] = @per_page
-      new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+      new_url = url_for(only_path: false, params: params.permit(Pharos::Application::PARAMS_HASH))
       new_url
     end
   end
@@ -328,7 +328,7 @@ class ApplicationController < ActionController::Base
       new_page = @page - 1
       params[:page] = new_page
       params[:per_page] = @per_page
-      new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+      new_url = url_for(only_path: false, params: params.permit(Pharos::Application::PARAMS_HASH))
       new_url
     end
   end

@@ -902,8 +902,8 @@ RSpec.describe WorkItemsController, type: :controller do
 
       it 'returns the correct next and previous links' do
         get :index, format: :json, params: { per_page: 2, page: 2, stage: 'Unpack' }
-        assigns(:next).should == 'http://test.host/items.json?page=3&per_page=2&sort=date&stage=Unpack'
-        assigns(:previous).should == 'http://test.host/items.json?page=1&per_page=2&sort=date&stage=Unpack'
+        assigns(:next).should == 'http://test.host/items?format=json&page=3&per_page=2&sort=date&stage=Unpack'
+        assigns(:previous).should == 'http://test.host/items?format=json&page=1&per_page=2&sort=date&stage=Unpack'
       end
     end
 
