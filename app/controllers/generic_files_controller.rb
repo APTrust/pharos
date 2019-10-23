@@ -31,7 +31,7 @@ class GenericFilesController < ApplicationController
       end
       filter_count_and_sort
       page_results(@generic_files)
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
+      options_hash = build_options_hash
       respond_to do |format|
         format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash(options_hash) } } }
         format.html { }
@@ -320,16 +320,28 @@ class GenericFilesController < ApplicationController
   end
 
   def object_as_json
-    if params[:with_ingest_state] == 'true' && current_user.admin? && params[:include_relations]
-      options_hash = {include: [:checksums, :premis_events, :ingest_state]}
-    elsif params[:with_ingest_state] == 'true' && current_user.admin?
-      options_hash = {include: [:ingest_state]}
-    elsif params[:include_relations]
-      options_hash = {include: [:checksums, :premis_events]}
-    else
-      options_hash = {}
-    end
+    options_hash = build_options_hash
     @generic_file.serializable_hash(options_hash)
+  end
+
+  def build_options_hash
+    options_hash = {}
+    options_hash[:include] = [:ingest_state] if params[:with_ingest_state] == 'true' && current_user.admin?
+    if params[:include_relations] == 'true'
+      if options_hash.key?(:include)
+        options_hash[:include].push(:checksums)
+        options_hash[:include].push(:premis_events)
+      else
+        options_hash[:include] = [:checksums, :premis_events]
+      end
+    end
+    if params[:include_checksums] == 'true'
+      options_hash.key?(:include) ? options_hash[:include].push(:checksums) : options_hash[:include] = [:checksums]
+    end
+    if params[:include_events] == 'true'
+      options_hash.key?(:include) ? options_hash[:include].push(:premis_events) : options_hash[:include] = [:premis_events]
+    end
+    options_hash
   end
 
   def array_as_json(list_of_generic_files)
