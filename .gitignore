@@ -6,6 +6,7 @@
 
 # Ignore bundler config.
 /.bundle
+vendor/
 
 # OS Files
 .DS_Store
