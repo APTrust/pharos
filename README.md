@@ -8,9 +8,7 @@ Build Status | Continuous Integration | Code Coverage
 develop | [![Build Status (Development)](https://travis-ci.org/APTrust/pharos.png?branch=develop)](https://travis-ci.org/APTrust/pharos) | [![Coverage Status](https://coveralls.io/repos/github/APTrust/pharos/badge.svg?branch=develop)](https://coveralls.io/github/APTrust/pharos?branch=develop)
 
 ### Requirements
-
-Since mid 2019 the Pharos app has been containerized. You may use the Baremetal
-or Docker version for development. In this case you will need
+Since mid 2019 the Pharos app has been containerized. You may use the Baremetal or Docker version for development. 
 
 #### Docker Version Requirements
 * [Docker Desktop](https://hub.docker.com/search/?type=edition&offering=community)
@@ -31,40 +29,64 @@ We use [dotenv](https://github.com/bkeepers/dotenv) for application
 configuration. See `.env` file in this repository for configuration parameters
 with default/development values. This file is updated by deployment according to
 it's environment.
-
-### Development credentials
+  
+### Development Credentials
 
 After running `rake pharos:setup` or `make build` and `make dev`
-you can log in wiht
-Email: ops@aptrust.org
-Password: 'password123'
+you can log in with
+- Email: ops@aptrust.org
+- Password: password123
 
-### Docker Develeopment Quick Start
+### Docker Development Quick-Start
 
-Once you have the Docker suite installed you may run `make build`. This builds
-containers based of the current git version of the repository.
-`make dev` will start all containers (Postgres, Pharos, Nginx) and populate the
-database with seed data to get started.
-You may now open a web browser and open `http://localhost:9292` and log-in with
-development credentials
+Once you have the Docker suite installed you may run `make` and see list of make targets you can run with ``` make <target>```.
+To get started run:
+1.  `make build` This builds containers based on the current git version of the repository.
+2.  `make dev` will start all containers (Postgres, Pharos, Nginx) and populate the database with seed data to get started.
+
+3. You may now open a web browser and open `http://localhost:9292` and log-in with [development credentials](#development-credentials)
+
+
+| Target | Description |
+| ----- | ------|
+| help     | This help.| 
+| revision | Show me the git hash|
+| build    |  Build the Pharos container from current repo. Make sure to commit all changes beforehand |
+| build-nc | Build the Pharos container from scratch, no cached layers.| 
+| up | Start containers in background for Pharos, Postgresql, Nginx. For local development. |
+| down | Stop containers for Pharos, Postgresql, Nginx. For local development. |
+| run | Just run Pharos in foreground |
+| runshell | Run Pharos container with interactive shell |
+| runconsole | Run Rails Console |
+| runcmd | Start Pharos container, run command and exit.|
+| test-ci | Run Pharos spec tests in CI |
+| dtest | Run Pharos spec tests |
+| dev | Run Pharos for development on localhost|
+| devclean | Stop and remove running Docker containers | 
+| devstop | Stop running Docker containers. Can pick up dev later |
+| release | Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab |
+| push | Push the Docker image up to the registry |
+| clean | Clean the generated/compiled files |
+
+#### Common Docker tasks
+- Enter running environment in demo/prod
+	- cd /srv/docker/pharos
+	- sudo docker-compose exec pharos bash
+- Run a one-off command within the environment
+	- cd /srv/docker/pharos
+	- `make runcmd <somecommand>` 
+
+
+### Baremetal Development Quick-Start
+
+1. Make sure the [requirements are met](#baremetal-version-requirements)
+2. Install dependencies: `bundle install`
+3. Create db schema: `rake db:migrate`
+4. Initial setup of seed data: `rake pharos:setup`
+5. Start appserver `bundle exec puma`
 
 ------
-* Setup APTrust Institution object and Roles
 
-```shell
-
-# create the db schema
-rake db:migrate
-
-# rake task to setup initial insitutions, roles and a default aptrust_admin user.
-rake pharos:setup
-```
-
-The default admin user that is being setup as follows:
-    name= "APTrustAdmin"
-    email= "ops@aptrust.org"
-    phone_number="4341234567"
-    password="password"
 
 ### Setting up Test Data
 
@@ -86,10 +108,11 @@ using the factory name and adding _fail at the end.  So to add some fake data fo
 testing you could do the following in code or at command line.
 
 ````
-# Start by getting the object you want to add the failed event to.
+#Start by getting the object you want to add the failed event to.
 gf = GenericFile.first
 
-# Then add the event as attributes
+#Then add the event as attributes
 gf.add_event(FactoryBot.attributes_for(:premis_events_fixity_check_fail))
 gf.save
 ````
+
