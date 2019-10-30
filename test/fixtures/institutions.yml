@@ -10,18 +10,26 @@ aptrust:
   name: APTrust
   identifier: aptrust.org
   dpn_uuid: 11111111-0000-4000-a000-000000000000
+  receiving_bucket: aptrust.receiving.test.test.edu
+  restore_bucket: aptrust.restore.test.test.edu
 
 inst1:
   name: Institution One
   identifier: institution1.edu
   dpn_uuid: 22222222-0000-4000-a000-000000000000
+  receiving_bucket: aptrust.receiving.test.test.edu
+  restore_bucket: aptrust.restore.test.test.edu
 
 inst2:
   name: Institution Two
   identifier: institution2.edu
   dpn_uuid: 33333333-0000-4000-a000-000000000000
+  receiving_bucket: aptrust.receiving.test.test.edu
+  restore_bucket: aptrust.restore.test.test.edu
 
 test_inst:
   name: Test Institution (for integration tests)
   identifier: test.edu
   dpn_uuid: 9a000000-0000-4000-a000-000000000001
+  receiving_bucket: aptrust.receiving.test.test.edu
+  restore_bucket: aptrust.restore.test.test.edu
