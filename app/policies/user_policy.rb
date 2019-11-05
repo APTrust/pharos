@@ -113,6 +113,10 @@ class UserPolicy < ApplicationPolicy
     user.admin? || user.institutional_admin?
   end
 
+  def nil_item?
+    true
+  end
+
   def checksum_index?
     user.admin?
   end

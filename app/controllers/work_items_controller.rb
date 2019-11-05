@@ -4,7 +4,7 @@ class WorkItemsController < ApplicationController
   require 'net/http'
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :set_item, only: [:show, :requeue, :spot_test_restoration]
+  before_action :set_item, only: [:show, :requeue, :edit, :spot_test_restoration]
   before_action :init_from_params, only: :create
   before_action :load_institution, only: :index
   #after_action :check_for_completed_restoration, only: :update
@@ -114,6 +114,19 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  def edit
+    if @work_item
+      authorize @work_item
+    else
+      authorize current_user, :nil_item?
+      respond_to do |format|
+        format.json { render body: nil, status: :not_found }
+        format.html { redirect_to root_url, alert: 'That Work Item could not be found or you do not have access to it.' }
+      end
+    end
+
+  end
+
   # Note that this method is available through the admin API, but is
   # not accessible to members. If we ever make it accessible to members,
   # we MUST NOT allow them to update :state, :node, or :pid!
@@ -148,14 +161,28 @@ class WorkItemsController < ApplicationController
       end
     else
       find_and_update
-      authorize @work_item
-      respond_to do |format|
-        if @work_item.save
-          format.json { render json: @work_item, status: :ok }
-        else
-          format.json { render json: @work_item.errors, status: :unprocessable_entity }
+      if @work_item
+        authorize @work_item
+        respond_to do |format|
+          if @work_item.save
+            format.json { render json: @work_item, status: :ok }
+            flash.clear
+            flash[:notice] = 'This work item has been successfully updated.'
+            format.html { render 'show' }
+          else
+            format.json { render json: @work_item.errors, status: :unprocessable_entity }
+            flash.clear
+            format.html { render 'edit' }
+          end
+        end
+      else
+        authorize current_user, :nil_item?
+        respond_to do |format|
+          format.json { render body: nil, status: :not_found }
+          format.html { redirect_to root_url, alert: 'That Work Item could not be found or you do not have access to it.' }
         end
       end
+
     end
   end
 
@@ -380,6 +407,8 @@ class WorkItemsController < ApplicationController
     set_item
     # Parse date explicitly, or ActiveRecord will not find records when date format string varies.
     if @work_item
+      params[:work_item][:retry] = @work_item.retry if params[:work_item][:retry].blank?
+      params[:work_item][:needs_admin_review] = @work_item.needs_admin_review if params[:work_item][:needs_admin_review].blank?
       @work_item.update(writable_work_item_params)
       # Never let non-admin set WorkItem.user.
       # Admin sets user only when importing WorkItems from Fluctus.

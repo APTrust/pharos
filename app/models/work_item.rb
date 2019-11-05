@@ -71,9 +71,9 @@ class WorkItem < ActiveRecord::Base
     }
 
 
-  def to_param
-    "#{etag}/#{name}"
-  end
+  # def to_param
+  #   #"#{etag}/#{name}"
+  # end
 
   def self.empty_param(param)
     (param.blank? || param.nil? || param == '*' || param == '' || param == '%') ? true : false

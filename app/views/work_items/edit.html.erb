@@ -1,0 +1,30 @@
+<% @title = "Edit #{@work_item.name}" %>
+
+<h1>Editing Work Item</h1>
+
+<%= simple_form_for(@work_item, html: {class: 'form-horizontal', :method => :put }) do |f| %>
+
+    <%= f.error_notification %>
+
+    <div class="form-inputs">
+      <%= f.input :action, collection: actions_for_select, as: :select, label: 'Action' %>
+      <%= f.input :stage, collection: stages_for_select, as: :select, label: 'Stage' %>
+      <%= f.input :status, collection: statuses_for_select, as: :select, label: 'Status' %>
+      <%= f.input :retry, collection: boolean_for_select, as: :select, label: 'Retry' %>
+      <%= f.input :needs_admin_review, collection: boolean_for_select, as: :select, label: 'Needs Admin Review' %>
+      <%= f.input :note %>
+      <%= f.input :node %>
+      <%= f.input :pid %>
+    </div>
+    <br>
+    <div class="form-actions">
+
+      <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm') do %>
+          <i class="glyphicon glyphicon-check"></i> Submit
+      <% end %>
+      <%= link_to work_item_path(id: @work_item.id), {class: 'btn doc-action-btn btn-warning btn-sm'} do %>
+          <i class="glyphicon glyphicon-remove"></i> Cancel
+      <% end %>
+
+    </div>
+<% end %>

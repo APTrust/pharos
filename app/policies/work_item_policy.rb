@@ -29,8 +29,7 @@ class WorkItemPolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin? ||
-        (user.institutional_admin? && (user.institution.id == record.institution_id))
+    user.admin?
   end
 
   def edit?

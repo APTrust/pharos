@@ -92,7 +92,7 @@ Rails.application.routes.draw do
   get '/api/v2/notifications/failed_fixity', to: 'premis_events#notify_of_failed_fixity', format: :json
 
   # WORK ITEM ROUTES
-  resources :work_items, only: [:index, :create, :show, :update], format: [:html, :json], path: 'items'
+  resources :work_items, only: [:index, :create, :show, :update, :edit], format: [:html, :json], path: 'items'
   put 'items/', to: 'work_items#update', format: :json
   resources :work_items, path: '/api/v2/items'
   resources :work_items, only: [:index], path: 'member-api/v2/items', format: [:json, :html]

@@ -9,6 +9,8 @@
     <h2 class="long_names"><%= @work_item.name %></h2>
   </section>
 
+  <%= edit_link(@work_item) %>
+
   <section>
     <p id="work_item_id" class="hidden"><%= @work_item.id %></p>
     <% if current_user.admin? %>

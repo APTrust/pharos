@@ -8,4 +8,20 @@ module WorkItemsHelper
     link_to(content.html_safe, [:requeue, object], options) if policy(object).requeue?
   end
 
+  def actions_for_select
+    ['Ingest', 'Fixity Check', 'Restore', 'Glacier Restore', 'Delete', 'DPN']
+  end
+
+  def stages_for_select
+   ['Requested', 'Receive', 'Fetch', 'Unpack', 'Validate', 'Store', 'Record', 'Cleanup', 'Resolve', 'Package', 'Restoring', 'Available in S3']
+  end
+
+  def statuses_for_select
+    %w(Pending Started Success Failed Cancelled)
+  end
+
+  def boolean_for_select
+    %w(true false)
+  end
+
 end

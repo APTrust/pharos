@@ -10,6 +10,8 @@ module ApplicationHelper
     options[:class] = 'btn doc-action-btn btn-normal btn-sm' if options[:class].nil?
     if object.is_a?(Institution)
       link_to(content.html_safe, edit_institution_path(object), options) if policy(object).edit?
+    elsif object.is_a?(WorkItem)
+      link_to(content.html_safe, edit_work_item_path(object.id), options) if policy(object).edit?
     else
       link_to(content.html_safe, [:edit, object], options) if policy(object).edit?
     end

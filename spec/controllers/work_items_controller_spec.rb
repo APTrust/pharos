@@ -250,6 +250,74 @@ RSpec.describe WorkItemsController, type: :controller do
     end
   end
 
+  describe 'GET edit' do
+    let(:item1) { FactoryBot.create(:work_item, institution_id: institutional_admin.institution.id) }
+    let(:item2) { FactoryBot.create(:work_item, institution_id: admin_user.institution.id) }
+
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        get :edit, params: { id: item1.id }
+        expect(response).to redirect_to root_url + 'users/sign_in'
+      end
+    end
+
+    describe 'when signed in' do
+      describe 'as an institutional_user' do
+        let(:user) { FactoryBot.create(:user, :institutional_user) }
+        before do
+          sign_in user
+          session[:verified] = true
+        end
+
+        it 'should be unauthorized' do
+          get :edit, params: { id: item1.id }
+          expect(response).to redirect_to root_url
+          expect(flash[:alert]).to eq 'That Work Item could not be found or you do not have access to it.'
+        end
+      end
+
+      describe 'as an institutional_admin' do
+        before do
+          sign_in institutional_admin
+          session[:verified] = true
+        end
+
+        describe 'editing an item from my own institution' do
+          it 'should be unauthorized' do
+            get :edit, params: { id: item1.id }
+            expect(response).to redirect_to root_url
+            expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+          end
+        end
+
+        describe 'editing an item from a different institution' do
+          it 'should be unauthorized' do
+            get :edit, params: { id: item2.id }
+            expect(response).to redirect_to root_url
+            expect(flash[:alert]).to eq 'That Work Item could not be found or you do not have access to it.'
+          end
+        end
+      end
+
+      describe 'as an admin' do
+        before do
+          sign_in admin_user
+          session[:verified] = true
+        end
+
+        it 'should show the item edit form for an item from a different institution' do
+          get :edit, params: { id: item1.id }
+          expect(response).to be_successful
+        end
+
+        it 'should show the item edit form for an item from own institution' do
+          get :edit, params: { id: item2.id }
+          expect(response).to be_successful
+        end
+      end
+    end
+  end
+
   describe 'PUT #update' do
 
     describe 'for admin' do
@@ -291,16 +359,6 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(return_data[1]['status']).to eq 'Success'
       end
 
-      # it 'creates an email log if the item being updated is a completed restoration' do
-      #   wi_hash = FactoryBot.create(:work_item_extended, action: Pharos::Application::PHAROS_ACTIONS['restore'],
-      #       stage: Pharos::Application::PHAROS_STAGES['record'], status: Pharos::Application::PHAROS_STATUSES['success']).attributes
-      #   post :update, params: { id: item.id, work_item: wi_hash }, format: :json
-      #   expect(response.status).to eq(200)
-      #   email_log = Email.where(item_id: item.id)
-      #   expect(email_log.count).to eq(1)
-      #   expect(email_log[0].email_type).to eq('restoration')
-      # end
-
     end
 
     describe 'for institutional admin' do
@@ -315,10 +373,6 @@ RSpec.describe WorkItemsController, type: :controller do
         expect(response.status).to eq 403
       end
 
-      # it 'restricts institutional admins from API usage when updating by etag' do
-      #   put :update, params: { etag: item.etag, name: item.name, bag_date: item.bag_date }, format: 'json'
-      #   expect(response.status).to eq 403
-      # end
     end
   end
 
