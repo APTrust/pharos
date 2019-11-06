@@ -13,7 +13,7 @@ services:
   pharos:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     restart: always
-    command: bundle exec puma -C config/puma.rb -e ${RAILS_ENV}
+    command: bundle exec puma -C "-" -e ${RAILS_ENV}
     volumes:
       - assets:/pharos/public
       - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
