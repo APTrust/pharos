@@ -54,7 +54,7 @@ Rails.application.configure do
   end
 
   # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
+  config.log_tags = [ :subdomain, :uuid ]
 
   # Semantic logger
   # http://rocketjob.github.io/semantic_logger/rails
