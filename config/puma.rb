@@ -98,6 +98,10 @@ workers 3
 # on_worker_boot do
 #   puts 'On worker boot...'
 # end
+on_worker_boot do
+  # Re-open appenders after forking the process
+  SemanticLogger.reopen
+end
 
 # before_fork do
 #  if Rails.env.production? or Rails.env.staging?
