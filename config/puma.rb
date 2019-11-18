@@ -1,3 +1,5 @@
+require 'semantic_logger'
+
 # Daemonize the server into the background. Highly suggest that
 # this be combined with "pidfile" and "stdout_redirect".
 #
