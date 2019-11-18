@@ -1,3 +1,5 @@
+require 'semantic_logger'
+
 # Daemonize the server into the background. Highly suggest that
 # this be combined with "pidfile" and "stdout_redirect".
 #
@@ -199,4 +201,3 @@ worker_timeout 300
 # activate_control_app 'unix:///var/run/pumactl.sock', { no_token: true }
 #
 # vim: set ft=ruby:
-
