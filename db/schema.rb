@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_28_142435) do
+ActiveRecord::Schema.define(version: 2019_11_18_161117) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -255,7 +255,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"
-    t.index ["date_time"], name: "index_premis_events_on_date_time"
+    t.index ["date_time"], name: "index_premis_events_date_time_desc", order: :desc
     t.index ["event_type", "outcome"], name: "index_premis_events_on_event_type_and_outcome"
     t.index ["event_type"], name: "index_premis_events_on_event_type"
     t.index ["generic_file_id", "event_type"], name: "index_premis_events_on_generic_file_id_and_event_type"

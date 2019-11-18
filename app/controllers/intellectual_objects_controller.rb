@@ -389,13 +389,18 @@ class IntellectualObjectsController < ApplicationController
                                 .with_access(params[:access])
                                 .with_file_format(params[:file_format])
                                 .with_state(params[:state])
+    # Used in erb template
     @selected = {}
-    get_object_format_counts(@intellectual_objects)
-    get_institution_counts(@intellectual_objects)
-    get_object_access_counts(@intellectual_objects)
-    get_state_counts(@intellectual_objects)
-    count = @intellectual_objects.count
-    set_page_counts(count)
+
+    # Don't run counts for API requests
+    if !api_request?
+      get_object_format_counts(@intellectual_objects)
+      get_institution_counts(@intellectual_objects)
+      get_object_access_counts(@intellectual_objects)
+      get_state_counts(@intellectual_objects)
+    end
+
+    set_page_counts(@intellectual_objects.count)
     params[:sort] = 'name' if params[:sort].nil?
     case params[:sort]
       when 'date'

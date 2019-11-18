@@ -201,4 +201,3 @@ worker_timeout 300
 # activate_control_app 'unix:///var/run/pumactl.sock', { no_token: true }
 #
 # vim: set ft=ruby:
-

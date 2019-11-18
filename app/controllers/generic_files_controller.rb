@@ -433,12 +433,19 @@ class GenericFilesController < ApplicationController
                          .with_institution(params[:institution])
                          .with_file_format(params[:file_format])
                          .with_state(params[:state])
+
+    # Not sure why this is declared here, but the erb templates
+    # seem to use it.
     @selected = {}
-    get_format_counts(@generic_files)
-    get_institution_counts(@generic_files)
-    get_state_counts(@generic_files)
-    count = @generic_files.count
-    set_page_counts(count)
+
+    # Don't run counts for API requests
+    if !api_request?
+      get_format_counts(@generic_files)
+      get_institution_counts(@generic_files)
+      get_state_counts(@generic_files)
+    end
+
+    set_page_counts(@generic_files.count)
     params[:sort] = 'name' if params[:sort].nil?
     case params[:sort]
       when 'date'
