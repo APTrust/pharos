@@ -191,14 +191,19 @@ class PremisEventsController < ApplicationController
                           .with_file_identifier_like(params[:file_identifier])
     end
     @premis_events = @premis_events.with_file_identifier_like(params[:file_identifier]) if @parent.is_a?(IntellectualObject)
+
+    # Not sure why this is declared here, but the erb templates
+    # seem to use it.
     @selected = {}
-    get_event_institution_counts(@premis_events)
-    get_event_type_counts(@premis_events)
-    get_outcome_counts(@premis_events)
-    query = "SELECT COUNT(*) FROM (#{@premis_events.to_sql}) AS event_index"
-    result = ActiveRecord::Base.connection.exec_query(query)
-    count = result[0]['count']
-    set_page_counts(count)
+
+    # Don't run counts for API requests.
+    if !api_request?
+      get_event_institution_counts(@premis_events)
+      get_event_type_counts(@premis_events)
+      get_outcome_counts(@premis_events)
+    end
+
+    set_page_counts(@premis_events.count)
     params[:sort] = 'date' if params[:sort].nil?
     case params[:sort]
       when 'date'

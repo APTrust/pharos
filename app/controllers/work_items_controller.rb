@@ -507,13 +507,19 @@ class WorkItemsController < ApplicationController
                  .with_unempty_pid(params[:pid_not_empty])
                  .with_empty_pid(params[:pid_empty])
                  .with_retry(params[:retry])
+
+    # @selected used in erb template
     @selected = {}
-    get_status_counts(@items)
-    get_stage_counts(@items)
-    get_action_counts(@items)
-    get_institution_counts(@items)
-    count = @items.count
-    set_page_counts(count)
+
+    # Don't run counts for API requests
+    if !api_request?
+      get_status_counts(@items)
+      get_stage_counts(@items)
+      get_action_counts(@items)
+      get_institution_counts(@items)
+    end
+
+    set_page_counts(@items.count)
     params[:sort] = 'date' if params[:sort].nil?
     case params[:sort]
       when 'date'
