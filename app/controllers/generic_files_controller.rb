@@ -419,20 +419,20 @@ class GenericFilesController < ApplicationController
   def filter_count_and_sort
     current_url = url_for(only_path: false)
     unless (current_url.include? 'api/v2') && (!params.include? :intellectual_object_identifier) &&
-                                (!params.include? :intellectual_object_id) && (!params.include? :state)
+           (!params.include? :intellectual_object_id) && (!params.include? :state)
       params[:state] = 'A' if params[:state].nil?
     end
     parameter_deprecation
     @generic_files = @generic_files
-                         .with_identifier_like(params[:identifier])
-                         .with_uri_like(params[:uri])
-                         .created_before(params[:created_before])
-                         .created_after(params[:created_after])
-                         .updated_before(params[:updated_before])
-                         .updated_after(params[:updated_after])
-                         .with_institution(params[:institution])
-                         .with_file_format(params[:file_format])
-                         .with_state(params[:state])
+                       .with_identifier_like(params[:identifier])
+                       .with_uri_like(params[:uri])
+                       .created_before(params[:created_before])
+                       .created_after(params[:created_after])
+                       .updated_before(params[:updated_before])
+                       .updated_after(params[:updated_after])
+                       .with_institution(params[:institution])
+                       .with_file_format(params[:file_format])
+                       .with_state(params[:state])
 
     # Not sure why this is declared here, but the erb templates
     # seem to use it.
@@ -440,7 +440,7 @@ class GenericFilesController < ApplicationController
 
     # Don't run counts for API requests
     if !api_request?
-      get_format_counts(@generic_files)
+      ok_to_count_formats? ? get_format_counts(@generic_files) : @format_counts = {}
       get_institution_counts(@generic_files)
       get_state_counts(@generic_files)
     end
@@ -455,6 +455,17 @@ class GenericFilesController < ApplicationController
       when 'institution'
         @generic_files = @generic_files.joins(:institution).order('institutions.name')
     end
+  end
+
+  # Don't count formats if there are no filters. This slows things down
+  # for APTrust users.
+  def ok_to_count_formats?
+    ok = true
+    if params[:institution_identifier] == 'aptrust.org' && params[:institution].blank?
+      logger.info("Skipping file format counts for APTrust user with no institution filter.")
+      ok = false
+    end
+    return ok
   end
 
   def parameter_deprecation
