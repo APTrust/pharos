@@ -18,7 +18,7 @@ class GenericFilesController < ApplicationController
     else
       if params[:not_checked_since]
         authorize current_user, :not_checked_since?
-        @generic_files = GenericFile.not_checked_since(params[:not_checked_since])
+        @generic_files = GenericFile.preload(:intellectual_object).not_checked_since(params[:not_checked_since])
       else
         load_parent_object
         if @intellectual_object
@@ -433,13 +433,14 @@ class GenericFilesController < ApplicationController
                        .with_institution(params[:institution])
                        .with_file_format(params[:file_format])
                        .with_state(params[:state])
+                       .with_storage_option(params[:storage_option])
 
     # Not sure why this is declared here, but the erb templates
     # seem to use it.
     @selected = {}
 
     # Don't run counts for API requests
-    if !api_request?
+    if !api_request? && request.path !~ /\/api\/v2\//
       ok_to_count_formats? ? get_format_counts(@generic_files) : @format_counts = {}
       get_institution_counts(@generic_files)
       get_state_counts(@generic_files)
