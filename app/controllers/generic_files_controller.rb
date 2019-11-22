@@ -451,6 +451,8 @@ class GenericFilesController < ApplicationController
     case params[:sort]
       when 'date'
         @generic_files = @generic_files.order('updated_at DESC')
+      when 'last_fixity_check'
+        @generic_files = @generic_files.order('last_fixity_check')
       when 'name'
         @generic_files = @generic_files.order('identifier').reverse_order
       when 'institution'
