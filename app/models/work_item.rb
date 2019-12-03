@@ -400,6 +400,18 @@ class WorkItem < ActiveRecord::Base
     end
   end
 
+  def self.unfinished_deletion_items
+    WorkItem.where(inst_approver: nil, action: Pharos::Application::PHAROS_ACTIONS['delete'])
+  end
+
+  def self.unfinished_deletion_items_for_inst(institution)
+    WorkItem.where(inst_approver: nil, action: Pharos::Application::PHAROS_ACTIONS['delete'], institution_id: institution)
+  end
+
+  def confirm_deletion_item
+
+  end
+
   def self.stalled_items_count(user)
     WorkItem.stalled_items(user).count
   end

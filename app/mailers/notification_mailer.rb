@@ -248,6 +248,8 @@ class NotificationMailer < ApplicationMailer
     mail(to: emails, subject: "#{prefix}New Completed Deletions")
   end
 
+
+
   def welcome_email(subject, password)
     @subject = subject
     @password = password

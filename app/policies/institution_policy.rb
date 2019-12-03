@@ -82,6 +82,14 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def resend_deletion_confirmation?
+    user.admin?
+  end
+
+  def finish_confirmation_for_resend?
+    user.institution_id == record.id
+  end
+
   def bulk_delete_job_index?
     user.admin? || (user.institutional_admin? && (user.institution_id == record.id))
   end

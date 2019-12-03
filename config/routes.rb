@@ -18,6 +18,10 @@ Rails.application.routes.draw do
   get '/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :bulk_deletion_admin_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :api_bulk_deletion_admin_confirmation, format: :json, institution_identifier: institution_ptrn
   get '/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :bulk_deletion_finished, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/:institution_identifier/resend_deletion_confirmation', to: 'institutions#resend_deletion_confirmation', as: :resend_deletion_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/resend_deletion_confirmation', to: 'institutions#resend_deletion_confirmation', format: [:html, :json], institution_identifier: institution_ptrn
+  get '/:institution_identifier/finish_confirmation_for_resend', to: 'institutions#finish_confirmation_for_resend', as: :finish_confirmation_for_resend, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/finish_confirmation_for_resend', to: 'institutions#finish_confirmation_for_resend', format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
   get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
   get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]

@@ -5,7 +5,8 @@ class InstitutionsController < ApplicationController
   before_action :authenticate_user!
   before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot, :deactivate, :reactivate,
                                           :trigger_bulk_delete, :partial_confirmation_bulk_delete, :final_confirmation_bulk_delete,
-                                          :finished_bulk_delete, :enable_otp, :disable_otp, :mass_forced_password_update]
+                                          :finished_bulk_delete, :resend_deletion_confirmation, :finish_confirmation_for_resend,
+                                          :enable_otp, :disable_otp, :mass_forced_password_update]
   respond_to :json, :html
   after_action :verify_authorized, except: :index
   after_action :verify_policy_scoped, only: :index
@@ -299,6 +300,56 @@ class InstitutionsController < ApplicationController
         flash[:notice] = "Bulk deletion job for #{@institution.name} has been completed."
         redirect_to root_path
       }
+    end
+  end
+
+  def resend_deletion_confirmation
+    authorize @institution
+    unfinished_items = WorkItem.unfinished_deletion_items
+    inst_ids = unfinished_items.distinct.pluck(:institution_id)
+    inst_ids.each do |id|
+      institution = Institution.find(id)
+      items = unfinished_items.with_institution(id)
+      ConfirmationToken.where(institution_id: @institution.id).delete_all # delete any old tokens. Only the new one should be valid
+      token = ConfirmationToken.create(institution: @institution, token: SecureRandom.hex)
+      token.save!
+      NotificationMailer.resend_deletion_confirmation(institution, items, token).deliver!
+    end
+    respond_to do |format|
+      message = 'New confirmation emails have been sent out for all institutions with unfinished deletions.'
+      format.json { render :json => { status: 'ok', message: message }, :status => :ok }
+      format.html {
+        flash[:notice] = message
+        redirect_to root_path
+      }
+    end
+  end
+
+  def finish_confirmation_for_resend
+    authorize @institution
+    if !@institution.confirmation_token.nil? && params[:confirmation_token] == @institution.confirmation_token.token
+      items = WorkItem.unfinished_deletion_items_for_inst(@institution.id)
+      items.each do |item|
+        item.inst_approver = current_user.email
+        item.save!
+      end
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html {
+          flash[:notice] = 'You have completed the approval process for these deletions and your items will be queued for deletion shortly.'
+          redirect_to root_path
+        }
+      end
+    else
+      respond_to do |format|
+        message = 'Your deletions cannot be confirmed at this time due to an invalid confirmation token. ' +
+            'Please contact your APTrust administrator for more information.'
+        format.json { render :json => { status: 'error', message: message }, :status => :conflict }
+        format.html {
+          redirect_to institution_url(@institution)
+          flash[:alert] = message
+        }
+      end
     end
   end
 
