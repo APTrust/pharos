@@ -605,6 +605,70 @@ namespace :pharos do
     end
   end
 
+  desc 'Two Factor Emails'
+  task :two_factor_emails => :environment do
+    User.all.each do |usr|
+      usr.email_verified = true
+      usr.save!
+      puts "#{usr.name} has been updated."
+    end
+  end
+
+  desc 'Two Factor Account Confirmations'
+  task :two_factor_account_confirmations => :environment do
+    User.all.each do |usr|
+      usr.account_confirmed = true
+      usr.save!
+      puts "#{usr.name} has been updated."
+    end
+  end
+
+  desc 'Test User Grace Period'
+  task :test_user_grace_period, [:user_email] => [:environment] do |t, args|
+    email = args[:user_email]
+    user = User.where(email: email).first
+    user.grace_period = DateTime.now + 11.months
+    user.save!
+    puts "#{user.name}'s grace period for Two Factor Authentication has been reset for one year."
+  end
+
+  desc 'Update Grace Period'
+  task :update_grace_period, [:user_email] => [:environment] do |t, args|
+    email = args[:user_email]
+    user = User.where(email: email).first
+    user.grace_period = DateTime.now
+    user.save!
+    puts "#{user.name}'s grace period for Two Factor Authentication has been reset for another 30 days."
+  end
+
+  desc 'Pre Date Grace Periods'
+  task :pre_date_user_grace_periods => :environment do
+    User.all.each do |usr|
+      usr.grace_period = DateTime.now - 30.days
+      usr.save!
+      puts "#{usr.name}'s grace period for Two Factor Authentication has been set for 30 days ago."
+    end
+  end
+
+  desc 'Set Production Grace Periods'
+  task :production_grace_periods => :environment do
+    User.all.each do |usr|
+      usr.grace_period = DateTime.now
+      usr.save!
+      puts "#{usr.name}'s grace period for Two Factor Authentication has been set for today."
+    end
+  end
+
+  desc 'Deactivate Unused Accounts'
+  task :deactive_unused_accounts => :environment do
+    User.all.each do |usr|
+      unless usr.account_confirmed
+        usr.soft_delete
+        puts "#{usr.name} has been deactivated."
+      end
+    end
+  end
+
   desc 'Set SMS Defaults'
   task :set_sms_defaults => :environment do
     sms = Aws::SNS::Client.new

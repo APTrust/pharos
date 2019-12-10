@@ -1,11 +1,20 @@
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
+  config.warden do |manager|
+    manager.default_strategies(scope: :user).unshift :two_factor_authenticatable
+    manager.default_strategies(scope: :user).unshift :two_factor_backupable
+  end
+
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
   # config.secret_key = 'c42eb9944793049777987a1f334d0eced0f2f6381840441dacdf7f5e61e834d864b972b712c649357e055848d73d28725a55087ca2184f3e0cb6a6bc6f46ef97'
   config.secret_key = ENV['DEVISE_SECRET_KEY']
+
+  # Allowing sign ins after a password reset would allow a user to
+  # bypass two factor authentication so keep it turned off.
+  config.sign_in_after_reset_password = false
 
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
@@ -141,7 +150,7 @@ Devise.setup do |config|
 
   # ==> Configuration for :validatable
   # Range for password length.
-  config.password_length = 8..128
+  config.password_length = 10..128
 
   # Email regex used to validate email formats. It simply asserts that
   # one (and only one) @ exists in the given string. This is mainly
@@ -151,7 +160,7 @@ Devise.setup do |config|
   # ==> Configuration for :timeoutable
   # The time you want to timeout the user session without activity. After this
   # time the user will be asked for credentials again. Default is 30 minutes.
-  config.timeout_in = 30.minutes
+  config.timeout_in = 4.hours
 
   # If true, expires auth token on session timeout.
   # config.expire_auth_token_on_timeout = false
@@ -261,4 +270,44 @@ Devise.setup do |config|
   # When using omniauth, Devise cannot automatically set Omniauth path,
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
+
+  # ==> Security Extension
+  # Configure security extension for devise
+
+  # Should the password expire (e.g 3.months)
+  # config.expire_password_after = 3.months
+
+  # Need 1 char of A-Z, a-z and 0-9 OR a password that is at least 20 characters long
+  # config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])|.{20,}/
+
+  # How many passwords to keep in archive
+  config.password_archiving_count = 3
+
+  # Deny old password (true, false, count)
+  config.deny_old_passwords = 3
+
+  # enable email validation for :secure_validatable. (true, false, validation_options)
+  # dependency: need an email validator like rails_email_validator
+  # config.email_validation = true
+
+  # captcha integration for recover form
+  # config.captcha_for_recover = true
+
+  # captcha integration for sign up form
+  # config.captcha_for_sign_up = true
+
+  # captcha integration for sign in form
+  # config.captcha_for_sign_in = true
+
+  # captcha integration for unlock form
+  # config.captcha_for_unlock = true
+
+  # captcha integration for confirmation form
+  # config.captcha_for_confirmation = true
+
+  # Time period for account expiry from last_activity_at
+  # config.expire_after = 90.days
+
+  # Set drift time for one time passwords to five minutes
+  config.otp_allowed_drift = 300
 end

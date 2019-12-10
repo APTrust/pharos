@@ -1,0 +1,10 @@
+<p>Team,</p>
+<br>
+<p>Here are the latest snapshot results for the <%= Rails.env.capitalize %> repository broken down by institution.</p>
+<br>
+<div><dl class="dl-horizontal dl-invert">
+  <% @snap_hash.each do |key, value| %>
+    <dt><%= key %></dt>
+    <dd><%= value %></dd>
+  <% end %>
+</dl></div>

@@ -1,0 +1,16 @@
+<h2>Renew your password</h2>
+
+<%= simple_form_for(resource, as: resource_name, url: [resource_name, :password_expired], html: { method: :put }) do |f| %>
+    <%= devise_error_messages! %>
+    <%= render 'shared/password_popup' %>
+
+    <%= f.input :password %>
+    <%= f.input :password_confirmation %>
+    <br/>
+    <p>We need your current password to confirm your changes.</p>
+    <%= f.input :current_password %>
+    <br>
+    <%= button_tag(type: 'submit', class: "btn doc-action-btn btn-success") do %>
+        <i class="glyphicon glyphicon-check"></i> Change my password
+    <% end %>
+<% end %>

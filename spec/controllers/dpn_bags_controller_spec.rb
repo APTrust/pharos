@@ -27,6 +27,7 @@ RSpec.describe DpnBagsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns successfully when no parameters are given' do
@@ -74,6 +75,7 @@ RSpec.describe DpnBagsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it "allows access only to bags belonging to the user's institution" do
@@ -88,6 +90,7 @@ RSpec.describe DpnBagsController, type: :controller do
   describe 'POST #create' do
     before do
       sign_in admin_user
+      session[:verified] = true
     end
 
     it 'successfully creates the dpn item' do
@@ -107,6 +110,7 @@ RSpec.describe DpnBagsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -120,6 +124,7 @@ RSpec.describe DpnBagsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully' do
@@ -139,6 +144,7 @@ RSpec.describe DpnBagsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -152,6 +158,7 @@ RSpec.describe DpnBagsController, type: :controller do
     describe 'for admin user' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully' do
@@ -168,6 +175,7 @@ RSpec.describe DpnBagsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access to a bag belonging to another institution' do

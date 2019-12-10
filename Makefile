@@ -19,7 +19,7 @@ TAG = $(NAME):$(REVISION)
 # HELP
 # This will output the help for each task
 # thanks to https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
-.PHONY: help build publish
+.PHONY: help build publish clean release
 
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -31,12 +31,10 @@ revision: ## Show me the git hash
 	@echo $(BRANCH)
 
 build: ## Build the Pharos container from current repo. Make sure to commit all changes beforehand
-	echo $(REVISION) >> .revision
 	docker build --build-arg PHAROS_RELEASE=$(REVISION) -t $(TAG) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) .
 	docker build --build-arg PHAROS_RELEASE=${REVISION} -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION)-$(BRANCH) -t aptrust/nginx-proxy-pharos -f Dockerfile.nginx .
 
 build-nc: ## Build the Pharos container, no cached layers.
-	echo $(REVISION) >> .revision
 	docker build --no-cache --build-arg PHAROS_RELEASE=$(REVISION) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) .
 	docker build --build-arg PHAROS_RELEASE=${REVISION} -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos -t aptrust/nginx-proxy-pharos -f Dockerfile.nginx .
 
@@ -50,7 +48,10 @@ run: ## Just run Pharos in foreground
 	docker run -p 9292:9292 $(TAG)
 
 runshell: ## Run Pharos container with interactive shell
-	docker run -it -p 9292:9292 $(TAG) bash
+	docker run -it --rm --env-file=.env $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) bash
+
+runconsole: ## Run Rails Console
+	docker run -it --rm --env-file=.env $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) /bin/bash -c "export TERM=dumb && rails c"
 
 runcmd: ## Start Pharos container, run command and exit.
 	docker run $(TAG) $(filter-out $@, $(MAKECMDGOALS))

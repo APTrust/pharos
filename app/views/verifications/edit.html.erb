@@ -1,0 +1,11 @@
+<h4>Please enter the one-time authorization code that has been sent via SMS</h4>
+
+<%= form_tag verification_path(id: params[:id], verification_type: params[:verification_type]), method: :put do %>
+    <div class="form-group">
+      <%= label_tag :code %><br />
+      <%= number_field_tag :code, class: "form-control"  %>
+    </div>
+    <%= submit_tag 'Verify One Time Code', class: "btn btn-primary" %>
+<% end %>
+<br>
+<%= button_to 'Back To Login', destroy_user_session_path, method: 'delete', class: 'btn btn-warning' %>

@@ -1,0 +1,7 @@
+Team,
+
+Here are the latest stale users for the <%= Rails.env.capitalize %> repository.
+
+<% @users.each do |usr| %>
+  <%= usr.name %> : <%= usr.email %>
+<% end %>

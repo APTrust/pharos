@@ -30,6 +30,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -54,6 +55,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -82,6 +84,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -101,6 +104,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -128,6 +132,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -150,6 +155,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -177,6 +183,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -195,6 +202,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -220,6 +228,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -239,6 +248,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -265,6 +275,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -289,6 +300,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -317,6 +329,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -337,6 +350,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -363,6 +377,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -375,6 +390,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users with access' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code' do
@@ -387,6 +403,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users without access' do
       before do
         sign_in @institutional_admin_two
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -405,6 +422,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in @admin_user
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do
@@ -429,6 +447,7 @@ RSpec.describe ReportsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in @institutional_admin
+        session[:verified] = true
       end
 
       it 'responds successfully with an HTTP 200 status code for own institution' do

@@ -1,0 +1,23 @@
+<%= form_for(current_user, :url => session_path(current_user)) do |f| %>
+
+    <div class="form_row">
+      <h4>Two Factor Option:</h4>
+      <p>If you are using two factor authentication, please select one of the following options.
+        Please note that push notifications will only work if you have the Authy app installed.</p>
+      <% [ 'Push Notification', 'Text Message', 'Backup Code'].each do |opt| %>
+          <%= radio_button_tag 'two_factor_option', opt, @two_factor_option == opt %>
+          <%= label_tag "two_factor_option_#{opt}", opt.humanize %><br>
+      <% end %>
+    </div>
+
+    <br/>
+    <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-normal', id: 'verification-login-btn') do %>
+        <i class="glyphicon glyphicon-log-in"></i> Sign In
+    <% end %>
+
+<% end %>
+
+<div id="push-notification-loader" class="hidden">
+  <h4>Please check your Authy app for a push notification. Waiting for a response...</h4>
+  <div class="loader"></div>
+</div>

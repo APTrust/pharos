@@ -1,6 +1,11 @@
 class ApplicationController < ActionController::Base
+  include ApiAuth
+  include Pundit
+  include AuthorizationForcedRedirects
   before_action do
-    resource = controller_path.singularize.gsub('/', '_').to_sym 
+    params[:user] = { email: request.headers["X-Pharos-API-User"] } if api_request? && params[:controller] == 'users'
+
+    resource = controller_path.singularize.gsub('/', '_').to_sym
     method = "#{resource}_params"
     params[resource] &&= send(method) if respond_to?(method, true)
 
@@ -8,10 +13,171 @@ class ApplicationController < ActionController::Base
     request.format = 'json' if (!api_check.nil? && api_check.include?('api') && params[:format].nil?)
   end
 
-  # Adds a few additional behaviors into the application controller
-  include ApiAuth
-  # Authorization mechanism
-  include Pundit
+  before_action do
+    session[:two_factor_option] = params[:two_factor_option] if session[:two_factor_option].nil?
+  end
+
+  before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :set_grace_period_notice, unless: :devise_controller?
+  before_action :set_format
+  before_action :verify_user!, unless: :devise_controller?
+
+  def verify_user!
+    if requires_verification?
+      start_verification
+    else
+      forced_redirections unless api_request?
+    end
+  end
+
+  def requires_verification?
+    if api_request? && user_signed_in?
+      return false
+    end
+    unless current_user.nil?
+      session[:verified].nil? && current_user.need_two_factor_authentication?
+    end
+  end
+
+  def start_verification
+    if session[:two_factor_option] == nil
+      delete_session_variables
+      redirect_to verification_login_path, flash: { notice: 'You must select an option for two factor sign in.' }
+    elsif session[:two_factor_option] == 'Backup Code'
+      redirect_to enter_backup_verification_path(id: current_user.id), flash: { alert: 'Please enter a backup code.' }
+    elsif session[:two_factor_option] == 'Push Notification'
+      one_touch = generate_one_touch('Request to Login to APTrust Repository Website')
+      if !one_touch['errors'].nil? && !one_touch['errors'].empty?
+        logger.info "Checking one touch contents: #{one_touch.inspect}"
+        delete_session_variables
+        sign_out(current_user)
+        respond_to do |format|
+          format.json { render json: { error: 'Create Push Error', message: one_touch.inspect }, status: :internal_server_error }
+          format.html { redirect_to new_user_session_path, flash: { error: "There was an error creating your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{one_touch['errors']['message']}" } }
+        end
+      elsif one_touch.ok?
+        check_one_touch(one_touch)
+      end
+    elsif session[:two_factor_option] == 'Text Message'
+      send_sms
+      redirect_to edit_verification_path(id: current_user.id, verification_type: 'login')
+    end
+  end
+
+  def one_touch_status
+    status = Authy::OneTouch.approval_request_status({uuid: session[:uuid]})
+    if !status['errors'].nil? && !status['errors'].empty?
+      logger.info "Checking one touch contents: #{status.inspect}"
+      delete_session_variables
+      sign_out(current_user)
+      respond_to do |format|
+        format.json { render json: { error: 'One Touch Status Error' }, status: :internal_server_error }
+        format.html { redirect_to root_path, flash: { error: "There was a problem verifying your push notification. Please try again. If the problem persists, please contact your administrator or an APTrust administrator for help, and let them know that the error message was: #{status['errors']['message']}" } }
+      end
+    elsif status.ok?
+      if session[:one_touch_timeout] <= 0
+        delete_session_variables
+        sign_out(current_user)
+        redirect_to new_user_session_path, flash: { error: 'This push notification has expired' }
+      else
+        if status['approval_request']['status'] == 'approved'
+          approve_session
+          redirect_to session['user_return_to'] || root_path, flash: { notice: 'Signed in successfully.' }
+        elsif status['approval_request']['status'] == 'denied'
+          delete_session_variables
+          sign_out(current_user)
+          redirect_to new_user_session_path, flash: { error: 'This request was denied.' }
+        else
+          recheck_one_touch_status
+        end
+      end
+    end
+  end
+
+  def forced_redirections
+    if current_user.nil?
+      return
+    elsif !current_user.initial_password_updated
+      if right_controller && right_action('password')
+        return
+      else
+        msg = 'Your initial password is only meant to be temporary, please change your password now.'
+        forced_redirect_return(msg)
+      end
+    elsif !current_user.email_verified
+      if right_controller_and_id && right_action('email')
+        return
+      else
+        msg = 'You are required to verify your email address before you can continue using this website.'
+        forced_redirect_return(msg)
+      end
+    elsif !current_user.account_confirmed
+      if right_controller_and_id && right_action('account')
+        return
+      else
+        msg = 'You must confirm your account every year, please do that by clicking the link in your confirmation email.'
+        forced_redirect_return(msg)
+      end
+    elsif current_user.force_password_update
+      if right_controller && right_action('password')
+        return
+      else
+        msg = 'One of your admins has requested you change your password now, please do that immediately.'
+        forced_redirect_return(msg)
+      end
+    elsif right_controller_and_id && right_action('release')
+      return
+    else
+      if current_user.required_to_use_twofa?
+        if !current_user.enabled_two_factor
+          date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
+          if current_user.institution.otp_enabled
+            if right_controller_and_id && right_action('twofa_enable')
+              return
+            else
+              msg = 'An administrator has made Two Factor Authentication mandatory for your institution. Please enable it now.'
+              forced_redirect_return(msg)
+            end
+          else
+            if (date_dif <= ENV['PHAROS_2FA_GRACE_PERIOD'].to_i) || (right_controller_and_id && right_action('twofa_enable'))
+              return
+            else
+              msg = 'You are required to use two factor authentication, please enable it now.'
+              forced_redirect_return(msg)
+            end
+          end
+        elsif !current_user.confirmed_two_factor
+          if (right_controller_and_id && right_action('twofa_confirm')) ||
+              (params[:controller] == 'verifications' && right_action('verification'))
+            return
+          else
+            msg = 'You are required to use two factor authentication, please verify your phone number now.'
+            forced_redirect_return(msg)
+          end
+        else
+          return
+        end
+      else
+        return
+      end
+    end
+  end
+
+  def set_grace_period_notice
+    time_period = ENV['PHAROS_2FA_GRACE_PERIOD'].to_i
+    unless current_user.nil? || current_user.institution.otp_enabled || (current_user.enabled_two_factor && !current_user.confirmed_two_factor) || current_user.institutional_user?
+      date_dif = ((DateTime.now.to_i - current_user.grace_period.to_i) / 86400)
+      if date_dif <= time_period && date_dif >= 0 && !current_user.confirmed_two_factor
+        if Rails.env.test? || request.referrer.nil? || !request.referrer.include?('/users/sign_in')
+          # flash.clear
+        else
+          if date_dif < time_period && request.referrer.include?('/users/sign_in')
+            flash[:notice] = "You have #{time_period - date_dif} day(s) left to enable Two Factor Authentication. Right now enabling Two Factor Authentication is optional, but after this grace period is over it will become mandatory. Please update your phone number to a valid mobile phone number and/or smartphone enabled number before enabling Two Factor Authentication, otherwise the process will not work as expected."
+          end
+        end
+      end
+    end
+  end
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -32,10 +198,13 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   rescue_from ActionController::RoutingError do |exception|
+    logger.error "Routing error occurred. URL: #{request.url}"
+    logger.error exception.backtrace.join("\n")
+    request.format = 'json' if api_request?
     logger.error 'Routing error occurred'
     respond_to do |format|
       format.html { render 'shared/404', status: 404 }
-      format.json { render :json => { status: 'error', message: 'The page you were looking for could not be found! If you were searching for a specific object or file, check to make sure you have the correct identifier and try again. If you believe you have reached this message in error, please contact your administrator or an APTrust administrator.' }, status: 404 }
+      format.json { render :json => { status: 'error', message: 'The page you were looking for could not be found! If you were searching for a specific object or file, check to make sure you have the correct identifier and try again. If you believe you have reached this message in error, please contact your administrator or an APTrust administrator.', url: request.original_url }, status: 404 }
     end
   end
 
@@ -43,11 +212,21 @@ class ApplicationController < ActionController::Base
     raise ActionController::RoutingError.new(params[:path])
   end
 
-  def after_sign_in_path_for(resource)
-    session['user_return_to'] || root_path
+  def after_sign_in_path_for(resource_or_scope)
+    stored_location_for(resource_or_scope) || root_path
+  end
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_in, keys: [:otp_attempt])
   end
 
   private
+
+  def set_format
+    request.format = 'html' unless request.format == 'json' || request.format == 'html' || request.format == 'rss'
+  end
 
   def user_not_authorized(exception)
     #policy_name = exception.policy.class.to_s.underscore
@@ -58,6 +237,15 @@ class ApplicationController < ActionController::Base
       format.html { redirect_to root_url, alert: 'You are not authorized to access this page.' }
       format.json { render :json => { status: 'error', message: 'You are not authorized to access this page.' }, status: :forbidden }
     end
+  end
+
+  def storable_location?
+    request.get? && is_navigational_format? && !devise_controller? && !request.xhr? && !verifications_controller?
+  end
+
+  def store_user_location!
+    # :user is the scope we are authenticating
+    store_location_for(:user, request.fullpath)
   end
 
   # Logs an exception with stacktrace
@@ -117,7 +305,7 @@ class ApplicationController < ActionController::Base
   def format_current
     params[:page] = @page
     params[:per_page] = @per_page
-    new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+    new_url = url_for(only_path: false, params: params.permit(Pharos::Application::PARAMS_HASH))
     new_url
   end
 
@@ -128,7 +316,7 @@ class ApplicationController < ActionController::Base
       new_page = @page + 1
       params[:page] = new_page
       params[:per_page] = @per_page
-      new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+      new_url = url_for(only_path: false, params: params.permit(Pharos::Application::PARAMS_HASH))
       new_url
     end
   end
@@ -140,7 +328,7 @@ class ApplicationController < ActionController::Base
       new_page = @page - 1
       params[:page] = new_page
       params[:per_page] = @per_page
-      new_url = url_for(params.permit(Pharos::Application::PARAMS_HASH))
+      new_url = url_for(only_path: false, params: params.permit(Pharos::Application::PARAMS_HASH))
       new_url
     end
   end

@@ -26,14 +26,17 @@ describe 'Catalog' do
         before(:all) do
           @user = FactoryBot.create(:user, :admin)
           login_as(@user)
+          inject_session verified: true
         end
 
         it 'should have admin dropdown' do
+          inject_session verified: true
           login_as(@user)
           expect(page).to have_content('Admin')
         end
 
         it 'should present the users name' do
+          inject_session verified: true
           login_as(@user)
           expect(page).to have_content("#{@user.name}")
         end
@@ -46,11 +49,13 @@ describe 'Catalog' do
         end
 
         it 'should have admin dropdown' do
+          inject_session verified: true
           login_as(@user)
           expect(page).to have_content('Admin')
         end
 
         it 'should present the users name' do
+          inject_session verified: true
           login_as(@user)
           expect(page).to have_content("#{@user.name}")
         end
@@ -58,7 +63,7 @@ describe 'Catalog' do
 
       describe 'institutional_user users' do
         before(:all) do
-          @user = FactoryBot.create(:aptrust_user, :institutional_user)
+          @user = FactoryBot.create(:aptrust_user, :institutional_user, confirmed_two_factor: false)
           login_as(@user)
         end
 

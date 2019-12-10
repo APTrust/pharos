@@ -207,6 +207,8 @@ RSpec.describe WorkItem, :type => :model do
     before do
       test_obj = FactoryBot.create(:intellectual_object, identifier: 'abc/123')
       FactoryBot.create(:generic_file, identifier: 'abc/123/doc.pdf', intellectual_object_id: test_obj.id)
+      FactoryBot.create(:generic_file, identifier: 'abc/123/txt.pdf', intellectual_object_id: test_obj.id)
+      FactoryBot.create(:generic_file, identifier: 'abc/123/ppt.pdf', intellectual_object_id: test_obj.id)
       3.times do
         ingest_date = ingest_date + 1.days
         FactoryBot.create(:work_item, object_identifier: 'abc/123',
@@ -224,6 +226,7 @@ RSpec.describe WorkItem, :type => :model do
     end
 
     it 'should create a restoration request when asked' do
+      test_obj = IntellectualObject.where(identifier: 'abc/123').first
       wi = WorkItem.create_restore_request('abc/123', 'mikey@example.com')
       wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
@@ -238,6 +241,7 @@ RSpec.describe WorkItem, :type => :model do
       wi.pid.should == 0
       wi.needs_admin_review.should == false
       wi.id.should_not be_nil
+      wi.size.should == test_obj.gf_size
     end
 
     it 'should create a file restoration request when asked' do
@@ -257,6 +261,7 @@ RSpec.describe WorkItem, :type => :model do
       wi.needs_admin_review.should == false
       wi.id.should_not be_nil
       wi.generic_file_identifier.should == test_file.identifier
+      wi.size.should == test_file.size
     end
 
     it 'should create a glacier restoration request when asked' do

@@ -11,7 +11,6 @@
       <th><%= model_class.human_attribute_name(:email) %></th>
       <th><%= model_class.human_attribute_name(:institution) %></th>
       <th><%= model_class.human_attribute_name(:groups) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody>
@@ -24,15 +23,24 @@
         <td><% user.roles.each do |role| %>
           <%= role.name.capitalize %>
         <% end %></td>
+        <td><%= show_link user %></td>
+        <td><%= edit_link user %></td>
         <% if user.deactivated? %>
-            <td>
-              <%= show_link user %> <%= edit_link user %> <%= reactivate_link user %> <%= destroy_link user %>
-            </td>
+            <td><%= reactivate_link user %></td>
         <% else %>
-            <td>
-              <%= show_link user %> <%= edit_link user %> <%= deactivate_link user %> <%= destroy_link user %>
-            </td>
+            <td><%= deactivate_link user %></td>
         <% end %>
+        <% if user.enabled_two_factor %>
+            <td><%= disable_otp_link user %></td>
+        <% else %>
+            <td><%= link_to 'Enable 2FA', "#", class: 'btn btn-success doc-action-btn', data: {toggle: "modal", target: "#enable_phone_modal_#{user.id}"} %></td>
+            <%= render 'enable_phone_number_index_modal', user: user %>
+            <% user = persist_errors(user) %>
+            <% if user.errors.any? %>
+                <script>$('#enable_phone_modal_<%= user.id %>').modal('show');</script>
+            <% end %>
+        <% end %>
+        <td><%= destroy_link user %></td>
       </tr>
     <% end %>
   </tbody>

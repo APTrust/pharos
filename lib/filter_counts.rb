@@ -13,11 +13,11 @@ module FilterCounts
 
   def get_event_institution_counts(results)
     @selected[:institution] = params[:institution] if params[:institution]
-    params[:institution] ? @institutions = [params[:institution]] : @institutions = Institution.all.pluck(:id)
+    params[:institution] ? @institutions = Institution.where("id = ?", params[:institution]) : @institutions = Institution.all.order(:name)
     @sorted_institutions = {}
-    @institutions.each do |id|
-      name = Institution.find(id).name
-      @sorted_institutions[name] = id
+    @institutions.each do |inst|
+      #name = Institution.find(id).name
+      @sorted_institutions[inst.name] = inst.id
     end
     @sorted_institutions = Hash[@sorted_institutions.sort]
     # Can be turned on if efficiency improves to the point where filter counts are plausible

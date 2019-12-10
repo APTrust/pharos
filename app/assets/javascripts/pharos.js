@@ -8,6 +8,10 @@ function dropdown() {
     $('.dropdown-toggle').dropdown();
 }
 
+function pass_popover() {
+    $('[data-toggle="password_popover"]').popover({html:true});
+}
+
 function addClickFunctions() {
     var buttons = $("a.btn-sm.btn-default");
     for (var i = 0; i < buttons.length; i++) {
@@ -33,7 +37,9 @@ function tabbed_nav(controller) {
         "reports": function () { activateNavTab('rep_tab'); },
         "alerts": function () { activateNavTab('alert_tab'); },
         "dpn_bags": function () { activateNavTab('dpn_bag_tab'); },
-        "catalog": function () {}
+        "catalog": function () {},
+        "devise/password_expired": function () {},
+        "users": function () {}
     };
     controllerSwitch[controller]();
 }
@@ -54,10 +60,28 @@ function activateNavTab(id) {
     $('#'+id).addClass('active');
 }
 
+// This function autofills the password and password confirmation forms
+// in the new user form, then hide the labels (the inputs are hidden in
+// the form itself) because that was the only way to get rid of the now
+// defunct fields that are overridden by the welcome email and temporary
+// password a new user receives.
+function autofillUserCreateForm() {
+    $('#new_user_password').val('passwordabc');
+    $("label[for='new_user_password']").addClass('hidden');
+    $('#new_user_password_confirmation').val('passwordabc');
+    $("label[for='new_user_password_confirmation']").addClass('hidden');
+}
+
+// Test function to test deploy and recreation of assets
+function dropout() {
+    $('.dropdown-toggle').dropdown();
+}
+
 $(document).ready(function(){
     fixFilters();
     activateTabs();
     dropdown();
     fixSearchBreadcrumb();
     addClickFunctions();
+    pass_popover();
 });

@@ -15,7 +15,7 @@ class Institution < ActiveRecord::Base
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
-  # before_validation :sanitize_update_params, on: :update
+  before_validation :sanitize_update_params, on: :update
 
   validates :name, :identifier, :type, presence: true
   validate :name_is_unique
@@ -25,8 +25,8 @@ class Institution < ActiveRecord::Base
   before_save :set_bucket_names
 
   attr_readonly :identifier
-  # attr_readonly :receiving_bucket
-  # attr_readonly :restore_bucket
+  attr_readonly :receiving_bucket
+  attr_readonly :restore_bucket
 
   before_destroy :check_for_associations
 
@@ -71,21 +71,12 @@ class Institution < ActiveRecord::Base
   end
 
   def new_deletion_items
-    latest_email = Email.where(institution_id: self.id, email_type: 'deletion_notifications').order(id: :asc).limit(1).first
-    if latest_email.nil?
-      time = Time.now - 1.month
-      deletion_items = WorkItem.with_institution(self.id)
-                           .created_after(time)
-                           .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
-                           .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
-                           .with_status(Pharos::Application::PHAROS_STATUSES['success'])
-    else
-      deletion_items = WorkItem.with_institution(self.id)
-                           .created_after(latest_email.created_at)
-                           .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
-                           .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
-                           .with_status(Pharos::Application::PHAROS_STATUSES['success'])
-    end
+    time = Time.now - 1.month
+    deletion_items = WorkItem.with_institution(self.id)
+                         .created_after(time)
+                         .with_action(Pharos::Application::PHAROS_ACTIONS['delete'])
+                         .with_stage(Pharos::Application::PHAROS_STAGES['resolve'])
+                         .with_status(Pharos::Application::PHAROS_STATUSES['success'])
     deletion_items
   end
 

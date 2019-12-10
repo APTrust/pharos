@@ -18,7 +18,7 @@ class GenericFilesController < ApplicationController
     else
       if params[:not_checked_since]
         authorize current_user, :not_checked_since?
-        @generic_files = GenericFile.not_checked_since(params[:not_checked_since])
+        @generic_files = GenericFile.preload(:intellectual_object).not_checked_since(params[:not_checked_since])
       else
         load_parent_object
         if @intellectual_object
@@ -31,7 +31,7 @@ class GenericFilesController < ApplicationController
       end
       filter_count_and_sort
       page_results(@generic_files)
-      (params[:with_ingest_state] == 'true' && current_user.admin?) ? options_hash = {include: [:ingest_state]} : options_hash = {}
+      options_hash = build_options_hash
       respond_to do |format|
         format.json { render json: { count: @count, next: @next, previous: @previous, results: @paged_results.map { |f| f.serializable_hash(options_hash) } } }
         format.html { }
@@ -51,7 +51,7 @@ class GenericFilesController < ApplicationController
     else
       authorize current_user, :nil_file?
       respond_to do |format|
-        format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.' }, status: :not_found }
+        format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.', url: request.original_url }, status: 404 }
         format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]} was not found. Please check to make sure the identifier was properly escaped." }
       end
     end
@@ -106,40 +106,56 @@ class GenericFilesController < ApplicationController
     # nested params cause new events to be created,
     # and it would require too much logic to determine which
     # events should not be duplicated.
-    authorize @generic_file
-    @generic_file.state = 'A'
-    if resource.update(single_generic_file_params)
-      render json: object_as_json, status: :ok
+    if @generic_file
+      authorize @generic_file
+      @generic_file.state = 'A'
+      if resource.update(single_generic_file_params)
+        render json: object_as_json, status: :ok
+      else
+        log_model_error(resource)
+        render json: resource.errors, status: :unprocessable_entity
+      end
     else
-      log_model_error(resource)
-      render json: resource.errors, status: :unprocessable_entity
+      authorize current_user, :nil_file?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.', url: request.original_url }, status: 404 }
+        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]} was not found. Please check to make sure the identifier was properly escaped." }
+      end
     end
   end
 
   def destroy
-    authorize @generic_file, :soft_delete?
-    # Don't allow a delete request if an ingest or restore is in process
-    # for this object. OK to delete if another delete request is in process.
-    result = WorkItem.can_delete_file?(@generic_file.intellectual_object.identifier, @generic_file.identifier)
-    if @generic_file.state == 'D'
-      redirect_to @generic_file
-      flash[:alert] = 'This file has already been deleted.'
-    elsif result == 'true'
-      log = Email.log_deletion_request(@generic_file)
-      ConfirmationToken.where(generic_file_id: @generic_file.id).delete_all #delete any old tokens. Only the new one should be valid
-      token = ConfirmationToken.create(generic_file: @generic_file, token: SecureRandom.hex)
-      token.save!
-      NotificationMailer.deletion_request(@generic_file, current_user, log, token).deliver!
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html {
-          redirect_to @generic_file
-          flash[:notice] = 'An email has been sent to the administrators of this institution to confirm deletion of this file.'
-        }
+    if @generic_file
+      authorize @generic_file, :soft_delete?
+      # Don't allow a delete request if an ingest or restore is in process
+      # for this object. OK to delete if another delete request is in process.
+      result = WorkItem.can_delete_file?(@generic_file.intellectual_object.identifier, @generic_file.identifier)
+      if @generic_file.state == 'D'
+        redirect_to @generic_file
+        flash[:alert] = 'This file has already been deleted.'
+      elsif result == 'true'
+        log = Email.log_deletion_request(@generic_file)
+        ConfirmationToken.where(generic_file_id: @generic_file.id).delete_all #delete any old tokens. Only the new one should be valid
+        token = ConfirmationToken.create(generic_file: @generic_file, token: SecureRandom.hex)
+        token.save!
+        NotificationMailer.deletion_request(@generic_file, current_user, log, token).deliver!
+        respond_to do |format|
+          format.json { head :no_content }
+          format.html {
+            redirect_to @generic_file
+            flash[:notice] = 'An email has been sent to the administrators of this institution to confirm deletion of this file.'
+          }
+        end
+      else
+        redirect_to @generic_file
+        flash[:alert] = "Your file cannot be deleted at this time due to a pending #{result} request."
       end
     else
-      redirect_to @generic_file
-      flash[:alert] = "Your file cannot be deleted at this time due to a pending #{result} request."
+      authorize current_user, :nil_file?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.', url: request.original_url }, status: 404 }
+        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]} was not found. Please check to make sure the identifier was properly escaped." }
+      end
     end
   end
 
@@ -194,37 +210,44 @@ class GenericFilesController < ApplicationController
     end
   end
 
-
   def restore
-    authorize @generic_file, :restore?
-    message = ""
-    api_status_code = :ok
-    restore_item = nil
-    pending = WorkItem.pending_action_for_file(@generic_file.identifier)
-    if @generic_file.state == 'D'
-      api_status_code = :conflict
-      message = 'This file has been deleted and cannot be queued for restoration.'
-    elsif pending.nil?
-      restore_item = WorkItem.create_restore_request_for_file(@generic_file, current_user.email)
-      message = 'Your file has been queued for restoration.'
+    if @generic_file
+      authorize @generic_file, :restore?
+      message = ""
+      api_status_code = :ok
+      restore_item = nil
+      pending = WorkItem.pending_action_for_file(@generic_file.identifier)
+      if @generic_file.state == 'D'
+        api_status_code = :conflict
+        message = 'This file has been deleted and cannot be queued for restoration.'
+      elsif pending.nil?
+        restore_item = WorkItem.create_restore_request_for_file(@generic_file, current_user.email)
+        message = 'Your file has been queued for restoration.'
+      else
+        api_status_code = :conflict
+        message = "Your file cannot be queued for restoration at this time due to a pending #{pending.action} request."
+      end
+      respond_to do |format|
+        status = restore_item.nil? ? 'error' : 'ok'
+        item_id = restore_item.nil? ? 0 : restore_item.id
+        format.json {
+          render :json => { status: status, message: message, work_item_id: item_id }, :status => api_status_code
+        }
+        format.html {
+          if restore_item.nil?
+            flash[:alert] = message
+          else
+            flash[:notice] = message
+          end
+          redirect_to @generic_file
+        }
+      end
     else
-      api_status_code = :conflict
-      message = "Your file cannot be queued for restoration at this time due to a pending #{pending.action} request."
-    end
-    respond_to do |format|
-      status = restore_item.nil? ? 'error' : 'ok'
-      item_id = restore_item.nil? ? 0 : restore_item.id
-      format.json {
-        render :json => { status: status, message: message, work_item_id: item_id }, :status => api_status_code
-      }
-      format.html {
-        if restore_item.nil?
-          flash[:alert] = message
-        else
-          flash[:notice] = message
-        end
-        redirect_to @generic_file
-      }
+      authorize current_user, :nil_file?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'This file could not be found. Please check to make sure the identifier was properly escaped.', url: request.original_url }, status: 404 }
+        format.html { redirect_to root_url, alert: "A Generic File with identifier: #{params[:generic_file_identifier]} was not found. Please check to make sure the identifier was properly escaped." }
+      end
     end
   end
 
@@ -297,16 +320,28 @@ class GenericFilesController < ApplicationController
   end
 
   def object_as_json
-    if params[:with_ingest_state] == 'true' && current_user.admin? && params[:include_relations]
-      options_hash = {include: [:checksums, :premis_events, :ingest_state]}
-    elsif params[:with_ingest_state] == 'true' && current_user.admin?
-      options_hash = {include: [:ingest_state]}
-    elsif params[:include_relations]
-      options_hash = {include: [:checksums, :premis_events]}
-    else
-      options_hash = {}
-    end
+    options_hash = build_options_hash
     @generic_file.serializable_hash(options_hash)
+  end
+
+  def build_options_hash
+    options_hash = {}
+    options_hash[:include] = [:ingest_state] if params[:with_ingest_state] == 'true' && current_user.admin?
+    if params[:include_relations] == 'true'
+      if options_hash.key?(:include)
+        options_hash[:include].push(:checksums)
+        options_hash[:include].push(:premis_events)
+      else
+        options_hash[:include] = [:checksums, :premis_events]
+      end
+    end
+    if params[:include_checksums] == 'true'
+      options_hash.key?(:include) ? options_hash[:include].push(:checksums) : options_hash[:include] = [:checksums]
+    end
+    if params[:include_events] == 'true'
+      options_hash.key?(:include) ? options_hash[:include].push(:premis_events) : options_hash[:include] = [:premis_events]
+    end
+    options_hash
   end
 
   def array_as_json(list_of_generic_files)
@@ -382,33 +417,58 @@ class GenericFilesController < ApplicationController
   end
 
   def filter_count_and_sort
-    params[:state] = 'A' if params[:state].nil?
+    current_url = url_for(only_path: false)
+    unless (current_url.include? 'api/v2') && (!params.include? :intellectual_object_identifier) &&
+           (!params.include? :intellectual_object_id) && (!params.include? :state)
+      params[:state] = 'A' if params[:state].nil?
+    end
     parameter_deprecation
     @generic_files = @generic_files
-                         .with_identifier_like(params[:identifier])
-                         .with_uri_like(params[:uri])
-                         .created_before(params[:created_before])
-                         .created_after(params[:created_after])
-                         .updated_before(params[:updated_before])
-                         .updated_after(params[:updated_after])
-                         .with_institution(params[:institution])
-                         .with_file_format(params[:file_format])
-                         .with_state(params[:state])
+                       .with_identifier_like(params[:identifier])
+                       .with_uri_like(params[:uri])
+                       .created_before(params[:created_before])
+                       .created_after(params[:created_after])
+                       .updated_before(params[:updated_before])
+                       .updated_after(params[:updated_after])
+                       .with_institution(params[:institution])
+                       .with_file_format(params[:file_format])
+                       .with_state(params[:state])
+                       .with_storage_option(params[:storage_option])
+
+    # Not sure why this is declared here, but the erb templates
+    # seem to use it.
     @selected = {}
-    get_format_counts(@generic_files)
-    get_institution_counts(@generic_files)
-    get_state_counts(@generic_files)
-    count = @generic_files.count
-    set_page_counts(count)
+
+    # Don't run counts for API requests
+    if !api_request? && request.path !~ /\/api\/v2\//
+      ok_to_count_formats? ? get_format_counts(@generic_files) : @format_counts = {}
+      get_institution_counts(@generic_files)
+      get_state_counts(@generic_files)
+    end
+
+    set_page_counts(@generic_files.count)
     params[:sort] = 'name' if params[:sort].nil?
     case params[:sort]
       when 'date'
         @generic_files = @generic_files.order('updated_at DESC')
+      when 'last_fixity_check'
+        @generic_files = @generic_files.order('last_fixity_check')
       when 'name'
         @generic_files = @generic_files.order('identifier').reverse_order
       when 'institution'
         @generic_files = @generic_files.joins(:institution).order('institutions.name')
     end
+  end
+
+  # Don't count formats if there are no filters. This slows things down
+  # for APTrust users.
+  def ok_to_count_formats?
+    ok = true
+    if params[:institution_identifier] == 'aptrust.org' && params[:institution].blank?
+      logger.info("Skipping file format counts for APTrust user with no institution filter.")
+      ok = false
+    end
+    return ok
   end
 
   def parameter_deprecation

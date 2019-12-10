@@ -1,6 +1,9 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
+abort('The Rails environment is running in production mode!') if (Rails.env.production? || Rails.env.demo?)
+require 'dotenv'
+Dotenv.load('.env.local', '.env.test','.env')
 require 'rspec/rails'
 require 'shoulda/matchers'
 require 'capybara/rails'
@@ -95,6 +98,9 @@ RSpec.configure do |config|
 
   #For devise testing
   config.include Devise::Test::ControllerHelpers, :type => :controller
+
+  config.include InjectSession, type: :feature
+  config.include InjectSession, type: :request
 
   # config.backtrace_exclusion_patterns = Array.new
 end

@@ -3,10 +3,18 @@ FactoryBot.define do
     name { Faker::Name.name }
     email { "#{Faker::Internet.user_name}@#{Faker::Internet.domain_name}" }
     phone_number { 4345551234 }
-    password { 'password' }
+    password { %w(Password514 thisisareallylongpasswordtesting).sample }
     roles { [Role.where(name: 'public').first_or_create] }
     institution_id { FactoryBot.create(:member_institution).id }
     deactivated_at { nil }
+    enabled_two_factor { true }
+    confirmed_two_factor { true }
+    email_verified { true }
+    initial_password_updated { true }
+    force_password_update { false }
+    account_confirmed { true }
+    sign_in_count { 5 }
+    grace_period { Time.now }
 
     factory :aptrust_user, class: 'User' do
       roles { [Role.where(name: 'admin').first_or_create] }
@@ -28,7 +36,6 @@ FactoryBot.define do
 
     trait :institutional_admin do
       roles { [Role.where(name: 'institutional_admin').first_or_create]}
-
     end
 
     trait :institutional_user do

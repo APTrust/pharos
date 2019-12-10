@@ -3,11 +3,112 @@
 <h4>User Information</h4>
 <%= gravatar_for @user %>
 <address>
-
   <strong><%= @user.name %></strong> (<em><%= @user.institution.name %></em>)<br />
-  <a href="mailto:#"><%= @user.email %></a><br>
-  <abbr title="Phone">Phone #: </abbr><%= @user.phone_number %><br><br>
+  Email: <a href="mailto:#"><%= @user.email %></a><br />
+  Mobile Phone Number: <%= @user.phone_number %> <br /><br />
 </address>
+<%= edit_link(@user) %>
+<%= link_to 'Change Password', edit_password_user_path(@user), class: 'btn btn-normal doc-action-btn btn-sm' %>
+
+<% if current_user.admin? || current_user.institutional_admin? %>
+    <%= link_to 'Force Password Update', user_forced_password_update_path(@user), class: 'btn btn-warning doc-action-btn btn-sm' %>
+<% end %>
+<% if @user.deactivated? %>
+    <%= reactivate_link(@user) %>
+<% else %>
+    <%= deactivate_link(@user) %>
+<% end %>
+<%= destroy_link(@user) %>
+<br><br>
+<% unless @user.email_verified %>
+    <h5>Resend Email Verification</h5>
+    <p>If you lost, or never received, a welcome email and have not changed your password you may need to verify your email. Please do so now. </p>
+    <%= button_to 'Send Email Verification Instructions', email_verification_path(@user.id),
+                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
+<% end %>
+
+<% unless @user.account_confirmed %>
+    <h5>Resend Account Confirmation Email</h5>
+    <p>If you lost, or never received, an email with a confirmation URL for your account confirmation you can resend a confirmation email here. </p>
+    <%= link_to 'Resend Email', indiv_confirmation_email_path(@user), class: 'btn btn-normal doc-action-btn btn-sm' %>
+<% end %>
+
+<hr />
+
+<h4>Two Factor Authentication (2FA)</h4>
+<% if @user.enabled_two_factor %>
+    <% if @user.confirmed_two_factor %>
+		<h5>Status: Enabled</h5>
+        <%= link_to 'Disable 2FA', users_disable_otp_path(@user.id), id: 'disable_twofa',
+                    :method => :get, class: 'btn btn-warning doc-action-btn' %>
+        <% if (current_user.authy_id.nil? || current_user.authy_id == '') %>
+            <%= link_to 'Register w/Authy', users_register_for_authy_path(@user.id), id: 'register_with_authy',
+                        :method => :get, class: 'btn btn-primary doc-action-btn' %>
+        <% end %>
+		<%= link_to 'Change Mobile Phone Number', "#", class: 'btn btn-normal doc-action-btn btn-sm', data: {toggle: "modal", target: "#authy_phone_modal"} %>
+		<%= render 'authy_phone_number_modal' %>
+		<% if @user.errors.any? %>
+		   <script>$('#authy_phone_modal').modal('show');</script>
+		<% end %>
+    <% else %>
+        <h5>Status: Mobile Phone Number Needs Verification</h5>
+        <p>If the phone number in your user profile is not able to receive text messages or push notifications you will need your
+          institutional administrator or an APTrust administrator to change the number to one capable of receiving text messages.
+          After that has been done, you can continue with the phone number verification process. </p>
+        <%= link_to 'Verify Phone Number via SMS', users_verify_twofa_path(@user.id, verification_option: 'sms'),
+                    class: 'btn btn-normal doc-action-btn' %>
+        <br />
+        <%= link_to 'Verify Phone Number via Push Notification', users_verify_twofa_path(@user.id, verification_option: 'push'),
+                    class: 'btn btn-normal doc-action-btn', id: 'phone_verification_push_btn' %><p>(requires Authy app installation)</p>
+        <%= link_to 'Disable 2FA', users_disable_otp_path(@user.id), id: 'disable_twofa',
+        :method => :get, class: 'btn btn-warning doc-action-btn' %>
+        <div id="verification-loader" class="hidden">
+          <h4>Please check your Authy app for a push notification. Waiting for a response...</h4>
+          <div class="loader"></div>
+        </div>
+    <% end %>
+
+    <br />
+    <br />
+    <h4>Backup Codes</h4>
+    <%= button_to 'Generate Backup Codes', backup_codes_path(@user.id),
+                  :method => :get, class: 'btn btn-normal doc-action-btn' %>
+    <% if @codes %>
+        <br />
+        <p><span class="badge badge-danger">Important!</span> Write these backup codes down in a safe place.
+          Each code can be used once to login to your account in case your two factor device is unavailable.
+          For security reasons they will not be displayed again.</p>
+        <ul class='unstyled'>
+          <% @codes.each do |code| %>
+              <li><%= code %></li>
+          <% end %>
+        </ul>
+    <% end %>
+    <br />
+
+<% else %>
+    <h5>Status: Not Enabled</h5>
+    <p>Please ensure you have an accurate phone number listed in your profile before you enable two factor authentication. </p>
+    <%= link_to 'Enable 2FA', "#", class: 'btn btn-success doc-action-btn', data: {toggle: "modal", target: "#enable_phone_modal"} %>
+    <%= render 'enable_phone_number_modal' %>
+    <% if @user.errors.any? %>
+        <script>$('#enable_phone_modal').modal('show');</script>
+    <% end %>
+<% end %>
+
+<div>
+  <h5>If you haven't already, consider downloading Authy and using push notifications!</h5>
+  <span><a href="https://play.google.com/store/apps/details?id=com.authy.authy" target="_blank">
+      <%= image_tag("aptrust/google-play.svg", size: "152x40", alt: "Get it on Google Play") %>
+    </a>
+  </span>
+  <span><a href="https://itunes.apple.com/us/app/authy/id494168017" target="_blank">
+      <%= image_tag("aptrust/app-store.svg", size: "152x40", alt: "Download on the App Store") %>
+    </a>
+  </span>
+</div>
+
+<hr />
 
 <h4>Roles</h4>
 <ul class="unstyled">
@@ -16,20 +117,14 @@
   <% end %>
 </ul>
 
+<hr />
+
 <%= render 'api_key' %>
+
+<hr />
 
 <h4>AWS Buckets</h4>
 <ul clas="unstyled">
   <li><strong>Receiving Bucket: </strong><%= @user.institution.receiving_bucket %></li>
   <li><strong>Restore Bucket: </strong><%= @user.institution.restore_bucket %></li>
 </ul>
-
-<hr />
-
-<%= edit_link(@user) %>
-<% if @user.deactivated? %>
-    <%= reactivate_link(@user) %>
-<% else %>
-    <%= deactivate_link(@user) %>
-<% end %>
-<%= destroy_link(@user) %>

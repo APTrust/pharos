@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '5.2.3'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 4.1.20'
+gem 'uglifier', '>= 4.2.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 5.0.0'
 # Use jquery as the JavaScript library
@@ -16,8 +16,8 @@ gem 'turbolinks'
 gem 'jbuilder', '~> 2.9.1'
 gem 'pg', '1.1.4' # Necessary for talking to our RDS instance
 gem 'pundit'
-gem 'figaro'
-gem 'devise', '4.7.0'
+# gem 'figaro'
+gem 'devise', '4.7.1'
 gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
@@ -35,18 +35,18 @@ gem 'rubyzip'
 # Used to create or edit google sheets
 gem 'google_drive'
 
-gem 'simple_form', '~> 4.1.0'
+gem 'simple_form', '~> 5.0.1'
 gem 'phony_rails'
 gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
 gem 'kaminari'
 gem 'sassc-rails'
-gem 'sassc', '2.0.1'
+gem 'sassc', '2.2.1'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'browser-timezone-rails'
 
 gem 'activerecord-nulldb-adapter'
-gem 'puma', '3.12.0'
+gem 'puma', '3.12.2'
 
 group :demo, :production, :staging do
   # Graylog logging gems
@@ -66,7 +66,7 @@ group :development do
 end
 
 group :test, :development do
-  gem 'capybara', '3.28.0'
+  gem 'capybara', '3.29.0'
   gem 'shoulda-matchers', '~> 4.1.2'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
@@ -78,7 +78,7 @@ group :development, :test, :staging, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.8.2'
+  gem 'rspec-rails', '~> 3.9.0'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end

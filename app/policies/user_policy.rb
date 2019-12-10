@@ -41,6 +41,18 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def account_confirmations?
+    user.admin?
+  end
+
+  def indiv_confirmation_email?
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id)) || user == record
+  end
+
+  def confirm_account?
+    user == record
+  end
+
   def deletion_notifications?
     user.admin?
   end
@@ -118,6 +130,47 @@ class UserPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.institution_id))
   end
 
+  def verify_email?
+    user == record || user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def email_confirmation?
+    user == record
+  end
+
+  def enable_otp?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def disable_otp?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def change_authy_phone_number?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def register_authy_user?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def verify_twofa?
+    user == record
+  end
+
+  def generate_backup_codes?
+    user == record ||  user.admin? ||
+        (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def stale_user_notification?
+    user.admin?
+  end
+
   def edit?
     update?
   end
@@ -143,6 +196,15 @@ class UserPolicy < ApplicationPolicy
 
   def admin_password_reset?
     user.admin?
+  end
+
+  def forced_password_update?
+    return false if (user.institutional_admin? && record.admin?)
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.institution_id))
+  end
+
+  def mass_forced_password_update?
+    user.admin? || user.institutional_admin?
   end
 
   def deactivate?

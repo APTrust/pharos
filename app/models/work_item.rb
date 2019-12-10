@@ -224,7 +224,9 @@ class WorkItem < ActiveRecord::Base
     if item.nil?
       raise ActiveRecord::RecordNotFound
     end
+    obj = IntellectualObject.with_identifier(intellectual_object_identifier).first
     restore_item = item.dup
+    restore_item.size = obj.gf_size
     restore_item.action = Pharos::Application::PHAROS_ACTIONS['restore']
     restore_item = WorkItem.finish_restore_request(restore_item, requested_by, item)
     restore_item
@@ -235,7 +237,9 @@ class WorkItem < ActiveRecord::Base
     if item.nil?
       raise ActiveRecord::RecordNotFound
     end
+    obj = IntellectualObject.with_identifier(intellectual_object_identifier).first
     restore_item = item.dup
+    restore_item.size = obj.gf_size
     restore_item.action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
     restore_item = WorkItem.finish_restore_request(restore_item, requested_by, item)
     restore_item
@@ -253,7 +257,6 @@ class WorkItem < ActiveRecord::Base
     restore_item.node = nil
     restore_item.pid = 0
     restore_item.needs_admin_review = false
-    restore_item.size = orig_item.size
     restore_item.stage_started_at = nil
     restore_item.queued_at = nil
     restore_item.save!
@@ -286,7 +289,7 @@ class WorkItem < ActiveRecord::Base
     restore_item.node = nil
     restore_item.pid = 0
     restore_item.needs_admin_review = false
-    restore_item.size = item.size
+    restore_item.size = generic_file.size
     restore_item.stage_started_at = nil
     restore_item.queued_at = nil
     restore_item.save!

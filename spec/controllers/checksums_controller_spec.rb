@@ -34,6 +34,7 @@ RSpec.describe ChecksumsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns successfully when no parameters are given' do
@@ -67,6 +68,7 @@ RSpec.describe ChecksumsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -86,7 +88,10 @@ RSpec.describe ChecksumsController, type: :controller do
     end
 
     describe 'when signed in' do
-      before { sign_in institutional_admin }
+      before do
+        sign_in institutional_admin
+        session[:verified] = true
+      end
       it 'should be forbidden when the file belongs to your institution' do
         post :create, params: { generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' } }, format: :json
         expect(response.status).to eq (403)
@@ -99,7 +104,10 @@ RSpec.describe ChecksumsController, type: :controller do
     end
 
     describe 'when signed in as admin' do
-      before { sign_in admin }
+      before do
+        sign_in admin
+        session[:verified] = true
+      end
       it 'should be successful' do
         post :create, params: { generic_file_identifier: generic_file_one.identifier, checksum: { algorithm: 'md5', datetime: Time.now, digest: '1234567890' } }, format: :json
         expect(response.status).to eq (201)

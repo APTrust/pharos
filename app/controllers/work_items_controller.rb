@@ -377,8 +377,8 @@ class WorkItemsController < ApplicationController
   end
 
   def find_and_update
-    # Parse date explicitly, or ActiveRecord will not find records when date format string varies.
     set_item
+    # Parse date explicitly, or ActiveRecord will not find records when date format string varies.
     if @work_item
       @work_item.update(writable_work_item_params)
       # Never let non-admin set WorkItem.user.
@@ -417,17 +417,18 @@ class WorkItemsController < ApplicationController
 
   def set_item
     @institution = current_user.institution
-    if params[:id].blank? == false
+    if params[:id].blank?
+      @work_item = WorkItem.where(etag: params[:etag],
+                                  name: params[:name],
+                                  bag_date: params[:bag_date]).first
+    else
       begin
         @work_item = WorkItem.readable(current_user).find(params[:id])
       rescue
         # If we don't catch this, we get an internal server error
       end
-    else
-        @work_item = WorkItem.where(etag: params[:etag],
-                                    name: params[:name],
-                                    bag_date: params[:bag_date]).first
     end
+
   end
 
   # def rewrite_params_for_sqlite
@@ -506,13 +507,19 @@ class WorkItemsController < ApplicationController
                  .with_unempty_pid(params[:pid_not_empty])
                  .with_empty_pid(params[:pid_empty])
                  .with_retry(params[:retry])
+
+    # @selected used in erb template
     @selected = {}
-    get_status_counts(@items)
-    get_stage_counts(@items)
-    get_action_counts(@items)
-    get_institution_counts(@items)
-    count = @items.count
-    set_page_counts(count)
+
+    # Don't run counts for API requests
+    if !api_request?
+      get_status_counts(@items)
+      get_stage_counts(@items)
+      get_action_counts(@items)
+      get_institution_counts(@items)
+    end
+
+    set_page_counts(@items.count)
     params[:sort] = 'date' if params[:sort].nil?
     case params[:sort]
       when 'date'

@@ -10,8 +10,8 @@
     <div class="form-inputs">
       <%= f.input :name, autofocus: true %>
       <%= f.input :email %>
-      <%= f.input :phone_number %>
-
+      <%= f.input :phone_number, label: 'Mobile Phone Number (Required for Two Factor authentication)' %>
+      <p>Please make sure the phone with this number can receive SMS text messages and/or Authy push notifications.</p>
       <% if current_user.admin?  %>
           <%= f.input :institution_id, collection: institutions_for_select, as: :select, label: 'Institution' %>
       <% end %>

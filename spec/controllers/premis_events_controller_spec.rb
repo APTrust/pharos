@@ -30,7 +30,10 @@ RSpec.describe PremisEventsController, type: :controller do
 
   describe 'signed in as admin user' do
     let(:user) { FactoryBot.create(:user, :admin) }
-    before { sign_in user }
+    before do
+      sign_in user
+      session[:verified] = true
+    end
 
     describe 'GET index' do
       before do
@@ -115,7 +118,10 @@ RSpec.describe PremisEventsController, type: :controller do
 
   describe 'signed in as institutional admin' do
     let(:user) { FactoryBot.create(:user, :institutional_admin) }
-    before { sign_in user }
+    before do
+      sign_in user
+      session[:verified] = true
+    end
 
     describe 'POST create' do
       it 'is forbidden' do
@@ -139,7 +145,10 @@ RSpec.describe PremisEventsController, type: :controller do
 
   describe 'signed in as institutional user' do
     let(:user) { FactoryBot.create(:user, :institutional_user) }
-    before { sign_in user }
+    before do
+      sign_in user
+      session[:verified] = true
+    end
 
     describe 'POST create' do
       it 'denies access' do

@@ -79,6 +79,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     describe 'when signed in as institutional user' do
       before do
         sign_in inst_user
+        session[:verified] = true
       end
       it 'should show results from my institution' do
         get :index, params: { institution_identifier: inst1.identifier }
@@ -89,7 +90,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
       it 'should show results from my institution' do
         get :index, params: { institution_identifier: inst1.identifier }
         expect(response).to be_successful
@@ -109,7 +113,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
       it 'should show all results' do
         get :index, params: {}
         expect(response).to be_successful
@@ -123,6 +130,7 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should apply filters' do
         [inst_user, inst_admin, sys_admin].each do |user|
           sign_in user
+          session[:verified] = true
 
           get :index, params: { created_before: '2016-07-26' }
           expect(assigns(:intellectual_objects).size).to eq 1
@@ -193,7 +201,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
 
       it "should show me my institution's object" do
         get :show, params: { intellectual_object_identifier: obj2 }
@@ -233,7 +244,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
 
       it "should show me my institution's object" do
         get :show, params: { intellectual_object_identifier: obj2 }
@@ -255,7 +269,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
 
       it "should show me my institution's object" do
         get :show, params: { intellectual_object_identifier: obj2 }
@@ -341,7 +358,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it "should not let me edit my institution's objects" do
         get :edit, params: { intellectual_object_identifier: inst1_obj }
         expect(response).to redirect_to root_url
@@ -355,7 +375,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
       it "should not let me edit my institution's objects" do
         get :edit, params: { intellectual_object_identifier: inst1_obj }
         expect(response).to redirect_to root_url
@@ -369,7 +392,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
       it 'should not let me edit this' do
         get :edit, params: { intellectual_object_identifier: inst1_obj }
         expect(response).to redirect_to root_url
@@ -412,7 +438,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
              intellectual_object: simple_obj.attributes }, format: 'html')
@@ -427,7 +456,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         post(:create, params: { institution_identifier: inst1.identifier,
              intellectual_object: simple_obj.attributes }, format: 'html')
@@ -442,7 +474,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
       it 'should create a simple object' do
         simple_obj.etag = '90908111'
         post(:create, params: { institution_identifier: inst1.identifier,
@@ -485,7 +520,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'} }
         expect(response).to redirect_to root_url
@@ -498,7 +536,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo'} }
         expect(response).to redirect_to root_url
@@ -511,7 +552,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
       it 'should update the object and respond with redirect (html)' do
         exp_two =  Faker::Lorem.paragraph
         patch :update, params: { intellectual_object_identifier: obj1, intellectual_object: {title: 'Foo', storage_option: 'Glacier-VA', ingest_state: '{[A]}',
@@ -576,7 +620,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         delete :destroy, params: { intellectual_object_identifier: deletable_obj }
         expect(response).to redirect_to root_url
@@ -589,7 +636,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
 
       it 'should create an deletion request email and token' do
         count_before = Email.all.count
@@ -616,7 +666,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
 
       it 'should create an deletion request email and token' do
         count_before = Email.all.count
@@ -680,7 +733,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj }
         expect(response).to redirect_to root_url
@@ -693,7 +749,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
 
       it 'should create delete event and redirect (html) if a correct confirmation token is provided' do
         token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
@@ -741,7 +800,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
 
       it 'should create delete event' do
         token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
@@ -795,7 +857,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in' do
-      before { sign_in user }
+      before do
+        sign_in user
+        session[:verified] = true
+      end
 
       describe "and deleting a file you don't have access to" do
         let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: inst2.id) }
@@ -907,7 +972,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }
         expect(response).to redirect_to root_url
@@ -921,7 +989,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }
         expect(response).to redirect_to intellectual_object_path(obj_for_dpn)
@@ -968,7 +1039,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
       it 'should respond with meaningful json (json)' do
         put :send_to_dpn, params: { intellectual_object_identifier: obj_for_dpn }, format: :json
         expect(response.code).to eq '200'
@@ -1065,7 +1139,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         put :restore, params: { intellectual_object_identifier: obj_for_restore }
         expect(response).to redirect_to root_url
@@ -1079,7 +1156,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_admin }
+      before do
+        sign_in inst_admin
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         put :restore, params: { intellectual_object_identifier: obj_for_restore }
         expect(response).to redirect_to intellectual_object_path(obj_for_restore)
@@ -1109,7 +1189,10 @@ RSpec.describe IntellectualObjectsController, type: :controller do
 
     # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as system admin' do
-      before { sign_in sys_admin }
+      before do
+        sign_in sys_admin
+        session[:verified] = true
+      end
       it 'should respond with meaningful json (json)' do
         # This returns a WorkItem object for format JSON
         put :restore, params: { intellectual_object_identifier: obj_for_restore, format: :json }

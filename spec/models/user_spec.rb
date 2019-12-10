@@ -1,12 +1,35 @@
 require 'spec_helper'
+require 'devise_two_factor/spec_helpers'
 
 describe User do
   let(:user) { FactoryBot.create(:aptrust_user) }
   let(:inst_admin) { FactoryBot.create(:user, :institutional_admin) }
   let(:inst_id) { subject.institution_id }
+  let(:stale_user) { FactoryBot.create(:user, created_at: DateTime.now - 88.days) }
+
+  before :all do
+    User.delete_all
+    Institution.delete_all
+  end
+
+  after :all do
+    User.delete_all
+    Institution.delete_all
+  end
+
+  it { should validate_presence_of(:email) }
+  it { should validate_presence_of(:name) }
+
+  # it_behaves_like "two_factor_authenticatable"
+  # it_behaves_like "two_factor_backupable"
 
   it 'should return a valid institution' do
     user.institution.id.should == user.institution_id
+  end
+
+  it 'should set a proper grace period' do
+    time = Time.now.change(sec: 0)
+    user.grace_period.change(sec: 0).should == time
   end
 
   describe 'as an admin' do
@@ -127,5 +150,20 @@ describe User do
   #     user.timeout_in.should eq 1234
   #   end
   # end
+
+  describe 'stale_users' do
+    it 'should retrieve a list of stale users' do
+      user.created_at = DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 15).days
+      user.save!
+      inst_admin.created_at = DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 1).days
+      inst_admin.save!
+      stale_user.created_at = DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 1).days
+      stale_user.save!
+      users = User.stale_users
+      users.count.should eq 2
+      users[0].should eq inst_admin
+      users[1].should eq stale_user
+    end
+  end
 
 end

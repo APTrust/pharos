@@ -29,6 +29,13 @@
       <dd><%= number_to_human_size(@size) %></dd>
     </dl>
 
+    <% if @institution.otp_enabled %>
+      <%= disable_otp_link(@institution) %>
+    <% else %>
+      <%= enable_otp_link(@institution) %>
+    <% end %>
+    <%= mass_pass_update_link(@institution) %>
+
     <%= render 'shared/work_items' %>
 
     <%= link_to 'View All Jobs', work_items_path %>

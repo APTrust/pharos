@@ -1,6 +1,7 @@
 require 'bcrypt'
 
 class User < ActiveRecord::Base
+
   self.primary_key = 'id'
   belongs_to :institution, foreign_key: :institution_id
   has_and_belongs_to_many :roles
@@ -10,19 +11,21 @@ class User < ActiveRecord::Base
   # :recoverable, :rememberable, :trackable, :validatable,
   # :token_authenticatable, :confirmable,
   # :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :recoverable, :rememberable, :trackable,
-         :timeoutable, :validatable
+  devise :recoverable, :rememberable, :trackable, :password_archivable,
+         :timeoutable, :validatable, :two_factor_authenticatable,
+         :two_factor_backupable, otp_backup_code_length: 10, :otp_secret_encryption_key => ENV['TWO_FACTOR_KEY']
 
   validates :email, presence: true, uniqueness: true
   validate :email_is_valid
-  validates :phone_number, presence: true
+  # validates :phone_number, presence: true
+  validates_presence_of :phone_number, on: :enable_otp
   validates :role_ids, presence: true
   validates :institution_id, presence: true
   validate :institution_id_points_at_institution
   validates :name, presence: true
   phony_normalize :phone_number, :default_country_code => 'US'
   validates_plausible_phone :phone_number
-  #validate :phone_number_length
+  validate :init_grace_period, on: :create
 
   # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
   scope :readable, ->(current_user) { where('(1=1)') }
@@ -72,6 +75,30 @@ class User < ActiveRecord::Base
 
   def institutional_user?
     is? 'institutional_user'
+  end
+
+  def sms_user?
+    self.authy_status == 'sms' || self.authy_status.nil?
+  end
+
+  def need_two_factor_authentication?
+    self.enabled_two_factor == true && self.confirmed_two_factor == true
+  end
+
+  def required_to_use_twofa?
+    self.institution.otp_enabled || self.admin? || self.institutional_admin?
+  end
+
+  def self.stale_users
+    users = User.where('created_at <= ? AND created_at >= ?',
+                       DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i - 3).days,
+                       DateTime.now - (ENV['PHAROS_2FA_GRACE_PERIOD'].to_i + 7).days, )
+    stale_users = []
+    users.each do |usr|
+      items = WorkItem.where(user: usr.email)
+      stale_users.push(usr) if items.count == 0
+    end
+    stale_users
   end
 
   def role_id
@@ -167,6 +194,14 @@ class User < ActiveRecord::Base
 
   def phone_number_length
     errors.add(:phone_number, 'is not the proper length') if phone_number.length < 10
+  end
+
+  def init_grace_period
+    self.grace_period = DateTime.now
+  end
+
+  def self.phone_number_is_valid
+
   end
 
 end

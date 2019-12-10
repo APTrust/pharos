@@ -27,7 +27,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.failed_fixity_notification(event, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Failed fixity check on one of your files')
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Failed fixity check on one of your files")
     end
 
     it 'renders the receiver email' do
@@ -36,7 +36,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @event_url' do
@@ -55,7 +55,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.restoration_notification(item, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Restoration complete on one of your work items')
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Restoration complete on one of your work items")
     end
 
     it 'renders the receiver email' do
@@ -64,7 +64,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @item_url' do
@@ -82,7 +82,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.multiple_failed_fixity_notification(events, email_log, institution).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Failed fixity check on one or more of your files')
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Failed fixity check on one or more of your files")
     end
 
     it 'renders the receiver email' do
@@ -91,7 +91,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @events_url' do
@@ -119,7 +119,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.multiple_restoration_notification(items, email_log, institution).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Restoration notification on one or more of your bags')
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Restoration notification on one or more of your bags")
     end
 
     it 'renders the receiver email' do
@@ -128,7 +128,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @items_url' do
@@ -153,7 +153,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.spot_test_restoration_notification(item, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Restoration System Spot Test')
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Restoration System Spot Test")
     end
 
     it 'renders the receiver email' do
@@ -162,7 +162,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @item_url' do
@@ -183,7 +183,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_request(object, user, email_log, token).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{user.name} has requested deletion of #{object.identifier}")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{user.name} has requested deletion of #{object.identifier}")
     end
 
     it 'renders the receiver email' do
@@ -192,7 +192,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -218,7 +218,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_request(file, user, email_log, token).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{user.name} has requested deletion of #{file.identifier}")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{user.name} has requested deletion of #{file.identifier}")
     end
 
     it 'renders the receiver email' do
@@ -227,7 +227,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -254,7 +254,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_confirmation(object, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{object.identifier} queued for deletion")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{object.identifier} queued for deletion")
     end
 
     it 'renders the receiver email' do
@@ -270,7 +270,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -292,7 +292,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_confirmation(file, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{file.identifier} queued for deletion")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{file.identifier} queued for deletion")
     end
 
     it 'renders the receiver email' do
@@ -301,7 +301,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -322,7 +322,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_finished(object, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{object.identifier} deleted.")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{object.identifier} deleted.")
     end
 
     it 'renders the receiver email' do
@@ -331,7 +331,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -353,7 +353,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.deletion_finished(file, user.id, user.id, email_log).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{file.identifier} deleted.")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{file.identifier} deleted.")
     end
 
     it 'renders the receiver email' do
@@ -362,7 +362,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @object_url' do
@@ -389,7 +389,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.bulk_deletion_inst_admin_approval(institution, job, {}, email_log, token, csv).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{admin_user.name} has made a bulk deletion request on behalf of #{institution.name}.")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{admin_user.name} has made a bulk deletion request on behalf of #{institution.name}.")
     end
 
     it 'renders the receiver email' do
@@ -398,7 +398,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @confirmation_url' do
@@ -437,7 +437,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("#{admin_user.name} and #{user.name} have made a bulk deletion request on behalf of #{institution.name}.")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - #{admin_user.name} and #{user.name} have made a bulk deletion request on behalf of #{institution.name}.")
     end
 
     it 'renders the receiver email' do
@@ -445,7 +445,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'assigns @confirmation_url' do
@@ -486,7 +486,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("A bulk deletion request has been successfully queued for #{institution.name}.")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - A bulk deletion request has been successfully queued for #{institution.name}.")
     end
 
     it 'renders the receiver email' do
@@ -499,7 +499,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'has an email log with proper associations' do
@@ -536,7 +536,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the subject' do
-      expect(mail.subject).to eq("A bulk deletion request has been successfully completed for #{institution.name}.")
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - A bulk deletion request has been successfully completed for #{institution.name}.")
     end
 
     it 'renders the receiver email' do
@@ -549,7 +549,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'has an email log with proper associations' do
@@ -586,7 +586,7 @@ RSpec.describe NotificationMailer, type: :mailer do
 
     it 'renders the subject' do
       zip.nil? #evaluate zip to force it to get made
-      expect(mail.subject).to eq('New Completed Deletions')
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - New Completed Deletions")
     end
 
     it 'renders the receiver email' do
@@ -597,7 +597,7 @@ RSpec.describe NotificationMailer, type: :mailer do
 
     it 'renders the sender email' do
       zip.nil? #evaluate zip to force it to get made
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
     it 'has a zip attachment' do
@@ -618,20 +618,129 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) { described_class.snapshot_notification(snap_hash).deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('New Snapshots')
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - New Snapshots")
     end
 
     it 'renders the receiver email' do
       expect(mail.to).to include('team@aptrust.org')
-      expect(mail.to).to include('chip.german@aptrust.org')
     end
 
     it 'renders the sender email' do
-      expect(mail.from).to eq(['info@aptrust.org'])
+      expect(mail.from).to eq(['help@aptrust.org'])
     end
 
-    it 'assigns @object_url' do
-      expect(mail.body.encoded).to include('Here are the latest snapshot results broken down by institution.')
+    it 'includes specific snapshot text' do
+      expect(mail.body.encoded).to include("Here are the latest snapshot results for the #{Rails.env.capitalize} repository broken down by institution.")
+    end
+  end
+
+  describe 'welcome_email' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:password) { 'temppassword' }
+    let(:mail) { described_class.welcome_email(user, password).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Welcome to APTrust!")
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'includes specific password text' do
+      expect(mail.body.encoded).to include('Temporary password: temppassword')
+    end
+  end
+
+  describe 'email_verification' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:token) { FactoryBot.create(:confirmation_token, user: user) }
+    let(:mail) { described_class.email_verification(user, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Verify Your Email")
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'assigns @confirmation_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/users/#{user.id}/email_confirmation?confirmation_token=#{token.token}")
+    end
+  end
+
+  describe 'admin_password_reset' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:password) { 'newpassword' }
+    let(:mail) { described_class.admin_password_reset(user, password).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - An Admin Has Reset Your Password")
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'includes specific password text' do
+      expect(mail.body.encoded).to include('Your new password is newpassword')
+    end
+  end
+
+  describe 'account_confirmation' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:token) { FactoryBot.create(:confirmation_token, user: user) }
+    let(:mail) { described_class.account_confirmation(user, token).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Confirm Your Account")
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to include(user.email)
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'assigns @confirmation_url' do
+      expect(mail.body.encoded).to include("http://localhost:3000/users/#{user.id}/confirm_account?confirmation_token=#{token.token}")
+    end
+  end
+
+  describe 'stale_user_notification' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:mail) { described_class.stale_user_notification([user]).deliver_now }
+
+    it 'renders the subject' do
+      expect(mail.subject).to eq("[APTrust #{Rails.env.capitalize}] - Stale Users")
+    end
+
+    it 'renders the receiver email' do
+      expect(mail.to).to eq ['team@aptrust.org']
+    end
+
+    it 'renders the sender email' do
+      expect(mail.from).to eq(['help@aptrust.org'])
+    end
+
+    it 'includes specific text about stale users' do
+      expect(mail.body.encoded).to include(user.name)
+      expect(mail.body.encoded).to include(user.email)
     end
   end
 end

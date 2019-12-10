@@ -6,18 +6,20 @@
 
 <%= simple_form_for(@user, html: {class: 'form-horizontal'}) do |f| %>
     <%= devise_error_messages! %>
+	<p>A temporary password will be generated and sent to the user in a welcome email. </p>
 
     <div class="form-inputs">
       <%= f.input :name, autofocus: true %>
       <%= f.input :email %>
-      <%= f.input :phone_number %>
+      <%= f.input :phone_number, label: 'Mobile Phone Number (Optional, only required for two factor authentication)' %>
+      <p>Make sure the phone associated with the number can receive SMS messages and/or Authy push notifications.</p>
 
       <%= f.input :institution_id, collection: institutions_for_select, as: :select, label: 'Institution' %>
 
       <%= f.association :roles, collection: roles_for_select, as: :radio_buttons %>
 
-      <%= f.input :password %>
-      <%= f.input :password_confirmation %>
+      <%= f.input :password, autocomplete: :on, input_html: { class: 'hidden', id: 'new_user_password'} %>
+      <%= f.input :password_confirmation, autocomplete: :on, input_html: { class: 'hidden', id: 'new_user_password_confirmation' } %>
 
     </div>
     <br>
@@ -30,3 +32,7 @@
       <% end %>
     </div>
 <% end %>
+
+<script>
+  autofillUserCreateForm();
+</script>

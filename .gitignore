@@ -6,6 +6,7 @@
 
 # Ignore bundler config.
 /.bundle
+vendor/
 
 # OS Files
 .DS_Store
@@ -41,5 +42,7 @@ travis_ci_test
 # Ignore Config file for Spreadsheet credentials
 config.json
 
-# Ignore local yml file
 /config/dev_env.yml
+
+# Ignore revision file. Only used for Docker image.
+.revision

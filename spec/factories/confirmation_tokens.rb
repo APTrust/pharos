@@ -17,4 +17,9 @@ FactoryBot.define do
     token { SecureRandom.hex }
     institution { FactoryBot.create(:institution) }
   end
+
+  factory :user_confirmation_token do
+    token { SecureRandom.hex }
+    user { FactoryBot.create(:user) }
+  end
 end

@@ -31,6 +31,7 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #index' do
     before do
       sign_in user
+      session[:verified] = true
       file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
       file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
@@ -57,6 +58,7 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #file_summary' do
     before do
       sign_in user
+      session[:verified] = true
       file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
       file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
@@ -97,6 +99,7 @@ RSpec.describe GenericFilesController, type: :controller do
   describe 'GET #show' do
     before do
       sign_in user
+      session[:verified] = true
       file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
       file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
       file.save!
@@ -153,7 +156,10 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when signed in as inst_admin' do
       let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
-      before { sign_in user }
+      before do
+        sign_in user
+        session[:verified] = true
+      end
 
       describe "should be forbidden" do
         let(:obj1) { FactoryBot.create(:consortial_intellectual_object) }
@@ -168,7 +174,10 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when signed in as inst_user' do
       let(:user) { FactoryBot.create(:user, :institutional_user, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
-      before { sign_in user }
+      before do
+        sign_in user
+        session[:verified] = true
+      end
 
       describe "should be forbidden" do
         let(:obj1) { FactoryBot.create(:consortial_intellectual_object) }
@@ -183,7 +192,10 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when signed in as admin' do
       let(:user) { FactoryBot.create(:user, :admin, institution_id: @institution.id) }
       let(:obj1) { @intellectual_object }
-      before { sign_in user }
+      before do
+        sign_in user
+        session[:verified] = true
+      end
 
       it 'should show errors' do
         post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'bar'} }, format: 'json'
@@ -251,7 +263,10 @@ RSpec.describe GenericFilesController, type: :controller do
       let(:obj1) { @intellectual_object }
       let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @institution.id) }
 
-      before { sign_in user }
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       it 'should show unauthorized' do
         post(:create_batch, params: { intellectual_object_id: obj1.id, generic_files: [] },
              format: 'json')
@@ -263,7 +278,10 @@ RSpec.describe GenericFilesController, type: :controller do
       let(:obj1) { @intellectual_object }
       let(:user) { FactoryBot.create(:user, :institutional_user, institution_id: @institution.id) }
 
-      before { sign_in user }
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       it 'should show unauthorized' do
         post(:create_batch, params: { intellectual_object_id: obj1.id, generic_files: [] },
              format: 'json')
@@ -280,8 +298,10 @@ RSpec.describe GenericFilesController, type: :controller do
       let(:raw_json) { File.read(json_file) }
       let(:gf_data) { JSON.parse(raw_json) }
 
-      before { sign_in user }
-
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       describe 'and assigning to an object you do have access to' do
         it 'it should create or update multiple files and their events' do
           files_before = GenericFile.count
@@ -324,8 +344,10 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in' do
-      before { sign_in user }
-
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       describe "and updating a file you don't have access to" do
         let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
@@ -387,8 +409,10 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in' do
-      before { sign_in user }
-
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       describe "and deleting a file you don't have access to" do
         let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
@@ -446,8 +470,10 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in' do
-      before { sign_in user }
-
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       describe "and deleting a file you don't have access to" do
         let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
@@ -533,8 +559,10 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in' do
-      before { sign_in user }
-
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       describe "and deleting a file you don't have access to" do
         let(:user) { FactoryBot.create(:user, :institutional_admin, institution_id: @another_institution.id) }
         it 'should be forbidden' do
@@ -582,6 +610,7 @@ RSpec.describe GenericFilesController, type: :controller do
         sign_in user
         PremisEvent.delete_all
         GenericFile.delete_all
+        session[:verified] = true
       end
 
       it 'allows access to the API endpoint' do
@@ -648,7 +677,10 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     describe 'when signed in as institutional user' do
-      before { sign_in basic_user }
+      before do
+        sign_in basic_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         put :restore, params: { generic_file_identifier: file_for_restore }
         expect(response).to redirect_to root_url
@@ -662,7 +694,10 @@ RSpec.describe GenericFilesController, type: :controller do
 
     # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as institutional admin' do
-      before { sign_in inst_user }
+      before do
+        sign_in inst_user
+        session[:verified] = true
+      end
       it 'should respond with redirect (html)' do
         put :restore, params: { generic_file_identifier: file_for_restore }
         expect(response).to redirect_to generic_file_path(file_for_restore)
@@ -692,7 +727,10 @@ RSpec.describe GenericFilesController, type: :controller do
 
     # Admin and inst admin can hit this endpoint via HTML or JSON
     describe 'when signed in as system admin' do
-      before { sign_in user }
+      before do
+        sign_in user
+        session[:verified] = true
+      end
       it 'should respond with meaningful json (json)' do
         # This returns a WorkItem object for format JSON
         put :restore, params: { generic_file_identifier: file_for_restore, format: :json }

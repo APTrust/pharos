@@ -26,6 +26,7 @@ RSpec.describe BulkDeleteJobsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns successfully with all snapshots' do
@@ -38,6 +39,7 @@ RSpec.describe BulkDeleteJobsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'returns only the snapshots that belong to own institution' do
@@ -53,6 +55,7 @@ RSpec.describe BulkDeleteJobsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns successfully a snapshot from own institution' do
@@ -71,6 +74,7 @@ RSpec.describe BulkDeleteJobsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'returns successfully a snapshot from own institution' do

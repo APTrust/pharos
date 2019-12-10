@@ -5,6 +5,7 @@ describe 'Searching' do
   let(:user) { FactoryBot.create(:user, :institutional_user) }
   it 'should work' do
     login_as user
+    inject_session verified: true
 
     visit '/'
     click_link 'Objects'

@@ -12,7 +12,7 @@ LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
     nodejs postgresql-client postgresql-dev python py-requests py-argparse \
     libstdc++ tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal \
-	libxml2-dev libxslt-dev \
+	libxml2-dev libxslt-dev readline readline-dev\
 # Following packages for wkhtmltopdf only
     libgcc libstdc++ libx11 glib libxrender libxext libintl \
     libcrypto1.0 libssl1.0 \
@@ -37,7 +37,7 @@ ENV SECRET_KEY_BASE=${SECRET_KEY_BASE:-52517cb1d20063c94605ba51bb5c40c4b0e2dc7d4
 COPY --from=builder /bin/wkhtmltopdf /bin/wkhtmltopdf
 
 COPY Gemfile Gemfile.lock ./
-RUN gem update --system && gem install bundler -v 2.0.1
+RUN gem update --system && gem install bundler -v 2.0.2
 RUN bundle install --jobs=4 --without=["development" "test"] --no-cache
 
 COPY . $WORKDIR

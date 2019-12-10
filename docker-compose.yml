@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    image: postgres:9.6.6-alpine
+    image: postgres:9.6.15-alpine
     restart: always
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -13,7 +13,7 @@ services:
   pharos:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     restart: always
-    command: bundle exec puma -w3 -p9292 -e ${RAILS_ENV}
+    command: bundle exec puma -C config/puma.rb -e ${RAILS_ENV}
     volumes:
       - assets:/pharos/public
       - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
@@ -21,7 +21,7 @@ services:
       - db
       - migration
     ports:
-      - "9292:9292"
+      - 9292
     networks:
       - backend
       - frontend
@@ -34,7 +34,7 @@ services:
   migration:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
-    command: /bin/bash -c "sleep 15 && rake db:exists && rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+    command: /bin/bash -c "sleep 15 && rake db:exists && time rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
     env_file:
       - ".env"
     logging:
@@ -52,6 +52,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - 18080 # nginx_status port
 #    environment:
 #      - DEFAULT_HOST=docker1.aptrust.org
 #      - DHPARAM_GENERATION=false
@@ -59,7 +60,10 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/certs:/etc/nginx/certs:ro
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/html:/usr/share/nginx/html:rw
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/:/var/log/nginx/:rw
       - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
+      - ./docker/nginx-proxy/graylog_nginx.conf:/etc/nginx/conf.d/graylog_nginx.conf
+      - ./docker/nginx-proxy/proxy_settings.conf:/etc/nginx/conf.d/proxy_settings.conf
       - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/vhost.d:/etc/nginx/vhost.d
       - assets:/etc/share/nginx/html/pharos
     labels:

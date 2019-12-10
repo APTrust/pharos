@@ -1,0 +1,57 @@
+Hello <%= @subject.name %>,
+
+Welcome to Pharos, the APTrust Repository web application.
+With Pharos you are able to manage preservation deposits and inspect outcomes of your
+preservation activities.
+
+An account with a temporary password has been created for you. Please follow
+the URL below to login with your email address and temporary password. You will
+be prompted to change this password after your initial login. A new password
+has to be least 10 characters long.
+
+Login: <%= @subject.email %>
+Temporary password: <%= @password %>
+
+Login URL: <%= @login_url %>
+
+<% if @subject.institutional_admin? || @subject.admin? %>
+    You have been setup as an institutional admin or an APTrust admin and you will be
+    required to enable two factor authentication within <%= ENV['PHAROS_2FA_GRACE_PERIOD'] %> days.
+    After that grace period, two factor authentication becomes mandatory.
+<% else %>
+    You have been setup as an institutional user in our system. We encourage you to setup
+    two factor authentication. However, it is optional unless required by an institutional admin at
+    your institution for the entire institution.
+<% end %>
+
+To enable two factor authentication, visit your user profile page
+(<%= @subject_url %>). Please note that before you attempt to enable two factor
+authentication you MUST have a mobile phone number registered on your account, otherwise
+the process will not work. Once you have enabled two factor authentication you will need
+to verify your phone number through a text message or push notification. Once that is
+done, two factor authentication setup is complete and you will be prompted to use it
+at every login.
+
+Pharos has an API that can be used to view Intellectual Objects, Generic Files,
+Premis Events, and Work Items. It can also be used to restore individual Intellectual
+Objects and Generic Files. To review the endpoints and experiment with them
+please see our Swagger documentation. https://aptrust.github.io/pharos
+
+To generate an API key please visit your user profile page and
+click the "Generate API Key" button, then save the API key in a safe place.
+
+In addition to the API key, you will also be issued AWS credentials. Those will
+be sent to you in a separate email. Please save those credentials in a safe space as well.
+They can be used to upload and access restored content from the repository.
+
+You can find more documentation on using APTrust on our wiki at https://wiki.aptrust.org/Using_APTrust
+
+Please contact the APTrust team if you have any questions.
+  eMail - help@aptrust.org
+  Slack - http://bit.ly/aptrust-slack #aptrust_community
+  Community listserv - community@aptrust.org - http://bit.ly/aptrust-community
+
+Thanks so much for joining the APTrust preservation community.
+
+The APTrust Team
+

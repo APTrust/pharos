@@ -23,6 +23,7 @@ RSpec.describe EmailsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns successfully all emails' do
@@ -35,6 +36,7 @@ RSpec.describe EmailsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do
@@ -49,6 +51,7 @@ RSpec.describe EmailsController, type: :controller do
     describe 'for admin users' do
       before do
         sign_in admin_user
+        session[:verified] = true
       end
 
       it 'returns successfully the requested email' do
@@ -61,6 +64,7 @@ RSpec.describe EmailsController, type: :controller do
     describe 'for institutional admin users' do
       before do
         sign_in institutional_admin
+        session[:verified] = true
       end
 
       it 'denies access' do

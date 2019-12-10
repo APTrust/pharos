@@ -1,5 +1,5 @@
 class NotificationMailer < ApplicationMailer
-  default from: 'info@aptrust.org'
+  default from: 'help@aptrust.org'
 
   def failed_fixity_notification(event, email_log)
     @event_institution = event.institution
@@ -12,7 +12,8 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@event_institution.name}, This email notification is to inform you that one of your files failed a fixity check. The failed fixity check can be found at the following link: #{premis_event_url(id: @event.id)}. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
-    mail(to: emails, subject: 'Failed fixity check on one of your files')
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject:"#{prefix}Failed fixity check on one of your files")
   end
 
   def restoration_notification(work_item, email_log)
@@ -26,7 +27,8 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that one of your restoration requests has successfully completed. The finished record of the restoration can be found at the following link: #{work_item_url(id: @item.id)}. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
-    mail(to: emails, subject: 'Restoration complete on one of your work items')
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}Restoration complete on one of your work items")
   end
 
   def spot_test_restoration_notification(work_item, email_log)
@@ -41,7 +43,8 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that a spot test of the restoration system has been performed on one of your bags. Please help APTrust out by downloading the restored bag and letting us know if any problems occur. Click #{@item_url} to view the Work Item record of the restored bag. The restored bag is available from S3 at #{@download_url}. You'll need your APTrust S3 credentials and an S3 client to download it. Please contact the APTrust team by replying to this email if you have any questions, or if you have any problems."
     email_log.save!
-    mail(to: emails, subject: 'Restoration System Spot Test')
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}Restoration System Spot Test")
   end
 
   def multiple_failed_fixity_notification(events, email_log, event_institution)
@@ -55,7 +58,8 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@event_institution.name}, This email notification is to inform you that one ore more of your files failed a fixity check. The failed fixity checks can be found at the following link: #{@events_url} A comprehensive list of failed fixity checks can be found below. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
-    mail(to: emails, subject: 'Failed fixity check on one or more of your files')
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}Failed fixity check on one or more of your files")
   end
 
   def multiple_restoration_notification(work_items, email_log, item_institution)
@@ -72,7 +76,8 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@item_institution.name}, This email notification is to inform you that one or more of your restoration requests has successfully completed. The finished restorations can be found at the following link: #{@items_url} A comprehensive list of completed restorations can be found below. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
-    mail(to: emails, subject: 'Restoration notification on one or more of your bags')
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}Restoration notification on one or more of your bags")
   end
 
   def deletion_request(subject, requesting_user, email_log, confirmation_token)
@@ -98,7 +103,8 @@ class NotificationMailer < ApplicationMailer
     end
     email_log.email_text = "Admin Users at #{@subject_institution.name}, This email notification is to inform you that #{@requesting_user.name} has requested the deletion of the following item: #{@subject_url} To confirm that this object should be deleting please click the following link: #{@confirmation_url} Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
-    mail(to: emails, subject: "#{requesting_user.name} has requested deletion of #{subject_line}")
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}#{requesting_user.name} has requested deletion of #{subject_line}")
   end
 
   def deletion_confirmation(subject, requesting_user, inst_approver, email_log)
@@ -120,7 +126,8 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@subject_institution.name}, This email notification is to inform you that the following item, whose deletion was requested by #{@requesting_user.name}, has been approved by #{@inst_approver.name} and has been successfully queued for deletion: #{@subject_url} Depending on the size of the object, it may take a few minutes for all associated files to be marked as deleted - if only a single file has been marked for deletion, this will not be an issue. Please contact the APTrust team by replying to this email if you have any questions."
     email_log.save!
-    mail(to: emails, subject: "#{subject_line} queued for deletion")
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}#{subject_line} queued for deletion")
   end
 
   def deletion_finished(subject, requesting_user, inst_approver, email_log)
@@ -143,7 +150,8 @@ class NotificationMailer < ApplicationMailer
     email_log.user_list = emails.join('; ')
     email_log.email_text = "Admin Users at #{@subject_institution.name}, This email notification is to inform you that #{@subject_url}, whose deletion was requested by #{@requesting_user.name}, and approved by #{@inst_approver.name}, has been successfully deleted."
     email_log.save!
-    mail(to: emails, subject: "#{subject_line} deleted.")
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}#{subject_line} deleted.")
   end
 
   def bulk_deletion_inst_admin_approval(subject, bulk_job, bad_idents, email_log, confirmation_token, csv)
@@ -161,7 +169,8 @@ class NotificationMailer < ApplicationMailer
     email_log.save!
     bulk_job.emails.push(email_log)
     attachments['requested_deletions.csv'] = { mime_type: 'text/csv', content: csv }
-    mail(to: emails, subject: "#{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}#{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name}.")
   end
 
   def bulk_deletion_apt_admin_approval(subject, bulk_job, email_log, confirmation_token, csv)
@@ -178,7 +187,8 @@ class NotificationMailer < ApplicationMailer
     email_log.email_text = "Admin Users at APTrust, This email notification is to inform you that #{@requesting_user.name} has made a bulk deletion request on behalf of #{@subject.name} that was approved by #{@inst_approver.name}. The identifiers of the objects and/or files included in this request are listed in an attached CSV file. To confirm this bulk deletion request a final time, please click the link below: #{@confirmation_url}"
     email_log.save!
     attachments['requested_deletions.csv'] = { mime_type: 'text/csv', content: csv }
-    mail(to: emails, subject: "#{@requesting_user.name} and #{@inst_approver.name} have made a bulk deletion request on behalf of #{@subject.name}.")
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}#{@requesting_user.name} and #{@inst_approver.name} have made a bulk deletion request on behalf of #{@subject.name}.")
   end
 
   def bulk_deletion_queued(subject, bulk_job, email_log, csv)
@@ -196,7 +206,8 @@ class NotificationMailer < ApplicationMailer
     email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has been successfully queued for deletion. Please see the attached CSV file for a list of identifiers."
     email_log.save!
     attachments['queued_deletions.csv'] = { mime_type: 'text/csv', content: csv }
-    mail(to: emails, subject: "A bulk deletion request has been successfully queued for #{@subject.name}.")
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}A bulk deletion request has been successfully queued for #{@subject.name}.")
   end
 
   def bulk_deletion_finished(subject, bulk_job, email_log, csv)
@@ -213,13 +224,14 @@ class NotificationMailer < ApplicationMailer
     email_log.email_text = "Admin Users at #{@subject.name} and APTrust, This email notification is to inform you that a bulk deletion job requested by #{@requesting_user.name} and approved by #{@inst_approver.name} and #{@apt_approver.name} has successfully finished and all objects and / or files have been deleted."
     email_log.save!
     attachments['finished_deletions.csv'] = { mime_type: 'text/csv', content: csv }
-    mail(to: emails, subject: "A bulk deletion request has been successfully completed for #{@subject.name}.")
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}A bulk deletion request has been successfully completed for #{@subject.name}.")
   end
 
   def snapshot_notification(snap_hash)
     @snap_hash = snap_hash
-    emails = ['team@aptrust.org', 'chip.german@aptrust.org']
-    mail(to: emails, subject: 'New Snapshots')
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: 'team@aptrust.org', subject: "#{prefix}New Snapshots")
   end
 
   def deletion_notification(subject)
@@ -232,7 +244,45 @@ class NotificationMailer < ApplicationMailer
     directory = "./tmp/deletions_#{Rails.env}/#{Time.now.month}-#{Time.now.day}-#{Time.now.year}/#{inst_name}"
     zip = File.read("#{directory}/#{inst_name}.zip")
     attachments['deletions.zip'] = { mime_type: 'application/zip', content: zip }
-    mail(to: emails, subject: 'New Completed Deletions')
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: emails, subject: "#{prefix}New Completed Deletions")
+  end
+
+  def welcome_email(subject, password)
+    @subject = subject
+    @password = password
+    @login_url = new_user_session_url
+    @subject_url = user_url(@subject.id)
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: subject.email, subject: "#{prefix}Welcome to APTrust!")
+  end
+
+  def email_verification(subject, confirmation_token)
+    @subject = subject
+    @confirmation_url = email_confirmation_url(@subject, confirmation_token: confirmation_token.token)
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: subject.email, subject: "#{prefix}Verify Your Email")
+  end
+
+  def admin_password_reset(subject, password)
+    @subject = subject
+    @password = password
+    @login_url = new_user_session_url
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: subject.email, subject: "#{prefix}An Admin Has Reset Your Password")
+  end
+
+  def account_confirmation(subject, confirmation_token)
+    @subject = subject
+    @confirmation_url = confirm_account_url(@subject, confirmation_token: confirmation_token.token)
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: subject.email, subject: "#{prefix}Confirm Your Account")
+  end
+
+  def stale_user_notification(users)
+    @users = users
+    prefix = "[APTrust #{Rails.env.capitalize}] - "
+    mail(to: 'team@aptrust.org', subject: "#{prefix}Stale Users")
   end
 
 end

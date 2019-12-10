@@ -1,0 +1,8 @@
+<h2>Please finish the verification process by entering the code that was sent to you via SMS.</h2>
+
+<%= form_tag(confirm_two_factor_update_path, :method => :put) do %>
+    <%= devise_error_messages! %>
+
+    <%= text_field_tag :code %>
+    <%= submit_tag 'Verify Mobile Phone Number' %>
+<% end %>

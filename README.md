@@ -7,50 +7,86 @@ Build Status | Continuous Integration | Code Coverage
 --- | --- | ---
 develop | [![Build Status (Development)](https://travis-ci.org/APTrust/pharos.png?branch=develop)](https://travis-ci.org/APTrust/pharos) | [![Coverage Status](https://coveralls.io/repos/github/APTrust/pharos/badge.svg?branch=develop)](https://coveralls.io/github/APTrust/pharos?branch=develop)
 
-## APTrust Admin Console
-
-This application uses ActiveRecord to interact with a SQL database.
-
 ### Requirements
+Since mid 2019 the Pharos app has been containerized. You may use the Baremetal or Docker version for development. 
 
-See 'Gemfile' for a full list of current dependencies.
+#### Docker Version Requirements
+* [Docker Desktop](https://hub.docker.com/search/?type=edition&offering=community)
+* [Make](Makefile)
 
-Overall Pharos targets the following versions or later
-
-* Ruby >= 2.2.0
-* Rails >= 4.2.7
+#### Baremetal Version Requirements
+* [Bundler](https://bundler.io)
+* [Ruby >= 2.5.0](https://www.ruby-lang.org/en/)
+* [Rails >= 5.2.3](https://rubyonrails.org/)
+* [Postgres](https://postgresapp.com/)
 
 Installing the Postgres gem on Mac with Postgres.app:
+```gem install pg -v 1.1.4 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin pg_config```
 
-`gem install pg -v 1.1.3 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin/pg_config`
+### Configuration
 
-If you have only one version of Postgres installed, substitute version number (e.g. 9.5 or 10.0) for 'latest' in the path above.
+We use [dotenv](https://github.com/bkeepers/dotenv) for application
+configuration. See `.env` file in this repository for configuration parameters
+with default/development values. This file is updated by deployment according to
+it's environment.
+  
+### Development Credentials
 
-### Additional Configuration
+After running `rake pharos:setup` or `make build` and `make dev`
+you can log in with
+- Email: ops@aptrust.org
+- Password: password123
 
-We use the figaro gem for additional application configuration through 'pharos/config/application.yml' which is added
-to the .gitignore file by default.  You will need to copy 'pharos/config/application.yml.local' to
-'pharos/config/application.yml' and setup values as appropriate.
+### Docker Development Quick-Start
 
-Use the ``` rake secret ``` command to generate secret keys for rails and devise.  Paste those keys into the 'pharos/config/application.yml' file.
+Once you have the Docker suite installed you may run `make` and see list of make targets you can run with ``` make <target>```.
+To get started run:
+1.  `make build` This builds containers based on the current git version of the repository.
+2.  `make dev` will start all containers (Postgres, Pharos, Nginx) and populate the database with seed data to get started.
+
+3. You may now open a web browser and open `http://localhost:9292` and log-in with [development credentials](#development-credentials)
 
 
-* Setup APTrust Institution object and Roles
+| Target | Description |
+| ----- | ------|
+| help     | This help.| 
+| revision | Show me the git hash|
+| build    |  Build the Pharos container from current repo. Make sure to commit all changes beforehand |
+| build-nc | Build the Pharos container from scratch, no cached layers.| 
+| up | Start containers in background for Pharos, Postgresql, Nginx. For local development. |
+| down | Stop containers for Pharos, Postgresql, Nginx. For local development. |
+| run | Just run Pharos in foreground |
+| runshell | Run Pharos container with interactive shell |
+| runconsole | Run Rails Console |
+| runcmd | Start Pharos container, run command and exit.|
+| test-ci | Run Pharos spec tests in CI |
+| dtest | Run Pharos spec tests |
+| dev | Run Pharos for development on localhost|
+| devclean | Stop and remove running Docker containers | 
+| devstop | Stop running Docker containers. Can pick up dev later |
+| release | Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab |
+| push | Push the Docker image up to the registry |
+| clean | Clean the generated/compiled files |
 
-````
+#### Common Docker tasks
+- Enter running environment in demo/prod
+	- cd /srv/docker/pharos
+	- sudo docker-compose exec pharos bash
+- Run a one-off command within the environment
+	- cd /srv/docker/pharos
+	- `make runcmd <somecommand>` 
 
-# create the db schema
-rake db:migrate
 
-# rake task to setup initial insitutions, roles and a default aptrust_admin user.
-rake pharos:setup
-````
+### Baremetal Development Quick-Start
 
-The default admin user that is being setup as follows:
-    name= "APTrustAdmin"
-    email= "ops@aptrust.org"
-    phone_number="4341234567"
-    password="password"
+1. Make sure the [requirements are met](#baremetal-version-requirements)
+2. Install dependencies: `bundle install`
+3. Create db schema: `rake db:migrate`
+4. Initial setup of seed data: `rake pharos:setup`
+5. Start appserver `bundle exec puma`
+
+------
+
 
 ### Setting up Test Data
 
@@ -72,10 +108,11 @@ using the factory name and adding _fail at the end.  So to add some fake data fo
 testing you could do the following in code or at command line.
 
 ````
-# Start by getting the object you want to add the failed event to.
+#Start by getting the object you want to add the failed event to.
 gf = GenericFile.first
 
-# Then add the event as attributes
+#Then add the event as attributes
 gf.add_event(FactoryBot.attributes_for(:premis_events_fixity_check_fail))
 gf.save
 ````
+

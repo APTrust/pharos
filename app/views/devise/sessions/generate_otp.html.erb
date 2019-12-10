@@ -1,0 +1,48 @@
+<h2></h2>
+
+<%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
+    <div><%= f.label :email %><br />
+      <%= f.email_field :email, :autofocus => true %></div>
+
+    <br/>
+    <%= button_tag(type: 'submit', class: "btn doc-action-btn btn-normal") do %>
+        <i class="glyphicon glyphicon-log-in"></i> Send Code
+    <% end %>
+
+<% end %>
+
+
+<div class="page-header">
+  <h1>Generate a One Time Password</h1>
+</div>
+
+<%= simple_form_for(@user, html: {class: 'form-horizontal', :method => :put}) do |f| %>
+    <%= devise_error_messages! %>
+
+    <div class="form-inputs">
+      <%= f.input :name, autofocus: true %>
+      <%= f.input :email %>
+      <%= f.input :phone_number %>
+
+      <% if current_user.admin?  %>
+          <%= f.input :institution_id, collection: institutions_for_select, as: :select, label: 'Institution' %>
+      <% end %>
+
+      <% if current_user.admin? || current_user.institutional_admin? %>
+          <%= f.association :roles, collection: roles_for_select, as: :radio_buttons, :checked => @user.role_id %>
+      <% end %>
+
+    </div>
+    <br>
+    <div class="form-actions">
+      <%= button_tag(type: 'submit', class: 'btn doc-action-btn btn-success btn-sm') do %>
+          <i class="glyphicon glyphicon-check"></i> Submit
+      <% end %>
+      <%= link_to @user, class: 'btn doc-action-btn btn-sm' do %>
+          <i class="glyphicon glyphicon-remove"></i> Cancel
+      <% end %>
+      <%= admin_password_link(@user) %>
+
+    </div>
+
+<% end %>

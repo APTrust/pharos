@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
   get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
   get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
+  get '/:institution_identifier/enable_otp', to: 'institutions#enable_otp', as: :enable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/:institution_identifier/disable_otp', to: 'institutions#disable_otp', as: :disable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/trigger_bulk_delete', to: 'institutions#trigger_bulk_delete', as: :api_bulk_deletion, format: :json, institution_identifier: institution_ptrn
   get '/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :api_bulk_deletion_institutional_confirmation, format: :json, institution_identifier: institution_ptrn
@@ -19,7 +21,8 @@ Rails.application.routes.draw do
   post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
   get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
   get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
-
+  get '/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
+  get 'api/v2/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :api_mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
 
   # INTELLECTUAL OBJECT ROUTES
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
@@ -160,7 +163,12 @@ Rails.application.routes.draw do
   resources :bulk_delete_jobs, path: 'api/v2/bulk_delete_jobs', only: [:index, :show], format: :json
 
   # USER ROUTES
-  devise_for :users
+  devise_for :users,
+  pathnames: {
+      verify_authy: '/verify-token',
+      enable_authy: '/enable-authy',
+      verify_authy_installation: '/verify-installation'
+  }
 
   resources :users do
     patch 'update_password', on: :collection
@@ -168,10 +176,35 @@ Rails.application.routes.draw do
     patch 'generate_api_key', on: :member
   end
   get 'users/:id/admin_password_reset', to: 'users#admin_password_reset', as: :admin_password_reset_user
+  get 'users/:id/forced_password_update', to: 'users#forced_password_update', as: :user_forced_password_update
   get 'users/:id/deactivate', to: 'users#deactivate', as: :deactivate_user
   get 'users/:id/reactivate', to: 'users#reactivate', as: :reactivate_user
   get '/vacuum', to: 'users#vacuum', format: [:json, :html], as: :vacuum
   get '/api/v2/vacuum', to: 'users#vacuum', format: [:json, :html], as: :api_vacuum
+  get '/notifications/stale_users', to: 'users#stale_user_notification', format: [:json, :html], as: :stale_users
+  get '/api/v2/notifications/stale_users', to: 'users#stale_user_notification', format: [:json, :html], as: :api_stale_users
+  get '/account_confirmations', to: 'users#account_confirmations', format: [:json, :html], as: :account_confirmations
+  get '/api/v2/account_confirmations', to: 'users#account_confirmations', format: [:json, :html], as: :api_account_confirmations
+  get '/users/:id/individual_account_confirmation', to: 'users#indiv_confirmation_email', format: [:json, :html], as: :indiv_confirmation_email
+  get '/api/v2/users/:id/individual_account_confirmation', to: 'users#indiv_confirmation_email', format: [:json, :html], as: :api_indiv_confirmation_email
+  get '/users/:id/confirm_account', to: 'users#confirm_account', format: [:json, :html], as: :confirm_account
+  get '/api/v2/users/:id/confirm_account', to: 'users#confirm_account', format: [:json, :html], as: :api_confirm_account
+  get 'users/:id/enable_otp', to: 'users#enable_otp', as: :users_enable_otp
+  get 'users/:id/disable_otp', to: 'users#disable_otp', as: :users_disable_otp
+  get 'users/:id/register_authy', to: 'users#register_authy_user', as: :users_register_for_authy
+  get 'users/:id/change_authy_phone_number', to: 'users#change_authy_phone_number', as: :user_authy_number
+  get 'users/:id/verify_twofa', to: 'users#verify_twofa', as: :users_verify_twofa
+  get 'users/:id/backup_codes', to: 'users#generate_backup_codes', as: :backup_codes
+  get 'users/:id/two_factor_text_link', to: 'users#two_factor_text_link', as: :twofa_text
+  get 'users/:id/verify_email', to: 'users#verify_email', as: :email_verification
+  get 'users/:id/email_confirmation', to: 'users#email_confirmation', as: :email_confirmation
+
+  resources :verifications, only: [:edit, :update]
+  get 'verifications/login', to: 'verifications#login', as: :verification_login
+  get 'verifications/enter_backup/:id', to: 'verifications#enter_backup', as: :enter_backup_verification
+  put 'verifications/check_backup/:id', to: 'verifications#check_backup', as: :check_backup_verification
+
+  #get '/verification_callback', to: 'application#callback', as: :verification_callback
 
   authenticated :user do
     root to: 'institutions#show', as: 'authenticated_root'

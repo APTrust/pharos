@@ -15,6 +15,7 @@ describe 'Users' do
 
     it 'should provide message after delete with name of deleted user' do
       login_as(@user)
+      inject_session verified: true
       visit('/users')
       expect {
         click_link 'Delete'

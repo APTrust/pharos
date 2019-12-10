@@ -1,0 +1,22 @@
+<p>Team,</p>
+<br>
+<p>Here are the latest stale users for the <%= Rails.env.capitalize %> repository.</p>
+<br>
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |usr| %>
+        <tr>
+          <td><%= usr.name %></td>
+          <td><%= usr.email %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

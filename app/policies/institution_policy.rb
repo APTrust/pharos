@@ -50,6 +50,18 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def mass_forced_password_update?
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.id))
+  end
+
+  def enable_otp?
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.id))
+  end
+
+  def disable_otp?
+    user.admin? || (user.institutional_admin? && (user.institution_id == record.id))
+  end
+
   def snapshot?
     user.admin?
   end

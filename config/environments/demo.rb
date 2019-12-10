@@ -46,16 +46,34 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :warn
+#  config.log_level = :warn
+  if ENV['PHAROS_LOG_LEVEL'].present?
+    config.log_level = ENV['PHAROS_LOG_LEVEL'].downcase.strip.to_sym
+  else
+	config.log_level = :warn
+  end
 
   # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
+  config.log_tags = [ :subdomain, :uuid ]
 
   # Semantic logger
+  # http://rocketjob.github.io/semantic_logger/rails
   #config.colorize_logging = false
+  if ENV["DOCKERIZED"] == 'true'
+    STDOUT.sync = true
+    config.semantic_logger.add_appender(io: STDOUT, level: config.log_level, formatter: config.rails_semantic_logger.format)
+  else
+    config.semantic_logger.add_appender(file_name: ENV['RAILS_ENV'] + ".log")
+  end
 
-  # Use a different logger for distributed setups.
-  # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  config.rails_semantic_logger.semantic   = false
+  config.rails_semantic_logger.started    = true
+  config.rails_semantic_logger.processing = true
+  config.rails_semantic_logger.rendered   = true
+  config.rails_semantic_logger.quiet_assets = true
+  config.colorize_logging = false
+
+
   if ENV['PHAROS_LOGSERVER'].present?
     #config.logger = GELF::Logger.new( ENV['PHAROS_LOGSERVER'], ENV['PHAROS_LOGSERVER_PORT'], "WAN", { :facility => "PHAROS", :environment => ENV['RAILS_ENV'] })
     config.semantic_logger.add_appender(
@@ -63,6 +81,7 @@ Rails.application.configure do
         url: "udp://#{ENV['PHAROS_LOGSERVER']}:#{ENV['PHAROS_LOGSERVER_PORT']}"
     )
   end
+
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
@@ -76,7 +95,7 @@ Rails.application.configure do
 
   # send password reset emails to a file
   config.action_mailer.default_url_options = {
-    :host => 'demo.aptrust.org',
+	:host => ENV['PHAROS_HOST'] || 'demo.aptrust.org',
     :protocol => 'https'
   }
   config.action_mailer.delivery_method = :smtp
@@ -94,7 +113,7 @@ Rails.application.configure do
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
-  config.i18n.fallbacks = true
+  config.i18n.fallbacks = [I18n.default_locale]
 
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify

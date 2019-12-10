@@ -41,6 +41,34 @@ module ApplicationHelper
     end
   end
 
+  def enable_otp_link(object, content = nil, options={})
+    options[:class] = 'btn doc-action-btn btn-success btn-sm' if options[:class].nil?
+    options[:method] = :get if options[:method].nil?
+    if object.is_a?(Institution)
+      content ||= '<i class="glyphicon glyphicon-thumbs-up"></i> Enable Mandatory Institution-wide 2FA'
+      options[:data] = { confirm: 'Are you sure you want to make Two Factor Authentication mandatory across your entire institution? This will eliminate any remaining grace period left for users at your institution and require them to immediately enable Two Factor Authentication.' } if options[:confirm].nil?
+      link_to(content.html_safe, enable_otp_institution_path(object), options) if policy(object).enable_otp?
+    else
+      content ||= '<i class="glyphicon glyphicon-thumbs-up"></i> Enable 2FA'
+      options[:data] = { confirm: 'Are you sure you want to enable Two Factor Authentication for this user?' } if options[:confirm].nil?
+      link_to(content.html_safe, users_enable_otp_path(object, redirect_loc: 'index'), options) if policy(object).enable_otp?
+    end
+  end
+
+  def disable_otp_link(object, content = nil, options={})
+    options[:class] = 'btn doc-action-btn btn-warning btn-sm' if options[:class].nil?
+    options[:method] = :get if options[:method].nil?
+    if object.is_a?(Institution)
+      content ||= '<i class="glyphicon glyphicon-thumbs-down"></i> Disable Mandatory Institution-wide 2FA'
+      options[:data] = { confirm: 'Are you sure you want to disable mandatory Two Factor Authentication for your entire institution?' } if options[:confirm].nil?
+      link_to(content.html_safe, disable_otp_institution_path(object), options) if policy(object).disable_otp?
+    else
+      content ||= '<i class="glyphicon glyphicon-thumbs-down"></i> Disable 2FA'
+      options[:data] = { confirm: 'Are you sure you want to disable Two Factor Authentication for this user?' } if options[:confirm].nil?
+      link_to(content.html_safe, users_disable_otp_path(object, redirect_loc: 'index'), options) if policy(object).disable_otp?
+    end
+  end
+
   def destroy_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-trash"></i> Delete'
     options[:class] = 'btn doc-action-btn btn-danger btn-sm' if options[:class].nil?
@@ -123,8 +151,8 @@ module ApplicationHelper
 
   def current_path(param, value)
     old_path = @current
-    old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except param) if old_path.include? param
-    old_path = url_for(params.permit(Pharos::Application::PARAMS_HASH).except :page) if old_path.include? 'page'
+    old_path = url_for(only_path: false, params: (params.permit(Pharos::Application::PARAMS_HASH).except param)) if old_path.include? param
+    old_path = url_for(only_path: false, params: (params.permit(Pharos::Application::PARAMS_HASH).except :page)) if old_path.include? 'page'
     value = '' if value.nil?
     if value.kind_of?(Integer)
       encoded_val = value
@@ -139,8 +167,6 @@ module ApplicationHelper
     else
       new_path = "#{old_path}?#{param}=#{encoded_val}"
     end
-    # params[param] = encoded_val
-    # new_path = url_for(params.permit(Pharos::Application::PARAMS_HASH))
     new_path
   end
 

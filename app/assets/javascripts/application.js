@@ -19,5 +19,6 @@
 //= require Chart.min
 //= require palette.js
 //= require sorttable.js
+//= require authy.js
 //= require js.cookie
 //= require browser_timezone_rails/set_time_zone

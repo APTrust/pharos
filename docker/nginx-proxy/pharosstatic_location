@@ -1,6 +1,7 @@
 location /assets/ {
     alias /etc/share/nginx/html/pharos/assets/;
 }
+
 set $cors '';
 if ($http_origin ~ '^https?://(localhost|demo\.aptrust\.org|aptrust\.github\.io)') {
 		set $cors 'true';
