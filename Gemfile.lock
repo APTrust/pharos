@@ -222,7 +222,7 @@ GEM
     mimemagic (0.3.3)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
-    minitest (5.12.2)
+    minitest (5.13.0)
     multi_json (1.13.1)
     multipart-post (2.1.1)
     nio4r (2.4.0)
@@ -265,8 +265,8 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
-    rails-html-sanitizer (1.2.0)
-      loofah (~> 2.2, >= 2.2.2)
+    rails-html-sanitizer (1.3.0)
+      loofah (~> 2.3)
     rails_semantic_logger (4.4.2)
       rack
       railties (>= 3.2)
@@ -331,7 +331,7 @@ GEM
       faraday (~> 0.9)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
-    simple_form (5.0.0)
+    simple_form (5.0.1)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
     simplecov (0.16.1)
@@ -427,7 +427,7 @@ DEPENDENCIES
   sassc (= 2.2.1)
   sassc-rails
   shoulda-matchers (~> 4.1.2)
-  simple_form (~> 5.0.0)
+  simple_form (~> 5.0.1)
   spring
   turbolinks
   uglifier (>= 4.2.0)
