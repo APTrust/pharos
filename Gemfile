@@ -35,7 +35,7 @@ gem 'rubyzip'
 # Used to create or edit google sheets
 gem 'google_drive'
 
-gem 'simple_form', '~> 5.0.0'
+gem 'simple_form', '~> 5.0.1'
 gem 'phony_rails'
 gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
@@ -46,7 +46,7 @@ gem 'bootstrap-sass', '~> 3.4.1'
 gem 'browser-timezone-rails'
 
 gem 'activerecord-nulldb-adapter'
-gem 'puma', '3.12.0'
+gem 'puma', '3.12.2'
 
 group :demo, :production, :staging do
   # Graylog logging gems
@@ -78,7 +78,7 @@ group :development, :test, :staging, :demo, :production, :integration do
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 3.8.2'
+  gem 'rspec-rails', '~> 3.9.0'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end

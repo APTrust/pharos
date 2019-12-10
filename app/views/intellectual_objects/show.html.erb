@@ -19,10 +19,28 @@
       <dt>Identifier</dt>
       <dd><%= @intellectual_object.identifier %></dd>
       <dt>Bag Group Identifier</dt>
-      <% if @intellectual_object.bag_group_identifier == '' %>
+      <% if @intellectual_object.bag_group_identifier.blank? %>
           <dd>-------</dd>
       <% else %>
           <dd><%= link_to @intellectual_object.bag_group_identifier, search_path(object_type: 'Intellectual Objects', search_field: 'Bag Group Identifier', q: @intellectual_object.bag_group_identifier) %></dd>
+      <% end %>
+      <dt>Source Organization</dt>
+      <% if @intellectual_object.source_organization.blank? %>
+          <dd>-------</dd>
+      <% else %>
+          <dd><%= link_to @intellectual_object.source_organization, search_path(object_type: 'Intellectual Objects', search_field: 'Source Organization', q: @intellectual_object.source_organization) %></dd>
+      <% end %>
+      <dt>Internal Sender Identifier</dt>
+      <% if @intellectual_object.internal_sender_identifier.blank? %>
+          <dd>-------</dd>
+      <% else %>
+          <dd><%= link_to @intellectual_object.internal_sender_identifier, search_path(object_type: 'Intellectual Objects', search_field: 'Internal Sender Identifier', q: @intellectual_object.internal_sender_identifier) %></dd>
+      <% end %>
+      <dt>Internal Sender Description</dt>
+      <% if @intellectual_object.internal_sender_description.blank? %>
+          <dd>-------</dd>
+      <% else %>
+          <dd><%= @intellectual_object.internal_sender_description%></dd>
       <% end %>
       <dt>Bag Name</dt>
       <dd><%= @intellectual_object.bag_name %></dd>

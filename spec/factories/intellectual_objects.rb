@@ -11,6 +11,9 @@ FactoryBot.define do
     bag_group_identifier { '' }
     state { 'A' }
     storage_option { 'Standard' }
+    source_organization { Faker::Company.name }
+    internal_sender_identifier { SecureRandom.uuid }
+    internal_sender_description { Faker::Lorem.paragraph }
 
     factory :consortial_intellectual_object, class: IntellectualObject do
       access { 'consortia' }
