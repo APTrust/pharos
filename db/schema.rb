@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_28_142435) do
+ActiveRecord::Schema.define(version: 2019_11_22_183902) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -55,8 +55,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["intellectual_object_id"], name: "index_bulk_delete_jobs_intellectual_objects_on_object_id"
   end
 
-  create_table "checksums", id: false, force: :cascade do |t|
-    t.serial "id", null: false
+  create_table "checksums", id: :serial, force: :cascade do |t|
     t.string "algorithm"
     t.string "datetime"
     t.string "digest"
@@ -66,8 +65,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["generic_file_id"], name: "index_checksums_on_generic_file_id"
   end
 
-  create_table "confirmation_tokens", id: false, force: :cascade do |t|
-    t.bigserial "id", null: false
+  create_table "confirmation_tokens", force: :cascade do |t|
     t.string "token"
     t.integer "intellectual_object_id"
     t.integer "generic_file_id"
@@ -75,8 +73,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.integer "user_id"
   end
 
-  create_table "dpn_bags", id: false, force: :cascade do |t|
-    t.bigserial "id", null: false
+  create_table "dpn_bags", force: :cascade do |t|
     t.integer "institution_id"
     t.string "object_identifier"
     t.string "dpn_identifier"
@@ -90,8 +87,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "dpn_work_items", id: false, force: :cascade do |t|
-    t.serial "id", null: false
+  create_table "dpn_work_items", id: :serial, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "remote_node", limit: 20, default: "", null: false
@@ -110,8 +106,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
   end
 
-  create_table "emails", id: false, force: :cascade do |t|
-    t.bigserial "id", null: false
+  create_table "emails", force: :cascade do |t|
     t.string "email_type"
     t.string "event_identifier"
     t.integer "item_id"
@@ -152,8 +147,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["work_item_id"], name: "index_emails_work_items_on_work_item_id"
   end
 
-  create_table "generic_files", id: false, force: :cascade do |t|
-    t.serial "id", null: false
+  create_table "generic_files", id: :serial, force: :cascade do |t|
     t.string "file_format"
     t.string "uri"
     t.bigint "size"
@@ -162,13 +156,14 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "state"
-    t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
     t.text "ingest_state"
+    t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
     t.integer "institution_id", null: false
     t.string "storage_option", default: "Standard", null: false
     t.index ["created_at"], name: "index_generic_files_on_created_at"
     t.index ["file_format", "state"], name: "index_generic_files_on_file_format_and_state"
     t.index ["file_format"], name: "index_generic_files_on_file_format"
+    t.index ["identifier"], name: "index_generic_files_on_identifier", unique: true
     t.index ["institution_id", "size", "state"], name: "index_generic_files_on_institution_id_and_size_and_state"
     t.index ["institution_id", "state", "file_format"], name: "index_files_on_inst_state_and_format"
     t.index ["institution_id", "state", "updated_at"], name: "index_files_on_inst_state_and_updated"
@@ -178,6 +173,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["intellectual_object_id", "file_format"], name: "index_generic_files_on_intellectual_object_id_and_file_format"
     t.index ["intellectual_object_id", "state"], name: "index_generic_files_on_intellectual_object_id_and_state"
     t.index ["intellectual_object_id"], name: "index_generic_files_on_intellectual_object_id"
+    t.index ["last_fixity_check"], name: "ix_gf_last_fixity_check"
     t.index ["size", "state"], name: "index_generic_files_on_size_and_state"
     t.index ["size"], name: "index_generic_files_on_size"
     t.index ["state", "updated_at"], name: "index_generic_files_on_state_and_updated_at"
@@ -185,8 +181,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["updated_at"], name: "index_generic_files_on_updated_at"
   end
 
-  create_table "institutions", id: false, force: :cascade do |t|
-    t.serial "id", null: false
+  create_table "institutions", id: :serial, force: :cascade do |t|
     t.string "name"
     t.string "identifier"
     t.string "dpn_uuid"
@@ -202,8 +197,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["name"], name: "index_institutions_on_name"
   end
 
-  create_table "intellectual_objects", id: false, force: :cascade do |t|
-    t.serial "id", null: false
+  create_table "intellectual_objects", id: :serial, force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "identifier"
@@ -219,9 +213,14 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.text "ingest_state"
     t.string "bag_group_identifier", default: "", null: false
     t.string "storage_option", default: "Standard", null: false
+    t.string "bagit_profile_identifier"
+    t.string "source_organization"
+    t.string "internal_sender_identifier"
+    t.text "internal_sender_description"
     t.index ["access"], name: "index_intellectual_objects_on_access"
     t.index ["bag_name"], name: "index_intellectual_objects_on_bag_name"
     t.index ["created_at"], name: "index_intellectual_objects_on_created_at"
+    t.index ["identifier"], name: "index_intellectual_objects_on_identifier", unique: true
     t.index ["institution_id", "state"], name: "index_intellectual_objects_on_institution_id_and_state"
     t.index ["institution_id"], name: "index_intellectual_objects_on_institution_id"
     t.index ["state"], name: "index_intellectual_objects_on_state"
@@ -250,12 +249,12 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.integer "generic_file_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "institution_id"
     t.string "outcome"
+    t.integer "institution_id"
     t.string "intellectual_object_identifier", default: "", null: false
     t.string "generic_file_identifier", default: "", null: false
     t.string "old_uuid"
-    t.index ["date_time"], name: "index_premis_events_on_date_time"
+    t.index ["date_time"], name: "index_premis_events_date_time_desc", order: :desc
     t.index ["event_type", "outcome"], name: "index_premis_events_on_event_type_and_outcome"
     t.index ["event_type"], name: "index_premis_events_on_event_type"
     t.index ["generic_file_id", "event_type"], name: "index_premis_events_on_generic_file_id_and_event_type"
@@ -305,6 +304,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.string "name"
     t.string "email"
     t.string "phone_number"
+    t.string "institution_pid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "encrypted_password", default: "", null: false
@@ -319,12 +319,12 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.integer "institution_id"
     t.text "encrypted_api_secret_key"
     t.datetime "password_changed_at"
-    t.datetime "deactivated_at"
     t.string "encrypted_otp_secret"
     t.string "encrypted_otp_secret_iv"
     t.string "encrypted_otp_secret_salt"
     t.integer "consumed_timestep"
     t.boolean "otp_required_for_login"
+    t.datetime "deactivated_at"
     t.boolean "enabled_two_factor", default: false
     t.boolean "confirmed_two_factor", default: false
     t.string "otp_backup_codes", array: true
@@ -335,8 +335,7 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.boolean "initial_password_updated", default: false
     t.boolean "force_password_update", default: false
     t.boolean "account_confirmed", default: true
-    t.datetime "grace_period", default: "2019-06-25 20:40:12"
-    t.string "aws_access_key", default: ""
+    t.datetime "grace_period"
     t.index ["authy_id"], name: "index_users_on_authy_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["institution_id"], name: "index_users_on_institution_id"
@@ -391,4 +390,6 @@ ActiveRecord::Schema.define(version: 2019_08_28_142435) do
     t.index ["status"], name: "index_work_items_on_status"
   end
 
+  add_foreign_key "checksums", "generic_files"
+  add_foreign_key "users", "institutions"
 end

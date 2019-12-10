@@ -19,7 +19,7 @@ TAG = $(NAME):$(REVISION)
 # HELP
 # This will output the help for each task
 # thanks to https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
-.PHONY: help build publish clean release
+.PHONY: help build publish clean release test
 
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -66,7 +66,7 @@ test-ci: build ## Run Pharos spec tests in CI
 	docker stop pharos-test-db && docker rm pharos-test-db
 	docker network rm pharos-test-net
 
-dtest: ## Run Pharos spec tests
+test: ## Run Pharos spec tests
 	docker network create -d bridge pharos-test-net > /dev/null 2>&1 || true
 	docker start pharos-test-db > /dev/null 2>&1 || docker run -d --network pharos-test-net --hostname pharos-test-db --name pharos-test-db -p 5432:5432 postgres:9.6.6-alpine
 	docker run  -e PHAROS_DB_NAME=pharos_test -e PHAROS_DB_HOST=pharos-test-db -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-test-db --network pharos-test-net --rm --name pharos-migration $(TAG) /bin/bash -c "echo 'Init DB setup'; rake db:setup; rake db:migrate; rake pharos:setup"

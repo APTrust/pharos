@@ -394,9 +394,13 @@ class IntellectualObjectsController < ApplicationController
                                 .with_access(params[:access])
                                 .with_file_format(params[:file_format])
                                 .with_state(params[:state])
+<<<<<<< HEAD
                                 .with_source_organization_like(params[:source_organization])
                                 .with_internal_sender_identifier_like(params[:internal_sender_identifier])
                                 .with_internal_sender_description_like(params[:internal_sender_description])
+=======
+    # Used in erb template
+>>>>>>> develop
     @selected = {}
 
     # Don't run counts for API requests

@@ -40,6 +40,12 @@ class IntellectualObject < ActiveRecord::Base
   scope :with_title_like, ->(param) { where('intellectual_objects.title like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_access, ->(param) { where(access: param) unless param.blank? }
   scope :with_storage_option, ->(param) { where(storage_option: param) unless param.blank? }
+  scope :with_source_organization, ->(param) { where(source_organization: param) unless param.blank? }
+  scope :with_source_organization_like, ->(param) { where('intellectual_objects.source_organization like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
+  scope :with_internal_sender_identifier, ->(param) { where(internal_sender_identifier: param) unless param.blank? }
+  scope :with_internal_sender_identifier_like, ->(param) { where('intellectual_objects.internal_sender_identifier like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
+  scope :with_internal_sender_description, ->(param) { where(internal_sender_description: param) unless param.blank? }
+  scope :with_internal_sender_description_like, ->(param) { where('intellectual_objects.internal_sender_description like ?', "%#{param}%") unless IntellectualObject.empty_param(param) }
   scope :with_file_format, ->(param) {
     joins(:generic_files)
         .where('generic_files.file_format = ?', param) unless param.blank?

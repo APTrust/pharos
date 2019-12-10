@@ -178,26 +178,32 @@ class PremisEventsController < ApplicationController
   def filter_count_and_sort
     parameter_deprecation
     @premis_events = @premis_events
-                         .with_institution(params[:institution])
-                         .with_type(params[:event_type])
-                         .with_outcome(params[:outcome])
-                         .with_create_date(params[:created_at])
-                         .created_before(params[:created_before])
-                         .created_after(params[:created_after])
-                         .with_event_identifier(params[:event_identifier])
+                       .with_institution(params[:institution])
+                       .with_type(params[:event_type])
+                       .with_outcome(params[:outcome])
+                       .with_create_date(params[:created_at])
+                       .created_before(params[:created_before])
+                       .created_after(params[:created_after])
+                       .with_event_identifier(params[:event_identifier])
     if @parent.is_a?(Institution)
       @premis_events = @premis_events
-                          .with_object_identifier_like(params[:object_identifier])
-                          .with_file_identifier_like(params[:file_identifier])
+                         .with_object_identifier_like(params[:object_identifier])
+                         .with_file_identifier_like(params[:file_identifier])
     end
     @premis_events = @premis_events.with_file_identifier_like(params[:file_identifier]) if @parent.is_a?(IntellectualObject)
+
+    # Not sure why this is declared here, but the erb templates
+    # seem to use it.
     @selected = {}
-    get_event_institution_counts(@premis_events)
-    get_event_type_counts(@premis_events)
-    get_outcome_counts(@premis_events)
-    query = "SELECT COUNT(*) FROM (#{@premis_events.to_sql}) AS event_index"
-    result = ActiveRecord::Base.connection.exec_query(query)
-    count = result[0]['count']
+
+    # Don't run counts for API requests.
+    if !api_request?
+      get_event_institution_counts(@premis_events)
+      get_event_type_counts(@premis_events)
+      get_outcome_counts(@premis_events)
+    end
+
+    count = get_event_count
     set_page_counts(count)
     params[:sort] = 'date' if params[:sort].nil?
     case params[:sort]
@@ -209,6 +215,30 @@ class PremisEventsController < ApplicationController
         @premis_events = @premis_events.joins(:institution).order('institutions.name')
     end
   end
+
+  # Returns the full count of events. If there's a where clause,
+  # just run a standard "select count(*) from premis_events where...".
+  # If there is no where clause, use a trick to query one of postgres'
+  # internal housekeeping tables for an *approximate* number of rows.
+  # This lets us avoid a table scan of 100 million records.
+  # The count returned by this query may be lower than the actual count
+  # after a quick series of PremisEvent inserts, but it will catch up.
+  # This count will never be high, because PremisEvents cannot be deleted.
+  #
+  # For documentation on why we're doing this, see:
+  #
+  # https://www.cybertec-postgresql.com/en/postgresql-count-made-fast/
+  # https://wiki.postgresql.org/wiki/Count_estimate
+  def get_event_count
+    if @premis_events.to_sql =~ / WHERE /
+      return @premis_events.count
+    else
+      query = "SELECT reltuples::bigint as row_count FROM pg_catalog.pg_class WHERE relname = 'premis_events'"
+      result = ActiveRecord::Base.connection.exec_query(query)
+      return result[0]['row_count']
+    end
+  end
+
 
   def parameter_deprecation
     params[:object_identifier] = params[:object_identifier_like] if params[:object_identifier_like]

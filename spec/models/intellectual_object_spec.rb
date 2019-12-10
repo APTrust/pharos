@@ -49,6 +49,27 @@ RSpec.describe IntellectualObject, :type => :model do
       subject.bag_group_identifier.should == 'This is a connected collection.'
     end
 
+    it 'should properly set a bagit_profile_identifier' do
+      subject.bagit_profile_identifier = 'bagit/profile/identifier'
+      subject.bagit_profile_identifier.should == 'bagit/profile/identifier'
+    end
+
+    it 'should properly set a source_organization' do
+      subject.source_organization = 'University of Virginia'
+      subject.source_organization.should == 'University of Virginia'
+    end
+
+    it 'should properly set an internal_sender_identifier' do
+      subject.internal_sender_identifier = 'internal/sender/identifier'
+      subject.internal_sender_identifier.should == 'internal/sender/identifier'
+    end
+
+    it 'should properly set an internal_sender_description' do
+      exp = Faker::Lorem.paragraph
+      subject.internal_sender_description = exp
+      subject.internal_sender_description.should == exp
+    end
+
     it 'should properly set an alternative identifier' do
       exp = 'test.edu/123456'
       subject.alt_identifier = exp
@@ -465,7 +486,11 @@ RSpec.describe IntellectualObject, :type => :model do
                                        description: 'Description of first item',
                                        bag_name: 'first_item',
                                        title: 'Title of first item',
-                                       state: 'A') }
+                                       state: 'A',
+                                       bag_group_identifier: 'Group Two',
+                                       source_organization: 'University of Colorado',
+                                       internal_sender_identifier: '1234-5678-9018-8362',
+                                       internal_sender_description: 'This is a paragraph. Of sorts.') }
       let!(:obj2) { FactoryBot.create(:intellectual_object,
                                        institution: inst,
                                        identifier: 'test.edu/second',
@@ -475,7 +500,11 @@ RSpec.describe IntellectualObject, :type => :model do
                                        description: 'Description of second item',
                                        bag_name: 'second_item',
                                        title: 'Title of second item',
-                                       state: 'A') }
+                                       state: 'A',
+                                       bag_group_identifier: 'Collection One',
+                                       source_organization: 'University of Denver',
+                                       internal_sender_identifier: '1234-5678-9018-9463',
+                                       internal_sender_description: 'This is a another paragraph. It has two sentences.') }
       let!(:obj3) { FactoryBot.create(:intellectual_object,
                                        institution: other_inst,
                                        identifier: 'xxx',
@@ -485,7 +514,11 @@ RSpec.describe IntellectualObject, :type => :model do
                                        description: 'xxx',
                                        bag_name: 'xxx',
                                        title: 'xxx',
-                                       state: 'D') }
+                                       state: 'D',
+                                       bag_group_identifier: 'Project Two',
+                                       source_organization: 'Nightmare on Elm Street Studios',
+                                       internal_sender_identifier: '0218-3823-3746-9463',
+                                       internal_sender_description: 'The quick brown fox jumped over the lazy dog.') }
 
       it 'should find items created before' do
         results = IntellectualObject.created_before('2016-07-29')
@@ -586,6 +619,46 @@ RSpec.describe IntellectualObject, :type => :model do
         expect(results).to include obj1
         expect(results.count).to eq 1
         results = IntellectualObject.with_title_like('item')
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
+      end
+
+      it 'should find objects with bag_group_identifier like' do
+        results = IntellectualObject.with_bag_group_identifier_like('Project Two')
+        expect(results).to include obj3
+        expect(results.count).to eq 1
+        results = IntellectualObject.with_bag_group_identifier_like('Two')
+        expect(results).to include obj1
+        expect(results).to include obj3
+        expect(results.count).to eq 2
+      end
+
+      it 'should find objects with source_organization like' do
+        results = IntellectualObject.with_source_organization_like('University of Colorado')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
+        results = IntellectualObject.with_source_organization_like('University')
+        expect(results).to include obj1
+        expect(results).to include obj2
+        expect(results.count).to eq 2
+      end
+
+      it 'should find objects with internal_sender_identifier like' do
+        results = IntellectualObject.with_internal_sender_identifier_like('1234-5678-9018-9463')
+        expect(results).to include obj2
+        expect(results.count).to eq 1
+        results = IntellectualObject.with_internal_sender_identifier_like('9463')
+        expect(results).to include obj2
+        expect(results).to include obj3
+        expect(results.count).to eq 2
+      end
+
+      it 'should find objects with internal_sender_description like' do
+        results = IntellectualObject.with_internal_sender_description_like('This is a paragraph. Of sorts.')
+        expect(results).to include obj1
+        expect(results.count).to eq 1
+        results = IntellectualObject.with_internal_sender_description_like('paragraph')
         expect(results).to include obj1
         expect(results).to include obj2
         expect(results.count).to eq 2
