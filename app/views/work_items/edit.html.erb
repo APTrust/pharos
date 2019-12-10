@@ -7,7 +7,6 @@
     <%= f.error_notification %>
 
     <div class="form-inputs">
-      <%= f.input :action, collection: actions_for_select, as: :select, label: 'Action' %>
       <%= f.input :stage, collection: stages_for_select, as: :select, label: 'Stage' %>
       <%= f.input :status, collection: statuses_for_select, as: :select, label: 'Status' %>
       <%= f.input :retry, collection: boolean_for_select, as: :select, label: 'Retry' %>
