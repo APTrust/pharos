@@ -199,7 +199,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from ActionController::RoutingError do |exception|
     logger.error "Routing error occurred. URL: #{request.url}"
-    logger.error exception.backtrace.join("\n")
     request.format = 'json' if api_request?
     logger.error 'Routing error occurred'
     respond_to do |format|
