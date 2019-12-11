@@ -692,7 +692,6 @@ paths:
         * Bag ingest requests
         * Restoration requests
         * Deletion requests
-        * Requests to send items to DPN
       responses:
         '200':
           description: A JSON array of work items
@@ -1095,53 +1094,6 @@ paths:
             default: 10
           description: >-
             The number of items to include in the page of results. If this is not specified, it defaults to 10.
-  '/member-api/v2/objects/{intellectual_object_identifier}/dpn':
-    put:
-      tags:
-        - Intellectual Objects
-      summary: This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN
-      description: >-
-        This endpoint allows a user to specify an intellectual object (via identifier) to be queued for DPN. It requires that the user specify the intellectual_object_identifier as url-encoded, and as part of the base URL. If the request is successful, the endpoint will return a newly created work item with specifics pertaining to the DPN request. If the request is unsuccessful, the user will return an error message with an explanation.
-      deprecated: true
-      responses:
-        '200':
-          description: JSON of a single work item
-          content:
-            application/json:
-              schema:
-                 $ref: '#/components/schemas/SendtoDPNResponses'
-      parameters:
-        - in: header
-          name: Content-Type
-          schema:
-            type: string
-            enum:
-              - application/json
-          description: The type of content the user will send to the API endpoint. This parameter is required.
-        - in: header
-          name: Accept
-          schema:
-            type: string
-            enum:
-              - application/json
-          description: The type of content the user will receive from the API endpoint. This parameter is required.
-        - in: header
-          name: X-Pharos-API-User
-          schema:
-            type: string
-            format: email
-          description: The email address of a user with a valid account in the Pharos APTrust system. This parameter is required.
-        - in: header
-          name: X-Pharos-API-Key
-          schema:
-            type: string
-          description: The API key the user generated in their Pharos profile, used to authenticate the user. This parameter is required.
-        - in: path
-          name: intellectual_object_identifier
-          schema:
-            type: string
-          description: 'Intellectual Object identifier to be sent to DPN'
-          required: true
   '/member-api/v2/objects/{intellectual_object_identifier}/restore':
     get:
       tags:
@@ -1409,11 +1361,10 @@ components:
             - Restore
             - Glacier Restore
             - Delete
-            - DPN
         stage:
           type: string
           description: >-
-              Stage of work item. 
+              Stage of work item.
           example: "Fetch"
           enum:
             - Requested
@@ -1586,12 +1537,6 @@ components:
           description: >-
               Internal ID of institution
           example: "345168"
-        dpn_uuid:
-          type: string
-          description: >-
-              Contains the UUID of the object in DPN if it has been sent to DPN and successfully ingested.
-          nullable: true
-          example: null
     RestoreResponse:
       properties:
         status:
@@ -1611,23 +1556,6 @@ components:
           description: "ID of the work item if the request was successful. If the request was unsuccessful it will be \"0\""
           type: integer
           example: '1234'
-    SendToDPNResponseFailed:
-      properties:
-        status:
-          type: string
-          enum:
-            - error
-            - conflict
-        message:
-          type: string
-          enum:
-            - 'We are not currently sending objects to DPN.'
-            - 'This item cannot be sent to DPN because the depositing institution is not a DPN member.'
-            - 'This item has already been sent to DPN.'
-            - 'This item has been deleted and cannot be sent to DPN.'
-            - 'This item cannot be sent to DPN at this time because it is greater than 250GB.'
-            - 'Your item has been queued for DPN.'
-            - "Your object cannot be sent to DPN at this time due to a pending #{pending.action} request."
     Events:
       type: array
       items:
@@ -1648,12 +1576,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/RestoreResponse'
-    SendtoDPNResponses:
-      type: array
-      items:
-        oneOf:
-          - $ref: '#/components/schemas/Item'
-          - $ref: '#/components/schemas/SendToDPNResponseFailed'
     EventsResponse:
       properties:
         count:
@@ -1784,5 +1706,3 @@ components:
 security:
   - UserId: []
     ApiKeyAuth: []
-
-
