@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_22_183902) do
+ActiveRecord::Schema.define(version: 2019_12_11_154633) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -71,39 +71,6 @@ ActiveRecord::Schema.define(version: 2019_11_22_183902) do
     t.integer "generic_file_id"
     t.integer "institution_id"
     t.integer "user_id"
-  end
-
-  create_table "dpn_bags", force: :cascade do |t|
-    t.integer "institution_id"
-    t.string "object_identifier"
-    t.string "dpn_identifier"
-    t.bigint "dpn_size"
-    t.string "node_1"
-    t.string "node_2"
-    t.string "node_3"
-    t.datetime "dpn_created_at"
-    t.datetime "dpn_updated_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "dpn_work_items", id: :serial, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "remote_node", limit: 20, default: "", null: false
-    t.string "task", limit: 40, default: "", null: false
-    t.string "identifier", limit: 40, default: "", null: false
-    t.datetime "queued_at"
-    t.datetime "completed_at"
-    t.string "note", limit: 400
-    t.text "state"
-    t.string "processing_node", limit: 255
-    t.integer "pid", default: 0
-    t.boolean "retry", default: true, null: false
-    t.string "stage"
-    t.string "status"
-    t.index ["identifier"], name: "index_dpn_work_items_on_identifier"
-    t.index ["remote_node", "task"], name: "index_dpn_work_items_on_remote_node_and_task"
   end
 
   create_table "emails", force: :cascade do |t|
@@ -184,7 +151,6 @@ ActiveRecord::Schema.define(version: 2019_11_22_183902) do
   create_table "institutions", id: :serial, force: :cascade do |t|
     t.string "name"
     t.string "identifier"
-    t.string "dpn_uuid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "state"
@@ -209,7 +175,6 @@ ActiveRecord::Schema.define(version: 2019_11_22_183902) do
     t.datetime "updated_at", null: false
     t.string "state"
     t.string "etag"
-    t.string "dpn_uuid"
     t.text "ingest_state"
     t.string "bag_group_identifier", default: "", null: false
     t.string "storage_option", default: "Standard", null: false
