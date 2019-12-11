@@ -394,13 +394,6 @@ class WorkItemsController < ApplicationController
 
   end
 
-  # def rewrite_params_for_sqlite
-  #   # SQLite wants t or f for booleans
-  #   if params[:retry].present? && params[:retry].is_a?(String)
-  #     params[:retry] = params[:retry][0]
-  #   end
-  # end
-
   def issue_requeue_http_post(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_delete_topic")
