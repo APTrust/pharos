@@ -3,7 +3,6 @@ require 'spec_helper'
 RSpec.describe AlertsController, type: :controller do
   before :all do
     WorkItem.delete_all
-    DpnWorkItem.delete_all
     PremisEvent.delete_all
     User.delete_all
     Institution.delete_all
@@ -18,14 +17,11 @@ RSpec.describe AlertsController, type: :controller do
     @ingest_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['ingest'], status: Pharos::Application::PHAROS_STATUSES['fail'])
     @restore_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['restore'], status: Pharos::Application::PHAROS_STATUSES['fail'])
     @delete_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['delete'], status: Pharos::Application::PHAROS_STATUSES['fail'])
-    @dpn_ingest_fail = FactoryBot.create(:work_item, action: Pharos::Application::PHAROS_ACTIONS['dpn'], status: Pharos::Application::PHAROS_STATUSES['fail'])
     @stalled = FactoryBot.create(:work_item, queued_at: Time.now - 13.hours, status: Pharos::Application::PHAROS_STATUSES['pend'])
-    @stalled_dpn = FactoryBot.create(:dpn_work_item, queued_at: Time.now - 25.hours, completed_at: nil)
   end
 
   after :all do
     WorkItem.delete_all
-    DpnWorkItem.delete_all
     PremisEvent.delete_all
     User.delete_all
     Institution.delete_all
@@ -46,8 +42,6 @@ RSpec.describe AlertsController, type: :controller do
         assigns(:alerts_list)[:failed_ingests].first.should eq(@ingest_fail)
         assigns(:alerts_list)[:failed_restorations].first.should eq(@restore_fail)
         assigns(:alerts_list)[:failed_deletions].first.should eq(@delete_fail)
-        assigns(:alerts_list)[:failed_dpn_ingests].first.should eq(@dpn_ingest_fail)
-        assigns(:alerts_list)[:stalled_dpn_replications].first.should eq(@stalled_dpn)
         assigns(:alerts_list)[:stalled_work_items].first.should eq(@stalled)
       end
 
@@ -112,8 +106,6 @@ RSpec.describe AlertsController, type: :controller do
         assigns(:alerts_summary)[:failed_ingest_count].should eq 1
         assigns(:alerts_summary)[:failed_restoration_count].should eq 1
         assigns(:alerts_summary)[:failed_deletion_count].should eq 1
-        assigns(:alerts_summary)[:failed_dpn_ingest_count].should eq 1
-        assigns(:alerts_summary)[:stalled_dpn_replication_count].should eq 1
         assigns(:alerts_summary)[:stalled_work_item_count].should eq 1
       end
 
@@ -124,8 +116,6 @@ RSpec.describe AlertsController, type: :controller do
         assigns(:alerts_summary)[:failed_ingest_count].should eq 1
         assigns(:alerts_summary)[:failed_restoration_count].should eq 1
         assigns(:alerts_summary)[:failed_deletion_count].should eq 1
-        assigns(:alerts_summary)[:failed_dpn_ingest_count].should eq 1
-        assigns(:alerts_summary)[:stalled_dpn_replication_count].should eq 1
         assigns(:alerts_summary)[:stalled_work_item_count].should eq 1
       end
 

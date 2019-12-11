@@ -52,10 +52,6 @@ class WorkItemPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def items_for_dpn?
-    user.admin?
-  end
-
   def delete_test_items?
     user.admin?
   end

@@ -23,8 +23,6 @@ class CatalogController < ApplicationController
         item_search
       when 'Premis Events'
         event_search
-      when 'DPN Items'
-        dpn_item_search
     end
     filter_sort_and_count
     page_results(@results)
@@ -126,19 +124,6 @@ class CatalogController < ApplicationController
     end
   end
 
-  def dpn_item_search
-    items = DpnWorkItem.discoverable(current_user)
-    @result_type = 'dpn_item'
-    if @empty_param
-      @results = items
-    else
-      case params[:search_field]
-        when 'Item Identifier'
-          @results = items.with_identifier(@q)
-      end
-    end
-  end
-
   def filter_sort_and_count
     @selected = {}
     params[:state] = 'A' if params[:state].nil?
@@ -182,20 +167,6 @@ class CatalogController < ApplicationController
         get_event_institution_counts(@results)
         get_event_type_counts(@results)
         get_outcome_counts(@results)
-      when 'dpn_item'
-        params[:status] = nil if params[:status] == 'Null Status'
-        params[:stage] = nil if params[:stage] == 'Null Stage'
-        @results = @results
-                       .with_remote_node(params[:remote_node])
-                       .queued(params[:queued])
-                       .with_stage(params[:stage])
-                       .with_status(params[:status])
-                       .with_retry(params[:retry])
-        get_node_counts(@results)
-        get_queued_counts(@results)
-        get_status_counts(@results)
-        get_stage_counts(@results)
-        get_retry_counts(@results)
     end
     params[:sort] = 'date' unless params[:sort]
     case params[:sort]
@@ -221,8 +192,6 @@ class CatalogController < ApplicationController
           @results = @results.order('premis_events.date_time DESC') unless @results.nil?
         when 'item'
           @results = @results.order('work_items.date DESC') unless @results.nil?
-        when 'dpn_item'
-          @results = @results.order('dpn_work_items.queued_at DESC') unless @results.nil?
       end
     end
   end
@@ -238,8 +207,6 @@ class CatalogController < ApplicationController
           @results = @results.order('identifier').reverse_order unless @results.nil?
         when 'item'
           @results = @results.order('name') unless @results.nil?
-        when 'dpn_item'
-          @results = @results.order ('identifier') unless @results.nil?
       end
     end
   end

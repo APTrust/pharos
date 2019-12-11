@@ -328,7 +328,7 @@ RSpec.describe InstitutionsController, type: :controller do
       let (:attributes) { FactoryBot.attributes_for(:member_institution) }
       let (:attributes2) { FactoryBot.attributes_for(:subscription_institution, member_institution_id: current_member.id) }
       let (:attributes3) { FactoryBot.attributes_for(:member_institution, receiving_bucket: nil, restore_bucket: nil) }
-      let (:attributes4) { FactoryBot.attributes_for(:member_institution, receiving_bucket: 'something.delete.test.edu', restore_bucket: 'something.dpn.test.edu') }
+      let (:attributes4) { FactoryBot.attributes_for(:member_institution, receiving_bucket: 'something.delete.test.edu', restore_bucket: 'something.test.edu') }
 
       before do
         sign_in admin_user
@@ -377,7 +377,7 @@ RSpec.describe InstitutionsController, type: :controller do
         assigns[:institution].should be_kind_of Institution
         inst = assigns[:institution]
         expect(inst.receiving_bucket).not_to eq 'something.delete.test.edu'
-        expect(inst.restore_bucket).not_to eq 'something.dpn.test.edu'
+        expect(inst.restore_bucket).not_to eq 'something.test.edu'
         expect(inst.receiving_bucket).to eq "#{Pharos::Application.config.pharos_receiving_bucket_prefix}#{inst.identifier}"
         expect(inst.restore_bucket).to eq "#{Pharos::Application.config.pharos_restore_bucket_prefix}#{inst.identifier}"
       end

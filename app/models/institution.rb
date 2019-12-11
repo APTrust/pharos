@@ -11,7 +11,6 @@ class Institution < ActiveRecord::Base
   has_many :premis_events, through: :intellectual_objects
   has_many :premis_events, through: :generic_files
   has_many :snapshots
-  has_many :dpn_bags
   has_many :bulk_delete_jobs
   has_one :confirmation_token
 
@@ -32,14 +31,6 @@ class Institution < ActiveRecord::Base
 
   def to_param
     identifier
-  end
-
-  def is_in_dpn
-    status = false
-    if self.dpn_uuid != '' || self.dpn_uuid != nil
-      status = true
-    end
-    status
   end
 
   def self.find_by_identifier(identifier)
@@ -155,7 +146,7 @@ class Institution < ActiveRecord::Base
   end
 
   def serializable_hash(options={})
-    { id: id, name: name, identifier: identifier, dpn_uuid: dpn_uuid }
+    { id: id, name: name, identifier: identifier }
   end
 
   def bytes_by_format

@@ -90,10 +90,6 @@ class InstitutionPolicy < ApplicationPolicy
     user.admin? || user.institution_id == record.id
   end
 
-  def dpn_bag_index?
-    user.admin? || user.institution_id == record.id
-  end
-
   class Scope
     attr_reader :user, :scope
 

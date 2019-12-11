@@ -2,10 +2,29 @@ class UsersController < ApplicationController
   require 'authy'
   inherit_resources
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :generate_api_key, :admin_password_reset, :deactivate, :reactivate,
-                                  :vacuum, :enable_otp, :disable_otp, :register_authy_user, :verify_twofa, :generate_backup_codes,
-                                  :verify_email, :email_confirmation, :forced_password_update, :indiv_confirmation_email, :confirm_account,
-                                  :change_authy_phone_number, :update_phone_number]
+  before_action :set_user, only: [
+                  :admin_password_reset,
+                  :change_authy_phone_number,
+                  :confirm_account,
+                  :deactivate,
+                  :destroy,
+                  :disable_otp,
+                  :edit,
+                  :email_confirmation,
+                  :enable_otp,
+                  :forced_password_update,
+                  :generate_api_key,
+                  :generate_backup_codes,
+                  :indiv_confirmation_email,
+                  :reactivate,
+                  :register_authy_user,
+                  :show,
+                  :update,
+                  :update_phone_number,
+                  :vacuum,
+                  :verify_email,
+                  :verify_twofa
+                ]
   after_action :verify_authorized, :except => :index
   after_action :verify_policy_scoped, :only => :index
 
@@ -465,7 +484,17 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.required(:user).permit(:password, :password_confirmation, :current_password, :name, :email, :phone_number, :institution_id, :role_ids, :two_factor_enabled)
+    params.required(:user).permit(
+      :current_password,
+      :email,
+      :institution_id,
+      :name,
+      :password,
+      :password_confirmation,
+      :phone_number,
+      :role_ids,
+      :two_factor_enabled
+    )
   end
 
   def set_query(target)
@@ -474,10 +503,6 @@ class UsersController < ApplicationController
         query = 'VACUUM (VERBOSE, ANALYZE) checksums'
       when 'confirmation_tokens'
         query = 'VACUUM (VERBOSE, ANALYZE) confirmation_tokens'
-      when 'dpn_bags'
-        query = 'VACUUM (VERBOSE, ANALYZE) dpn_bags'
-      when 'dpn_work_items'
-        query = 'VACUUM (VERBOSE, ANALYZE) dpn_work_items'
       when 'emails'
         query = 'VACUUM (VERBOSE, ANALYZE) emails'
       when 'generic_files'

@@ -5,13 +5,11 @@ function configureDropDownLists() {
     var gf_options = ['File Identifier', 'URI'];
     var event_options = ['Event Identifier', 'Object Identifier', 'File Identifier'];
     var wi_options = ['Object Identifier', 'File Identifier', 'Name', 'Etag'];
-    var dpn_options = ['Item Identifier'];
     var listSwitch = {
         "Intellectual Objects": function () { createOptionList(ddl2, io_options); },
         "Generic Files": function () { createOptionList(ddl2, gf_options); },
         "Work Items": function () { createOptionList(ddl2, wi_options); },
-        "Premis Events": function () { createOptionList(ddl2, event_options); },
-        "DPN Items": function () { createOptionList(ddl2, dpn_options); }
+        "Premis Events": function () { createOptionList(ddl2, event_options); }
     };
     listSwitch[ddl1.value]();
 }

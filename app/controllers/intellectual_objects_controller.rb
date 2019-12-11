@@ -3,7 +3,7 @@ class IntellectualObjectsController < ApplicationController
   inherit_resources
   before_action :authenticate_user!
   before_action :load_institution, only: [:index, :create]
-  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirm_destroy, :finished_destroy, :send_to_dpn, :restore]
+  before_action :load_object, only: [:show, :edit, :update, :destroy, :confirm_destroy, :finished_destroy, :restore]
   after_action :verify_authorized
 
   def index
@@ -193,55 +193,6 @@ class IntellectualObjectsController < ApplicationController
     end
   end
 
-  def send_to_dpn
-    authorize @intellectual_object, :dpn?
-    dpn_item = nil
-    message = ""
-    api_status_code = :ok
-    pending = WorkItem.pending_action(@intellectual_object.identifier)
-    if Pharos::Application.config.show_send_to_dpn_button == false
-      message = 'We are not currently sending objects to DPN.'
-      api_status_code = :conflict
-    elsif @intellectual_object.institution.dpn_uuid == ''
-      message = 'This item cannot be sent to DPN because the depositing institution is not a DPN member.'
-      api_status_code = :conflict
-    elsif @intellectual_object.in_dpn?
-      message = 'This item has already been sent to DPN.'
-      api_status_code = :conflict
-    elsif @intellectual_object.state == 'D'
-      message = 'This item has been deleted and cannot be sent to DPN.'
-      api_status_code = :conflict
-    elsif @intellectual_object.too_big?
-      message = 'This item cannot be sent to DPN at this time because it is greater than 250GB.'
-      api_status_code = :conflict
-    elsif pending.nil?
-      dpn_item = WorkItem.create_dpn_request(@intellectual_object.identifier, current_user.email)
-      message = 'Your item has been queued for DPN.'
-    else
-      message = "Your object cannot be sent to DPN at this time due to a pending #{pending.action} request."
-      api_status_code = :conflict
-    end
-    respond_to do |format|
-      status = dpn_item.nil? ? 'error' : 'ok'
-      item_id = dpn_item.nil? ? 0 : dpn_item.id
-      format.json {
-        if status == 'ok'
-          render :json => dpn_item, :status => api_status_code
-        else
-          render :json => { status: status, message: message }, :status => api_status_code
-        end
-      }
-      format.html {
-        if dpn_item.nil?
-          flash[:alert] = message
-        else
-          flash[:notice] = message
-        end
-        redirect_to @intellectual_object
-      }
-    end
-  end
-
   def restore
     if @intellectual_object
       authorize @intellectual_object, :restore?
@@ -305,45 +256,95 @@ class IntellectualObjectsController < ApplicationController
   end
 
   def create_params
-    params.require(:intellectual_object).permit(:institution_id, :title, :etag, :storage_option,
-                                                :description, :access, :identifier,
-                                                :bag_name, :alt_identifier, :ingest_state,
-                                                :bag_group_identifier, :bagit_profile_identifier,
-                                                :source_organization, :internal_sender_identifier,
-                                                :internal_sender_description, generic_files_attributes:
-                                                [:id, :uri, :identifier,
-                                                 :size, :created, :modified, :file_format,
-                                                 premis_events_attributes:
-                                                 [:id, :identifier, :event_type, :date_time,
-                                                  :outcome, :outcome_detail,
-                                                  :outcome_information, :detail,
-                                                  :object, :agent, :intellectual_object_id,
-                                                  :generic_file_id, :institution_id,
-                                                  :created_at, :updated_at]],
-                                                premis_events_attributes:
-                                                [:id, :identifier, :event_type,
-                                                 :date_time, :outcome, :outcome_detail,
-                                                 :outcome_information, :detail, :object,
-                                                 :agent, :intellectual_object_id,
-                                                 :generic_file_id, :institution_id,
-                                                 :created_at, :updated_at])
-
+    params.require(:intellectual_object).permit(
+      :access,
+      :alt_identifier,
+      :bag_group_identifier,
+      :bag_name,
+      :bagit_profile_identifier,
+      :description,
+      :etag,
+      :identifier,
+      :ingest_state,
+      :institution_id,
+      :internal_sender_description,
+      :internal_sender_identifier,
+      :source_organization,
+      :storage_option,
+      :title,
+      # For generic files nested in intellectual object
+      # in bulk create method.
+      generic_files_attributes:
+        [:id,
+         :uri,
+         :identifier,
+         :size,
+         :created,
+         :modified,
+         :file_format,
+         # For premis events nested in generic file objects.
+         # Used in bulk create.
+         premis_events_attributes:
+           [
+             :agent,
+             :created_at,
+             :date_time,
+             :detail,
+             :event_type,
+             :generic_file_id,
+             :id,
+             :identifier,
+             :institution_id,
+             :intellectual_object_id,
+             :object,
+             :outcome,
+             :outcome_detail,
+             :outcome_information,
+             :updated_at
+           ]],
+      # For premis events attached to top-level intellectual
+      # object. Used in bulk create.
+      premis_events_attributes:
+        [
+          :agent,
+          :created_at,
+          :date_time,
+          :detail,
+          :event_type,
+          :generic_file_id,
+          :id,
+          :identifier,
+          :institution_id,
+          :intellectual_object_id,
+          :object,
+          :outcome,
+          :outcome_detail,
+          :outcome_information,
+          :updated_at
+        ])
   end
 
   def update_params
-    params.require(:intellectual_object).permit(:title, :description, :access, :ingest_state, :storage_option,
-                                                :alt_identifier, :state, :dpn_uuid, :etag, :bag_group_identifier,
-                                                :bagit_profile_identifier, :source_organization,
-                                                :internal_sender_identifier, :internal_sender_description)
+    params.require(:intellectual_object).permit(
+      :access,
+      :alt_identifier,
+      :bag_group_identifier,
+      :bagit_profile_identifier,
+      :description,
+      :etag,
+      :ingest_state,
+      :internal_sender_description,
+      :internal_sender_identifier,
+      :source_organization,
+      :state,
+      :storage_option,
+      :title
+    )
   end
 
   def load_object
     if params[:intellectual_object_identifier]
       @intellectual_object = IntellectualObject.where(identifier: params[:intellectual_object_identifier]).first
-      # if @intellectual_object.nil?
-      #   msg = "IntellectualObject '#{params[:intellectual_object_identifier]}' not found"
-      #   raise ActionController::RoutingError.new(msg)
-      # end
     else
       @intellectual_object ||= IntellectualObject.readable(current_user).find(params[:id])
     end
@@ -380,23 +381,23 @@ class IntellectualObjectsController < ApplicationController
     params[:state] = 'A' if params[:state].nil?
     parameter_deprecation
     @intellectual_objects = @intellectual_objects
-                                .with_institution(params[:institution])
-                                .with_description_like(params[:description])
-                                .with_identifier_like(params[:identifier])
-                                .with_bag_group_identifier_like(params[:bag_group_identifier])
-                                .with_alt_identifier_like(params[:alt_identifier])
-                                .with_bag_name_like(params[:bag_name])
-                                .with_etag_like(params[:etag])
-                                .created_before(params[:created_before])
-                                .created_after(params[:created_after])
-                                .updated_before(params[:updated_before])
-                                .updated_after(params[:updated_after])
-                                .with_access(params[:access])
-                                .with_file_format(params[:file_format])
-                                .with_state(params[:state])
-                                .with_source_organization_like(params[:source_organization])
-                                .with_internal_sender_identifier_like(params[:internal_sender_identifier])
-                                .with_internal_sender_description_like(params[:internal_sender_description])
+                              .with_institution(params[:institution])
+                              .with_description_like(params[:description])
+                              .with_identifier_like(params[:identifier])
+                              .with_bag_group_identifier_like(params[:bag_group_identifier])
+                              .with_alt_identifier_like(params[:alt_identifier])
+                              .with_bag_name_like(params[:bag_name])
+                              .with_etag_like(params[:etag])
+                              .created_before(params[:created_before])
+                              .created_after(params[:created_after])
+                              .updated_before(params[:updated_before])
+                              .updated_after(params[:updated_after])
+                              .with_access(params[:access])
+                              .with_file_format(params[:file_format])
+                              .with_state(params[:state])
+                              .with_source_organization_like(params[:source_organization])
+                              .with_internal_sender_identifier_like(params[:internal_sender_identifier])
+                              .with_internal_sender_description_like(params[:internal_sender_description])
     @selected = {}
 
     # Don't run counts for API requests

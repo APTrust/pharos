@@ -15,7 +15,7 @@ describe 'intellectual_objects/show.html.erb' do
 
   describe 'A user with access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, destroy?: true, restore?: true, send_to_dpn?: true)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: true, destroy?: true, restore?: true)
       render
     end
 
@@ -26,13 +26,12 @@ describe 'intellectual_objects/show.html.erb' do
     it 'has a links for manipulating the object' do
       rendered.should have_link('Delete', href: intellectual_object_path(object))
       rendered.should have_link('Restore Object', href: intellectual_object_restore_path(object))
-      rendered.should have_link('Send Object To DPN', href: intellectual_object_send_to_dpn_path(object))
     end
   end
 
   describe 'A user without access' do
     before do
-      allow(view).to receive(:policy).and_return double(show?: true, edit?: false, destroy?: false, restore?: false, send_to_dpn?: false)
+      allow(view).to receive(:policy).and_return double(show?: true, edit?: false, destroy?: false, restore?: false)
       render
     end
 

@@ -4,7 +4,7 @@
       <span class="input-group-addon">
         <label for="search_field" class="sr-only">Search</label>
         <% if current_user.admin? %>
-            <%= select_tag :object_type, options_for_select(['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events', 'DPN Items'], params[:object_type]), onchange: 'configureDropDownLists();' %>
+            <%= select_tag :object_type, options_for_select(['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events'], params[:object_type]), onchange: 'configureDropDownLists();' %>
         <% else %>
             <%= select_tag :object_type, options_for_select(['Intellectual Objects', 'Generic Files', 'Work Items', 'Premis Events'], params[:object_type]), onchange: 'configureDropDownLists();' %>
         <% end %>

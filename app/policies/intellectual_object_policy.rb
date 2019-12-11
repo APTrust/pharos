@@ -75,10 +75,6 @@ class IntellectualObjectPolicy < ApplicationPolicy
     user.admin? || (user.institutional_admin? && user.institution_id == record.institution.id)
   end
 
-  def dpn?
-    user.admin? || (user.institutional_admin? && user.institution_id == record.institution.id)
-  end
-
   class Scope
     attr_reader :user, :scope
 

@@ -72,8 +72,7 @@ module Pharos
         'fixity' => 'Fixity Check',
         'restore' => 'Restore',
 		'glacier_restore' => 'Glacier Restore',
-        'delete' => 'Delete',
-        'dpn' => 'DPN'
+        'delete' => 'Delete'
     }
 
     PHAROS_EVENT_TYPES = {
@@ -99,30 +98,104 @@ module Pharos
 
     PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR Glacier-Deep-VA Glacier-Deep-OH Glacier-Deep-OR)
 
-    DPN_TASKS = %w(sync ingest replication restore fixity)
-
-    DPN_STATUS = false
-    DPN_SIZE_LIMIT = 2199023255552 # 2TB
-
     APTRUST_NAME = 'APTrust'
     APTRUST_ID = 'aptrust.org'
 
     VALID_DOMAINS = %w(com edu org museum)
 
-    PARAMS_HASH = [:page, :sort, :item_action, :institution, :stage, :status, :access, :file_format, :object_association,
-                   :file_association, :type, :state, :event_type, :outcome, :q, :search_field, :object_type,
-                   :institution_identifier, :name_contains, :name_exact, :method, :bag_date, :name, :etag, :etag_contains,
-                   :updated_since, :node, :needs_admin_review, :not_checked_since, :identifier_like, :per_page, :utf8,
-                   :authenticity_token, :remote_node, :queued, :file_identifier, :generic_file_id, :intellectual_object_id,
-                   :object_identifier, :format, :institution_id, :type, :member_institution_id, :requesting_user_id,
-                   :confirmation_token, :dpn_identifier, :dpn_size, :node_1, :node_2, :node_3, :dpn_created_at, :dpn_updated_at,
-                   :bag_group_identifier, :storage_option, :dpn_identifer, :created_before, :created_after, :updated_before,
-                   :updated_after, :task, :identifier, :retry, :pid, :queued_before, :queued_after, :completed_before,
-                   :completed_after, :is_completed, :is_not_completed, :object_identifier_contains, :file_identifier_contains,
-                   :node_not_empty, :node_empty, :file_identifier_like, :object_identifier_like, :event_identifier, :created_at,
-                   :uri, :etag_like, :bag_name, :bag_name_like, :alt_identifier, :alt_identifier_like, :bag_group_identifier,
-                   :bag_group_identifier_like, :description, :description_like, :pid_empty, :pid_not_empty, :include_relations,
-                   :include_checksums, :include_events, :api, :v2]
+    # What's this? List of all params allowed throughout entire app?
+    # If so, it's an antipattern and a security risk.
+    PARAMS_HASH = [
+      :access,
+      :alt_identifier,
+      :alt_identifier_like,
+      :api,
+      :authenticity_token,
+      :bag_date,
+      :bag_group_identifier,
+      :bag_group_identifier,
+      :bag_group_identifier_like,
+      :bag_name,
+      :bag_name_like,
+      :completed_after,
+      :completed_before,
+      :confirmation_token,
+      :created_after,
+      :created_at,
+      :created_before,
+      :description,
+      :description_like,
+      :etag,
+      :etag_contains,
+      :etag_like,
+      :event_identifier,
+      :event_type,
+      :file_association,
+      :file_format,
+      :file_identifier,
+      :file_identifier_contains,
+      :file_identifier_like,
+      :format,
+      :generic_file_id,
+      :identifier,
+      :identifier_like,
+      :include_checksums,
+      :include_events,
+      :include_relations,
+      :institution,
+      :institution_id,
+      :institution_identifier,
+      :intellectual_object_id,
+      :is_completed,
+      :is_not_completed,
+      :item_action,
+      :member_institution_id,
+      :method,
+      :name,
+      :name_contains,
+      :name_exact,
+      :needs_admin_review,
+      :node,
+      :node_1,
+      :node_2,
+      :node_3,
+      :node_empty,
+      :node_not_empty,
+      :not_checked_since,
+      :object_association,
+      :object_identifier,
+      :object_identifier_contains,
+      :object_identifier_like,
+      :object_type,
+      :outcome,
+      :page,
+      :per_page,
+      :pid,
+      :pid_empty,
+      :pid_not_empty,
+      :q,
+      :queued,
+      :queued_after,
+      :queued_before,
+      :remote_node,
+      :requesting_user_id,
+      :retry,
+      :search_field,
+      :sort,
+      :stage,
+      :state,
+      :status,
+      :storage_option,
+      :task,
+      :type,
+      :type,
+      :updated_after,
+      :updated_before,
+      :updated_since,
+      :uri,
+      :utf8,
+      :v2
+    ]
 
     if Rails.env.production?
       NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'

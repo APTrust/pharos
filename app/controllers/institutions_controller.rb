@@ -3,9 +3,22 @@ class InstitutionsController < ApplicationController
   inherit_resources
   skip_before_action :verify_authenticity_token, only: [:trigger_bulk_delete]
   before_action :authenticate_user!
-  before_action :load_institution, only: [:edit, :update, :show, :destroy, :single_snapshot, :deactivate, :reactivate,
-                                          :trigger_bulk_delete, :partial_confirmation_bulk_delete, :final_confirmation_bulk_delete,
-                                          :finished_bulk_delete, :enable_otp, :disable_otp, :mass_forced_password_update]
+  before_action :load_institution, only: [
+                  :deactivate,
+                  :destroy,
+                  :disable_otp,
+                  :edit,
+                  :enable_otp,
+                  :final_confirmation_bulk_delete,
+                  :finished_bulk_delete,
+                  :mass_forced_password_update,
+                  :partial_confirmation_bulk_delete,
+                  :reactivate,
+                  :show,
+                  :single_snapshot,
+                  :trigger_bulk_delete,
+                  :update,
+                ]
   respond_to :json, :html
   after_action :verify_authorized, except: :index
   after_action :verify_policy_scoped, only: :index
@@ -329,7 +342,7 @@ class InstitutionsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def build_resource_params
-    params[:action] == 'new' ? [] : [params.require(:institution).permit(:name, :identifier, :dpn_uuid, :type, :member_institution_id)]
+    params[:action] == 'new' ? [] : [params.require(:institution).permit(:name, :identifier, :type, :member_institution_id)]
   end
 
   def set_recent_objects

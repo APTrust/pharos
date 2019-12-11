@@ -54,16 +54,6 @@
       <dd><%= @intellectual_object.alt_identifier %></dd>
       <dt>Storage Type</dt>
       <dd><%= @intellectual_object.storage_option %></dd>
-      <dt>DPN Status</dt>
-      <% if @intellectual_object.in_dpn? %>
-          <% if @intellectual_object.dpn_bag.nil? %>
-              <dd>Item is in DPN but DPN Bag information is not yet available, please check back later.</dd>
-          <% else %>
-              <dd>Item is in DPN with id <%= link_to @intellectual_object.dpn_uuid, dpn_bag_path(id: @intellectual_object.dpn_bag.id) %></dd>
-          <% end %>
-      <% else %>
-          <dd>Item does not reside in DPN.</dd>
-      <% end %>
       <% if @intellectual_object.state == 'D' %>
           <dt><i><b>State</b></i></dt>
           <dd><i>This object has been deleted.</i></dd>
@@ -85,11 +75,6 @@
         <% if current_user.admin? || (current_user.institutional_admin? && current_user.institution_id == @intellectual_object.institution_id) %>
             <%= link_to intellectual_object_restore_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal'} do %>
                 <i class="glyphicon glyphicon-download"></i> Restore Object
-            <% end %>
-            <% if (Pharos::Application.config.show_send_to_dpn_button == true && @intellectual_object.in_dpn? == false && @intellectual_object.too_big? == false && @intellectual_object.glacier_only? == false)%>
-                <%= link_to intellectual_object_send_to_dpn_path(@intellectual_object.identifier), {class: 'btn doc-action-btn btn-normal', id: 'dpn-button'} do %>
-                    <i class="glyphicon glyphicon-send dpn"></i> Send Object To DPN
-                <% end %>
             <% end %>
             <%= destroy_link(@intellectual_object) %>
         <% end %>

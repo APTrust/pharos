@@ -28,7 +28,6 @@ Rails.application.routes.draw do
   object_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%|\/)[\w\-\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
   resources :intellectual_objects, only: [:show, :edit, :update, :destroy], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'objects'
   get 'objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_restore
-  get 'objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_send_to_dpn
   get 'objects', to: 'intellectual_objects#index', format: [:json, :html]
   get 'objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :intellectual_objects
   resources :intellectual_objects, only: [:show, :update, :destroy], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/objects'
@@ -38,8 +37,6 @@ Rails.application.routes.draw do
   get 'member-api/v2/objects/:institution_identifier', to: 'intellectual_objects#index', format: [:json, :html], institution_identifier: institution_ptrn
   get 'member-api/v2/objects/', to: 'intellectual_objects#index', format: [:json, :html]
   get 'member-api/v2/objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: :json, intellectual_object_identifier: object_ptrn
-  put 'member-api/v2/objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: :json, intellectual_object_identifier: object_ptrn
-  put 'api/v2/objects/:intellectual_object_identifier/dpn', to: 'intellectual_objects#send_to_dpn', format: :json, intellectual_object_identifier: object_ptrn
   put 'api/v2/objects/:intellectual_object_identifier/restore', to: 'intellectual_objects#restore', format: :json, intellectual_object_identifier: object_ptrn
   delete 'api/v2/objects/:intellectual_object_identifier/delete', to: 'intellectual_objects#destroy', format: :json, intellectual_object_identifier: object_ptrn
   delete 'objects/:intellectual_object_identifier/confirm_delete', to: 'intellectual_objects#confirm_destroy', format: [:html, :json], intellectual_object_identifier: object_ptrn, as: :object_confirm_destroy
@@ -98,7 +95,6 @@ Rails.application.routes.draw do
   resources :work_items, only: [:index], path: 'member-api/v2/items', format: [:json, :html]
   get '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#show', as: :work_item_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
   put '/api/v2/items/:etag/:name/:bag_date', to: 'work_items#update', format: 'json', as: :work_item_api_update_by_etag, name: /[^\/]*/, bag_date: /[^\/]*/
-  get 'items/items_for_dpn', to: 'work_items#items_for_dpn', format: :json
   get 'items/items_for_restore', to: 'work_items#items_for_restore', format: :json
   get 'items/items_for_delete', to: 'work_items#items_for_delete', format: :json
   get 'items/ingested_since', to: 'work_items#ingested_since', format: :json
@@ -141,16 +137,6 @@ Rails.application.routes.draw do
   # ALERT ROUTES
   get 'alerts/', to: 'alerts#index', format: [:json, :html], as: :alerts
   get 'alerts/summary', to: 'alerts#summary', format: [:json, :html], as: :alerts_summary
-
-  # DPN WORK ITEM ROUTES
-  resources :dpn_work_items, path: 'dpn_items', only: [:index, :show], format: :html
-  resources :dpn_work_items, path: 'api/v2/dpn_items', only: [:index, :create, :show, :update], format: :json
-  get 'dpn_items/:id/requeue', to: 'dpn_work_items#requeue', format: [:json, :html], as: :requeue_dpn_item
-
-  # DPN BAG ROUTES
-  resources :dpn_bags, path: 'dpn_bags', only: [:index, :show], format: [:json, :html]
-  resources :dpn_bags, path: 'api/v2/dpn_bags', only: [:index, :create, :show, :update], format: :json
-  resources :dpn_bags, path: 'member-api/v2/dpn_bags', only: [:index, :show], format: :json
 
   # EMAIL ROUTES
   resources :emails, path: 'email_logs', only: [:index, :show], format: [:json]

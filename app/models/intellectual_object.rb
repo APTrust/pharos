@@ -135,19 +135,9 @@ class IntellectualObject < ActiveRecord::Base
     return false
   end
 
-  def in_dpn?
-    (self.dpn_uuid.nil? || self.dpn_uuid.blank? || self.dpn_uuid.empty?) ? object_in_dpn = false : object_in_dpn = true
-    object_in_dpn
-  end
-
   def glacier_only?
     (self.storage_option == 'Standard') ? glacier_only = false : glacier_only = true
     glacier_only
-  end
-
-  def dpn_bag
-    bag = DpnBag.where(object_identifier: self.identifier).first
-    bag
   end
 
   def gf_count
@@ -184,11 +174,6 @@ class IntellectualObject < ActiveRecord::Base
     (generic_files.count == generic_files.where(state: 'D').count) ? true : false
   end
 
-  def too_big?
-    total_size = self.generic_files.sum(:size)
-    (total_size > Pharos::Application::DPN_SIZE_LIMIT) ? true : false
-  end
-
   def serializable_hash (options={})
     data = super(options)
     data.delete('ingest_state')
@@ -201,7 +186,6 @@ class IntellectualObject < ActiveRecord::Base
       end
     end
     data.merge(
-        in_dpn: in_dpn?,
         file_count: gf_count,
         file_size: gf_size,
         institution: self.institution.identifier

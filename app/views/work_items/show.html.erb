@@ -31,10 +31,6 @@
               <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', remote: true, onclick: 'ingestRequeue();' do %>
                   <i class="glyphicon glyphicon-repeat"></i> Requeue
               <% end %>
-          <% elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['dpn'] %>
-              <%= link_to '#', id: 'requeue-btn', class: 'btn doc-action-btn btn-normal requeue-link', onclick: 'dpnRequeue();' do %>
-                  <i class="glyphicon glyphicon-repeat"></i> Requeue
-              <% end %>
           <% end %>
         <% end %>
     <% end %>
@@ -42,7 +38,6 @@
     <%= render 'ingest_requeue_form' %>
     <%= render 'restore_requeue_form' %>
     <%= render 'glacier_restore_requeue_form' %>
-    <%= render 'dpn_requeue_form' %>
   </section>
 
   <section class="queue">

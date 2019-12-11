@@ -41,7 +41,6 @@ Rails.application.configure do
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
-  config.show_send_to_dpn_button = true
 
   # Log debug messages, because we're testing.
   config.colorize_logging = false

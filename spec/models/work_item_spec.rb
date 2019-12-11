@@ -3,7 +3,6 @@ require 'spec_helper'
 ingest = Pharos::Application::PHAROS_ACTIONS['ingest']
 delete = Pharos::Application::PHAROS_ACTIONS['delete']
 restore = Pharos::Application::PHAROS_ACTIONS['restore']
-dpn = Pharos::Application::PHAROS_ACTIONS['dpn']
 requested = Pharos::Application::PHAROS_STAGES['requested']
 receive = Pharos::Application::PHAROS_STAGES['receive']
 record = Pharos::Application::PHAROS_STAGES['record']
@@ -193,13 +192,6 @@ RSpec.describe WorkItem, :type => :model do
     subject.action.should == Pharos::Application::PHAROS_ACTIONS['ingest']
     subject.stage.should ==  Pharos::Application::PHAROS_STAGES['receive']
 
-    subject.status = Pharos::Application::PHAROS_STATUSES['fail']
-    subject.action = Pharos::Application::PHAROS_ACTIONS['dpn']
-    subject.stage = Pharos::Application::PHAROS_STAGES['validate']
-    subject.requeue_item(stage: Pharos::Application::PHAROS_STAGES['package'])
-    subject.status.should == Pharos::Application::PHAROS_STATUSES['pend']
-    subject.action.should == Pharos::Application::PHAROS_ACTIONS['dpn']
-    subject.stage.should ==  Pharos::Application::PHAROS_STAGES['requested']
   end
 
   describe 'work queue methods' do
@@ -281,23 +273,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.id.should_not be_nil
     end
 
-    it 'should create a dpn request when asked' do
-      wi = WorkItem.create_dpn_request('abc/123', 'mikey@example.com')
-      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
-      wi.action.should == Pharos::Application::PHAROS_ACTIONS['dpn']
-      wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
-      wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
-      wi.note.should == 'Requested item be sent to DPN'
-      wi.outcome.should == 'Not started'
-      wi.user.should == 'mikey@example.com'
-      wi.retry.should == true
-      wi.work_item_state.state.should be_nil
-      wi.node.should be_nil
-      wi.pid.should == 0
-      wi.needs_admin_review.should == false
-      wi.id.should_not be_nil
-    end
-
     it 'should create a delete request when asked' do
       wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com', 'jeremy@example.com', 'joyce@example.com')
       wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
@@ -369,19 +344,6 @@ RSpec.describe WorkItem, :type => :model do
       pending_action = WorkItem.pending_action(subject.object_identifier)
       pending_action.should_not be_nil
       pending_action.action.should == delete
-    end
-
-    it 'should find pending DPN request' do
-      setup_item(subject)
-      subject.action = dpn
-      subject.stage = record
-      subject.status = pending
-      subject.object_identifier = 'abc/123'
-      subject.save!
-
-      pending_action = WorkItem.pending_action(subject.object_identifier)
-      pending_action.should_not be_nil
-      pending_action.action.should == dpn
     end
 
     it 'should find ingest by name, etag, bag_date' do

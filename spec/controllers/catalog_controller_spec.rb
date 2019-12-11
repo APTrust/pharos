@@ -11,7 +11,6 @@ RSpec.describe CatalogController, type: :controller do
     IntellectualObject.delete_all
     WorkItem.delete_all
     PremisEvent.delete_all
-    DpnWorkItem.delete_all
     User.delete_all
     Institution.delete_all
 
@@ -45,10 +44,6 @@ RSpec.describe CatalogController, type: :controller do
     @event_four = FactoryBot.create(:premis_event_fixity_check, intellectual_object: @object_four)
     @event_five = FactoryBot.create(:premis_event_ingest, intellectual_object: @object_five, generic_file: @file_five)
     @event_six = FactoryBot.create(:premis_event_identifier_fail, intellectual_object: @object_six, generic_file: @file_six)
-
-    @dpn_one = FactoryBot.create(:dpn_work_item, identifier: '1234-5678', remote_node: 'hathi', status: 'Success', stage: 'Record')
-    @dpn_two = FactoryBot.create(:dpn_work_item, remote_node: 'sdr', status: 'Cancelled', stage: 'Store', retry: false)
-    @dpn_three = FactoryBot.create(:dpn_work_item, remote_node: 'sdr', queued_at: nil, status: 'Success', stage: 'Store')
   end
 
   after(:all) do
@@ -56,7 +51,6 @@ RSpec.describe CatalogController, type: :controller do
     IntellectualObject.delete_all
     WorkItem.delete_all
     PremisEvent.delete_all
-    DpnWorkItem.delete_all
     User.delete_all
     Institution.delete_all
   end
@@ -203,53 +197,6 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).map &:id).to match_array [@event_three.id]
           end
         end
-
-        describe 'for dpn item searches' do
-          it 'should match a search on an item identifier' do
-            get :search, params: { q: @dpn_one.identifier, search_field: 'Item Identifier', object_type: 'DPN Items' }
-            expect(assigns(:paged_results).size).to eq 1
-            expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id]
-          end
-
-          it 'should bring back all results when the query is generic' do
-            get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items' }
-            expect(assigns(:paged_results).size).to eq 3
-            expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id, @dpn_two.id, @dpn_three.id]
-          end
-
-          describe 'with filtering' do
-            it 'should filter results by remote node' do
-              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', remote_node: 'hathi' }
-              expect(assigns(:paged_results).size).to eq 1
-              expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id]
-            end
-
-            it 'should filter results by queued status' do
-              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', queued: 'is_queued' }
-              expect(assigns(:paged_results).size).to eq 2
-              expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id, @dpn_two.id]
-            end
-
-            it 'should filter results by status' do
-              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', status: 'Success' }
-              expect(assigns(:paged_results).size).to eq 2
-              expect(assigns(:paged_results).map &:id).to match_array [@dpn_one.id, @dpn_three.id]
-            end
-
-            it 'should filter results by stage' do
-              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', stage: 'Store' }
-              expect(assigns(:paged_results).size).to eq 2
-              expect(assigns(:paged_results).map &:id).to match_array [@dpn_two.id, @dpn_three.id]
-            end
-
-            it 'should filter results by retry' do
-              get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items', retry: false }
-              expect(assigns(:paged_results).size).to eq 1
-              expect(assigns(:paged_results).map &:id).to match_array [@dpn_two.id]
-            end
-          end
-        end
-
       end
 
       describe 'as an institutional admin user' do
@@ -310,14 +257,6 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).size).to eq 0
           end
         end
-
-        describe 'for dpn item searches' do
-          it 'should not return results that you do not have access to' do
-            get :search, params: { q: '*', search_field: 'Item Identifier', object_type: 'DPN Items' }
-            expect(assigns(:paged_results).size).to eq 0
-          end
-        end
-
       end
 
       describe 'as an institutional user' do

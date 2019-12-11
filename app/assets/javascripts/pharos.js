@@ -33,10 +33,8 @@ function tabbed_nav(controller) {
         "generic_files": function () { activateNavTab('gf_tab'); },
         "work_items": function () { activateNavTab('wi_tab'); },
         "premis_events": function () { activateNavTab('pe_tab'); },
-        "dpn_work_items": function () { activateNavTab('dpn_tab'); },
         "reports": function () { activateNavTab('rep_tab'); },
         "alerts": function () { activateNavTab('alert_tab'); },
-        "dpn_bags": function () { activateNavTab('dpn_bag_tab'); },
         "catalog": function () {},
         "devise/password_expired": function () {},
         "users": function () {}

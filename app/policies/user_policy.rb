@@ -81,14 +81,6 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
-  def nil_dpn_bag?
-    true
-  end
-
-  def dpn_bag_create?
-    user.admin?
-  end
-
   def object_create?
     user.admin?
   end
@@ -118,14 +110,6 @@ class UserPolicy < ApplicationPolicy
   end
 
   def checksum_index?
-    user.admin?
-  end
-
-  def dpn_show?
-    user.admin?
-  end
-
-  def dpn_index?
     user.admin?
   end
 

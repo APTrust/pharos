@@ -93,7 +93,7 @@ class WorkItem < ActiveRecord::Base
     item = WorkItem
       .where('object_identifier = ? ' +
              'and status not in (?, ?, ?) ' +
-             'and action in (?, ?, ?, ?, ?)',
+             'and action in (?, ?, ?, ?)',
              intellectual_object_identifier,
              Pharos::Application::PHAROS_STATUSES['success'],
              Pharos::Application::PHAROS_STATUSES['fail'],
@@ -101,7 +101,6 @@ class WorkItem < ActiveRecord::Base
              Pharos::Application::PHAROS_ACTIONS['ingest'],
              Pharos::Application::PHAROS_ACTIONS['restore'],
              Pharos::Application::PHAROS_ACTIONS['delete'],
-             Pharos::Application::PHAROS_ACTIONS['dpn'],
              Pharos::Application::PHAROS_ACTIONS['glacier_restore'])
       .order('date DESC')
       .limit(1)
@@ -112,15 +111,14 @@ class WorkItem < ActiveRecord::Base
     item = WorkItem
                .where('generic_file_identifier = ? ' +
                           'and status not in (?, ?, ?) ' +
-                          'and action in (?, ?, ?, ?)',
+                          'and action in (?, ?, ?)',
                       generic_file_identifier,
                       Pharos::Application::PHAROS_STATUSES['success'],
                       Pharos::Application::PHAROS_STATUSES['fail'],
                       Pharos::Application::PHAROS_STATUSES['cancel'],
                       Pharos::Application::PHAROS_ACTIONS['ingest'],
                       Pharos::Application::PHAROS_ACTIONS['restore'],
-                      Pharos::Application::PHAROS_ACTIONS['delete'],
-                      Pharos::Application::PHAROS_ACTIONS['dpn'])
+                      Pharos::Application::PHAROS_ACTIONS['delete'])
                .order('date DESC')
                .limit(1)
                .first
@@ -158,18 +156,6 @@ class WorkItem < ActiveRecord::Base
           self.stage = Pharos::Application::PHAROS_STAGES['record']
           self.note = 'Item is pending record'
         end
-      end
-    elsif self.action == Pharos::Application::PHAROS_ACTIONS['dpn']
-      if options[:stage] == Pharos::Application::PHAROS_STAGES['package']
-        self.stage = Pharos::Application::PHAROS_STAGES['requested']
-        self.note = 'Requested item be sent to DPN'
-        self.work_item_state.delete if self.work_item_state
-      elsif options[:stage] == Pharos::Application::PHAROS_STAGES['store']
-        self.stage = Pharos::Application::PHAROS_STAGES['store']
-        self.note = 'Packaging completed, awaiting storage'
-      elsif options[:stage] == Pharos::Application::PHAROS_STAGES['record']
-        self.stage = Pharos::Application::PHAROS_STAGES['record']
-        self.note = 'Bag copied to long-term storage'
       end
     end
     self.save!
@@ -294,31 +280,6 @@ class WorkItem < ActiveRecord::Base
     restore_item.queued_at = nil
     restore_item.save!
     restore_item
-  end
-
-  def self.create_dpn_request(intellectual_object_identifier, requested_by)
-    item = WorkItem.last_ingested_version(intellectual_object_identifier)
-    if item.nil?
-      raise ActiveRecord::RecordNotFound
-    end
-    dpn_item = item.dup
-    dpn_item.action = Pharos::Application::PHAROS_ACTIONS['dpn']
-    dpn_item.stage = Pharos::Application::PHAROS_STAGES['requested']
-    dpn_item.status = Pharos::Application::PHAROS_STATUSES['pend']
-    dpn_item.note = 'Requested item be sent to DPN'
-    dpn_item.outcome = 'Not started'
-    dpn_item.user = requested_by
-    dpn_item.retry = true
-    dpn_item.date = Time.now
-    dpn_item.work_item_state.state = nil unless dpn_item.work_item_state.nil?
-    dpn_item.node = nil
-    dpn_item.pid = 0
-    dpn_item.needs_admin_review = false
-    dpn_item.size = item.size
-    dpn_item.stage_started_at = nil
-    dpn_item.queued_at = nil
-    dpn_item.save!
-    dpn_item
   end
 
   # Creates a WorkItem record showing that someone has requested

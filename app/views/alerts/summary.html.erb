@@ -11,12 +11,6 @@
     <dd><%= @alerts_summary[:failed_restoration_count] %></dd>
     <dt>Failed Deletions</dt>
     <dd><%= @alerts_summary[:failed_deletion_count] %></dd>
-    <dt>Failed DPN Ingests</dt>
-    <dd><%= @alerts_summary[:failed_dpn_ingest_count] %></dd>
-    <% if current_user.admin? %>
-        <dt>Stalled DPN Replications</dt>
-        <dd><%= @alerts_summary[:stalled_dpn_replication_count] %></dd>
-    <% end %>
     <dt>Stalled Work Items</dt>
     <dd><%= @alerts_summary[:stalled_work_item_count] %></dd>
   </dl>

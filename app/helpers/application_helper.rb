@@ -117,24 +117,6 @@ module ApplicationHelper
 
   end
 
-  def dpn_process_time(item)
-    if item.completed_at && item.queued_at
-      process_time = ((item.completed_at.to_f - item.queued_at.to_f) / 1.hour).round(2)
-      if process_time == 1
-        process_final = '1 hour'
-      else
-        process_final = "#{process_time} hours"
-      end
-    elsif item.completed_at.nil? && item.queued_at.nil?
-      process_final = 'N/A'
-    elsif item.completed_at.nil?
-      process_final = 'In Progress'
-    elsif item.queued_at.nil?
-      process_final = 'Item is Magic'
-    end
-    process_final
-  end
-
   def format_boolean_as_yes_no(boolean)
     if boolean == 'true'
       return 'Yes'
@@ -207,15 +189,6 @@ module ApplicationHelper
                                                                              :object_identifier_contains, :file_identifier,
                                                                              :file_identifier_contains, :queued, :node, :pid, :node_not_empty,
                                                                              :node_empty, :retry, :pid_empty, :pid_not_empty))
-      when 'dpn_work_items'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :task, :identifier, :stage,
-                                                                             :status, :state, :retry, :pid, :queued_before, :queued_after,
-                                                                             :completed_before, :completed_after, :is_completed,
-                                                                             :is_not_completed, :remote_node, :queued))
-      when 'dpn_bags'
-        url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :object_identifer,
-                                                                             :dpn_identifer, :created_before, :created_after,
-                                                                             :updated_before, :updated_after))
     end
     url
   end
