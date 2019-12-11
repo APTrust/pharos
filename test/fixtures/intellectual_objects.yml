@@ -11,7 +11,6 @@ inst1_obj1:
   institution: inst1
   state: A
   etag: etagforinst1photos
-  dpn_uuid:
   source_organization: Institution One
   bagit_profile_identifier: https://example.com/profile.json
 
@@ -25,7 +24,6 @@ inst1_obj2:
   institution: inst1
   state: A
   etag: etagforinst1pdfs
-  dpn_uuid:
   source_organization: Institution One
   bagit_profile_identifier: https://example.com/profile.json
 
@@ -39,7 +37,6 @@ inst1_obj3:
   institution: inst1
   state: A
   etag: etagforinst1glass
-  dpn_uuid: 5a6e3789-1a43-4681-9309-38bef7fce77e
   source_organization: Institution One
   bagit_profile_identifier: https://example.com/profile.json
 
@@ -53,7 +50,6 @@ inst2_obj1:
   institution: inst2
   state: A
   etag: etagforinst2chocolate
-  dpn_uuid:
   source_organization: Institution Two
   bagit_profile_identifier: https://example.com/profile.json
 
@@ -67,7 +63,6 @@ inst2_obj2:
   institution: inst2
   state: A
   etag: etagforinst2coal
-  dpn_uuid:
   source_organization: Institution Two
   bagit_profile_identifier: https://example.com/profile.json
 
@@ -81,6 +76,5 @@ inst2_obj3:
   institution: inst2
   state: A
   etag: etagforinst2toads
-  dpn_uuid: 7813f3f4-9813-41ce-a527-b0f6873f50d2
   source_organization: Institution Two
   bagit_profile_identifier: https://example.com/profile.json
