@@ -90,7 +90,7 @@ end
 #
 # The default is "0".
 #
-workers 3
+workers 2
 
 # Code to run when a worker boots to setup the process before booting
 # the app.
