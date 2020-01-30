@@ -41,7 +41,8 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    alt_identifier: 'test.edu/some-bag',
                                    created_at: '2011-10-10T10:00:00Z',
                                    updated_at: '2011-10-10T10:00:00Z',
-                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec3') }
+                                   etag: '4d05dc2aa07e411a55ef11bc6ade5ec3',
+                                   internal_sender_identifier: '31337') }
   let!(:file1) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj2) }
   let!(:event1) { FactoryBot.create(:premis_event_ingest,
@@ -147,37 +148,37 @@ RSpec.describe IntellectualObjectsController, type: :controller do
           get :index, params: { description: 'Founded in Aberdeen in 1928.' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { description: 'Aberdeen' }
+          get :index, params: { description_like: 'Aberdeen' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { identifier: 'test.edu/baggie?c=152' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { identifier: 'baggie' }
+          get :index, params: { identifier_like: 'baggie' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { alt_identifier: 'test.edu/some-bag' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { alt_identifier: 'some-bag' }
+          get :index, params: { alt_identifier_like: 'some-bag' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
           get :index, params: { bag_group_identifier: 'This is a collection.' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { bag_group_identifier: 'collection' }
+          get :index, params: { bag_group_identifier_like: 'collection' }
           expect(assigns(:intellectual_objects).size).to eq 2
 
           get :index, params: { source_organization: 'University of Colorado' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { source_organization: 'Colorado' }
+          get :index, params: { source_organization_like: 'Colorado' }
           expect(assigns(:intellectual_objects).size).to eq 2
 
           get :index, params: { internal_sender_identifier: '1234-5678-9018-8362' }
           expect(assigns(:intellectual_objects).size).to eq 1
 
-          get :index, params: { internal_sender_identifier: '9018' }
+          get :index, params: { internal_sender_identifier_like: '9018' }
           expect(assigns(:intellectual_objects).size).to eq 2
 
           get :index, params: { internal_sender_description: 'This is a paragraph. Of sorts.' }

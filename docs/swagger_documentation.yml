@@ -1004,36 +1004,78 @@ paths:
             type: string
           description: "List of Objects belonging to a particular institution."
           required: true
+        - name: bag_group_identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact bag group identifier.
+        - name: bag_group_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose bag group identifier contain the string.
         - name: description
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact description  or Intellectual Objects with the fragment of the description provided.
+            Return only the Intellectual Objects with this exact description.
+        - name: description_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose description contain the specified string.
         - name: identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact identifier  or Intellectual Objects with the fragment of the identifier provided.
+            Return only the Intellectual Objects with this exact identifier.
+        - name: identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose identifier contains the string.
         - name: alt_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact alternative identifier  or Intellectual Objects with the fragment of the alternative identifier provided.
+            Return only the Intellectual Objects with this exact alternate identifier.
+        - name: alt_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose alternate identifier contains this string.
         - name: etag
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact etag  or Intellectual Objects with the fragment of the etag provided.
+            Return only the Intellectual Objects with this exact etag.
+        - name: etag_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose etags contain this string.
         - name: bag_name
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Object with this exact bag name  or Intellectual Objects with the fragment of the bag name provided.
+            Return only the Intellectual Object with this exact bag name.
+        - name: bag_name_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose bag names contain this string.
         - name: created_before
           in: query
           schema:

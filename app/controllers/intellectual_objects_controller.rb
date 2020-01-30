@@ -379,15 +379,20 @@ class IntellectualObjectsController < ApplicationController
 
   def filter_count_and_sort
     params[:state] = 'A' if params[:state].nil?
-    parameter_deprecation
     @intellectual_objects = @intellectual_objects
                               .with_institution(params[:institution])
-                              .with_description_like(params[:description])
-                              .with_identifier_like(params[:identifier])
-                              .with_bag_group_identifier_like(params[:bag_group_identifier])
-                              .with_alt_identifier_like(params[:alt_identifier])
-                              .with_bag_name_like(params[:bag_name])
-                              .with_etag_like(params[:etag])
+                              .with_description(params[:description])
+                              .with_description_like(params[:description_like])
+                              .with_identifier(params[:identifier])
+                              .with_identifier_like(params[:identifier_like])
+                              .with_bag_group_identifier(params[:bag_group_identifier])
+                              .with_bag_group_identifier_like(params[:bag_group_identifier_like])
+                              .with_alt_identifier(params[:alt_identifier])
+                              .with_alt_identifier_like(params[:alt_identifier_like])
+                              .with_bag_name(params[:bag_name])
+                              .with_bag_name_like(params[:bag_name_like])
+                              .with_etag(params[:etag])
+                              .with_etag_like(params[:etag_like])
                               .created_before(params[:created_before])
                               .created_after(params[:created_after])
                               .updated_before(params[:updated_before])
@@ -395,8 +400,10 @@ class IntellectualObjectsController < ApplicationController
                               .with_access(params[:access])
                               .with_file_format(params[:file_format])
                               .with_state(params[:state])
-                              .with_source_organization_like(params[:source_organization])
-                              .with_internal_sender_identifier_like(params[:internal_sender_identifier])
+                              .with_source_organization(params[:source_organization])
+                              .with_source_organization_like(params[:source_organization_like])
+                              .with_internal_sender_identifier(params[:internal_sender_identifier])
+                              .with_internal_sender_identifier_like(params[:internal_sender_identifier_like])
                               .with_internal_sender_description_like(params[:internal_sender_description])
     @selected = {}
 
@@ -418,15 +425,6 @@ class IntellectualObjectsController < ApplicationController
       when 'institution'
         @intellectual_objects = @intellectual_objects.joins(:institution).order('institutions.name')
     end
-  end
-
-  def parameter_deprecation
-    params[:identifier] = params[:identifier_like] if params[:identifier_like]
-    params[:description] = params[:description_like] if params[:description_like]
-    params[:bag_group_identifier] = params[:bag_group_identifier_like] if params[:bag_group_identifier_like]
-    params[:bag_name] = params[:bag_name_like] if params[:bag_name_like]
-    params[:alt_identifier] = params[:alt_identifier_like] if params[:alt_identifier_like]
-    params[:etag] = params[:etag_like] if params[:etag_like]
   end
 
 end
