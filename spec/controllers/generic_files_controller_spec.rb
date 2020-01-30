@@ -5,9 +5,10 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:file) { FactoryBot.create(:generic_file) }
   let(:inst_user) { FactoryBot.create(:user, :institutional_admin, institution_id: @institution.id)}
   let(:basic_user) { FactoryBot.create(:user, :institutional_user, institution_id: @institution.id)}
-  let(:crazy_file) { FactoryBot.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0') }
-  let(:question_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161') }
-  let(:parens_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf') }
+  let(:obj) { FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id) }
+  let(:crazy_file) { FactoryBot.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0', intellectual_object_id: obj.id) }
+  let(:question_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161', intellectual_object_id: obj.id) }
+  let(:parens_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf', intellectual_object_id: obj.id) }
   let(:deleted_file) { FactoryBot.create(:generic_file, state: 'D') }
 
   before(:all) do
@@ -41,6 +42,18 @@ RSpec.describe GenericFilesController, type: :controller do
       get :index, params: { intellectual_object_identifier: @intellectual_object.identifier }, format: :json
       expect(response).to be_successful
       expect(assigns(:intellectual_object)).to eq @intellectual_object
+    end
+
+    it 'returns exact matches by identifier' do
+      get :index, params: { intellectual_object_id: obj.id, identifier: question_file.identifier }, format: :json
+      expect(response).to be_successful
+      expect(assigns(:generic_files)).to eq [question_file]
+    end
+
+    it 'returns partial matches by identifier' do
+      get :index, params: { intellectual_object_id: obj.id, identifier_like: 'us_cuba_policy' }, format: :json
+      expect(response).to be_successful
+      expect(assigns(:generic_files)).to eq [question_file]
     end
 
     it 'returns only active files' do

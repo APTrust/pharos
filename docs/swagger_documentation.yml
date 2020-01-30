@@ -389,13 +389,25 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Generic Files with this exact identifier or Generic Files with the fragment of the identifier provided.
+            Return only the Generic File with this exact identifier.
+        - name: identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Generic Files whose identifier contains this string.
         - name: uri
           in: query
           schema:
             type: string
           description: >-
-             Return only the Generic Files with this exact URI or Generic Files with the fragment of the URI provided.
+             Return only the Generic Files with this exact URI.
+        - name: uri_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only the Generic Files whose URI contains this string.
         - name: file_format
           in: query
           schema:

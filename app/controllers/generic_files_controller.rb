@@ -422,10 +422,11 @@ class GenericFilesController < ApplicationController
            (!params.include? :intellectual_object_id) && (!params.include? :state)
       params[:state] = 'A' if params[:state].nil?
     end
-    parameter_deprecation
     @generic_files = @generic_files
-                       .with_identifier_like(params[:identifier])
-                       .with_uri_like(params[:uri])
+                       .with_identifier(params[:identifier])
+                       .with_identifier_like(params[:identifier_like])
+                       .with_uri(params[:uri])
+                       .with_uri_like(params[:uri_like])
                        .created_before(params[:created_before])
                        .created_after(params[:created_after])
                        .updated_before(params[:updated_before])
@@ -469,11 +470,6 @@ class GenericFilesController < ApplicationController
       ok = false
     end
     return ok
-  end
-
-  def parameter_deprecation
-    params[:identifier] = params[:identifier_like] if params[:identifier_like]
-    params[:uri] = params[:uri_like] if params[:uri_like]
   end
 
   private
