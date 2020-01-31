@@ -771,13 +771,25 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact tar file name or items with the fragment of the name provided.
+            Return only items with the exact tar file name.
+        - name: name_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items whose tar file name contains the specific string.
         - name: etag
           in: query
           schema:
             type: string
           description: >-
-            Return only items with the exact etag or items with the fragment of the etag provided.
+            Return only items with the exact etag or items.
+        - name: etag_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items whose etag contains the specified string.
         - name: bag_date
           in: query
           schema:
@@ -807,13 +819,25 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact object identifier  or items with the fragment of the object identifier provided.
+            Return only items with the exact intellectual object identifier.
+        - name: object_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items whose intellectual object identifier contains the specified string.
         - name: file_identifier
           in: query
           schema:
             type: string
           description: >-
-             Return only items with the exact file identifier specified or items with the fragment of the file identifier provided. Useful for finding all items associated with a specific file.
+             Return only items with the exact generic file identifier specified.
+        - name: file_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only items whose generic file identifier contains the specified string.
         - name: access
           in: query
           schema:

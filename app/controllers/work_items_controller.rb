@@ -432,7 +432,6 @@ class WorkItemsController < ApplicationController
     bag_date1 = DateTime.parse(params[:bag_date]) if params[:bag_date]
     bag_date2 = DateTime.parse(params[:bag_date]) + 1.seconds if params[:bag_date]
     date = format_date if params[:updated_since].present?
-    parameter_deprecation
     @items = @items
                  .created_before(params[:created_before])
                  .created_after(params[:created_after])
@@ -440,10 +439,14 @@ class WorkItemsController < ApplicationController
                  .updated_after(params[:updated_after])
                  .updated_after(date)
                  .with_bag_date(bag_date1, bag_date2)
-                 .with_name_like(params[:name])
+                 .with_name(params[:name])
+                 .with_name_like(params[:name_like])
                  .with_etag(params[:etag])
-                 .with_object_identifier_like(params[:object_identifier])
-                 .with_file_identifier_like(params[:file_identifier])
+                 .with_etag_like(params[:etag_like])
+                 .with_object_identifier(params[:object_identifier])
+                 .with_object_identifier_like(params[:object_identifier_like])
+                 .with_file_identifier(params[:file_identifier])
+                 .with_file_identifier_like(params[:file_identifier_like])
                  .with_status(params[:status])
                  .with_stage(params[:stage])
                  .with_action(params[:item_action])
@@ -477,14 +480,6 @@ class WorkItemsController < ApplicationController
       when 'institution'
         @items = @items.joins(:institution).order('institutions.name')
     end
-  end
-
-  def parameter_deprecation
-    params[:name] = params[:name_contains] if params[:name_contains]
-    params[:name] = params[:name_exact] if params[:name_exact]
-    params[:object_identifier] = params[:object_identifier_contains] if params[:object_identifier_contains]
-    params[:file_identifier] = params[:file_identifier_contains] if params[:file_identifier_contains]
-    params[:etag] = params[:etag_contains] if params[:etag_contains]
   end
 
   def check_for_completed_restoration
