@@ -26,7 +26,6 @@ class PremisEventsController < ApplicationController
       @parent = @premis_events.first.intellectual_object
     end
     params[:file_identifier] = '' if params[:file_identifier] == 'null' || params[:file_identifier] == 'blank'
-    params[:file_identifier_like] = '' if params[:file_identifier_like] == 'null' || params[:file_identifier_like] == 'blank'
     if @parent.nil?
       authorize current_user, :nil_index?
       @institution = current_user.institution
@@ -176,7 +175,6 @@ class PremisEventsController < ApplicationController
   end
 
   def filter_count_and_sort
-    parameter_deprecation
     @premis_events = @premis_events
                        .with_institution(params[:institution])
                        .with_type(params[:event_type])
@@ -187,10 +185,10 @@ class PremisEventsController < ApplicationController
                        .with_event_identifier(params[:event_identifier])
     if @parent.is_a?(Institution)
       @premis_events = @premis_events
-                         .with_object_identifier_like(params[:object_identifier])
-                         .with_file_identifier_like(params[:file_identifier])
+                         .with_object_identifier(params[:object_identifier])
+                         .with_file_identifier(params[:file_identifier])
     end
-    @premis_events = @premis_events.with_file_identifier_like(params[:file_identifier]) if @parent.is_a?(IntellectualObject)
+    @premis_events = @premis_events.with_file_identifier(params[:file_identifier]) if @parent.is_a?(IntellectualObject)
 
     # Not sure why this is declared here, but the erb templates
     # seem to use it.
@@ -237,12 +235,6 @@ class PremisEventsController < ApplicationController
       result = ActiveRecord::Base.connection.exec_query(query)
       return result[0]['row_count']
     end
-  end
-
-
-  def parameter_deprecation
-    params[:object_identifier] = params[:object_identifier_like] if params[:object_identifier_like]
-    params[:file_identifier] = params[:file_identifier_like] if params[:file_identifier_like]
   end
 
   private

@@ -102,7 +102,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided.
+          description: Return only the Premis Events with this exact generic file identifier.
         - name: outcome
           in: query
           schema:
@@ -198,12 +198,12 @@ paths:
           in: query
           schema:
             type: string
-          description: "Return only the Premis Events with this exact intellectual object identifier or Premis Events with the fragment of the identifier provided."
+          description: "Return only the Premis Events with this exact intellectual object identifier."
         - name: generic_file_identifier
           in: query
           schema:
             type: string
-          description: "Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided."
+          description: "Return only the Premis Events with this exact generic file identifier or Premis Events."
         - name: outcome
           in: query
           schema:
@@ -295,13 +295,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact intellectual object identifier or Premis Events with the fragment of the identifier provided.
+            Return only the Premis Events with this exact intellectual object identifier.
         - name: generic_file_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided.
+            Return only the Premis Events with this exact generic file identifier.
         - name: outcome
           in: query
           schema:

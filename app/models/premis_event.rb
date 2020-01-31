@@ -17,16 +17,13 @@ class PremisEvent < ActiveRecord::Base
   ###SCOPES
   scope :with_type, ->(param) { where(event_type: param) unless param.blank? }
   scope :with_event_identifier, ->(param) { where(identifier: param) unless param.blank? }
-  scope :with_event_identifier_like, ->(param) { where('premis_events.identifier LIKE ?', "%#{param}%") unless PremisEvent.empty_param(param) }
   scope :with_create_date, ->(param) { where(created_at: param) unless param.blank? }
   scope :created_before, ->(param) { where('premis_events.created_at < ?', param) unless param.blank? }
   scope :created_after, ->(param) { where('premis_events.created_at >= ?', param) unless param.blank? }
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
   scope :with_outcome, ->(param) { where(outcome: param) unless param.blank? }
   scope :with_object_identifier, ->(param) { where(intellectual_object_identifier: param) unless param.blank? }
-  scope :with_object_identifier_like, ->(param) { where('premis_events.intellectual_object_identifier LIKE ?', "%#{param}%") unless PremisEvent.empty_param(param) }
   scope :with_file_identifier, ->(param) { where(generic_file_identifier: param) unless param.blank? }
-  scope :with_file_identifier_like, ->(param) { where('premis_events.generic_file_identifier LIKE ?', "%#{param}%") unless PremisEvent.empty_param(param) }
   scope :with_access, ->(param) {
     joins(:intellectual_object)
         .where('intellectual_objects.access = ?', param) unless param.blank?
