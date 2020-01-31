@@ -8,7 +8,7 @@ Build Status | Continuous Integration | Code Coverage
 develop | [![Build Status (Development)](https://travis-ci.org/APTrust/pharos.png?branch=develop)](https://travis-ci.org/APTrust/pharos) | [![Coverage Status](https://coveralls.io/repos/github/APTrust/pharos/badge.svg?branch=develop)](https://coveralls.io/github/APTrust/pharos?branch=develop)
 
 ### Requirements
-Since mid 2019 the Pharos app has been containerized. You may use the Baremetal or Docker version for development. 
+Since mid 2019 the Pharos app has been containerized. You may use the Baremetal or Docker version for development.
 
 #### Docker Version Requirements
 * [Docker Desktop](https://hub.docker.com/search/?type=edition&offering=community)
@@ -21,7 +21,7 @@ Since mid 2019 the Pharos app has been containerized. You may use the Baremetal 
 * [Postgres](https://postgresapp.com/)
 
 Installing the Postgres gem on Mac with Postgres.app:
-```gem install pg -v 1.1.4 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin pg_config```
+```gem install pg -v 1.2.0 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin/pg_config```
 
 ### Configuration
 
@@ -29,7 +29,7 @@ We use [dotenv](https://github.com/bkeepers/dotenv) for application
 configuration. See `.env` file in this repository for configuration parameters
 with default/development values. This file is updated by deployment according to
 it's environment.
-  
+
 ### Development Credentials
 
 After running `rake pharos:setup` or `make build` and `make dev`
@@ -49,10 +49,10 @@ To get started run:
 
 | Target | Description |
 | ----- | ------|
-| help     | This help.| 
+| help     | This help.|
 | revision | Show me the git hash|
 | build    |  Build the Pharos container from current repo. Make sure to commit all changes beforehand |
-| build-nc | Build the Pharos container from scratch, no cached layers.| 
+| build-nc | Build the Pharos container from scratch, no cached layers.|
 | up | Start containers in background for Pharos, Postgresql, Nginx. For local development. |
 | down | Stop containers for Pharos, Postgresql, Nginx. For local development. |
 | run | Just run Pharos in foreground |
@@ -62,7 +62,7 @@ To get started run:
 | test-ci | Run Pharos spec tests in CI |
 | dtest | Run Pharos spec tests |
 | dev | Run Pharos for development on localhost|
-| devclean | Stop and remove running Docker containers | 
+| devclean | Stop and remove running Docker containers |
 | devstop | Stop running Docker containers. Can pick up dev later |
 | release | Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab |
 | push | Push the Docker image up to the registry |
@@ -74,7 +74,7 @@ To get started run:
 	- sudo docker-compose exec pharos bash
 - Run a one-off command within the environment
 	- cd /srv/docker/pharos
-	- `make runcmd <somecommand>` 
+	- `make runcmd <somecommand>`
 
 
 ### Baremetal Development Quick-Start
@@ -115,4 +115,3 @@ gf = GenericFile.first
 gf.add_event(FactoryBot.attributes_for(:premis_events_fixity_check_fail))
 gf.save
 ````
-
