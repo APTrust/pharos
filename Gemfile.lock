@@ -230,7 +230,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     orm_adapter (0.5.0)
     os (1.0.1)
-    pg (1.2.0)
+    pg (1.2.2)
     phonelib (0.6.40)
     phony (2.18.5)
     phony_rails (0.14.13)
@@ -411,7 +411,7 @@ DEPENDENCIES
   kaminari
   meta_request (= 0.7.2)
   mimemagic
-  pg (= 1.2.0)
+  pg (= 1.2.2)
   phonelib
   phony_rails
   puma (= 4.3.1)
