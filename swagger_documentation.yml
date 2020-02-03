@@ -102,7 +102,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided.
+          description: Return only the Premis Events with this exact generic file identifier.
         - name: outcome
           in: query
           schema:
@@ -198,12 +198,12 @@ paths:
           in: query
           schema:
             type: string
-          description: "Return only the Premis Events with this exact intellectual object identifier or Premis Events with the fragment of the identifier provided."
+          description: "Return only the Premis Events with this exact intellectual object identifier."
         - name: generic_file_identifier
           in: query
           schema:
             type: string
-          description: "Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided."
+          description: "Return only the Premis Events with this exact generic file identifier or Premis Events."
         - name: outcome
           in: query
           schema:
@@ -295,13 +295,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact intellectual object identifier or Premis Events with the fragment of the identifier provided.
+            Return only the Premis Events with this exact intellectual object identifier.
         - name: generic_file_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Premis Events with this exact generic file identifier or Premis Events with the fragment of the identifier provided.
+            Return only the Premis Events with this exact generic file identifier.
         - name: outcome
           in: query
           schema:
@@ -389,13 +389,25 @@ paths:
           schema:
             type: string
           description: >-
-            Return only the Generic Files with this exact identifier or Generic Files with the fragment of the identifier provided.
+            Return only the Generic File with this exact identifier.
+        - name: identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Generic Files whose identifier contains this string.
         - name: uri
           in: query
           schema:
             type: string
           description: >-
-             Return only the Generic Files with this exact URI or Generic Files with the fragment of the URI provided.
+             Return only the Generic Files with this exact URI.
+        - name: uri_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only the Generic Files whose URI contains this string.
         - name: file_format
           in: query
           schema:
@@ -759,13 +771,25 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact tar file name or items with the fragment of the name provided.
+            Return only items with the exact tar file name.
+        - name: name_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items whose tar file name contains the specific string.
         - name: etag
           in: query
           schema:
             type: string
           description: >-
-            Return only items with the exact etag or items with the fragment of the etag provided.
+            Return only items with the exact etag or items.
+        - name: etag_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items whose etag contains the specified string.
         - name: bag_date
           in: query
           schema:
@@ -795,13 +819,25 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items with the exact object identifier  or items with the fragment of the object identifier provided.
+            Return only items with the exact intellectual object identifier.
+        - name: object_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only items whose intellectual object identifier contains the specified string.
         - name: file_identifier
           in: query
           schema:
             type: string
           description: >-
-             Return only items with the exact file identifier specified or items with the fragment of the file identifier provided. Useful for finding all items associated with a specific file.
+             Return only items with the exact generic file identifier specified.
+        - name: file_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+             Return only items whose generic file identifier contains the specified string.
         - name: access
           in: query
           schema:
@@ -1004,36 +1040,78 @@ paths:
             type: string
           description: "List of Objects belonging to a particular institution."
           required: true
+        - name: bag_group_identifier
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects with this exact bag group identifier.
+        - name: bag_group_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose bag group identifier contain the string.
         - name: description
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact description  or Intellectual Objects with the fragment of the description provided.
+            Return only the Intellectual Objects with this exact description.
+        - name: description_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose description contain the specified string.
         - name: identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact identifier  or Intellectual Objects with the fragment of the identifier provided.
+            Return only the Intellectual Objects with this exact identifier.
+        - name: identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose identifier contains the string.
         - name: alt_identifier
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact alternative identifier  or Intellectual Objects with the fragment of the alternative identifier provided.
+            Return only the Intellectual Objects with this exact alternate identifier.
+        - name: alt_identifier_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose alternate identifier contains this string.
         - name: etag
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Objects with this exact etag  or Intellectual Objects with the fragment of the etag provided.
+            Return only the Intellectual Objects with this exact etag.
+        - name: etag_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose etags contain this string.
         - name: bag_name
           in: query
           schema:
             type: string
           description: >-
-            Return only the Intellectual Object with this exact bag name  or Intellectual Objects with the fragment of the bag name provided.
+            Return only the Intellectual Object with this exact bag name.
+        - name: bag_name_like
+          in: query
+          schema:
+            type: string
+          description: >-
+            Return only the Intellectual Objects whose bag names contain this string.
         - name: created_before
           in: query
           schema:
