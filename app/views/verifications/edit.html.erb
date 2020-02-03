@@ -3,7 +3,7 @@
 <%= form_tag verification_path(id: params[:id], verification_type: params[:verification_type]), method: :put do %>
     <div class="form-group">
       <%= label_tag :code %><br />
-      <%= number_field_tag :code, class: "form-control"  %>
+      <%= number_field_tag :code, class: "form-control", autofocus: true  %>
     </div>
     <%= submit_tag 'Verify One Time Code', class: "btn btn-primary" %>
 <% end %>
