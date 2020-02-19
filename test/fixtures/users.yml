@@ -12,3 +12,8 @@ user1:
   institution: aptrust
   encrypted_api_secret_key: $2a$10$QA5At7VeEexGAQtgg00rzOMcDWLOe6W72fzRiRtAx1JTjANDal2XW
   roles: role_admin
+  email_verified: true
+  initial_password_updated: true
+  force_password_update: false
+  account_confirmed: true
+  grace_period: '2099-12-31T23:59:59Z'
