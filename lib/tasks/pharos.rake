@@ -281,9 +281,10 @@ namespace :pharos do
     email = "ops@aptrust.org"
     phone_number ="4341234567"
     password ="password123"
+    grace_period = '2099-12-31 23:59:59'
     User.create!(name: name, email: email, password: password,
                  phone_number: phone_number, institution_id: aptrust.id,
-                 roles: [admin_role])
+                 roles: [admin_role], grace_period: grace_period)
     puts "Created admin user"
 
     puts 'Creating system user for API use'
@@ -292,7 +293,8 @@ namespace :pharos do
     api_key = "75d35f5b6e324594a05045175661ba3785c02dde"
     User.create!(name: name, email: email, password: password,
                  phone_number: phone_number, institution_id: aptrust.id,
-                 roles: [admin_role], api_secret_key: api_key)
+                 roles: [admin_role], api_secret_key: api_key,
+                 grace_period: grace_period)
     puts "Created system (API) user"
 
   end
