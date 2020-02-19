@@ -261,7 +261,6 @@ namespace :pharos do
         puts "Creating #{partner[0]}"
         Institution.create!(name: partner[0],
                             identifier: partner[2],
-                            dpn_uuid: partner[3],
                             type: 'MemberInstitution')
       else
         puts "#{partner[0]} already exists"
