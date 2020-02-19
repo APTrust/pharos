@@ -3,27 +3,25 @@ RSpec::Core::RakeTask.new(:rspec => 'test:prepare') { |t| t.rspec_opts = ['--col
 
 namespace :pharos do
 
-  # DPN member UUIDs are at
-  # https://docs.google.com/spreadsheets/d/1-WFK0me8dM2jETlUkI7wpmRFMOgHC5LhyYk6hgHOfIA/
   partner_list = [
-      ['APTrust', 'apt', 'aptrust.org', nil],
-      ['Columbia University', 'cul', 'columbia.edu', 'ed73acd4-93e9-4196-a1ba-7fc8031b5f0b'],
-      ['Indiana University Bloomington', 'iub', 'indiana.edu', '77abdcc5-6d50-441b-8fd7-8085ceba5f05'],
-      ['Johns Hopkins University', 'jhu', 'jhu.edu', '0ab32901-5377-4928-898c-f4c5e2cde8e1'],
-      ['North Carolina State University', 'ncsu', 'ncsu.edu', 'd3432b4f-9f82-4206-a086-89bff5c5bd1e'],
-      ['Pennsylvania State University', 'pst', 'psu.edu', 'cf153594-6c22-4b59-a12e-420e0ae5280f'],
-      ['Syracuse University', 'syr', 'syr.edu', 'd5e231ad-cf1f-4499-9afe-7045f1254eaa'],
-      ['Test University','test', 'test.edu', 'fe908327-3635-43c2-9ca6-849485febcf3'],
-      ['University of Chicago', 'uchi', 'uchicago.edu', nil],
-      ['University of Cincinnati', 'ucin', 'uc.edu', nil],
-      ['University of Connecticut', 'uconn', 'uconn.edu', nil],
-      ['University of Maryland', 'mdu', 'umd.edu', 'a905b4da-cb04-43b9-8e23-ee43e02b23df'],
-      ['University of Miami', 'um', 'miami.edu', '41d34f47-ab83-4fa3-a40d-85465bc5fd14'],
-      ['University of Michigan', 'umich', 'umich.edu', '7277cbab-d539-4a81-ac1e-70cefc28fb2e'],
-      ['University of North Carolina at Chapel Hill', 'unc', 'unc.edu', 'cdd177a9-fe6b-4b75-9960-d808d1fb5570'],
-      ['University of Notre Dame', 'und', 'nd.edu', 'e25e97d2-44fe-472b-bbfe-6efc71dae268'],
-      ['University of Virginia','uva', 'virginia.edu', '63fd28df-4178-48e0-b259-343f82f04551'],
-      ['Virginia Tech','vatech', 'vt.edu', '77b67409-2966-4ea9-95f8-fef59b12ee29']
+      ['APTrust', 'apt', 'aptrust.org'],
+      ['Columbia University', 'cul', 'columbia.edu'],
+      ['Indiana University Bloomington', 'iub', 'indiana.edu'],
+      ['Johns Hopkins University', 'jhu', 'jhu.edu'],
+      ['North Carolina State University', 'ncsu', 'ncsu.edu'],
+      ['Pennsylvania State University', 'pst', 'psu.edu'],
+      ['Syracuse University', 'syr', 'syr.edu'],
+      ['Test University','test', 'test.edu'],
+      ['University of Chicago', 'uchi', 'uchicago.edu'],
+      ['University of Cincinnati', 'ucin', 'uc.edu'],
+      ['University of Connecticut', 'uconn', 'uconn.edu'],
+      ['University of Maryland', 'mdu', 'umd.edu'],
+      ['University of Miami', 'um', 'miami.edu'],
+      ['University of Michigan', 'umich', 'umich.edu'],
+      ['University of North Carolina at Chapel Hill', 'unc', 'unc.edu'],
+      ['University of Notre Dame', 'und', 'nd.edu'],
+      ['University of Virginia','uva', 'virginia.edu'],
+      ['Virginia Tech','vatech', 'vt.edu']
   ]
 
   roles = %w(admin institutional_admin institutional_user)
@@ -261,7 +259,6 @@ namespace :pharos do
         puts "Creating #{partner[0]}"
         Institution.create!(name: partner[0],
                             identifier: partner[2],
-                            dpn_uuid: partner[3],
                             type: 'MemberInstitution')
       else
         puts "#{partner[0]} already exists"
