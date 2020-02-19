@@ -95,8 +95,7 @@ devstop: ## Stop running Docker containers. Can pick up dev later
 
 integration: ## Setup for Integration tests
 	docker network create -d bridge pharos-integration-net > /dev/null 2>&1 || true
-	#docker start pharos-dev-db > /dev/null 2>&1 || docker run -d --network pharos-dev-net --hostname pharos-dev-db -e POSTGRES_DB=pharos_development --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
-	docker start pharos-integration-db > /dev/null 2>&1 || docker run -d --network pharos-integration-net --hostname pharos-integration-db --name pharos-integration-db -p 5432:5432 postgres:9.6.6-alpine
+	docker start pharos-integration-db > /dev/null 2>&1 || docker run -d --network pharos-integration-net --hostname pharos-integration-db --name pharos-integration-db postgres:9.6.6-alpine
 	docker run  -e PHAROS_DB_NAME=pharos_integration -e PHAROS_DB_HOST=pharos-integration-db -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-integration-db --network pharos-integration-net --rm --name pharos-migration $(TAG) /bin/bash -c "echo 'Init DB setup'; rake db:setup RAILS_ENV=integration; rake db:migrate; rake pharos:setup; rake db:fixtures:load"
 	docker start pharos-integration-web > /dev/null 2>&1 || docker run -d -e PHAROS_DB_HOST=pharos-integration-db -e PHAROS_DB_NAME=pharos_integration -e PHAROS_DB_USER=postgres --network=pharos-integration-net -p 9292:9292 --name pharos-integration-web $(TAG)
 
