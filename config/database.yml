@@ -29,6 +29,12 @@ integration:
   host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
 
+# Database for docker integration tests.
+docker_integration:
+  <<: *default
+  host: <%= ENV['PHAROS_DB_HOST'] || 'localhost' %>
+  database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_integration' %>
+
 staging:
   <<: *default
   database: <%= ENV['PHAROS_DB_NAME'] || 'pharos_staging' %>

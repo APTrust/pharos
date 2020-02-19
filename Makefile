@@ -96,8 +96,8 @@ devstop: ## Stop running Docker containers. Can pick up dev later
 integration: ## Setup for Integration tests
 	docker network create -d bridge pharos-integration-net > /dev/null 2>&1 || true
 	docker start pharos-integration-db > /dev/null 2>&1 || docker run -d --network pharos-integration-net --hostname pharos-integration-db --name pharos-integration-db postgres:9.6.6-alpine
-	docker run  -e PHAROS_DB_NAME=pharos_integration -e PHAROS_DB_HOST=pharos-integration-db -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-integration-db --network pharos-integration-net --rm --name pharos-migration $(TAG) /bin/bash -c "echo 'Init DB setup'; rake db:setup RAILS_ENV=integration; rake db:migrate; rake pharos:setup; rake db:fixtures:load"
-	docker start pharos-integration-web > /dev/null 2>&1 || docker run -d -e PHAROS_DB_HOST=pharos-integration-db -e PHAROS_DB_NAME=pharos_integration -e PHAROS_DB_USER=postgres --network=pharos-integration-net -p 9292:9292 --name pharos-integration-web $(TAG)
+	docker run  -e PHAROS_DB_NAME=pharos_integration -e PHAROS_DB_HOST=pharos-integration-db -e PHAROS_DB_USER=postgres -e PHAROS_DB_HOST=pharos-integration-db -e RAILS_ENV=docker_integration --network pharos-integration-net --rm --name pharos-migration $(TAG) /bin/bash -c "echo 'Init DB setup'; rake db:setup RAILS_ENV=docker_integration; rake db:migrate; rake pharos:setup; rake db:fixtures:load; echo 'Fixtures loaded. Now login with system@aptrust.org/password'"
+	docker start pharos-integration-web > /dev/null 2>&1 || docker run -d -e PHAROS_DB_HOST=pharos-integration-db -e PHAROS_DB_NAME=pharos_integration -e PHAROS_DB_USER=postgres -e RAILS_ENV=docker_integration --network=pharos-integration-net -p 9292:9292 --name pharos-integration-web $(TAG)
 
 integration_clean: ## Stop and Remove integration containers
 	docker stop pharos-integration-db || true && docker rm -v pharos-integration-db

@@ -73,7 +73,7 @@ group :test, :development do
   gem 'mimemagic'
 end
 
-group :development, :test, :staging, :demo, :production, :integration do
+group :development, :test, :staging, :demo, :production, :integration, :docker_integration do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'factory_bot_rails'
