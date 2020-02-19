@@ -49,24 +49,26 @@ To get started run:
 
 | Target | Description |
 | ----- | ------|
-| help     | This help.|
-| revision | Show me the git hash|
 | build    |  Build the Pharos container from current repo. Make sure to commit all changes beforehand |
 | build-nc | Build the Pharos container from scratch, no cached layers.|
-| up | Start containers in background for Pharos, Postgresql, Nginx. For local development. |
-| down | Stop containers for Pharos, Postgresql, Nginx. For local development. |
-| run | Just run Pharos in foreground |
-| runshell | Run Pharos container with interactive shell |
-| runconsole | Run Rails Console |
-| runcmd | Start Pharos container, run command and exit.|
-| test-ci | Run Pharos spec tests in CI |
-| dtest | Run Pharos spec tests |
+| clean | Clean the generated/compiled files |
 | dev | Run Pharos for development on localhost|
 | devclean | Stop and remove running Docker containers |
 | devstop | Stop running Docker containers. Can pick up dev later |
-| release | Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab |
+| down | Stop containers for Pharos, Postgresql, Nginx. For local development. |
+| dtest | Run Pharos spec tests |
+| help  | This help.|
+| integration  | Runs Pharos container with fixtures for integration tests. |
+| integration_clean  | Stops and removes Pharos integration containers. |
 | push | Push the Docker image up to the registry |
-| clean | Clean the generated/compiled files |
+| release | Make a release by building and publishing the `{version}` as `latest` tagged containers to Gitlab |
+| revision | Show me the git hash|
+| run | Just run Pharos in foreground |
+| runcmd | Start Pharos container, run command and exit.|
+| runconsole | Run Rails Console |
+| runshell | Run Pharos container with interactive shell |
+| test-ci | Run Pharos spec tests in CI |
+| up | Start containers in background for Pharos, Postgresql, Nginx. For local development. |
 
 #### Common Docker tasks
 - Enter running environment in demo/prod
