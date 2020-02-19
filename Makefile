@@ -77,7 +77,7 @@ test: ## Run Pharos spec tests
 	docker stop pharos-test-db && docker rm -v pharos-test-db || true
 	docker network rm pharos-test-net
 
-dev: ## Run Pharos for development on localhost
+dev: registry_login ## Run Pharos for development on localhost
 	docker network create -d bridge pharos-dev-net > /dev/null 2>&1 || true
 	#docker start pharos-dev-db > /dev/null 2>&1 || docker run -d --network pharos-dev-net --hostname pharos-dev-db -e POSTGRES_DB=pharos_development --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
 	docker start pharos-dev-db > /dev/null 2>&1 || docker run -d --network pharos-dev-net --hostname pharos-dev-db --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
@@ -93,7 +93,7 @@ devstop: ## Stop running Docker containers. Can pick up dev later
 	docker stop pharos-dev-db
 	docker stop pharos-dev-web
 
-integration: ## Setup for Integration tests
+integration: registry_login ## Setup for Integration tests
 	docker network create -d bridge pharos-integration-net > /dev/null 2>&1 || true
 	#docker start pharos-dev-db > /dev/null 2>&1 || docker run -d --network pharos-dev-net --hostname pharos-dev-db -e POSTGRES_DB=pharos_development --name pharos-dev-db -p 5432:5432 postgres:9.6.6-alpine
 	docker start pharos-integration-db > /dev/null 2>&1 || docker run -d --network pharos-integration-net --hostname pharos-integration-db --name pharos-integration-db -p 5432:5432 postgres:9.6.6-alpine
