@@ -117,3 +117,9 @@ gf = GenericFile.first
 gf.add_event(FactoryBot.attributes_for(:premis_events_fixity_check_fail))
 gf.save
 ````
+
+--------
+
+## API Documentation
+
+Swagger docs at https://aptrust.github.io/pharos/
