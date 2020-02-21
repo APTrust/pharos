@@ -12,7 +12,7 @@ LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
     nodejs postgresql-client postgresql-dev python py-requests py-argparse \
     libstdc++ tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal \
-	libxml2-dev libxslt-dev readline readline-dev\
+	libxml2-dev libxslt-dev readline readline-dev curl \
 # Following packages for wkhtmltopdf only
     libgcc libstdc++ libx11 glib libxrender libxext libintl \
     libcrypto1.0 libssl1.0 \
@@ -68,6 +68,8 @@ RUN apk del build-base postgresql-dev postgresql-client libxml2-dev libxslt-dev 
 
 # Expose a volume so that nginx will be able to read in assets in production.
 VOLUME ["$WORKDIR/public"]
+
+HEALTHCHECK CMD curl --fail http://localhost:9292/ || exit 1
 
 RUN chown -R somebody:somegroup /pharos
 USER somebody
