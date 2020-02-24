@@ -26,6 +26,9 @@ class InstitutionsController < ApplicationController
   def index
     respond_to do |format|
       @institutions = policy_scope(Institution)
+
+      @institutions = @institutions.where(receiving_bucket: params[:receiving_bucket]) unless params[:receiving_bucket].blank?
+
       @institutions = @institutions.order('name')
       @sizes = find_all_sizes unless request.url.include?("/api/")
       @count = @institutions.count

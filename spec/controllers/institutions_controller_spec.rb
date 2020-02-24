@@ -63,7 +63,7 @@ RSpec.describe InstitutionsController, type: :controller do
         session[:verified] = true
       end
 
-      it 'assigns all institutions as @institutions' do
+      it 'returns bucket names for all @institutions' do
         get :index, format: :json
         assigns(:institutions).should include(admin_user.institution)
         data = JSON.parse(response.body)
@@ -72,6 +72,17 @@ RSpec.describe InstitutionsController, type: :controller do
           expect(inst['restore_bucket']).to include(".restore.")
         end
       end
+
+      it 'filters by bucket name' do
+        get :index, format: :json, params: { receiving_bucket: admin_user.institution.receiving_bucket }
+        assigns(:institutions).should include(admin_user.institution)
+        assigns(:institutions).should_not include(institutional_admin.institution)
+
+        get :index, format: :json, params: { receiving_bucket: institutional_admin.institution.receiving_bucket }
+        assigns(:institutions).should include(institutional_admin.institution)
+        assigns(:institutions).should_not include(admin_user.institution)
+      end
+
     end
   end
 
