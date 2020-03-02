@@ -56,6 +56,37 @@ RSpec.describe InstitutionsController, type: :controller do
     end
   end
 
+  describe 'GET #index for admin API' do
+    describe 'for admin users' do
+      before do
+        sign_in admin_user
+        session[:verified] = true
+      end
+
+      it 'returns bucket names for all @institutions' do
+        get :index, format: :json
+        assigns(:institutions).should include(admin_user.institution)
+        data = JSON.parse(response.body)
+        data['results'].each do |inst|
+          expect(inst['receiving_bucket']).to include(".receiving.")
+          expect(inst['restore_bucket']).to include(".restore.")
+        end
+      end
+
+      it 'filters by bucket name' do
+        get :index, format: :json, params: { receiving_bucket: admin_user.institution.receiving_bucket }
+        assigns(:institutions).should include(admin_user.institution)
+        assigns(:institutions).should_not include(institutional_admin.institution)
+
+        get :index, format: :json, params: { receiving_bucket: institutional_admin.institution.receiving_bucket }
+        assigns(:institutions).should include(institutional_admin.institution)
+        assigns(:institutions).should_not include(admin_user.institution)
+      end
+
+    end
+  end
+
+
   describe 'GET #new' do
     describe 'for admin users' do
       before do
@@ -146,14 +177,34 @@ RSpec.describe InstitutionsController, type: :controller do
         session[:verified] = true
       end
       it 'responds successfully with an HTTP 200 status code' do
-        get :show, params: { institution_identifier: CGI.escape(admin_user.institution.to_param) }
+        get :show, params: { institution_identifier: admin_user.institution.identifier }
         expect(response).to be_successful
         expect(response.status).to eq(200)
+        assigns(:institution).should eq(admin_user.institution)
+        assigns(:institution).receiving_bucket.should eq(admin_user.institution.receiving_bucket)
+        assigns(:institution).restore_bucket.should eq(admin_user.institution.restore_bucket)
       end
 
       it 'should provide a 404 code when an incorrect identifier is provided' do
         get :show, params: { institution_identifier: CGI.escape('notreal.edu') }, format: 'json'
         expect(response.status).to eq(404)
+      end
+    end
+  end
+
+  describe 'GET #show for admin API' do
+    describe 'for admin users' do
+      before do
+        sign_in admin_user
+        session[:verified] = true
+      end
+
+      it 'returns an institution with bucket names' do
+        get :show, params: { institution_identifier: institutional_user.institution.to_param }, format: :json
+        assigns(:institution).id.should equal(institutional_user.institution.id)
+        data = JSON.parse(response.body)
+        expect(data['receiving_bucket']).to include('aptrust.receiving.test')
+        expect(data['restore_bucket']).to include('aptrust.restore.test')
       end
     end
   end

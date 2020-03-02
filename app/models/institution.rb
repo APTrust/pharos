@@ -146,7 +146,13 @@ class Institution < ActiveRecord::Base
   end
 
   def serializable_hash(options={})
-    { id: id, name: name, identifier: identifier }
+    {
+      id: id,
+      identifier: identifier,
+      name: name,
+      receiving_bucket: receiving_bucket,
+      restore_bucket: restore_bucket
+    }
   end
 
   def bytes_by_format

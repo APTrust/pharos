@@ -13,7 +13,7 @@ gem 'chart-js-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.9.1'
+gem 'jbuilder', '~> 2.10.0'
 gem 'pg', '1.2.2' # Necessary for talking to our RDS instance
 gem 'pundit'
 # gem 'figaro'
@@ -35,7 +35,7 @@ gem 'rubyzip'
 # Used to create or edit google sheets
 gem 'google_drive'
 
-gem 'simple_form', '~> 5.0.1'
+gem 'simple_form', '~> 5.0.2'
 gem 'phony_rails'
 gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
@@ -46,7 +46,7 @@ gem 'bootstrap-sass', '~> 3.4.1'
 gem 'browser-timezone-rails'
 
 gem 'activerecord-nulldb-adapter'
-gem 'puma', '4.3.1'
+gem 'puma', '4.3.3'
 
 group :demo, :production, :staging do
   # Graylog logging gems
@@ -67,7 +67,7 @@ end
 
 group :test, :development do
   gem 'capybara', '3.31.0'
-  gem 'shoulda-matchers', '~> 4.1.2'
+  gem 'shoulda-matchers', '~> 4.3.0'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
   gem 'mimemagic'
