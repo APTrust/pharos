@@ -16,7 +16,7 @@ event_1:
   created_at: 2016-08-26 18:47:20.228354000 Z
   updated_at: 2016-08-26 18:47:20.228354000 Z
   intellectual_object_identifier: institution2.edu/coal
-  generic_file_identifier: institution2.edu/pdfs/doc1
+  generic_file_identifier: institution2.edu/coal/doc1
   outcome: Success
   institution: inst2
 
@@ -70,7 +70,7 @@ event_4:
   created_at: 2016-08-26 18:47:20.243959000 Z
   updated_at: 2016-08-26 18:47:20.243959000 Z
   intellectual_object_identifier: institution2.edu/chocolate
-  generic_file_identifier: institution2.edu/photos/picture1
+  generic_file_identifier: institution2.edu/chocolate/picture1
   outcome: Success
   institution: inst1
 
@@ -87,7 +87,7 @@ event_5:
   generic_file: inst1_obj3_gf2
   created_at: 2016-08-26 18:47:20.248493000 Z
   updated_at: 2016-08-26 18:47:20.248493000 Z
-  intellectual_object_identifier: institution1.edu/glass_shards
+  intellectual_object_identifier: institution1.edu/glass
   generic_file_identifier: institution1.edu/glass/shard2
   outcome: Success
   institution: inst1
@@ -102,11 +102,11 @@ event_6:
   object: APTrust Go Exchange + Amazon S3 client
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst2_obj3
-  generic_file: inst2_obj3_gf3
+  generic_file: inst2_obj3_gf4
   created_at: 2016-08-26 18:47:20.257325000 Z
   updated_at: 2016-08-26 18:47:20.257325000 Z
-  intellectual_object_identifier: institution1.edu/toads
-  generic_file_identifier: institution2.edu/glass/shard4_deleted
+  intellectual_object_identifier: institution2.edu/toads
+  generic_file_identifier: institution2.edu/toads/toad4_deleted
   outcome: Success
   institution: inst2
 
@@ -123,7 +123,7 @@ event_7:
   generic_file: inst2_obj3_gf1
   created_at: 2016-08-26 18:47:20.261371000 Z
   updated_at: 2016-08-26 18:47:20.261371000 Z
-  intellectual_object_identifier: institution1.edu/glass_shards
+  intellectual_object_identifier: institution1.edu/glass
   generic_file_identifier: institution1.edu/glass/shard1
   outcome: Success
   institution: inst2
@@ -142,7 +142,7 @@ event_8:
   created_at: 2016-08-26 18:47:20.265356000 Z
   updated_at: 2016-08-26 18:47:20.265356000 Z
   intellectual_object_identifier: institution2.edu/coal
-  generic_file_identifier: institution2.edu/pdfs/doc2
+  generic_file_identifier: institution2.edu/coal/doc2
   outcome: Success
   institution: inst2
 
@@ -160,7 +160,7 @@ event_9:
   created_at: 2016-08-26 18:47:20.272115000 Z
   updated_at: 2016-08-26 18:47:20.272115000 Z
   intellectual_object_identifier: institution2.edu/chocolate
-  generic_file_identifier: institution2.edu/photos/picture2
+  generic_file_identifier: institution2.edu/chocolate/picture2
   outcome: Success
   institution: inst1
 
@@ -178,7 +178,7 @@ event_10:
   created_at: 2016-08-26 18:47:20.276463000 Z
   updated_at: 2016-08-26 18:47:20.276463000 Z
   intellectual_object_identifier: institution1.edu/toads
-  generic_file_identifier: institution2.edu/glass/shard2
+  generic_file_identifier: institution2.edu/toads/toad2
   outcome: Success
   institution: inst2
 
@@ -196,7 +196,7 @@ event_11:
   created_at: 2016-08-26 18:47:20.280480000 Z
   updated_at: 2016-08-26 18:47:20.280480000 Z
   intellectual_object_identifier: institution2.edu/chocolate
-  generic_file_identifier: institution2.edu/photos/picture3
+  generic_file_identifier: institution2.edu/chocolate/picture3
   outcome: Success
   institution: inst1
 
@@ -250,7 +250,7 @@ event_14:
   created_at: 2016-08-26 18:47:20.293814000 Z
   updated_at: 2016-08-26 18:47:20.293814000 Z
   intellectual_object_identifier: institution2.edu/coal
-  generic_file_identifier: institution2.edu/pdfs/doc3
+  generic_file_identifier: institution2.edu/coal/doc3
   outcome: Success
   institution: inst2
 
@@ -300,10 +300,10 @@ event_17:
   object: APTrust Go Exchange + Amazon S3 client
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst1_obj3
-  generic_file: inst1_obj3_gf3
+  generic_file: inst1_obj3_gf4
   created_at: 2016-08-26 18:47:20.312631000 Z
   updated_at: 2016-08-26 18:47:20.312631000 Z
-  intellectual_object_identifier: institution1.edu/glass_shards
+  intellectual_object_identifier: institution1.edu/glass
   generic_file_identifier: institution1.edu/glass/shard4_deleted
   outcome: Success
   institution: inst1
@@ -322,7 +322,7 @@ event_18:
   created_at: 2016-08-26 18:47:20.317914000 Z
   updated_at: 2016-08-26 18:47:20.317914000 Z
   intellectual_object_identifier: institution1.edu/toads
-  generic_file_identifier: institution2.edu/glass/shard1
+  generic_file_identifier: institution2.edu/toads/toad1
   outcome: Success
   institution: inst2
 
@@ -340,7 +340,7 @@ event_19:
   created_at: 2016-08-26 18:53:32.095819000 Z
   updated_at: 2016-08-26 18:53:32.095819000 Z
   intellectual_object_identifier: institution2.edu/coal
-  generic_file_identifier: institution2.edu/pdfs/doc1
+  generic_file_identifier: institution2.edu/coal/doc1
   outcome: Success
   institution: inst2
 
@@ -394,7 +394,7 @@ event_22:
   created_at: 2016-08-26 18:53:32.117144000 Z
   updated_at: 2016-08-26 18:53:32.117144000 Z
   intellectual_object_identifier: institution2.edu/chocolate
-  generic_file_identifier: institution2.edu/photos/picture1
+  generic_file_identifier: institution2.edu/chocolate/picture1
   outcome: Success
   institution: inst1
 
@@ -411,7 +411,7 @@ event_23:
   generic_file: inst1_obj3_gf2
   created_at: 2016-08-26 18:53:32.121324000 Z
   updated_at: 2016-08-26 18:53:32.121324000 Z
-  intellectual_object_identifier: institution1.edu/glass_shards
+  intellectual_object_identifier: institution1.edu/glass
   generic_file_identifier: institution1.edu/glass/shard2
   outcome: Success
   institution: inst1
@@ -426,11 +426,11 @@ event_24:
   object: SHA-256 thingy
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst2_obj3
-  generic_file: inst2_obj3_gf3
+  generic_file: inst2_obj3_gf4
   created_at: 2016-08-26 18:53:32.125356000 Z
   updated_at: 2016-08-26 18:53:32.125356000 Z
-  intellectual_object_identifier: institution1.edu/toads
-  generic_file_identifier: institution2.edu/glass/shard4_deleted
+  intellectual_object_identifier: institution2.edu/toads
+  generic_file_identifier: institution2.edu/toads/toad4_deleted
   outcome: Success
   institution: inst2
 
@@ -447,7 +447,7 @@ event_25:
   generic_file: inst1_obj3_gf1
   created_at: 2016-08-26 18:53:32.129263000 Z
   updated_at: 2016-08-26 18:53:32.129263000 Z
-  intellectual_object_identifier: institution1.edu/glass_shards
+  intellectual_object_identifier: institution1.edu/glass
   generic_file_identifier: institution1.edu/glass/shard1
   outcome: Success
   institution: inst1
@@ -466,7 +466,7 @@ event_26:
   created_at: 2016-08-26 18:53:32.133305000 Z
   updated_at: 2016-08-26 18:53:32.133305000 Z
   intellectual_object_identifier: institution2.edu/coal
-  generic_file_identifier: institution2.edu/pdfs/doc2
+  generic_file_identifier: institution2.edu/coal/doc2
   outcome: Success
   institution: inst2
 
@@ -484,7 +484,7 @@ event_27:
   created_at: 2016-08-26 18:53:32.139157000 Z
   updated_at: 2016-08-26 18:53:32.139157000 Z
   intellectual_object_identifier: institution2.edu/chocolate
-  generic_file_identifier: institution2.edu/photos/picture2
+  generic_file_identifier: institution2.edu/chocolate/picture2
   outcome: Success
   institution: inst1
 
@@ -502,7 +502,7 @@ event_28:
   created_at: 2016-08-26 18:53:32.143246000 Z
   updated_at: 2016-08-26 18:53:32.143246000 Z
   intellectual_object_identifier: institution1.edu/toads
-  generic_file_identifier: institution2.edu/glass/shard2
+  generic_file_identifier: institution2.edu/toads/toad2
   outcome: Success
   institution: inst2
 
@@ -520,7 +520,7 @@ event_29:
   created_at: 2016-08-26 18:53:32.147170000 Z
   updated_at: 2016-08-26 18:53:32.147170000 Z
   intellectual_object_identifier: institution2.edu/chocolate
-  generic_file_identifier: institution2.edu/photos/picture3
+  generic_file_identifier: institution2.edu/chocolate/picture3
   outcome: Success
   institution: inst1
 
@@ -574,7 +574,7 @@ event_32:
   created_at: 2016-08-26 18:53:32.159155000 Z
   updated_at: 2016-08-26 18:53:32.159155000 Z
   intellectual_object_identifier: institution2.edu/coal
-  generic_file_identifier: institution2.edu/pdfs/doc3
+  generic_file_identifier: institution2.edu/coal/doc3
   outcome: Success
   institution: inst2
 
@@ -624,10 +624,10 @@ event_35:
   object: SHA-256 thingy
   agent: https://github.com/APTrust/exchange
   intellectual_object: inst1_obj3
-  generic_file: inst1_obj3_gf3
+  generic_file: inst1_obj3_gf4
   created_at: 2016-08-26 18:53:32.176610000 Z
   updated_at: 2016-08-26 18:53:32.176610000 Z
-  intellectual_object_identifier: institution1.edu/glass_shards
+  intellectual_object_identifier: institution1.edu/glass
   generic_file_identifier: institution1.edu/glass/shard4_deleted
   outcome: Success
   institution: inst1
@@ -646,7 +646,7 @@ event_36:
   created_at: 2016-08-26 18:53:32.180648000 Z
   updated_at: 2016-08-26 18:53:32.180648000 Z
   intellectual_object_identifier: institution1.edu/toads
-  generic_file_identifier: institution2.edu/glass/shard1
+  generic_file_identifier: institution2.edu/toads/toad1
   outcome: Success
   institution: inst1
 
@@ -694,7 +694,7 @@ event_39:
   intellectual_object: inst1_obj3
   created_at: 2016-08-26 18:53:32.180648000 Z
   updated_at: 2016-08-26 18:53:32.180648000 Z
-  intellectual_object_identifier: institution1.edu/glass_shards
+  intellectual_object_identifier: institution1.edu/glass
   outcome: Success
   institution: inst1
 

@@ -30,7 +30,7 @@ inst1_obj2:
 inst1_obj3:
   title: Third Object for Institution One
   description: A bag of broken glass
-  identifier: institution1.edu/glass_shards
+  identifier: institution1.edu/glass
   alt_identifier: glass_do_not_eat
   access: consortia
   bag_name: glass.tar
