@@ -420,7 +420,7 @@ DEPENDENCIES
   rails (= 5.2.3)
   rails-controller-testing
   rails_semantic_logger
-  rake
+  rake (= 13.0.1)
   rb-readline
   rspec-activemodel-mocks
   rspec-its

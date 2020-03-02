@@ -41,11 +41,10 @@ you can log in with
 
 Once you have the Docker suite installed you may run `make` and see list of make targets you can run with ``` make <target>```.
 To get started run:
-1.  `make build` This builds containers based on the current git version of the repository.
+1.  `make build` This builds containers based on the current git version of the repository. If you get an error about "docker login," run `docker login registry.gitlab.com`
 2.  `make dev` will start all containers (Postgres, Pharos, Nginx) and populate the database with seed data to get started.
 
 3. You may now open a web browser and open `http://localhost:9292` and log-in with [development credentials](#development-credentials)
-
 
 | Target | Description |
 | ----- | ------|
