@@ -157,7 +157,7 @@ class PremisEventsController < ApplicationController
   end
 
   def load_event
-    @event = PremisEvent.readable(current_user).find(params[:id])
+    @event = PremisEvent.readable(current_user).find_by_identifier(params[:identifier])
   end
 
   def for_selected_institution
