@@ -304,8 +304,11 @@ class GenericFilesController < ApplicationController
       @intellectual_object = IntellectualObject.readable(current_user).find(params[:intellectual_object_id])
     elsif params[:institution_identifier]
       @institution = Institution.where(identifier: params[:institution_identifier]).first
-    else
+    elsif params[:id]
       @intellectual_object = GenericFile.readable(current_user).find(params[:id]).intellectual_object
+    else
+      # No file, object, or institution id in params
+      @institution = current_user.institution
     end
   end
 
