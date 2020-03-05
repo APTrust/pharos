@@ -37,10 +37,6 @@ services:
     command: /bin/bash -c "sleep 15 && rake db:exists && time rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
     env_file:
       - ".env"
-    logging:
-      driver: "gelf"
-      options:
-        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
     depends_on:
       - db
     networks:
