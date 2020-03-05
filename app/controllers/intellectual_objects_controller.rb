@@ -170,7 +170,15 @@ class IntellectualObjectsController < ApplicationController
 
   def finished_destroy
     authorize @intellectual_object
-    deletion_item = WorkItem.with_object_identifier(@intellectual_object.identifier).with_action(Pharos::Application::PHAROS_ACTIONS['delete']).first
+    deletion_item = WorkItem.with_object_identifier(@intellectual_object.identifier).with_action(Pharos::Application::PHAROS_ACTIONS['delete']).order(updated_at: :desc).first
+    if deletion_item.nil?
+      respond_to do |format|
+        format.json { render json: { status: 'error', message: 'There is no existing deletion request for the specified object.', intellectual_object_identifier: @intellectual_object.identifier}, :status => 404 }
+        format.html { redirect_to root_url, alert: "An intellectual object with identifer: #{params[:intellectual_object_identifier]} could not be found." }
+      end
+      return
+    end
+
     attributes = { event_type: Pharos::Application::PHAROS_EVENT_TYPES['delete'],
                    date_time: "#{Time.now}",
                    detail: 'Object deleted from S3 storage',

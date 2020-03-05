@@ -26,6 +26,14 @@ class ChecksumsController < ApplicationController
     end
   end
 
+  def show
+    authorize current_user, :checksum_show?
+    @checksum = Checksum.find(params[:id])
+    respond_to do |format|
+      format.json { render json: @checksum.serializable_hash }
+    end
+  end
+
   private
 
   def checksum_params

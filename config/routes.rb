@@ -50,6 +50,9 @@ Rails.application.routes.draw do
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :html }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
   resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :json }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
+  get '/api/v2/files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files_api
+  get '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files_api
+  get '/api/v2/files/', to: 'generic_files#index', format: [:json], as: :generic_files_admin_list
   get 'files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files
   get 'files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files
   post '/api/v2/files/:intellectual_object_id/create_batch', to: 'generic_files#create_batch', format: :json
@@ -74,7 +77,8 @@ Rails.application.routes.draw do
   get 'api/v2/institutions/:institution_identifier', to: 'institutions#show', format: [:json], institution_identifier: institution_ptrn
 
   # PREMIS EVENT ROUTES
-  #get 'events/:identifier', to: 'premis_events#index', format: [:json, :html], identifier: /[\/\-\%\w\.]*/, as: :events
+  uuid_pattern = /([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}/
+  get '/api/v2/events/:identifier', to: 'premis_events#show', format: [:json], identifier: uuid_pattern
   get 'events/:file_identifier', to: 'premis_events#index', format: [:json, :html], file_identifier: file_ptrn, as: :generic_file_events
   get 'events/:object_identifier', to: 'premis_events#index', format: [:json, :html], object_identifier: object_ptrn, as: :intellectual_object_events
   get 'events/:institution_identifier', to: 'premis_events#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_events
@@ -115,6 +119,7 @@ Rails.application.routes.draw do
 
   # CHECKSUM ROUTES
   get '/api/v2/checksums', to: 'checksums#index', format: :json
+  get '/api/v2/checksums/:id', to: 'checksums#show', format: :json
   post '/api/v2/checksums/:generic_file_identifier', to: 'checksums#create', format: :json, generic_file_identifier: /.*/
 
   # CATALOG ROUTES
