@@ -24,3 +24,10 @@ test_inst:
   identifier: test.edu
   receiving_bucket: aptrust.receiving.test.test.edu
   restore_bucket: aptrust.restore.test.test.edu
+
+# This one matches bag names used in integration tests
+example_inst:
+  name: Example Institution (for integration tests)
+  identifier: example.edu
+  receiving_bucket: aptrust.receiving.test.example.edu
+  restore_bucket: aptrust.restore.test.example.edu
