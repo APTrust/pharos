@@ -27,10 +27,6 @@ services:
       - frontend
     env_file:
       - ".env"
-    logging:
-      driver: "gelf"
-      options:
-        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
   migration:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
