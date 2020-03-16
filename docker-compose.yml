@@ -27,20 +27,12 @@ services:
       - frontend
     env_file:
       - ".env"
-    logging:
-      driver: "gelf"
-      options:
-        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
   migration:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
-    command: /bin/bash -c "sleep 15 && rake db:exists && time rake db:migrate || (echo 'Init DB setup' && rake db:setup && rake pharos:setup)"
+    command: /bin/bash -c "sleep 15 && bundle exec rake db:exists && time bundle exec rake db:migrate || (echo 'Init DB setup' && bundle exec rake db:setup && bundle exec rake pharos:setup)"
     env_file:
       - ".env"
-    logging:
-      driver: "gelf"
-      options:
-        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
     depends_on:
       - db
     networks:
