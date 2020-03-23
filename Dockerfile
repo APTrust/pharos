@@ -1,6 +1,6 @@
 FROM madnight/docker-alpine-wkhtmltopdf as builder
 
-FROM ruby:2.6-alpine3.7
+FROM ruby:2.6-alpine
 LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 
 # Install dependencies
@@ -15,7 +15,7 @@ RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
 	libxml2-dev libxslt-dev readline readline-dev curl \
 # Following packages for wkhtmltopdf only
     libgcc libstdc++ libx11 glib libxrender libxext libintl \
-    libcrypto1.0 libssl1.0 \
+    libcrypto1.1 libssl1.1 \
     ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
 
 RUN addgroup -S somegroup -g 1000 && adduser -S -G somegroup somebody -u 1000
