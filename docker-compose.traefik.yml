@@ -1,0 +1,72 @@
+---
+version: '3'
+services:
+  db:
+    image: postgres:9.6.15-alpine
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ${DOCKERAPP_DATA_PATH:-./docker}/pgdata:/pgdata
+    networks:
+      - backend
+    ports:
+      - '5432:5432'
+  pharos:
+    image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
+    restart: always
+    command: bundle exec puma -C config/puma.rb -e ${RAILS_ENV}
+    volumes:
+      - assets:/pharos/public
+      - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
+    depends_on:
+      - db
+      - migration
+    ports:
+      - 9292
+    networks:
+      - backend
+      - gateway
+    env_file:
+      - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
+  migration:
+    image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
+    # Note: Sleep 5 seconds before init db, so psql has time to start up.
+    command: /bin/bash -c "sleep 15 && bundle exec rake db:exists && time bundle exec rake db:migrate || (echo 'Init DB setup' && bundle exec rake db:setup && bundle exec rake pharos:setup)"
+    env_file:
+      - ".env"
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://${PHAROS_LOGSERVER}:${PHAROS_LOGSERVER_PORT}"
+    depends_on:
+      - db
+    networks:
+      - backend
+  nginx-assets:
+    image: nginx:alpine
+    container_name: nginx-assets
+    restart: always
+    volumes:
+      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
+        #- ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
+      - assets:/etc/share/nginx/html/pharos
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx-assets.rule=Host(`${VIRTUAL_HOST:-localhost}`) && PathPrefix(`/assets`)"
+      - "traefik.http.routers.nginx-assets.entrypoints=insecure"
+      - "traefik.http.services.nginx-assets.loadbalancer.server.port=80"
+
+    networks:
+      - gateway
+networks:
+  external:
+    name: gateway
+  backend:
+
+volumes:
+  pgdata:
+  assets:
