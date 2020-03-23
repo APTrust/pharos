@@ -63,8 +63,9 @@ services:
     networks:
       - gateway
 networks:
-  external:
-    name: gateway
+  gateway:
+    external:
+      name: gateway
   backend:
 
 volumes:
