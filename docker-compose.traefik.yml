@@ -51,7 +51,7 @@ services:
     container_name: nginx-assets
     restart: always
     volumes:
-      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
+            #      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
         #- ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
       - assets:/etc/share/nginx/html/pharos
     labels:
