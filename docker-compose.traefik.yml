@@ -36,6 +36,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.pharos.rule=Host(`${VIRTUAL_HOST:-localhost}`)"
       - "traefik.http.routers.pharos.entrypoints=secure"
+      - "traefik.http.routers.pharos.tls.certresolver=le"
+      - "traefik.http.routers.pharos.loadbalancer.server.port=9292"
+
   migration:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
     # Note: Sleep 5 seconds before init db, so psql has time to start up.
@@ -54,9 +57,11 @@ services:
     image: nginx:alpine
     container_name: nginx-assets
     restart: always
+    ports:
+      - 80
+      - 443
     volumes:
-            #      - ${DOCKERAPP_DATA_PATH:-./docker}/nginx-proxy/default.conf:/etc/nginx/conf.d/default.conf:ro
-        #- ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
+      - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
       - assets:/etc/share/nginx/html/pharos
     labels:
       - "traefik.enable=true"
