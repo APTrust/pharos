@@ -807,13 +807,13 @@ paths:
           schema:
             type: string
           description: >-
-            Return only items having the specified stage.
+            Return only items having the specified stage. Stages include "Requested", "Receive", "Fetch", "Unpack", "Validate", "Store", "Record", "Cleanup" and "Resolve".
         - name: status
           in: query
           schema:
             type: string
           description: >-
-            Return only items having the specified status. Stages include "Requested", "Receive", "Fetch", "Unpack", "Validate", "Store", "Record", "Cleanup" and "Resolve".
+            Return only items having the specified status. Status are Cancelled, Failed, Pending, Started, Success
         - name: object_identifier
           in: query
           schema:
