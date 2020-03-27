@@ -66,7 +66,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nginx-assets.rule=Host(`${VIRTUAL_HOST:-localhost}`) && PathPrefix(`/assets`)"
-      - "traefik.http.routers.nginx-assets.entrypoints=insecure"
+      - "traefik.http.routers.nginx-assets.entrypoints=secure"
+      - "traefik.http.routers.nginx-assets.tls=true"
+      - "traefik.http.routers.nginx-assets.certresolver=le"
       - "traefik.http.services.nginx-assets.loadbalancer.server.port=80"
 
     networks:
