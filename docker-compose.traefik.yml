@@ -61,7 +61,8 @@ services:
       - 80
       - 443
     volumes:
-      - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx-proxy/pharosstatic_location:/etc/nginx/vhost.d/${VIRTUAL_HOST}_location.conf
       - assets:/etc/share/nginx/html/pharos
     labels:
       - "traefik.enable=true"
