@@ -1,6 +1,6 @@
 FROM madnight/docker-alpine-wkhtmltopdf as builder
 
-FROM ruby:2.6-alpine
+FROM ruby:2.7.0-alpine
 LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 
 # Install dependencies
