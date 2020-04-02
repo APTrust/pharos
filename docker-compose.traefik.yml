@@ -57,7 +57,7 @@ services:
   nginx-assets:
     image: nginx:alpine
     container_name: nginx-assets
-    restart: unless-stopped
+    restart: always
     ports:
       - 80
       - 443
