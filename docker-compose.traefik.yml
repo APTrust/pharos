@@ -36,8 +36,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.pharos.rule=Host(`${VIRTUAL_HOST:-localhost}`)"
       - "traefik.http.routers.pharos.entrypoints=secure"
+      - "traefik.http.routers.pharos.tls=true"
       - "traefik.http.routers.pharos.tls.certresolver=le"
-      - "traefik.http.routers.pharos.loadbalancer.server.port=9292"
+      - "traefik.http.services.pharos.loadbalancer.server.port=9292"
 
   migration:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
