@@ -78,6 +78,30 @@ class InstitutionsController < ApplicationController
     update!
   end
 
+  # /api/v2/deposit_summary
+  # This is a JSON-only, admin-only call.
+  # It returns the total gigabytes deposited by each institution
+  # through end_date. If param end_date is not in the query string,
+  # it defaults to Now. https://trello.com/c/SR1jFZBg
+  def deposit_summary
+    authorize current_user, :deposit_summary?
+    gb = 1073741824.0
+    end_date = params[:end_date] || Time.now.utc.iso8601
+    report = {
+      'end_date' => end_date,
+      'unit' => 'GB',
+      'institutions' => {}
+    }
+    Institution.all.each do |inst|
+      byte_count = inst.active_files.where("created_at <= ?", end_date).sum(:size)
+      gigabytes = (byte_count / gb).round(2)
+      report['institutions'][inst.name] = gigabytes.to_f
+    end
+    respond_to do |format|
+      format.json { render json: report }
+    end
+  end
+
   def destroy
     authorize current_user, :delete_institution?
     destroy!

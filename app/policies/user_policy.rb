@@ -57,6 +57,10 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def deposit_summary?
+    user.admin?
+  end
+
   def search?
     true
   end

@@ -321,6 +321,29 @@ RSpec.describe InstitutionsController, type: :controller do
     end
   end
 
+
+  describe 'GET #deposit_summary for admin API' do
+    describe 'for admin users' do
+      before do
+        sign_in admin_user
+        session[:verified] = true
+      end
+
+      it 'returns deposit stats for all institutions' do
+        get :deposit_summary, params: { end_date: '2098-12-31' }, format: :json
+        data = JSON.parse(response.body)
+        expect(data['end_date']).to eq('2098-12-31')
+        expect(data['institutions'].keys.length).to eq(Institution.all.count)
+        data['institutions'].each do |key, value|
+          expect(key.length).to be > 4
+          expect(value).to be >= 0
+        end
+      end
+    end
+  end
+
+
+
   describe 'PATCH update' do
 
     describe 'when not signed in' do
