@@ -54,7 +54,7 @@ runconsole: ## Run Rails Console
 	docker run -it --rm --env-file=.env $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) /bin/bash -c "export TERM=dumb && rails c"
 
 runcmd: ## Start Pharos container, run command and exit.
-	docker run $(TAG) $(filter-out $@, $(MAKECMDGOALS))
+	docker run -it --rm --env-file=.env $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) $(filter-out $@, $(MAKECMDGOALS))
 
 %:
 	@true
