@@ -39,6 +39,15 @@ services:
       - "traefik.http.routers.pharos.tls=true"
       - "traefik.http.routers.pharos.tls.certresolver=le"
       - "traefik.http.services.pharos.loadbalancer.server.port=9292"
+      # CORS Headers
+      - "traefik.http.middlewares.pharos.headers.accesscontrolalloworiginlist=https://demo.aptrust.org,https://repo.aptrust.org,https://aptrust.github.io"
+      - "traefik.http.middlewares.pharos.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.pharos.headers.accesscontrolallowmethods=GET,PUT,POST,DELETE,OPTIONS"
+      - "traefik.http.middlewares.pharos.headers.accessControlAllowHeaders=Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With,X-Pharos-API-KEY,X-Pharos-API-User,api_key"
+      #PerformanceSettings
+      - "traefik.http.middlewares.limit.buffering.maxRequestBodyBytes=0"
+      - "traefik.http.middlewares.pharos.compress=true"
+
 
   migration:
     image: registry.gitlab.com/aptrust/container-registry/pharos:${DOCKER_TAG_NAME:-latest}
