@@ -38,6 +38,10 @@ class InstitutionPolicy < ApplicationPolicy
         (user.institutional_admin? && (user.institution_id == record.id))
   end
 
+  def deposit_summary?
+    user.admin?
+  end
+
   def destroy?
     false
   end
