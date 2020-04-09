@@ -22,6 +22,7 @@ RSpec.describe InstitutionsController, type: :controller do
   let(:institution_one) { FactoryBot.create(:member_institution) }
   let(:institution_two) { FactoryBot.create(:member_institution) }
   let(:institution_three) { FactoryBot.create(:member_institution) }
+  let(:institution_four) { FactoryBot.create(:member_institution, identifier: 'has-a-dash.and-more.edu') }
   let(:admin_user) { FactoryBot.create(:user, :admin, institution_id: institution_one.id, encrypted_api_secret_key: '1234-5678') }
   let(:institutional_user) { FactoryBot.create(:user, :institutional_user, institution_id: institution_two.id) }
   let(:institutional_admin) { FactoryBot.create(:user, :institutional_admin, institution_id: institution_three.id) }
@@ -110,6 +111,12 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully with an HTTP 200 status code' do
         get :show, params: { institution_identifier: admin_user.institution.to_param }
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+      end
+
+      it 'responds with 200 status code when identifier contains dashes' do
+        get :show, params: { institution_identifier: institution_four.identifier }
         expect(response).to be_successful
         expect(response.status).to eq(200)
       end
