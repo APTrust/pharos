@@ -22,6 +22,14 @@ env:
     - secure: SmLhixxIMzu5pJW2bwz33txH0W/0e0nuEugkGYDpfAAWQhEYgta7OhtNi/7m+UxlTbrYMirDLdcVV342CuV2c92k+0j97axX+gWmFIYGLg98fy6fRDXR+PlIjTrmRimzCY/WSRKDn02qBcsf/L1pTZRbI4mGf6gqorlIWioOow87V6OJt4GFzAMx35ADFAKQkr5RJBBkTzTf5fqUY3ugV1QC1BWp5Y8lTtTsIPbrYv4TBRpwoznRGCdvnkp75dnnsmsIbrxKxWS8ehBLOddUqPB7zrcQXgirb2r9IHtOzeUASjl1pX6rWNQFFCSfbD7gqavjjUXh9ZzfcR5VDk7tWguusWI7b5N9HKM5DUgkQ8Wg7pSrdwwl1j53mYcm0xeQdwwU0cTRTKv6Gam7L3Js4NN0MgSlrOk6J9TN4385g9mumzqzAV950/Kv13AsC9amqfadQrZpHSB/Rb8PY2VHCfREec7uzmgasUmPW0pJJzDsZjb37F1dLHjcNIYD57UJcVq5o/pPeh1QxCYPEXcKAGxsN9KjHr3FUOo7hjHPx+tZv40AW+80GlK7wLO+kI1Jn/EGdGHCngd2FoLG2gmNDOZafNNyKv9cU/7Kbw4PCx8vpRJYx+c0tMn8LdNM0yai1apatZZrujjqKBgG+9NmVYpPqVr50L3S0/xdFX/aT2U=
 script:
   - make test-ci
+
+before_deploy:
+# Set up git user name and tag this commit
+- git config --local user.name "Deploy Fella"
+- git config --local user.email "ops@aptrust.org"
+- export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+- git tag $TRAVIS_TAG
+
 deploy:
   - provider: pages
     skip-cleanup: true
