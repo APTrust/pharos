@@ -197,13 +197,6 @@ module Pharos
       :v2
     ]
 
-    if Rails.env.production?
-      NSQ_BASE_URL = 'http://prod-services.aptrust.org:4151'
-    elsif Rails.env.demo?
-      NSQ_BASE_URL = 'http://demo-services.aptrust.org:4151'
-    elsif Rails.env.development?
-      NSQ_BASE_URL = 'http://localhost:4151'
-    end
-
+	NSQ_BASE_URL = ENV['NSQ_BASE_URL']
   end
 end
