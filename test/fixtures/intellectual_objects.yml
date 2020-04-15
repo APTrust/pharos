@@ -13,6 +13,8 @@ inst1_obj1:
   etag: etagforinst1photos
   source_organization: Institution One
   bagit_profile_identifier: https://example.com/profile.json
+  internal_sender_identifier: First internal identifier
+  internal_sender_description: First internal description
 
 inst1_obj2:
   title: Second Object for Institution One
@@ -26,6 +28,8 @@ inst1_obj2:
   etag: etagforinst1pdfs
   source_organization: Institution One
   bagit_profile_identifier: https://example.com/profile.json
+  internal_sender_identifier: Second internal identifier
+  internal_sender_description: Second internal description
 
 inst1_obj3:
   title: Third Object for Institution One
@@ -39,6 +43,8 @@ inst1_obj3:
   etag: etagforinst1glass
   source_organization: Institution One
   bagit_profile_identifier: https://example.com/profile.json
+  internal_sender_identifier: Third internal identifier
+  internal_sender_description: Third internal description
 
 inst2_obj1:
   title: First Object for Institution Two
@@ -52,6 +58,8 @@ inst2_obj1:
   etag: etagforinst2chocolate
   source_organization: Institution Two
   bagit_profile_identifier: https://example.com/profile.json
+  internal_sender_identifier: Fourth internal identifier
+  internal_sender_description: Fourth internal description
 
 inst2_obj2:
   title: Second Object for Institution Two
@@ -65,6 +73,8 @@ inst2_obj2:
   etag: etagforinst2coal
   source_organization: Institution Two
   bagit_profile_identifier: https://example.com/profile.json
+  internal_sender_identifier: Fifth internal identifier
+  internal_sender_description: Fifth internal description
 
 inst2_obj3:
   title: Third Object for Institution Two
@@ -78,3 +88,5 @@ inst2_obj3:
   etag: etagforinst2toads
   source_organization: Institution Two
   bagit_profile_identifier: https://example.com/profile.json
+  internal_sender_identifier: Sixth internal identifier
+  internal_sender_description: Sixth internal description
