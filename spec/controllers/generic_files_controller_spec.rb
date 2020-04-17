@@ -220,15 +220,18 @@ RSpec.describe GenericFilesController, type: :controller do
         # NOTE: while storage_option is a required field it should NOT be included in this error message because it should be set to 'standard' by default
       end
 
-      it 'should update fields' do
+      it 'should save field values' do
         obj1.storage_option = 'Glacier-VA'
         obj1.save!
-        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', storage_option: 'Glacier-VA', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', ingest_state: '{[A]}', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
+        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', storage_option: 'Glacier-VA', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', ingest_state: '{[A]}', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}], storage_records_attributes: [ {url: 'https://example.com/url1' }, {url: 'https://example.com/url2' }]} }, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
           expect(file.uri).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg'
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/puppy.jpg'
           expect(file.storage_option).to eq 'Glacier-VA'
+          expect(file.storage_records.length).to eq 2
+          expect(file.storage_records[0].url).to eq "https://example.com/url1"
+          expect(file.storage_records[1].url).to eq "https://example.com/url2"
         end
       end
 
@@ -386,12 +389,15 @@ RSpec.describe GenericFilesController, type: :controller do
           premis_event_count = file.premis_events.count
           file.checksums << new_checksum
           file.premis_events << new_event
-          patch :update, params: { generic_file_identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true }
+          patch :update, params: { generic_file_identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99, storage_records_attributes: [ {url: 'https://example.com/url1' }, {url: 'https://example.com/url2' }]}, format: 'json', trailing_slash: true }
           expect(assigns[:generic_file].size).to eq 99
           expect(response.code).to eq '200'
           file.reload
           expect(file.checksums.count).to eq(checksum_count + 1)
           expect(file.premis_events.count).to eq(premis_event_count + 1)
+          expect(file.storage_records.length).to eq 2
+          expect(file.storage_records[0].url).to eq "https://example.com/url1"
+          expect(file.storage_records[1].url).to eq "https://example.com/url2"
         end
       end
     end

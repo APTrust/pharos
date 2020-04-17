@@ -279,7 +279,7 @@ class GenericFilesController < ApplicationController
                :institution_id],
               checksums_attributes:
                 [:datetime, :algorithm, :digest, :generic_file_id],
-              storage_records_attributes: [:url])
+              storage_records_attributes: [:url, :generic_file_id])
   end
 
   def batch_generic_file_params
@@ -292,7 +292,7 @@ class GenericFilesController < ApplicationController
                        :institution_id],
                       checksums_attributes:
                         [:datetime, :algorithm, :digest, :generic_file_id],
-                     storage_records_attributes: [:url]])
+                     storage_records_attributes: [:url, :generic_file_id]])
   end
 
   def resource
