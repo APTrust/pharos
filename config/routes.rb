@@ -4,24 +4,23 @@ Rails.application.routes.draw do
   institution_ptrn = /(?:[a-zA-Z0-9\-_]+)(?:\.[a-zA-Z]+)+/
   resources :institutions, format: [:json, :html], param: :institution_identifier, institution_identifier: institution_ptrn
   resources :institutions, only: [:index], format: :json, param: :institution_identifier, institution_identifier: institution_ptrn, path: 'api/v2/institutions'
-  get ':institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :institution_snapshot
   get 'api/v2/:institution_identifier/single_snapshot', to: 'institutions#single_snapshot', format: [:html, :json], institution_identifier: institution_ptrn, as: :api_institution_snapshot
-  get '/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :group_snapshot
+  get '/institutions/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :group_snapshot
   get 'api/v2/group_snapshot', to: 'institutions#group_snapshot', format: [:html, :json], as: :api_group_snapshot
-  get '/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
-  get '/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
-  get '/:institution_identifier/enable_otp', to: 'institutions#enable_otp', as: :enable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
-  get '/:institution_identifier/disable_otp', to: 'institutions#disable_otp', as: :disable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/deactivate', to: 'institutions#deactivate', as: :deactivate_institution, institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/reactivate', to: 'institutions#reactivate', as: :reactivate_institution, institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/enable_otp', to: 'institutions#enable_otp', as: :enable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/disable_otp', to: 'institutions#disable_otp', as: :disable_otp_institution, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/trigger_bulk_delete', to: 'institutions#trigger_bulk_delete', as: :api_bulk_deletion, format: :json, institution_identifier: institution_ptrn
-  get '/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :bulk_deletion_institutional_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/confirm_bulk_delete_institution', to: 'institutions#partial_confirmation_bulk_delete', as: :api_bulk_deletion_institutional_confirmation, format: :json, institution_identifier: institution_ptrn
-  get '/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :bulk_deletion_admin_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :bulk_deletion_admin_confirmation, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/confirm_bulk_delete_admin', to: 'institutions#final_confirmation_bulk_delete', as: :api_bulk_deletion_admin_confirmation, format: :json, institution_identifier: institution_ptrn
-  get '/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :bulk_deletion_finished, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :bulk_deletion_finished, format: [:html, :json], institution_identifier: institution_ptrn
   post 'api/v2/:institution_identifier/finished_bulk_delete', to: 'institutions#finished_bulk_delete', as: :api_bulk_deletion_finished, format: :json, institution_identifier: institution_ptrn
   get '/notifications/deletion', to: 'institutions#deletion_notifications', as: :institution_deletion_notifications, format: [:html, :json]
   get 'api/v2/notifications/deletion', to: 'institutions#deletion_notifications', as: :api_institution_deletion_notifications, format: [:html, :json]
-  get '/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
+  get '/institutions/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
   get 'api/v2/:institution_identifier/mass_forced_password_update', to: 'institutions#mass_forced_password_update', as: :api_mass_forced_password_update, format: [:html, :json], institution_identifier: institution_ptrn
 
   # Admin URL for monthly deposit report
@@ -75,6 +74,8 @@ Rails.application.routes.draw do
   get 'member-api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
   put 'api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
 
+  # STORAGE RECORDS (API)
+  get 'api/v2/storage_records/:generic_file_identifier', to: 'storage_records#index', format: :json, generic_file_identifier: file_ptrn
 
   # INSTITUTIONS (API)
   # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'

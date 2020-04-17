@@ -4,9 +4,11 @@ class GenericFile < ActiveRecord::Base
   belongs_to :institution
   has_many :premis_events
   has_many :checksums
+  has_many :storage_records
   has_one :confirmation_token
   accepts_nested_attributes_for :checksums, allow_destroy: true
   accepts_nested_attributes_for :premis_events, allow_destroy: true
+  accepts_nested_attributes_for :storage_records, allow_destroy: true
 
   validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_option, presence: true
   validates_uniqueness_of :identifier

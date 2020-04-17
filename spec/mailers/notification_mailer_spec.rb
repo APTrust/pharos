@@ -402,7 +402,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'assigns @confirmation_url' do
-      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_institution?bulk_delete_job_id=#{job.id}&confirmation_token=#{token.token}")
+      expect(mail.body.encoded).to include("http://localhost:3000/institutions/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_institution?bulk_delete_job_id=#{job.id}&confirmation_token=#{token.token}")
     end
 
     it 'has an email log with proper associations' do
@@ -449,7 +449,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     end
 
     it 'assigns @confirmation_url' do
-      expect(mail.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_admin?bulk_delete_job_id=#{job.id}&confirmation_token=#{token.token}")
+      expect(mail.body.encoded).to include("http://localhost:3000/institutions/#{CGI.escape(institution.identifier)}/confirm_bulk_delete_admin?bulk_delete_job_id=#{job.id}&confirmation_token=#{token.token}")
     end
 
     it 'has an email log with proper associations' do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_05_130017) do
+ActiveRecord::Schema.define(version: 2020_04_17_135832) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -258,6 +258,12 @@ ActiveRecord::Schema.define(version: 2020_03_05_130017) do
     t.bigint "go_bytes"
   end
 
+  create_table "storage_records", force: :cascade do |t|
+    t.integer "generic_file_id"
+    t.string "url"
+    t.index ["generic_file_id"], name: "index_storage_records_on_generic_file_id"
+  end
+
   create_table "usage_samples", id: :serial, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -283,13 +289,13 @@ ActiveRecord::Schema.define(version: 2020_03_05_130017) do
     t.string "last_sign_in_ip"
     t.integer "institution_id"
     t.text "encrypted_api_secret_key"
-    t.datetime "deactivated_at"
     t.datetime "password_changed_at"
     t.string "encrypted_otp_secret"
     t.string "encrypted_otp_secret_iv"
     t.string "encrypted_otp_secret_salt"
     t.integer "consumed_timestep"
     t.boolean "otp_required_for_login"
+    t.datetime "deactivated_at"
     t.boolean "enabled_two_factor", default: false
     t.boolean "confirmed_two_factor", default: false
     t.string "otp_backup_codes", array: true
@@ -356,5 +362,6 @@ ActiveRecord::Schema.define(version: 2020_03_05_130017) do
   end
 
   add_foreign_key "checksums", "generic_files"
+  add_foreign_key "storage_records", "generic_files"
   add_foreign_key "users", "institutions"
 end

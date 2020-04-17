@@ -510,9 +510,9 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds successfully and creates a snapshot' do
         get :single_snapshot, params: { institution_identifier: admin_user.institution.to_param }
-        #expect(response).to be_successful
-        expect(response.status).to eq(302)
-        expect(flash[:notice]).to eq "A snapshot of #{admin_user.institution.name} has been taken and archived on #{assigns(:snapshots).first.audit_date}. Please see the reports page for that analysis."
+        expect(response).to be_successful
+        #expect(response.status).to eq(302)
+        #expect(flash[:notice]).to eq "A snapshot of #{admin_user.institution.name} has been taken and archived on #{assigns(:snapshots).first.audit_date}. Please see the reports page for that analysis."
         expect(assigns(:snapshots).first.apt_bytes).to eq 0
         expect(assigns(:snapshots).first.cost).to eq 0.00
       end
@@ -527,8 +527,9 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds unauthorized' do
         get :single_snapshot, params: { institution_identifier: institutional_admin.institution.to_param }
-        expect(response).to redirect_to root_path
-        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+        expect(response.status).to eq(403)
+        #expect(response).to redirect_to root_path
+        #expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
 
     end
@@ -541,8 +542,9 @@ RSpec.describe InstitutionsController, type: :controller do
 
       it 'responds unauthorized' do
         get :single_snapshot, params: { institution_identifier: institutional_user.institution.to_param }
-        expect(response).to redirect_to root_path
-        expect(flash[:alert]).to eq 'You are not authorized to access this page.'
+        expect(response.status).to eq(403)
+        #expect(response).to redirect_to root_path
+        #expect(flash[:alert]).to eq 'You are not authorized to access this page.'
       end
     end
   end
@@ -847,7 +849,7 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(count_after).to eq count_before + 1
         token = ConfirmationToken.where(institution_id: institution_one.id).first
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_one.identifier)}/confirm_bulk_delete_institution?bulk_delete_job_id=#{assigns[:bulk_job].id}&confirmation_token=#{token.token}")
+        expect(email.body.encoded).to include("http://localhost:3000/institutions/#{CGI.escape(institution_one.identifier)}/confirm_bulk_delete_institution?bulk_delete_job_id=#{assigns[:bulk_job].id}&confirmation_token=#{token.token}")
       end
 
     end
@@ -927,7 +929,7 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(assigns[:institution].confirmation_token).to eq new_token
         expect(new_token.token).not_to eq token.token
         email = ActionMailer::Base.deliveries.last
-        expect(email.body.encoded).to include("http://localhost:3000/#{CGI.escape(institution_three.identifier)}/confirm_bulk_delete_admin?bulk_delete_job_id=#{bulk_job.id}&confirmation_token=#{new_token.token}")
+        expect(email.body.encoded).to include("http://localhost:3000/institutions/#{CGI.escape(institution_three.identifier)}/confirm_bulk_delete_admin?bulk_delete_job_id=#{bulk_job.id}&confirmation_token=#{new_token.token}")
       end
 
       it 'responds unsuccessfully if the confirmation token is invalid' do
