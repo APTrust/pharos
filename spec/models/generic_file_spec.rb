@@ -87,15 +87,24 @@ RSpec.describe GenericFile, :type => :model do
       describe 'soft_delete' do
         let(:object) { FactoryBot.create(:intellectual_object) }
         let(:file) { FactoryBot.create(:generic_file, intellectual_object: object) }
+        let(:sr1) { FactoryBot.create(:storage_record, generic_file: file, url: "https://url1")}
+        let(:sr2) { FactoryBot.create(:storage_record, generic_file: file, url: "https://url2")}
+
         before do
+          file.storage_records = [sr1, sr2]
           file.save!
+          FactoryBot.create(:premis_event_ingest, generic_file: file, date_time: DateTime.current - 2.days)
+          FactoryBot.create(:premis_event_deletion, generic_file: file, date_time: DateTime.current)
+
           @parent_work_item = FactoryBot.create(:work_item,
-                                                      object_identifier: file.intellectual_object.identifier,
-                                                      action: Pharos::Application::PHAROS_ACTIONS['ingest'],
-                                                      stage: Pharos::Application::PHAROS_STAGES['record'],
-                                                      status: Pharos::Application::PHAROS_STATUSES['success'])
+                                                object_identifier: file.intellectual_object.identifier,
+                                                action: Pharos::Application::PHAROS_ACTIONS['ingest'],
+                                                stage: Pharos::Application::PHAROS_STAGES['record'],
+                                                status: Pharos::Application::PHAROS_STATUSES['success'])
         end
+
         after do
+          file.storage_records.destroy_all
           file.destroy
           intellectual_object.delete
           @parent_work_item.delete
@@ -127,6 +136,21 @@ RSpec.describe GenericFile, :type => :model do
           expect(pi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
           expect(pi.user).to eq 'user@example.com'
           expect(pi.inst_approver).to eq 'other_user@example.com'
+        end
+
+        # We can call this only after the deletion WorkItem has been
+        # created.
+        it 'mark_deleted should set state to D and delete storage records' do
+          expect(file).not_to be_nil
+          expect(file.state).to eq 'A'
+          expect(file.storage_records.length).to eq 2
+
+          file.mark_deleted
+          file.reload
+
+          expect(file).not_to be_nil
+          expect(file.state).to eq 'D'
+          expect(file.storage_records.length).to eq 0
         end
 
       end

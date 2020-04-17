@@ -6,9 +6,9 @@ class GenericFile < ActiveRecord::Base
   has_many :checksums
   has_many :storage_records
   has_one :confirmation_token
-  accepts_nested_attributes_for :checksums, allow_destroy: true
-  accepts_nested_attributes_for :premis_events, allow_destroy: true
-  accepts_nested_attributes_for :storage_records, allow_destroy: true
+  accepts_nested_attributes_for :checksums
+  accepts_nested_attributes_for :premis_events
+  accepts_nested_attributes_for :storage_records
 
   validates :uri, :size, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_option, presence: true
   validates_uniqueness_of :identifier
@@ -112,6 +112,7 @@ class GenericFile < ActiveRecord::Base
   def mark_deleted
     if self.deleted_since_last_ingest?
       self.state = 'D'
+      self.storage_records.destroy_all
       self.save!
     else
       raise 'File cannot be marked deleted without first creating a deletion PREMIS event.'
