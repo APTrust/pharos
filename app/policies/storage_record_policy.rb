@@ -40,7 +40,7 @@ class StorageRecordPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       else
-        scope.where("0 = 1")
+        scope.none
       end
     end
   end
