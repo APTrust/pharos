@@ -17,7 +17,6 @@
 class StorageRecord < ApplicationRecord
   belongs_to :generic_file
 
-  validates_presence_of :generic_file_id
   validates_presence_of :url
   validates_uniqueness_of :url
 
