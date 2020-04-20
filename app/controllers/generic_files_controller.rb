@@ -67,6 +67,7 @@ class GenericFilesController < ApplicationController
         format.json { render json: object_as_json, status: :created }
       else
         log_model_error(@generic_file)
+        # TODO: Return 409 on storage_record.url conflict! 422 is useless.
         format.json { render json: @generic_file.errors, status: :unprocessable_entity }
       end
     end
