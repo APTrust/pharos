@@ -1,0 +1,162 @@
+# These fixtures are used in integration tests with the
+# APTrust Go services. They're not used for spec tests.
+
+sr01:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/25452f41-1b18-47b7-b334-751dfd5d011e
+  generic_file: inst1_obj1_gf1
+
+sr02:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/25452f41-1b18-47b7-b334-751dfd5d011e
+  generic_file: inst1_obj1_gf1
+
+sr03:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/e2bd408c-1958-42f2-a536-b9aa34318f85
+  generic_file: inst1_obj1_gf2
+
+sr04:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/e2bd408c-1958-42f2-a536-b9aa34318f85
+  generic_file: inst1_obj1_gf2
+
+sr05:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/8205a12c-67dc-4618-96ff-53ddaa663469
+  generic_file: inst1_obj1_gf3
+
+sr06:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/8205a12c-67dc-4618-96ff-53ddaa663469
+  generic_file: inst1_obj1_gf3
+
+sr07:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/13c02f70-b149-46a8-96c9-f59512239047
+  generic_file: inst1_obj2_gf1
+
+sr08:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/13c02f70-b149-46a8-96c9-f59512239047
+  generic_file: inst1_obj2_gf1
+
+sr09:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/72153e55-e34a-4c16-a6c5-7ac27a16ae6b
+  generic_file: inst1_obj2_gf2
+
+sr10:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/72153e55-e34a-4c16-a6c5-7ac27a16ae6b
+  generic_file: inst1_obj2_gf2
+
+sr11:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/9abb01d3-0b36-4de1-8149-41eeeec2f551
+  generic_file: inst1_obj2_gf3
+
+sr12:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/9abb01d3-0b36-4de1-8149-41eeeec2f551
+  generic_file: inst1_obj2_gf3
+
+sr13:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/4820099e-f1f9-4f21-8db9-19f01ea5a1c1
+  generic_file: inst1_obj3_gf1
+
+sr14:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/4820099e-f1f9-4f21-8db9-19f01ea5a1c1
+  generic_file: inst1_obj3_gf1
+
+sr15:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/1857267a-a0eb-469d-ac7c-f50e772b20e9
+  generic_file: inst1_obj3_gf2
+
+sr16:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/1857267a-a0eb-469d-ac7c-f50e772b20e9
+  generic_file: inst1_obj3_gf2
+
+sr17:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/e2060c45-1501-4286-b580-ca664be88390
+  generic_file: inst1_obj3_gf3
+
+sr18:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/e2060c45-1501-4286-b580-ca664be88390
+  generic_file: inst1_obj3_gf3
+
+sr19:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/72459afd-4e31-438b-b46d-f3d3cffa10f3
+  generic_file: inst1_obj3_gf4
+
+sr20:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/72459afd-4e31-438b-b46d-f3d3cffa10f3
+  generic_file: inst1_obj3_gf4
+
+sr21:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/3ba064ae-6a12-49e9-b9f8-cd63fbb173ce
+  generic_file: inst2_obj1_gf1
+
+sr22:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/3ba064ae-6a12-49e9-b9f8-cd63fbb173ce
+  generic_file: inst2_obj1_gf1
+
+sr23:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/856e3b62-f3ce-4122-a560-685b7204a5d3
+  generic_file: inst2_obj1_gf2
+
+sr24:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/856e3b62-f3ce-4122-a560-685b7204a5d3
+  generic_file: inst2_obj1_gf2
+
+sr25:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/1877b440-bdf7-454a-b586-1920eb17335c
+  generic_file: inst2_obj1_gf3
+
+sr26:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/1877b440-bdf7-454a-b586-1920eb17335c
+  generic_file: inst2_obj1_gf3
+
+sr27:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/88ea1bf7-56bd-4bd0-a316-f6db12d7e34d
+  generic_file: inst2_obj2_gf1
+
+sr28:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/88ea1bf7-56bd-4bd0-a316-f6db12d7e34d
+  generic_file: inst2_obj2_gf1
+
+sr29:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/058d8e9b-a23a-4125-b6fe-ff3c35ff48e4
+  generic_file: inst2_obj2_gf2
+
+sr30:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/058d8e9b-a23a-4125-b6fe-ff3c35ff48e4
+  generic_file: inst2_obj2_gf2
+
+sr31:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/016aa20b-a072-4207-8aa4-5d875bdaf166
+  generic_file: inst2_obj2_gf3
+
+sr32:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/016aa20b-a072-4207-8aa4-5d875bdaf166
+  generic_file: inst2_obj2_gf3
+
+sr33:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/7c8daeb2-8a37-411e-91b7-f828c0e6f407
+  generic_file: inst2_obj3_gf1
+
+sr34:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/7c8daeb2-8a37-411e-91b7-f828c0e6f407
+  generic_file: inst2_obj3_gf1
+
+sr35:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/735c7f8b-1795-451d-9adc-2904c3096721
+  generic_file: inst2_obj3_gf2
+
+sr36:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/735c7f8b-1795-451d-9adc-2904c3096721
+  generic_file: inst2_obj3_gf2
+
+sr37:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/507ba10f-eb98-409c-b95a-a03dbb323e97
+  generic_file: inst2_obj3_gf3
+
+sr38:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/507ba10f-eb98-409c-b95a-a03dbb323e97
+  generic_file: inst2_obj3_gf3
+
+sr39:
+  url: https://s3.amazonaws.com/aptrust.test.preservation/da86f292-7a85-45c3-9436-e42675e3471b
+  generic_file: inst2_obj3_gf4
+
+sr40:
+  url: https://s3.amazonaws.com/aptrust.test.preservation-or/da86f292-7a85-45c3-9436-e42675e3471b
+  generic_file: inst2_obj3_gf4

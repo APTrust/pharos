@@ -123,8 +123,8 @@ ActiveRecord::Schema.define(version: 2020_04_17_135832) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "state"
-    t.text "ingest_state"
     t.datetime "last_fixity_check", default: "2000-01-01 00:00:00", null: false
+    t.text "ingest_state"
     t.integer "institution_id", null: false
     t.string "storage_option", default: "Standard", null: false
     t.index ["created_at"], name: "index_generic_files_on_created_at"
@@ -275,7 +275,6 @@ ActiveRecord::Schema.define(version: 2020_04_17_135832) do
     t.string "name"
     t.string "email"
     t.string "phone_number"
-    t.string "institution_pid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "encrypted_password", default: "", null: false
@@ -289,13 +288,13 @@ ActiveRecord::Schema.define(version: 2020_04_17_135832) do
     t.string "last_sign_in_ip"
     t.integer "institution_id"
     t.text "encrypted_api_secret_key"
+    t.datetime "deactivated_at"
     t.datetime "password_changed_at"
     t.string "encrypted_otp_secret"
     t.string "encrypted_otp_secret_iv"
     t.string "encrypted_otp_secret_salt"
     t.integer "consumed_timestep"
     t.boolean "otp_required_for_login"
-    t.datetime "deactivated_at"
     t.boolean "enabled_two_factor", default: false
     t.boolean "confirmed_two_factor", default: false
     t.string "otp_backup_codes", array: true
@@ -361,7 +360,5 @@ ActiveRecord::Schema.define(version: 2020_04_17_135832) do
     t.index ["status"], name: "index_work_items_on_status"
   end
 
-  add_foreign_key "checksums", "generic_files"
   add_foreign_key "storage_records", "generic_files"
-  add_foreign_key "users", "institutions"
 end
