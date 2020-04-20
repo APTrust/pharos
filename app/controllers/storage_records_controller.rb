@@ -32,7 +32,7 @@ class StorageRecordsController < InheritedResources::Base
   private
 
   def storage_record_params
-    params.require(:storage_record).permit(:generic_file_identifier)
+    params.require(:generic_file_identifier)
   end
 
 end
