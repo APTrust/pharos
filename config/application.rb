@@ -49,7 +49,8 @@ module Pharos
         'start' => 'Started',
         'success' => 'Success',
         'fail' => 'Failed',
-        'cancel' => 'Cancelled'
+        'cancel' => 'Cancelled',
+        'suspended' => 'Suspended'
     }
 
     PHAROS_STAGES = {
