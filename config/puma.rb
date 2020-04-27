@@ -36,7 +36,7 @@ state_path '/tmp/puma.state'
 #
 # The default is "0, 16".
 #
-threads 8, 32
+threads Integer(ENV['RAILS_MIN_THREADS'] || 0), Integer(ENV['RAILS_MAX_THREADS'] || 16)
 
 # By default, workers accept all requests and queue them to pass to handlers.
 # When false, workers accept the number of simultaneous requests configured.
@@ -90,7 +90,7 @@ end
 #
 # The default is "0".
 #
-workers 2
+workers Integer(ENV['WEB_CONCURRENCY'] || 2)
 
 # Code to run when a worker boots to setup the process before booting
 # the app.
