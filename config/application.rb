@@ -59,6 +59,7 @@ module Pharos
         'fetch' => 'Fetch',
         'unpack' => 'Unpack',
         'validate' => 'Validate',
+        'reingest_check' => 'ReingestCheck',
         'store' => 'Store',
         'record' => 'Record',
         'clean' => 'Cleanup',
