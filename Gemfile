@@ -41,7 +41,7 @@ gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
 gem 'kaminari'
 gem 'sassc-rails'
-gem 'sassc', '2.2.1'
+gem 'sassc', '2.3.0'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'browser-timezone-rails'
 gem 'sprockets', '~> 3.7.2'
@@ -67,7 +67,7 @@ group :development do
 end
 
 group :test, :development do
-  gem 'capybara', '3.32.0'
+  gem 'capybara', '3.32.1'
   gem 'shoulda-matchers', '~> 4.3.0'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
