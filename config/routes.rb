@@ -51,8 +51,8 @@ Rails.application.routes.draw do
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
-  resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :html }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
-  resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :json }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
+  resources :generic_files, only: [:show, :update, :destroy], format: [:html], defaults: { format: :html }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
+  resources :generic_files, only: [:show, :update, :destroy], format: [:json], defaults: { format: :json }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
   get '/api/v2/files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files_api
   get '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files_api
   get '/api/v2/files/', to: 'generic_files#index', format: [:json], as: :generic_files_admin_list
