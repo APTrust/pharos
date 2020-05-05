@@ -216,7 +216,7 @@ RSpec.describe GenericFilesController, type: :controller do
         expect(JSON.parse(response.body)).to eq( {
                                                      'file_format' => ["can't be blank"],
                                                      'identifier' => ["can't be blank"],
-                                                     'size' => ["can't be blank"]})
+                                                     'size' => ["is not a number"]})
         # NOTE: while storage_option is a required field it should NOT be included in this error message because it should be set to 'standard' by default
       end
 

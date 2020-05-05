@@ -9,7 +9,7 @@ RSpec.describe GenericFile, :type => :model do
   end
 
   it { should validate_presence_of(:uri) }
-  it { should validate_presence_of(:size) }
+  it { should validate_numericality_of(:size) }
   it { should validate_presence_of(:file_format) }
   it { should validate_presence_of(:identifier) }
   it { should validate_presence_of(:institution_id) }
