@@ -38,6 +38,7 @@ namespace :pharos do
       puts 'Nothing to do: Institution, groups, and admin user already exist.'
     end
     puts "You should be able to log in as ops@aptrust.org, with password 'password123'"
+    puts "or system@aptrust.org / password"
   end
 
   desc 'Set up user API key'
