@@ -57,6 +57,7 @@ module Pharos
         'requested' => 'Requested',
         'receive' => 'Receive',
         'fetch' => 'Fetch',
+        'format_identification' => 'Format Identification',
         'unpack' => 'Unpack',
         'validate' => 'Validate',
         'reingest_check' => 'Reingest Check',
