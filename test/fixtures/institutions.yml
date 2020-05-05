@@ -4,8 +4,8 @@
 aptrust:
   name: APTrust
   identifier: aptrust.org
-  receiving_bucket: aptrust.receiving.test.test.edu
-  restore_bucket: aptrust.restore.test.test.edu
+  receiving_bucket: aptrust.receiving.test.aptrust.org
+  restore_bucket: aptrust.restore.test.aptrust.org
 
 inst1:
   name: Institution One
