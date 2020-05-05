@@ -21,6 +21,20 @@ RSpec.describe GenericFile, :type => :model do
     expect(file.intellectual_object.identifier).to include('/')
   end
 
+  it 'should allow file size zero' do
+    file = FactoryBot.create(:generic_file)
+    file.size = 0
+    file.save
+    file.errors[:size].should be_empty
+  end
+
+  it 'should not allow file size less than zero' do
+    file = FactoryBot.create(:generic_file)
+    file.size = -1
+    file.save
+    file.errors[:size].should include('must be greater than or equal to 0')
+  end
+
   it 'should not allow the institution_id to be changed once set' do
     file = FactoryBot.create(:generic_file)
     file.institution_id = 15

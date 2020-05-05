@@ -11,7 +11,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :storage_records
 
   validates :uri, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_option, presence: true
-  validates :size, numericality: { only_integer: true }
+  validates :size, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates_uniqueness_of :identifier
   validate :init_institution_id, on: :create
   validate :matching_storage_option, on: :create
