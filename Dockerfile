@@ -10,13 +10,16 @@ LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 # - postgresql-client-9.4: In case you want to talk directly to postgres
 
 RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
-    nodejs postgresql-client postgresql-dev python py-requests py-argparse \
+    nodejs postgresql-client postgresql-dev python py-pip py-argparse \
     libstdc++ tzdata bash ruby-dev ruby-nokogiri ruby-bigdecimal \
 	libxml2-dev libxslt-dev readline readline-dev curl \
 # Following packages for wkhtmltopdf only
     libgcc libstdc++ libx11 glib libxrender libxext libintl \
     libcrypto1.1 libssl1.1 \
     ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
+
+# Needed for bin/pharos_notify.py
+RUN pip install requests
 
 RUN addgroup -S somegroup -g 1000 && adduser -S -G somegroup somebody -u 1000
 
