@@ -204,7 +204,7 @@ class InstitutionsController < ApplicationController
       end
     end
     NotificationMailer.snapshot_notification(@wb_hash).deliver!
-    write_snapshots_to_spreadsheet if Rails.env.production?
+#    write_snapshots_to_spreadsheet if Rails.env.production?
     respond_to do |format|
       format.json { render json: { snapshots: @snapshots.each { |snap_set| snap_set.map { |item| item.serializable_hash } } } }
       format.html {
@@ -497,6 +497,9 @@ class InstitutionsController < ApplicationController
     response.headers['Content-Disposition'] = "attachment; filename*=UTF-8''#{escaped}"
   end
 
+  # Note: [cd3ef - 050820] This function is flawed since it relies on a config.json (from development presumably). It should access env vars
+  # for credentials. Also re-using the same sheet may be problematic if the permissions on the sheet change or it gets
+  # accidentally deleted. Better to create a new sheet every momth. Leaving this function in place for future reference.
   def write_snapshots_to_spreadsheet
     session = GoogleDrive::Session.from_config('config.json')
     sheet = session.spreadsheet_by_key('1E29ttbnuRDyvWfYAh6_-Zn9s0ChOspUKCOOoeez1fZE').worksheets[0] # Chip Sheet
