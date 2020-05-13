@@ -77,7 +77,7 @@ Rails.application.routes.draw do
   # STORAGE RECORDS (API)
   get 'api/v2/storage_records/:generic_file_identifier', to: 'storage_records#index', format: :json, generic_file_identifier: file_ptrn
   post 'api/v2/storage_records/:generic_file_identifier', to: 'storage_records#create', format: :json, generic_file_identifier: file_ptrn
-  delete 'api/v2/storage_records/:generic_file_identifier', to: 'storage_records#destroy', format: :json, generic_file_identifier: file_ptrn
+  delete 'api/v2/storage_records/:id', to: 'storage_records#destroy', format: :json
 
   # INSTITUTIONS (API)
   # resources :institutions doesn't like this route for #show, because it interprets .edu/.org/.com as an 'unknown format'

@@ -96,8 +96,42 @@ RSpec.describe StorageRecordsController, type: :controller do
         expect(response.status).to eq(403)
       end
     end
+  end
+
+  describe '#DELETE destroy' do
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        delete :destroy, params: { id: storage_record_one.id }, format: :json
+        expect(response.status).to eq (401)
+      end
+    end
+
+    describe 'for admin users' do
+      before do
+        sign_in admin_user
+        session[:verified] = true
+      end
+
+      it 'allows sys admin to delete a storage record' do
+        delete :destroy, params: { id: storage_record_one.id }, format: :json
+        expect(response.status).to eq (204)
+      end
+    end
+
+    describe 'for institutional admin users' do
+      before do
+        sign_in institutional_admin
+        session[:verified] = true
+      end
+
+      it 'denies access' do
+        delete :destroy, params: { id: storage_record_one.id }, format: :json
+        expect(response.status).to eq(403)
+      end
+    end
 
   end
+
 
   # -- No further testing because no other routes are defined
   # -- for this controller.
