@@ -19,6 +19,7 @@ RSpec.describe StorageRecordsController, type: :controller do
     Institution.delete_all
   end
 
+  let(:url) { 'https://example.com/file.txt' }
   let!(:institution_one) { FactoryBot.create(:member_institution) }
   let!(:institution_two) { FactoryBot.create(:subscription_institution) }
   let!(:admin_user) { FactoryBot.create(:user, :admin, institution: institution_one) }
@@ -61,6 +62,41 @@ RSpec.describe StorageRecordsController, type: :controller do
         expect(response.status).to eq(403)
       end
     end
+  end
+
+  describe '#POST create' do
+    describe 'when not signed in' do
+      it 'should redirect to login' do
+        post :create, params: { generic_file_identifier: generic_file_one.identifier, url: url }, format: :json
+        expect(response.status).to eq (401)
+      end
+    end
+
+    describe 'for admin users' do
+      before do
+        sign_in admin_user
+        session[:verified] = true
+      end
+
+      it 'allows sys admin to create a storage record' do
+        post :create, params: { generic_file_identifier: generic_file_one.identifier, url: url }, format: :json
+        expect(response.status).to eq (201)
+        expect(assigns(:storage_record).url).to eq(url)
+      end
+    end
+
+    describe 'for institutional admin users' do
+      before do
+        sign_in institutional_admin
+        session[:verified] = true
+      end
+
+      it 'denies access' do
+        post :create, params: { generic_file_identifier: generic_file_one.identifier }, format: :json
+        expect(response.status).to eq(403)
+      end
+    end
+
   end
 
   # -- No further testing because no other routes are defined

@@ -29,10 +29,38 @@ class StorageRecordsController < InheritedResources::Base
     end
   end
 
+  # POST 'api/v2/storage_records/:generic_file_identifier'
+  def create
+    authorize StorageRecord
+    generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier])
+    @storage_record = generic_file.storage_records.new(storage_record_params)
+    respond_to do |format|
+      if @storage_record.save
+        format.json { render json: @storage_record.serializable_hash, status: :created }
+      else
+        log_model_error(storage_record)
+        format.json { render json: @storage_record.errors, status: :bad_request }
+      end
+    end
+  end
+
+  # DELETE 'api/v2/storage_records/:id'
+  def destroy
+    authorize StorageRecord
+    StorageRecord.destroy(params[:id])
+    respond_to do |format|
+      format.json { render body: nil, status: :no_content }
+    end
+  end
+
   private
 
   def storage_record_params
-    params.require(:generic_file_identifier)
+    if request.method == 'POST'
+      params.permit(:url)
+    else
+      params.require(:id)
+    end
   end
 
 end
