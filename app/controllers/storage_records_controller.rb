@@ -56,9 +56,11 @@ class StorageRecordsController < InheritedResources::Base
   private
 
   def storage_record_params
-    if request.method == 'POST'
+    if request.method == 'GET'
+      params.require(:generic_file_identifier)
+    elsif request.method == 'POST'
       params.permit(:url)
-    else
+    elsif request.method == 'DELETE'
       params.require(:id)
     end
   end
