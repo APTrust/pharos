@@ -199,6 +199,10 @@ class GenericFilesController < ApplicationController
     end
   end
 
+  # TODO: This method should create the deletion PremisEvent
+  # just like IntellectualObjectsController#finished_delete.
+  # Currently, the Go deletion service is responsible for creating
+  # the event. Fix this in the rewrite.
   def finished_destroy
     authorize @generic_file
     @generic_file.mark_deleted

@@ -184,8 +184,8 @@ class IntellectualObjectsController < ApplicationController
                    detail: 'Object deleted from S3 storage',
                    outcome: 'Success',
                    outcome_detail: deletion_item.user,
-                   object: 'AWS Go SDK S3 Library',
-                   agent: 'https://github.com/aws/aws-sdk-go',
+                   object: 'Minio S3 Library for Go',
+                   agent: 'https://github.com/minio/minio-go',
                    identifier: SecureRandom.uuid
     }
     (deletion_item.aptrust_approver.nil? || deletion_item.aptrust_approver == '') ?

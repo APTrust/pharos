@@ -461,8 +461,8 @@ class InstitutionsController < ApplicationController
                        detail: 'Object deleted from S3 storage',
                        outcome: 'Success',
                        outcome_detail: @bulk_job.requested_by,
-                       object: 'AWS Go SDK S3 Library',
-                       agent: 'https://github.com/aws/aws-sdk-go',
+                       object: 'Minio S3 Library for Go',
+                       agent: 'https://github.com/minio/minio-go',
                        identifier: SecureRandom.uuid,
                        outcome_information: "Object deleted as part of bulk deletion at the request of #{@bulk_job.requested_by}. Institutional Approver: #{@bulk_job.institutional_approver}. APTrust Approver: #{@bulk_job.aptrust_approver}"
 
