@@ -38,7 +38,7 @@ class StorageRecordsController < InheritedResources::Base
       if @storage_record.save
         format.json { render json: @storage_record.serializable_hash, status: :created }
       else
-        log_model_error(storage_record)
+        log_model_error(@storage_record)
         format.json { render json: @storage_record.errors, status: :bad_request }
       end
     end
