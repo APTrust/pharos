@@ -114,7 +114,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    devise-authy (2.0.0)
+    devise-authy (2.1.0)
       authy (>= 2.7.5)
       devise (>= 4.0.0)
     devise-security (0.14.3)
@@ -284,7 +284,7 @@ GEM
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)
       uber (< 0.2.0)
-    responders (3.0.0)
+    responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
     retriable (3.1.2)
