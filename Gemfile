@@ -47,7 +47,7 @@ gem 'browser-timezone-rails'
 gem 'sprockets', '~> 3.7.2'
 
 gem 'activerecord-nulldb-adapter'
-gem 'puma', '4.3.3'
+gem 'puma', '4.3.5'
 
 group :demo, :production, :staging do
   # Graylog logging gems
@@ -67,7 +67,7 @@ group :development do
 end
 
 group :test, :development do
-  gem 'capybara', '3.32.1'
+  gem 'capybara', '3.32.2'
   gem 'shoulda-matchers', '~> 4.3.0'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
@@ -79,7 +79,7 @@ group :development, :test, :staging, :demo, :production, :integration, :docker_i
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 4.0.0'
+  gem 'rspec-rails', '~> 4.0.1'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
