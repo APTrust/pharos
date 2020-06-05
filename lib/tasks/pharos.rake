@@ -225,6 +225,26 @@ namespace :pharos do
     end
   end
 
+  desc 'Initialize staging environment'
+  task :init_staging => :environment do
+    staging_inst = [['Staging University', 'staging', 'staging.edu']]
+    create_institutions(staging_inst)
+    inst = Institution.find_by_identifier('staging.edu')
+    user = User.find_by_email('staging_user@aptrust.org')
+    if user.nil?
+      inst_admin = Role.find_by_name('institutional_admin')
+      User.create!(name: 'Staging User', email: 'staging_user@aptrust.org',
+                   password: 'password123', phone_number: '555-555-5555',
+                   institution_id: inst.id,
+                   roles: [inst_admin],
+                   grace_period: '2099-12-31 23:59:59',
+                   api_secret_key: "d6022eb9c7b14469a4ad3d70ca5579a4e31dbfb3")
+      puts "Created user staging_user@aptrust.org"
+    else
+      puts "User staging_user@aptrust.org already exists"
+    end
+  end
+
   # To get total GB deposited by each institution through the end of July, 2018:
   #
   # inst_storage_summary('2018-07-31')
