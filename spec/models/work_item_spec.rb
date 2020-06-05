@@ -6,7 +6,7 @@ restore = Pharos::Application::PHAROS_ACTIONS['restore']
 requested = Pharos::Application::PHAROS_STAGES['requested']
 receive = Pharos::Application::PHAROS_STAGES['receive']
 record = Pharos::Application::PHAROS_STAGES['record']
-clean = Pharos::Application::PHAROS_STAGES['clean']
+cleanup = Pharos::Application::PHAROS_STAGES['cleanup']
 success = Pharos::Application::PHAROS_STATUSES['success']
 failed = Pharos::Application::PHAROS_STATUSES['fail']
 pending = Pharos::Application::PHAROS_STATUSES['pend']
@@ -67,7 +67,7 @@ RSpec.describe WorkItem, :type => :model do
     subject.status = success
     subject.ingested?.should == true
 
-    subject.stage = clean
+    subject.stage = cleanup
     subject.ingested?.should == true
 
     subject.action = restore
@@ -350,7 +350,7 @@ RSpec.describe WorkItem, :type => :model do
       bag_date = Time.parse('2016-08-31T19:39:39Z')
       setup_item(subject)
       subject.action = ingest
-      subject.stage = clean
+      subject.stage = cleanup
       subject.status = success
       subject.object_identifier = 'abc/123'
       subject.name = '123.tar'
@@ -466,4 +466,32 @@ RSpec.describe WorkItem, :type => :model do
       end
     end
   end
+
+  describe 'misc methods' do
+    it 'should know if an item has passed a given stage of ingest' do
+      s = Pharos::Application::PHAROS_STAGES
+      item = FactoryBot.create(:work_item, action: ingest, stage: s['cleanup'])
+      expect(item.has_reached?(s['fetch'])).to eq true
+      expect(item.has_reached?(s['validate'])).to eq true
+      expect(item.has_reached?(s['reingest_check'])).to eq true
+      expect(item.has_reached?(s['copy_to_staging'])).to eq true
+      expect(item.has_reached?(s['format_identification'])).to eq true
+      expect(item.has_reached?(s['store'])).to eq true
+      expect(item.has_reached?(s['storage_validation'])).to eq true
+      expect(item.has_reached?(s['record'])).to eq true
+      expect(item.has_reached?(s['cleanup'])).to eq true
+
+      item.stage = s['format_identification']
+      expect(item.has_reached?(s['fetch'])).to eq true
+      expect(item.has_reached?(s['validate'])).to eq true
+      expect(item.has_reached?(s['reingest_check'])).to eq true
+      expect(item.has_reached?(s['copy_to_staging'])).to eq true
+      expect(item.has_reached?(s['format_identification'])).to eq true
+      expect(item.has_reached?(s['store'])).to eq false
+      expect(item.has_reached?(s['storage_validation'])).to eq false
+      expect(item.has_reached?(s['record'])).to eq false
+      expect(item.has_reached?(s['cleanup'])).to eq false
+    end
+  end
+
 end

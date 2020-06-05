@@ -65,11 +65,33 @@ module Pharos
         'store' => 'Store',
         'storage_validation' => 'Storage Validation',
         'record' => 'Record',
-        'clean' => 'Cleanup',
+        'cleanup' => 'Cleanup',
         'resolve' => 'Resolve',
         'package' => 'Package',
         'restoring' => 'Restoring',
         'available_in_s3' => 'Available in S3'
+    }
+
+    # Map NSQ topics to stage. Yes, receive and fetch are the same topic.
+    # TODO: Bundle Stage names, stage topic names, and stage default messages
+    # into one class?
+    NSQ_TOPIC_FOR_STAGE = {
+        'requested' => nil,
+        'receive' => 'ingest01_prefetch',
+        'fetch' => 'ingest01_prefetch',
+        'format_identification' => 'ingest05_format_identification',
+        'unpack' => nil, # No longer used
+        'validate' => 'ingest02_bag_validation',
+        'reingest_check' => 'ingest03_reingest_check',
+        'copy_to_staging' => 'ingest04_staging',
+        'store' => 'ingest06_storage',
+        'storage_validation' => 'ingest07_storage_validation',
+        'record' => 'ingest08_record',
+        'cleanup' => 'ingest09_cleanup',
+        'resolve' => nil,
+        'package' => nil, # TBD when restoration services are ready
+        'restoring' => nil,
+        'available_in_s3' => nil
     }
 
     PHAROS_ACTIONS = {

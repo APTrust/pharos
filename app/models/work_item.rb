@@ -70,6 +70,19 @@ class WorkItem < ActiveRecord::Base
     end
     }
 
+  # Ingest stages, in order of processing.
+  @@ingest_stages_in_order = [
+    Pharos::Application::PHAROS_STAGES['fetch'],
+    Pharos::Application::PHAROS_STAGES['validate'],
+    Pharos::Application::PHAROS_STAGES['reingest_check'],
+    Pharos::Application::PHAROS_STAGES['copy_to_staging'],
+    Pharos::Application::PHAROS_STAGES['format_identification'],
+    Pharos::Application::PHAROS_STAGES['store'],
+    Pharos::Application::PHAROS_STAGES['storage_validation'],
+    Pharos::Application::PHAROS_STAGES['record'],
+    Pharos::Application::PHAROS_STAGES['cleanup'],
+  ]
+
 
   # def to_param
   #   #"#{etag}/#{name}"
@@ -124,6 +137,7 @@ class WorkItem < ActiveRecord::Base
                .first
   end
 
+  # Clean this up. Aargh!
   def requeue_item(options={})
     self.status = Pharos::Application::PHAROS_STATUSES['pend']
     self.retry = true
@@ -138,27 +152,55 @@ class WorkItem < ActiveRecord::Base
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
-      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
       self.stage = Pharos::Application::PHAROS_STAGES['requested']
       self.note = 'Restore requested'
-      self.work_item_state.delete if self.work_item_state && options[:work_item_state_delete]
     elsif self.action == Pharos::Application::PHAROS_ACTIONS['ingest']
       if options[:stage]
         if options[:stage] == Pharos::Application::PHAROS_STAGES['fetch']
           self.stage = Pharos::Application::PHAROS_STAGES['receive']
           self.note = 'Item is pending ingest'
-          self.work_item_state.delete if self.work_item_state
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['validate']
+          self.stage = Pharos::Application::PHAROS_STAGES['validate']
+          self.note = 'Item is pending bag validation'
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['reingest_check']
+          self.stage = Pharos::Application::PHAROS_STAGES['reingest_check']
+          self.note = 'Item is pending reingest check'
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['copy_to_staging']
+          self.stage = Pharos::Application::PHAROS_STAGES['copy_to_staging']
+          self.note = 'Waiting to copy files to staging area'
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['format_identification']
+          self.stage = Pharos::Application::PHAROS_STAGES['format_identification']
+          self.note = 'Files are pending format identification'
         elsif options[:stage] == Pharos::Application::PHAROS_STAGES['store']
           self.stage = Pharos::Application::PHAROS_STAGES['store']
           self.note = 'Item is pending storage'
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['storage_validation']
+          self.stage = Pharos::Application::PHAROS_STAGES['storage_validation']
+          self.note = 'Item is pending validation of preservation storage copies'
         elsif options[:stage] == Pharos::Application::PHAROS_STAGES['record']
           self.stage = Pharos::Application::PHAROS_STAGES['record']
           self.note = 'Item is pending record'
+        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['cleanup']
+          self.stage = Pharos::Application::PHAROS_STAGES['cleanup']
+          self.note = 'Item is pending cleanup of staging files and interim processing data'
         end
       end
     end
     self.save!
+  end
+
+  # Returns true if item has reached or passed the specified stage of ingest.
+  # This method is used to determine which stages to show in the requeue
+  # template at app/views/work_items/_ingest_requeue_form.html.erb.
+  # The default values of 0 for current and 100 for target catch cases of
+  # some very old legacy WorkItems whose stages are no longer used. We
+  # do not want to requeue these ancient items. Forcing a return of false
+  # prevents the requeue template from displaying requeue options.
+  def has_reached?(stage)
+    current_stage_index = @@ingest_stages_in_order.index(self.stage) || 0
+    target_stage_index = @@ingest_stages_in_order.index(stage) || 100
+    return current_stage_index >= target_stage_index
   end
 
   def self.can_delete_file?(intellectual_object_identifier, generic_file_identifier)
@@ -390,7 +432,7 @@ class WorkItem < ActiveRecord::Base
   def ingested?
     ingest = Pharos::Application::PHAROS_ACTIONS['ingest']
     record = Pharos::Application::PHAROS_STAGES['record']
-    clean = Pharos::Application::PHAROS_STAGES['clean']
+    cleanup = Pharos::Application::PHAROS_STAGES['cleanup']
     success = Pharos::Application::PHAROS_STATUSES['success']
 
     if self.action.blank? == false && self.action != ingest
@@ -399,7 +441,7 @@ class WorkItem < ActiveRecord::Base
     elsif self.action == ingest && self.stage == record && self.status == success
       # we just finished successful ingest
       return true
-    elsif self.action == ingest && self.stage == clean && self.status == success
+    elsif self.action == ingest && self.stage == cleanup && self.status == success
       # we finished ingest and processor is cleaning up
       return true
     end

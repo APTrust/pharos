@@ -412,16 +412,13 @@ class WorkItemsController < ApplicationController
         end
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
-      if stage == Pharos::Application::PHAROS_STAGES['fetch']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_fetch_topic")
-      elsif stage == Pharos::Application::PHAROS_STAGES['store']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_store_topic")
-      elsif stage == Pharos::Application::PHAROS_STAGES['record']
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_record_topic")
-      end
+      topic = Pharos::Application::NSQ_TOPIC_FOR_STAGE(stage)
+      return if stage.nil?
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=#{topic}")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
     end
+    logger.info("Requeuing WorkItem #{@work_item.id} to #{uri}")
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri)
     request.body = @work_item.id.to_s

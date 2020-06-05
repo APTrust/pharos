@@ -41,7 +41,7 @@ function ingestRequeue(){
     $('#requeue-btn').addClass('hidden');
     $('#ingest_form_submit').on("click", function() {
         var stage = $('input[name="stage"]:checked').val();
-        if (stage == "Fetch" || stage == "Store" || stage == "Record") {
+        if (stage != "") {
             if (!$('#ingest_error').hasClass('hidden')) {
                 $('#ingest_error').addClass('hidden');
             }

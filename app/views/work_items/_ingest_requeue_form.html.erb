@@ -7,15 +7,43 @@
       <fieldset>
         <label for="stage">What stage would you like to requeue to?</label><br>
         <p id="ingest_error" class="hidden alert alert-error">This field is required.</p>
-        <% if @work_item.stage == Pharos::Application::PHAROS_STAGES['store'] %>
-            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch</label><br>
-            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['store'] %>"> Store</label>
-        <% elsif @work_item.stage == Pharos::Application::PHAROS_STAGES['record'] %>
-            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch</label><br>
-            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['record'] %>"> Record</label>
-        <% else %>
-            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch<br></label>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['fetch']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['fetch'] %>"> Fetch</label> <br/>
         <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['validate']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['validate'] %>"> Validate</label> <br/>
+        <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['reingest_check']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['reingest_check'] %>"> Reingest Check</label> <br/>
+        <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['copy_to_staging']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['copy_to_staging'] %>"> Copy to Staging</label> <br/>
+        <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['format_identification']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['format_identification'] %>"> Format Identification</label> <br/>
+        <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['store']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['store'] %>"> Store</label> <br/>
+        <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['storage_validation']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['storage_validation'] %>"> Storage Validation</label> <br/>
+        <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['record']) %>
+            <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['record'] %>"> Record</label> <br/>
+        <% end %>
+
+        <% if @work_item.has_reached?(Pharos::Application::PHAROS_STAGES['clean']) %>
+        <label><input type="radio" name="stage" value="<%= Pharos::Application::PHAROS_STAGES['clean'] %>"> Cleanup (deletes staging and interim data)</label> <br/>
+        <% end %>
+
       </fieldset>
     </form>
   </div>
