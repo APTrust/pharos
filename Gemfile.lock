@@ -114,7 +114,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    devise-authy (2.1.0)
+    devise-authy (2.2.0)
       authy (>= 2.7.5)
       devise (>= 4.0.0)
     devise-security (0.14.3)
@@ -174,7 +174,7 @@ GEM
       actionpack (>= 4.1)
       activesupport (>= 4.1)
     httpclient (2.8.3)
-    i18n (1.8.2)
+    i18n (1.8.3)
       concurrent-ruby (~> 1.0)
     inherited_resources (1.11.0)
       actionpack (>= 5.0, < 6.1)
