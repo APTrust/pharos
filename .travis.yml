@@ -46,8 +46,7 @@ deploy:
     script: make -w publish-ci
     on:
       branch:
-        - develop
-        - master
+        - /.*/
     skip_cleanup: true
 notifications:
   slack:
