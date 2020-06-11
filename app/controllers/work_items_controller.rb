@@ -412,7 +412,7 @@ class WorkItemsController < ApplicationController
         end
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
-      topic = Pharos::Application::NSQ_TOPIC_FOR_STAGE(stage)
+      topic = Pharos::Application::NSQ_TOPIC_FOR_STAGE[stage]
       return if stage.nil?
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=#{topic}")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
