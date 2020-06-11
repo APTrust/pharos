@@ -238,6 +238,7 @@ namespace :pharos do
                    institution_id: inst.id,
                    roles: [inst_admin],
                    grace_period: '2099-12-31 23:59:59',
+                   initial_password_updated: true,
                    api_secret_key: "d6022eb9c7b14469a4ad3d70ca5579a4e31dbfb3")
       puts "Created user staging_user@aptrust.org"
     else
