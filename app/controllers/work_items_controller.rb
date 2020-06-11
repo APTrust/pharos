@@ -395,6 +395,15 @@ class WorkItemsController < ApplicationController
   end
 
   def issue_requeue_http_post(stage)
+    uri = get_requeue_uri(stage)
+    logger.info("Requeuing WorkItem #{@work_item.id} to #{uri}")
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri)
+    request.body = @work_item.id.to_s
+    http.request(request)
+  end
+
+  def get_requeue_uri(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_delete_topic")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
@@ -418,11 +427,7 @@ class WorkItemsController < ApplicationController
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
     end
-    logger.info("Requeuing WorkItem #{@work_item.id} to #{uri}")
-    http = Net::HTTP.new(uri.host, uri.port)
-    request = Net::HTTP::Post.new(uri)
-    request.body = @work_item.id.to_s
-    http.request(request)
+    return uri
   end
 
   def filter_count_and_sort
