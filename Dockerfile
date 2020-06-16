@@ -1,6 +1,6 @@
 FROM madnight/docker-alpine-wkhtmltopdf as builder
 
-FROM ruby:2.7.1-alpine
+FROM ruby:2.7.1-alpine3.11
 LABEL maintainer="Christian Dahlhausen <christian@aptrust.org>"
 
 # Install dependencies
@@ -16,7 +16,8 @@ RUN apk update -qq && apk upgrade && apk add --no-cache build-base libpq \
 # Following packages for wkhtmltopdf only
     libgcc libstdc++ libx11 glib libxrender libxext libintl \
     libcrypto1.1 libssl1.1 \
-    ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
+    ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family \
+	jq py3-configobj py3-pip py3-setuptools python3 python3-dev
 
 # Needed for bin/pharos_notify.py
 RUN pip install requests
