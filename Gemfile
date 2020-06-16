@@ -44,7 +44,7 @@ gem 'sassc-rails'
 gem 'sassc', '2.4.0'
 gem 'bootstrap-sass', '~> 3.4.1'
 gem 'browser-timezone-rails'
-gem 'sprockets', '~> 3.7.2'
+gem 'sprockets', '~> 4.0.2'
 
 gem 'activerecord-nulldb-adapter'
 gem 'puma', '4.3.5'
