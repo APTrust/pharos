@@ -1,0 +1,20 @@
+version: 2
+updates:
+- package-ecosystem: bundler
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: '04:00'
+    timezone: America/New_York
+  open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: '04:00'
+    timezone: America/New_York
+  open-pull-requests-limit: 10
+  reviewers:
+  - cdahlhausen
+  assignees:
+  - cdahlhausen
