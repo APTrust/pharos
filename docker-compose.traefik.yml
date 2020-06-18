@@ -55,6 +55,8 @@ services:
     command: /bin/bash -c "sleep 15 && bundle exec rake db:exists && time bundle exec rake db:migrate || (echo 'Init DB setup' && bundle exec rake db:setup && bundle exec rake pharos:setup)"
     env_file:
       - ".env"
+    volumes:
+      - ${DOCKERAPP_DATA_PATH:-./docker}/log:/pharos/log
     logging:
       driver: "gelf"
       options:
