@@ -10,15 +10,11 @@
 REGISTRY = registry.gitlab.com/aptrust
 REPOSITORY = container-registry
 NAME=$(shell basename $(CURDIR))
-#REVISION=$(shell git log -1 --pretty=%h)
+REVISION=$(shell git log -1 --pretty=%h)
 REVISION=$(shell git rev-parse --short=7 HEAD)
 BRANCH = $(subst /,_,$(shell git rev-parse --abbrev-ref HEAD))
 PUSHBRANCH = $(subst /,_,$(TRAVIS_BRANCH))
 TAG = $(NAME):$(REVISION)
-
-ifdef TRAVIS
-override BRANCH=$(PUSHBRANCH)
-endif
 
 # HELP
 # This will output the help for each task
@@ -35,7 +31,6 @@ revision: ## Show me the git hash
 	@echo $(BRANCH)
 
 build: ## Build the Pharos container from current repo. Make sure to commit all changes beforehand
-	@echo $(BRANCH)
 	docker build --build-arg PHAROS_RELEASE=$(REVISION) -t pharos:latest -t $(TAG) -t aptrust/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/$(TAG) -t $(REGISTRY)/$(REPOSITORY)/pharos:$(REVISION)-$(BRANCH) .
 	docker build --build-arg PHAROS_RELEASE=${REVISION} -t nginx-proxy-pharos:latest -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION) -t $(REGISTRY)/$(REPOSITORY)/nginx-proxy-pharos:$(REVISION)-$(BRANCH) -t aptrust/nginx-proxy-pharos -f Dockerfile.nginx .
 
