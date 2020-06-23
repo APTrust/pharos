@@ -54,7 +54,6 @@ class WorkItemsController < ApplicationController
     if @work_item
       authorize @work_item
       if current_user.admin?
-        @show_state = true
         get_redis_records
       end
       respond_to do |format|
@@ -500,8 +499,13 @@ class WorkItemsController < ApplicationController
 
   def get_redis_records
     if Redis.current.connected?
+      logger.info("Have redis connection")
       @redis_obj = RedisHelper::get_obj_record(@work_item)
-      @resis_results = RedisHelper::get_work_results(@work_item)
+      @redis_results = RedisHelper::get_work_results(@work_item)
+      logger.info("Redis Obj: #{@redis_obj}")
+      logger.info("Redis Results: #{@redis_results}")
+    else
+      logger.info("No redis connection")
     end
   end
 
