@@ -49,6 +49,8 @@ gem 'sprockets', '~> 3.7.2'
 gem 'activerecord-nulldb-adapter'
 gem 'puma', '4.3.5'
 
+gem 'redis', '~> 4.2.1'
+
 group :demo, :production, :staging do
   # Graylog logging gems
   gem 'rails_semantic_logger'

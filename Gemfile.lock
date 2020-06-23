@@ -279,6 +279,7 @@ GEM
       thor (>= 0.19.0, < 2.0)
     rake (13.0.1)
     rb-readline (0.5.5)
+    redis (4.2.1)
     regexp_parser (1.7.0)
     representable (3.0.4)
       declarative (< 0.1.0)
@@ -422,6 +423,7 @@ DEPENDENCIES
   rails_semantic_logger
   rake (= 13.0.1)
   rb-readline
+  redis (~> 4.2.1)
   rspec-activemodel-mocks
   rspec-its
   rspec-rails (~> 4.0.1)

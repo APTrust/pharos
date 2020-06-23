@@ -53,7 +53,10 @@ class WorkItemsController < ApplicationController
   def show
     if @work_item
       authorize @work_item
-      (params[:with_state_json] == 'true' && current_user.admin?) ? @show_state = true : @show_state = false
+      if current_user.admin?
+        @show_state = true
+        get_redis_records
+      end
       respond_to do |format|
         if current_user.admin?
           format.json { render json: @work_item.serializable_hash }
@@ -494,4 +497,12 @@ class WorkItemsController < ApplicationController
       return
     end
   end
+
+  def get_redis_records
+    if Redis.current.connected?
+      @redis_obj = RedisHelper::get_obj_record(@work_item)
+      @resis_results = RedisHelper::get_work_results(@work_item)
+    end
+  end
+
 end
