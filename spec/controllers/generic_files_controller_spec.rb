@@ -9,6 +9,7 @@ RSpec.describe GenericFilesController, type: :controller do
   let(:crazy_file) { FactoryBot.create(:generic_file, identifier: 'uc.edu/cin.scholar.2016-03-03/data/fedora_backup/data/datastreamStore/45/info%3Afedora%2Fsufia%3Ar781wg21b%2Fcontent%2Fcontent.0', intellectual_object_id: obj.id) }
   let(:question_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.archiveit5161_us_cuba_policy_masters_archiveit_5161_us_cuba_policy_md5sums_txt?c=5161/data/md5sums.txt?c=5161', intellectual_object_id: obj.id) }
   let(:parens_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/chc5200000040/METAFILES/chc52000000400001001(wav).mtf', intellectual_object_id: obj.id) }
+  let(:at_file) { FactoryBot.create(:generic_file, identifier: 'miami.edu/miami.edu.chc5200/data/@at_sign@.file', intellectual_object_id: obj.id) }
   let(:deleted_file) { FactoryBot.create(:generic_file, state: 'D') }
 
   before(:all) do
@@ -154,6 +155,11 @@ RSpec.describe GenericFilesController, type: :controller do
       expect(assigns(:generic_file)).to eq parens_file
     end
 
+    # Bug: https://trello.com/c/7reXyCVV
+    it 'should allow files with an at sign in the identifier' do
+      get :show, params: { generic_file_identifier: at_file.identifier }
+      expect(assigns(:generic_file)).to eq at_file
+    end
   end
 
   describe 'POST #create' do
