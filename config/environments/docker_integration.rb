@@ -6,9 +6,15 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # Don't reload classes between integration tests. We're going to run
-  # a whole suite of tests, so just load everything once.
+  # Reload classes when they change?
+  # When running integration tests, this should be false, because
+  # it makes Pharos very slow. When running interactive tests and
+  # fiddling with Rails code, this should be true, so it reloads
+  # code whenever you make a change.
   config.cache_classes = true
+
+  # Eager load code on boot.
+  config.eager_load = true
 
   # Don't care if the mailer can't send.
   # config.action_mailer.raise_delivery_errors = false
