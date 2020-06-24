@@ -76,7 +76,8 @@ To get started run:
 - Run a one-off command within the environment
 	- cd /srv/docker/pharos
 	- `make runcmd <somecommand>`
-
+- Get a shell inside the docker container
+    - docker exec -it pharos-dev-web ash
 
 ### Baremetal Development Quick-Start
 
