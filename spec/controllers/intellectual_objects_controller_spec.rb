@@ -43,6 +43,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                    updated_at: '2011-10-10T10:00:00Z',
                                    etag: '4d05dc2aa07e411a55ef11bc6ade5ec3',
                                    internal_sender_identifier: '31337') }
+  let!(:obj7) { FactoryBot.create(:institutional_intellectual_object,
+                                   identifier: 'test.edu/atsign@bag',
+                                   institution: inst2) }
   let!(:file1) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj2) }
   let!(:event1) { FactoryBot.create(:premis_event_ingest,
@@ -121,9 +124,9 @@ RSpec.describe IntellectualObjectsController, type: :controller do
       it 'should show all results' do
         get :index, params: {}
         expect(response).to be_successful
-        expect(assigns(:intellectual_objects).size).to eq 6
+        expect(assigns(:intellectual_objects).size).to eq 7
         expect(assigns(:intellectual_objects).map &:id).to match_array [obj1.id, obj2.id, obj3.id,
-                                                                        obj4.id, obj5.id, obj6.id]
+                                                                        obj4.id, obj5.id, obj6.id, obj7.id]
       end
     end
 
@@ -291,6 +294,14 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         get :show, params: { intellectual_object_identifier: obj3 }
         expect(response).to be_successful
         expect(assigns(:intellectual_object)).to eq obj3
+      end
+
+      # Identifier: 'test.edu/atsign@bag'
+      # Bug: https://trello.com/c/7reXyCVV
+      it "should show return the object even if it has an at sign in the name" do
+        get :show, params: { intellectual_object_identifier: obj7 }
+        expect(response).to be_successful
+        expect(assigns(:intellectual_object)).to eq obj7
       end
 
       it 'should serialize files when asked' do
