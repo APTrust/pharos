@@ -100,8 +100,7 @@
               State
             </th>
             <td><div style="overflow:auto;max-width:800px;max-height:600px;"><pre>
-                  <%= @redis_obj %>
-                  <%= @redis_results %>
+<%= JSON.pretty_generate(@redis_data) %>
             </pre></div></td></tr>
       <% end %>
       </tbody>

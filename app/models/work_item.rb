@@ -450,6 +450,17 @@ class WorkItem < ActiveRecord::Base
     return false
   end
 
+  # Returns the object identifier that should be assigned to this object
+  # once it has been ingested. The RedisHelper also uses this to assemble
+  # Redis key names for items currently undergoing ingest.
+  def construct_obj_identifier
+      # Suffixes for single-part and multi-part bags
+      re_single = /\.tar$/
+      re_multi = /\.b\d+\.of\d+$/
+      bag_basename = self.name.sub(re_single, '').sub(re_multi, '')
+      return "#{self.institution.identifier}/#{bag_basename}"
+  end
+
   private
 
   # WorkItem will not have an object identifier until
@@ -472,17 +483,6 @@ class WorkItem < ActiveRecord::Base
       generic_file = GenericFile.where(identifier: self.generic_file_identifier).first
       self.generic_file_id = generic_file.id unless generic_file.nil?
     end
-  end
-
-  # Returns the object identifier that should be assigned to this object
-  # once it has been ingested. The RedisHelper also uses this to assemble
-  # Redis key names for items currently undergoing ingest.
-  def construct_obj_identifier
-      # Suffixes for single-part and multi-part bags
-      re_single = /\.tar$/
-      re_multi = /\.b\d+\.of\d+$/
-      bag_basename = self.name.sub(re_single, '').sub(re_multi, '')
-      return "#{self.institution.identifier}/#{bag_basename}"
   end
 
 end

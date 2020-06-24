@@ -498,15 +498,10 @@ class WorkItemsController < ApplicationController
   end
 
   def get_redis_records
-    if Redis.current.connected?
-      logger.info("Have redis connection")
-      @redis_obj = RedisHelper::get_obj_record(@work_item)
-      @redis_results = RedisHelper::get_work_results(@work_item)
-      logger.info("Redis Obj: #{@redis_obj}")
-      logger.info("Redis Results: #{@redis_results}")
-    else
-      logger.info("No redis connection")
-    end
+    @redis_data = {
+      object: helpers.get_obj_record(@work_item),
+      work_results: helpers.get_work_results(@work_item)
+    }
   end
 
 end
