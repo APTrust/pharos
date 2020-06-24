@@ -45,8 +45,7 @@ deploy:
   - provider: script
     script: make -w publish-ci
     on:
-      branch:
-        - /.*/
+      all_branches: true
     skip_cleanup: true
 notifications:
   slack:
