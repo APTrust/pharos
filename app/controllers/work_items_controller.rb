@@ -498,10 +498,14 @@ class WorkItemsController < ApplicationController
   end
 
   def get_redis_records
-    @redis_data = {
-      object: helpers.get_obj_record(@work_item),
-      work_results: helpers.get_work_results(@work_item)
-    }
+    begin
+      @redis_data = {
+        object: helpers.get_obj_record(@work_item),
+        work_results: helpers.get_work_results(@work_item)
+      }
+    rescue => e
+      @redis_date = 'Unavailable: #{e.message}'
+    end
   end
 
 end
