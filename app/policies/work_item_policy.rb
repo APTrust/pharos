@@ -20,6 +20,10 @@ class WorkItemPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def redis_file?
+    user.admin?
+  end
+
   def show?
     user.admin? || (user.institution.id == record.institution_id)
   end

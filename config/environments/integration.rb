@@ -11,7 +11,8 @@ Rails.application.configure do
   # it makes Pharos very slow. When running interactive tests and
   # fiddling with Rails code, this should be true, so it reloads
   # code whenever you make a change.
-  config.cache_classes = true
+  config.cache_classes = false
+  config.file_watcher = ActiveSupport::FileUpdateChecker
 
   # Eager load code on boot.
   config.eager_load = true
@@ -20,9 +21,6 @@ Rails.application.configure do
   # Don't care if the mailer can't send.
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
-
-  # Eager load code on boot.
-  config.eager_load = true
 
   # Configure static file server for tests with Cache-Control for performance.
   config.public_file_server.enabled = true

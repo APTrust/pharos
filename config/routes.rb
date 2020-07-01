@@ -116,6 +116,7 @@ Rails.application.routes.draw do
   get '/api/v2/notifications/successful_restoration', to: 'work_items#notify_of_successful_restoration', format: :json
   get 'notifications/spot_test_restoration/:id', to: 'work_items#spot_test_restoration', format: :json
   get '/api/v2/notifications/spot_test_restoration/:id', to: 'work_items#spot_test_restoration', format: :json
+  get 'items/redis_file/:id/:file_identifier', to: 'work_items#redis_file', :defaults => { :format => 'json' }, file_identifier: file_ptrn, as: :redis_file
 
   # WORK ITEM STATE ROUTES
   #resources :work_item_states, path: 'item_state', only: [:show, :update, :create], format: :json, param: :work_item_id

@@ -101,7 +101,22 @@
             </th>
             <td><div style="overflow:auto;max-width:800px;max-height:600px;"><pre>
 <%= JSON.pretty_generate(@redis_data) %>
-            </pre></div></td></tr>
+              </pre></div>
+            </td>
+          </tr>
+          <tr><th>Files</th>
+            <td>
+              <ul>
+                <% if !@redis_files.nil? %>
+                <% @redis_files.each do |f| %>
+                <li>
+                  <%= link_to(f, redis_file_url(@work_item, f), { target: '_blank' }) %>
+                </li>
+                <% end %>
+                <% end %>
+              </ul>
+            </td>
+          </tr>
       <% end %>
       </tbody>
     </table>

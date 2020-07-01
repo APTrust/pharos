@@ -4,7 +4,7 @@ class WorkItemsController < ApplicationController
   require 'net/http'
   respond_to :html, :json
   before_action :authenticate_user!
-  before_action :set_item, only: [:show, :requeue, :edit, :spot_test_restoration]
+  before_action :set_item, only: [:show, :requeue, :edit, :spot_test_restoration, :redis_file]
   before_action :init_from_params, only: :create
   before_action :load_institution, only: :index
   #after_action :check_for_completed_restoration, only: :update
@@ -317,6 +317,24 @@ class WorkItemsController < ApplicationController
     end
   end
 
+  # Returns JSON data for a single ingest file record in Redis.
+  # That's interim ingest data. Admins want to see these records
+  # periodically to diagnose stalled items.
+  def redis_file
+    authorize @work_item
+    # Have to force format, because file identifiers may end in
+    # .txt, .html, etc. and Rails interprets that as the format.
+    params[:format] = 'json'
+    begin
+      data = helpers.get_ingest_file(@work_item, params[:file_identifier])
+    rescue => ex
+      data = ex
+    end
+    respond_to do |format|
+      format.json { render json: data, status: :ok }
+    end
+  end
+
   private
 
   def load_institution
@@ -499,12 +517,19 @@ class WorkItemsController < ApplicationController
 
   def get_redis_records
     begin
+      files = helpers.get_ingest_file_list(@work_item) || []
+      files_to_show = [50, files.length].min
+      @redis_files = files[0..files_to_show]
+    rescue
+      @redis_files = []
+    end
+    begin
       @redis_data = {
         object: helpers.get_obj_record(@work_item),
         work_results: helpers.get_work_results(@work_item)
       }
     rescue => e
-      @redis_date = 'Unavailable: #{e.message}'
+      @redis_data = 'Unavailable: #{e.message}'
     end
   end
 

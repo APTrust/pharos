@@ -2,8 +2,8 @@ module RedisHelper
 
   # Caller should wrap this in begin/rescue
   def get_obj_record(work_item)
-    field = "object:#{work_item.construct_obj_identifier}"
-    data = Redis.current.hget(work_item.id, field)
+    key = "object:#{work_item.construct_obj_identifier}"
+    data = Redis.current.hget(work_item.id, key)
     JSON.parse(data) rescue nil
   end
 
@@ -16,6 +16,18 @@ module RedisHelper
       results.push(data) unless data.nil?
     end
     results
+  end
+
+  # Returns a list of Redis file keys for the specified object.
+  def get_ingest_file_list(work_item)
+    return Redis.current.hkeys(work_item.id.to_s).filter{ |key| key.start_with?('file:') }.map{ |key| key.sub(/^file:/, '') }
+  end
+
+  # Returns an individual file record
+  def get_ingest_file(work_item, file_identifier)
+    key = "file:#{file_identifier}"
+    data = Redis.current.hget(work_item.id, key)
+    JSON.parse(data) rescue nil
   end
 
   def ingest_topic_names
