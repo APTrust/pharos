@@ -215,6 +215,9 @@ namespace :pharos do
     })
   end
 
+  # The following task does not work at all because bucket names are read-only.
+  # Not sure why this is here or who's using it. See the code in init_staging
+  # below.
   desc 'Set Bucket Attributes'
   task :set_bucket_attributes => :environment do
     Institution.all.each do |inst|
@@ -247,6 +250,22 @@ namespace :pharos do
       puts "Created user staging_user@aptrust.org"
     else
       puts "User staging_user@aptrust.org already exists"
+    end
+
+    # Change bucket names from "test" to "receiving". We have to circumvent
+    # Rails readonly attributes and update the DB directly. DB was copied from
+    # demo, so it has the wrong bucket names. Run this only on staging. Make
+    # sure it doesn't run in local docker_integration env, or in test, dev,
+    # prod, etc.
+    if Rails.env.staging?
+      Institution.all.each do |inst|
+        receiving = inst.receiving_bucket.sub(/^aptrust\.receiving\.test\./, 'aptrust.receiving.staging.')
+        restore = inst.restore_bucket.sub(/^aptrust\.restore\.test\./, 'aptrust.restore.staging.')
+        ActiveRecord::Base.connection.execute("update institutions set receiving_bucket=#{ActiveRecord::Base.connection.quote(receiving)}, restore_bucket=#{ActiveRecord::Base.connection.quote(restore)} where id=#{inst.id}")
+        puts "Fixed bucket names for #{inst.name}"
+      end
+    else
+      puts "Skipping bucket renaming because this is not staging"
     end
   end
 
