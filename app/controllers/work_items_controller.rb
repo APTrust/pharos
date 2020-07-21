@@ -86,18 +86,6 @@ class WorkItemsController < ApplicationController
         options[:stage] = params[:item_stage] if params[:item_stage]
         options[:work_item_state_delete] = 'true' if params[:delete_state_item] && params[:delete_state_item] == 'true'
         @work_item.requeue_item(options)
-
-        # Get rid of Redis records if we're moving this item all the
-        # way back to receive.
-        if options[:stage] == Pharos::Application::PHAROS_ACTIONS['receive']
-          begin
-            helpers.delete_redis_work_item(@work_item.id)
-            logger.info("Deleted Redis records for #{@work_item.id} because requeing pushed it back to Receive stage.")
-          rescue => ex
-            logger.warn("Couldn't delete Redis records for work item #{@work_item.id}: #{ex}")
-          end
-        end
-
         if Rails.env.development?
           flash[:notice] = 'The response from NSQ to the requeue request is as follows: Status: 200, Body: ok'
           flash.keep(:notice)

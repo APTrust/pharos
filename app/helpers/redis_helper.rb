@@ -18,11 +18,6 @@ module RedisHelper
     results
   end
 
-  # Caller should wrap this in begin/rescue
-  def delete_redis_work_item(work_item_id)
-    return Redis.current.del(work_item_id.to_s)
-  end
-
   # Returns a list of Redis file keys for the specified object.
   def get_ingest_file_list(work_item)
     return Redis.current.hkeys(work_item.id.to_s).filter{ |key| key.start_with?('file:') }.map{ |key| key.sub(/^file:/, '') }
