@@ -529,7 +529,7 @@ class WorkItemsController < ApplicationController
         work_results: helpers.get_work_results(@work_item)
       }
     rescue => e
-      @redis_data = 'Unavailable: #{e.message}'
+      @redis_data = "Unavailable: #{e.message}"
     end
   end
 
