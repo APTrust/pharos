@@ -230,7 +230,7 @@ GEM
     orm_adapter (0.5.0)
     os (1.1.0)
     pg (1.2.3)
-    phonelib (0.6.43)
+    phonelib (0.6.44)
     phony (2.18.12)
     phony_rails (0.14.13)
       activesupport (>= 3.0)
