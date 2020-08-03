@@ -60,12 +60,6 @@ queue_requests false
 # bind 'unix:///home/git/gitlab/tmp/sockets/gitlab.socket'
 bind 'tcp://0.0.0.0:9292'
 
-# Keep persistent connections open for this many seconds.
-# Default is 20 seconds, according to https://www.rubydoc.info/gems/puma/Puma/Const.
-# The setting is documented at:
-# See https://puma.io/puma/Puma/DSL.html#persistent_timeout-instance_method
-persistent_timeout 60
-
 # Instead of "bind 'ssl://127.0.0.1:9292?key=path_to_key&cert=path_to_cert'" you
 # can also use the "ssl_bind" option.
 #
