@@ -190,7 +190,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h1.has_key?('institution_id')).to be true
           expect(h1.has_key?('storage_option')).to be true
 
-          h2 = subject.serializable_hash(include: [:checksums, :premis_events, :ingest_state])
+          h2 = subject.serializable_hash(include: [:checksums, :premis_events, :ingest_state, :storage_records])
           expect(h2.has_key?('id')).to be true
           expect(h2.has_key?('uri')).to be true
           expect(h2.has_key?('size')).to be true
@@ -205,6 +205,7 @@ RSpec.describe GenericFile, :type => :model do
           expect(h2.has_key?('ingest_state')).to be true
           expect(h1.has_key?('institution_id')).to be true
           expect(h1.has_key?('storage_option')).to be true
+          expect(h2.has_key?('storage_records')).to be true
         end
       end
 

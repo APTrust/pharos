@@ -351,6 +351,9 @@ class GenericFilesController < ApplicationController
     if params[:include_events] == 'true'
       options_hash.key?(:include) ? options_hash[:include].push(:premis_events) : options_hash[:include] = [:premis_events]
     end
+    if params[:include_storage_records] == 'true'
+      options_hash.key?(:include) ? options_hash[:include].push(:storage_records) : options_hash[:include] = [:storage_records]
+    end
     options_hash
   end
 

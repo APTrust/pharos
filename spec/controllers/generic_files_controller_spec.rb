@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe GenericFilesController, type: :controller do
   let(:user) { FactoryBot.create(:user, :admin, institution_id: @institution.id) }
-  let(:file) { FactoryBot.create(:generic_file) }
+  let(:file) { FactoryBot.create(:generic_file, intellectual_object: @intellectual_object) }
   let(:inst_user) { FactoryBot.create(:user, :institutional_admin, institution_id: @institution.id)}
   let(:basic_user) { FactoryBot.create(:user, :institutional_user, institution_id: @institution.id)}
   let(:obj) { FactoryBot.create(:consortial_intellectual_object, institution_id: @institution.id) }
@@ -36,6 +36,8 @@ RSpec.describe GenericFilesController, type: :controller do
       session[:verified] = true
       file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
       file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
+      StorageRecord.new({generic_file_id: file.id, url: "https://example.com/url1"}).save
+      StorageRecord.new({generic_file_id: file.id, url: "https://example.com/url2"}).save
       file.save!
     end
 
@@ -43,6 +45,16 @@ RSpec.describe GenericFilesController, type: :controller do
       get :index, params: { intellectual_object_identifier: @intellectual_object.identifier }, format: :json
       expect(response).to be_successful
       expect(assigns(:intellectual_object)).to eq @intellectual_object
+    end
+
+    it 'will return StorageRecords when requested' do
+      get :index, params: { intellectual_object_identifier: @intellectual_object.identifier, include_storage_records: 'true' }, format: :json
+      expect(response).to be_successful
+      data = JSON.parse(response.body)
+      storage_records = data['results'][0]['storage_records']
+      expect(storage_records.count).to eq 2
+      expect(storage_records[0]['url']).to eq 'https://example.com/url1'
+      expect(storage_records[1]['url']).to eq 'https://example.com/url2'
     end
 
     it 'returns exact matches by identifier' do
@@ -58,7 +70,9 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     it 'returns only active files' do
-      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'one', state: 'A')
+      # The variable called file, created above, contains the one
+      # active file for this test. We'll create a second, deleted
+      # file, which should not be returned with the results.
       FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'two', state: 'D')
       get :index, params: { intellectual_object_identifier: @intellectual_object.identifier }, format: :json
       expect(response).to be_successful
@@ -116,6 +130,8 @@ RSpec.describe GenericFilesController, type: :controller do
       session[:verified] = true
       file.add_event(FactoryBot.attributes_for(:premis_event_ingest, institution: @institution, intellectual_object: @intellectual_object))
       file.add_event(FactoryBot.attributes_for(:premis_event_fixity_generation, institution: @institution, intellectual_object: @intellectual_object))
+      StorageRecord.new({generic_file_id: file.id, url: "https://example.com/url1"}).save
+      StorageRecord.new({generic_file_id: file.id, url: "https://example.com/url2"}).save
       file.save!
     end
 
@@ -138,6 +154,16 @@ RSpec.describe GenericFilesController, type: :controller do
     it 'should show the file by identifier for API users' do
       get :show, params: { generic_file_identifier: URI.encode(file.identifier) }, format: :html
       expect(assigns(:generic_file)).to eq file
+    end
+
+    it 'returns StorageRecords when requested' do
+      get :show, params: { generic_file_identifier: URI.encode(file.identifier), include_storage_records: 'true' }, format: :json
+      expect(response).to be_successful
+      data = JSON.parse(response.body)
+      storage_records = data['storage_records']
+      expect(storage_records.count).to eq 2
+      expect(storage_records[0]['url']).to eq 'https://example.com/url1'
+      expect(storage_records[1]['url']).to eq 'https://example.com/url2'
     end
 
     it 'responds with the file even when the file identifier is crazy' do

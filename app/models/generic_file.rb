@@ -146,6 +146,7 @@ class GenericFile < ActiveRecord::Base
     if options.has_key?(:include)
       data.merge!(checksums: serialize_checksums) if options[:include].include?(:checksums)
       data.merge!(premis_events: serialize_events) if options[:include].include?(:premis_events)
+      data.merge!(storage_records: serialize_storage_records) if options[:include].include?(:storage_records)
     end
     data
   end
@@ -168,6 +169,12 @@ class GenericFile < ActiveRecord::Base
   def serialize_events
     premis_events.map do |event|
       event.serializable_hash
+    end
+  end
+
+  def serialize_storage_records
+    storage_records.map do |storage_record|
+      storage_record.serializable_hash
     end
   end
 
