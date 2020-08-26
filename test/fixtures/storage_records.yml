@@ -160,3 +160,76 @@ sr39:
 sr40:
   url: https://localhost:9899/preservation-or/da86f292-7a85-45c3-9436-e42675e3471b
   generic_file: inst2_obj3_gf4
+
+# Storage records for restoration tests
+
+storage_record_1036955700:
+  id: 1036955700
+  generic_file_id: 1029996145
+  url: https://s3.us-east-1.localhost:9899/preservation-va/669e2c86-b3e0-4a46-8e24-811d526c1ec0
+
+storage_record_1036955701:
+  id: 1036955701
+  generic_file_id: 1029996145
+  url: https://s3.us-west-2.localhost:9899/preservation-or/669e2c86-b3e0-4a46-8e24-811d526c1ec0
+
+storage_record_1036955702:
+  id: 1036955702
+  generic_file_id: 1029996146
+  url: https://s3.us-east-1.localhost:9899/preservation-va/0b135223-88f6-45aa-96a3-2e67ecb50066
+
+storage_record_1036955703:
+  id: 1036955703
+  generic_file_id: 1029996146
+  url: https://s3.us-west-2.localhost:9899/preservation-or/0b135223-88f6-45aa-96a3-2e67ecb50066
+
+storage_record_1036955704:
+  id: 1036955704
+  generic_file_id: 1029996147
+  url: https://s3.us-east-1.localhost:9899/preservation-va/246c54b3-6476-494c-8fd0-bdd260b712c6
+
+storage_record_1036955705:
+  id: 1036955705
+  generic_file_id: 1029996147
+  url: https://s3.us-west-2.localhost:9899/preservation-or/246c54b3-6476-494c-8fd0-bdd260b712c6
+
+storage_record_1036955692:
+  id: 1036955692
+  generic_file_id: 1029996141
+  url: https://s3.us-east-1.localhost:9899/preservation-va/216cf80c-8d23-4435-bdac-3bfa715b064a
+
+storage_record_1036955693:
+  id: 1036955693
+  generic_file_id: 1029996141
+  url: https://s3.us-west-2.localhost:9899/preservation-or/216cf80c-8d23-4435-bdac-3bfa715b064a
+
+storage_record_1036955694:
+  id: 1036955694
+  generic_file_id: 1029996142
+  url: https://s3.us-east-1.localhost:9899/preservation-va/b8dde88f-da56-4477-b78f-7e17dd2f37c2
+
+storage_record_1036955695:
+  id: 1036955695
+  generic_file_id: 1029996142
+  url: https://s3.us-west-2.localhost:9899/preservation-or/b8dde88f-da56-4477-b78f-7e17dd2f37c2
+
+storage_record_1036955696:
+  id: 1036955696
+  generic_file_id: 1029996143
+  url: https://s3.us-east-1.localhost:9899/preservation-va/1275dbcf-8bc9-4943-95d0-5ce27e8b4c08
+
+storage_record_1036955697:
+  id: 1036955697
+  generic_file_id: 1029996143
+  url: https://s3.us-west-2.localhost:9899/preservation-or/1275dbcf-8bc9-4943-95d0-5ce27e8b4c08
+
+storage_record_1036955698:
+  id: 1036955698
+  generic_file_id: 1029996144
+  url: https://s3.us-east-1.localhost:9899/preservation-va/2a3ad959-4891-445f-84b0-cd59be88fbe6
+
+storage_record_1036955699:
+  id: 1036955699
+  generic_file_id: 1029996144
+  url: https://s3.us-west-2.localhost:9899/preservation-or/2a3ad959-4891-445f-84b0-cd59be88fbe6
+

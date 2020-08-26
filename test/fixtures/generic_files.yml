@@ -184,3 +184,181 @@ inst2_obj3_gf4:
   intellectual_object: inst2_obj3
   state: D
   institution: inst2
+
+# Files for restoration test
+
+generic_file_1029996145:
+  id: 1029996145
+  file_format: application/json
+  uri: https://s3.us-east-1.localhost:9899/preservation-va/669e2c86-b3e0-4a46-8e24-811d526c1ec0
+  size: 20471
+  identifier: test.edu/btr-512-test-restore/data/sample.json
+  intellectual_object_id: 889911812
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:41.442869000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:41.464435000 Z
+    zone: *2
+    time: *3
+  state: A
+  last_fixity_check: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.710309000 Z
+    zone: *2
+    time: *4
+  ingest_state: 
+  institution: test_inst
+  storage_option: Standard
+
+generic_file_1029996146:
+  id: 1029996146
+  file_format: application/xml
+  uri: https://s3.us-east-1.localhost:9899/preservation-va/0b135223-88f6-45aa-96a3-2e67ecb50066
+  size: 23972
+  identifier: test.edu/btr-512-test-restore/data/sample.xml
+  intellectual_object_id: 889911812
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:41.516634000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:41.530583000 Z
+    zone: *2
+    time: *3
+  state: A
+  last_fixity_check: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.710573000 Z
+    zone: *2
+    time: *4
+  ingest_state: 
+  institution: test_inst
+  storage_option: Standard
+
+generic_file_1029996147:
+  id: 1029996147
+  file_format: text/plain
+  uri: https://s3.us-east-1.localhost:9899/preservation-va/246c54b3-6476-494c-8fd0-bdd260b712c6
+  size: 739
+  identifier: test.edu/btr-512-test-restore/bag-info.txt
+  intellectual_object_id: 889911812
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:41.613580000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:41.613580000 Z
+    zone: *2
+    time: *3
+  state: A
+  last_fixity_check: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2000-01-01 00:00:00.000000000 Z
+    zone: *2
+    time: *4
+  ingest_state: 
+  institution: test_inst
+  storage_option: Standard
+
+generic_file_1029996141:
+  id: 1029996141
+  file_format: application/xml
+  uri: https://s3.us-east-1.localhost:9899/preservation-va/216cf80c-8d23-4435-bdac-3bfa715b064a
+  size: 23972
+  identifier: test.edu/apt-test-restore/data/sample.xml
+  intellectual_object_id: 889911811
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:41.156266000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:41.190442000 Z
+    zone: *2
+    time: *3
+  state: A
+  last_fixity_check: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.148725000 Z
+    zone: *2
+    time: *4
+  ingest_state: 
+  institution: test_inst
+  storage_option: Standard
+
+generic_file_1029996142:
+  id: 1029996142
+  file_format: text/plain
+  uri: https://s3.us-east-1.localhost:9899/preservation-va/b8dde88f-da56-4477-b78f-7e17dd2f37c2
+  size: 344
+  identifier: test.edu/apt-test-restore/bag-info.txt
+  intellectual_object_id: 889911811
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:41.263072000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:41.263072000 Z
+    zone: *2
+    time: *3
+  state: A
+  last_fixity_check: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2000-01-01 00:00:00.000000000 Z
+    zone: *2
+    time: *4
+  ingest_state: 
+  institution: test_inst
+  storage_option: Standard
+
+generic_file_1029996143:
+  id: 1029996143
+  file_format: application/json
+  uri: https://s3.us-east-1.localhost:9899/preservation-va/1275dbcf-8bc9-4943-95d0-5ce27e8b4c08
+  size: 20471
+  identifier: test.edu/apt-test-restore/data/sample.json
+  intellectual_object_id: 889911811
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:41.290669000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:41.398907000 Z
+    zone: *2
+    time: *3
+  state: A
+  last_fixity_check: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.148542000 Z
+    zone: *2
+    time: *4
+  ingest_state: 
+  institution: test_inst
+  storage_option: Standard
+
+generic_file_1029996144:
+  id: 1029996144
+  file_format: text/plain
+  uri: https://s3.us-east-1.localhost:9899/preservation-va/2a3ad959-4891-445f-84b0-cd59be88fbe6
+  size: 136
+  identifier: test.edu/apt-test-restore/aptrust-info.txt
+  intellectual_object_id: 889911811
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:41.420489000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:41.420489000 Z
+    zone: *2
+    time: *3
+  state: A
+  last_fixity_check: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2000-01-01 00:00:00.000000000 Z
+    zone: *2
+    time: *4
+  ingest_state: 
+  institution: test_inst
+  storage_option: Standard
+

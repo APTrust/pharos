@@ -90,3 +90,61 @@ inst2_obj3:
   bagit_profile_identifier: https://example.com/profile.json
   internal_sender_identifier: Sixth internal identifier
   internal_sender_description: Sixth internal description
+
+# Objects for restoration tests
+
+intellectual_object_889911812:
+  id: 889911812
+  title: BTR Restoration Test Bag (sha512)
+  description: Bag to test restoration of BTR with SHA512 manifests.
+  identifier: test.edu/btr-512-test-restore
+  alt_identifier: ''
+  access: institution
+  bag_name: btr-512-test-restore
+  institution: test_inst
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:40.689221000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:40.689221000 Z
+    zone: *2
+    time: *3
+  state: A
+  etag: 00000000000000000000000000000000-1
+  ingest_state: 
+  bag_group_identifier: ''
+  storage_option: Standard
+  bagit_profile_identifier: https://raw.githubusercontent.com/dpscollaborative/btr_bagit_profile/master/btr-bagit-profile.json
+  source_organization: APTrust
+  internal_sender_identifier: ''
+  internal_sender_description: ''
+
+intellectual_object_889911811:
+  id: 889911811
+  title: APTrust Test Restoration Bag
+  description: Bag to test restoration in APTrust format
+  identifier: test.edu/apt-test-restore
+  alt_identifier: 99-99
+  access: institution
+  bag_name: apt-test-restore
+  institution: test_inst
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:40.081866000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:40.081866000 Z
+    zone: *2
+    time: *3
+  state: A
+  etag: 00000000000000000000000000000000-1
+  ingest_state: 
+  bag_group_identifier: ''
+  storage_option: Standard
+  bagit_profile_identifier: https://wiki.aptrust.org/APTrust_BagIt_Profile-2.2
+  source_organization: Test University
+  internal_sender_identifier: 99-99
+  internal_sender_description: ''

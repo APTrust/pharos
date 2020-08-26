@@ -9,3 +9,538 @@ cs2:
   algorithm: sha256
   datetime: "2020-03-04T20:07:42.224Z"
   digest: 9876543210
+
+# Checksums for restoration tests
+
+checksum_957732848:
+  id: 957732848
+  algorithm: md5
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.700891000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: ba9e68d0fa876bbd284c9346bf69eefe
+  generic_file_id: 1029996145
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *4
+
+checksum_957732849:
+  id: 957732849
+  algorithm: sha1
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.700891000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 23c4182dd522a63e99c82582ab8b1a04dc0777d3
+  generic_file_id: 1029996145
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *4
+
+checksum_957732850:
+  id: 957732850
+  algorithm: sha256
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.700891000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: aa20e971f6a0a7c482f3ed70cc6edc115eb577f987322ba42e5c3869e1d714d1
+  generic_file_id: 1029996145
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *4
+
+checksum_957732851:
+  id: 957732851
+  algorithm: sha512
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.700891000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: c951077d844973f9143a121e4e783c72141da123592828294c161897c65e1a6c89ed8ff36d55272d9b405bc9c6b20849561595e64fe8f12b5152a94710cd8e3a
+  generic_file_id: 1029996145
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.700891000 Z
+    zone: *2
+    time: *4
+
+checksum_957732852:
+  id: 957732852
+  algorithm: md5
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701260000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 2e16d9e3f03d0a8f8ade375d4bca57ad
+  generic_file_id: 1029996146
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *4
+
+checksum_957732853:
+  id: 957732853
+  algorithm: sha1
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701260000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: bc50b526b1fed6c320386677e63f4d039079667a
+  generic_file_id: 1029996146
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *4
+
+checksum_957732854:
+  id: 957732854
+  algorithm: sha256
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701260000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 1b7c71ab47d7bc73aa7173cd59f639fd0fd7c9c790ce89ed9f76700d50720a0e
+  generic_file_id: 1029996146
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *4
+
+checksum_957732855:
+  id: 957732855
+  algorithm: sha512
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701260000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 2836be20b229b2112652bf8bb0daa50f1413c83ce518a5e0005f13260a0fd733581aca9d730b1f24a3219fede3032b9dd1bd75bfba96bbf923e83728cbd8d976
+  generic_file_id: 1029996146
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701260000 Z
+    zone: *2
+    time: *4
+
+checksum_957732856:
+  id: 957732856
+  algorithm: md5
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701559000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 296c734a9e88f2f958dabefb87813da2
+  generic_file_id: 1029996147
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *4
+
+checksum_957732857:
+  id: 957732857
+  algorithm: sha1
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701559000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: f76659816805cfd11f7a903982cb4251a28c87b6
+  generic_file_id: 1029996147
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *4
+
+checksum_957732858:
+  id: 957732858
+  algorithm: sha256
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701559000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 8b3a97eb32d51372ea6ece21e5a903afe8cd8e2438b74d1e390e8ac5da50d943
+  generic_file_id: 1029996147
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *4
+
+checksum_957732859:
+  id: 957732859
+  algorithm: sha512
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.701559000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 46a0a290d02af1e7d202dbde4e65131189f8e8b6682657f80c644d97f340d49a54a9dd07f31c57a7bbb5326bd1a9ab34e391bd0e60b470f10a3a968ef9054269
+  generic_file_id: 1029996147
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.701559000 Z
+    zone: *2
+    time: *4
+
+checksum_957732832:
+  id: 957732832
+  algorithm: md5
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131047000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 2e16d9e3f03d0a8f8ade375d4bca57ad
+  generic_file_id: 1029996141
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *4
+
+checksum_957732833:
+  id: 957732833
+  algorithm: sha1
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131047000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: bc50b526b1fed6c320386677e63f4d039079667a
+  generic_file_id: 1029996141
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *4
+
+checksum_957732834:
+  id: 957732834
+  algorithm: sha256
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131047000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 1b7c71ab47d7bc73aa7173cd59f639fd0fd7c9c790ce89ed9f76700d50720a0e
+  generic_file_id: 1029996141
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *4
+
+checksum_957732835:
+  id: 957732835
+  algorithm: sha512
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131047000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 2836be20b229b2112652bf8bb0daa50f1413c83ce518a5e0005f13260a0fd733581aca9d730b1f24a3219fede3032b9dd1bd75bfba96bbf923e83728cbd8d976
+  generic_file_id: 1029996141
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131047000 Z
+    zone: *2
+    time: *4
+
+checksum_957732836:
+  id: 957732836
+  algorithm: md5
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.132116000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 61ddee1206e696b2b23acaff569baae2
+  generic_file_id: 1029996142
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *4
+
+checksum_957732837:
+  id: 957732837
+  algorithm: sha1
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.132116000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 1f9d2ebcae035839e9e7b33167c0ada0d8777d65
+  generic_file_id: 1029996142
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *4
+
+checksum_957732838:
+  id: 957732838
+  algorithm: sha256
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.132116000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 2ca8a02035f449fa8ec0aa52799e3194cab22e1c2adfd3c30a9f7de1f6ee7d81
+  generic_file_id: 1029996142
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *4
+
+checksum_957732839:
+  id: 957732839
+  algorithm: sha512
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.132116000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 4a65dc3062d8344d3de51abe6d3fc04bf19aacc0fe975b58cf2ce6442a4a308d2a1bf1ab10896d73a477301a3da05492d1191221d6b4dbf54766756899af71ca
+  generic_file_id: 1029996142
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.132116000 Z
+    zone: *2
+    time: *4
+
+checksum_957732840:
+  id: 957732840
+  algorithm: md5
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.130492000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: ba9e68d0fa876bbd284c9346bf69eefe
+  generic_file_id: 1029996143
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *4
+
+checksum_957732841:
+  id: 957732841
+  algorithm: sha1
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.130492000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 23c4182dd522a63e99c82582ab8b1a04dc0777d3
+  generic_file_id: 1029996143
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *4
+
+checksum_957732842:
+  id: 957732842
+  algorithm: sha256
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.130492000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: aa20e971f6a0a7c482f3ed70cc6edc115eb577f987322ba42e5c3869e1d714d1
+  generic_file_id: 1029996143
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *4
+
+checksum_957732843:
+  id: 957732843
+  algorithm: sha512
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.130492000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: c951077d844973f9143a121e4e783c72141da123592828294c161897c65e1a6c89ed8ff36d55272d9b405bc9c6b20849561595e64fe8f12b5152a94710cd8e3a
+  generic_file_id: 1029996143
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.130492000 Z
+    zone: *2
+    time: *4
+
+checksum_957732844:
+  id: 957732844
+  algorithm: md5
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131347000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 1d11dded901a53137695e33d36658f5f
+  generic_file_id: 1029996144
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *4
+
+checksum_957732845:
+  id: 957732845
+  algorithm: sha1
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131347000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: 88a73be67a3e674a77b341ecd9a22de80acde4bb
+  generic_file_id: 1029996144
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *4
+
+checksum_957732846:
+  id: 957732846
+  algorithm: sha256
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131347000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: bc964b0ad4d8a43e8a2e691242656df24cb16d8ba989524374f90c7db5ac6d11
+  generic_file_id: 1029996144
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *4
+
+checksum_957732847:
+  id: 957732847
+  algorithm: sha512
+  datetime: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &1 2020-08-26 15:26:33.131347000 Z
+    zone: &2 !ruby/object:ActiveSupport::TimeZone
+      name: Etc/UTC
+    time: *1
+  digest: ec57e5563f55b0a54159b7251c58df8d107005d81b4286729e3608fa1fc091d7a2b9fd1f5ff2a1f0809f6a5f16deee38f9120f3e9170fb58873f6ce55f8af46a
+  generic_file_id: 1029996144
+  created_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &3 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *3
+  updated_at: !ruby/object:ActiveSupport::TimeWithZone
+    utc: &4 2020-08-26 15:26:33.131347000 Z
+    zone: *2
+    time: *4
+
