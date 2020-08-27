@@ -429,7 +429,7 @@ class WorkItemsController < ApplicationController
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
       if @work_item.generic_file_identifier.blank?
         # Restore full bag
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_restore_topic")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=bag_restorer")
       else
         # Restore individual file. If it's in Glacier, we'll have to run
         # GlacierRestore first.
