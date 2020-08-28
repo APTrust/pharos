@@ -425,17 +425,23 @@ class WorkItemsController < ApplicationController
 
   def get_requeue_uri(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_delete_topic")
+      if @work_item.generic_file_identifier.blank?
+        # Delete full bag
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=delete_object")
+      else
+        # Delete individual file.
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=delete_file")
+      end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
       if @work_item.generic_file_identifier.blank?
         # Restore full bag
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=bag_restorer")
+        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=restore_object")
       else
         # Restore individual file. If it's in Glacier, we'll have to run
         # GlacierRestore first.
         gf = GenericFile.find_by_identifier(@work_item.generic_file_identifier)
         if gf && gf.storage_option == 'Standard'
-          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_file_restore_topic")
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=restore_file")
         else
           uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
         end
