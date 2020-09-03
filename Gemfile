@@ -70,7 +70,7 @@ end
 
 group :test, :development do
   gem 'capybara', '3.33.0'
-  gem 'shoulda-matchers', '~> 4.3.0'
+  gem 'shoulda-matchers', '~> 4.4.1'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
   gem 'mimemagic'
