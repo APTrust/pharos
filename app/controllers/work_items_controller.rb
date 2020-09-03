@@ -443,7 +443,7 @@ class WorkItemsController < ApplicationController
         if gf && gf.storage_option == 'Standard'
           uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=restore_file")
         else
-          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
+          uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=restore_glacier")
         end
       end
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['ingest']
@@ -451,7 +451,7 @@ class WorkItemsController < ApplicationController
       return if stage.nil?
       uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=#{topic}")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
-      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=apt_glacier_restore_init_topic")
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=restore_glacier")
     end
     return uri
   end
