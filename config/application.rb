@@ -125,7 +125,7 @@ module Pharos
         'virus_check' => 'virus check'
     }
 
-    PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR Glacier-Deep-VA Glacier-Deep-OH Glacier-Deep-OR)
+    PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR Glacier-Deep-VA Glacier-Deep-OH Glacier-Deep-OR Wasabi-OR Wasabi-VA)
 
     APTRUST_NAME = 'APTrust'
     APTRUST_ID = 'aptrust.org'
