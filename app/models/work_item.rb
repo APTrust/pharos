@@ -300,7 +300,7 @@ class WorkItem < ActiveRecord::Base
       raise ActiveRecord::RecordNotFound
     end
     action = Pharos::Application::PHAROS_ACTIONS['restore']
-    if generic_file.storage_option != 'Standard'
+    if generic_file.storage_option.include?('Glacier')
       action = Pharos::Application::PHAROS_ACTIONS['glacier_restore']
     end
     restore_item = item.dup
