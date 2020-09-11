@@ -425,13 +425,7 @@ class WorkItemsController < ApplicationController
 
   def get_requeue_uri(stage)
     if @work_item.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      if @work_item.generic_file_identifier.blank?
-        # Delete full bag
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=delete_object")
-      else
-        # Delete individual file.
-        uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=delete_file")
-      end
+      uri = URI("#{Pharos::Application::NSQ_BASE_URL}/pub?topic=delete_item")
     elsif @work_item.action == Pharos::Application::PHAROS_ACTIONS['restore']
       if @work_item.generic_file_identifier.blank?
         # Restore full bag
