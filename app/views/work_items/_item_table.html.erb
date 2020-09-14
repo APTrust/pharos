@@ -14,7 +14,7 @@
   <% @paged_results.each do |item| %>
       <tr class="<%= item.status %>">
         <td class="name"><% if item.action == Pharos::Application::PHAROS_ACTIONS['delete'] %>
-              <% unless item.generic_file_identifier.nil? %>
+              <% unless item.generic_file_identifier.blank? %>
                   <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.generic_file_identifier, length: 55) %></a>
               <% else %>
                   <a href="<%= work_item_path(id: item.id) %>" ><%= truncate(item.object_identifier, length: 55) %></a>
