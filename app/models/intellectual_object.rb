@@ -96,10 +96,10 @@ class IntellectualObject < ActiveRecord::Base
   end
 
   def soft_delete(attributes)
-    generic_files.each do |gf|
-      gf.soft_delete(attributes)
-    end
-    save!
+    user_email = attributes[:requestor]
+    attributes[:inst_app] ? inst_app = attributes[:inst_app] : inst_app = nil
+    attributes[:apt_app] ? apt_app = attributes[:apt_app] : apt_app = nil
+    WorkItem.create_delete_request(self.identifier, nil, user_email, inst_app, apt_app)
   end
 
   def active_file_count

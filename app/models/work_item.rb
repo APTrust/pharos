@@ -332,8 +332,11 @@ class WorkItem < ActiveRecord::Base
     if item.nil?
       raise ActiveRecord::RecordNotFound
     end
-    file = GenericFile.with_identifier(generic_file_identifier).first
-    file ? size = file.size : size = 0
+    size = item.size
+    if generic_file_identifier
+      file = GenericFile.with_identifier(generic_file_identifier).first
+      file ? size = file.size : size = 0
+    end
     delete_item = item.dup
     delete_item.action = Pharos::Application::PHAROS_ACTIONS['delete']
     delete_item.stage = Pharos::Application::PHAROS_STAGES['requested']

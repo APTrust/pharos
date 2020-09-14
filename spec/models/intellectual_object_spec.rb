@@ -422,16 +422,14 @@ RSpec.describe IntellectualObject, :type => :model do
           attributes = { requestor: 'user@example.com',
                          inst_app: 'other_user@example.com' }
           subject.soft_delete(attributes)
-          subject.generic_files.all?{ |file|
-            wi = WorkItem.where(generic_file_identifier: file.identifier).first
-            expect(wi).not_to be_nil
-            expect(wi.object_identifier).to eq subject.identifier
-            expect(wi.action).to eq Pharos::Application::PHAROS_ACTIONS['delete']
-            expect(wi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
-            expect(wi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
-            expect(wi.user).to eq 'user@example.com'
-            expect(wi.inst_approver).to eq 'other_user@example.com'
-          }
+          wi = WorkItem.where(object_identifier: subject.identifier, action: Pharos::Application::PHAROS_ACTIONS['delete']).first
+          expect(wi).not_to be_nil
+          expect(wi.object_identifier).to eq subject.identifier
+          expect(wi.action).to eq Pharos::Application::PHAROS_ACTIONS['delete']
+          expect(wi.stage).to eq Pharos::Application::PHAROS_STAGES['requested']
+          expect(wi.status).to eq Pharos::Application::PHAROS_STATUSES['pend']
+          expect(wi.user).to eq 'user@example.com'
+          expect(wi.inst_approver).to eq 'other_user@example.com'
         end
 
       end

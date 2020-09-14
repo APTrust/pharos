@@ -724,6 +724,11 @@ RSpec.describe IntellectualObjectsController, type: :controller do
                                            institution: inst1,
                                            state: 'A',
                                            identifier: 'college.edu/item') }
+    let!(:ingest_work_item) { FactoryBot.create(:work_item,
+                                         object_identifier: deletable_obj.identifier,
+                                         action: 'Ingest',
+                                         stage: 'Cleanup',
+                                         status: 'Success') }
     let!(:work_item) { FactoryBot.create(:work_item,
                                          object_identifier: 'college.edu/item',
                                          action: 'Restore',
@@ -770,7 +775,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
         count_before = Email.all.count
         delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj.identifier, confirmation_token: token.token, requesting_user_id: inst_admin.id }
-        assigns[:t].join
         expect(response).to redirect_to root_url
         expect(flash[:notice]).to include 'Delete job has been queued'
         reloaded_object = IntellectualObject.find(deletable_obj.id)
@@ -821,7 +825,6 @@ RSpec.describe IntellectualObjectsController, type: :controller do
         token = FactoryBot.create(:confirmation_token, intellectual_object: deletable_obj)
         count_before = Email.all.count
         delete :confirm_destroy, params: { intellectual_object_identifier: deletable_obj, confirmation_token: token.token, requesting_user_id: inst_admin.id }, format: :json
-        assigns[:t].join
         expect(response.status).to eq(204)
         expect(response.body).to be_empty
         reloaded_object = IntellectualObject.find(deletable_obj.id)

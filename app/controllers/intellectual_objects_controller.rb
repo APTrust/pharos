@@ -373,16 +373,10 @@ class IntellectualObjectsController < ApplicationController
     attributes = { requestor: requesting_user.email,
                    inst_app: current_user.email
     }
-    @t = Thread.new do
-      ActiveRecord::Base.connection_pool.with_connection do
-        @intellectual_object.soft_delete(attributes)
-        log = Email.log_deletion_confirmation(@intellectual_object)
-        NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
-        ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all
-      end
-      ActiveRecord::Base.connection_pool.release_connection
-    end
-    #t.join
+    @intellectual_object.soft_delete(attributes)
+    log = Email.log_deletion_confirmation(@intellectual_object)
+    NotificationMailer.deletion_confirmation(@intellectual_object, requesting_user.id, current_user.id, log).deliver!
+    ConfirmationToken.where(intellectual_object_id: @intellectual_object.id).delete_all
   end
 
   def filter_count_and_sort

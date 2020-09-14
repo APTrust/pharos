@@ -1019,33 +1019,17 @@ RSpec.describe InstitutionsController, type: :controller do
         expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 0
         delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
-        expect(delete_items.count).to eq 5
+        expect(delete_items.count).to eq 1
         expect(delete_items[0].inst_approver).to eq institutional_admin.email
         expect(delete_items[0].aptrust_approver).to eq admin_user.email
-        expect(delete_items[1].inst_approver).to eq institutional_admin.email
-        expect(delete_items[1].aptrust_approver).to eq admin_user.email
-        expect(delete_items[2].inst_approver).to eq institutional_admin.email
-        expect(delete_items[2].aptrust_approver).to eq admin_user.email
-        expect(delete_items[3].inst_approver).to eq institutional_admin.email
-        expect(delete_items[3].aptrust_approver).to eq admin_user.email
-        expect(delete_items[4].inst_approver).to eq institutional_admin.email
-        expect(delete_items[4].aptrust_approver).to eq admin_user.email
 
         reloaded_object = IntellectualObject.find(obj2.id)
         expect(reloaded_object.state).to eq 'A'
         expect(reloaded_object.premis_events.count).to eq 0
         delete_items = WorkItem.with_action('Delete').with_object_identifier(reloaded_object.identifier)
-        expect(delete_items.count).to eq 5
+        expect(delete_items.count).to eq 1
         expect(delete_items[0].inst_approver).to eq institutional_admin.email
         expect(delete_items[0].aptrust_approver).to eq admin_user.email
-        expect(delete_items[1].inst_approver).to eq institutional_admin.email
-        expect(delete_items[1].aptrust_approver).to eq admin_user.email
-        expect(delete_items[2].inst_approver).to eq institutional_admin.email
-        expect(delete_items[2].aptrust_approver).to eq admin_user.email
-        expect(delete_items[3].inst_approver).to eq institutional_admin.email
-        expect(delete_items[3].aptrust_approver).to eq admin_user.email
-        expect(delete_items[4].inst_approver).to eq institutional_admin.email
-        expect(delete_items[4].aptrust_approver).to eq admin_user.email
 
         reloaded_object = GenericFile.find(file1.id)
         expect(reloaded_object.state).to eq 'A'
