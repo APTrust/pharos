@@ -30,7 +30,14 @@ class GenericFile < ActiveRecord::Base
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
   scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
   scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
-  scope :not_checked_since, ->(param) { where("last_fixity_check <= ? and generic_files.state='A'", param) unless param.blank? }
+  scope :not_checked_since, ->(param) {
+    # Note that we want to filter out files whose storage option is
+    # Glacier-OH, Glacier-OR, Glacier-VA, Glacier-Deep-OH, Glacier-Deep-OR, Glacier-Deep-VA.
+    # We run fixity checks only on items in S3 and Wasabi.
+    unless param.blank?
+      where("last_fixity_check <= ? and generic_files.state='A' and storage_option not like 'Glacier%'", param)
+    end
+  }
   scope :with_state, ->(param) { where(state: param) unless (param.blank? || param == 'all' || param == 'All') }
   scope :with_storage_option, ->(param) { where(storage_option: param) unless param.blank? }
   scope :with_access, ->(param) {

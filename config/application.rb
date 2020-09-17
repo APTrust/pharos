@@ -125,6 +125,8 @@ module Pharos
         'virus_check' => 'virus check'
     }
 
+    # Be sure to preserve case on these.
+    # These constants are also defined in preservation services.
     PHAROS_STORAGE_OPTIONS = %w(Standard Glacier-OH Glacier-VA Glacier-OR Glacier-Deep-VA Glacier-Deep-OH Glacier-Deep-OR Wasabi-OR Wasabi-VA)
 
     APTRUST_NAME = 'APTrust'
