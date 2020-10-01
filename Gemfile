@@ -35,7 +35,7 @@ gem 'rubyzip'
 # Used to create or edit google sheets
 gem 'google_drive'
 
-gem 'simple_form', '~> 5.0.2'
+gem 'simple_form', '~> 5.0.3'
 gem 'phony_rails'
 gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
