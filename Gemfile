@@ -13,11 +13,11 @@ gem 'chart-js-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.10.0'
+gem 'jbuilder', '~> 2.10.1'
 gem 'pg', '1.2.3' # Necessary for talking to our RDS instance
 gem 'pundit'
 # gem 'figaro'
-gem 'devise', '4.7.2'
+gem 'devise', '4.7.3'
 gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
@@ -35,7 +35,7 @@ gem 'rubyzip'
 # Used to create or edit google sheets
 gem 'google_drive'
 
-gem 'simple_form', '~> 5.0.2'
+gem 'simple_form', '~> 5.0.3'
 gem 'phony_rails'
 gem 'inherited_resources', '1.11.0'
 gem 'uuidtools'
