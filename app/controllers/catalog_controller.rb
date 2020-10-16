@@ -82,8 +82,8 @@ class CatalogController < ApplicationController
         when 'File Identifier'
           @results = files.with_identifier(@q)
           @results = files.with_identifier_like(@q) if @results.count == 0
-        when 'URI'
-          @results = files.with_uri_like(@q)
+        when 'UUID'
+          @results = files.with_uuid(@q)
       end
     end
   end

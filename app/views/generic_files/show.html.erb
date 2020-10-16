@@ -19,8 +19,12 @@
       <dd><%= link_to @generic_file.intellectual_object.title, @generic_file.intellectual_object %></dd>
       <dt>Identifier</dt>
       <dd><%= @generic_file.identifier %></dd>
+      <dt>UUID</dt>
+      <dd><%= @generic_file.uuid %></dd>
       <dt>URL to File</dt>
-      <dd><%= @generic_file.uri %></dd>
+      <% @generic_file.storage_records.each do |sr| %>
+      <dd><%= sr.url %><br/></dd>
+      <% end %>
       <dt>Access</dt>
       <dd><%= @generic_file.intellectual_object.access %></dd>
       <dt>MimeType<dt>

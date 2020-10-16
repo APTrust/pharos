@@ -8,7 +8,7 @@ RSpec.describe GenericFile, :type => :model do
     file.institution.should == institution
   end
 
-  it { should validate_presence_of(:uri) }
+  it { should validate_presence_of(:uuid) }
   it { should validate_numericality_of(:size) }
   it { should validate_presence_of(:file_format) }
   it { should validate_presence_of(:identifier) }
@@ -179,7 +179,7 @@ RSpec.describe GenericFile, :type => :model do
         it 'should set the state to deleted and index the object state' do
           h1 = subject.serializable_hash
           expect(h1.has_key?('id')).to be true
-          expect(h1.has_key?('uri')).to be true
+          expect(h1.has_key?('uuid')).to be true
           expect(h1.has_key?('size')).to be true
           expect(h1.has_key?('created_at')).to be true
           expect(h1.has_key?('updated_at')).to be true
@@ -192,7 +192,7 @@ RSpec.describe GenericFile, :type => :model do
 
           h2 = subject.serializable_hash(include: [:checksums, :premis_events, :ingest_state, :storage_records])
           expect(h2.has_key?('id')).to be true
-          expect(h2.has_key?('uri')).to be true
+          expect(h2.has_key?('uuid')).to be true
           expect(h2.has_key?('size')).to be true
           expect(h2.has_key?('created_at')).to be true
           expect(h2.has_key?('updated_at')).to be true
@@ -596,7 +596,7 @@ RSpec.describe GenericFile, :type => :model do
                                      state: 'D') }
     let!(:gf1) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj1,
-                                    uri: "https://s3.kom/uri1",
+                                    uuid: "c5e26175-338a-4549-9843-5fdf552efb34",
                                     identifier: 'test.edu/bag/first',
                                     file_format: 'text/plain',
                                     created_at: '2011-01-01',
@@ -604,7 +604,7 @@ RSpec.describe GenericFile, :type => :model do
                                     state: 'A') }
     let!(:gf2) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj2,
-                                    uri: "https://s3.kom/uri2",
+                                    uuid: "33ab4e85-fbff-42ac-a7bc-0f431568af7e",
                                     identifier: 'test.edu/bag/second',
                                     file_format: 'application/pdf',
                                     created_at: '2017-12-31',
@@ -612,7 +612,7 @@ RSpec.describe GenericFile, :type => :model do
                                     state: 'A') }
     let!(:gf3) { FactoryBot.create(:generic_file,
                                     intellectual_object: obj3,
-                                    uri: "https://s3.kom/uri2",
+                                    uuid: "65f0653a-aab4-432d-a56f-9e35da13fa7b",
                                     identifier: 'test.edu/bag/third',
                                     file_format: 'application/xml',
                                     created_at: '2011-01-01',

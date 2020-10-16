@@ -73,7 +73,7 @@ RSpec.describe GenericFilesController, type: :controller do
       # The variable called file, created above, contains the one
       # active file for this test. We'll create a second, deleted
       # file, which should not be returned with the results.
-      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'two', state: 'D')
+      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'two', uuid: "38c093fb-c50d-43de-88d2-b924c488e3ba", state: 'D')
       get :index, params: { intellectual_object_identifier: @intellectual_object.identifier }, format: :json
       expect(response).to be_successful
       response_data = JSON.parse(response.body)
@@ -98,9 +98,9 @@ RSpec.describe GenericFilesController, type: :controller do
       expect(assigns(:intellectual_object)).to eq @intellectual_object
     end
 
-    it 'returns only active files with uri, size and identifier attributes' do
-      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://one', identifier: 'file_one', state: 'A')
-      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, uri:'https://two', identifier: 'file_two', state: 'D')
+    it 'returns only active files with size, uuid, and identifier attributes' do
+      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'file_one', uuid: "5e67ba40-90e3-4030-9652-792aabb12b91",  state: 'A')
+      FactoryBot.create(:generic_file, intellectual_object: @intellectual_object, identifier: 'file_two', uuid: "c1c6c25e-6fe1-459e-b469-1422555d8419", state: 'D')
       get :index, params: { alt_action: 'file_summary', intellectual_object_identifier: CGI.escape(@intellectual_object.identifier) }, format: :json
       expect(response).to be_successful
 
@@ -109,15 +109,13 @@ RSpec.describe GenericFilesController, type: :controller do
 
       active_files = {}
       @intellectual_object.active_files.each do |f|
-        key = "#{f.uri}-#{f.size}"
-        active_files[key] = f
+        active_files[f.uuid] = f
       end
       response_data = JSON.parse(response.body)
       response_data.each do |file_summary|
-        key = "#{file_summary['uri']}-#{file_summary['size']}"
-        generic_file = active_files[key]
+        generic_file = active_files[file_summary['uuid']]
         expect(generic_file).not_to be_nil
-        expect(file_summary['uri']).to eq generic_file.uri
+        expect(file_summary['uuid']).to eq generic_file.uuid
         expect(file_summary['size']).to eq generic_file.size
         expect(file_summary['identifier']).to eq generic_file.identifier
       end
@@ -192,7 +190,7 @@ RSpec.describe GenericFilesController, type: :controller do
     describe 'when not signed in' do
       let(:obj1) { @intellectual_object }
       it 'should redirect to login' do
-        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'Foo' }, format: :html }
+        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {size: 3456, uuid: "e993201e-ed41-4735-9872-9a651f1f2444" }, format: :html }
         expect(response).to redirect_to root_url + 'users/sign_in'
         expect(flash[:alert]).to eq 'You need to sign in or sign up before continuing.'
       end
@@ -209,7 +207,7 @@ RSpec.describe GenericFilesController, type: :controller do
       describe "should be forbidden" do
         let(:obj1) { FactoryBot.create(:consortial_intellectual_object) }
         it 'should be forbidden' do
-          post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
+          post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {size: 12314121, uuid: "5769dfa3-bf3a-45b4-9a16-31974554efff", created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
           expect(response.code).to eq '403' # forbidden
           expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
         end
@@ -227,7 +225,7 @@ RSpec.describe GenericFilesController, type: :controller do
       describe "should be forbidden" do
         let(:obj1) { FactoryBot.create(:consortial_intellectual_object) }
         it 'should be forbidden' do
-          post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'path/within/bag', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
+          post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {size: 12314121, uuid: "389457ad-730f-472f-832e-31ad28885432", created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', checksums: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
           expect(response.code).to eq '403' # forbidden
           expect(JSON.parse(response.body)).to eq({'status'=>'error','message'=>'You are not authorized to access this page.'})
         end
@@ -243,8 +241,8 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'should show errors' do
-        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'bar'} }, format: 'json'
-        expect(response.code).to eq '422' #Unprocessable Entity
+        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uuid: "d61f415e-7f71-4554-b906-24c3bd0c7b6f"} }, format: 'json'
+        expect(response.code).to eq '422' # Unprocessable Entity <- WRONG!! Should be 400
         expect(JSON.parse(response.body)).to eq( {
                                                      'file_format' => ["can't be blank"],
                                                      'identifier' => ["can't be blank"],
@@ -255,10 +253,10 @@ RSpec.describe GenericFilesController, type: :controller do
       it 'should save field values' do
         obj1.storage_option = 'Glacier-VA'
         obj1.save!
-        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', storage_option: 'Glacier-VA', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', ingest_state: '{[A]}', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}], storage_records_attributes: [ {url: 'https://example.com/url1' }, {url: 'https://example.com/url2' }]} }, format: 'json'
+        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {size: 12314121, uuid: "f0127e22-0843-4839-8310-090311ee1f8d", created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', storage_option: 'Glacier-VA', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', ingest_state: '{[A]}', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}], storage_records_attributes: [ {url: 'https://example.com/url1' }, {url: 'https://example.com/url2' }]} }, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
-          expect(file.uri).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg'
+          expect(file.uuid).to eq 'f0127e22-0843-4839-8310-090311ee1f8d'
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/puppy.jpg'
           expect(file.storage_option).to eq 'Glacier-VA'
           expect(file.storage_records.length).to eq 2
@@ -268,7 +266,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it "should match the parent object's storage_type" do
-        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', storage_option: 'something-else', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', ingest_state: '{[A]}', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
+        post :create, params: { intellectual_object_identifier: obj1.identifier, generic_file: {size: 12314121, uuid: "27930d43-6a01-48f9-b5b0-01100e4aefc7", created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', storage_option: 'something-else', identifier: 'test.edu/12345678/data/mybucket/puppy.jpg', ingest_state: '{[A]}', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
           expect(file.storage_option).to eq 'Standard'
@@ -277,20 +275,20 @@ RSpec.describe GenericFilesController, type: :controller do
 
       it 'should add generic file using API identifier' do
         identifier = URI.escape(obj1.identifier)
-        post :create, params: { intellectual_object_identifier: identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/cat.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
+        post :create, params: { intellectual_object_identifier: identifier, generic_file: {size: 12314121, uuid: "6772210b-4241-41d4-9a08-67df67c5f1e0", created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/cat.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
-          expect(file.uri).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg'
+          expect(file.uuid).to eq '6772210b-4241-41d4-9a08-67df67c5f1e0'
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/cat.jpg'
         end
       end
 
       it 'should create generic files larger than 2GB' do
         identifier = URI.escape(obj1.identifier)
-        post :create, params: { intellectual_object_identifier: identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg', size: 300000000000, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/dog.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
+        post :create, params: { intellectual_object_identifier: identifier, generic_file: {size: 300000000000, uuid: "43b47ce5-a79e-4b66-a892-8e2ce66b1263", created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/dog.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
-          expect(file.uri).to eq 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg'
+          expect(file.uuid).to eq '43b47ce5-a79e-4b66-a892-8e2ce66b1263'
           expect(file.identifier).to eq 'test.edu/12345678/data/mybucket/dog.jpg'
         end
       end
@@ -554,7 +552,7 @@ RSpec.describe GenericFilesController, type: :controller do
           delete :confirm_destroy, params: { generic_file_identifier: file, confirmation_token: token.token, requesting_user_id: user.id }, format: 'html'
           expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
           expect(assigns[:generic_file].state).to eq 'A'
-          expect(flash[:notice]).to eq "Delete job has been queued for file: #{file.uri}."
+          expect(flash[:notice]).to eq "Delete job has been queued for file: #{file.identifier}."
         end
 
         it 'should create a WorkItem with the delete request' do
@@ -649,7 +647,7 @@ RSpec.describe GenericFilesController, type: :controller do
           get :finished_destroy, params: { generic_file_identifier: file, requesting_user_id: user.id, inst_approver_id: inst_user.id }, format: 'html'
           expect(response).to redirect_to intellectual_object_path(file.intellectual_object)
           expect(assigns[:generic_file].state).to eq 'D'
-          expect(flash[:notice]).to eq "Delete job has been finished for file: #{file.uri}. File has been marked as deleted."
+          expect(flash[:notice]).to eq "Delete job has been finished for file: #{file.identifier}. File has been marked as deleted."
         end
       end
     end

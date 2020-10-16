@@ -179,7 +179,7 @@ class GenericFilesController < ApplicationController
         respond_to do |format|
           format.json { head :no_content }
           format.html {
-            flash[:notice] = "Delete job has been queued for file: #{@generic_file.uri}."
+            flash[:notice] = "Delete job has been queued for file: #{@generic_file.identifier}."
             redirect_to @generic_file.intellectual_object
           }
         end
@@ -209,7 +209,7 @@ class GenericFilesController < ApplicationController
     respond_to do |format|
         format.json { head :no_content }
         format.html {
-          flash[:notice] = "Delete job has been finished for file: #{@generic_file.uri}. File has been marked as deleted."
+          flash[:notice] = "Delete job has been finished for file: #{@generic_file.identifier}. File has been marked as deleted."
           redirect_to @generic_file.intellectual_object
         }
     end
@@ -265,7 +265,7 @@ class GenericFilesController < ApplicationController
       summary = {}
       summary['size'] = file.size
       summary['identifier'] = file.identifier
-      summary['uri'] = file.uri
+      summary['uuid'] = file.uuid
       data << summary
     end
     respond_to do |format|
@@ -276,7 +276,7 @@ class GenericFilesController < ApplicationController
 
   def single_generic_file_params
     params[:generic_file] &&= params.require(:generic_file)
-      .permit(:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
+      .permit(:id, :uuid, :identifier, :size, :ingest_state, :last_fixity_check,
               :file_format, :storage_option, premis_events_attributes:
               [:identifier, :event_type, :date_time, :outcome, :id,
                :outcome_detail, :outcome_information, :detail, :object,
@@ -289,8 +289,8 @@ class GenericFilesController < ApplicationController
 
   def batch_generic_file_params
     params[:generic_files] &&= params.require(:generic_files)
-      .permit(files: [:id, :uri, :identifier, :size, :ingest_state, :last_fixity_check,
-                      :file_format, :storage_option, premis_events_attributes:
+      .permit(files: [:id, :identifier, :size, :ingest_state, :last_fixity_check,
+                      :file_format, :uuid, :storage_option, premis_events_attributes:
                       [:identifier, :event_type, :date_time, :outcome, :id,
                        :outcome_detail, :outcome_information, :detail, :object,
                        :agent, :intellectual_object_id, :generic_file_id,
@@ -438,14 +438,13 @@ class GenericFilesController < ApplicationController
     @generic_files = @generic_files
                        .with_identifier(params[:identifier])
                        .with_identifier_like(params[:identifier_like])
-                       .with_uri(params[:uri])
-                       .with_uri_like(params[:uri_like])
                        .created_before(params[:created_before])
                        .created_after(params[:created_after])
                        .updated_before(params[:updated_before])
                        .updated_after(params[:updated_after])
                        .with_institution(params[:institution])
                        .with_file_format(params[:file_format])
+                       .with_uuid(params[:uuid])
                        .with_state(params[:state])
                        .with_storage_option(params[:storage_option])
 

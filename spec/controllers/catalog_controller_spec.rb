@@ -24,8 +24,8 @@ RSpec.describe CatalogController, type: :controller do
     @object_five = FactoryBot.create(:institutional_intellectual_object, institution_id: @another_institution.id, identifier: 'test.edu/1234-5678', id: 5, source_organization: 'University of Denver')
     @object_six = FactoryBot.create(:restricted_intellectual_object, institution_id: @another_institution.id, id: 6, internal_sender_identifier: '1234-5678-9108-6380')
 
-    @file_one = FactoryBot.create(:generic_file, intellectual_object: @object_one, uri: 'file://something/data/old_file.xml', id: 7)
-    @file_two = FactoryBot.create(:generic_file, intellectual_object: @object_two, uri: 'file://fancy/data/new_file.xml', id: 8)
+    @file_one = FactoryBot.create(:generic_file, intellectual_object: @object_one, uuid: "23e73e5a-55ed-46aa-a260-b0bafd929b1f", id: 7)
+    @file_two = FactoryBot.create(:generic_file, intellectual_object: @object_two, uuid: "59909e75-eb70-43f5-b6ed-955f580d47e1", id: 8)
     @file_three = FactoryBot.create(:generic_file, intellectual_object: @object_three, identifier: 'something/1234-5678/data/new_file.xml', id: 9)
     @file_four = FactoryBot.create(:generic_file, intellectual_object: @object_four, id: 10)
     @file_five = FactoryBot.create(:generic_file, intellectual_object: @object_five, id: 11)
@@ -145,11 +145,12 @@ RSpec.describe CatalogController, type: :controller do
             expect(assigns(:paged_results).first.id).to eq @file_one.id
           end
 
-          it 'should match a partial search on uri' do
-            get :search, params: { q: 'fancy', search_field: 'URI', object_type: 'Generic Files' }
+          it 'should match on uuid' do
+            get :search, params: { q: @file_two.uuid, search_field: 'UUID', object_type: 'Generic Files' }
             expect(assigns(:paged_results).size).to eq 1
             expect(assigns(:paged_results).first.id).to eq @file_two.id
           end
+
         end
 
         describe 'for work item searches' do

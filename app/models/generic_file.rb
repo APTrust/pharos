@@ -10,7 +10,7 @@ class GenericFile < ActiveRecord::Base
   accepts_nested_attributes_for :premis_events
   accepts_nested_attributes_for :storage_records
 
-  validates :uri, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_option, presence: true
+  validates :uuid, :file_format, :identifier, :last_fixity_check, :institution_id, :storage_option, presence: true
   validates :size, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates_uniqueness_of :identifier
   validate :init_institution_id, on: :create
@@ -28,8 +28,7 @@ class GenericFile < ActiveRecord::Base
   scope :with_identifier, ->(param) { where(identifier: param) unless param.blank? }
   scope :with_identifier_like, ->(param) { where('generic_files.identifier like ?', "%#{param}%") unless GenericFile.empty_param(param) }
   scope :with_institution, ->(param) { where(institution_id: param) unless param.blank? }
-  scope :with_uri, ->(param) { where(uri: param) unless param.blank? }
-  scope :with_uri_like, ->(param) { where('generic_files.uri like ?', "%#{param}%") unless GenericFile.empty_param(param) }
+  scope :with_uuid, ->(param) { where(uuid: param) unless param.blank? }
   scope :not_checked_since, ->(param) {
     # Note that we want to filter out files whose storage option is
     # Glacier-OH, Glacier-OR, Glacier-VA, Glacier-Deep-OH, Glacier-Deep-OR, Glacier-Deep-VA.

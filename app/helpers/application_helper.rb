@@ -172,7 +172,7 @@ module ApplicationHelper
       when 'generic_files'
         url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :file_format,
                                                                              :object_association, :state, :identifier, :identifier_like,
-                                                                             :uri, :created_before, :created_after, :updated_before,
+                                                                             :uuid, :created_before, :created_after, :updated_before,
                                                                              :updated_after))
       when 'premis_events'
         url = url_for(params.permit(Pharos::Application::PARAMS_HASH).except(:page, :sort, :institution, :access, :object_association,

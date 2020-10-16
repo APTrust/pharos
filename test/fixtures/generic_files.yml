@@ -5,7 +5,7 @@
 
 inst1_obj1_gf1:
   file_format: image/jpeg
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/25452f41-1b18-47b7-b334-751dfd5d011e
+  uuid: 25452f41-1b18-47b7-b334-751dfd5d011e
   size: 48771
   identifier: institution1.edu/photos/picture1
   intellectual_object: inst1_obj1
@@ -14,7 +14,7 @@ inst1_obj1_gf1:
 
 inst1_obj1_gf2:
   file_format: image/jpeg
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/e2bd408c-1958-42f2-a536-b9aa34318f85
+  uuid: e2bd408c-1958-42f2-a536-b9aa34318f85
   size: 233871
   identifier: institution1.edu/photos/picture2
   intellectual_object: inst1_obj1
@@ -23,7 +23,7 @@ inst1_obj1_gf2:
 
 inst1_obj1_gf3:
   file_format: image/jpeg
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/8205a12c-67dc-4618-96ff-53ddaa663469
+  uuid: 8205a12c-67dc-4618-96ff-53ddaa663469
   size: 48771
   identifier: institution1.edu/photos/picture3
   intellectual_object: inst1_obj1
@@ -32,7 +32,7 @@ inst1_obj1_gf3:
 
 inst1_obj2_gf1:
   file_format: application/pdf
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/13c02f70-b149-46a8-96c9-f59512239047
+  uuid: 13c02f70-b149-46a8-96c9-f59512239047
   size: 2233889
   identifier: institution1.edu/pdfs/doc1
   intellectual_object: inst1_obj2
@@ -41,7 +41,7 @@ inst1_obj2_gf1:
 
 inst1_obj2_gf2:
   file_format: application/pdf
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/72153e55-e34a-4c16-a6c5-7ac27a16ae6b
+  uuid: 72153e55-e34a-4c16-a6c5-7ac27a16ae6b
   size: 8977245
   identifier: institution1.edu/pdfs/doc2
   intellectual_object: inst1_obj2
@@ -50,7 +50,7 @@ inst1_obj2_gf2:
 
 inst1_obj2_gf3:
   file_format: application/pdf
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/9abb01d3-0b36-4de1-8149-41eeeec2f551
+  uuid: 9abb01d3-0b36-4de1-8149-41eeeec2f551
   size: 1337409
   identifier: institution1.edu/pdfs/doc3
   intellectual_object: inst1_obj2
@@ -59,7 +59,7 @@ inst1_obj2_gf3:
 
 inst1_obj3_gf1:
   file_format: application/binary
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/4820099e-f1f9-4f21-8db9-19f01ea5a1c1
+  uuid: 4820099e-f1f9-4f21-8db9-19f01ea5a1c1
   size: 2233889
   identifier: institution1.edu/glass/shard1
   intellectual_object: inst1_obj3
@@ -68,7 +68,7 @@ inst1_obj3_gf1:
 
 inst1_obj3_gf2:
   file_format: video/mp4
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/1857267a-a0eb-469d-ac7c-f50e772b20e9
+  uuid: 1857267a-a0eb-469d-ac7c-f50e772b20e9
   size: 399288
   identifier: institution1.edu/glass/shard2
   intellectual_object: inst1_obj3
@@ -77,7 +77,7 @@ inst1_obj3_gf2:
 
 inst1_obj3_gf3:
   file_format: audio/mp3
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/e2060c45-1501-4286-b580-ca664be88390
+  uuid: e2060c45-1501-4286-b580-ca664be88390
   size: 78333
   identifier: institution1.edu/glass/shard3
   intellectual_object: inst1_obj3
@@ -86,7 +86,7 @@ inst1_obj3_gf3:
 
 inst1_obj3_gf4:
   file_format: text/plain
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/72459afd-4e31-438b-b46d-f3d3cffa10f3
+  uuid: 72459afd-4e31-438b-b46d-f3d3cffa10f3
   size: 988226
   identifier: institution1.edu/glass/shard4_deleted
   intellectual_object: inst1_obj3
@@ -97,7 +97,7 @@ inst1_obj3_gf4:
 
 inst2_obj1_gf1:
   file_format: image/jpeg
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/3ba064ae-6a12-49e9-b9f8-cd63fbb173ce
+  uuid: 3ba064ae-6a12-49e9-b9f8-cd63fbb173ce
   size: 4494933
   identifier: institution2.edu/chocolate/picture1
   intellectual_object: inst2_obj1
@@ -106,7 +106,7 @@ inst2_obj1_gf1:
 
 inst2_obj1_gf2:
   file_format: image/jpeg
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/856e3b62-f3ce-4122-a560-685b7204a5d3
+  uuid: 856e3b62-f3ce-4122-a560-685b7204a5d3
   size: 3894894
   identifier: institution2.edu/chocolate/picture2
   intellectual_object: inst2_obj1
@@ -115,7 +115,7 @@ inst2_obj1_gf2:
 
 inst2_obj1_gf3:
   file_format: image/jpeg
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/1877b440-bdf7-454a-b586-1920eb17335c
+  uuid: 1877b440-bdf7-454a-b586-1920eb17335c
   size: 848944
   identifier: institution2.edu/chocolate/picture3
   intellectual_object: inst2_obj1
@@ -124,7 +124,7 @@ inst2_obj1_gf3:
 
 inst2_obj2_gf1:
   file_format: application/pdf
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/88ea1bf7-56bd-4bd0-a316-f6db12d7e34d
+  uuid: 88ea1bf7-56bd-4bd0-a316-f6db12d7e34d
   size: 88747474
   identifier: institution2.edu/coal/doc1
   intellectual_object: inst2_obj2
@@ -133,7 +133,7 @@ inst2_obj2_gf1:
 
 inst2_obj2_gf2:
   file_format: application/pdf
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/058d8e9b-a23a-4125-b6fe-ff3c35ff48e4
+  uuid: 058d8e9b-a23a-4125-b6fe-ff3c35ff48e4
   size: 22939893
   identifier: institution2.edu/coal/doc2
   intellectual_object: inst2_obj2
@@ -142,7 +142,7 @@ inst2_obj2_gf2:
 
 inst2_obj2_gf3:
   file_format: application/pdf
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/016aa20b-a072-4207-8aa4-5d875bdaf166
+  uuid: 016aa20b-a072-4207-8aa4-5d875bdaf166
   size: 384994
   identifier: institution2.edu/coal/doc3
   intellectual_object: inst2_obj2
@@ -151,7 +151,7 @@ inst2_obj2_gf3:
 
 inst2_obj3_gf1:
   file_format: application/binary
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/7c8daeb2-8a37-411e-91b7-f828c0e6f407
+  uuid: 7c8daeb2-8a37-411e-91b7-f828c0e6f407
   size: 7388987
   identifier: institution2.edu/toads/toad1
   intellectual_object: inst2_obj3
@@ -160,7 +160,7 @@ inst2_obj3_gf1:
 
 inst2_obj3_gf2:
   file_format: video/mp4
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/735c7f8b-1795-451d-9adc-2904c3096721
+  uuid: 735c7f8b-1795-451d-9adc-2904c3096721
   size: 9000378
   identifier: institution2.edu/toads/toad2
   intellectual_object: inst2_obj3
@@ -169,7 +169,7 @@ inst2_obj3_gf2:
 
 inst2_obj3_gf3:
   file_format: audio/mp3
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/507ba10f-eb98-409c-b95a-a03dbb323e97
+  uuid: 507ba10f-eb98-409c-b95a-a03dbb323e97
   size: 214199
   identifier: institution2.edu/toads/Prakash_ 39 Harv. J.L. & Pub. Pol’y 341 .pdf
   intellectual_object: inst2_obj3
@@ -178,7 +178,7 @@ inst2_obj3_gf3:
 
 inst2_obj3_gf4:
   file_format: text/plain
-  uri: https://s3.amazonaws.com/aptrust.test.preservation/da86f292-7a85-45c3-9436-e42675e3471b
+  uuid: da86f292-7a85-45c3-9436-e42675e3471b
   size: 132899
   identifier: institution2.edu/toads/toad4_deleted
   intellectual_object: inst2_obj3
@@ -190,7 +190,7 @@ inst2_obj3_gf4:
 generic_file_1029996145:
   id: 1029996145
   file_format: application/json
-  uri: https://s3.us-east-1.localhost:9899/preservation-va/669e2c86-b3e0-4a46-8e24-811d526c1ec0
+  uuid: 669e2c86-b3e0-4a46-8e24-811d526c1ec0
   size: 20471
   identifier: test.edu/btr-512-test-restore/data/sample.json
   intellectual_object_id: 889911812
@@ -208,14 +208,14 @@ generic_file_1029996145:
     utc: &4 2020-08-26 15:26:33.710309000 Z
     zone: *2
     time: *4
-  ingest_state: 
+  ingest_state:
   institution: test_inst
   storage_option: Standard
 
 generic_file_1029996146:
   id: 1029996146
   file_format: application/xml
-  uri: https://s3.us-east-1.localhost:9899/preservation-va/0b135223-88f6-45aa-96a3-2e67ecb50066
+  uuid: 0b135223-88f6-45aa-96a3-2e67ecb50066
   size: 23972
   identifier: test.edu/btr-512-test-restore/data/sample.xml
   intellectual_object_id: 889911812
@@ -233,14 +233,14 @@ generic_file_1029996146:
     utc: &4 2020-08-26 15:26:33.710573000 Z
     zone: *2
     time: *4
-  ingest_state: 
+  ingest_state:
   institution: test_inst
   storage_option: Standard
 
 generic_file_1029996147:
   id: 1029996147
   file_format: text/plain
-  uri: https://s3.us-east-1.localhost:9899/preservation-va/246c54b3-6476-494c-8fd0-bdd260b712c6
+  uuid: 246c54b3-6476-494c-8fd0-bdd260b712c6
   size: 739
   identifier: test.edu/btr-512-test-restore/bag-info.txt
   intellectual_object_id: 889911812
@@ -258,14 +258,14 @@ generic_file_1029996147:
     utc: &4 2000-01-01 00:00:00.000000000 Z
     zone: *2
     time: *4
-  ingest_state: 
+  ingest_state:
   institution: test_inst
   storage_option: Standard
 
 generic_file_1029996141:
   id: 1029996141
   file_format: application/xml
-  uri: https://s3.us-east-1.localhost:9899/preservation-va/216cf80c-8d23-4435-bdac-3bfa715b064a
+  uuid: 216cf80c-8d23-4435-bdac-3bfa715b064a
   size: 23972
   identifier: test.edu/apt-test-restore/data/sample.xml
   intellectual_object_id: 889911811
@@ -283,14 +283,14 @@ generic_file_1029996141:
     utc: &4 2020-08-26 15:26:33.148725000 Z
     zone: *2
     time: *4
-  ingest_state: 
+  ingest_state:
   institution: test_inst
   storage_option: Standard
 
 generic_file_1029996142:
   id: 1029996142
   file_format: text/plain
-  uri: https://s3.us-east-1.localhost:9899/preservation-va/b8dde88f-da56-4477-b78f-7e17dd2f37c2
+  uuid: b8dde88f-da56-4477-b78f-7e17dd2f37c2
   size: 344
   identifier: test.edu/apt-test-restore/bag-info.txt
   intellectual_object_id: 889911811
@@ -308,14 +308,14 @@ generic_file_1029996142:
     utc: &4 2000-01-01 00:00:00.000000000 Z
     zone: *2
     time: *4
-  ingest_state: 
+  ingest_state:
   institution: test_inst
   storage_option: Standard
 
 generic_file_1029996143:
   id: 1029996143
   file_format: application/json
-  uri: https://s3.us-east-1.localhost:9899/preservation-va/1275dbcf-8bc9-4943-95d0-5ce27e8b4c08
+  uuid: 1275dbcf-8bc9-4943-95d0-5ce27e8b4c08
   size: 20471
   identifier: test.edu/apt-test-restore/data/sample.json
   intellectual_object_id: 889911811
@@ -333,14 +333,14 @@ generic_file_1029996143:
     utc: &4 2020-08-26 15:26:33.148542000 Z
     zone: *2
     time: *4
-  ingest_state: 
+  ingest_state:
   institution: test_inst
   storage_option: Standard
 
 generic_file_1029996144:
   id: 1029996144
   file_format: text/plain
-  uri: https://s3.us-east-1.localhost:9899/preservation-va/2a3ad959-4891-445f-84b0-cd59be88fbe6
+  uuid: 2a3ad959-4891-445f-84b0-cd59be88fbe6
   size: 136
   identifier: test.edu/apt-test-restore/aptrust-info.txt
   intellectual_object_id: 889911811
@@ -358,7 +358,6 @@ generic_file_1029996144:
     utc: &4 2000-01-01 00:00:00.000000000 Z
     zone: *2
     time: *4
-  ingest_state: 
+  ingest_state:
   institution: test_inst
   storage_option: Standard
-
