@@ -107,7 +107,6 @@ RSpec.describe WorkItem, :type => :model do
   end
 
   it 'should set queue fields' do
-    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
     ts = Time.now
     setup_item(subject)
     subject.action = ingest
@@ -123,38 +122,6 @@ RSpec.describe WorkItem, :type => :model do
     subject.node.should == "10.11.12.13"
     subject.pid.should == 808
     subject.needs_admin_review.should == true
-  end
-
-  it 'pretty_state should not choke on nil' do
-    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
-    setup_item(subject)
-    subject.work_item_state.state = nil
-    subject.pretty_state.should == nil
-  end
-
-  it 'pretty_state should not choke on empty string' do
-    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
-    setup_item(subject)
-    subject.work_item_state.state = Zlib::Deflate.deflate('')
-    subject.pretty_state.should == nil
-  end
-
-  it 'pretty_state should produce formatted JSON' do
-    subject.work_item_state = FactoryBot.create(:work_item_state, work_item: subject, action: 'Success')
-    setup_item(subject)
-    subject.work_item_state.state = Zlib::Deflate.deflate('{ "here": "is", "some": ["j","s","o","n"] }')
-    pretty_json = <<-eos
-{
-  "here": "is",
-  "some": [
-    "j",
-    "s",
-    "o",
-    "n"
-  ]
-}
-    eos
-    subject.pretty_state.should == pretty_json.strip
   end
 
   it 'requeue_item should reset the status, stage, and action to the appropriate fields' do
@@ -220,7 +187,6 @@ RSpec.describe WorkItem, :type => :model do
     it 'should create a restoration request when asked' do
       test_obj = IntellectualObject.where(identifier: 'abc/123').first
       wi = WorkItem.create_restore_request('abc/123', 'mikey@example.com')
-      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
       wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
@@ -228,7 +194,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
       wi.retry.should == true
-      wi.work_item_state.state.should be_nil
       wi.node.should be_nil
       wi.pid.should == 0
       wi.needs_admin_review.should == false
@@ -239,7 +204,6 @@ RSpec.describe WorkItem, :type => :model do
     it 'should create a file restoration request when asked' do
       test_file = GenericFile.where(identifier: 'abc/123/doc.pdf').first
       wi = WorkItem.create_restore_request_for_file(test_file, 'mikey@example.com')
-      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['restore']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
       wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
@@ -247,7 +211,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
       wi.retry.should == true
-      wi.work_item_state.state.should be_nil
       wi.node.should be_nil
       wi.pid.should == 0
       wi.needs_admin_review.should == false
@@ -258,7 +221,6 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a glacier restoration request when asked' do
       wi = WorkItem.create_glacier_restore_request('abc/123', 'mikey@example.com')
-      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
       wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
@@ -266,7 +228,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.outcome.should == 'Not started'
       wi.user.should == 'mikey@example.com'
       wi.retry.should == true
-      wi.work_item_state.state.should be_nil
       wi.node.should be_nil
       wi.pid.should == 0
       wi.needs_admin_review.should == false
@@ -275,7 +236,6 @@ RSpec.describe WorkItem, :type => :model do
 
     it 'should create a delete request when asked' do
       wi = WorkItem.create_delete_request('abc/123', 'abc/123/doc.pdf', 'mikey@example.com', 'jeremy@example.com', 'joyce@example.com')
-      wi.work_item_state = FactoryBot.build(:work_item_state, work_item: wi)
       wi.action.should == Pharos::Application::PHAROS_ACTIONS['delete']
       wi.stage.should == Pharos::Application::PHAROS_STAGES['requested']
       wi.status.should == Pharos::Application::PHAROS_STATUSES['pend']
@@ -286,7 +246,6 @@ RSpec.describe WorkItem, :type => :model do
       wi.aptrust_approver.should == 'joyce@example.com'
       wi.retry.should == true
       wi.generic_file_identifier.should == 'abc/123/doc.pdf'
-      wi.work_item_state.state.should be_nil
       wi.node.should be_nil
       wi.pid.should == 0
       wi.needs_admin_review.should == false

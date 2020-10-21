@@ -523,8 +523,6 @@ class UsersController < ApplicationController
         query = 'VACUUM (VERBOSE, ANALYZE) users'
       when 'work_items'
         query = 'VACUUM (VERBOSE, ANALYZE) work_items'
-      when 'work_item_states'
-        query = 'VACUUM (VERBOSE, ANALYZE) work_item_states'
       when 'entire_database'
         query = 'VACUUM (VERBOSE, ANALYZE)'
     end

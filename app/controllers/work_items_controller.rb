@@ -84,7 +84,6 @@ class WorkItemsController < ApplicationController
       else
         options = {}
         options[:stage] = params[:item_stage] if params[:item_stage]
-        options[:work_item_state_delete] = 'true' if params[:delete_state_item] && params[:delete_state_item] == 'true'
         @work_item.requeue_item(options)
         if Rails.env.development?
           flash[:notice] = 'The response from NSQ to the requeue request is as follows: Status: 200, Body: ok'

@@ -118,13 +118,6 @@ Rails.application.routes.draw do
   get '/api/v2/notifications/spot_test_restoration/:id', to: 'work_items#spot_test_restoration', format: :json
   get 'items/redis_file/:id/:file_identifier', to: 'work_items#redis_file', :defaults => { :format => 'json' }, file_identifier: file_ptrn, as: :redis_file
 
-  # WORK ITEM STATE ROUTES
-  #resources :work_item_states, path: 'item_state', only: [:show, :update, :create], format: :json, param: :work_item_id
-  #resources :work_item_states, path: '/api/v2/item_state', only: [:show, :update, :create], format: :json, param: :work_item_id
-  post '/api/v2/item_state', to: 'work_item_states#create', format: :json
-  put '/api/v2/item_state/:id', to: 'work_item_states#update', format: :json
-  get '/api/v2/item_state/:id', to: 'work_item_states#show', format: :json
-
   # CHECKSUM ROUTES
   get '/api/v2/checksums', to: 'checksums#index', format: :json
   get '/api/v2/checksums/:id', to: 'checksums#show', format: :json
