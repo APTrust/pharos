@@ -332,6 +332,8 @@ namespace :pharos do
                  roles: [admin_role], grace_period: grace_period)
     puts "Created admin user"
 
+    # This API key works for integration tests only.
+    # It does not work on any of our publicly available instances.
     puts 'Creating system user for API use'
     name = "APTrust System"
     email = "system@aptrust.org"
