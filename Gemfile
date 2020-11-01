@@ -47,7 +47,7 @@ gem 'browser-timezone-rails'
 gem 'sprockets', '~> 3.7.2'
 
 gem 'activerecord-nulldb-adapter'
-gem 'puma', '4.3.5'
+gem 'puma', '5.0.4'
 
 group :demo, :production, :staging do
   # Graylog logging gems
