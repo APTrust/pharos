@@ -26,6 +26,24 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
+    describe 'who wants to filter users' do
+      let!(:user1) { FactoryBot.create :user, name: 'User1', email: 'user1@example.com' }
+      let!(:user2) { FactoryBot.create :user, name: '_user2_', email: 'joe@nowhere.org' }
+      let!(:user3) { FactoryBot.create :user, name: 'XUser3', email: 'rails@aptrust.org' }
+      it 'should see only the users he/she asks for' do
+        get :index, params: { name_or_email_like: 'user1' }
+        response.should be_successful
+        expect(assigns[:users]).to include(user1)
+        expect(assigns[:users]).not_to include(user2, user3)
+
+        get :index, params: { name_or_email_like: '.org' }
+        response.should be_successful
+        expect(assigns[:users]).to include(user2, user3)
+        expect(assigns[:users]).not_to include(user1)
+      end
+    end
+
+
     it 'should be able to perform yearly account confirmations' do
       get :account_confirmations, format: :html
       expect(response.status).to eq(302)
