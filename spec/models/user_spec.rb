@@ -141,6 +141,26 @@ describe User do
     end
   end
 
+  describe 'name_or_email_like' do
+    it 'filters users on partial name or email' do
+      user1 = FactoryBot.create :user, name: 'user1', email: 'user1@example.com'
+      user2 = FactoryBot.create :user, name: '_user2_', email: 'joe@nowhere.org'
+      user3 = FactoryBot.create :user, name: 'xuser3', email: 'rails@aptrust.org'
+
+      User.name_or_email_like('user1').count.should eq 1
+      User.name_or_email_like('user1')[0].name.should eq 'user1'
+
+      User.name_or_email_like('user2').count.should eq 1
+      User.name_or_email_like('user2')[0].name.should eq '_user2_'
+
+      org_users = User.name_or_email_like('.org')
+      org_users.count.should eq 2
+      org_users[0].name.should eq '_user2_'
+      org_users[1].name.should eq 'xuser3'
+    end
+  end
+
+
   # describe 'session timeout' do
   #   it 'defaults to Devise.timeout_in' do
   #     user.timeout_in.should eq Devise.timeout_in

@@ -1,6 +1,14 @@
 <% @title = 'Users' %>
 
 <%- model_class = User -%>
+
+<div>
+  <form>
+    <input type="text" name="name_or_email_like" id="name_or_email_like"/>
+    <input type="submit" value="Search"/>
+  </form>
+</div>
+
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 </div>

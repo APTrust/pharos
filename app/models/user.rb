@@ -29,6 +29,8 @@ class User < ActiveRecord::Base
 
   # We want this to always be true so that authorization happens in the user policy, preventing incorrect 404 errors.
   scope :readable, ->(current_user) { where('(1=1)') }
+  scope :name_or_email_like, ->(param) { where('(name ILIKE ? or email ILIKE ?)', "%#{param}%", "%#{param}%") unless param.blank? }
+
 
   # This method assigns permission groups
   # Don't think these are necessary anymore, we use Pundit/Roles

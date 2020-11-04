@@ -29,7 +29,7 @@ class UsersController < ApplicationController
   after_action :verify_policy_scoped, :only => :index
 
   def index
-    @users = policy_scope(User).order(:name)
+    @users = policy_scope(User).name_or_email_like(params[:name_or_email_like]).order(:name)
   end
 
   def new
