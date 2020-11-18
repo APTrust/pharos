@@ -110,7 +110,7 @@
                 <% if !@redis_files.nil? %>
                 <% @redis_files.each do |f| %>
                 <li>
-                  <%= begin link_to(f, redis_file_url(@work_item, f), { target: '_blank' }) rescue "Bad link to #{f.identifier}" end %>
+                  <%= begin link_to(f, redis_file_url(@work_item, f), { target: '_blank' }) rescue "Bad link to #{f}" end %>
                 </li>
                 <% end %>
                 <% end %>
