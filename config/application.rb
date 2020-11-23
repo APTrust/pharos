@@ -136,6 +136,7 @@ module Pharos
 
     # What's this? List of all params allowed throughout entire app?
     # If so, it's an antipattern and a security risk.
+    # It's also not a hash. It's an array.
     PARAMS_HASH = [
       :access,
       :alt_identifier,
@@ -177,6 +178,7 @@ module Pharos
       :institution_id,
       :institution_identifier,
       :intellectual_object_id,
+      :intellectual_object_identifier,
       :is_completed,
       :is_not_completed,
       :item_action,
