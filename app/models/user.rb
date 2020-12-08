@@ -17,7 +17,6 @@ class User < ActiveRecord::Base
 
   validates :email, presence: true, uniqueness: true
   validate :email_is_valid
-  # validates :phone_number, presence: true
   validates_presence_of :phone_number, on: :enable_otp
   validates :role_ids, presence: true
   validates :institution_id, presence: true
@@ -200,10 +199,6 @@ class User < ActiveRecord::Base
 
   def init_grace_period
     self.grace_period = DateTime.now
-  end
-
-  def self.phone_number_is_valid
-
   end
 
 end
