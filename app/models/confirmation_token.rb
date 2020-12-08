@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: confirmation_tokens
+#
+#  id                     :bigint           not null, primary key
+#  token                  :string
+#  intellectual_object_id :integer
+#  generic_file_id        :integer
+#  institution_id         :integer
+#  user_id                :integer
+#
 class ConfirmationToken < ActiveRecord::Base
   self.primary_key = 'id'
   belongs_to :institution

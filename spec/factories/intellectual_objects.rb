@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: intellectual_objects
+#
+#  id                          :integer          not null, primary key
+#  title                       :string
+#  description                 :text
+#  identifier                  :string
+#  alt_identifier              :string
+#  access                      :string
+#  bag_name                    :string
+#  institution_id              :integer
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  state                       :string
+#  etag                        :string
+#  ingest_state                :text
+#  bag_group_identifier        :string           default(""), not null
+#  storage_option              :string           default("Standard"), not null
+#  bagit_profile_identifier    :string
+#  source_organization         :string
+#  internal_sender_identifier  :string
+#  internal_sender_description :text
+#
 FactoryBot.define do
 
   factory :intellectual_object, class: IntellectualObject do

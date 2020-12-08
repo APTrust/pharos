@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: snapshots
+#
+#  id             :bigint           not null, primary key
+#  audit_date     :datetime
+#  institution_id :integer
+#  apt_bytes      :bigint
+#  cost           :decimal(, )
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  snapshot_type  :string
+#  cs_bytes       :bigint
+#  go_bytes       :bigint
+#
 FactoryBot.define do
   factory :snapshot do
     audit_date { Time.now }

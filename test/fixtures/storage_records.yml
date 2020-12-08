@@ -1,5 +1,11 @@
-# These fixtures are used in integration tests with the
-# APTrust Go services. They're not used for spec tests.
+# == Schema Information
+#
+# Table name: storage_records
+#
+#  id              :bigint           not null, primary key
+#  generic_file_id :integer
+#  url             :string
+#
 
 sr01:
   url: https://localhost:9899/preservation-va/25452f41-1b18-47b7-b334-751dfd5d011e

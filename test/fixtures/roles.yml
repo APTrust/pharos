@@ -1,5 +1,12 @@
-# These fixtures are used in integration tests with the
-# APTrust Go services. They're not used for spec tests.
+# == Schema Information
+#
+# Table name: roles
+#
+#  id         :integer          not null, primary key
+#  name       :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 
 role_admin:
   name: admin

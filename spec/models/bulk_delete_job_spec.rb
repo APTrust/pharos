@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: bulk_delete_jobs
+#
+#  id                        :bigint           not null, primary key
+#  requested_by              :string
+#  institutional_approver    :string
+#  aptrust_approver          :string
+#  institutional_approval_at :datetime
+#  aptrust_approval_at       :datetime
+#  note                      :text
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  institution_id            :integer          not null
+#
 require 'spec_helper'
 
 RSpec.describe BulkDeleteJob, :type => :model do

@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: confirmation_tokens
+#
+#  id                     :bigint           not null, primary key
+#  token                  :string
+#  intellectual_object_id :integer
+#  generic_file_id        :integer
+#  institution_id         :integer
+#  user_id                :integer
+#
 FactoryBot.define do
   factory :confirmation_token do
     token { SecureRandom.hex }

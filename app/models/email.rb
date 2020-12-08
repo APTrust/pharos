@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: emails
+#
+#  id                     :bigint           not null, primary key
+#  email_type             :string
+#  event_identifier       :string
+#  item_id                :integer
+#  email_text             :text
+#  user_list              :text
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  intellectual_object_id :integer
+#  generic_file_id        :integer
+#  institution_id         :integer
+#
 class Email < ApplicationRecord
   self.primary_key = 'id'
   has_and_belongs_to_many :premis_events

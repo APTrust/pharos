@@ -1,4 +1,13 @@
-# Read about factories at https://github.com/thoughtbot/factory_bot
+# == Schema Information
+#
+# Table name: usage_samples
+#
+#  id             :integer          not null, primary key
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  institution_id :string
+#  data           :text
+#
 
 FactoryBot.define do
   factory :usage_sample do

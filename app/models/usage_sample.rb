@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: usage_samples
+#
+#  id             :integer          not null, primary key
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  institution_id :string
+#  data           :text
+#
 class UsageSample < ActiveRecord::Base
   self.primary_key = 'id'
   serialize :data, Hash

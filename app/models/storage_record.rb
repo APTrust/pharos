@@ -1,19 +1,11 @@
-# StorageRecord contains a URL pointing to a location in preservation
-# storage the contains a GenericFile. The format of these URLs is:
+# == Schema Information
 #
-# https://<provider_host>/<bucket>/<uuid>
+# Table name: storage_records
 #
-# The last part of the URL is the UUID of the GenericFile.
+#  id              :bigint           not null, primary key
+#  generic_file_id :integer
+#  url             :string
 #
-# Most files will have 1-2 StorageRecords.
-#
-# StorageRecords are created and deleted through the GenericFilesController.
-# The StorageRecords controller includes only an #index endpoint for use
-# by preservation-services workers.
-#
-# When we delete StorageRecords, we fully delete the records instead of
-# just marking them with State='D'. The PremisEvents table contains records
-# of deletions that can serve as tombstones.
 class StorageRecord < ApplicationRecord
   belongs_to :generic_file
 

@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: premis_events
+#
+#  id                             :integer          not null, primary key
+#  identifier                     :string
+#  event_type                     :string
+#  date_time                      :string
+#  outcome_detail                 :string
+#  detail                         :string
+#  outcome_information            :string
+#  object                         :string
+#  agent                          :string
+#  intellectual_object_id         :integer
+#  generic_file_id                :integer
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  outcome                        :string
+#  institution_id                 :integer
+#  intellectual_object_identifier :string           default(""), not null
+#  generic_file_identifier        :string           default(""), not null
+#  old_uuid                       :string
+#
 require 'spec_helper'
 
 RSpec.describe PremisEvent, :type => :model do
