@@ -1,4 +1,7 @@
 module ApplicationHelper
+
+  # CLEANUP: These link methods should probably be partial layouts
+
   def show_link(object, content = nil, options={})
     content ||= '<i class="glyphicon glyphicon-eye-open"></i> View'
     options[:class] = 'btn doc-action-btn btn-normal btn-sm' if options[:class].nil?
@@ -201,10 +204,9 @@ module ApplicationHelper
   end
 
   def pretty_date(date)
-    unless date.nil? || date == ''
+    unless date.blank?
       zoned_date = date.in_time_zone(Time.zone)
-      pretty_date = zoned_date.strftime('%Y-%m-%dT%H:%M:%S %Z') #ISO Format
-      pretty_date
+      zoned_date.strftime('%Y-%m-%dT%H:%M:%S %Z') #ISO Format
     end
   end
 

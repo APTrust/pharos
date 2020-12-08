@@ -8,10 +8,12 @@ module WorkItemsHelper
     link_to(content.html_safe, [:requeue, object], options) if policy(object).requeue?
   end
 
+  # CLEANUP: We should be using Pharos::Application::PHAROS_STAGES
   def stages_for_select
    ['Requested', 'Receive', 'Fetch', 'Unpack', 'Validate', 'Store', 'Record', 'Cleanup', 'Resolve', 'Package', 'Restoring', 'Available in S3']
   end
 
+  # CLEANUP: We should be using Pharos::Application::PHAROS_STATUSES
   def statuses_for_select
     %w(Pending Started Success Failed Cancelled)
   end
