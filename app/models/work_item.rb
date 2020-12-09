@@ -115,6 +115,21 @@ class WorkItem < ActiveRecord::Base
     Pharos::Application::PHAROS_STAGES['cleanup'],
   ]
 
+  @@note_for_requeue = {
+    Pharos::Application::PHAROS_ACTIONS['delete'] => 'Delete requested',
+    Pharos::Application::PHAROS_ACTIONS['restore'] => 'Restore requested',
+    Pharos::Application::PHAROS_ACTIONS['glacier_restore'] => 'Restore requested',
+    Pharos::Application::PHAROS_STAGES['fetch'] => 'Item is pending ingest',
+    Pharos::Application::PHAROS_STAGES['validate'] => 'Item is pending bag validation',
+    Pharos::Application::PHAROS_STAGES['reingest_check'] => 'Item is pending reingest check',
+    Pharos::Application::PHAROS_STAGES['copy_to_staging'] => 'Waiting to copy files to staging area',
+    Pharos::Application::PHAROS_STAGES['format_identification'] => 'Files are pending format identification',
+    Pharos::Application::PHAROS_STAGES['store'] => 'Item is pending storage',
+    Pharos::Application::PHAROS_STAGES['storage_validation'] => 'Item is pending validation of preservation storage copies',
+    Pharos::Application::PHAROS_STAGES['record'] => 'Item is pending record',
+    Pharos::Application::PHAROS_STAGES['cleanup'] => 'Item is pending cleanup of staging files and interim processing data'
+  }
+
 
   # def to_param
   #   #"#{etag}/#{name}"
@@ -159,7 +174,6 @@ class WorkItem < ActiveRecord::Base
                .first
   end
 
-  # Clean this up. Aargh!
   def requeue_item(options={})
     self.status = Pharos::Application::PHAROS_STATUSES['pend']
     self.retry = true
@@ -167,48 +181,20 @@ class WorkItem < ActiveRecord::Base
     self.node = nil
     self.pid = 0
     self.queued_at = nil
-    if self.action == Pharos::Application::PHAROS_ACTIONS['delete']
-      self.stage = Pharos::Application::PHAROS_STAGES['requested']
-      self.note = 'Delete requested'
-      self.outcome = 'Not started'
-    elsif self.action == Pharos::Application::PHAROS_ACTIONS['restore']
-      self.stage = Pharos::Application::PHAROS_STAGES['requested']
-      self.note = 'Restore requested'
-    elsif self.action == Pharos::Application::PHAROS_ACTIONS['glacier_restore']
-      self.stage = Pharos::Application::PHAROS_STAGES['requested']
-      self.note = 'Restore requested'
-    elsif self.action == Pharos::Application::PHAROS_ACTIONS['ingest']
-      if options[:stage]
-        if options[:stage] == Pharos::Application::PHAROS_STAGES['fetch']
-          self.stage = Pharos::Application::PHAROS_STAGES['receive']
-          self.note = 'Item is pending ingest'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['validate']
-          self.stage = Pharos::Application::PHAROS_STAGES['validate']
-          self.note = 'Item is pending bag validation'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['reingest_check']
-          self.stage = Pharos::Application::PHAROS_STAGES['reingest_check']
-          self.note = 'Item is pending reingest check'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['copy_to_staging']
-          self.stage = Pharos::Application::PHAROS_STAGES['copy_to_staging']
-          self.note = 'Waiting to copy files to staging area'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['format_identification']
-          self.stage = Pharos::Application::PHAROS_STAGES['format_identification']
-          self.note = 'Files are pending format identification'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['store']
-          self.stage = Pharos::Application::PHAROS_STAGES['store']
-          self.note = 'Item is pending storage'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['storage_validation']
-          self.stage = Pharos::Application::PHAROS_STAGES['storage_validation']
-          self.note = 'Item is pending validation of preservation storage copies'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['record']
-          self.stage = Pharos::Application::PHAROS_STAGES['record']
-          self.note = 'Item is pending record'
-        elsif options[:stage] == Pharos::Application::PHAROS_STAGES['cleanup']
-          self.stage = Pharos::Application::PHAROS_STAGES['cleanup']
-          self.note = 'Item is pending cleanup of staging files and interim processing data'
-        end
-      end
-    end
+    self.stage = options[:stage] || Pharos::Application::PHAROS_STAGES['requested']
+    self.note = @@note_for_requeue[options[:stage] || self.action]
+    self.outcome = self.note
+
+    # Note: Forciby change stage 'Fetch' to stage 'Receive'.
+    #
+    # We want to move to 'Fetch', which matches up with our
+    # service names and our queue names, but to maintain
+    # our contract with the public member API, we have to
+    # stick with 'Receive' for now. The bucket reader also
+    # looks for 'Receive'. We can fix this when publish API changes,
+    # but not before.
+    self.stage = Pharos::Application::PHAROS_STAGES['receive'] if self.stage == Pharos::Application::PHAROS_STAGES['fetch']
+
     self.save!
   end
 
