@@ -3,6 +3,7 @@ class ChecksumsController < ApplicationController
   before_action :load_generic_file, only: :create
   after_action :verify_authorized
 
+  # Note that this controller is API only.
   def index
     authorize current_user, :checksum_index?
     @checksums = Checksum.all
@@ -44,8 +45,7 @@ class ChecksumsController < ApplicationController
 
   def load_generic_file
     if params[:generic_file_identifier]
-      @generic_file ||= GenericFile.where(identifier: params[:generic_file_identifier]).first
-      @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier]) if @generic_file.nil?
+      @generic_file = GenericFile.find_by_identifier(params[:generic_file_identifier])
     elsif params[:generic_file_id]
       @generic_file = GenericFile.readable(current_user).find(params[:generic_file_id])
     end
@@ -56,6 +56,8 @@ class ChecksumsController < ApplicationController
       .with_generic_file_identifier(params[:generic_file_identifier])
       .with_algorithm(params[:algorithm])
       .with_digest(params[:digest])
+      .created_before(params[:created_before])
+      .created_after(params[:created_after])
     count = @checksums.count
     set_page_counts(count)
     @checksums = @checksums.order('datetime DESC')
