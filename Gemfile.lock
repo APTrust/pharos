@@ -132,7 +132,7 @@ GEM
     dotenv-rails (2.7.6)
       dotenv (= 2.7.6)
       railties (>= 3.2)
-    email_validator (2.0.1)
+    email_validator (2.2.2)
       activemodel
     encryptor (3.0.0)
     erubi (1.10.0)
@@ -358,7 +358,7 @@ GEM
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
     turbolinks-source (5.2.0)
-    tzinfo (1.2.8)
+    tzinfo (1.2.9)
       thread_safe (~> 0.1)
     uber (0.1.0)
     uglifier (4.2.0)
