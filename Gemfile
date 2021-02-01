@@ -13,7 +13,7 @@ gem 'chart-js-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.10.1'
+gem 'jbuilder', '~> 2.11.2'
 gem 'pg', '1.2.3' # Necessary for talking to our RDS instance
 gem 'pundit'
 # gem 'figaro'
@@ -69,8 +69,8 @@ group :development do
 end
 
 group :test, :development do
-  gem 'capybara', '3.34.0'
-  gem 'shoulda-matchers', '~> 4.4.1'
+  gem 'capybara', '3.35.3'
+  gem 'shoulda-matchers', '~> 4.5.1'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
   gem 'mimemagic'
