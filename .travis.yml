@@ -40,14 +40,16 @@ deploy:
     local-dir: docs
     on:
       branch:
-        - develop
-        - master
+       # - develop
+       # - master
+        - learn-builds
   - provider: script
     script: make -w publish-ci
     on:
       branch:
-        - develop
-        - master
+       # - develop
+       # - master
+        - learn-builds
     skip_cleanup: true
 notifications:
   slack:
