@@ -17,7 +17,7 @@ gem 'jbuilder', '~> 2.11.2'
 gem 'pg', '1.2.3' # Necessary for talking to our RDS instance
 gem 'pundit'
 # gem 'figaro'
-gem 'devise', '4.7.3'
+gem 'devise', '4.8.0'
 gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
