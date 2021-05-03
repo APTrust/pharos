@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.4.3'
+gem 'rails', '~> 5.2.5'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.2.0'
 # Use CoffeeScript for .coffee assets and views
@@ -17,7 +17,7 @@ gem 'jbuilder', '~> 2.11.2'
 gem 'pg', '1.2.3' # Necessary for talking to our RDS instance
 gem 'pundit'
 # gem 'figaro'
-gem 'devise', '4.7.3'
+gem 'devise', '4.8.0'
 gem 'devise-security'
 gem 'devise-two-factor'
 gem 'dotenv-rails'
@@ -73,7 +73,6 @@ group :test, :development do
   gem 'shoulda-matchers', '~> 4.5.1'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
-  gem 'mimemagic'
 end
 
 group :development, :test, :staging, :demo, :production, :integration, :docker_integration do
