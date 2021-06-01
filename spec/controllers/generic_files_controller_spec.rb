@@ -241,7 +241,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'should add generic file using API identifier' do
-        identifier = URI.escape(obj1.identifier)
+        identifier = URI.encode_www_form_component(obj1.identifier)
         post :create, params: { intellectual_object_identifier: identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/cat.jpg', size: 12314121, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/cat.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
@@ -251,7 +251,7 @@ RSpec.describe GenericFilesController, type: :controller do
       end
 
       it 'should create generic files larger than 2GB' do
-        identifier = URI.escape(obj1.identifier)
+        identifier = URI.encode_www_form_component(obj1.identifier)
         post :create, params: { intellectual_object_identifier: identifier, generic_file: {uri: 'http://s3-eu-west-1.amazonaws.com/mybucket/dog.jpg', size: 300000000000, created_at: '2001-12-31', updated_at: '2003-03-13', file_format: 'text/html', identifier: 'test.edu/12345678/data/mybucket/dog.jpg', checksums_attributes: [{digest: '123ab13df23', algorithm: 'MD6', datetime: '2003-03-13T12:12:12Z'}]} }, format: 'json'
         expect(response.code).to eq '201'
         assigns(:generic_file).tap do |file|
@@ -386,7 +386,7 @@ RSpec.describe GenericFilesController, type: :controller do
           premis_event_count = file.premis_events.count
           file.checksums << new_checksum
           file.premis_events << new_event
-          patch :update, params: { generic_file_identifier: URI.escape(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true }
+          patch :update, params: { generic_file_identifier: URI.encode_www_form_component(file.identifier), id: file.id, generic_file: {size: 99}, format: 'json', trailing_slash: true }
           expect(assigns[:generic_file].size).to eq 99
           expect(response.code).to eq '200'
           file.reload

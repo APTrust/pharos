@@ -283,13 +283,13 @@ ActiveRecord::Schema.define(version: 2020_03_05_130017) do
     t.string "last_sign_in_ip"
     t.integer "institution_id"
     t.text "encrypted_api_secret_key"
-    t.datetime "deactivated_at"
     t.datetime "password_changed_at"
     t.string "encrypted_otp_secret"
     t.string "encrypted_otp_secret_iv"
     t.string "encrypted_otp_secret_salt"
     t.integer "consumed_timestep"
     t.boolean "otp_required_for_login"
+    t.datetime "deactivated_at"
     t.boolean "enabled_two_factor", default: false
     t.boolean "confirmed_two_factor", default: false
     t.string "otp_backup_codes", array: true

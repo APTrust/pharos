@@ -144,7 +144,7 @@ module ApplicationHelper
       pieces = value.split('+')
       encoded_val = "#{pieces[0]}%2B#{pieces[1]}"
     else
-      encoded_val = URI.escape(value)
+      encoded_val = URI.encode_www_form_component(value)
     end
     if old_path.include? '?'
       new_path = "#{old_path}&#{param}=#{encoded_val}"
