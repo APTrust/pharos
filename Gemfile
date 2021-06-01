@@ -37,7 +37,7 @@ gem 'google_drive'
 
 gem 'simple_form', '~> 5.1.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.12.0'
+gem 'inherited_resources', '1.13.0'
 gem 'uuidtools'
 gem 'kaminari'
 gem 'sassc-rails'
