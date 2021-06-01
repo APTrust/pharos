@@ -333,9 +333,9 @@ class ApplicationController < ActionController::Base
   end
 
   def add_params(str)
-    str = str << "&q=#{URI.escape(params[:q])}" if params[:q].present?
-    str = str << "&search_field=#{URI.escape(params[:search_field])}" if params[:search_field].present?
-    str = str << "&object_type=#{URI.escape(params[:object_type])}" if params[:object_type].present?
+    str = str << "&q=#{URI.encode_www_form_component(params[:q])}" if params[:q].present?
+    str = str << "&search_field=#{URI.encode_www_form_component(params[:search_field])}" if params[:search_field].present?
+    str = str << "&object_type=#{URI.encode_www_form_component(params[:object_type])}" if params[:object_type].present?
     str = str << "&institution=#{params[:institution]}" if params[:institution].present?
     str = str << "&item_action=#{params[:item_action]}" if params[:item_action].present?
     str = str << "&stage=#{params[:stage]}" if params[:stage].present?

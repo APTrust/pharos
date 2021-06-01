@@ -150,12 +150,12 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     it 'should show the file by identifier for API users' do
-      get :show, params: { generic_file_identifier: URI.encode(file.identifier) }, format: :html
+      get :show, params: { generic_file_identifier: URI.encode_www_form_component(file.identifier) }, format: :html
       expect(assigns(:generic_file)).to eq file
     end
 
     it 'returns StorageRecords when requested' do
-      get :show, params: { generic_file_identifier: URI.encode(file.identifier), include_storage_records: 'true' }, format: :json
+      get :show, params: { generic_file_identifier: URI.encode_www_form_component(file.identifier), include_storage_records: 'true' }, format: :json
       expect(response).to be_successful
       data = JSON.parse(response.body)
       storage_records = data['storage_records']
