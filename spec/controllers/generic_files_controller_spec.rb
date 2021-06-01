@@ -135,7 +135,7 @@ RSpec.describe GenericFilesController, type: :controller do
     end
 
     it 'should show the file by identifier for API users' do
-      get :show, params: { generic_file_identifier: URI.encode(file.identifier) }, format: :html
+      get :show, params: { generic_file_identifier: URI.encode_www_form_component(file.identifier) }, format: :html
       expect(assigns(:generic_file)).to eq file
     end
 
