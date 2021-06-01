@@ -419,11 +419,11 @@ class GenericFilesController < ApplicationController
 
     # Now URL-encode slashes and colons AFTER the dirname,
     # and use capitals, because Postgres is case-sensitive.
-    # Second arg to URI.encode forces it to escape slashes
+    # Second arg to URI.encode_www_form_component forces it to escape slashes
     # and colons, which the encoder would otherwise let through
     start_of_name = parts[0]
     end_of_name = parts[1]
-    encoded_end = URI.encode(end_of_name, "/:")
+    encoded_end = URI.encode_www_form_component(end_of_name, "/:")
 
     # Now rebuild and return the fixed file name.
     return "#{start_of_name}#{dirname}#{encoded_end}"

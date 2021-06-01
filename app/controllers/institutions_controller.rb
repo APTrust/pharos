@@ -493,7 +493,7 @@ class InstitutionsController < ApplicationController
   end
 
   def set_attachment_name(name)
-    escaped = URI.encode(name)
+    escaped = URI.encode_www_form_component(name)
     response.headers['Content-Disposition'] = "attachment; filename*=UTF-8''#{escaped}"
   end
 

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.5'
+gem 'rails', '~> 5.2.6'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 4.2.0'
 # Use CoffeeScript for .coffee assets and views
@@ -37,7 +37,7 @@ gem 'google_drive'
 
 gem 'simple_form', '~> 5.1.0'
 gem 'phony_rails'
-gem 'inherited_resources', '1.12.0'
+gem 'inherited_resources', '1.13.0'
 gem 'uuidtools'
 gem 'kaminari'
 gem 'sassc-rails'
