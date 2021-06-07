@@ -263,6 +263,7 @@ ActiveRecord::Schema.define(version: 2020_10_21_150157) do
     t.integer "generic_file_id"
     t.string "url"
     t.index ["generic_file_id"], name: "index_storage_records_on_generic_file_id"
+    t.index ["url"], name: "index_storage_records_on_url", unique: true
   end
 
   create_table "usage_samples", id: :serial, force: :cascade do |t|
