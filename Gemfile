@@ -23,7 +23,7 @@ gem 'devise-two-factor'
 gem 'dotenv-rails'
 gem 'aws-sdk-sns'
 gem 'devise-authy'
-gem 'rake', '13.0.3'
+gem 'rake', '13.0.6'
 gem 'email_validator'
 gem 'phonelib'
 
