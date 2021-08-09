@@ -23,7 +23,7 @@ gem 'devise-two-factor'
 gem 'dotenv-rails'
 gem 'aws-sdk-sns'
 gem 'devise-authy'
-gem 'rake', '13.0.3'
+gem 'rake', '13.0.6'
 gem 'email_validator'
 gem 'phonelib'
 
@@ -70,7 +70,7 @@ end
 
 group :test, :development do
   gem 'capybara', '3.35.3'
-  gem 'shoulda-matchers', '~> 4.5.1'
+  gem 'shoulda-matchers', '~> 5.0.0'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
 end
