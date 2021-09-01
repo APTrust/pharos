@@ -78,7 +78,7 @@ group :development, :test, :staging, :demo, :production, :integration, :docker_i
   gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
-  gem 'rspec-rails', '~> 4.0.2'
+  gem 'rspec-rails', '~> 5.0.2'
   gem 'rspec-its'
   gem 'rspec-activemodel-mocks'
 end
