@@ -52,27 +52,30 @@ Rails.application.routes.draw do
 
   # GENERIC FILE ROUTES
   file_ptrn = /(\w+\.)*\w+(\.edu|\.com|\.org|\.museum)(\%2[Ff]|\/)+[\w\-\/\.\%\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+(\%2[fF]|\/)+[\w\-\/\.\%\@\?\=\(\)\:\#\[\]\!\$\&\'\*\+\,\;\_\~\ \p{L}]+/
-  resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :html }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
-  resources :generic_files, only: [:show, :update, :destroy], format: [:json, :html], defaults: { format: :json }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
-  get '/api/v2/files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files_api
-  get '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files_api
+
+  resources :generic_files, only: [:index, :show, :update, :destroy], format: :html, defaults: { format: :html }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'files'
+  get 'files/:institution_identifier', to: 'generic_files#index', format: :html, institution_identifier: institution_ptrn, as: :institution_files
+  get 'files/:intellectual_object_identifier', to: 'generic_files#index', format: :html, intellectual_object_identifier: object_ptrn, as: :intellectual_object_files
+  resources :generic_files, only: [:index, :create], format: :json, param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/files'
+  delete 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :file_confirm_destroy
+  get 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_confirm_destroy
+  get 'files/finish_delete/:generic_file_identifier', to: 'generic_files#finished_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_finish_destroy
+  get 'files/restore/:generic_file_identifier', to: 'generic_files#restore', format: [:json, :html], generic_file_identifier: file_ptrn, as: :generic_file_restore
+
+  get 'member-api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: :json, intellectual_object_identifier: object_ptrn
+  get 'member-api/v2/files/:institution_identifier', to: 'generic_files#index', format: :json, institution_identifier: institution_ptrn
+  get 'member-api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
+
+  resources :generic_files, only: [:show, :update, :destroy], format: [:json], defaults: { format: :json }, param: :generic_file_identifier, generic_file_identifier: file_ptrn, path: 'api/v2/files'
+  get '/api/v2/files/:institution_identifier', to: 'generic_files#index', format: [:json], institution_identifier: institution_ptrn, as: :institution_files_api
+  get '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files_api
   get '/api/v2/files/', to: 'generic_files#index', format: [:json], as: :generic_files_admin_list
-  get 'files/:institution_identifier', to: 'generic_files#index', format: [:json, :html], institution_identifier: institution_ptrn, as: :institution_files
-  get 'files/:intellectual_object_identifier', to: 'generic_files#index', format: [:json, :html], intellectual_object_identifier: object_ptrn, as: :intellectual_object_files
   post '/api/v2/files/:intellectual_object_id/create_batch', to: 'generic_files#create_batch', format: :json
   post '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#create', format: :json, intellectual_object_identifier: object_ptrn
   put '/api/v2/files/:intellectual_object_identifier', to: 'generic_files#update', format: :json, intellectual_object_identifier: object_ptrn
-  resources :generic_files, only: [:index, :create], format: [:json, :html], param: :intellectual_object_identifier, intellectual_object_identifier: object_ptrn, path: 'api/v2/files'
-  get 'member-api/v2/files/:intellectual_object_identifier', to: 'generic_files#index', format: :json, intellectual_object_identifier: object_ptrn
-  get 'member-api/v2/files/:institution_identifier', to: 'generic_files#index', format: :json, institution_identifier: institution_ptrn
-  delete 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :file_confirm_destroy
   delete 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :api_file_confirm_destroy
-  get 'files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_confirm_destroy
   get 'api/v2/files/confirm_delete/:generic_file_identifier', to: 'generic_files#confirm_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_api_file_confirm_destroy
-  get 'files/finish_delete/:generic_file_identifier', to: 'generic_files#finished_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_file_finish_destroy
   get 'api/v2/files/finish_delete/:generic_file_identifier', to: 'generic_files#finished_destroy', format: [:html, :json], generic_file_identifier: file_ptrn, as: :get_api_file_finish_destroy
-  get 'files/restore/:generic_file_identifier', to: 'generic_files#restore', format: [:json, :html], generic_file_identifier: file_ptrn, as: :generic_file_restore
-  get 'member-api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
   put 'api/v2/files/restore/:generic_file_identifier', to: 'generic_files#restore', format: :json, generic_file_identifier: file_ptrn
 
 
