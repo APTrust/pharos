@@ -57,7 +57,7 @@ group :demo, :production, :staging do
 end
 
 group :development do
-  gem 'meta_request', '0.7.2'
+  gem 'meta_request', '0.7.3'
   gem 'better_errors'
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 3.7.0'
