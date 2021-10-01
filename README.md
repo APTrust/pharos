@@ -1,5 +1,13 @@
 # Pharos
 
+Pharos is a SaaS application developed by APTrust to provide archiving services to the APTrust membership. The primary capability consist of a UI based functionality to manage the deposits made by members, including the bagging, uploading, tracking and recovery of their data. The actual ingest and archving of the data does not take place on Pharos, but on the Exchange service, which will be soon replaced with the new Preservation Services. Pharos is nearing the end of its lifecycle, and is slated to be retired with the Registry service currently under development. 
+
+Currently, the Pharos application is deployed in a Docker containerized architecture, on the AWS Public Cloud. It is not a true microservices architecture, but utilizes multiple containers to provide the service, and connectivity. Deployment consists of Ansible supported AMI's with the Docker engine using docker compose. The AWS ECS/EC2 implementation is not used at this time. Scalability is limited to the capacity of the AMIs themselves, and the use technologies such as Swarm have not been implemented. 
+
+Deployment instructions can be found at the end of this document. 
+
+
+
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d37b48c4c5547cca0c9c61a5887f589)](https://www.codacy.com/app/cdahlhausen/pharos?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=APTrust/pharos&amp;utm_campaign=Badge_Grade)
 [![Code Climate](https://codeclimate.com/github/APTrust/pharos.png)](https://codeclimate.com/github/APTrust/pharos.png?branch=develop)
 
