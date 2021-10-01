@@ -130,3 +130,25 @@ gf.save
 ## API Documentation
 
 Swagger docs at https://aptrust.github.io/pharos/
+
+## Deployment Methods and Processes
+
+Pharos uses multiple techologies to deploy the stack, and not all are automated. 
+It consists of:
+- Ansible playbooks for the actual deployment. Each environment has it's own playbook.
+- Travis CI/CD that runs automated tests and builds the containers, before pushing them to the repo.
+- Gitlab/Aptrust container repo ( not Dockerhub).
+- Makefile with multiple cli based tasks integrated into different phases. Options for make can be found above.
+
+The entire deployment consists of two primary tasks. 
+#### Initial Build
+- Change code in the Pharos repo, and merge to master. 
+- Commit locally. ( Local live testing can use the Docker Development quick start above.)
+- Push to GitHub. This will trigger a build in combination with Travis-CI. A successful build will roll new containers, and push them to the Gitlab/Aptrust container repo, tagged with the commit number and branch version. 
+#### Ansible deployment 
+- After the successful build has finished, cd to the Ansible-Playbooks repo locally on your Workstation.
+- Select the playbook that is for the environment being deployed to. ex: pharos.demo.yml
+- enter Ansible command that is appropriate: ansible-playbook --ask-vault-password -b pharos.demo.yml
+
+### Additional options.
+ It is possible to build the application testing locally. Using the Makefile and it's commands, the containers can be built, and the published to the Gitlab/Aptrust repos. The makefile commands can also support local standup of the domain and testing environment. Instructions for the dev Docker environment can be found above. 
