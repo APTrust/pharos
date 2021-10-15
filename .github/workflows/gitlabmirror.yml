@@ -1,4 +1,4 @@
-# This is an action file to run a workflow mirroring the repo to gitlab. Branches set to unprotect for the moment. This is s mirrored service and makes no changes not made in the github location. 
+# This is an action file to run a workflow mirroring the repo to gitlab. Branches set to unprotect for the moment. This is s mirrored service and changes should not be made to gitlab. 
 name: gitlab mirroring
 
 on: [push, pull_request]
