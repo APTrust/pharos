@@ -1,54 +1,37 @@
----
 language: ruby
 sudo: required
 services:
-  - docker
+- docker
 install: true
 addons:
   apt:
     packages:
-      - docker-ce
-      - git
+    - docker-ce
+    - git
 before_script:
-  - sudo service postgresql stop
-    #  - sudo cp .env.test .env
-  - env
-  - export
-
+- sudo service postgresql stop
+- env
+- export
 env:
   global:
-#    - secure: qPaHXSA6sYY1EKpv27D+3L0dO3VH0r8aTzhGoYsPR/ENWkUBSQ3XVP7YfWuSKJjK+rgAlZzTyCGDSTe/lDShDMiPBjqTfri9tL6Pmkg5WUYwaoQRmmnCQQbhQiSBPa6bTD4p9xYTdBvXu6/u4tX/KFJcdz+LWqBUtj0iSUNyA2tN1kFf+SyO9diB1PCmA6O9kq6NpBP1eSIJV/v81aGVvwgmOPd/gBf0B61zS+dczNrKUytqYGZbAS/hrenhn7+8Ng7+9k3VROCi9nlXq1v5BjFcJF24t1u7qM7MEsZVNBn9Tfr3P/qXAnikxzZbVpjqWJ7eZLDiqy0gRZNk+um+c4jBzUS3LaJdTCf0hTYCSAflorWaYKRAADGNJDkOpjeN/Rc1k+DOkuAZskvLc9ehe5PS2YTASgX+vLpcf5Uje9jIa5WbA/LnFk0pzfzbo6UUZRdm3RryE/RfcqOVeEHiG3DR0W2SY6Y+0samRZ4d/Kacz3M9Zp9aD/UhnGP/s/7TNss3RG6tOnNWR/7e5lsms9lOAUUeDY1IW+tGwIHztvTijAB6pn4Eb8hUMatpWWUqeZs1HqfvGN682o7xmGrqBMisZifYaNf4WijUw+wft8KgtfSp9a0QKfx0UswCNiTxr20vt/6MBM/exhWntKXJv5fBlFX9040YCIzbiJVsliY=
-    - secure: QQnJi0gzmOj42XLp5P5juZdY41BGG3+uyV4NyFUHsUfkzeSKz63tkAXVWXF3DL6eFdXQhWgpXPDrdYlYwYa7T464hP3f+dxFOEhKLENWJgNdtQQnOWjoscnKnTBvjjarK/QMFcuG1a6IopbokWSuNkalFlbQYK2ZW72SEu7gj7bp3JcEVc+hXbWmAAyRRRdexGhZIigMR6MHDdKZ8AbYRaTNgZlDwOid8cL25PBQjpBPLigpqGXpzYynkwYWcyJCZUcEusuy4WzMAFQnGdHwpSr8tneVb+PZ3Rzvc5CfAeIO/KF/60bZe2mQeA2xPfURwcmRQ2AtVTWe2Yc20JgTpI98guJ2rBZ3U/j0JIqYwj0HM2cpiRbtU/jhIaMaynjJqR94iOGqPnjwcVSKBII3FKrEk2YEyIm5++Hbyfak2qozX25poYXMiXP1XKZnYGmMJvgxHoo6lhGoATSCA3PaMvMWegH4N7mBA84S6CFUyz/oq58GxdqY6rmMqtjuB+ELJGTpIEEKl7NFRo5eLQP3tlZB4C+urmgMFu0YpdAotUx/zVQrqknLiAh7PpsC6pjQFmzvhS+8IlJcHvyF78eCJS5sSWfIi7A78kVk8JZy4Iqh1efSZ6BIh1mjRingAii3TpUDvznF4ANR6BG8pxl2leawUgK9uFasaRnMjrS7UPo=
-    - secure: SmLhixxIMzu5pJW2bwz33txH0W/0e0nuEugkGYDpfAAWQhEYgta7OhtNi/7m+UxlTbrYMirDLdcVV342CuV2c92k+0j97axX+gWmFIYGLg98fy6fRDXR+PlIjTrmRimzCY/WSRKDn02qBcsf/L1pTZRbI4mGf6gqorlIWioOow87V6OJt4GFzAMx35ADFAKQkr5RJBBkTzTf5fqUY3ugV1QC1BWp5Y8lTtTsIPbrYv4TBRpwoznRGCdvnkp75dnnsmsIbrxKxWS8ehBLOddUqPB7zrcQXgirb2r9IHtOzeUASjl1pX6rWNQFFCSfbD7gqavjjUXh9ZzfcR5VDk7tWguusWI7b5N9HKM5DUgkQ8Wg7pSrdwwl1j53mYcm0xeQdwwU0cTRTKv6Gam7L3Js4NN0MgSlrOk6J9TN4385g9mumzqzAV950/Kv13AsC9amqfadQrZpHSB/Rb8PY2VHCfREec7uzmgasUmPW0pJJzDsZjb37F1dLHjcNIYD57UJcVq5o/pPeh1QxCYPEXcKAGxsN9KjHr3FUOo7hjHPx+tZv40AW+80GlK7wLO+kI1Jn/EGdGHCngd2FoLG2gmNDOZafNNyKv9cU/7Kbw4PCx8vpRJYx+c0tMn8LdNM0yai1apatZZrujjqKBgG+9NmVYpPqVr50L3S0/xdFX/aT2U=
+  - secure: QQnJi0gzmOj42XLp5P5juZdY41BGG3+uyV4NyFUHsUfkzeSKz63tkAXVWXF3DL6eFdXQhWgpXPDrdYlYwYa7T464hP3f+dxFOEhKLENWJgNdtQQnOWjoscnKnTBvjjarK/QMFcuG1a6IopbokWSuNkalFlbQYK2ZW72SEu7gj7bp3JcEVc+hXbWmAAyRRRdexGhZIigMR6MHDdKZ8AbYRaTNgZlDwOid8cL25PBQjpBPLigpqGXpzYynkwYWcyJCZUcEusuy4WzMAFQnGdHwpSr8tneVb+PZ3Rzvc5CfAeIO/KF/60bZe2mQeA2xPfURwcmRQ2AtVTWe2Yc20JgTpI98guJ2rBZ3U/j0JIqYwj0HM2cpiRbtU/jhIaMaynjJqR94iOGqPnjwcVSKBII3FKrEk2YEyIm5++Hbyfak2qozX25poYXMiXP1XKZnYGmMJvgxHoo6lhGoATSCA3PaMvMWegH4N7mBA84S6CFUyz/oq58GxdqY6rmMqtjuB+ELJGTpIEEKl7NFRo5eLQP3tlZB4C+urmgMFu0YpdAotUx/zVQrqknLiAh7PpsC6pjQFmzvhS+8IlJcHvyF78eCJS5sSWfIi7A78kVk8JZy4Iqh1efSZ6BIh1mjRingAii3TpUDvznF4ANR6BG8pxl2leawUgK9uFasaRnMjrS7UPo=
+  - secure: SmLhixxIMzu5pJW2bwz33txH0W/0e0nuEugkGYDpfAAWQhEYgta7OhtNi/7m+UxlTbrYMirDLdcVV342CuV2c92k+0j97axX+gWmFIYGLg98fy6fRDXR+PlIjTrmRimzCY/WSRKDn02qBcsf/L1pTZRbI4mGf6gqorlIWioOow87V6OJt4GFzAMx35ADFAKQkr5RJBBkTzTf5fqUY3ugV1QC1BWp5Y8lTtTsIPbrYv4TBRpwoznRGCdvnkp75dnnsmsIbrxKxWS8ehBLOddUqPB7zrcQXgirb2r9IHtOzeUASjl1pX6rWNQFFCSfbD7gqavjjUXh9ZzfcR5VDk7tWguusWI7b5N9HKM5DUgkQ8Wg7pSrdwwl1j53mYcm0xeQdwwU0cTRTKv6Gam7L3Js4NN0MgSlrOk6J9TN4385g9mumzqzAV950/Kv13AsC9amqfadQrZpHSB/Rb8PY2VHCfREec7uzmgasUmPW0pJJzDsZjb37F1dLHjcNIYD57UJcVq5o/pPeh1QxCYPEXcKAGxsN9KjHr3FUOo7hjHPx+tZv40AW+80GlK7wLO+kI1Jn/EGdGHCngd2FoLG2gmNDOZafNNyKv9cU/7Kbw4PCx8vpRJYx+c0tMn8LdNM0yai1apatZZrujjqKBgG+9NmVYpPqVr50L3S0/xdFX/aT2U=
 script:
-  - make test-ci
-
+- make test-ci
 before_deploy:
-  # Set up git user name and tag this commit
-  - git config --local user.name "Deploy Fella"
-  - git config --local user.email "ops@aptrust.org"
-  - export TRAVIS_TAG=''
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
-  - git tag $TRAVIS_TAG
-
+- git config --local user.name "Deploy Fella"
+- git config --local user.email "ops@aptrust.org"
+- export TRAVIS_TAG=''
+- export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+- git tag $TRAVIS_TAG
 deploy:
-  # - provider: pages
-  #   skip-cleanup: true
-  #   github-token: "$GH_TOKEN"
-  #   keep-history: true
-  #   verbose: true
-  #   local-dir: docs
-  #   on:
-  #     branch:
-  #       - develop
-  #       - master
-  - provider: script
-    script: make -w publish-ci
-    on:
-      branch:
-        - develop
-        - master
-    skip_cleanup: true
+- provider: script
+  script: make -w publish-ci
+  on:
+    branch:
+    - develop
+    - master
+  skip_cleanup: true
 notifications:
   slack:
-    secure: H5vU3wRKiO5VCBNThkEfT5uhpZVa710PnaRzfSM1wfX95X5JvV7NmH8AwbGtpe90O5gpub2kEji7WIFtshRwVCFwcjvA11pWUH7Q2K5fs6mcSoIFTXXptNW2jnbC8a11yiMPu41BFVOphQQk/mDMIhP95RN0+Zr7x92zzn/LwRETW1OseJN05KpOE0CLTaOv8apJecpVzcw55sNuCD2Ztrlu9tut45rKBKCEGUta4YImWey5RgxKYgP+7I7K7ImueRCZuKWMbYtmVaYSF7/hf23xwD5jESVpq/xlf89B3JOpu3NQL6ZNQHfMvGZwjHkgTAnO/D/zWD+kUVTs1ulgbVbeJqxtT/mAqiWVCagX7QHOSirwJ7Se4jjAU4LpNAvtXGFuRKZNiNDtDm1beQGbwmrMoTN22FykQwkDm1bWwUQCuFEsSNi1yHS7pN+RNAyqIYOqdn9KjZT/TMxsWRfp/+z3rReh7GBZTsDzGaNG46gUUJDcYLcgO7jpAiu7wcM2md9Q0qmmZ8LP3cZzHyde3k4MYNL+ETZXrAzJOxN6liUW+TgdfyD5mK632OVImCRyxLv6NKvTCL/YhpRRymI0gYLhENy3BgM/yZPV62qfVxyAxUrtFF9hwcXd3Nzj56hFmBCuNXRnF2jnMETv9tzQZaGARcEbGMaHw/hLSXYBtpE=
+    secure: JdzFiXSUkp9WYojv0apHOoEYgdROuMDtTzAW6cwi8HzFHOtfy1o4QMfiTJiVzRS1YP9jlS1w8PE0eioP0nbyW+Xg+NiSP6CDN0xlK1c6giDnPnojNZ0/u2fpWtObbclYiwHI+UyH/S784kEKjgHIgWBcYCcOXgKekqCtOfBjGdNCjpiXAbK5eJZclcNN4kAv7iWK1/YXsqFx0SkGWdId42uNhXZacYUYAjrjnWohUmc/LS3vxK71wOkQqz2TqRa+8u5iQJqpDtolIS66h1PTvAz5EG/JbyxrD3KG1TSYMaIn6Bfa/bJ72qtqSQObvCRKXNspF79eWc3zt4yLVJua82DIERWmZf8uNIrEQLtq9tn+Hw2fRx9uftc7qsOb4AZrx0oA/ucvbvChrmBFvxWq4Yh7zmjCv8mVDpe0SGZ4LC0Q7cZeSs2MLLsGh4fPLhGp/+8u0BJT2luhEbeSSdFfIaS4whszeS8+Ey6bPzZxz/5N+hsJWkgLIxQthzIhYImfAyEHxdrVYrNWXsAU+vx84CK44qUjiczR7u25gzuiwLQF2vgyCDktHLh/DFnw9SWWnr9uXBDkHo6pwGQ1hN2QHgpL0K80EtsstBYXs+5anFL0gCAwhhjan4MhHxwXImlmtRvTjpAM12DMZfi89+K8fvfZVQHn/AGKM959u6H+y7o=
