@@ -14,7 +14,7 @@ gem 'chart-js-rails'
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.11.5'
-gem 'pg', '1.2.3' # Necessary for talking to our RDS instance
+gem 'pg', '1.3.3' # Necessary for talking to our RDS instance
 gem 'pundit'
 # gem 'figaro'
 gem 'devise', '4.8.1'
