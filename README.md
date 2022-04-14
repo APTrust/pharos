@@ -1,10 +1,10 @@
 # Pharos
 
-Pharos is a SaaS application developed by APTrust to provide archiving services to the APTrust membership. The primary capability consist of a UI based functionality to manage the deposits made by members, including the bagging, uploading, tracking and recovery of their data. The actual ingest and archving of the data does not take place on Pharos, but on the Exchange service, which will be soon replaced with the new Preservation Services. Pharos is nearing the end of its lifecycle, and is slated to be retired with the Registry service currently under development. 
+Pharos is a SaaS application developed by APTrust to provide archiving services to the APTrust membership. The primary capability consist of a UI based functionality to manage the deposits made by members, including the bagging, uploading, tracking and recovery of their data. The actual ingest and archving of the data does not take place on Pharos, but on the Exchange service, which will be soon replaced with the new Preservation Services. Pharos is nearing the end of its lifecycle, and is slated to be retired with the Registry service currently under development.
 
-Currently, the Pharos application is deployed in a Docker containerized architecture, on the AWS Public Cloud. It is not a true microservices architecture, but utilizes multiple containers to provide the service, and connectivity. Deployment consists of Ansible supported AMI's with the Docker engine using docker compose. The AWS ECS/EC2 implementation is not used at this time. Scalability is limited to the capacity of the AMIs themselves, and the use technologies such as Swarm have not been implemented. 
+Currently, the Pharos application is deployed in a Docker containerized architecture, on the AWS Public Cloud. It is not a true microservices architecture, but utilizes multiple containers to provide the service, and connectivity. Deployment consists of Ansible supported AMI's with the Docker engine using docker compose. The AWS ECS/EC2 implementation is not used at this time. Scalability is limited to the capacity of the AMIs themselves, and the use technologies such as Swarm have not been implemented.
 
-Deployment instructions can be found at the end of this document. 
+Deployment instructions can be found at the end of this document.
 
 
 
@@ -133,22 +133,39 @@ Swagger docs at https://aptrust.github.io/pharos/
 
 ## Deployment Methods and Processes
 
-Pharos uses multiple techologies to deploy the stack, and not all are automated. 
+Pharos uses multiple techologies to deploy the stack, and not all are automated.
 It consists of:
 - Ansible playbooks for the actual deployment. Each environment has it's own playbook.
 - Travis CI/CD that runs automated tests and builds the containers, before pushing them to the repo.
 - Gitlab/Aptrust container repo ( not Dockerhub).
 - Makefile with multiple cli based tasks integrated into different phases. Options for make can be found above.
 
-The entire deployment consists of two primary tasks. 
+The entire deployment consists of two primary tasks.
 #### Initial Build
-- Change code in the Pharos repo, and merge to master. 
+- Change code in the Pharos repo, and merge to master.
 - Commit locally. ( Local live testing can use the Docker Development quick start above.)
-- Push to GitHub. This will trigger a build in combination with Travis-CI. A successful build will roll new containers, and push them to the Gitlab/Aptrust container repo, tagged with the commit number and branch version. 
-#### Ansible deployment 
+- Push to GitHub. This will trigger a build in combination with Travis-CI. A successful build will roll new containers, and push them to the Gitlab/Aptrust container repo, tagged with the commit number and branch version.
+#### Ansible deployment
 - After the successful build has finished, cd to the Ansible-Playbooks repo locally on your Workstation.
 - Select the playbook that is for the environment being deployed to. ex: pharos.demo.yml
 - enter Ansible command that is appropriate: ansible-playbook --ask-vault-password -b pharos.demo.yml
 
 ### Additional options.
- It is possible to build the application testing locally. Using the Makefile and it's commands, the containers can be built, and the published to the Gitlab/Aptrust repos. The makefile commands can also support local standup of the domain and testing environment. Instructions for the dev Docker environment can be found above. 
+ It is possible to build the application testing locally. Using the Makefile and it's commands, the containers can be built, and the published to the Gitlab/Aptrust repos. The makefile commands can also support local standup of the domain and testing environment. Instructions for the dev Docker environment can be found above.
+
+### Deposit Report Query
+
+```sql
+select
+	coalesce(i.name, 'All Depositors') as "Institution",
+	coalesce(gf.storage_option, 'Total') as "Storage Option",
+	(sum(gf.size) /  1073741824) as "Total GB",
+	(sum(gf.size) /  1099511627776::bigint) as "Total TB"
+from generic_files gf
+left join intellectual_objects io on gf.intellectual_object_id = io.id
+left join institutions i on io.institution_id = i.id
+where gf.state != 'D'
+group by cube(i.name, gf.storage_option)
+order by i.name, gf.storage_option;
+
+```
