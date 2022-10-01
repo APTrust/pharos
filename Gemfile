@@ -68,7 +68,7 @@ end
 
 group :test, :development do
   gem 'capybara', '3.37.1'
-  gem 'shoulda-matchers', '~> 5.1.0'
+  gem 'shoulda-matchers', '~> 5.2.0'
   gem 'coveralls', '0.8.23', require: false
   gem 'rails-controller-testing'
 end
