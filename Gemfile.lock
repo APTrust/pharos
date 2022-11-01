@@ -250,7 +250,7 @@ GEM
       activesupport (>= 3.0)
       phony (>= 2.18.12)
     public_suffix (4.0.7)
-    puma (4.3.12)
+    puma (6.0.0)
       nio4r (~> 2.0)
     pundit (2.2.0)
       activesupport (>= 3.0.0)
@@ -433,7 +433,7 @@ DEPENDENCIES
   pg (= 1.4.2)
   phonelib
   phony_rails
-  puma (= 4.3.12)
+  puma (= 6.0.0)
   pundit
   rails (~> 5.2.7.1)
   rails-controller-testing
